@@ -1,0 +1,43 @@
+services:  
+  
+  # WEB      
+  webserver:       
+    image: ${DOCKER_IMAGE:-poznote:latest}  # Use registry image in prod, build locally in dev
+    build:
+      context: . # Use the current directory as the build context (only for dev)
+      dockerfile: Dockerfile # Specify the Dockerfile to use
+    restart: always      
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: database
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}  
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      APP_ENV: ${APP_ENV}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "${ENTRIES_DATA_PATH}:/var/www/html/entries"
+      - "${ATTACHMENTS_DATA_PATH}:/var/www/html/attachments"
+    command: /bin/sh -c "chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && apache2-foreground"
+
+  # DATABASE
+  database:
+    image: mysql:9.3.0
+    restart: always
+    volumes:
+      - "${DB_DATA_PATH}:/var/lib/mysql"
+    environment:
+      MYSQL_USER: ${MYSQL_USER}  
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      interval: 10s
+      retries: 10
+      start_period: 40s

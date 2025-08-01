@@ -1,0 +1,119 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/poznote:${{ github.sha }}
+          ${{ secrets.DOCKER_USERNAME }}/poznote:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Clean up old Docker images
+      run: |
+        echo "🧹 Cleaning up old Docker images on Docker Hub..."
+        
+        # Get list of all tags for the repository
+        REPO="${{ secrets.DOCKER_USERNAME }}/poznote"
+        TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "${{ secrets.DOCKER_USERNAME }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+        
+        if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+          echo "❌ Failed to authenticate with Docker Hub"
+          exit 1
+        fi
+        
+        # Get all tags except 'latest' and current commit
+        TAGS=$(curl -s -H "Authorization: JWT $TOKEN" "https://hub.docker.com/v2/repositories/$REPO/tags/?page_size=100" | jq -r '.results[].name' | grep -v "^latest$" | grep -v "^${{ github.sha }}$" | head -n +20)
+        
+        # Keep only the 5 most recent tags (excluding latest and current)
+        OLD_TAGS=$(echo "$TAGS" | tail -n +6)
+        
+        if [ -n "$OLD_TAGS" ]; then
+          echo "🗑️  Deleting old tags:"
+          echo "$OLD_TAGS"
+          
+          for TAG in $OLD_TAGS; do
+            echo "Deleting tag: $TAG"
+            curl -s -X DELETE -H "Authorization: JWT $TOKEN" "https://hub.docker.com/v2/repositories/$REPO/tags/$TAG/"
+            if [ $? -eq 0 ]; then
+              echo "✅ Deleted $TAG"
+            else
+              echo "❌ Failed to delete $TAG"
+            fi
+          done
+        else
+          echo "✅ No old tags to delete"
+        fi
+        
+        echo "🎉 Docker Hub cleanup completed!"
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to production server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USERNAME }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        passphrase: ${{ secrets.PROD_SSH_PASSPHRASE }}
+        port: ${{ secrets.PROD_PORT || 22 }}
+        script: |
+          set -e
+          echo "🚀 Starting production deployment.."
+          
+          cd ${{ secrets.PROD_PROJECT_PATH || '/root/poznote/poznote' }}
+          
+          # Check if .env file exists, if not create it from template
+          if [ ! -f ".env" ]; then
+            echo "⚠️  .env file not found, creating from template..."
+            if [ -f ".env.template" ]; then
+              cp .env.template .env
+              echo "✅ .env file created from template"
+            else
+              echo "❌ Error: .env.template not found! Please run setup script first."
+              exit 1
+            fi
+          else
+            echo "✅ .env file found"
+          fi
+          
+          # Pull the new image
+          IMAGE_TAG="${{ secrets.DOCKER_USERNAME }}/poznote:${{ github.sha }}"
+          echo "📥 Pulling new Docker image: $IMAGE_TAG"
+          docker pull $IMAGE_TAG
+          
+          # Deploy to production
+          echo "🔄 Updating production services..."
+          DOCKER_IMAGE=$IMAGE_TAG docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --force-recreate
+          
+          echo "🧹 Cleaning up old images..."
+          docker image prune -f
+          
+          echo "✅ Production deployment completed!"
+          echo "📊 Deployed version: ${{ github.sha }}"

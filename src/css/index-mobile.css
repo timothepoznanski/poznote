@@ -1,0 +1,810 @@
+#left_col {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    position: fixed;
+    inset: 0;
+    padding: 16px;
+    background: #F7F6F2;
+    box-sizing: border-box;
+    overflow-y: scroll !important; /* Always show scrollbar on mobile */
+    overflow-x: hidden !important; /* Hide horizontal scrollbar */
+}
+
+/* Hide resize handle on mobile */
+.resize-handle {
+    display: none !important;
+}
+
+/* Mobile content spacing */
+.mobile-search-container {
+    margin-bottom: 15px !important;
+    margin-top: 8px !important;
+}
+
+/* Folder filter spacing on mobile */
+.folder-filter-container {
+    margin-top: 10px !important;
+}
+
+.folder-filter-container .searchbar-row {
+    margin-bottom: 0 !important;
+}
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Exception for tags page */
+body.tags-page {
+    overflow: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+html {
+overflow-x: hidden;
+}
+
+body {
+    display: block !important;
+    flex-direction: unset !important;
+    position: relative;
+}
+
+/* .note-header {
+  display: none !important;
+} */
+
+/* Mobile toolbar optimization */
+.note-edit-toolbar {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    width: 100% !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* Reduce space between toolbar and tags on mobile */
+.note-header {
+    margin-bottom: 8px !important;
+    padding-bottom: 0 !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    box-sizing: border-box !important;
+}
+
+.note-tags-row {
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+}
+
+.toolbar-btn {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    font-size: 1.0em !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    border: none !important;
+    color: #007DB8 !important;
+}
+
+.toolbar-btn:hover, .toolbar-btn:focus {
+    background: transparent !important;
+    border: none !important;
+    color: #005a8a !important;
+}
+
+/* Mobile responsive button management */
+/* Hide formatting buttons by default on mobile */
+.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough,
+.btn-link, .btn-unlink, .btn-color, .btn-highlight,
+.btn-list-ul, .btn-list-ol, .btn-text-height, .btn-code, .btn-eraser {
+    display: none !important;
+}
+
+/* Always visible buttons on mobile */
+.btn-separator, .btn-save {
+    display: flex !important;
+}
+
+/* Action buttons visible by default on mobile */
+.btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
+    display: flex !important;
+}
+
+/* When text is selected: show formatting buttons and hide action buttons */
+.show-format-buttons .btn-bold, 
+.show-format-buttons .btn-italic, 
+.show-format-buttons .btn-underline, 
+.show-format-buttons .btn-strikethrough,
+.show-format-buttons .btn-link, 
+.show-format-buttons .btn-unlink, 
+.show-format-buttons .btn-color, 
+.show-format-buttons .btn-highlight,
+.show-format-buttons .btn-list-ul, 
+.show-format-buttons .btn-list-ol, 
+.show-format-buttons .btn-text-height, 
+.show-format-buttons .btn-code, 
+.show-format-buttons .btn-eraser {
+    display: flex !important;
+}
+
+/* Hide ALL action buttons when text is selected (including separator and save) */
+.show-format-buttons .btn-separator,
+.show-format-buttons .btn-save,
+.show-format-buttons .btn-favorite, 
+.show-format-buttons .btn-folder, 
+.show-format-buttons .btn-attachment, 
+.show-format-buttons .btn-download, 
+.show-format-buttons .btn-info, 
+.show-format-buttons .btn-trash {
+    display: none !important;
+}
+
+/* Increase text size for code blocks on mobile */
+.noteentry span[style*='Consolas'] {
+    font-size: 16px !important;
+}
+
+pre, code {
+    font-size: 16px !important;
+}
+
+/* Increase text size in left column on mobile */
+#left_col .links_arbo_left {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+    box-sizing: border-box !important;
+}
+
+/* Specific rule for note title spans in all links on mobile */
+#left_col .links_arbo_left .note-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+#right_col {
+    display: none !important;
+}
+
+.innernote{
+    padding-left: 5%;
+    padding-top: 5px;
+    padding-right: 5%;
+    padding-bottom: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+body.note-open #left_col {
+    display: none !important;
+}
+
+body.note-open #right_col {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    overflow-y: scroll !important; /* Always show scrollbar */
+    background: #fff;
+    z-index: 100;
+}
+
+/* FOLDER STYLES FOR MOBILE */
+
+.folder-header {
+    margin-bottom: 0px; /* Remove spacing between mobile folders (5px → 0px) */
+    cursor: pointer !important;
+    border-radius: 8px !important;
+    transition: background-color 0.2s !important;
+}
+
+.folder-header.selected-folder {
+    background-color: transparent !important; /* Remove blue background on mobile */
+}
+
+/* Override any focus/active states on mobile */
+.folder-header:focus,
+.folder-header:active {
+    background-color: transparent !important;
+    outline: none !important;
+}
+
+.folder-content a:focus,
+.folder-content a:active {
+    background-color: transparent !important;
+    outline: none !important;
+}
+
+/* Remove note selection highlighting on mobile */
+a.links_arbo_left.selected-note {
+    background-color: transparent !important;
+}
+
+/* Prevent touch highlight effects on mobile */
+.folder-header {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+a.links_arbo_left {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Remove hover effects on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .folder-header:hover,
+    .folder-header:active,
+    .folder-header:focus {
+        background-color: transparent !important;
+    }
+    
+    a.links_arbo_left:hover,
+    a.links_arbo_left:active,
+    a.links_arbo_left:focus {
+        background-color: transparent !important;
+    }
+}
+
+/* Force override all possible highlighting states on mobile */
+.folder-header,
+.folder-header:hover,
+.folder-header:active,
+.folder-header:focus,
+.folder-header.selected-folder {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+a.links_arbo_left,
+a.links_arbo_left:hover,
+a.links_arbo_left:active,
+a.links_arbo_left:focus,
+a.links_arbo_left.selected-note {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.folder-content {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.folder-toggle {
+    padding: 12px 8px !important;
+    border-radius: 8px !important;
+}
+
+.folder-name {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.folder-note-count {
+    font-size: 14px !important;
+    color: #999 !important;
+    font-weight: 300 !important;
+    margin-left: 3px !important;
+    margin-right: 10px !important;
+}
+
+.folder-content {
+    margin-left: 16px !important;
+    margin-bottom: 5px !important; /* Reduce spacing under mobile folders (12px → 5px) */
+}
+
+.note-in-folder {
+    padding-left: 6px !important; /* Reduce mobile padding (34px → 6px) */
+    margin-bottom: 0px !important; /* Remove spacing between notes */
+    display: flex !important;
+    align-items: center !important;
+    position: relative !important;
+}
+
+.note-in-folder a.links_arbo_left {
+    display: block !important;
+    position: relative !important;
+}
+
+.note-in-folder a.links_arbo_left .note-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    margin-left: 0px !important; /* Recover mobile spacing (20px → 0px) */
+}
+
+.folder-actions {
+    opacity: 1 !important; /* Always visible on mobile */
+}
+
+.note-actions {
+    opacity: 1 !important; /* Always visible on mobile */
+}
+
+.folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
+    font-size: 14px !important;
+    padding: 8px !important;
+}
+
+.move-note-btn {
+    display: none !important; /* Hide move note button on mobile */
+}
+
+/* MODAL MOBILE ADJUSTMENTS */
+
+.modal-content {
+    margin: 25% auto !important;
+    width: 280px !important;
+    max-width: 95% !important;
+}
+
+.modal-content input, .modal-content select {
+    font-size: 16px !important;
+    padding: 12px !important;
+}
+
+.modal-buttons button {
+    padding: 12px 20px !important;
+    font-size: 16px !important;
+}
+
+/* MOVE FOLDER MODAL MOBILE STYLES */
+
+.move-folder-modal {
+    margin: 5% 5% !important;
+    width: calc(100% - 40px) !important;
+    max-width: 90% !important;
+    min-width: unset !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+}
+
+/* Override general modal styles for move folder modal */
+#moveNoteFolderModal .modal-content.move-folder-modal {
+    position: fixed !important;
+    top: 5% !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+.move-folder-modal h3 {
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+    text-align: center !important;
+    margin-top: 0 !important;
+}
+
+.folder-search-section {
+    margin-bottom: 0px !important;
+}
+
+.folder-search-section input {
+    font-size: 16px !important;
+    padding: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+}
+
+.suggested-folders-section {
+    margin-bottom: 15px !important;
+}
+
+.suggested-folders-list {
+    gap: 10px !important;
+}
+
+.suggested-folder-option {
+    padding: 10px 16px !important;
+    font-size: 15px !important;
+    border-radius: 25px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+}
+
+.suggested-folder-option i {
+    margin-right: 8px !important;
+    font-size: 14px !important;
+}
+
+.folders-selection-list {
+    max-height: 200px !important;
+    font-size: 15px !important;
+    margin-bottom: 20px !important;
+    border-radius: 8px !important;
+}
+
+.folder-option {
+    padding: 16px 14px !important;
+    font-size: 15px !important;
+    min-height: 50px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.folder-option i {
+    margin-right: 10px !important;
+    font-size: 16px !important;
+    flex-shrink: 0 !important;
+}
+
+.folder-option .folder-name {
+    flex: 1 !important;
+}
+
+.folder-option .note-count {
+    margin-left: 8px !important;
+    font-size: 13px !important;
+}
+
+.create-folder-section {
+    margin-bottom: 20px !important;
+    padding-top: 15px !important;
+}
+
+.create-folder-section input {
+    font-size: 16px !important;
+    padding: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    margin-bottom: 15px !important;
+}
+
+.create-folder-buttons {
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.create-folder-buttons button {
+    width: 100% !important;
+    padding: 14px !important;
+    font-size: 16px !important;
+    min-height: 50px !important;
+    border-radius: 8px !important;
+}
+
+.move-folder-modal .modal-buttons {
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-top: 20px !important;
+    padding-top: 20px !important;
+    border-top: 1px solid #e0e0e0 !important;
+}
+
+.move-folder-modal .modal-buttons button {
+    width: 100% !important;
+    padding: 16px !important;
+    font-size: 16px !important;
+    min-height: 52px !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+}
+
+/* Modal error message styles for mobile */
+.modal-error-message {
+    text-align: center !important;
+    color: #dc3545 !important;
+    font-size: 15px !important;
+    margin-top: 15px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    display: none !important;
+    box-sizing: border-box !important;
+}
+
+/* ATTACHMENT MOBILE STYLES */
+
+.attachment-modal .modal-content {
+    width: 90% !important;
+    max-width: 400px !important;
+    margin: 10% auto !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+}
+
+.attachment-upload {
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.attachment-upload input[type="file"] {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.attachment-upload button {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 16px !important;
+}
+
+.attachment-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 12px !important;
+}
+
+.attachment-info {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.attachment-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+}
+
+.attachment-actions button {
+    flex: 1 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+}
+
+.btn-attachment {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    font-size: 1.1em !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    border: none !important;
+    color: #007DB8 !important;
+    cursor: pointer !important;
+}
+
+.btn-attachment:hover, .btn-attachment:focus {
+    background: rgba(0, 125, 184, 0.1) !important;
+    color: #005a8a !important;
+}
+
+/* TOOLBAR VERTICAL MENU MOBILE */
+
+.toolbar-vertical-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    z-index: 1000 !important;
+    min-width: 250px !important;
+    max-width: 90vw !important;
+    padding: 8px 0 !important;
+    margin-top: 5px !important;
+}
+
+.toolbar-menu-btn {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: none !important;
+    background: transparent !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    color: #333 !important;
+    font-size: 16px !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.toolbar-menu-btn:hover {
+    background: #f5f5f5 !important;
+    color: #007DB8 !important;
+}
+
+.toolbar-menu-btn i {
+    width: 24px !important;
+    margin-right: 12px !important;
+    text-align: center !important;
+}
+
+.btn-settings {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    font-size: 1.1em !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    border: none !important;
+    color: #007DB8 !important;
+    cursor: pointer !important;
+    position: relative !important;
+}
+
+.btn-settings:hover, .btn-settings:focus, .btn-settings.active {
+    background: rgba(0, 125, 184, 0.1) !important;
+    color: #005a8a !important;
+}
+
+/* Green indicators for notes with attachments on mobile */
+.btn-settings.has-attachments,
+.btn-attachment.has-attachments {
+    color: #28a745 !important;
+}
+
+.btn-settings.has-attachments:hover,
+.btn-settings.has-attachments:focus,
+.btn-attachment.has-attachments:hover,
+.btn-attachment.has-attachments:focus {
+    color: #1e7e34 !important;
+}
+
+/* UNIFIED SEARCH MOBILE STYLES */
+
+/* Mobile searchbar input adjustments */
+.searchbar-input {
+    padding: 8px 70px 8px 40px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+}
+
+/* When clear button is present on mobile, add more padding */
+.searchbar-input-wrapper.has-clear-button .searchbar-input {
+    padding-right: 110px !important;
+}
+
+/* Mobile clear button positioning */
+.searchbar-clear {
+    right: 85px !important;
+    height: 32px !important;
+    width: 32px !important;
+}
+
+.search-type-buttons {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 1px;
+    align-items: center;
+    z-index: 4;
+}
+
+.search-type-btn {
+    background: transparent;
+    border: none;
+    padding: 4px 5px;
+    font-size: 0.8em;
+    min-width: 26px;
+    height: 26px;
+    color: #b0b0b0;
+    transition: all 0.2s ease;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-type-btn:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.search-type-btn:hover i {
+    color: #007DB8;
+}
+
+.search-type-btn.active i {
+    color: #007DB8 !important;
+}
+
+.search-type-btn.active:hover i {
+    color: #007DB8 !important;
+}
+
+/* Mobile search validation error styles */
+.mobile .search-validation-error {
+    font-size: 0.8em;
+    margin: 6px 0 2px 0;
+    padding: 6px 10px;
+}
+
+/* MOBILE NOTIFICATION POPUP STYLES */
+.notification-overlay {
+    z-index: 999 !important;
+}
+
+#notificationPopup {
+    padding: 12px 20px !important;
+    font-size: 0.9em !important;
+    max-width: 90% !important;
+    min-width: 250px !important;
+    left: 50% !important;
+    top: 30% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1000 !important;
+}
+
+/* Hide webkit search controls (native blue cross) on mobile */
+.searchbar-input::-webkit-search-decoration,
+.searchbar-input::-webkit-search-cancel-button,
+.searchbar-input::-webkit-search-results-button,
+.searchbar-input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
+
+.search::-webkit-search-decoration,
+.search::-webkit-search-cancel-button,
+.search::-webkit-search-results-button,
+.search::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}

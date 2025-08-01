@@ -1,0 +1,2334 @@
+/* CSS Variables for resizable layout */
+:root {
+    --left-col-width: 370px;
+}
+
+/* Placeholder color for tags input to match note title */
+.name_tags input::placeholder {
+    color: #bababa;
+}
+
+/* Font families */
+.font-calibri {
+    font-family: 'Calibri', sans-serif;
+}
+
+/* Hidden elements */
+.hidden {
+    display: none;
+}
+
+/* Specific hidden elements */
+.folders-selection-list,
+.create-folder-section,
+.modal-error-message {
+    display: none;
+}
+
+/* File upload styling */
+.file-input-label {
+    display: block;
+    width: 160px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.accepted-types {
+    font-size: 0.85em;
+    color: #888;
+    text-align: center;
+    margin-top: 4px;
+}
+
+.spacer-18 {
+    height: 18px;
+}
+
+.selected-filename {
+    margin: 0 0 18px 0;
+    font-size: 0.95em;
+    color: #444;
+    text-align: center;
+    min-height: 1.5em;
+}
+
+/* Welcome message */
+.welcome-message-full {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    min-height: 600px;
+    padding: 2rem;
+}
+
+.welcome-content {
+    text-align: center;
+    max-width: 900px;
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    color: #007DB8;
+    margin-bottom: 1.5rem;
+}
+
+.poznote-logo {
+    position: relative;
+    display: inline-block;
+}
+
+.poznote-favicon {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+}
+
+.poznote-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #37352F;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.welcome-description {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+}
+
+.welcome-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.welcome-btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.welcome-btn-primary:hover {
+    background: #005c8a;
+    transform: translateY(-1px);
+}
+
+.welcome-btn-secondary {
+    background: #f8f9fa;
+    color: #2c3e50;
+    border: 1px solid #e9ecef;
+}
+
+.welcome-btn-secondary:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
+/* Responsive design for welcome page */
+@media (max-width: 768px) {
+    .welcome-message-full {
+        padding: 1rem;
+        min-height: 500px;
+    }
+    
+    .welcome-content {
+        padding: 1rem 0;
+    }
+    
+    .welcome-title {
+        font-size: 2rem;
+    }
+    
+    .welcome-description {
+        font-size: 1rem;
+    }
+    
+    .welcome-actions {
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .welcome-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+html, body {
+    font-family: 'Inter', sans-serif;
+    color: rgb(55, 53, 47);
+}
+
+body {
+    height: 100%;
+}
+
+/* Supprimer les marges du h4 du titre de la note */
+h4 {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+form{
+    margin:0px; 
+    padding:0px;
+}
+
+/* LINKS */
+
+a { color: #2E8CFA;  text-decoration: none; }
+
+/* a:link { color: #2E8CFA; }
+a:visited { color: #2E8CFA; }
+a:hover { color: #2E8CFA; }
+a:active { color: #2E8CFA; } */
+
+.note-bottom-space { height: 30px; }
+
+/* ATTACHMENT MODAL AND STYLES */
+
+.attachment-modal {
+    z-index: 1001;
+    margin: 5% auto !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Specific styling for attachment modal */
+#attachmentModal .modal-content {
+    margin: 5% auto !important;
+}
+
+.attachment-upload {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.file-input-container {
+    margin-bottom: 5px;
+}
+
+.upload-button-container {
+    text-align: center;
+}
+
+.attachment-upload input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.attachment-upload button {
+    padding: 8px 16px;
+    background: #007DB8;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.attachment-upload button:hover {
+    background: #005a8a;
+}
+
+.attachments-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+}
+
+.attachment-info {
+    flex: 1;
+}
+
+.attachment-filename {
+    font-weight: bold;
+    color: #333;
+}
+
+.attachment-size {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.attachment-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.attachment-actions button {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.attachment-download {
+    background: #28a745;
+    color: white;
+}
+
+.attachment-download:hover {
+    background: #218838;
+}
+
+.attachment-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.attachment-delete:hover {
+    background: #c82333;
+}
+
+/* TOOLBAR VERTICAL MENU */
+
+.note-edit-toolbar {
+    position: relative;
+}
+
+.desktop-toolbar {
+    display: flex !important;
+    width: 100%;
+    position: relative;
+}
+
+.mobile-toolbar {
+    display: none !important;
+}
+
+.toolbar-vertical-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 200px;
+    padding: 8px 0;
+    margin-top: 5px;
+}
+
+.toolbar-menu-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.toolbar-menu-btn:hover {
+    background: #f5f5f5;
+    color: #007DB8;
+}
+
+.toolbar-menu-btn i {
+    width: 20px;
+    margin-right: 8px;
+}
+
+.btn-settings {
+    position: relative;
+}
+
+.btn-settings.active {
+    background: rgba(0, 125, 184, 0.1) !important;
+    color: #007DB8 !important;
+}
+
+/* Green indicators for notes with attachments */
+.btn-settings.has-attachments {
+    color: #28a745 !important;
+}
+
+.btn-settings.has-attachments:hover {
+    color: #1e7e34 !important;
+}
+
+.btn-attachment.has-attachments {
+    color: #28a745 !important;
+}
+
+.btn-attachment.has-attachments:hover {
+    color: #1e7e34 !important;
+}
+
+.dropdown-item.has-attachments i {
+    color: #28a745 !important;
+}
+
+.attachments-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.attachment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+}
+
+.attachment-info {
+    flex: 1;
+}
+
+.attachment-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.attachment-actions button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: #007DB8;
+}
+
+.attachment-actions button:hover {
+    background-color: #f0f0f0;
+}
+
+.attachment-actions .delete-btn {
+    color: #dc3545;
+}
+
+.attachment-actions .delete-btn:hover {
+    background-color: #f8d7da;
+}
+
+/* LEFT COLUMN */
+
+
+body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+#left_col {
+    width: var(--left-col-width);
+    min-width: 200px;
+    max-width: 800px;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 16px;
+    box-sizing: border-box;
+    background: #F7F6F2;
+    flex-shrink: 0;
+}
+
+.resize-handle {
+    width: 3px;
+    height: 100vh;
+    background: #F7F6F2;
+    cursor: col-resize;
+    position: relative;
+    flex-shrink: 0;
+    border-right: 1px solid #ddd;
+}
+
+/* LEFT HEADER */
+
+.left-header {
+    text-align: center;
+    padding: 0px 0px 13px 0px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.left-header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.left-header-logo:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.left-header-logo:visited,
+.left-header-logo:link,
+.left-header-logo:active {
+    text-decoration: none;
+    color: inherit;
+}
+
+.left-header-favicon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.left-header-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #007DB8;
+    letter-spacing: 0.5px;
+}
+
+/* RIGHT COLUMN */
+
+#right_col {
+    flex: 1;
+    min-width: 400px;
+    height: 100vh;
+    background-color: #FFFFFF;
+    overflow-y: scroll; /* Always show scrollbar */
+    overflow-x: hidden; /* Disable horizontal scrolling */
+    box-sizing: border-box;
+}
+
+/* Header note : contient uniquement la barre d'outils */
+
+.note-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    /* margin-bottom: 15px; */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    /* border-bottom: 1px solid #ccc; */
+    gap: 8px;
+}
+
+.note-header-left {
+    min-width: 120px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    order: 1;
+}
+
+.note-edit-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-width: 100%;
+    text-align: center;
+    position: relative;
+    order: 2;
+}
+
+.note-edit-toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.note-header > #lastupdated {
+    font-size: 0.95em;
+    color: #888;
+}
+
+.toolbar-btn {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    margin: 0 6px;
+    transition: color 0.2s;
+    color: #007DB8;
+    outline: none;
+    flex-shrink: 0;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.toolbar-btn i {
+    display: block;
+    text-align: center;
+    line-height: 1;
+}
+.toolbar-btn:hover, .toolbar-btn:focus {
+    background: transparent !important;
+    border: none !important;
+    color: #005a8a;
+}
+
+    /* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
+    .text-format-btn {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        width: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
+    }
+    
+    .text-format-btn.show-on-selection {
+        opacity: 1;
+        visibility: visible;
+        position: relative;
+        width: auto;
+        padding: 6px 8px;
+        margin: 0 2px;
+        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
+    }
+    
+    /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
+    .note-action-btn {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        width: auto;
+        padding: 6px 8px;
+        margin: 0 4px;
+    }
+    
+    /* Ajustement de la toolbar pour les écrans desktop */
+    .note-edit-toolbar {
+        gap: 2px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .toolbar-btn {
+        margin: 0 6px;
+        padding: 6px 8px;
+        min-width: 36px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .note-action-btn.hide-on-selection {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        width: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+/* Toolbar dropdown menu styles */
+.toolbar-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-style: normal;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item.dropdown-delete:hover {
+    background-color: #fee;
+    color: #d32f2f;
+}
+
+.dropdown-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+.dropdown-item.dropdown-delete i {
+    color: #d32f2f;
+}
+
+/* .note-header::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 5px;
+    background: #fff;
+    z-index: 10;
+} */
+
+/* Espace blanc entre le header et les tags */
+.note-header-spacer {
+    width: 100%;
+    height: 15px;
+    background: #fff;
+}
+
+
+/* LINKS ARBO LEFT */
+
+a.links_arbo_left, a.links_arbo_left:link, a.links_arbo_left:visited, a.links_arbo_left:hover, a.links_arbo_left:active {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    text-decoration: none;
+    color: rgb(55, 53, 47);
+    padding: 3px 6px 3px 0px; /* Réduction du padding vertical (6px → 3px) */
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: normal;
+    box-sizing: border-box;
+}
+
+/* Specific rule for note title spans in all links */
+a.links_arbo_left .note-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+a.links_arbo_left.selected-note {
+    background-color: #EFEFED;
+}
+
+/* SEARCHBARS */
+
+.searchbar-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.searchbar-input-wrapper {
+    position: relative;
+    width: 100%;
+    flex: 1;
+}
+
+.searchbar-input {
+    padding: 6px 80px 6px 38px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    font-size: 0.95em;
+    transition: box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    outline: none;
+    width: 100%;
+    min-width: 0;
+    font-family: 'Inter', sans-serif !important;
+    color: #868484b9 
+}
+
+/* When clear button is present, add more padding to avoid overlap */
+.searchbar-input-wrapper.has-clear-button .searchbar-input {
+    padding-right: 120px;
+}
+
+.searchbar-input:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.searchbar-input::placeholder {
+    color: #b0b0b0;
+    opacity: 1;
+    font-size: 0.95em;
+}
+
+.searchbar-input:focus {
+    border-color: #32a1ce;
+}
+
+.searchbar-icon-row {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.searchbar-icon {
+    position: absolute;
+    left: 12px;
+    right: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b0b0b0;
+    pointer-events: none;
+    z-index: 2;
+    font-size: 0.8em;
+}
+
+.searchbar-clear-outer {
+    position: relative;
+    background: none !important;
+    border: none;
+    color: #bbb;
+    font-size: 1.0em;
+    cursor: pointer;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    z-index: 3;
+}
+
+.searchbar-clear-outer:hover {
+    color: #e74c3c;
+    background: #f5eaea;
+}
+
+.searchbar-desktop {
+    margin-top: 12px;
+    margin-bottom: 15px;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Folder filter container styling */
+.folder-filter-container {
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+
+.folder-filter-container .searchbar-row {
+    margin-bottom: 0;
+}
+
+.searchbar-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+/* Folder filter clear buttons (hidden by default) */
+#folder-filter-clear-mobile,
+#folder-filter-clear-desktop {
+    display: none;
+}
+
+.searchbar-clear {
+    position: absolute;
+    right: 95px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none !important;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0 4px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+}
+
+.searchbar-clear .fa-times-circle {
+    color: #d32f2f;
+    font-size: 0.8em;
+}
+
+.searchbar-toggle, .searchbar-clear {
+    padding: 8px 10px;
+    font-size: 0.9em;
+    background: none !important;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contains_forms_search
+{
+    width: 100%;
+    margin: 12px 0 15px 0;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* CAPTURES */
+
+img {
+    max-width:100%; /* To prevent screenshots from exceeding their container when they are too large */
+}
+
+/* POPUP NOTIFICATION */
+
+/* Notification overlay */
+.notification-overlay {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#notificationPopup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 24px;
+    color: #007DB8;
+    background-color: #fff;
+    border: 2px solid #007DB8;
+    z-index: 1000;
+    font-size: 1em;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+    max-width: 400px;
+    min-width: 200px;
+}
+
+#notificationPopup.notification-success {
+    color: #007DB8;
+    background-color: #fff;
+    border-color: #007DB8;
+    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+}
+
+#notificationPopup.notification-error {
+    color: #dc3545;
+    background-color: #fff;
+    border-color: #dc3545;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
+}
+
+/* MENU RIGHT */
+
+.icon_download{
+    color: #007DB8;
+    font-size: 17px;
+}
+
+.note-icons-desktop {
+    padding: 4px 11px;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    cursor: pointer;
+    margin: 0 0 0 auto;
+}
+
+.icon_info{
+    color: #007DB8;
+    font-size: 1.1em;
+}
+
+.icon_save{
+    color: #007DB8;
+    font-size: 1.1em;
+}
+
+.icon_separator.blue-separator {
+  color: #007DB8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon_separator.blue-separator:hover {
+  color: #007DB8;
+}
+
+/* TAGS RIGHT */ 
+
+.note-tags-row {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+.fa-tag.icon_tag {
+    font-size: 12px;
+    margin-right: 8px;
+    flex-shrink: 0;
+} 
+
+.name_tags {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgb(55, 53, 47) !important;
+}
+
+.name_tags * {
+    color: rgb(55, 53, 47) !important;
+}
+
+/* Retirer la bordure lors du focus sur l'input des tags */
+.name_tags input:focus {
+    border: none !important;
+    outline: none;
+}
+
+.add-margin {
+    margin: 8px 5px;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 15px;
+}
+
+/* MENU LEFT */
+
+.containbuttons{
+    text-align: center;
+    /* padding-top: 8px; */
+    /* padding-bottom: 8px; */
+}
+
+.newbutton[style], .list_tags[style] {
+    text-align: center;
+}
+
+.newbutton[style] {
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.newbutton[style] .fa-times-circle {
+    color: #d32f2f;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newbutton, .newfolderbutton, .list_tags, .settingsbutton {
+    display: inline-block;
+    width:30px;
+    cursor: pointer;
+    height:20px;
+    margin: 5px;
+    color: #007DB8;
+    font-size: 15px;
+}
+
+/* Settings dropdown styles */
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.settingsbutton {
+    display: inline-block;
+    width: 30px;
+    cursor: pointer;
+    height: 20px;
+    margin: 5px;
+    color: #007DB8;
+    font-size: 17px;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 180px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.settings-menu-item:last-child {
+    border-bottom: none;
+}
+
+.settings-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.settings-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+.settings-menu-item.deployment-info {
+    /* border-top: 1px solid rgba(0,0,0,0.1); */
+    margin-top: 5px;
+    padding-top: 8px;
+    cursor: default;
+    /* opacity: 0.7; */
+}
+
+.settings-menu-item.deployment-info:hover {
+    background-color: transparent;
+    color: #333;
+}
+
+.settings-menu-item.deployment-info i {
+    color: #007DB8;
+}
+
+.settings-menu-item.deployment-info span {
+    font-size: 1em;
+}
+
+.settings-menu-item.deployment-info small {
+    display: block;
+}
+
+.search:focus{
+    border-bottom: 1px solid #32a1ce;
+}
+
+/* ICONES TRASH pour interface principale */
+
+.icon_trash {
+    color: #007DB8;
+}
+
+.trashnotebutton {
+    display: inline-block;
+    width: 30px;
+    cursor: pointer;
+    height: 20px;
+    margin: 5px;
+    color: #007DB8;
+    font-size: 15px;
+}
+
+.logoutbutton {
+    display: inline-block;
+    width: 30px;
+    cursor: pointer;
+    height: 20px;
+    margin: 5px;
+    color: #dc3545;
+    font-size: 15px;
+}
+
+.logoutbutton:hover {
+    color: #c82333;
+}
+
+/* NOTE DISPLAY */
+
+div[contentEditable=true]:empty:before {
+        content:attr(data-ph);
+        color: #bababa;
+}
+
+/* Exclure les blocs de code du placeholder automatique */
+.code-block:empty:before,
+.noteentry .code-block:empty:before {
+        content: none !important;
+}
+
+.notecard{
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom:20px;
+    background: white;
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+}
+
+.innernote{
+    padding-left: 2%;
+    padding-top: 0px;
+    padding-right: 2%;
+    padding-bottom: 5px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+textarea{
+    padding: 0;
+    padding-top: 30px; 
+    width:100%;
+    border: 0 none white;
+    overflow: hidden;
+    outline: none;
+    resize: none;
+    font-family: 'Inter', sans-serif;
+}
+
+textarea:focus{
+    border-bottom: 1px;
+    outline: 0;
+}
+
+.noteentry{
+    padding: 0;
+    padding-top: 5px; 
+    width:100%;
+    border: 0 none white;
+    overflow-wrap: break-word;
+    outline: none;
+    resize: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+}
+
+/* Appliquer Inter sur les éléments textuels, sauf dans les blocs de code */
+.noteentry p,
+.noteentry div,
+.noteentry ul,
+.noteentry ol,
+.noteentry li,
+.noteentry b,
+.noteentry strong,
+.noteentry i,
+.noteentry em,
+.noteentry u,
+.noteentry s,
+.noteentry a,
+.noteentry span:not(.code-block span) {
+    font-family: 'Inter', sans-serif !important;
+}
+
+.noteentry:focus{
+    border-bottom: 1px;
+    outline: 0;
+}
+
+/* CODE BLOCKS */
+
+/* Style simplifié pour les blocs de code */
+.code-block, 
+pre.code-block,
+.noteentry pre {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    background-color: #f8f8f8 !important;
+    /* border: 1px solid #e1e1e1; */
+    border-radius: 4px;
+    padding: 30px 30px;
+    margin: 8px 0;
+    color: #333;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+    font-size: 14px !important;
+    position: relative;
+}
+
+/* Container pour le bouton copier */
+.code-block-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Bouton copier pour les blocs de code */
+.copy-code-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    z-index: 10;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.code-block:hover .copy-code-btn,
+.code-block-container:hover .copy-code-btn {
+    opacity: 1;
+}
+
+.copy-code-btn:hover {
+    background: #fff;
+    color: #007DB8;
+    border-color: #007DB8;
+}
+
+.copy-code-btn.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+/* Code inline */
+code {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    background-color: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: #333;
+}
+
+/* Force la même police pour tous les éléments avec styles inline dans les blocs de code */
+pre span[style],
+code span[style],
+.noteentry pre span[style],
+.noteentry code span[style],
+.noteentry pre *[style],
+.noteentry code *[style] {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+}
+
+/* Force la même police pour tous les éléments de formatage dans les blocs de code */
+pre b, pre strong, pre i, pre em, pre u, pre s, pre span,
+code b, code strong, code i, code em, code u, code s, code span,
+.code-block b, .code-block strong, .code-block i, .code-block em, .code-block u, .code-block s, .code-block span,
+.noteentry pre b, .noteentry pre strong, .noteentry pre i, .noteentry pre em, .noteentry pre u, .noteentry pre s, .noteentry pre span,
+.noteentry code b, .noteentry code strong, .noteentry code i, .noteentry code em, .noteentry code u, .noteentry code s, .noteentry code span,
+.noteentry .code-block b, .noteentry .code-block strong, .noteentry .code-block i, .noteentry .code-block em, .noteentry .code-block u, .noteentry .code-block s, .noteentry .code-block span {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+}
+
+/* Préserver le background gris même avec du surlignage dans les blocs de code */
+/* Solution simple et efficace : override du background pour les éléments surlignés */
+pre *[style*="background"],
+code *[style*="background"],
+.code-block *[style*="background"],
+.noteentry pre *[style*="background"],
+.noteentry code *[style*="background"],
+.noteentry .code-block *[style*="background"] {
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #f4f4f4 !important;
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+}
+
+/* Force la même police pour les éléments avec couleur dans les blocs de code */
+pre *[style*="color"],
+code *[style*="color"],
+.code-block *[style*="color"],
+.noteentry pre *[style*="color"],
+.noteentry code *[style*="color"],
+.noteentry .code-block *[style*="color"] {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+}
+
+/* Style plugin code block (optionnel, garder la taille et couleur si besoin) */
+.noteentry span[style*='Consolas'],
+.noteentry span[style*='Consolas'] *,
+.noteentry span[style*='Consolas'] b,
+.noteentry span[style*='Consolas'] strong,
+.noteentry span[style*='Consolas'] i,
+.noteentry span[style*='Consolas'] em,
+.noteentry span[style*='Consolas'] u,
+.noteentry span[style*='Consolas'] s {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    color: #333 !important;
+}
+
+/* OTHERS */
+
+/* #pxbetweennotes {
+    height: 0px;
+} */
+
+input {
+    width:100%;
+    border:0px;
+    text-overflow: ellipsis;
+}
+
+.css-title {
+    margin-bottom: 20px;
+    margin-left:-3px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #37352F;
+    font-family: 'Inter', sans-serif;
+}
+
+.css-title:focus {
+    border: none !important;
+    outline: none;
+    box-shadow: none;
+}
+
+hr {
+    margin:0;
+    border-top: 1px solid #ccc
+}
+
+/* LAST UPDATED AND CREATED DATES */
+
+.lastupdated {
+    float: none;
+    margin-right: auto;
+    margin-left: 0;
+    font-size: 14px;
+    font-family: 'Inter' !important;
+    font-style: italic;
+    font-weight: 400;
+    margin-top: 7px;
+    color: rgb(51,51,51) !important;
+}
+
+.toolbar-btn.save-modified {
+    background: transparent !important;
+    border: none !important;
+    animation: pulse-save 2s infinite;
+}
+
+/* Animation de pulsation pour le bouton save modifié */
+@keyframes pulse-save {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.0);
+    }
+}
+
+/* Quand save est modifié, il reste rouge même au hover/focus */
+.toolbar-btn.save-modified i.fas.fa-save {
+    color: #e53935 !important;
+}
+.toolbar-btn.save-modified:hover i.fas.fa-save,
+.toolbar-btn.save-modified:focus i.fas.fa-save {
+    color: #e53935 !important;
+}
+/* Pour l'icône save normale, permettre le changement de couleur au hover */
+.toolbar-btn:not(.save-modified) i.fas.fa-save {
+    color: inherit;
+}
+.toolbar-btn i.fas.fa-palette,
+.toolbar-btn i.fas.fa-fill-drip {
+    color: inherit !important;
+}
+
+/* Couleurs par défaut des icônes */
+.toolbar-btn i.fas.fa-palette {
+    color: #ff2222;
+}
+
+.toolbar-btn i.fas.fa-fill-drip {
+    color: #ffe066;
+}
+
+/* Couleurs spécifiques au hover pour les boutons de couleur */
+.toolbar-btn:hover i.fas.fa-palette,
+.toolbar-btn:focus i.fas.fa-palette {
+    color: #ff2222 !important;
+}
+
+.toolbar-btn:hover i.fas.fa-fill-drip,
+.toolbar-btn:focus i.fas.fa-fill-drip {
+    color: #ffe066 !important;
+}
+
+/* FOLDER STYLES */
+
+.folder-header {
+    margin-bottom: 0px; /* Suppression de l'espace entre les dossiers */
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.folder-header.selected-folder {
+    background-color: transparent;
+}
+
+.folder-toggle {
+    display: flex;
+    align-items: center;
+    padding: 8px 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+    user-select: none;
+    position: relative;
+    width: 100%;
+}
+
+.folder-toggle:hover {
+    background-color: transparent;
+}
+
+.folder-icon {
+    font-size: 12px;
+    color: #b0b0b0;
+    margin-right: 8px;
+    transition: transform 0.2s;
+    width: 12px;
+}
+
+.folder-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(55, 53, 47);
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.folder-note-count {
+    font-size: 12px;
+    color: #999;
+    font-weight: 300;
+    margin-left: 8px;
+    flex: 0 0 auto;
+}
+
+.folder-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.folder-toggle:hover .folder-actions {
+    opacity: 1;
+}
+
+.folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
+    font-size: 12px;
+    color: #007DB8;
+    margin-left: 8px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.folder-edit-btn:hover {
+    background-color: rgba(0, 125, 184, 0.2);
+}
+
+.folder-delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.folder-empty-btn:hover {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.folder-content {
+    margin-left: 20px;
+    margin-bottom: 5px; /* Réduction de l'espace sous chaque dossier */
+}
+
+.note-in-folder {
+    margin-bottom: 0px !important; /* Suppression de l'espace entre les notes */
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 6px !important; /* Réduction du padding pour récupérer l'espace */
+    transition: padding-left 0.2s;
+}
+
+.note-in-folder a.links_arbo_left {
+    display: block !important;
+    position: relative !important;
+}
+
+.note-in-folder a.links_arbo_left .note-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    margin-left: 0px !important; /* Récupérer l'espace de l'icône supprimée */
+    transition: margin-left 0.2s ease; /* Animation fluide */
+}
+
+/* Au survol, garder le titre à gauche (pas de changement) */
+.note-in-folder:hover a.links_arbo_left .note-title {
+    margin-left: 0px !important; /* Reste à gauche */
+}
+
+.note-actions {
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.note-in-folder:hover .note-actions {
+    opacity: 1;
+}
+
+.move-note-btn {
+    display: none; /* Masquer complètement l'icône de dossier */
+}
+
+.note-in-folder:hover .move-note-btn {
+    display: none; /* Garder masqué même au survol */
+}
+
+.move-note-btn:hover {
+    transform: scale(1.1);
+}
+
+/* MODALS */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+    width: 300px;
+    max-width: 90%;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: rgb(55, 53, 47);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-content input, .modal-content select {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-content input:focus, .modal-content select:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+}
+
+.modal-buttons button:first-child {
+    background-color: #007DB8;
+    color: white;
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: #005a8a;
+}
+
+.modal-buttons button:last-child {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons button:last-child:hover {
+    background-color: #e9ecef;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #333;
+    text-decoration: none;
+}
+
+/* Existing folders section in modals */
+.existing-folders-section {
+    margin-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 15px;
+}
+
+.existing-folders-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.folders-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #fafafa;
+    margin-top: 8px;
+}
+
+.folder-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.folder-item:last-child {
+    border-bottom: none;
+}
+
+.folder-item:hover {
+    background-color: #f0f0f0;
+}
+
+.folder-item i {
+    margin-right: 8px;
+    color: #666;
+    width: 12px;
+}
+
+.no-folders-message {
+    padding: 15px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* Move folder modal specific styles */
+.move-folder-modal {
+    min-width: 400px;
+    max-width: 500px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    margin: 5% auto !important;
+}
+
+.folder-search-section {
+    margin-bottom: 0px;
+}
+
+.folder-search-section input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.folder-search-section input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+.suggested-folders-section {
+    margin-bottom: 15px;
+}
+
+.suggested-folders-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggested-folder-option {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.suggested-folder-option:hover {
+    background-color: #007DB8;
+    color: white;
+    border-color: #007DB8;
+}
+
+.suggested-folder-option.selected {
+    background-color: #007DB8;
+    color: white;
+    border-color: #007DB8;
+}
+
+.suggested-folder-option i {
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.folders-selection-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
+    flex-shrink: 0;
+}
+
+.folder-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    color: #333;
+}
+
+.folder-option:last-child {
+    border-bottom: none;
+}
+
+.folder-option:hover {
+    background-color: #f0f6ff;
+}
+
+.folder-option.selected {
+    background-color: #007DB8;
+    color: white;
+}
+
+.folder-option.selected:hover {
+    background-color: #005a8a;
+}
+
+.folder-option i {
+    margin-right: 10px;
+    width: 16px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.folder-option.selected i {
+    color: white;
+}
+
+.folder-option .folder-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.folder-option .note-count {
+    color: #888;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.folder-option.selected .note-count {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.create-folder-section {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 15px;
+    margin-bottom: 20px;
+}
+
+.create-folder-section input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.create-folder-section input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+.create-folder-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.create-folder-buttons button {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+}
+
+.create-folder-buttons button:first-child {
+    background-color: #28a745;
+    color: white;
+}
+
+.create-folder-buttons button:first-child:hover {
+    background-color: #218838;
+}
+
+.create-folder-buttons button:last-child {
+    background-color: #6c757d;
+    color: white;
+}
+
+.create-folder-buttons button:last-child:hover {
+    background-color: #5a6268;
+}
+
+.no-folders-found {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+/* Update modal buttons for new design */
+#moveNoteFolderModal .modal-buttons {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 15px;
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+#moveNoteFolderModal .modal-buttons button:first-child {
+    background-color: #007DB8;
+    color: white;
+    flex: 1;
+}
+
+#moveNoteFolderModal .modal-buttons button:first-child:hover {
+    background-color: #005a8a;
+}
+
+#moveNoteFolderModal .modal-buttons button:nth-child(2) {
+    background-color: #28a745;
+    color: white;
+    flex: 1;
+}
+
+#moveNoteFolderModal .modal-buttons button:nth-child(2):hover {
+    background-color: #218838;
+}
+
+/* Modal error message styles */
+.modal-error-message {
+    text-align: center;
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    display: none;
+}
+
+/* UNIFIED SEARCH STYLES */
+.unified-search-container {
+    width: 100%;
+}
+
+.search-type-buttons {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 2px;
+    align-items: center;
+    z-index: 4;
+    /* margin-right: 8px; */
+}
+
+.search-type-btn {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #b0b0b0;
+    font-size: 0.85em;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-type-btn:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.search-type-btn:hover i {
+    color: #007DB8;
+}
+
+.search-type-btn.active i {
+    color: #007DB8;
+}
+
+.search-type-btn.active:hover i {
+    color: #007DB8;
+}
+
+.searchbar-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+/* Search validation error styles */
+.search-validation-error {
+    background-color: #ffebee;
+    color: #d32f2f;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin: 8px 0 4px 0;
+    border-left: 3px solid #d32f2f;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-type-btn-error {
+    animation: shake 0.5s ease-in-out;
+    border-color: #d32f2f !important;
+    background-color: #ffebee !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+/* CACHER LES BARRES DE SCROLL */
+
+/* Cacher la barre de scroll pour Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Cacher la barre de scroll pour Firefox */
+* {
+    scrollbar-width: none;
+}
+
+/* Alternative pour cacher toutes les barres de scroll */
+html, body, #left_col {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+}
+
+#right_col {
+    -ms-overflow-style: auto;  /* Internet Explorer 10+ */
+    scrollbar-width: auto;  /* Firefox */
+}
+
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar, 
+#left_col::-webkit-scrollbar {
+    display: none;
+}
+
+#right_col::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+}
+
+#right_col::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#right_col::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+#right_col::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Hide webkit search controls (native blue cross) for all search inputs */
+.searchbar-input::-webkit-search-decoration,
+.searchbar-input::-webkit-search-cancel-button,
+.searchbar-input::-webkit-search-results-button,
+.searchbar-input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
+
+/* Also apply to inputs with search class */
+.search::-webkit-search-decoration,
+.search::-webkit-search-cancel-button,
+.search::-webkit-search-results-button,
+.search::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
+
+/* General rule for any input that might have search type */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}

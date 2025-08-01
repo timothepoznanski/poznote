@@ -1,0 +1,51 @@
+A NETTOYER
+-----------
+
+# POZNOTE - Commandes simplifiées avec un seul reverse proxy
+
+# Production (code embedé)
+alias poznote-prod='cd /root/poznote/poznote && docker compose down && docker compose -p poznote down && git checkout main && docker compose --env-file .env --env-file .env.prod -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build'
+
+# Développement (live reload)
+alias poznote-dev='cd /root/poznote/poznote && docker compose down && docker compose -p poznote-dev down && git checkout dev && docker compose -p poznote-dev --env-file .env --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose-reverse-proxy.yml up -d --build'
+
+# Status
+alias poznote-status='docker ps --filter "name=poznote" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"'
+
+---------------------
+
+# Clean docker images not user
+
+docker image prune -a
+
+# Display containers 
+
+docker ps -a --format "table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Status}}\t{{.Names}}"
+
+
+# Install Prod TPO
+
+docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
+
+
+# Install dev TPO
+
+docker compose -p poznote-dev --env-file .env.dev -f docker-compose.yml -f docker-compose-dev.yml -f docker-compose-reverse-proxy-dev.yml up -d --build
+
+
+# Update manualy Prod TPO
+
+git checkout main
+cd /root/poznote/poznote
+git pull
+docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml build --no-cache
+docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --force-recreate
+git checkout dev
+
+# Update manualy Dev TPO 
+
+git checkout dev
+cd /root/poznote/poznote
+git pull 
+docker compose -p poznote-dev --env-file .env.dev -f docker-compose.yml -f docker-compose-dev.yml -f docker-compose-reverse-proxy-dev.yml down
+docker compose -p poznote-dev --env-file .env.dev -f docker-compose.yml -f docker-compose-dev.yml -f docker-compose-reverse-proxy-dev.yml up -d --build

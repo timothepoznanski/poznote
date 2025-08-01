@@ -1,0 +1,5 @@
+# Override for development with live reload
+services:
+  webserver:
+    volumes:
+      - "./src:/var/www/html"  # Mount local code for live reload

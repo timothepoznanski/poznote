@@ -1,0 +1,84 @@
+name: Auto PR Creation for Production
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  test-and-create-pr:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Test Docker build
+      run: |
+        echo "Testing Docker build..."
+        docker build -t poznote-test .
+        echo "Docker build successful"
+    
+    - name: PHP Syntax Check
+      run: |
+        echo "Checking PHP syntax..."
+        docker run --rm -v $(pwd)/src:/app php:8.1-cli find /app -name "*.php" -exec php -l {} \;
+        echo "PHP syntax check passed"
+    
+    - name: Check for changes
+      run: |
+        echo "Checking if there are changes between dev and main..."
+        git fetch origin main
+        
+        # Check if there are any differences
+        if git diff --quiet origin/main HEAD; then
+          echo "No changes detected between dev and main branches"
+          echo "Skipping PR creation - branches are identical"
+          exit 0
+        fi
+        
+        echo "Changes detected, proceeding with PR creation..."
+    
+    - name: Check for merge conflicts
+      run: |
+        echo "Checking for merge conflicts..."
+        
+        # Simple conflict check
+        if ! git merge-tree $(git merge-base HEAD origin/main) origin/main HEAD > /dev/null 2>&1; then
+          echo "Potential merge conflicts detected!"
+          exit 1
+        fi
+        
+        echo "No conflicts detected"
+    
+
+    
+    - name: Create Pull Request
+      run: |
+        echo "Checking for existing PRs..."
+        
+        # List all PRs to debug
+        echo "All open PRs:"
+        gh pr list --state open || echo "No PRs found or error occurred"
+        
+        # Check specifically for dev -> main PR
+        echo "Checking for dev -> main PR..."
+        existing_pr=$(gh pr list --head dev --base main --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+        
+        echo "Existing PR result: '$existing_pr'"
+        
+        if [ -z "$existing_pr" ] || [ "$existing_pr" = "null" ]; then
+          echo "No existing PR found. Creating new PR..."
+          gh pr create \
+            --base main \
+            --head dev \
+            --title "Deploy to production" \
+            --body "Automatic deployment PR from dev branch"
+          echo "Pull Request created successfully!"
+        else
+          echo "PR already exists (#$existing_pr)"
+          echo "You can view it at: https://github.com/${{ github.repository }}/pull/$existing_pr"
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.PAT_TOKEN }}

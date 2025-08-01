@@ -1,0 +1,16 @@
+services:
+  webserver:
+    networks:
+      - npm-poznote-dev-webserver-net
+      - internal-net
+
+  database:
+    networks:
+      - internal-net
+
+networks:
+  npm-poznote-dev-webserver-net:
+    external: true
+  internal-net:
+    external: true
+    name: poznote-dev_internal-net

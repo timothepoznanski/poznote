@@ -1,0 +1,34 @@
+# Ignore data directories (Docker volumes for database, entries, attachments)
+data/
+
+# Ignore entries in source directory  
+src/entries/*
+!src/entries/index.php
+
+# Ignore attachments in source directory
+src/attachments/*
+!src/attachments/.gitkeep
+
+# Environment files (these should not be committed)
+.env
+.env.local
+.env.prod
+
+# Keep templates for reference
+# .env.template
+# .env.dev
+
+# Docker volumes and temporary files
+.docker/
+docker-data/
+
+# IDE files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

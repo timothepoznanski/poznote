@@ -1,0 +1,114 @@
+/* Styles pour la page de tags */
+
+/* Reset spécifique pour éviter les conflits avec index.css et index-mobile.css */
+body.tags-page {
+    overflow: auto !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    display: block !important;
+    flex-direction: unset !important;
+}
+
+html.tags-page {
+    overflow: auto !important;
+    height: auto !important;
+}
+
+.tags-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.tags-header {
+    display: none;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    color: #333;
+    font-weight: 500;
+}
+
+.tags-search-form {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.tags-search-input {
+    width: 40%;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.tags-search-input:focus {
+    border-color: #007DB8;
+}
+
+.tags-info {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.search-results {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.tags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.tag-item {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Classe pour masquer les tags lors du filtrage */
+.tag-item.hidden {
+    display: none;
+}
+
+.tag-item:hover {
+    border-color: #007DB8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.tag-name {
+    font-weight: normal;
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.no-tags {
+    text-align: center;
+    color: #666;
+    font-size: 1.2em;
+    margin-top: 50px;
+    padding: 40px;
+    background: #f9f9f9;
+    border-radius: 12px;
+}
