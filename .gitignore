@@ -11,12 +11,6 @@ src/attachments/*
 
 # Environment files (these should not be committed)
 .env
-.env.local
-.env.prod
-
-# Keep templates for reference
-# .env.template
-# .env.dev
 
 # Docker volumes and temporary files
 .docker/

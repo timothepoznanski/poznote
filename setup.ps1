@@ -304,8 +304,6 @@ DB_DATA_PATH=$($existingConfig['DB_DATA_PATH'])
 ENTRIES_DATA_PATH=$($existingConfig['ENTRIES_DATA_PATH'])
 ATTACHMENTS_DATA_PATH=$($existingConfig['ATTACHMENTS_DATA_PATH'])
 
-# Environment identifier
-APP_ENV=$($existingConfig['APP_ENV'])
 "@
 
     $newEnvContent | Out-File -FilePath ".env" -Encoding UTF8
@@ -538,8 +536,6 @@ DB_DATA_PATH=$DB_DATA_PATH
 ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH
 ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
 
-# Environment identifier
-APP_ENV=prod
 "@
         
         $envContent | Out-File -FilePath ".env" -Encoding UTF8
