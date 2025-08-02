@@ -154,7 +154,7 @@ check_docker() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+    if ! command -v docker compose &> /dev/null && ! docker compose version &> /dev/null; then
         print_error "Docker Compose is not installed. Please install Docker Compose first."
         echo "Visit: https://docs.docker.com/compose/install/"
         exit 1
@@ -173,7 +173,7 @@ check_docker() {
 # Function to check if Poznote is already installed
 check_existing_installation() {
     # Check for indicators of an existing installation
-    # Don't consider docker-compose.yml or .env.template as indicators
+    # Don't consider docker compose.yml or .env.template as indicators
     local indicators=0
     
     [ -d "../ENTRIES_DATA" ] && ((indicators++))
@@ -313,30 +313,30 @@ update_containers() {
     print_status "Updating Poznote containers..."
     
     # Stop existing containers if they're running
-    if docker-compose ps -q 2>/dev/null | grep -q .; then
+    if docker compose ps -q 2>/dev/null | grep -q .; then
         print_status "Stopping existing containers..."
-        docker-compose down
+        docker compose down
     fi
     
     # Pull latest images
     print_status "Pulling latest Docker images..."
-    docker-compose pull
+    docker compose pull
     
     # Start containers
     print_status "Starting containers..."
-    docker-compose up -d
+    docker compose up -d
     
     # Wait for containers to be ready
     print_status "Waiting for services to start..."
     sleep 15
     
     # Check if containers are running
-    if docker-compose ps | grep -q "Up"; then
+    if docker compose ps | grep -q "Up"; then
         print_success "Poznote containers are running"
     else
         print_error "Failed to start containers"
         echo "Container logs:"
-        docker-compose logs
+        docker compose logs
         exit 1
     fi
 }
@@ -360,11 +360,11 @@ show_info() {
     echo "  🔑 Password: [the password you configured]"
     echo
     print_status "🔧 Management Commands:"
-    echo "  📊 View logs: docker-compose logs -f"
-    echo "  🔄 Restart: docker-compose restart"
-    echo "  ⏹️  Stop: docker-compose down"
-    echo "  ▶️  Start: docker-compose up -d"
-    echo "  🗑️  Remove: docker-compose down -v (⚠️  WARNING: This deletes all data!)"
+    echo "  📊 View logs: docker compose logs -f"
+    echo "  🔄 Restart: docker compose restart"
+    echo "  ⏹️  Stop: docker compose down"
+    echo "  ▶️  Start: docker compose up -d"
+    echo "  🗑️  Remove: docker compose down -v (⚠️  WARNING: This deletes all data!)"
     echo
     print_status "💡 Configuration Management:"
     echo "  🔧 To change password or port: Edit .env file and restart containers"
@@ -377,7 +377,7 @@ show_info() {
         print_status "📁 Your notes and data are stored in Docker volumes and will persist between restarts."
     fi
     echo
-    print_warning "💡 Remember: To change password or port, edit the .env file and run 'docker-compose down && docker-compose up -d'"
+    print_warning "💡 Remember: To change password or port, edit the .env file and run 'docker compose down && docker compose up -d'"
 }
 
 # Main installation/update function
