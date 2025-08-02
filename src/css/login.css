@@ -1,82 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f5f5f5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f8fafc;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    padding: 20px;
 }
 
 .login-container {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 400px;
-    margin: 30px;
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 3rem;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-favicon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
 }
 
 .login-title {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #333;
-    font-size: 1.5rem;
+    color: #1a202c;
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin: 0;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
 }
 
 label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #333;
+    color: #4a5568;
     font-weight: 500;
+    font-size: 0.875rem;
 }
 
 input[type="password"] {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 1rem;
-    box-sizing: border-box;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    background: white;
 }
 
 input[type="password"]:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+input[type="password"]::placeholder {
+    color: #a0aec0;
 }
 
 .login-button {
     width: 100%;
-    padding: 0.75rem;
-    background-color: #007bff;
+    padding: 0.875rem 1rem;
+    background: #3182ce;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
 }
 
 .login-button:hover {
-    background-color: #0056b3;
+    background: #2c5282;
+}
+
+.login-button:active {
+    transform: translateY(1px);
 }
 
 .error {
-    color: #dc3545;
+    color: #e53e3e;
     margin-top: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
 }
 
 .info {
-    margin-top: 1rem;
+    margin-top: 2rem;
     padding: 1rem;
-    background-color: #f8f9fa;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.info a {
+    color: #3182ce;
+    text-decoration: none;
+}
+
+.info a:hover {
+    text-decoration: underline;
+}
+
+.info code {
+    background: #edf2f7;
+    padding: 0.125rem 0.25rem;
     border-radius: 4px;
-    font-size: 0.9rem;
-    color: #6c757d;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 0.8125rem;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    body {
+        padding: 16px;
+    }
+    
+    .login-header {
+        margin-bottom: 2rem;
+    }
+    
+    .logo {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .logo-favicon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .login-title {
+        font-size: 1.5rem;
+    }
+    
+    .info {
+        font-size: 0.8125rem;
+    }
 }
