@@ -10,8 +10,8 @@ function formatDateTime($t) {
 }
 
 /**
- * Get the correct entries directory path (dev or prod environment)
- * Now unified: always use 'entries' directory in webroot
+ * Get the correct entries directory path
+ * Always use 'entries' directory in webroot
  */
 function getEntriesPath() {
     // Always use the same path - Docker volumes handle the mapping
@@ -35,8 +35,8 @@ function getEntriesPath() {
 }
 
 /**
- * Get the correct attachments directory path (dev or prod environment)
- * Now unified: always use 'attachments' directory in webroot
+ * Get the correct attachments directory path
+ * Always use 'attachments' directory in webroot
  */
 function getAttachmentsPath() {
     // Always use the same path - Docker volumes handle the mapping

@@ -72,7 +72,7 @@ reconfigure_poznote() {
     NEW_POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
 
     if [ "$NEW_POZNOTE_PASSWORD" = "admin123" ]; then
-        print_warning "You are using the default password! Please change it for production use."
+        print_warning "You are using the default password! Please change it for security."
     fi
 
     # Update .env file with new values, preserving everything else
@@ -80,13 +80,12 @@ reconfigure_poznote() {
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_USER=$MYSQL_USER
 MYSQL_PASSWORD=$MYSQL_PASSWORD
-# Database name (fixed for containerized environment)
 MYSQL_DATABASE=$MYSQL_DATABASE
 
 # Authentication - Change this password for security
 POZNOTE_PASSWORD=$NEW_POZNOTE_PASSWORD
 
-# Environment ports and paths
+# Ports and paths
 HTTP_WEB_PORT=$NEW_HTTP_WEB_PORT
 DB_DATA_PATH=$DB_DATA_PATH
 ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH

@@ -51,7 +51,7 @@ The setup script will automatically detect your situation and present an appropr
 - **Security**: Poznote password (⚠️ change from default `admin123`!)
 - **Overwrite existing files**: Interactive prompts for any conflicts
 
-*Note: Database credentials and data paths are automatically set to secure defaults for the containerized environment.*
+*Note: Database credentials and data paths are automatically set to secure defaults for Docker.*
 
 ### Prerequisites
 
@@ -123,15 +123,15 @@ docker compose logs -f
 docker compose restart
 ```
 
-## Security & Production
+## Security & Best Practices
 
 ### Important Security Notes
 1. **Change Default Password**: Always change `admin123` to a strong password
-2. **Use HTTPS**: Configure a reverse proxy with SSL/TLS for production
+2. **Use HTTPS**: Configure a reverse proxy with SSL/TLS for secure access
 3. **Firewall**: Restrict access to ports if not using a reverse proxy
 4. **Regular Updates**: Keep Docker images updated with `docker compose pull`
 
-### Recommended Production Setup
+### Recommended Setup
 Consider using a reverse proxy like [Nginx Proxy Manager](https://nginxproxymanager.com) for:
 - SSL/TLS certificates (Let's Encrypt)
 - Domain mapping
@@ -208,7 +208,7 @@ docker compose down
 docker compose up -d
 ```
 
-*Note: Database settings are fixed for the containerized environment and cannot be changed after initial setup.*
+*Note: Database settings are fixed for Docker and cannot be changed after initial setup.*
 
 ## Export or backup
 

@@ -55,7 +55,7 @@ if (!empty($_POST['unified_search'])) {
     
     $using_unified_search = true;
     
-    // Debug output (remove in production)
+    // Debug output disabled
     // Debugging removed - search working correctly
     
     // Only proceed if at least one option is selected

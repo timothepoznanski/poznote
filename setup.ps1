@@ -135,7 +135,7 @@ function Test-Docker {
 
 # Check if this is an existing installation
 function Test-ExistingInstallation {
-    # Don't consider .env.template or .env.dev as indicators of existing installation
+    # Don't consider .env.template as indicators of existing installation
     $indicators = @(
         (Test-Path "../ENTRIES_DATA"),
         (Test-Path "../ATTACHMENTS_DATA"),
@@ -284,7 +284,7 @@ function Reconfigure-Poznote {
     $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
 
     if ($POZNOTE_PASSWORD -eq "admin123") {
-        Write-Warning "You are using the default password! Please change it for production use."
+        Write-Warning "You are using the default password! Please change it for security."
     }
 
     # Update .env file with new values, preserving everything else
@@ -292,13 +292,12 @@ function Reconfigure-Poznote {
 MYSQL_ROOT_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
 MYSQL_USER=$($existingConfig['MYSQL_USER'])
 MYSQL_PASSWORD=$($existingConfig['MYSQL_PASSWORD'])
-# Database name (fixed for containerized environment)
 MYSQL_DATABASE=$($existingConfig['MYSQL_DATABASE'])
 
 # Authentication - Change this password for security
 POZNOTE_PASSWORD=$POZNOTE_PASSWORD
 
-# Environment ports and paths
+# Ports and paths
 HTTP_WEB_PORT=$HTTP_WEB_PORT
 DB_DATA_PATH=$($existingConfig['DB_DATA_PATH'])
 ENTRIES_DATA_PATH=$($existingConfig['ENTRIES_DATA_PATH'])
@@ -506,16 +505,16 @@ function Install-Poznote {
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" "admin123"
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
-            Write-Warning "You are using the default password! Please change it for production use."
+            Write-Warning "You are using the default password! Please change it for security."
         }
         
-        # Database settings - Fixed for containerized environment
-        Write-Host "`nDatabase Configuration: Using default values for containerized environment" -ForegroundColor $Colors.Blue
+        # Database settings - Fixed for Docker
+        Write-Host "`nDatabase Configuration: Using default values for Docker" -ForegroundColor $Colors.Blue
         $MYSQL_ROOT_PASSWORD = "mysqlrootpassword"
         $MYSQL_USER = "mysqluser"
         $MYSQL_PASSWORD = "mysqlpassword"
         
-        # Fixed database name for containerized environment
+        # Fixed database name for Docker
         $MYSQL_DATABASE = "poznote_db"
         
         # Create .env file
@@ -626,7 +625,7 @@ ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"
-        Write-Host "  • Use HTTPS in production"
+        Write-Host "  • Use HTTPS for secure access"
         Write-Host "  • Consider using a reverse proxy like Nginx Proxy Manager"
         Write-Host ""
         Write-Host "Useful commands:" -ForegroundColor $Colors.Blue
