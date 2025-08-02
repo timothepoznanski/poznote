@@ -40,7 +40,7 @@ You must configure the following secrets in your GitHub repository (Settings →
 - `PROD_PORT` : SSH port (usually 22)
 - `PROD_PROJECT_PATH` : Absolute path to project on server (ex: `/root/poznote/poznote`)
 - `PAT_TOKEN` : GitHub Personal Access Token to create Pull Requests
-- `DOCKER_USERNAME` : Docker Hub username (for registry push)
+- `DOCKER_USERNAME` : Docker Hub username (for registry push / Not the email address)
 - `DOCKER_PASSWORD` : Docker Hub password or access token
 
 ### SSH Configuration
