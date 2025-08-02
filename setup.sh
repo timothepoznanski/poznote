@@ -91,9 +91,6 @@ HTTP_WEB_PORT=$NEW_HTTP_WEB_PORT
 DB_DATA_PATH=$DB_DATA_PATH
 ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH
 ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
-
-# Environment identifier
-APP_ENV=$APP_ENV
 EOF
 
     print_success "Configuration updated successfully!"
@@ -289,20 +286,13 @@ create_env_file() {
 # Poznote Configuration
 POZNOTE_PASSWORD=$POZNOTE_PASSWORD
 HTTP_WEB_PORT=$HTTP_WEB_PORT
-
-# Database Configuration
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_DATABASE=poznote_db
 MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
-
-# Docker Configuration
 DB_DATA_PATH=./data/mysql
 ENTRIES_DATA_PATH=./data/entries
 ATTACHMENTS_DATA_PATH=./data/attachments
-
-# Application Environment
-APP_ENV=production
 EOF
     
     print_success ".env file created"

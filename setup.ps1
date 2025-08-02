@@ -303,9 +303,6 @@ HTTP_WEB_PORT=$HTTP_WEB_PORT
 DB_DATA_PATH=$($existingConfig['DB_DATA_PATH'])
 ENTRIES_DATA_PATH=$($existingConfig['ENTRIES_DATA_PATH'])
 ATTACHMENTS_DATA_PATH=$($existingConfig['ATTACHMENTS_DATA_PATH'])
-
-# Environment identifier
-APP_ENV=$($existingConfig['APP_ENV'])
 "@
 
     $newEnvContent | Out-File -FilePath ".env" -Encoding UTF8
@@ -526,20 +523,12 @@ function Install-Poznote {
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_USER=$MYSQL_USER
 MYSQL_PASSWORD=$MYSQL_PASSWORD
-# Database name (fixed for containerized environment)
 MYSQL_DATABASE=$MYSQL_DATABASE
-
-# Authentication - Change this password for security
 POZNOTE_PASSWORD=$POZNOTE_PASSWORD
-
-# Environment ports and paths
 HTTP_WEB_PORT=$HTTP_WEB_PORT
 DB_DATA_PATH=$DB_DATA_PATH
 ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH
 ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
-
-# Environment identifier
-APP_ENV=prod
 "@
         
         $envContent | Out-File -FilePath ".env" -Encoding UTF8

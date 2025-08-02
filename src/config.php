@@ -4,5 +4,4 @@
     define("MYSQL_DATABASE", $_ENV['MYSQL_DATABASE']);
     define("MYSQL_PASSWORD", $_ENV['MYSQL_PASSWORD']); 
     define("SERVER_NAME", $_ENV['SERVER_NAME'] ?? 'localhost');
-    define("APP_ENV", $_ENV['APP_ENV'] ?? 'production');
 ?>

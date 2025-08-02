@@ -15,7 +15,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_DATABASE: ${MYSQL_DATABASE}  
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      APP_ENV: ${APP_ENV}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
     ports:
       - "${HTTP_WEB_PORT}:80"
