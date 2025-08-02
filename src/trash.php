@@ -64,7 +64,7 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 		if ($res && $res->num_rows > 0) {
 			while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
 				$id = $row['id'];
-				$filename = "./entries/" . $id . ".html";
+				$filename = getEntriesRelativePath() . $id . ".html";
 				$entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
 				$heading = $row['heading'];
 				$updated = formatDateTime(strtotime($row['updated']));

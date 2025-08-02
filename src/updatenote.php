@@ -34,7 +34,7 @@
 		die('Note not found');
 	}
 	
-    $filename = "entries/" . $id . ".html";
+    $filename = getEntriesRelativePath() . $id . ".html";
 	
 	// Write HTML content to file
 	file_put_contents($filename, $entry);

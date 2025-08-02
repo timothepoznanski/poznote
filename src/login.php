@@ -27,10 +27,16 @@ if ($_POST && isset($_POST['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Poznote</title>
     <link rel="stylesheet" href="css/login.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
     <div class="login-container">
-        <h1 class="login-title">Poznote</h1>
+        <div class="login-header">
+            <div class="logo">
+                <img src="favicon.ico" alt="Poznote" class="logo-favicon">
+            </div>
+            <h1 class="login-title">Poznote</h1>
+        </div>
         
         <form method="POST">
             <div class="form-group">
@@ -44,7 +50,7 @@ if ($_POST && isset($_POST['password'])) {
         </form>
         
                 <div class="info">
-            To change the password, rerun the setup script and select "Change configuration". See <a href="https://github.com/timothepoznanski/poznote#configuration-updates" target="_blank">README.md configuration section</a>.<br>
+            To change the password, rerun the setup script and select "Change configuration". <br>See <a href="https://github.com/timothepoznanski/poznote#configuration-updates" target="_blank">README.md configuration section</a>.<br>
             Default password: <code>admin123</code>
         </div>
     </div>

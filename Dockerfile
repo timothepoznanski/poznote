@@ -24,5 +24,10 @@ COPY php.ini /usr/local/etc/php/
 # - In development: provides initial files and correct permissions before volume mount overrides it
 COPY ./src/ /var/www/html/
 
+# Create directories for data volumes (will be mounted over in production/development)
+RUN mkdir -p /var/www/html/entries /var/www/html/attachments && \
+    chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && \
+    chmod -R 755 /var/www/html/entries /var/www/html/attachments
+
 # Expose port HTTP
 EXPOSE 80

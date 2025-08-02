@@ -9,19 +9,8 @@ include 'db_connect.php';
 // Start output buffering to prevent any unwanted output
 ob_start();
 
-// Try multiple possible entries paths from different working directories
-$entriesPaths = [
-    realpath('entries'),                // Production: mounted directly in webroot
-    realpath('../data/entries'),        // Development: data folder outside src
-];
-
-$rootPath = null;
-foreach ($entriesPaths as $path) {
-    if ($path && is_dir($path)) {
-        $rootPath = $path;
-        break;
-    }
-}
+// Get the correct entries path using our centralized function
+$rootPath = getEntriesPath();
 
 $zip = new ZipArchive();
 // Create ZIP file in temporary directory with proper permissions
