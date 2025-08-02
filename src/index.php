@@ -704,7 +704,7 @@ if($note != '') {
                 while($row = mysqli_fetch_array($res_right, MYSQLI_ASSOC))
                 {
                 
-                    $filename = "entries/".$row["id"].".html";
+                    $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];             
                     $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                

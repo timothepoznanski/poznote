@@ -3,3 +3,5 @@ services:
   webserver:
     volumes:
       - "./src:/var/www/html"  # Mount local code for live reload
+      - "./data/entries:/var/www/html/entries"  # Mount data entries for dev
+      - "./data/attachments:/var/www/html/attachments"  # Mount data attachments for dev

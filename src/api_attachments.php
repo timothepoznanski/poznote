@@ -13,10 +13,11 @@ ini_set('display_errors', 0);
 error_reporting(0);
 
 require 'config.php';
+include 'functions.php';
 include 'db_connect.php';
 
-// Create attachments directory if it doesn't exist
-$attachments_dir = 'attachments';
+// Get the correct attachments directory path
+$attachments_dir = rtrim(getAttachmentsRelativePath(), '/');
 if (!file_exists($attachments_dir)) {
     if (!mkdir($attachments_dir, 0777, true)) {
         echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);

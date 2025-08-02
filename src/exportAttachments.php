@@ -9,19 +9,8 @@ include 'db_connect.php';
 // Start output buffering to prevent any unwanted output
 ob_start();
 
-// Try multiple possible attachment paths from different working directories
-$attachmentsPaths = [
-    realpath('attachments'),                // Production: mounted directly in webroot
-    realpath('../data/attachments'),        // Development: data folder outside src
-];
-
-$attachmentsPath = null;
-foreach ($attachmentsPaths as $path) {
-    if ($path && is_dir($path)) {
-        $attachmentsPath = $path;
-        break;
-    }
-}
+// Get the correct attachments path using our centralized function
+$attachmentsPath = getAttachmentsPath();
 
 $zip = new ZipArchive();
 // Create ZIP file in temporary directory with proper permissions
