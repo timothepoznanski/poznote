@@ -295,7 +295,7 @@ function Reconfigure-Poznote {
     # Update .env file with new values, preserving everything else
     $newEnvContent = @"
 MYSQL_ROOT_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
-MYSQL_USER=root
+MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
 MYSQL_HOST=database
 # Database name (fixed for containerized environment)
@@ -525,7 +525,7 @@ function Install-Poznote {
         # Database settings - Fixed for containerized environment
         Write-Host "`nDatabase Configuration: Using default values for containerized environment" -ForegroundColor $Colors.Blue
         $MYSQL_ROOT_PASSWORD = "sfs466!sfdgGH"
-        $MYSQL_USER = "root"
+        $MYSQL_USER = "poznote_user"
         $MYSQL_PASSWORD = "sfs466!sfdgGH"
         
         # Fixed database name for containerized environment
@@ -534,7 +534,7 @@ function Install-Poznote {
         # Create .env file
         $envContent = @"
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_USER=root
+MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$MYSQL_PASSWORD
 MYSQL_HOST=database
 # Database name (fixed for containerized environment)

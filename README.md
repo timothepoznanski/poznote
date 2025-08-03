@@ -51,7 +51,7 @@ The setup script will automatically detect your situation and present an appropr
 - **Security**: Poznote password (⚠️ change from default `admin123`!)
 - **Overwrite existing files**: Interactive prompts for any conflicts
 
-*Note: Database configuration uses MySQL root user by default for the containerized environment - no additional database users are needed.*
+*Note: Database configuration automatically creates a dedicated `poznote_user` for secure access to the MySQL database - no additional database configuration is needed.*
 
 ### Prerequisites
 

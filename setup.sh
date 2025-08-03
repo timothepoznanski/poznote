@@ -78,7 +78,7 @@ reconfigure_poznote() {
     # Update .env file with new values, preserving everything else
     cat > .env << EOF
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_USER=root
+MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_HOST=database
 # Database name (fixed for containerized environment)
@@ -282,10 +282,10 @@ create_env_file() {
 POZNOTE_PASSWORD=$POZNOTE_PASSWORD
 HTTP_WEB_PORT=$HTTP_WEB_PORT
 
-# Database Configuration (Simplified - using root user directly)
+# Database Configuration (Simplified - using dedicated user)
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_DATABASE=poznote_db
-MYSQL_USER=root
+MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_HOST=database
 
