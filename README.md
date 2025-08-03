@@ -47,7 +47,7 @@ The setup script will automatically detect your situation and present an appropr
     3. **Cancel**: Exit without changes
 
 #### Configuration options you'll be prompted for (new installations):
-- **Web Server Port**: Port for the web interface (default: `8077`)
+- **Web Server Port**: Port for the web interface (default: `8040`)
 - **Security**: Poznote password (⚠️ change from default `admin123`!)
 - **Overwrite existing files**: Interactive prompts for any conflicts
 
@@ -78,7 +78,7 @@ docker compose up -d --build
 
 ### Access
 
-Open your web browser and visit: `http://YOUR_SERVER_NAME:8077`
+Open your web browser and visit: `http://YOUR_SERVER_NAME:8040`
 
 You'll be prompted to login with the default password: `admin123`
 
@@ -363,7 +363,7 @@ bash-5.1# mysql -u root -pmysqlrootpassword poznote_db < /tmp/dump.sql
 ### Example curl
 
 ```bash
-curl -X POST http://YOUR_SERVER_NAME:8077/api_create_note.php \
+curl -X POST http://YOUR_SERVER_NAME:8040/api_create_note.php \
   -H "Content-Type: application/json" \
   -d '{"heading": "My new note", "tags": "personal,important"}'
 ```

@@ -495,7 +495,7 @@ function Install-Poznote {
         Write-Host "`nPlease configure your Poznote installation:`n" -ForegroundColor $Colors.Blue
         
         # Prompt for configuration values
-        $HTTP_WEB_PORT = Get-UserInput "Web Server Port" "8077"
+        $HTTP_WEB_PORT = Get-UserInput "Web Server Port" "8040"
         
         # Use fixed default paths (no prompts)
         $DB_DATA_PATH = "../DB_DATA"
@@ -655,7 +655,7 @@ ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
         Write-Host "  • Wait for Docker Desktop to fully start (green status in system tray)"
         Write-Host "  • Try running 'docker info' to verify Docker is accessible"
         Write-Host "  • Restart Docker Desktop if needed"
-        Write-Host "  • Check that no other services are using the ports (8077, 3306)"
+        Write-Host "  • Check that no other services are using the ports (8040, 3306)"
         exit 1
     }
 }
