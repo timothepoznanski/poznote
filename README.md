@@ -10,14 +10,12 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 
 **For Linux/macOS:**
 ```bash
-mkdir my-poznote && cd my-poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote && chmod +x setup.sh && ./setup.sh
 ```
 
 **For Windows (PowerShell):**
 ```powershell
-mkdir my-poznote; cd my-poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote; .\setup.ps1
 ```
@@ -33,8 +31,6 @@ cd poznote; .\setup.ps1
 
 **For Linux/macOS:**
 ```bash
-mkdir my-poznote
-cd my-poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 chmod +x setup.sh
@@ -43,8 +39,6 @@ chmod +x setup.sh
 
 **For Windows (PowerShell):**
 ```powershell
-mkdir my-poznote
-cd my-poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 .\setup.ps1
@@ -105,8 +99,6 @@ The setup script will automatically detect your situation and present an appropr
 ### Manual Installation
 
 ```bash
-mkdir my-poznote
-cd my-poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 cp .env.template .env
@@ -244,7 +236,6 @@ The script will present a menu where you can choose to:
 
 **Manual Update (Alternative):**
 ```bash
-cd my-poznote/poznote
 git pull origin main
 docker compose build --no-cache
 docker compose up -d --force-recreate
