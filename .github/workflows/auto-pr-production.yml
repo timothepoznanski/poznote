@@ -81,4 +81,4 @@ jobs:
           echo "You can view it at: https://github.com/${{ github.repository }}/pull/$existing_pr"
         fi
       env:
-        GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}

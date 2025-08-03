@@ -39,7 +39,7 @@ You must configure the following secrets in your GitHub repository (Settings →
 - `PROD_SSH_PASSPHRASE` : SSH key passphrase (if your key has one)
 - `PROD_PORT` : SSH port (usually 22)
 - `PROD_PROJECT_PATH` : Absolute path to project on server (ex: `/root/poznote/poznote`)
-- `PAT_TOKEN` : GitHub Personal Access Token to create Pull Requests
+- `GH_TOKEN` : GitHub Personal Access Token to create Pull Requests
 - `DOCKER_USERNAME` : Docker Hub username (for registry push / Not the email address)
 - `DOCKER_PASSWORD` : Docker Hub password or access token
 
@@ -63,7 +63,7 @@ You must configure the following secrets in your GitHub repository (Settings →
    - ✅ `repo` (Full control of private repositories)
    - ✅ `workflow` (Update GitHub Action workflows)
 5. Click "Generate token"
-6. Copy the token and add it to the `PAT_TOKEN` secret
+6. Copy the token and add it to the `GH_TOKEN` secret
 
 ### Alternative option: Key without passphrase
 If you prefer, you can create a dedicated SSH key without passphrase for GitHub Actions:
@@ -184,7 +184,7 @@ This error occurs when your `dev` branch has changes that conflict with `main` d
 
 ### Error "invalid header field value for Authorization"
 This error indicates a problem with the Personal Access Token:
-- ✅ Check that the `PAT_TOKEN` secret is properly configured in your repository
+- ✅ Check that the `GH_TOKEN` secret is properly configured in your repository
 - ✅ Make sure the token hasn't expired
 - ✅ Verify that the token has `repo` and `workflow` permissions
 - ✅ The token should not contain spaces or special characters at the beginning/end
