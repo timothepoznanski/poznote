@@ -432,6 +432,12 @@ function Install-Poznote {
                         Write-Host "$composeCmd logs -f" -ForegroundColor $Colors.Green
                         Write-Host "  • Restart:       " -NoNewline -ForegroundColor $Colors.Blue
                         Write-Host "$composeCmd restart" -ForegroundColor $Colors.Green
+                        Write-Host ""
+                        Write-Warning "💡 To apply configuration changes:"
+                        Write-Host "  1. Edit the .env file with your new values" -ForegroundColor $Colors.Yellow
+                        Write-Host "  2. Run: $composeCmd down && $composeCmd up -d --force-recreate" -ForegroundColor $Colors.Yellow
+                        Write-Host "  " -ForegroundColor $Colors.Yellow
+                        Write-Host "  Or use the setup script option 2 for guided configuration update." -ForegroundColor $Colors.Yellow
                         exit 0
                     }
                     catch {
@@ -643,6 +649,12 @@ ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
         Write-Host "$dockerComposeCmd logs -f" -ForegroundColor $Colors.Green
         Write-Host "  • Restart:       " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$dockerComposeCmd restart" -ForegroundColor $Colors.Green
+        Write-Host ""
+        Write-Warning "💡 To apply configuration changes:"
+        Write-Host "  1. Edit the .env file with your new values" -ForegroundColor $Colors.Yellow
+        Write-Host "  2. Run: $dockerComposeCmd down && $dockerComposeCmd up -d --force-recreate" -ForegroundColor $Colors.Yellow
+        Write-Host "  " -ForegroundColor $Colors.Yellow
+        Write-Host "  Or use the setup script option 2 for guided configuration update." -ForegroundColor $Colors.Yellow
         Write-Host ""
         Write-Status "Wait a few seconds for the database to initialize before accessing the web interface."
     } else {

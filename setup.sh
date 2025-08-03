@@ -366,7 +366,11 @@ show_info() {
         print_status "📁 Your notes and data are stored in Docker volumes and will persist between restarts."
     fi
     echo
-    print_warning "💡 Remember: To change password or port, edit the .env file and run 'docker compose down && docker compose up -d'"
+    print_warning "💡 To apply configuration changes:"
+    print_warning "  1. Edit the .env file with your new values"
+    print_warning "  2. Run: docker compose down && docker compose up -d --force-recreate"
+    print_warning "  "
+    print_warning "  Or use the setup script option 2 for guided configuration update."
 }
 
 # Main installation/update function
