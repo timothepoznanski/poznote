@@ -1629,7 +1629,6 @@ if (document.readyState === 'loading') {
     // DOM is still loading
 } else {
     // DOM is already loaded
-    console.log('DOM already loaded - initializing copy buttons immediately');
     addCopyButtonsToCodeBlocks();
 }
 
@@ -1661,11 +1660,32 @@ function initTextSelectionHandlers() {
                 // Remonter dans l'arbre DOM pour trouver une zone éditable
                 let isTitleOrTagField = false;
                 while (currentElement && currentElement !== document.body) {
-                    // Vérifier si on est dans un champ de titre ou de tags
-                    if (currentElement.classList && 
-                        (currentElement.classList.contains('css-title') || 
-                         currentElement.classList.contains('name_tags') ||
-                         (currentElement.id && (currentElement.id.startsWith('inp') || currentElement.id.startsWith('tags'))))) {
+                    
+                    // Vérifier l'élément actuel et ses enfants directs pour les champs titre/tags
+                    function checkElementAndChildren(element) {
+                        // Vérifier l'élément lui-même
+                        if (element.classList && 
+                            (element.classList.contains('css-title') || 
+                             element.classList.contains('add-margin') ||
+                             (element.id && (element.id.startsWith('inp') || element.id.startsWith('tags'))))) {
+                            return true;
+                        }
+                        
+                        // Vérifier les enfants directs (pour le cas <h4><input class="css-title"...></h4>)
+                        if (element.children) {
+                            for (let child of element.children) {
+                                if (child.classList && 
+                                    (child.classList.contains('css-title') || 
+                                     child.classList.contains('add-margin') ||
+                                     (child.id && (child.id.startsWith('inp') || child.id.startsWith('tags'))))) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                    
+                    if (checkElementAndChildren(currentElement)) {
                         isTitleOrTagField = true;
                         break;
                     }
@@ -1681,8 +1701,13 @@ function initTextSelectionHandlers() {
                 }
                 
                 if (isTitleOrTagField) {
-                    // Texte sélectionné dans un champ de titre ou de tags : ne rien faire, garder l'état actuel de la toolbar
-                    return;
+                    // Texte sélectionné dans un champ de titre ou de tags : garder l'état normal (actions visibles, formatage caché)
+                    textFormatButtons.forEach(btn => {
+                        btn.classList.remove('show-on-selection');
+                    });
+                    noteActionButtons.forEach(btn => {
+                        btn.classList.remove('hide-on-selection');
+                    });
                 } else if (editableElement) {
                     // Texte sélectionné dans une zone éditable : afficher les boutons de formatage, cacher les actions
                     textFormatButtons.forEach(btn => {
@@ -1740,7 +1765,8 @@ function initTextSelectionHandlers() {
     });
 }
 
-// Initialiser les gestionnaires de sélection de texte
+// Les gestionnaires de sélection de texte sont désactivés
+// pour éviter le masquage automatique de la toolbar
 document.addEventListener('DOMContentLoaded', initTextSelectionHandlers);
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTextSelectionHandlers);
@@ -1750,25 +1776,20 @@ if (document.readyState === 'loading') {
 
 // Global function for manual testing
 window.testCopyButtons = function() {
-    console.log('Manual test - adding copy buttons');
     addCopyButtonsToCodeBlocks();
 };
 
 // Global function to test copy functionality directly
 window.testCopyFunction = function(text) {
     if (!text) text = "Test copy functionality";
-    console.log('Testing copy with text:', text);
     
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-            console.log('Copy test successful');
             showNotificationPopup('Copy test successful!');
         }).catch((err) => {
-            console.log('Copy test failed:', err);
             showNotificationPopup('Copy test failed: ' + err, 'error');
         });
     } else {
-        console.log('Clipboard API not available');
         showNotificationPopup('Clipboard API not available', 'error');
     }
 };
