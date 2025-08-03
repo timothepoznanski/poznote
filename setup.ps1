@@ -228,6 +228,11 @@ function Update-DockerContainers {
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Containers updated successfully!"
+            
+            # Wait for database to be ready
+            Write-Status "Waiting for database to be ready..."
+            Start-Sleep -Seconds 15
+            
             return $composeCmd
         } else {
             Write-Error "Docker command failed with exit code: $LASTEXITCODE"
@@ -290,8 +295,9 @@ function Reconfigure-Poznote {
     # Update .env file with new values, preserving everything else
     $newEnvContent = @"
 MYSQL_ROOT_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
-MYSQL_USER=$($existingConfig['MYSQL_USER'])
-MYSQL_PASSWORD=$($existingConfig['MYSQL_PASSWORD'])
+MYSQL_USER=root
+MYSQL_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
+MYSQL_HOST=database
 # Database name (fixed for containerized environment)
 MYSQL_DATABASE=$($existingConfig['MYSQL_DATABASE'])
 
@@ -518,9 +524,9 @@ function Install-Poznote {
         
         # Database settings - Fixed for containerized environment
         Write-Host "`nDatabase Configuration: Using default values for containerized environment" -ForegroundColor $Colors.Blue
-        $MYSQL_ROOT_PASSWORD = "mysqlrootpassword"
-        $MYSQL_USER = "mysqluser"
-        $MYSQL_PASSWORD = "mysqlpassword"
+        $MYSQL_ROOT_PASSWORD = "sfs466!sfdgGH"
+        $MYSQL_USER = "root"
+        $MYSQL_PASSWORD = "sfs466!sfdgGH"
         
         # Fixed database name for containerized environment
         $MYSQL_DATABASE = "poznote_db"
@@ -528,8 +534,9 @@ function Install-Poznote {
         # Create .env file
         $envContent = @"
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_USER=$MYSQL_USER
+MYSQL_USER=root
 MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_HOST=database
 # Database name (fixed for containerized environment)
 MYSQL_DATABASE=$MYSQL_DATABASE
 
