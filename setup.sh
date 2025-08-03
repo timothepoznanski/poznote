@@ -75,8 +75,16 @@ reconfigure_poznote() {
         print_warning "You are using the default password! Please change it for production use."
     fi
 
-    # Update .env file with new values, preserving everything else
-    cat > .env << EOF
+    # Update .env file with new values, using template as base
+    if [ -f ".env.template" ]; then
+        # Copy template and update values
+        cp ".env.template" ".env"
+        sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$NEW_POZNOTE_PASSWORD/" .env
+        sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$NEW_HTTP_WEB_PORT/" .env
+        print_success "Configuration updated from template successfully!"
+    else
+        # Fallback to manual creation if template doesn't exist
+        cat > .env << EOF
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
@@ -94,8 +102,8 @@ ENTRIES_DATA_PATH=./data/entries
 ATTACHMENTS_DATA_PATH=./data/attachments
 
 EOF
-
-    print_success "Configuration updated successfully!"
+        print_success "Configuration updated successfully!"
+    fi
 
     # Restart containers with new configuration
     print_status "Restarting Poznote with new configuration..."
@@ -229,6 +237,15 @@ load_existing_env() {
 configure_poznote() {
     local is_update=$1
     
+    # Load defaults from .env.template if it exists
+    local TEMPLATE_PASSWORD=""
+    local TEMPLATE_PORT=""
+    
+    if [ -f ".env.template" ]; then
+        TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
+        TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2)
+    fi
+    
     if [ "$is_update" = "true" ]; then
         print_status "Current configuration will be preserved. Press Enter to keep current values or enter new ones:"
         echo
@@ -240,13 +257,13 @@ configure_poznote() {
         echo
         POZNOTE_PASSWORD=${POZNOTE_PASSWORD:-$DEFAULT_PASSWORD}
     else
-        while [ -z "$POZNOTE_PASSWORD" ]; do
-            read -s -p "Enter Poznote Password: " POZNOTE_PASSWORD
-            echo
-            if [ -z "$POZNOTE_PASSWORD" ]; then
-                print_error "Password cannot be empty"
-            fi
-        done
+        read -p "Poznote Password (default: $TEMPLATE_PASSWORD): " POZNOTE_PASSWORD
+        POZNOTE_PASSWORD=${POZNOTE_PASSWORD:-$TEMPLATE_PASSWORD}
+        
+        if [ -z "$POZNOTE_PASSWORD" ]; then
+            print_error "Password cannot be empty"
+            POZNOTE_PASSWORD="admin123"  # Fallback
+        fi
     fi
     
     # Get HTTP port
@@ -254,14 +271,19 @@ configure_poznote() {
         read -p "HTTP Port (current: $DEFAULT_PORT): " HTTP_WEB_PORT
         HTTP_WEB_PORT=${HTTP_WEB_PORT:-$DEFAULT_PORT}
     else
-        read -p "HTTP Port (default: 8040): " HTTP_WEB_PORT
-        HTTP_WEB_PORT=${HTTP_WEB_PORT:-8040}
+        read -p "HTTP Port (default: $TEMPLATE_PORT): " HTTP_WEB_PORT
+        HTTP_WEB_PORT=${HTTP_WEB_PORT:-$TEMPLATE_PORT}
+        
+        # Fallback if template doesn't have port
+        if [ -z "$HTTP_WEB_PORT" ]; then
+            HTTP_WEB_PORT=8040
+        fi
     fi
     
     # Validate port
     if ! [[ "$HTTP_WEB_PORT" =~ ^[0-9]+$ ]] || [ "$HTTP_WEB_PORT" -lt 1 ] || [ "$HTTP_WEB_PORT" -gt 65535 ]; then
-        print_error "Invalid port number. Using default 8040."
-        HTTP_WEB_PORT=8040
+        print_error "Invalid port number. Using default from template or 8040."
+        HTTP_WEB_PORT=${TEMPLATE_PORT:-8040}
     fi
     
     # Set MySQL password (use template value for new installations)
@@ -269,7 +291,11 @@ configure_poznote() {
         MYSQL_ROOT_PASSWORD="$DEFAULT_DB_PASSWORD"
     else
         # Use the same password as defined in .env.template for new installations
-        MYSQL_ROOT_PASSWORD="sfs466!sfdgGH"
+        if [ -f ".env.template" ]; then
+            MYSQL_ROOT_PASSWORD=$(grep "^MYSQL_ROOT_PASSWORD=" .env.template | cut -d'=' -f2)
+        fi
+        # Fallback to hardcoded value if template doesn't exist
+        MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-"sfs466!sfdgGH"}
     fi
 }
 
@@ -277,26 +303,26 @@ configure_poznote() {
 create_env_file() {
     print_status "Creating .env file..."
     
-    cat > .env << EOF
-# Poznote Configuration
-POZNOTE_PASSWORD=$POZNOTE_PASSWORD
-HTTP_WEB_PORT=$HTTP_WEB_PORT
-
-# Database Configuration (Simplified - using dedicated user)
-MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_DATABASE=poznote_db
-MYSQL_USER=poznote_user
-MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_HOST=database
-
-# Docker Configuration
-DB_DATA_PATH=./data/mysql
-ENTRIES_DATA_PATH=./data/entries
-ATTACHMENTS_DATA_PATH=./data/attachments
-
-EOF
+    # Check if .env.template exists
+    if [ ! -f ".env.template" ]; then
+        print_error ".env.template file not found. Cannot create .env file."
+        exit 1
+    fi
     
-    print_success ".env file created"
+    # Copy template to .env
+    cp ".env.template" ".env"
+    
+    # Replace the configurable values in the .env file
+    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
+    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
+    
+    # For new installations, we can use the default MYSQL_PASSWORD from template
+    # For updates, we preserve the existing password
+    if [ "$IS_UPDATE" != "true" ] && [ -n "$MYSQL_PASSWORD_OVERRIDE" ]; then
+        sed -i "s/^MYSQL_PASSWORD=.*/MYSQL_PASSWORD=$MYSQL_PASSWORD_OVERRIDE/" .env
+    fi
+    
+    print_success ".env file created from template"
 }
 
 # Function to update Docker containers

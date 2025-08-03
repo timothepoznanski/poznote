@@ -292,8 +292,21 @@ function Reconfigure-Poznote {
         Write-Warning "You are using the default password! Please change it for production use."
     }
 
-    # Update .env file with new values, preserving everything else
-    $newEnvContent = @"
+    # Update .env file with new values, using template as base
+    if (Test-Path ".env.template") {
+        # Copy template and update values
+        Copy-Item ".env.template" ".env" -Force
+        
+        # Update the configurable values
+        $envContent = Get-Content ".env" -Raw
+        $envContent = $envContent -replace "^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
+        $envContent = $envContent -replace "^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
+        
+        $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
+        Write-Success "Configuration updated from template successfully!"
+    } else {
+        # Fallback to manual creation if template doesn't exist
+        $newEnvContent = @"
 MYSQL_ROOT_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
 MYSQL_USER=poznote_user
 MYSQL_PASSWORD=$($existingConfig['MYSQL_ROOT_PASSWORD'])
@@ -312,8 +325,9 @@ ATTACHMENTS_DATA_PATH=$($existingConfig['ATTACHMENTS_DATA_PATH'])
 
 "@
 
-    $newEnvContent | Out-File -FilePath ".env" -Encoding UTF8
-    Write-Success "Configuration updated successfully!"
+        $newEnvContent | Out-File -FilePath ".env" -Encoding UTF8
+        Write-Success "Configuration updated successfully!"
+    }
 
     # Restart containers with new configuration
     Write-Status "Restarting Poznote with new configuration..."
@@ -504,55 +518,39 @@ function Install-Poznote {
             exit 1
         }
         
+        # Load default values from template
+        $templateConfig = @{}
+        Get-Content ".env.template" | ForEach-Object {
+            if ($_ -match '^([^#][^=]+)=(.*)$') {
+                $templateConfig[$matches[1]] = $matches[2]
+            }
+        }
+        
         Write-Host "`nPlease configure your Poznote installation:`n" -ForegroundColor $Colors.Blue
         
-        # Prompt for configuration values
-        $HTTP_WEB_PORT = Get-UserInput "Web Server Port" "8040"
-        
-        # Use fixed default paths (no prompts)
-        $DB_DATA_PATH = "./data/mysql"
-        $ENTRIES_DATA_PATH = "./data/entries"
-        $ATTACHMENTS_DATA_PATH = "./data/attachments"
+        # Prompt for configuration values with template defaults
+        $HTTP_WEB_PORT = Get-UserInput "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
         
         # Security settings
         Write-Host "`nSecurity Configuration:" -ForegroundColor $Colors.Yellow
-        $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" "admin123"
+        $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
             Write-Warning "You are using the default password! Please change it for production use."
         }
         
-        # Database settings - Fixed for containerized environment
-        Write-Host "`nDatabase Configuration: Using default values for containerized environment" -ForegroundColor $Colors.Blue
-        $MYSQL_ROOT_PASSWORD = "sfs466!sfdgGH"
-        $MYSQL_USER = "poznote_user"
-        $MYSQL_PASSWORD = "sfs466!sfdgGH"
+        Write-Host "`nUsing template configuration for database and paths..." -ForegroundColor $Colors.Blue
         
-        # Fixed database name for containerized environment
-        $MYSQL_DATABASE = "poznote_db"
+        # Copy template to .env
+        Copy-Item ".env.template" ".env" -Force
         
-        # Create .env file
-        $envContent = @"
-MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_USER=poznote_user
-MYSQL_PASSWORD=$MYSQL_PASSWORD
-MYSQL_HOST=database
-# Database name (fixed for containerized environment)
-MYSQL_DATABASE=$MYSQL_DATABASE
-
-# Authentication - Change this password for security
-POZNOTE_PASSWORD=$POZNOTE_PASSWORD
-
-# Environment ports and paths
-HTTP_WEB_PORT=$HTTP_WEB_PORT
-DB_DATA_PATH=$DB_DATA_PATH
-ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH
-ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
-
-"@
+        # Update the configurable values in the copied file
+        $envContent = Get-Content ".env" -Raw
+        $envContent = $envContent -replace "^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
+        $envContent = $envContent -replace "^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
         
-        $envContent | Out-File -FilePath ".env" -Encoding UTF8
-        Write-Success ".env file created successfully!"
+        $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
+        Write-Success ".env file created from template successfully!"
     }
     
     # Read .env file to get paths

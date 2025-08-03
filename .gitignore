@@ -11,7 +11,6 @@ src/attachments/*
 
 # Environment files (these should not be committed)
 .env
-.env.dev.template
 
 # Docker compose files
 docker-compose-dev.yml
