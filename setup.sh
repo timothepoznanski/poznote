@@ -441,7 +441,12 @@ main() {
                     
                     # Load existing configuration (no backup needed for updates)
                     load_existing_env
-                    break
+                    
+                    # For updates, skip configuration and go directly to container update
+                    print_status "Preserving existing configuration..."
+                    update_containers
+                    show_info $IS_UPDATE
+                    exit 0
                     ;;
                 2)
                     reconfigure_poznote
