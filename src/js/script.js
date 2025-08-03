@@ -1659,7 +1659,16 @@ function initTextSelectionHandlers() {
                 let editableElement = null;
                 
                 // Remonter dans l'arbre DOM pour trouver une zone éditable
+                let isTitleOrTagField = false;
                 while (currentElement && currentElement !== document.body) {
+                    // Vérifier si on est dans un champ de titre ou de tags
+                    if (currentElement.classList && 
+                        (currentElement.classList.contains('css-title') || 
+                         currentElement.classList.contains('name_tags') ||
+                         (currentElement.id && (currentElement.id.startsWith('inp') || currentElement.id.startsWith('tags'))))) {
+                        isTitleOrTagField = true;
+                        break;
+                    }
                     if (currentElement.classList && currentElement.classList.contains('noteentry')) {
                         editableElement = currentElement;
                         break;
@@ -1671,7 +1680,10 @@ function initTextSelectionHandlers() {
                     currentElement = currentElement.parentElement;
                 }
                 
-                if (editableElement) {
+                if (isTitleOrTagField) {
+                    // Texte sélectionné dans un champ de titre ou de tags : ne rien faire, garder l'état actuel de la toolbar
+                    return;
+                } else if (editableElement) {
                     // Texte sélectionné dans une zone éditable : afficher les boutons de formatage, cacher les actions
                     textFormatButtons.forEach(btn => {
                         btn.classList.add('show-on-selection');

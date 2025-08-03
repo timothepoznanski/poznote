@@ -78,8 +78,9 @@ reconfigure_poznote() {
     # Update .env file with new values, preserving everything else
     cat > .env << EOF
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
-MYSQL_USER=$MYSQL_USER
-MYSQL_PASSWORD=$MYSQL_PASSWORD
+MYSQL_USER=root
+MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+MYSQL_HOST=database
 # Database name (fixed for containerized environment)
 MYSQL_DATABASE=$MYSQL_DATABASE
 
@@ -281,11 +282,12 @@ create_env_file() {
 POZNOTE_PASSWORD=$POZNOTE_PASSWORD
 HTTP_WEB_PORT=$HTTP_WEB_PORT
 
-# Database Configuration
+# Database Configuration (Simplified - using root user directly)
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 MYSQL_DATABASE=poznote_db
-MYSQL_USER=poznote_user
+MYSQL_USER=root
 MYSQL_PASSWORD=$MYSQL_ROOT_PASSWORD
+MYSQL_HOST=database
 
 # Docker Configuration
 DB_DATA_PATH=./data/mysql
@@ -366,7 +368,11 @@ show_info() {
         print_status "📁 Your notes and data are stored in Docker volumes and will persist between restarts."
     fi
     echo
-    print_warning "💡 Remember: To change password or port, edit the .env file and run 'docker compose down && docker compose up -d'"
+    print_warning "💡 To apply configuration changes:"
+    print_warning "  1. Edit the .env file with your new values"
+    print_warning "  2. Run: docker compose down && docker compose up -d --force-recreate"
+    print_warning "  "
+    print_warning "  Or use the setup script option 2 for guided configuration update."
 }
 
 # Main installation/update function
