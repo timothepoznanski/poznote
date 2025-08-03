@@ -1,10 +1,33 @@
 # Poznote
 
-I created Poznote as a effective, self-hosted, open-source, full-responsive, note-taking tool with powerful search and full control over your data. 🤩
+I created Poznote as an effective, self-hosted, open-source, fully-responsive note-taking tool with powerful search and full control over your data. 🤩
 
 Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices.
 
-## Installation & Updates
+## 🚀 Quick Start
+
+### Automated Setup (Recommended)
+
+**For Linux/macOS:**
+```bash
+mkdir my-poznote && cd my-poznote
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote && chmod +x setup.sh && ./setup.sh
+```
+
+**For Windows (PowerShell):**
+```powershell
+mkdir my-poznote; cd my-poznote
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote; .\setup.ps1
+```
+
+### Default Access
+- **URL**: `http://localhost:8040` (local) or `http://YOUR_SERVER_IP:8040` (VPS)
+- **Username**: `admin`
+- **Password**: `admin123` ⚠️ **Change this immediately!**
+
+## 🔧 Installation & Updates
 
 ### Automated Setup
 
@@ -48,21 +71,36 @@ The setup script will automatically detect your situation and present an appropr
 
 #### Configuration options you'll be prompted for (new installations):
 - **Web Server Port**: Port for the web interface (default: `8040`)
-- **Security**: Poznote password (⚠️ change from default `admin123`!)
-- **Overwrite existing files**: Interactive prompts for any conflicts
+- **Poznote Password**: Application login password (⚠️ change from default `admin123`!)
 
-*Note: Database configuration automatically creates a dedicated `poznote_user` for secure access to the MySQL database - no additional database configuration is needed.*
+*Note: Database configuration is automatically handled using a dedicated `poznote_user` for secure access to the MySQL database - no additional database configuration is needed.*
 
-### Prerequisites
+## 📋 Prerequisites
 
-**For Linux/macOS:**
-- Docker Engine and Docker Compose
+### System Requirements
+- **Docker Engine** and **Docker Compose** (v2.0+)
+- **Git** (for installation and updates)
+- **2GB RAM** minimum, 4GB recommended
+- **1GB disk space** minimum for application + your data
+
+### Platform Specific
+**Linux/macOS:**
 - Bash shell
 - `sudo` access (for file permissions)
 
-**For Windows:**
+**Windows:**
 - Docker Desktop for Windows
 - PowerShell 5.1 or later
+- Git for Windows
+
+### Network Requirements
+**Ports used by Poznote:**
+- `8040` (default) - Web interface (configurable)
+- `3306` - MySQL database (internal, not exposed)
+
+**For VPS installations:**
+- Ensure your firewall allows the chosen web port
+- Consider setting up a reverse proxy for HTTPS
 
 ### Manual Installation
 
@@ -76,69 +114,112 @@ cp .env.template .env
 docker compose up -d --build
 ```
 
+### Docker Architecture
+
+Poznote uses a multi-container Docker setup:
+
+**Containers:**
+- `webserver` - Apache/PHP serving the application
+- `database` - MySQL 9.3.0 for data storage
+
+**Volumes:**
+- `./data/entries` - Your note files (HTML)
+- `./data/attachments` - File attachments
+- `./data/mysql` - Database files
+
+**Configuration:**
+- `.env` file contains all settings (ports, passwords, paths)
+- Based on `.env.template` with secure defaults
+
 ### Access
 
-Open your web browser and visit: `http://YOUR_SERVER_NAME:8040`
+**For local installation:**
+Open your web browser and visit: `http://localhost:8040`
+
+**For VPS/remote server installation:**
+Open your web browser and visit: `http://YOUR_SERVER_IP:8040` or `http://your-domain.com:8040`
+
+**For network access from other devices on local network:**
+Use: `http://YOUR_LOCAL_IP:8040`
 
 You'll be prompted to login with the default password: `admin123`
 
-## Troubleshooting
+⚠️ **Important**: Change the default password after first login for security!
+
+## 🛡️ Security Considerations
+
+### Essential Security Steps
+1. **🔑 Change Default Password**: Replace `admin123` immediately
+2. **🌐 Network Security**: 
+   - For VPS: Configure firewall (`ufw allow 8040` on Ubuntu)
+   - Consider using non-default ports
+   - Implement fail2ban for brute force protection
+3. **🔒 Production Setup**: Use HTTPS with reverse proxy
+4. **📦 Keep Updated**: Regular `docker compose pull` for security patches
+
+### For VPS/Production
+```bash
+# Example firewall setup (Ubuntu/Debian)
+sudo ufw enable
+sudo ufw allow ssh
+sudo ufw allow 8040/tcp  # Or your chosen port
+sudo ufw status
+```
+
+### Recommended Production Architecture
+- **Reverse Proxy**: [Nginx Proxy Manager](https://nginxproxymanager.com), Traefik, or Caddy
+- **SSL/TLS**: Let's Encrypt certificates
+- **Backup Strategy**: Automated backups of data volumes
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-**Database connection errors on first start:**
-```bash
+**🐛 Database connection errors on first start:**
+```
 BDD connection error : Connection refused
 ```
-- **Solution**: Wait a few seconds for the database to initialize, then refresh the page
+**Solution**: Wait 30-60 seconds for MySQL to initialize, then refresh the page.
 
-**Permission errors when saving notes:**
-- **Solution**: Fix file permissions:
+**📁 Permission errors when saving notes:**
+**Solution**: Docker handles permissions automatically, but if issues persist:
 ```bash
-sudo chown -R www-data:www-data ../ENTRIES_DATA ../ATTACHMENTS_DATA
+docker compose down
+docker compose up -d --force-recreate
 ```
 
-**Port already in use:**
-- **Solution**: Edit your `.env` file to use different ports
+**🚪 Port already in use:**
+**Solution**: Edit `.env` file to change `HTTP_WEB_PORT=8041` (or any free port)
 
-### Docker Not Found
-- **Linux**: Install Docker Engine and Docker Compose
-- **macOS**: Install Docker Desktop for Mac  
-- **Windows**: Install Docker Desktop for Windows
+**🐳 Docker issues:**
+- **Linux**: `sudo systemctl start docker`
+- **macOS/Windows**: Start Docker Desktop application
+- **Verification**: `docker --version && docker compose version`
 
-### Post-Installation Management
-
-**Common Docker commands:**
+### Getting Help
+**Check logs for detailed error information:**
 ```bash
-# Stop Poznote
-docker compose down
-
-# Start Poznote  
-docker compose up -d
-
-# View logs
+# All services
 docker compose logs -f
 
-# Restart services
-docker compose restart
+# Specific service
+docker compose logs -f webserver
+docker compose logs -f database
 ```
 
-## Security & Production
+**Common diagnostic commands:**
+```bash
+# Check container status
+docker compose ps
 
-### Important Security Notes
-1. **Change Default Password**: Always change `admin123` to a strong password
-2. **Use HTTPS**: Configure a reverse proxy with SSL/TLS for production
-3. **Firewall**: Restrict access to ports if not using a reverse proxy
-4. **Regular Updates**: Keep Docker images updated with `docker compose pull`
+# Check resource usage
+docker stats
 
-### Recommended Production Setup
-Consider using a reverse proxy like [Nginx Proxy Manager](https://nginxproxymanager.com) for:
-- SSL/TLS certificates (Let's Encrypt)
-- Domain mapping
-- Additional security layers
+# Restart specific service
+docker compose restart webserver
+```
 
-
-## Updates
+## 🔄 Updates
 
 ### Automated Update (Recommended)
 
@@ -189,9 +270,7 @@ Run the setup script and select option 2 from the menu:
 
 **Manual configuration changes:**
 
-**Manual configuration changes:**
-
-**For basic settings (HTTP_WEBSERVER_PORT, POZNOTE_PASSWORD):**
+**For basic settings (HTTP_WEB_PORT, POZNOTE_PASSWORD):**
 Edit your `.env` file and restart the application:
 ```bash
 docker compose down
@@ -210,160 +289,142 @@ docker compose up -d
 
 *Note: Database settings are fixed for the containerized environment and cannot be changed after initial setup.*
 
-## Export or backup
+## 💾 Backup & Restore
 
-Poznote provides three types of exports for complete backup coverage. Access all export functions through Settings → "Export/Import Database".
+Poznote provides comprehensive backup and restore functionality through the web interface.
 
-### Export your notes ###
+### 📤 Export (Backup)
 
-**Web Interface (Recommended)**
-- Go to Settings → "Export/Import Database"
-- Click "Download Notes (ZIP)" 
-- Downloads all notes as HTML files in a ZIP archive with index
+**Access**: Settings → "Export/Import Database"
 
-**Manual Export (Alternative)**
-Get your HTML files directly from the `../ENTRIES_DATA` directory.
+#### 📝 Export Notes
+- **Web Interface**: Click "Download Notes (ZIP)" → Complete ZIP with HTML files + index
+- **Manual**: Copy files from `./data/entries` directory
 
-### Export your attachments ###
+#### 📎 Export Attachments  
+- **Web Interface**: Click "Download Attachments (ZIP)" → All files in organized ZIP
+- **Manual**: Copy files from `./data/attachments` directory
 
-**Web Interface (Recommended)**
-- Go to Settings → "Export/Import Database"
-- Click "Download Attachments (ZIP)"
-- Downloads all attachment files in a ZIP archive with index
+#### 🗄️ Export Database
+- **Web Interface**: Click "Download Database (SQL)" → Complete SQL dump
+- **Format**: `poznote_export_YYYY-MM-DD_HH-MM-SS.sql`
+- **Contents**: Tables, data, routines, triggers
 
-**Manual Export (Alternative)**  
-Get your attachment files directly from the `../ATTACHMENTS_DATA` directory.
-
-### Export your database ###
-
-**Web Interface (Recommended)**
-- Go to Settings → "Export/Import Database" 
-- Click "Download Database (SQL)"
-- Downloads database structure as `poznote_export_YYYY-MM-DD_HH-MM-SS.sql`
-
-**Features:**
-- **Real-time generation**: No server storage required
-- **Complete structure**: Includes tables, data, routines, and triggers
-- **Security**: Only authenticated users can access
-- **Format**: Standard SQL dump compatible with MySQL
-
-**Manual Export (Alternative)**
-
-Create temporarily another container to create a dump where you run the command:
-
+**Manual Database Export:**
 ```bash
-docker run --rm --network container:dbserverpoznote -e MYSQL_PWD=mysqrootpassword mysql:latest mysqldump -h127.0.0.1 -uroot poznote_db > dump.sql
+# Get container status
+docker compose ps
+
+# Export database
+docker compose exec database mysqldump -u root -p${MYSQL_ROOT_PASSWORD} poznote_db > backup.sql
 ```
+*Replace `${MYSQL_ROOT_PASSWORD}` with your actual password from `.env`*
 
-## Import or restore
+### 📥 Import (Restore)
 
-Poznote provides web-based import functionality for easy restoration. Access all import functions through Settings → "Export/Import Database".
+**Access**: Settings → "Export/Import Database"
 
-**Complete Restoration**: For a full application restore, you need all three components: Notes, Attachments, and Database.
+⚠️ **Complete Restore**: For full restoration, import all three components: Notes + Attachments + Database
 
-### Import your notes ### 
+#### 📝 Import Notes
+1. **Web Interface**: Select ZIP file → Click "Import Notes (ZIP)" → Auto-extraction
+2. **Manual**: Copy HTML files to `./data/entries` (auto-accessible by container)
 
-**Web Interface (Recommended)**
-1. Go to Settings → "Export/Import Database"
-2. In "Import Notes" section, select your ZIP file containing HTML notes
-3. Click "Import Notes (ZIP)"
-4. All HTML files will be extracted to the notes directory automatically
+#### 📎 Import Attachments
+1. **Web Interface**: Select ZIP file → Click "Import Attachments (ZIP)" → Auto-extraction  
+2. **Manual**: Copy files to `./data/attachments` (auto-accessible by container)
 
-**Manual Import (Alternative)**
-Copy all your HTML files to `../ENTRIES_DATA` directory and ensure proper ownership:
+#### 🗄️ Import Database
+1. **Web Interface**: Select SQL file → Click "Import Database"
+   
+   ⚠️ **Warning**: Completely replaces current database!
+
+2. **Manual Import**:
 ```bash
-sudo chown -R www-data:www-data ../ENTRIES_DATA
+# Copy dump to container
+docker compose cp backup.sql database:/tmp/backup.sql
+
+# Import database
+docker compose exec database bash
+mysql -u root -p${MYSQL_ROOT_PASSWORD} poznote_db < /tmp/backup.sql
+exit
 ```
 
-### Import your attachments ### 
-
-**Web Interface (Recommended)**
-1. Go to Settings → "Export/Import Database"
-2. In "Import Attachments" section, select your ZIP file containing attachments
-3. Click "Import Attachments (ZIP)"
-4. All files will be extracted to the attachments directory automatically
-
-**Manual Import (Alternative)**
-Copy all your attachment files to `../ATTACHMENTS_DATA` directory and ensure proper ownership:
-```bash
-sudo chown -R www-data:www-data ../ATTACHMENTS_DATA
-```
-
-### Import your database ### 
-
-**Web Interface (Recommended)**
-1. Go to Settings → "Export/Import Database"
-2. In "Import Database" section, select your SQL file
-3. Click "Import Database" 
-4. ⚠️ **Warning**: This completely replaces your current database
-
-**Security & Technical Notes:**
-- ZIP files are validated and safely extracted
-- HTML files are filtered during notes import
-- SQL files are verified before database import
-- Proper file permissions are set automatically
-- Temporary files are cleaned up after processing
-- No temporary files kept on server after use
-
-**Manual Import (Alternative)**
-
-Copy your dump into the docker instance:
-
-```
-$ docker cp dump.sql dbserverpoznote:/tmp/dump.sql
-```
-
-Enter your database docker instance and import your dump :
-
-```
-$ docker exec -it dbserverpoznote bash
-bash-5.1# mysql -u root -pmysqlrootpassword poznote_db < /tmp/dump.sql
-```
+**Security Features:**
+- ✅ ZIP files validated and safely extracted
+- ✅ HTML files filtered during import
+- ✅ SQL files verified before import
+- ✅ Automatic permission handling
+- ✅ Temporary files cleaned up automatically
 
 
 
-## API
+## 🔌 API Documentation
 
-### List notes
+Poznote provides a REST API for external integrations.
 
+### Authentication
+Currently, the API uses the same authentication as the web interface.
+
+### Endpoints
+
+#### 📋 List Notes
 - **URL**: `/api_list_notes.php`
 - **Method**: `GET`
 - **Response**:
-    ```json
-    [
-      {
-        "id": 1,
-        "heading": "Title",
-        "tags": "tag1,tag2",
-        "updated": "2025-07-14 20:00:00"
-      }
-    ]
-    ```
+```json
+[
+  {
+    "id": 1,
+    "heading": "Note Title",
+    "tags": "tag1,tag2",
+    "updated": "2025-07-14 20:00:00"
+  }
+]
+```
 
-### Create a note
-
+#### ✏️ Create Note
 - **URL**: `/api_create_note.php`
 - **Method**: `POST`
-- **Body (JSON)**:
-    ```json
-    {
-      "heading": "Note title",
-      "tags": "tag1,tag2"
-    }
-    ```
-- **Response (success)**:
-    ```json
-    { "success": true, "id": 2 }
-    ```
-- **Response (error)**:
-    ```json
-    { "error": "The heading field is required" }
-    ```
+- **Content-Type**: `application/json`
+- **Body**:
+```json
+{
+  "heading": "Note title",
+  "tags": "tag1,tag2"
+}
+```
+- **Success Response**:
+```json
+{ 
+  "success": true, 
+  "id": 2 
+}
+```
+- **Error Response**:
+```json
+{ 
+  "error": "The heading field is required" 
+}
+```
 
-### Example curl
+### Examples
 
+**Local Installation:**
 ```bash
-curl -X POST http://YOUR_SERVER_NAME:8040/api_create_note.php \
+curl -X POST http://localhost:8040/api_create_note.php \
   -H "Content-Type: application/json" \
   -d '{"heading": "My new note", "tags": "personal,important"}'
+```
+
+**VPS/Remote Server:**
+```bash
+curl -X POST http://YOUR_SERVER_IP:8040/api_create_note.php \
+  -H "Content-Type: application/json" \
+  -d '{"heading": "My new note", "tags": "personal,important"}'
+```
+
+**List all notes:**
+```bash
+curl http://localhost:8040/api_list_notes.php
 ```
