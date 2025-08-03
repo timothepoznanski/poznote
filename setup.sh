@@ -307,13 +307,13 @@ update_containers() {
         docker compose down
     fi
     
-    # Pull latest images
+    # Pull latest images (only for external images like MySQL)
     print_status "Pulling latest Docker images..."
     docker compose pull
     
-    # Start containers
-    print_status "Starting containers..."
-    docker compose up -d
+    # Start containers with build (to rebuild webserver with latest code)
+    print_status "Building and starting containers..."
+    docker compose up -d --build
     
     # Wait for containers to be ready
     print_status "Waiting for services to start..."
