@@ -253,29 +253,22 @@ configure_poznote() {
         read -p "HTTP Port (current: $DEFAULT_PORT): " HTTP_WEB_PORT
         HTTP_WEB_PORT=${HTTP_WEB_PORT:-$DEFAULT_PORT}
     else
-        read -p "HTTP Port (default: 8077): " HTTP_WEB_PORT
-        HTTP_WEB_PORT=${HTTP_WEB_PORT:-8077}
+        read -p "HTTP Port (default: 8040): " HTTP_WEB_PORT
+        HTTP_WEB_PORT=${HTTP_WEB_PORT:-8040}
     fi
     
     # Validate port
     if ! [[ "$HTTP_WEB_PORT" =~ ^[0-9]+$ ]] || [ "$HTTP_WEB_PORT" -lt 1 ] || [ "$HTTP_WEB_PORT" -gt 65535 ]; then
-        print_error "Invalid port number. Using default 8077."
-        HTTP_WEB_PORT=8077
+        print_error "Invalid port number. Using default 8040."
+        HTTP_WEB_PORT=8040
     fi
     
-    # Get MySQL password (hidden for updates)
+    # Set MySQL password (use template value for new installations)
     if [ "$is_update" = "true" ] && [ -n "$DEFAULT_DB_PASSWORD" ]; then
-        read -s -p "MySQL Root Password (current: [hidden], press Enter to keep): " MYSQL_ROOT_PASSWORD
-        echo
-        MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-$DEFAULT_DB_PASSWORD}
+        MYSQL_ROOT_PASSWORD="$DEFAULT_DB_PASSWORD"
     else
-        while [ -z "$MYSQL_ROOT_PASSWORD" ]; do
-            read -s -p "Enter MySQL Root Password: " MYSQL_ROOT_PASSWORD
-            echo
-            if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
-                print_error "MySQL password cannot be empty"
-            fi
-        done
+        # Use the same password as defined in .env.template for new installations
+        MYSQL_ROOT_PASSWORD="sfs466!sfdgGH"
     fi
 }
 
@@ -314,13 +307,13 @@ update_containers() {
         docker compose down
     fi
     
-    # Pull latest images
+    # Pull latest images (only for external images like MySQL)
     print_status "Pulling latest Docker images..."
     docker compose pull
     
-    # Start containers
-    print_status "Starting containers..."
-    docker compose up -d
+    # Start containers with build (to rebuild webserver with latest code)
+    print_status "Building and starting containers..."
+    docker compose up -d --build
     
     # Wait for containers to be ready
     print_status "Waiting for services to start..."
