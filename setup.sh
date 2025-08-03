@@ -89,9 +89,9 @@ POZNOTE_PASSWORD=$NEW_POZNOTE_PASSWORD
 
 # Environment ports and paths
 HTTP_WEB_PORT=$NEW_HTTP_WEB_PORT
-DB_DATA_PATH=$DB_DATA_PATH
-ENTRIES_DATA_PATH=$ENTRIES_DATA_PATH
-ATTACHMENTS_DATA_PATH=$ATTACHMENTS_DATA_PATH
+DB_DATA_PATH=./data/mysql
+ENTRIES_DATA_PATH=./data/entries
+ATTACHMENTS_DATA_PATH=./data/attachments
 
 EOF
 
@@ -175,9 +175,9 @@ check_existing_installation() {
     # Don't consider docker compose.yml or .env.template as indicators
     local indicators=0
     
-    [ -d "../ENTRIES_DATA" ] && ((indicators++))
-    [ -d "../ATTACHMENTS_DATA" ] && ((indicators++))
-    [ -d "../DB_DATA" ] && ((indicators++))
+    [ -d "./data/entries" ] && ((indicators++))
+    [ -d "./data/attachments" ] && ((indicators++))
+    [ -d "./data/mysql" ] && ((indicators++))
     
     # Only count .env if it's not identical to .env.template
     if [ -f ".env" ] && [ -f ".env.template" ]; then

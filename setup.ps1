@@ -137,9 +137,9 @@ function Test-Docker {
 function Test-ExistingInstallation {
     # Don't consider .env.template or .env.dev as indicators of existing installation
     $indicators = @(
-        (Test-Path "../ENTRIES_DATA"),
-        (Test-Path "../ATTACHMENTS_DATA"),
-        (Test-Path "../DB_DATA"),
+        (Test-Path "./data/entries"),
+        (Test-Path "./data/attachments"),
+        (Test-Path "./data/mysql"),
         ((Test-Path ".env") -and -not ((Test-Path ".env.template") -and ((Get-Content ".env" -Raw) -eq (Get-Content ".env.template" -Raw))))
     )
     
@@ -510,9 +510,9 @@ function Install-Poznote {
         $HTTP_WEB_PORT = Get-UserInput "Web Server Port" "8040"
         
         # Use fixed default paths (no prompts)
-        $DB_DATA_PATH = "../DB_DATA"
-        $ENTRIES_DATA_PATH = "../ENTRIES_DATA"
-        $ATTACHMENTS_DATA_PATH = "../ATTACHMENTS_DATA"
+        $DB_DATA_PATH = "./data/mysql"
+        $ENTRIES_DATA_PATH = "./data/entries"
+        $ATTACHMENTS_DATA_PATH = "./data/attachments"
         
         # Security settings
         Write-Host "`nSecurity Configuration:" -ForegroundColor $Colors.Yellow
