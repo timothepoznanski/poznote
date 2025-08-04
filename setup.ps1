@@ -36,7 +36,6 @@ FEATURES:
       - New installation (fresh setup)
       - Update application (pull latest code)
       - Change configuration (password/port)
-    • Smart backup creation during configuration changes
     • Configuration preservation during updates
 
 REQUIREMENTS:
