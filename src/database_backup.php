@@ -11,6 +11,14 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 $message = '';
 $error = '';
 
+// Variables for specific section messages
+$restore_message = '';
+$restore_error = '';
+$import_notes_message = '';
+$import_notes_error = '';
+$import_attachments_message = '';
+$import_attachments_error = '';
+
 // Process actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -28,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreBackup($_FILES['backup_file']);
                 if ($result['success']) {
-                    $message = "Database restored successfully!";
+                    $restore_message = "Database restored successfully!";
                 } else {
-                    $error = "Restore error: " . $result['error'];
+                    $restore_error = "Restore error: " . $result['error'];
                 }
             } else {
-                $error = "No backup file selected or upload error.";
+                $restore_error = "No backup file selected or upload error.";
             }
             break;
             
@@ -41,12 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['notes_file']) && $_FILES['notes_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importNotesZip($_FILES['notes_file']);
                 if ($result['success']) {
-                    $message = "Notes imported successfully! " . $result['count'] . " files processed.";
+                    $import_notes_message = "Notes imported successfully! " . $result['count'] . " files processed.";
                 } else {
-                    $error = "Import error: " . $result['error'];
+                    $import_notes_error = "Import error: " . $result['error'];
                 }
             } else {
-                $error = "No notes file selected or upload error.";
+                $import_notes_error = "No notes file selected or upload error.";
             }
             break;
             
@@ -54,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['attachments_file']) && $_FILES['attachments_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importAttachmentsZip($_FILES['attachments_file']);
                 if ($result['success']) {
-                    $message = $result['message'] ?? "Attachments imported successfully! " . $result['count'] . " files processed.";
+                    $import_attachments_message = $result['message'] ?? "Attachments imported successfully! " . $result['count'] . " files processed.";
                 } else {
-                    $error = "Import error: " . $result['error'];
+                    $import_attachments_error = "Import error: " . $result['error'];
                 }
             } else {
-                $error = "No attachments file selected or upload error.";
+                $import_attachments_error = "No attachments file selected or upload error.";
             }
             break;
     }
@@ -452,18 +460,6 @@ $backups = [];
 
         </div>
         
-        <?php if ($message): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($error): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-        
         <!-- Export Notes Section -->
         <div class="backup-section">
             <h3><i class="fas fa-file-archive"></i> Export Notes</h3>
@@ -497,6 +493,12 @@ $backups = [];
         <!-- Import Database Section -->
         <div class="backup-section">
             <h3><i class="fas fa-upload"></i> Import Database</h3>
+            <?php if (!empty($restore_message)): ?>
+                <div class="message success"><?php echo htmlspecialchars($restore_message); ?></div>
+            <?php endif; ?>
+            <?php if (!empty($restore_error)): ?>
+                <div class="message error"><?php echo htmlspecialchars($restore_error); ?></div>
+            <?php endif; ?>
             <div class="warning">
                 <strong>Warning:</strong> This will replace your current database completely. Make sure you have a backup first.
             </div>
@@ -515,6 +517,12 @@ $backups = [];
         <!-- Import Notes Section -->
         <div class="backup-section">
             <h3><i class="fas fa-file-upload"></i> Import Notes</h3>
+            <?php if (!empty($import_notes_message)): ?>
+                <div class="message success"><?php echo htmlspecialchars($import_notes_message); ?></div>
+            <?php endif; ?>
+            <?php if (!empty($import_notes_error)): ?>
+                <div class="message error"><?php echo htmlspecialchars($import_notes_error); ?></div>
+            <?php endif; ?>
             <p>Upload a ZIP file containing HTML notes to import.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_notes">
@@ -531,6 +539,12 @@ $backups = [];
         <!-- Import Attachments Section -->
         <div class="backup-section">
             <h3><i class="fas fa-paperclip"></i> Import Attachments</h3>
+            <?php if (!empty($import_attachments_message)): ?>
+                <div class="message success"><?php echo htmlspecialchars($import_attachments_message); ?></div>
+            <?php endif; ?>
+            <?php if (!empty($import_attachments_error)): ?>
+                <div class="message error"><?php echo htmlspecialchars($import_attachments_error); ?></div>
+            <?php endif; ?>
             <p>Upload a ZIP file containing attachments to import.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_attachments">
