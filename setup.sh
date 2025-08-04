@@ -21,9 +21,11 @@ show_help() {
     echo ""
     echo "OPTIONS:"
     echo "    -h, --help       Show this help message"
+    echo "    --dev            Use development template (.env.dev.template)"
     echo ""
     echo "EXAMPLES:"
     echo "    ./setup.sh                   # Interactive menu for installation, update, or configuration"
+    echo "    ./setup.sh --dev            # Use development configuration"
     echo ""
     echo "FEATURES:"
     echo "    • Automatic detection of existing installations"
@@ -303,14 +305,26 @@ configure_poznote() {
 create_env_file() {
     print_status "Creating .env file..."
     
-    # Check if .env.template exists
-    if [ ! -f ".env.template" ]; then
-        print_error ".env.template file not found. Cannot create .env file."
+    # Check which template to use
+    TEMPLATE_FILE=".env.template"
+    
+    # If we're on dev branch or in a dev environment, prefer dev template
+    if [ -f ".env.dev.template" ]; then
+        CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "")
+        if [ "$CURRENT_BRANCH" = "dev" ] || [ "$PWD" = *"dev"* ] || [ "$USE_DEV_TEMPLATE" = "true" ]; then
+            TEMPLATE_FILE=".env.dev.template"
+            print_success "Using development template: $TEMPLATE_FILE"
+        fi
+    fi
+    
+    # Check if chosen template exists
+    if [ ! -f "$TEMPLATE_FILE" ]; then
+        print_error "$TEMPLATE_FILE file not found. Cannot create .env file."
         exit 1
     fi
     
     # Copy template to .env
-    cp ".env.template" ".env"
+    cp "$TEMPLATE_FILE" ".env"
     
     # Replace the configurable values in the .env file
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
@@ -403,11 +417,18 @@ show_info() {
 
 # Main installation/update function
 main() {
+    # Capture arguments globally
+    USE_DEV_TEMPLATE=false
+    
     # Handle command line arguments
     case "$1" in
         -h|--help)
             show_help
             exit 0
+            ;;
+        --dev)
+            USE_DEV_TEMPLATE=true
+            print_status "Development mode enabled - will use .env.dev.template"
             ;;
         "")
             # No arguments, proceed with normal installation/update
