@@ -6,23 +6,40 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 
 ## 🚀 Quick Start
 
-### Installation
+### Installation on Linux/macOS
 
 ```bash
-# Configure Poznote
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 cp .env.template .env
+# Edit with your preferred editor
 vim .env
 ```
 
-**Configure your installation** by editing the `.env` file:
 - Change `POZNOTE_USERNAME=admin` to your preferred username
 - Change `POZNOTE_PASSWORD=admin123` to a secure password
 - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
 
 ```bash
-# Install and start Poznote
+# Start Poznote
+docker compose up -d --build
+```
+
+### Installation on Windows
+
+```powershell
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote
+copy .env.template .env
+notepad .env
+```
+
+- Change `POZNOTE_USERNAME=admin` to your preferred username
+- Change `POZNOTE_PASSWORD=admin123` to a secure password
+- Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+
+```powershell
+# Start Poznote
 docker compose up -d --build
 ```
 
@@ -48,8 +65,11 @@ docker compose up -d
 
 ## 📋 Prerequisites
 
-### System Requirements
+### Linux/macOS
 - **Docker Engine** and **Docker Compose**
+
+### Windows
+- **Docker Desktop for Windows**
 
 ### Docker Architecture
 
@@ -113,7 +133,7 @@ For manual backup, copy these directories:
 docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
 ```
 
-## � Restore
+## 🔄 Restore
 
 ### Web Interface Restore
 **Access**: Settings → "Export/Import Database"
@@ -146,7 +166,7 @@ docker compose up -d
 docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
 ```
 
-## �🔌 API
+## 🔌 API
 
 Basic REST API endpoints:
 
