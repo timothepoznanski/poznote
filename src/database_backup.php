@@ -448,6 +448,8 @@ $backups = [];
                     <li><strong>Attachments</strong> - Attachments files</li>
                     <li><strong>Database</strong> - Structure, tags, folders, settings</li>
                 </ol>
+                <h4>For offline consulation, export only html notes.</h4>
+
         </div>
         
         <?php if ($message): ?>
