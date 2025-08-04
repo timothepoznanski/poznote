@@ -183,7 +183,7 @@ Available backup options:
 
 #### Manual Backup
 
-You can manually copy these directories:
+You can also manually backup with:
 
 ```bash
 # Backup your notes
@@ -193,15 +193,12 @@ cp -r ./data/entries /path/to/backup/entries
 cp -r ./data/attachments /path/to/backup/attachments
 
 # Backup database
-docker compose exec database mysqldump -u root -p[PASSWORD] poznote_db > backup.sql
+docker compose exec database mysqldump -u root -p sfs466!sfdgGH poznote_db > backup.sql
 ```
-
-> **⚠️ Security Note**: Replace `[PASSWORD]` with your actual database password. For security reasons, avoid exposing passwords in documentation.
 
 ### 🔄 Restore
 
-#### Web Interface Restore
-**Access Path**: Settings → "Export/Import Database"
+Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
 Available restore options:
 - **📝 Import Notes** - Upload ZIP file with your notes
