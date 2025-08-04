@@ -124,10 +124,7 @@ docker compose up -d
 To update Poznote to the latest version:
 
 ```bash
-cd poznote
-git pull origin main
-docker compose down
-docker compose up -d --build
+git pull origin main && docker compose down && docker compose up -d --build
 ```
 
 ## Backup and Restore

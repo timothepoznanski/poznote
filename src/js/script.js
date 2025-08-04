@@ -213,7 +213,6 @@ function uploadAttachment() {
         uploadButton.disabled = false;
     });
 }
-}
 
 function loadAttachments(noteId) {
     fetch(`api_attachments.php?action=list&note_id=${noteId}`)
