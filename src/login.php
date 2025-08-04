@@ -52,10 +52,6 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             
             <button type="submit" class="login-button">Login</button>
         </form>
-        
-        <div class="info">
-            <a href="https://github.com/timothepoznanski/poznote#configuration" target="_blank">Configuration Guide</a>
-        </div>
     </div>
 </body>
 </html>
