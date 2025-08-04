@@ -153,8 +153,21 @@ function uploadAttachment() {
         return;
     }
     
+    // Check file size (200MB limit)
+    const maxSize = 200 * 1024 * 1024; // 200MB in bytes
+    if (file.size > maxSize) {
+        showAttachmentError('File too large. Maximum size is 200MB.');
+        return;
+    }
+    
     // Clear any previous error messages
     hideAttachmentError();
+    
+    // Show upload progress
+    const uploadButton = document.querySelector('.attachment-upload button');
+    const originalText = uploadButton.textContent;
+    uploadButton.textContent = 'Uploading...';
+    uploadButton.disabled = true;
     
     const formData = new FormData();
     formData.append('action', 'upload');
@@ -165,8 +178,21 @@ function uploadAttachment() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Get text first to check for HTML errors
+    })
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Invalid JSON response:', text);
+            throw new Error('Server returned invalid response');
+        }
+        
         if (data.success) {
             fileInput.value = ''; // Clear input
             document.getElementById('selectedFileName').textContent = 'No file chosen'; // Reset filename display
@@ -178,9 +204,15 @@ function uploadAttachment() {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        showAttachmentError('Upload failed');
+        console.error('Upload error:', error);
+        showAttachmentError('Upload failed: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state
+        uploadButton.textContent = originalText;
+        uploadButton.disabled = false;
     });
+}
 }
 
 function loadAttachments(noteId) {

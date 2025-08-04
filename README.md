@@ -195,7 +195,34 @@ docker compose up -d
 docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
 ```
 
-## 🔌 API
+## � Troubleshooting
+
+### Upload Issues on Windows
+
+If you experience "upload failed" errors on Windows Desktop, try these solutions:
+
+1. **Quick Fix - Restart Container:**
+   ```bash
+   docker compose down
+   docker compose up -d --build
+   ```
+
+2. **Check Diagnostic Page:**
+   Visit `http://localhost:8040/test_upload.php` to see detailed information about your upload configuration.
+
+3. **Fix Permissions:**
+   ```bash
+   docker compose exec webserver chmod -R 777 /var/www/html/attachments
+   ```
+
+4. **View Logs:**
+   ```bash
+   docker compose logs webserver
+   ```
+
+For detailed troubleshooting steps, see [TROUBLESHOOTING_UPLOAD.md](TROUBLESHOOTING_UPLOAD.md).
+
+## �🔌 API
 
 Poznote provides a RESTful API for programmatic access to your notes.
 

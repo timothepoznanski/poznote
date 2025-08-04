@@ -49,12 +49,21 @@ function getAttachmentsPath() {
     // Fallback: create attachments directory in current location
     // This should rarely happen as Docker creates the directories
     if (!is_dir('attachments')) {
-        mkdir('attachments', 0755, true);
+        if (!mkdir('attachments', 0777, true)) {
+            error_log("Failed to create attachments directory");
+            return false;
+        }
+        
+        // Set proper permissions
+        chmod('attachments', 0777);
+        
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
             chown('attachments', 'www-data');
             chgrp('attachments', 'www-data');
         }
+        
+        error_log("Created attachments directory: " . realpath('attachments'));
     }
     return realpath('attachments');
 }

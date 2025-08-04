@@ -278,6 +278,19 @@ a:active { color: #2E8CFA; } */
     text-align: center;
 }
 
+.attachment-help {
+    margin-top: 10px;
+    padding: 8px;
+    background: #e7f3ff;
+    border: 1px solid #bee5eb;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.attachment-help small {
+    color: #0c5460;
+}
+
 .attachment-upload input[type="file"] {
     width: 100%;
     padding: 8px;

@@ -212,7 +212,7 @@ if($note != '') {
                         Choose a file
                         <input type="file" id="attachmentFile" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar" class="file-input-hidden">
                     </label>
-                    <div id="acceptedTypes" class="accepted-types">pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar</div>
+                    <div id="acceptedTypes" class="accepted-types">Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)</div>
                 </div>
                 <div class="spacer-18"></div>
                 <div id="selectedFileName" class="selected-filename">No file chosen</div>
@@ -220,6 +220,8 @@ if($note != '') {
                     <button onclick="uploadAttachment()">Upload File</button>
                 </div>
                 <div id="attachmentErrorMessage" class="modal-error-message" style="display: none;"></div>
+                <div class="attachment-help">
+                    <small>💡 If upload fails on Windows, try with a smaller file or restart the Docker container.</small></div>
             </div>
             <div id="attachmentsList" class="attachments-list">
                 <!-- Attachments will be loaded here -->
