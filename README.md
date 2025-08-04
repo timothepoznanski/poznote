@@ -25,6 +25,11 @@ vim .env
 docker compose up -d --build
 ```
 
+**💡 For reverse proxy setups** (Nginx Proxy Manager, Traefik, etc.):
+```bash
+docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
+```
+
 ### Installation on Windows
 
 ```powershell
@@ -41,6 +46,11 @@ notepad .env
 ```powershell
 # Start Poznote
 docker compose up -d --build
+```
+
+**💡 For reverse proxy setups** (Nginx Proxy Manager, Traefik, etc.):
+```powershell
+docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
 ```
 
 ### Default Access
@@ -92,6 +102,8 @@ git pull origin main
 docker compose down
 docker compose up -d --build
 ```
+
+**💡 For reverse proxy setups**: Use `docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml` instead of `docker compose` in the commands above
 
 ## 💾 Data Management
 
