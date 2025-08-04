@@ -3,11 +3,16 @@
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql## 🛠️ Troubleshooting
 
-A powerful, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
+### Common Issues
 
-Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
+#### Database Connection Error on First Start
+**Problem**: Connection errors when first accessing Poznote  
+**Solution**: Wait 30-60 seconds for MySQL to fully initialize, then refresh your browser.
+
+#### Port Already in Use
+**Problem**: Cannot start - port conflict  
 **Solution**: 
 1. Change `HTTP_WEB_PORT` in your `.env` file
 2. Restart: `docker compose down && docker compose up -d`
@@ -19,6 +24,70 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 # Fix data directory permissions
 sudo chown -R $(id -u):$(id -g) ./data
 ```
+
+### Debugging Commands
+
+**Check container logs:**
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f webserver
+docker compose logs -f database
+```
+
+**Check container status:**
+```bash
+docker compose ps
+```
+
+**Restart services:**
+```bash
+# Restart all services
+docker compose restart
+
+# Restart specific service
+docker compose restart webserver
+```
+
+**Reset everything (⚠️ Data loss):**
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
+### Getting Help
+
+- 📋 **Issues**: [GitHub Issues](https://github.com/timothepoznanski/poznote/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/timothepoznanski/poznote/discussions)
+- 📖 **Documentation**: Check this README and source code comments
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open source. Please check the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+Built with ❤️ using:
+- PHP & Apache
+- MySQL
+- Docker & Docker Compose
+- Font Awesome
+- Inter Font Familyl, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
+
+Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
+**Solution**: 
+1. Change `HTTP_WEB_PORT` in your `.env` file
+2. Restart: `docker compose down && docker compose up -d`
+
+## ✨ Features
 
 ### Debugging Commands
 
