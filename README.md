@@ -9,7 +9,7 @@ A powerful, self-hosted, open-source note-taking tool with advanced search capab
 
 Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
 
-## ✨ Features
+## Features
 
 - 📝 **Rich Text Editor** - Write and format notes with ease
 - 🔍 **Powerful Search** - Find your notes instantly with advanced search
@@ -22,7 +22,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 - 🌐 **REST API** - Programmatic access to your notes
 - 🐳 **Docker Ready** - Easy deployment with Docker Compose
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Linux/macOS
 - **[Docker Engine](https://docs.docker.com/engine/install/)** (v20.10+)
@@ -31,7 +31,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ### Windows
 - **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
 
-## 🚀 Installation
+## Installation
 
 ### Linux/macOS
 
@@ -91,7 +91,7 @@ Where `YOUR_SERVER` depends on your environment:
 - Your server's IP address
 - Your domain name
 
-## ⚙️ Change login, password or port
+## Change login, password or port
 
 Open the folder of your project and edit the `.env` file to customize your installation:
 
@@ -119,8 +119,7 @@ docker compose up -d
 - 📎 `./data/attachments` - File attachments  
 - 🗄️ `./data/mysql` - Database files
 
-
-## 🔄 Updates
+## Updates
 
 To update Poznote to the latest version:
 
@@ -132,7 +131,7 @@ git pull origin main && docker compose down && docker compose up -d --build
 
 Poznote offers different backup options depending on your needs:
 
-**📝 Complete Application Restore**: Requires all 3 components
+**Complete Application Restore**: Requires all 3 components
 - Notes (HTML files) + Attachments + Database
 - Use this for full Poznote restoration (new server or current installation)
 
@@ -143,7 +142,7 @@ Poznote offers different backup options depending on your needs:
 
 ⚠️ Database contains only note metadata like titles, tags, dates - not the actual note content which is stored in HTML files
 
-### 💾 Backup
+### Backup
 
 Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
@@ -165,11 +164,12 @@ cp -r ./data/attachments /path/to/backup/attachments
 docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
 ```
 
-### 🔄 Restore
+### Restore
 
-Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
+Poznote includes built-in restore functionality through the web interface in Settings → "Export/Import Database"
 
-> **⚠️ Warning**: Database import will completely replace your current data!  
+> **⚠️ Warning**: Database import will completely replace your current data!
+>  
 > **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
 
 but if you prefere you can also manually restore with:
@@ -220,7 +220,7 @@ If you experience "upload failed" errors on Windows Desktop, try these solutions
 
 For detailed troubleshooting steps, see [TROUBLESHOOTING_UPLOAD.md](TROUBLESHOOTING_UPLOAD.md).
 
-## 🔌 API
+## API
 
 Poznote provides a RESTful API for programmatic access to your notes.
 
