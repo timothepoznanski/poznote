@@ -93,8 +93,6 @@ Where `YOUR_SERVER` depends on your environment:
 
 ## ⚙️ Change login, password or port
 
-### Environment Variables
-
 Open the folder of your project and edit the `.env` file to customize your installation:
 
 ```bash
