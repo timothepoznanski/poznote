@@ -204,15 +204,14 @@ git pull origin main && docker compose down && docker compose up -d --build
 
 ## Backup and Restore
 
-Poznote offers different backup options depending on your needs:
+Poznote offers different backup options depending on your needs.
 
 **Complete Application Restore**:
 - Requires all 3 components: Notes (HTML files) + Attachments + Database
 - Use this for full Poznote restoration (new server or current installation)
 
-**Offline Notes Consultation**:
+**Offline Notes Consultation (without Poznote)**:
 - Export notes as ZIP file → Contains all HTML files + `index.html` menu
-- Open `index.html` in any browser to browse your notes offline
 - No Poznote installation needed, works anywhere
 
 ⚠️ Database contains only note metadata like titles, tags, dates - not the actual note content which is stored in HTML files
@@ -264,6 +263,7 @@ Copy your backup files to `./data/entries/` and `./data/attachments/`
 Then restart Poznote:
 
 ```bash
+# Start Poznote
 docker compose up -d
 ```
 
