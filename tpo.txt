@@ -1,1 +1,5 @@
 docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d
+
+Update :
+
+git pull origin main && docker compose down && docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
