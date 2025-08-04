@@ -77,9 +77,6 @@ reconfigure_poznote() {
     read -p "Web Server Port [$HTTP_WEB_PORT]: " NEW_HTTP_WEB_PORT
     HTTP_WEB_PORT=${NEW_HTTP_WEB_PORT:-$HTTP_WEB_PORT}
 
-    read -p "Poznote Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
-    POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
-
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
