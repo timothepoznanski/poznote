@@ -1,7 +1,15 @@
 # Poznote
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
+[![License](https:/**Se**Services:**
+- 🌐 **webserver** - Apache/PHP serving the application
+- 📊 **database** - MySQL for data storage
+
+**Persistent Volumes:**s:**
+- 🌐 **webserver** - Apache/PHP serving the application
+- 🗂️ **database** - MySQL for data storage
+
+**Persistent Volumes:**shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
 
@@ -130,21 +138,13 @@ docker compose up -d
 ### Docker Architecture
 
 **Services:**
-- 🐳 **webserver** - Apache/PHP serving the application
-- 🐳 **database** - MySQL for data storage
+- 🌐 **webserver** - Apache/PHP serving the application
+- 🗄️ **database** - MySQL for data storage
 
 **Persistent Volumes:**
 - 📁 `./data/entries` - Your note files (HTML format)
 - 📎 `./data/attachments` - File attachments  
 - 💾 `./data/mysql` - Database files
-
-### Reverse Proxy Setup
-
-For reverse proxy configurations (Nginx, Traefik, etc.), use the dedicated compose file:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d
-```
 
 ## 🔄 Updates
 
@@ -156,8 +156,6 @@ git pull origin main
 docker compose down
 docker compose up -d --build
 ```
-
-> **💡 Tip**: For reverse proxy setups, replace `docker compose` with `docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml` in the commands above.
 
 ## 💾 Data Management
 
