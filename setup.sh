@@ -91,6 +91,7 @@ reconfigure_poznote() {
     
     echo -e "${GREEN}Your Poznote configuration has been updated!${NC}"
     echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
+    echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
 }
 
