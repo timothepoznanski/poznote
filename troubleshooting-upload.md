@@ -199,6 +199,39 @@ docker compose exec webserver find /var/www/html/attachments -name "*.pdf" -o -n
 ### 🚨 Warning
 The current "Import Attachments" feature is designed to work **only with a corresponding database restore**. Importing attachments without the matching database will result in orphaned files that appear in the filesystem but not in the application.
 
+### 🐛 Troubleshooting HTTP 500 Errors During Import
+
+If you get an HTTP 500 error when trying to import attachments:
+
+1. **Check server logs:**
+   ```bash
+   docker compose logs webserver --tail=20
+   ```
+
+2. **Check PHP error logs:**
+   ```bash
+   docker compose exec webserver tail -20 /var/log/apache2/error.log
+   ```
+
+3. **Common causes after recent updates:**
+   - **Corrupted ZIP metadata**: The ZIP file may contain invalid JSON metadata
+   - **Database connection issues**: MySQL connection may be interrupted
+   - **File permissions**: Temporary file creation may fail
+
+4. **Quick fixes:**
+   ```bash
+   # Restart the container to clear any temporary issues
+   docker compose restart webserver
+   
+   # Reset file permissions
+   docker compose exec webserver chmod -R 777 /var/www/html/attachments
+   ```
+
+5. **If import still fails:**
+   - Try importing a database backup first, then attachments
+   - Use the "legacy" import method (files only, manual re-linking)
+   - Check that your ZIP file isn't corrupted
+
 ## �📞 Support
 
 If the problem persists after all these steps, create a GitHub issue with:

@@ -251,10 +251,14 @@ function importNotesZip($uploadedFile) {
 function importAttachmentsZip($uploadedFile) {
     global $con;
     
+    error_log("DEBUG: Starting importAttachmentsZip function");
+    
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
         return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
     }
+    
+    error_log("DEBUG: File type check passed");
     
     $tempFile = '/tmp/poznote_attachments_import_' . uniqid() . '.zip';
     
@@ -262,6 +266,8 @@ function importAttachmentsZip($uploadedFile) {
     if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
         return ['success' => false, 'error' => 'Error uploading file'];
     }
+    
+    error_log("DEBUG: File moved to temp directory");
     
     // Determine attachments directory
     $attachmentsPaths = [
@@ -282,6 +288,8 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Attachments directory not found'];
     }
     
+    error_log("DEBUG: Attachments directory found: " . $attachmentsPath);
+    
     // Extract ZIP file
     $zip = new ZipArchive();
     $result = $zip->open($tempFile);
@@ -291,29 +299,36 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Cannot open ZIP file. Error code: ' . $result];
     }
     
+    error_log("DEBUG: ZIP file opened successfully");
+    
     $extractedCount = 0;
     $metadataFound = false;
     $metadata = [];
+    
+    error_log("DEBUG: Starting first pass for metadata");
     
     // First pass: extract metadata file if it exists
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $filename = $zip->getNameIndex($i);
         
         if ($filename === '_poznote_attachments_metadata.json') {
+            error_log("DEBUG: Found metadata file");
             $metadataContent = $zip->getFromIndex($i);
             if ($metadataContent) {
                 $decodedMetadata = json_decode($metadataContent, true);
                 if ($decodedMetadata && is_array($decodedMetadata)) {
                     $metadata = $decodedMetadata;
                     $metadataFound = true;
-                    error_log("Found attachment metadata with " . count($metadata) . " entries");
+                    error_log("DEBUG: Found attachment metadata with " . count($metadata) . " entries");
                 } else {
-                    error_log("Failed to decode attachment metadata JSON");
+                    error_log("DEBUG: Failed to decode attachment metadata JSON");
                 }
             }
             break;
         }
     }
+    
+    error_log("DEBUG: Starting second pass for file extraction");
     
     // Second pass: extract files
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -344,6 +359,8 @@ function importAttachmentsZip($uploadedFile) {
     $zip->close();
     unlink($tempFile);
     
+    error_log("DEBUG: Files extracted: " . $extractedCount);
+    
     // Set proper permissions
     chmod($attachmentsPath, 0755);
     $files = glob($attachmentsPath . '/*');
@@ -353,9 +370,12 @@ function importAttachmentsZip($uploadedFile) {
         }
     }
     
+    error_log("DEBUG: Starting metadata linking process");
+    
     // If metadata was found, try to link attachments to notes
     $linkedCount = 0;
     if ($metadataFound && !empty($metadata)) {
+        error_log("DEBUG: Processing " . count($metadata) . " metadata entries");
         foreach ($metadata as $meta) {
             $noteId = $meta['note_id'];
             $attachment = $meta['attachment'];
@@ -395,18 +415,20 @@ function importAttachmentsZip($uploadedFile) {
                         
                         if ($updateStmt->execute()) {
                             $linkedCount++;
-                            error_log("Linked attachment {$filename} to note {$noteId}");
+                            error_log("DEBUG: Linked attachment {$filename} to note {$noteId}");
                         } else {
-                            error_log("Failed to link attachment {$filename} to note {$noteId}");
+                            error_log("DEBUG: Failed to link attachment {$filename} to note {$noteId}");
                         }
                     }
                 } else {
-                    error_log("Note {$noteId} not found for attachment {$filename}");
+                    error_log("DEBUG: Note {$noteId} not found for attachment {$filename}");
                 }
             } else {
-                error_log("Attachment file {$filename} not found for linking");
+                error_log("DEBUG: Attachment file {$filename} not found for linking");
             }
         }
+    } else {
+        error_log("DEBUG: No metadata found or metadata is empty");
     }
     
     $message = "Extracted {$extractedCount} files";
@@ -415,6 +437,8 @@ function importAttachmentsZip($uploadedFile) {
     } else {
         $message .= " (no metadata found - files not linked to notes)";
     }
+    
+    error_log("DEBUG: Import completed successfully");
     
     return ['success' => true, 'count' => $extractedCount, 'linked' => $linkedCount, 'message' => $message];
 }
