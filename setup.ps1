@@ -2,7 +2,8 @@
 # This script automates the installation and update process for Poznote
 
 param(
-    [switch]$Help
+    [switch]$Help,
+    [switch]$Dev
 )
 
 # Set error action preference
@@ -49,9 +50,11 @@ USAGE:
 
 OPTIONS:
     -Help        Show this help message
+    -Dev         Use development template (.env.dev.template)
 
 EXAMPLES:
     .\setup.ps1                   # Interactive menu for installation, update, or configuration
+    .\setup.ps1 -Dev             # Use development configuration
 
 FEATURES:
     • Automatic detection of existing installations
@@ -292,10 +295,30 @@ function Reconfigure-Poznote {
         Write-Warning "You are using the default password! Please change it for production use."
     }
 
-    # Update .env file with new values, using template as base
-    if (Test-Path ".env.template") {
+    # Determine which template to use
+    $templateFile = ".env.template"
+    
+    # If we're on dev branch or in a dev environment, prefer dev template
+    if (Test-Path ".env.dev.template") {
+        $currentBranch = ""
+        try {
+            $currentBranch = (git branch --show-current 2>$null) | Out-String
+            $currentBranch = $currentBranch.Trim()
+        }
+        catch {
+            # Git command failed, continue with default
+        }
+        
+        if ($currentBranch -eq "dev" -or $PWD.Path -like "*dev*" -or $Dev) {
+            $templateFile = ".env.dev.template"
+            Write-Success "Using development template: $templateFile"
+        }
+    }
+
+    # Update .env file with new values, using chosen template as base
+    if (Test-Path $templateFile) {
         # Copy template and update values
-        Copy-Item ".env.template" ".env" -Force
+        Copy-Item $templateFile ".env" -Force
         
         # Update the configurable values
         $envContent = Get-Content ".env" -Raw
@@ -514,7 +537,7 @@ function Install-Poznote {
         
         # Check if .env.template exists
         if (-not (Test-Path ".env.template")) {
-            Write-Error ".env.template file not found!"
+            Write-Error "Template file .env.template not found!"
             exit 1
         }
         
@@ -681,6 +704,11 @@ function Install-Poznote {
 if ($Help) {
     Show-Help
     exit 0
+}
+
+# Handle Dev parameter
+if ($Dev) {
+    Write-Status "Development mode enabled - will use .env.dev.template"
 }
 
 try {
