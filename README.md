@@ -119,6 +119,7 @@ docker compose up -d
 - 📎 `./data/attachments` - File attachments  
 - 🗄️ `./data/mysql` - Database files
 
+
 ## 🔄 Updates
 
 To update Poznote to the latest version:
@@ -192,7 +193,7 @@ docker compose up -d
 docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
 ```
 
-## � Troubleshooting
+## Troubleshooting
 
 ### Upload Issues on Windows
 
@@ -219,7 +220,7 @@ If you experience "upload failed" errors on Windows Desktop, try these solutions
 
 For detailed troubleshooting steps, see [TROUBLESHOOTING_UPLOAD.md](TROUBLESHOOTING_UPLOAD.md).
 
-## �🔌 API
+## 🔌 API
 
 Poznote provides a RESTful API for programmatic access to your notes.
 
