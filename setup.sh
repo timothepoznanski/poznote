@@ -286,13 +286,7 @@ show_info() {
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: [the password you configured]"
     echo
-    print_status "🔧 Management Commands:"
-    echo "  📊 View logs: docker compose logs -f"
-    echo "  🔄 Restart: docker compose restart"
-    echo "  ⏹️  Stop: docker compose down"
-    echo "  ▶️  Start: docker compose up -d"
-    echo
-    print_status "💡 Configuration Management:"
+    print_status " Configuration Management:"
     echo "  🔧 To change settings: Run this script again and select option 2"
     echo "  📝 To update Poznote: Run this script again and select option 1"
     echo "  💾 Data location: ./data/ directory"

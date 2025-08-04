@@ -319,10 +319,6 @@ function Install-Poznote {
                         Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
                         Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
                         Write-Host ""
-                        Write-Host "Useful commands:" -ForegroundColor $Colors.Blue
-                        Write-Host "  • Stop:     $composeCmd down" -ForegroundColor $Colors.Green
-                        Write-Host "  • Logs:     $composeCmd logs -f" -ForegroundColor $Colors.Green
-                        Write-Host "  • Restart:  $composeCmd restart" -ForegroundColor $Colors.Green
                         exit 0
                     }
                     catch {
@@ -484,11 +480,6 @@ function Install-Poznote {
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"
         Write-Host "  • Use HTTPS in production"
-        Write-Host ""
-        Write-Host "Useful commands:" -ForegroundColor $Colors.Blue
-        Write-Host "  • Stop:     $dockerComposeCmd down" -ForegroundColor $Colors.Green
-        Write-Host "  • Logs:     $dockerComposeCmd logs -f" -ForegroundColor $Colors.Green
-        Write-Host "  • Restart:  $dockerComposeCmd restart" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Status "Wait a few seconds for the database to initialize before accessing the web interface."
     } else {
