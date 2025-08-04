@@ -25,7 +25,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ## 📚 Table of Contents
 
 - [Prerequisites](#-prerequisites)
-- [Installation](#️-installation)
+- [Installation](#-installation)
   - [Linux/macOS](#linuxmacos)
   - [Windows](#windows)
 - [Configuration](#️-configuration)
@@ -42,7 +42,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ### Windows
 - **Docker Desktop for Windows**
 
-## 🛠️ Installation
+## 🚀 Installation
 
 ### Linux/macOS
 
