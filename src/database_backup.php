@@ -433,7 +433,12 @@ $backups = [];
 </head>
 <body>
     <div class="backup-container">
-        <h2><i class="fas fa-database"></i> Database Export / Import</h2>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2><i class="fas fa-database"></i> Database Export / Import</h2>
+            <a href="index.php" class="btn-back" style="text-decoration: none; color: #666; font-size: 14px; padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa; transition: all 0.2s;">
+                <i class="fas fa-arrow-left" style="margin-right: 6px;"></i>Retour aux notes
+            </a>
+        </div>
         
         <!-- Information Section -->
             <div class="warning">

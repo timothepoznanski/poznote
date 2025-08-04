@@ -123,3 +123,10 @@
     border-radius: 4px;
     margin-bottom: 20px;
 }
+
+/* Back button styling */
+.btn-back:hover {
+    background: #e9ecef !important;
+    color: #495057 !important;
+    border-color: #adb5bd !important;
+}
