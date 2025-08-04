@@ -43,7 +43,7 @@ docker compose -f docker-compose.yml up -d --build
 ```
 
 ### Default Access
-- **URL**: `http://localhost:8040` (local) or `http://YOUR_SERVER_IP:8040` (VPS)
+- **URL**: `http://localhost:HTTP_WEB_PORT` (local) or `http://YOUR_SERVER_IP:HTTP_WEB_PORT` (VPS)
 
 ## 🔧 Configuration
 
