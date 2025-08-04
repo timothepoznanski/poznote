@@ -53,10 +53,8 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             <button type="submit" class="login-button">Login</button>
         </form>
         
-                <div class="info">
-            To change credentials, edit <code>POZNOTE_USERNAME</code> and <code>POZNOTE_PASSWORD</code> in your <code>.env</code> file and restart with <code>docker compose restart</code>.<br>
-            See <a href="https://github.com/timothepoznanski/poznote#configuration" target="_blank">README.md configuration section</a>.<br>
-            Default credentials: <code>admin</code> / <code>admin123</code>
+        <div class="info">
+            <a href="https://github.com/timothepoznanski/poznote#configuration" target="_blank">Configuration Guide</a>
         </div>
     </div>
 </body>

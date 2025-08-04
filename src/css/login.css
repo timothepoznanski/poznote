@@ -60,6 +60,7 @@ label {
     font-size: 0.875rem;
 }
 
+input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 0.875rem 1rem;
@@ -71,12 +72,14 @@ input[type="password"] {
     background: white;
 }
 
+input[type="text"]:focus,
 input[type="password"]:focus {
     outline: none;
     border-color: #3182ce;
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
+input[type="text"]::placeholder,
 input[type="password"]::placeholder {
     color: #a0aec0;
 }
