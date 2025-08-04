@@ -19,12 +19,9 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY php.ini /usr/local/etc/php/
 
 # Copy src files
-# This ensures the container has the application code in all scenarios:
-# - In production: code is embedded in the image (no external dependencies)
-# - In development: provides initial files and correct permissions before volume mount overrides it
 COPY ./src/ /var/www/html/
 
-# Create directories for data volumes (will be mounted over in production/development)
+# Create directories for data volumes
 RUN mkdir -p /var/www/html/entries /var/www/html/attachments && \
     chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && \
     chmod -R 755 /var/www/html/entries /var/www/html/attachments
