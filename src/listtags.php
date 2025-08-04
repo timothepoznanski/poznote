@@ -5,7 +5,7 @@ requireAuth();
 require 'config.php';
 include 'db_connect.php';
 
-$res = $con->query('SELECT tags FROM entries');
+$res = $con->query('SELECT tags FROM entries WHERE trash = 0');
 $tags_list = [];
 $count_tags = 0;
 

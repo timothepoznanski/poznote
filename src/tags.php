@@ -8,7 +8,7 @@ require 'db_connect.php';
 $search = $_POST['search'] ?? '';
 $tags = [];
 
-$tagSql = "SELECT tags FROM entries WHERE tags IS NOT NULL AND tags != ''";
+$tagSql = "SELECT tags FROM entries WHERE tags IS NOT NULL AND tags != '' AND trash = 0";
 if (!empty($search)) $tagSql .= " AND tags LIKE '%$search%'";
 
 $tagRs = $con->query($tagSql);
