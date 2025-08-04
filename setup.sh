@@ -284,18 +284,8 @@ show_info() {
     print_status "📋 Access Information:"
     echo "  🌐 URL: http://localhost:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
-    echo "  🔑 Password: [the password you configured]"
-    echo
-    print_status " Configuration Management:"
-    echo "  🔧 To change settings: Run this script again and select option 2"
-    echo "  📝 To update Poznote: Run this script again and select option 1"
-    echo "  💾 Data location: ./data/ directory"
-    echo
-    if [ "$is_update" = "true" ]; then
-        print_status "✅ Your data and settings have been preserved during the update."
-    else
-        print_status "📁 Your notes and data will persist between restarts."
-    fi
+    echo "  🔑 Password: $POZNOTE_PASSWORD"
+
 }
 
 # Main function
