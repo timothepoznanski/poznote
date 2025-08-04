@@ -24,7 +24,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 
 ## 📚 Table of Contents
 
-- [Quick Start](#-quick-start)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
   - [Linux/macOS](#linuxmacos)
@@ -35,17 +34,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 - [API](#-api)
 - [Troubleshooting](#-troubleshooting)
 
-## 🚀 Quick Start
-
-```bash
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote
-cp .env.template .env
-# Edit .env with your credentials
-docker compose up -d --build
-# Access at http://localhost:8040
-```
-
 ## 📋 Prerequisites
 
 ### Linux/macOS
@@ -53,7 +41,7 @@ docker compose up -d --build
 - **Docker Compose** (v2.0+)
 
 ### Windows
-- **Docker Desktop for Windows** (with WSL2 backend recommended)
+- **Docker Desktop for Windows**
 
 ## 🛠️ Installation
 
@@ -81,9 +69,6 @@ docker compose up -d --build
    docker compose up -d --build
    ```
 
-5. **Access your application**
-   Open your browser and go to `http://localhost:8040` (or your configured port)
-
 ### Windows
 
 1. **Clone the repository**
@@ -108,23 +93,15 @@ docker compose up -d --build
    docker compose up -d --build
    ```
 
-5. **Access your application**
-   Open your browser and go to `http://localhost:8040` (or your configured port)
-
 ### Access URLs
 
 After starting Poznote, you can access it at:
 - **URL Pattern**: `http://YOUR_SERVER:HTTP_WEB_PORT`
 
-Where `YOUR_SERVER` can be:
-- `localhost` (for local development)
+Where `YOUR_SERVER` depends on your environment:
+- `localhost`
 - Your server's IP address
 - Your domain name
-
-**Examples:**
-- Local: `http://localhost:8040`
-- Server: `http://192.168.1.100:8040`
-- Domain: `http://notes.yourdomain.com:8040`
 
 ## ⚙️ Configuration
 
