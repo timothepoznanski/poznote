@@ -22,17 +22,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 - 🌐 **REST API** - Programmatic access to your notes
 - 🐳 **Docker Ready** - Easy deployment with Docker Compose
 
-## 📚 Table of Contents
-
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-  - [Linux/macOS](#linuxmacos)
-  - [Windows](#windows)
-- [Configuration](#️-configuration)
-- [Updates](#-updates)
-- [Backup and Restore](#backup-and-restore)
-- [API](#-api)
-
 ## 📋 Prerequisites
 
 ### Linux/macOS
@@ -102,22 +91,17 @@ Where `YOUR_SERVER` depends on your environment:
 - Your server's IP address
 - Your domain name
 
-## ⚙️ Configuration
+## ⚙️ Change login, password or port
 
 ### Environment Variables
 
-Edit the `.env` file to customize your installation:
+Open the folder of your project and edit the `.env` file to customize your installation:
 
 ```bash
-# Authentication (Required)
-POZNOTE_USERNAME=admin            # Change this to your username
-POZNOTE_PASSWORD=admin123         # Change this to a secure password
-
-# Network Configuration
-HTTP_WEB_PORT=8040               # Web interface port
+POZNOTE_USERNAME=admin            
+POZNOTE_PASSWORD=admin123        
+HTTP_WEB_PORT=8040             
 ```
-
-### Applying Configuration Changes
 
 After modifying the `.env` file, restart the application:
 
