@@ -219,6 +219,8 @@ Poznote offers different backup options depending on your needs:
 
 ### Backup
 
+#### Option 1: Backup through the web interface
+
 Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
 Available backup options:
@@ -226,7 +228,7 @@ Available backup options:
 - **📎 Export Attachments** - Download all file attachments  
 - **🗄️ Export Database** - Download SQL dump
 
-but if you prefere you can also manually backup with:
+#### Option 2: Manual backups
 
 ```bash
 # Backup your notes
@@ -241,28 +243,32 @@ docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > back
 
 ### Restore
 
+#### Option 1: Restore through the web interface
+
 Poznote includes built-in restore functionality through the web interface in Settings → "Export/Import Database"
 
 > **⚠️ Warning**: Database import will completely replace your current data!
 >  
 > **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
 
-but if you prefere you can also manually restore with:
+#### Option 2: Manual restore
 
 **Restore notes and attachments**
 ```bash
 # Stop Poznote
 docker compose down
+```
 
-# Copy your backup files
-cp -r backup_entries/* ./data/entries/
-cp -r backup_attachments/* ./data/attachments/
+Copy your backup files to `./data/entries/` and `./data/attachments/`
 
-# Restart Poznote
+Then restart Poznote:
+
+```bash
 docker compose up -d
 ```
 
 **Restore database from SQL**
+
 ```bash
 # Import SQL backup into database
 docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
