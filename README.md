@@ -249,7 +249,6 @@ curl -X POST http://localhost:8040/api_create_note.php \
 - `api_favorites.php` - Manage favorite notes
 - `api_attachments.php` - Handle file attachments
 
-> **📚 API Documentation**: For complete API documentation, see the individual PHP files in the `src/` directory.
 
 ## 🛠️ Troubleshooting
 
