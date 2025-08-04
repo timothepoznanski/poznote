@@ -3,16 +3,11 @@
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
-[![MySQL](https://im## 🛠️ Troubleshooting
+[![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
 
-### Common Issues
+A powerful, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
 
-#### Database Connection Error on First Start
-**Problem**: Connection errors when first accessing Poznote  
-**Solution**: Wait 30-60 seconds for MySQL to fully initialize, then refresh your browser.
-
-#### Port Already in Use
-**Problem**: Cannot start - port conflict  
+Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
 **Solution**: 
 1. Change `HTTP_WEB_PORT` in your `.env` file
 2. Restart: `docker compose down && docker compose up -d`
