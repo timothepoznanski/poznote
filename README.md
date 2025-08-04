@@ -229,13 +229,11 @@ Available backup options:
 
 #### Option 2: Manual backups
 
+- To backup your notes, copy your html files found in `./data/entries`
+- To backup your attachements, copy your files found in `./data/attachments`
+- To backup your database:
+
 ```bash
-# Backup your notes
-cp -r ./data/entries /path/to/backup/entries
-
-# Backup attachments  
-cp -r ./data/attachments /path/to/backup/attachments
-
 # Backup database
 docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
 ```
