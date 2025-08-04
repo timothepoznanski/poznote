@@ -35,7 +35,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 
 ### Linux/macOS
 
-#### Option 1: Automated Setup (Recommended)
+#### Option 1: Automated Setup
 
 ```bash
 git clone https://github.com/timothepoznanski/poznote.git
@@ -76,7 +76,7 @@ The script will automatically:
 
 ### Windows
 
-#### Option 1: Automated Setup (Recommended)
+#### Option 1: Automated Setup
 ```powershell
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
@@ -125,7 +125,7 @@ Where `YOUR_SERVER` depends on your environment:
 
 ## Change login, password or port
 
-### Option 1: Automated Configuration Change (Recommended)
+### Option 1: Automated Configuration Change
 
 **Linux/macOS:**
 ```bash
@@ -164,7 +164,7 @@ docker compose up -d
 
 ## Update Poznote application
 
-### Option 1: Automated Update (Recommended)
+### Option 1: Automated Update
 
 **Linux/macOS:**
 ```bash
