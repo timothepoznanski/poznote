@@ -191,7 +191,7 @@ cp -r ./data/entries /path/to/backup/entries
 cp -r ./data/attachments /path/to/backup/attachments
 
 # Backup database
-docker compose exec database mysqldump -u root -p sfs466!sfdgGH poznote_db > backup.sql
+docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
 ```
 
 ### 🔄 Restore
@@ -219,10 +219,8 @@ docker compose up -d
 **Restore database from SQL**
 ```bash
 # Import SQL backup into database
-docker compose exec -T database mysql -u root -p[PASSWORD] poznote_db < backup.sql
+docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
 ```
-
-> **💡 Tip**: Replace `[PASSWORD]` with your database password when running the command.
 
 ## 🔌 API
 
