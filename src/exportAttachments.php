@@ -76,25 +76,6 @@ if (!empty($metadataInfo)) {
     $zip->addFromString('poznote_attachments_metadata.json', $metadataContent);
 }
 
-// Create a simple index file
-$indexContent = '<html><head><title>Poznote Attachments Export</title></head><body>';
-$indexContent .= '<h1>Poznote Attachments Export</h1>';
-$indexContent .= '<p>Total files exported: ' . $attachmentCount . '</p>';
-$indexContent .= '<p>Notes with attachments: ' . count($metadataInfo) . '</p>';
-$indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';
-if ($attachmentCount == 0) {
-    $indexContent .= '<p>No attachments found in your notes.</p>';
-} else {
-    $indexContent .= '<ul>';
-    $indexContent .= '<li><strong>files/</strong> - Physical attachment files</li>';
-    $indexContent .= '<li><strong>poznote_attachments_metadata.json</strong> - Linking information</li>';
-    $indexContent .= '</ul>';
-    $indexContent .= '<p><strong>Important:</strong> For proper restoration, import the database first, then use this attachments export.</p>';
-}
-$indexContent .= '</body></html>';
-
-$zip->addFromString('README.html', $indexContent);
-
 $zip->close();
 
 // Clear any output buffer
