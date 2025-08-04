@@ -21,7 +21,29 @@ jobs:
           set -e
           echo "🚀 Starting production deployment.."
           
-          cd ${{ secrets.PROD_PROJECT_PATH || '/root/poznote/poznote' }}
+          # Define project directory
+          PROJECT_DIR="/root/poznote/poznote"
+          
+          # Check if project directory exists, if not clone the repository
+          if [ ! -d "$PROJECT_DIR" ]; then
+            echo "📁 Project directory not found. Performing initial setup..."
+            
+            # Create parent directory if needed
+            mkdir -p "$(dirname "$PROJECT_DIR")"
+            
+            # Clone the repository
+            echo "� Cloning repository for first deployment..."
+            cd "$(dirname "$PROJECT_DIR")"
+            git clone https://github.com/timothepoznanski/poznote.git
+            
+            echo "✅ Repository cloned successfully"
+          else
+            echo "✅ Project directory exists"
+          fi
+          
+          # Navigate to project directory
+          cd "$PROJECT_DIR"
+          echo "📁 Current directory: $(pwd)"
           
           # Check if .env file exists, if not create it from template
           if [ ! -f ".env" ]; then
@@ -39,6 +61,12 @@ jobs:
           
           # Pull the latest code
           echo "📥 Pulling latest code from repository..."
+          
+          # Ensure we're on the main branch
+          echo "🔄 Checking out main branch..."
+          git checkout main
+          
+          # Pull the latest changes
           git pull origin main
           
           # Build and deploy
