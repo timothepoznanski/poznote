@@ -85,6 +85,7 @@ docker compose exec webserver ls -la /tmp
 | "Invalid uploaded file" | Transfer problem | Retry or restart container |
 | "Upload failed" (generic) | Various causes | Check browser console, try smaller file |
 | "Network error" | Connection issue | Check Docker container status |
+| "HTTP 500 error" | Server error | Check logs: `docker compose logs webserver` |
 | "showAttachmentDialog is not defined" | JavaScript error | Hard refresh page (Ctrl+F5), clear cache |
 | "Uncaught SyntaxError" | Script loading issue | Restart Docker container |
 

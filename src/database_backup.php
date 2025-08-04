@@ -302,9 +302,14 @@ function importAttachmentsZip($uploadedFile) {
         if ($filename === '_poznote_attachments_metadata.json') {
             $metadataContent = $zip->getFromIndex($i);
             if ($metadataContent) {
-                $metadata = json_decode($metadataContent, true);
-                $metadataFound = true;
-                error_log("Found attachment metadata with " . count($metadata) . " entries");
+                $decodedMetadata = json_decode($metadataContent, true);
+                if ($decodedMetadata && is_array($decodedMetadata)) {
+                    $metadata = $decodedMetadata;
+                    $metadataFound = true;
+                    error_log("Found attachment metadata with " . count($metadata) . " entries");
+                } else {
+                    error_log("Failed to decode attachment metadata JSON");
+                }
             }
             break;
         }
