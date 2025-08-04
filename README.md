@@ -246,9 +246,8 @@ docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > back
 
 Poznote includes built-in restore functionality through the web interface in Settings → "Export/Import Database"
 
-> **⚠️ Warning**: Database import will completely replace your current data!
->  
-> **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
+**⚠️ Warning**: Database import will completely replace your current data!  
+**ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
 
 #### Option 2: Manual restore
 
@@ -258,7 +257,7 @@ Poznote includes built-in restore functionality through the web interface in Set
 docker compose down
 ```
 
-Copy your backup files to `./data/entries/` and `./data/attachments/`
+Copy your files to `./data/entries/` and `./data/attachments/`
 
 Then restart Poznote:
 
