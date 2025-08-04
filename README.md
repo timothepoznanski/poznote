@@ -25,11 +25,11 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ## 📋 Prerequisites
 
 ### Linux/macOS
-- **Docker Engine** (v20.10+)
-- **Docker Compose** (v2.0+)
+- **[Docker Engine](https://docs.docker.com/engine/install/)** (v20.10+)
+- **[Docker Compose](https://docs.docker.com/compose/install/)** (v2.0+)
 
 ### Windows
-- **Docker Desktop for Windows**
+- **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
 
 ## 🚀 Installation
 
