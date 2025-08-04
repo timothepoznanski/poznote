@@ -413,9 +413,9 @@ function importAttachmentsZip($uploadedFile) {
     
     // Create result message
     if ($hasMetadata) {
-        $message = "✅ Successfully imported {$extractedCount} files and linked {$linkedCount} attachments to notes";
+        $message = "Successfully imported {$extractedCount} files and linked {$linkedCount} attachments to notes";
     } else {
-        $message = "⚠️ Successfully imported {$extractedCount} files (no metadata found - files copied but not linked to notes)";
+        $message = "Successfully imported {$extractedCount} files (no metadata found - files copied but not linked to notes)";
     }
     
     return [
