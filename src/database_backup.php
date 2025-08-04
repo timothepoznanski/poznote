@@ -36,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreBackup($_FILES['backup_file']);
                 if ($result['success']) {
-                    $restore_message = "Database restored successfully!";
+                    $message = "Database restored successfully!";
                 } else {
-                    $restore_error = "Restore error: " . $result['error'];
+                    $error = "Restore error: " . $result['error'];
                 }
             } else {
-                $restore_error = "No backup file selected or upload error.";
+                $error = "No backup file selected or upload error.";
             }
             break;
             
@@ -49,12 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['notes_file']) && $_FILES['notes_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importNotesZip($_FILES['notes_file']);
                 if ($result['success']) {
-                    $import_notes_message = "Notes imported successfully! " . $result['count'] . " files processed.";
+                    $message = "Notes imported successfully! " . $result['count'] . " files processed.";
                 } else {
-                    $import_notes_error = "Import error: " . $result['error'];
+                    $error = "Import error: " . $result['error'];
                 }
             } else {
-                $import_notes_error = "No notes file selected or upload error.";
+                $error = "No notes file selected or upload error.";
             }
             break;
             
@@ -62,12 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['attachments_file']) && $_FILES['attachments_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importAttachmentsZip($_FILES['attachments_file']);
                 if ($result['success']) {
-                    $import_attachments_message = $result['message'] ?? "Attachments imported successfully! " . $result['count'] . " files processed.";
+                    $message = $result['message'] ?? "Attachments imported successfully! " . $result['count'] . " files processed.";
                 } else {
-                    $import_attachments_error = "Import error: " . $result['error'];
+                    $error = "Import error: " . $result['error'];
                 }
             } else {
-                $import_attachments_error = "No attachments file selected or upload error.";
+                $error = "No attachments file selected or upload error.";
             }
             break;
     }
@@ -460,6 +460,18 @@ $backups = [];
 
         </div>
         
+        <?php if ($message): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+        
         <!-- Export Notes Section -->
         <div class="backup-section">
             <h3><i class="fas fa-file-archive"></i> Export Notes</h3>
@@ -493,12 +505,7 @@ $backups = [];
         <!-- Import Database Section -->
         <div class="backup-section">
             <h3><i class="fas fa-upload"></i> Import Database</h3>
-            <?php if (!empty($restore_message)): ?>
-                <div class="message success"><?php echo htmlspecialchars($restore_message); ?></div>
-            <?php endif; ?>
-            <?php if (!empty($restore_error)): ?>
-                <div class="message error"><?php echo htmlspecialchars($restore_error); ?></div>
-            <?php endif; ?>
+
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="restore">
                 <div class="form-group">
@@ -514,12 +521,6 @@ $backups = [];
         <!-- Import Notes Section -->
         <div class="backup-section">
             <h3><i class="fas fa-file-upload"></i> Import Notes</h3>
-            <?php if (!empty($import_notes_message)): ?>
-                <div class="message success"><?php echo htmlspecialchars($import_notes_message); ?></div>
-            <?php endif; ?>
-            <?php if (!empty($import_notes_error)): ?>
-                <div class="message error"><?php echo htmlspecialchars($import_notes_error); ?></div>
-            <?php endif; ?>
             <p>Upload a ZIP file containing HTML notes to import.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_notes">
@@ -536,12 +537,6 @@ $backups = [];
         <!-- Import Attachments Section -->
         <div class="backup-section">
             <h3><i class="fas fa-paperclip"></i> Import Attachments</h3>
-            <?php if (!empty($import_attachments_message)): ?>
-                <div class="message success"><?php echo htmlspecialchars($import_attachments_message); ?></div>
-            <?php endif; ?>
-            <?php if (!empty($import_attachments_error)): ?>
-                <div class="message error"><?php echo htmlspecialchars($import_attachments_error); ?></div>
-            <?php endif; ?>
             <p>Upload a ZIP file containing attachments to import.</p>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_attachments">
