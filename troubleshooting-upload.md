@@ -141,7 +141,64 @@ docker compose up -d --build
 3. **Antivirus:** Some antivirus software blocks uploads - add an exception
 4. **WSL2:** If using WSL2, try restarting WSL
 
-## 📞 Support
+## � Import Issues (Restore from Backup)
+
+### Problem: Attachments ZIP Import Doesn't Link Files to Notes
+
+When importing attachments from a ZIP backup using the "Import Attachments" feature in `database_backup.php`, there are two scenarios:
+
+#### ✅ **Modern Exports (After Fix)**
+- **Exports created after this fix** include metadata that automatically links attachments to notes
+- **Import message will show**: "Extracted X files and linked Y attachments to notes"
+- **Files are properly connected** to their original notes
+
+#### ⚠️ **Legacy Exports (Before Fix)**  
+- **Older exports** only contain physical files without metadata
+- **Import message will show**: "Extracted X files (no metadata found - files not linked to notes)"
+- **Files are copied but not linked** - they appear in filesystem but not in the application
+
+### 🛠️ Solutions for Attachment Import Issues
+
+#### Option 1: Complete Database Restore (Recommended)
+```bash
+# For a complete restoration, import all 3 components in this order:
+# 1. Import the database SQL file first (contains note structure + attachment metadata)
+# 2. Import the notes ZIP file (HTML files)
+# 3. Import the attachments ZIP file (physical files)
+```
+
+#### Option 2: Manual Attachment Re-linking
+If you only have the attachments ZIP without the database backup:
+1. Import the attachments ZIP (files will be copied but not linked)
+2. Manually re-upload each attachment to its corresponding note
+3. Delete the old unlinked files from the attachments folder
+
+#### Option 3: Database Repair (Advanced Users)
+```bash
+# Check what files exist but aren't linked to notes
+docker compose exec webserver find /var/www/html/attachments -name "*.pdf" -o -name "*.jpg" -o -name "*.png" -o -name "*.doc*"
+
+# Compare with database entries - look for orphaned files
+```
+
+### 📋 Best Practices for Backup/Restore
+
+1. **Always backup all 3 components together:**
+   - Database (SQL) - contains structure and metadata
+   - Notes (ZIP) - contains HTML content files  
+   - Attachments (ZIP) - contains physical attachment files
+
+2. **Export order doesn't matter, but import order does:**
+   - Import database **first** (creates note structure + attachment metadata)
+   - Import notes **second** (restores HTML files)
+   - Import attachments **last** (restores physical files that link to database entries)
+
+3. **Test your backups regularly** by doing a complete restore on a test system
+
+### 🚨 Warning
+The current "Import Attachments" feature is designed to work **only with a corresponding database restore**. Importing attachments without the matching database will result in orphaned files that appear in the filesystem but not in the application.
+
+## �📞 Support
 
 If the problem persists after all these steps, create a GitHub issue with:
 - Output from `test_upload.php`

@@ -49,13 +49,40 @@ if ($attachmentsPath && is_dir($attachmentsPath)) {
     }
 }
 
+// Create a metadata file with attachment-to-note mappings
+$metadata = [];
+$query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != ''";
+$result = $con->query($query);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $attachments = json_decode($row['attachments'], true);
+        if (is_array($attachments) && !empty($attachments)) {
+            foreach ($attachments as $attachment) {
+                $metadata[] = [
+                    'note_id' => $row['id'],
+                    'note_heading' => $row['heading'],
+                    'attachment' => $attachment
+                ];
+            }
+        }
+    }
+}
+
+// Add metadata file to ZIP
+$metadataContent = json_encode($metadata, JSON_PRETTY_PRINT);
+$zip->addFromString('_poznote_attachments_metadata.json', $metadataContent);
+
 // Create a simple index file
 $indexContent = '<html><head><title>Attachments Index</title></head><body>';
 $indexContent .= '<h1>Poznote Attachments Export</h1>';
 $indexContent .= '<p>Total attachments: ' . $attachmentCount . '</p>';
+$indexContent .= '<p>Total notes with attachments: ' . count($metadata) . '</p>';
 $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';
 if ($attachmentCount == 0) {
     $indexContent .= '<p>No attachments found in your notes.</p>';
+} else {
+    $indexContent .= '<p><strong>Note:</strong> This export includes metadata file for proper restoration.</p>';
 }
 $indexContent .= '</body></html>';
 $zip->addFromString('index.html', $indexContent);

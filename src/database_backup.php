@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['attachments_file']) && $_FILES['attachments_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importAttachmentsZip($_FILES['attachments_file']);
                 if ($result['success']) {
-                    $message = "Attachments imported successfully! " . $result['count'] . " files processed.";
+                    $message = $result['message'] ?? "Attachments imported successfully! " . $result['count'] . " files processed.";
                 } else {
                     $error = "Import error: " . $result['error'];
                 }
@@ -290,12 +290,30 @@ function importAttachmentsZip($uploadedFile) {
     }
     
     $extractedCount = 0;
+    $metadataFound = false;
+    $metadata = [];
     
+    // First pass: extract metadata file if it exists
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $filename = $zip->getNameIndex($i);
         
-        // Skip directories and index files
-        if (!str_ends_with($filename, '/') && $filename !== 'index.html') {
+        if ($filename === '_poznote_attachments_metadata.json') {
+            $metadataContent = $zip->getFromIndex($i);
+            if ($metadataContent) {
+                $metadata = json_decode($metadataContent, true);
+                $metadataFound = true;
+                error_log("Found attachment metadata with " . count($metadata) . " entries");
+            }
+            break;
+        }
+    }
+    
+    // Second pass: extract files
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $filename = $zip->getNameIndex($i);
+        
+        // Skip directories, index files, and metadata file
+        if (!str_ends_with($filename, '/') && $filename !== 'index.html' && $filename !== '_poznote_attachments_metadata.json') {
             $baseName = basename($filename);
             $targetPath = $attachmentsPath . '/' . $baseName;
             
@@ -328,7 +346,70 @@ function importAttachmentsZip($uploadedFile) {
         }
     }
     
-    return ['success' => true, 'count' => $extractedCount];
+    // If metadata was found, try to link attachments to notes
+    $linkedCount = 0;
+    if ($metadataFound && !empty($metadata)) {
+        foreach ($metadata as $meta) {
+            $noteId = $meta['note_id'];
+            $attachment = $meta['attachment'];
+            $filename = $attachment['filename'];
+            
+            // Check if the file exists in the attachments directory
+            if (file_exists($attachmentsPath . '/' . $filename)) {
+                // Check if the note still exists
+                $checkQuery = "SELECT id, attachments FROM entries WHERE id = ?";
+                $checkStmt = $con->prepare($checkQuery);
+                $checkStmt->bind_param("i", $noteId);
+                $checkStmt->execute();
+                $checkResult = $checkStmt->get_result();
+                
+                if ($checkResult->num_rows > 0) {
+                    $noteRow = $checkResult->fetch_assoc();
+                    $currentAttachments = $noteRow['attachments'] ? json_decode($noteRow['attachments'], true) : [];
+                    
+                    // Check if attachment isn't already linked
+                    $alreadyExists = false;
+                    foreach ($currentAttachments as $existing) {
+                        if ($existing['filename'] === $filename) {
+                            $alreadyExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$alreadyExists) {
+                        // Add the attachment to the note
+                        $currentAttachments[] = $attachment;
+                        
+                        // Update the database
+                        $updateQuery = "UPDATE entries SET attachments = ? WHERE id = ?";
+                        $updateStmt = $con->prepare($updateQuery);
+                        $attachmentsJson = json_encode($currentAttachments);
+                        $updateStmt->bind_param("si", $attachmentsJson, $noteId);
+                        
+                        if ($updateStmt->execute()) {
+                            $linkedCount++;
+                            error_log("Linked attachment {$filename} to note {$noteId}");
+                        } else {
+                            error_log("Failed to link attachment {$filename} to note {$noteId}");
+                        }
+                    }
+                } else {
+                    error_log("Note {$noteId} not found for attachment {$filename}");
+                }
+            } else {
+                error_log("Attachment file {$filename} not found for linking");
+            }
+        }
+    }
+    
+    $message = "Extracted {$extractedCount} files";
+    if ($metadataFound) {
+        $message .= " and linked {$linkedCount} attachments to notes";
+    } else {
+        $message .= " (no metadata found - files not linked to notes)";
+    }
+    
+    return ['success' => true, 'count' => $extractedCount, 'linked' => $linkedCount, 'message' => $message];
 }
 
 $backups = [];
