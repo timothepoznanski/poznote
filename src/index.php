@@ -220,8 +220,6 @@ if($note != '') {
                     <button onclick="uploadAttachment()">Upload File</button>
                 </div>
                 <div id="attachmentErrorMessage" class="modal-error-message" style="display: none;"></div>
-                <div class="attachment-help">
-                    <small>💡 If upload fails on Windows, try with a smaller file or restart the Docker container.</small></div>
             </div>
             <div id="attachmentsList" class="attachments-list">
                 <!-- Attachments will be loaded here -->
