@@ -499,9 +499,6 @@ $backups = [];
             <?php if (!empty($restore_error)): ?>
                 <div class="message error"><?php echo htmlspecialchars($restore_error); ?></div>
             <?php endif; ?>
-            <div class="warning">
-                <strong>Warning:</strong> This will replace your current database completely. Make sure you have a backup first.
-            </div>
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="restore">
                 <div class="form-group">
