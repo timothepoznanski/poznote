@@ -258,7 +258,7 @@ if($note != '') {
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
                     </div>
-                    <div class="settings-menu-item" onclick="showMobileExportMessage();">
+                    <div class="settings-menu-item" onclick="window.location = 'database_backup.php';">
                         <i class="fas fa-database"></i>
                         <span>Export/Import</span>
                     </div>
@@ -862,9 +862,6 @@ if($note != '') {
     </div>  <!-- Close main-container -->
     
     <script>
-    function showMobileExportMessage() {
-        alert('Export/Import functionality is only available on desktop version. Please access Poznote from a desktop computer to use this feature.');
-    }
     </script>
 </body>
 <script src="js/script.js"></script>
