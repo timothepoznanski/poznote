@@ -1,15 +1,7 @@
 # Poznote
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
-[![License](https:/**Se**Services:**
-- 🌐 **webserver** - Apache/PHP serving the application
-- 📊 **database** - MySQL for data storage
-
-**Persistent Volumes:**s:**
-- 🌐 **webserver** - Apache/PHP serving the application
-- 🗂️ **database** - MySQL for data storage
-
-**Persistent Volumes:**shields.io/badge/License-Open%20Source-green)](LICENSE)
+[![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
 
