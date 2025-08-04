@@ -192,9 +192,10 @@ function Reconfigure-Poznote {
     $existingConfig = Get-ExistingEnvConfig
     
     Write-Host "`nCurrent configuration:" -ForegroundColor $Colors.Blue
+    Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
+    Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  • Web Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -274,9 +275,10 @@ function Install-Poznote {
         
         if ($existingConfig.Count -gt 0) {
             Write-Host "`nCurrent configuration:" -ForegroundColor $Colors.Blue
+            Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
+            Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  • Web Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green

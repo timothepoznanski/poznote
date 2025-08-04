@@ -61,9 +61,9 @@ reconfigure_poznote() {
     load_env_config
     
     echo -e "\n${BLUE}Current configuration:${NC}"
+    echo -e "  • URL: ${GREEN}http://localhost:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
-    echo -e "  • Web Port: ${HTTP_WEB_PORT}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -324,9 +324,9 @@ main() {
         
         if [ -n "$HTTP_WEB_PORT" ]; then
             echo -e "\n${BLUE}Current configuration:${NC}"
+            echo -e "  • URL: ${GREEN}http://localhost:${HTTP_WEB_PORT}${NC}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
-            echo -e "  • Web Port: ${HTTP_WEB_PORT}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
