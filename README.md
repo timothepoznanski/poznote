@@ -12,7 +12,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 cp .env.template .env
-# Edit with your preferred editor
 vim .env
 ```
 
@@ -22,12 +21,7 @@ vim .env
 
 ```bash
 # Start Poznote
-docker compose up -d --build
-```
-
-**💡 For reverse proxy setups** (Nginx Proxy Manager, Traefik, etc.):
-```bash
-docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
+docker compose -f docker-compose.yml up -d --build
 ```
 
 ### Installation on Windows
@@ -45,12 +39,7 @@ notepad .env
 
 ```powershell
 # Start Poznote
-docker compose up -d --build
-```
-
-**💡 For reverse proxy setups** (Nginx Proxy Manager, Traefik, etc.):
-```powershell
-docker compose -f docker-compose.yml -f docker-compose-reverse-proxy.yml up -d --build
+docker compose -f docker-compose.yml up -d --build
 ```
 
 ### Default Access
