@@ -211,9 +211,9 @@ function Reconfigure-Poznote {
     if (Test-Path ".env.template") {
         Copy-Item ".env.template" ".env" -Force
         $envContent = Get-Content ".env" -Raw
-        $envContent = $envContent -replace "^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
-        $envContent = $envContent -replace "^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
-        $envContent = $envContent -replace "^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
+        $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
+        $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
+        $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success "Configuration updated from template successfully!"
     }
@@ -385,7 +385,6 @@ function Install-Poznote {
         
         # Get configuration
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
-        Write-Host "`nSecurity Configuration:" -ForegroundColor $Colors.Yellow
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
         $HTTP_WEB_PORT = Get-UserInput "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
         
@@ -398,9 +397,9 @@ function Install-Poznote {
         # Create .env file
         Copy-Item ".env.template" ".env" -Force
         $envContent = Get-Content ".env" -Raw
-        $envContent = $envContent -replace "^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
-        $envContent = $envContent -replace "^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
-        $envContent = $envContent -replace "^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
+        $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
+        $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
+        $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success ".env file created from template successfully!"
     }
@@ -470,12 +469,17 @@ function Install-Poznote {
 
 "@ -ForegroundColor $Colors.Green
         
+        # Use the variables directly instead of reading from file
+        $finalUsername = if ($POZNOTE_USERNAME) { $POZNOTE_USERNAME } else { $envVars['POZNOTE_USERNAME'] }
+        $finalPassword = if ($POZNOTE_PASSWORD) { $POZNOTE_PASSWORD } else { $envVars['POZNOTE_PASSWORD'] }
+        $finalPort = if ($HTTP_WEB_PORT) { $HTTP_WEB_PORT } else { $envVars['HTTP_WEB_PORT'] }
+        
         Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "http://localhost:$($envVars['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
+        Write-Host "http://localhost:$finalPort" -ForegroundColor $Colors.Green
         Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$($envVars['POZNOTE_USERNAME'])" -ForegroundColor $Colors.Yellow
+        Write-Host "$finalUsername" -ForegroundColor $Colors.Yellow
         Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$($envVars['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.Yellow
+        Write-Host "$finalPassword" -ForegroundColor $Colors.Yellow
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"
