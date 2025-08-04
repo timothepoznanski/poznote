@@ -52,10 +52,10 @@ if ($attachmentsPath && is_dir($attachmentsPath)) {
 // Create a metadata file with attachment-to-note mappings
 $metadata = [];
 $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != ''";
-$result = $con->query($query);
+$queryResult = $con->query($query);
 
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
+if ($queryResult) {
+    while ($row = $queryResult->fetch_assoc()) {
         $attachments = json_decode($row['attachments'], true);
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {

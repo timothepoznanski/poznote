@@ -249,6 +249,8 @@ function importNotesZip($uploadedFile) {
 }
 
 function importAttachmentsZip($uploadedFile) {
+    global $con;
+    
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
         return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
