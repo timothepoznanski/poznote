@@ -200,11 +200,6 @@ docker compose exec database mysqldump -u root -p sfs466!sfdgGH poznote_db > bac
 
 Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
-Available restore options:
-- **📝 Import Notes** - Upload ZIP file with your notes
-- **📎 Import Attachments** - Upload ZIP file with attachments  
-- **💾 Import Database** - Upload SQL dump file
-
 > **⚠️ Warning**: Database import will completely replace your current data!  
 > **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
 
