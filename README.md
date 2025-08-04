@@ -25,14 +25,13 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ## 📚 Table of Contents
 
 - [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
+- [Installation](#️-installation)
   - [Linux/macOS](#linuxmacos)
   - [Windows](#windows)
-- [Configuration](#-configuration)
+- [Configuration](#️-configuration)
 - [Updates](#-updates)
-- [Data Management](#-data-management)
+- [Backup and Restore](#backup-and-restore)
 - [API](#-api)
-- [Troubleshooting](#-troubleshooting)
 
 ## 📋 Prerequisites
 
@@ -149,7 +148,7 @@ docker compose down
 docker compose up -d --build
 ```
 
-## Data Management
+## Backup and Restore
 
 Poznote offers different backup options depending on your needs:
 
