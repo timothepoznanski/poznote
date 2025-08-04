@@ -35,6 +35,25 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 
 ### Linux/macOS
 
+#### Option 1: Automated Setup (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote
+
+# Make the script executable and run it
+chmod +x setup.sh
+./setup.sh
+```
+
+The script will automatically:
+- ✅ Verify Docker installation
+- 🔍 Detect existing installations  
+- 📋 Guide you through configuration
+- 🚀 Start Poznote with your settings
+
+#### Option 2: Manual Setup
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/timothepoznanski/poznote.git
@@ -58,6 +77,24 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
    ```
 
 ### Windows
+
+#### Option 1: Automated Setup (Recommended)
+```powershell
+# Clone the repository
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote
+
+# Run the PowerShell script
+.\setup.ps1
+```
+
+The script will automatically:
+- ✅ Verify Docker installation
+- 🔍 Detect existing installations
+- 📋 Guide you through configuration  
+- 🚀 Start Poznote with your settings
+
+#### Option 2: Manual Setup
 
 1. **Clone the repository**
    ```powershell
@@ -93,6 +130,28 @@ Where `YOUR_SERVER` depends on your environment:
 
 ## Change login, password or port
 
+### Automated Configuration Change (Recommended)
+
+**Linux/macOS:**
+```bash
+./setup.sh
+```
+Then select option 2 (Change configuration) from the menu.
+
+**Windows:**
+```powershell
+.\setup.ps1
+```
+Then select option 2 (Change configuration) from the menu.
+
+The script will:
+- 📋 Show your current configuration
+- ✏️ Allow you to update password and port
+- 🔄 Restart services automatically
+- 🛡️ Preserve all your data
+
+### Manual Configuration Change
+
 Open the folder of your project and edit the `.env` file to customize your installation:
 
 ```bash
@@ -121,7 +180,28 @@ docker compose up -d
 
 ## Updates
 
-To update Poznote to the latest version:
+### Automated Update (Recommended)
+
+**Linux/macOS:**
+```bash
+./setup.sh
+```
+Then select option 1 (Update application) from the menu.
+
+**Windows:**
+```powershell
+.\setup.ps1
+```
+Then select option 1 (Update application) from the menu.
+
+The script will:
+- 🔄 Pull the latest code automatically
+- 🛡️ Preserve your existing configuration and data
+- 🚀 Restart services with updates
+
+### Manual Update
+
+To update Poznote manually to the latest version:
 
 ```bash
 git pull origin main && docker compose down && docker compose up -d --build
