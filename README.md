@@ -36,8 +36,8 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ### Linux/macOS
 
 #### Option 1: Automated Setup (Recommended)
+
 ```bash
-# Clone the repository
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 chmod +x setup.sh
@@ -61,7 +61,7 @@ The script will automatically:
 2. **Configure environment**
    ```bash
    cp .env.template .env
-   vim .env  # or use your preferred editor
+   vim .env
    ```
 
 3. **Customize settings**
@@ -78,7 +78,6 @@ The script will automatically:
 
 #### Option 1: Automated Setup (Recommended)
 ```powershell
-# Clone the repository
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
 .\setup.ps1
@@ -101,7 +100,7 @@ The script will automatically:
 2. **Configure environment**
    ```powershell
    copy .env.template .env
-   notepad .env  # or use your preferred editor
+   notepad .env
    ```
 
 3. **Customize settings**
@@ -126,7 +125,7 @@ Where `YOUR_SERVER` depends on your environment:
 
 ## Change login, password or port
 
-### Automated Configuration Change (Recommended)
+### Option 1: Automated Configuration Change (Recommended)
 
 **Linux/macOS:**
 ```bash
@@ -146,7 +145,7 @@ The script will:
 - 🔄 Restart services automatically
 - 🛡️ Preserve all your data
 
-### Manual Configuration Change
+### Option 2: Manual Configuration Change
 
 Open the folder of your project and edit the `.env` file to customize your installation:
 
@@ -163,9 +162,9 @@ docker compose down
 docker compose up -d
 ```
 
-## Updates
+## Updates Poznote
 
-### Automated Update (Recommended)
+### Option 1: Automated Update (Recommended)
 
 **Linux/macOS:**
 ```bash
@@ -184,7 +183,7 @@ The script will:
 - 🛡️ Preserve your existing configuration and data
 - 🚀 Restart services with updates
 
-### Manual Update
+### Option 2: Manual Update
 
 To update Poznote manually to the latest version:
 
