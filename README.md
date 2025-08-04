@@ -181,9 +181,7 @@ Available backup options:
 - **📎 Export Attachments** - Download all file attachments  
 - **🗄️ Export Database** - Download SQL dump
 
-#### Manual Backup
-
-You can also manually backup with:
+but if you prefere you can also manually backup with:
 
 ```bash
 # Backup your notes
@@ -203,9 +201,9 @@ Poznote includes built-in backup functionality through the web interface in Sett
 > **⚠️ Warning**: Database import will completely replace your current data!  
 > **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
 
-#### Manual Restore
+but if you prefere you can also manually restore with:
 
-**Restore notes and attachments:**
+**Restore notes and attachments**
 ```bash
 # Stop Poznote
 docker compose down
@@ -218,7 +216,7 @@ cp -r backup_attachments/* ./data/attachments/
 docker compose up -d
 ```
 
-**Restore database from SQL:**
+**Restore database from SQL**
 ```bash
 # Import SQL backup into database
 docker compose exec -T database mysql -u root -p[PASSWORD] poznote_db < backup.sql
