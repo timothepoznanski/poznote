@@ -162,7 +162,7 @@ docker compose down
 docker compose up -d
 ```
 
-## Updates Poznote
+## Update Poznote application
 
 ### Option 1: Automated Update (Recommended)
 
