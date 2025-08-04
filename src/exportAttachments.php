@@ -24,10 +24,102 @@ if ($result !== TRUE) {
 }
 
 $attachmentCount = 0;
+$metadataInfo = [];
 
-// Check if attachments directory exists and add files
+// Collect all attachment information from database
+$query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+$queryResult = $con->query($query);
+
+if ($queryResult && $queryResult->num_rows > 0) {
+    while ($row = $queryResult->fetch_assoc()) {
+        $attachments = json_decode($row['attachments'], true);
+        if (is_array($attachments) && !empty($attachments)) {
+            foreach ($attachments as $attachment) {
+                if (isset($attachment['filename'])) {
+                    $metadataInfo[] = [
+                        'note_id' => $row['id'],
+                        'note_heading' => $row['heading'],
+                        'attachment_data' => $attachment
+                    ];
+                }
+            }
+        }
+    }
+}
+
+// Add physical files to ZIP
 if ($attachmentsPath && is_dir($attachmentsPath)) {
-    // Add all files from attachments directory
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($attachmentsPath), 
+        RecursiveIteratorIterator::LEAVES_ONLY
+    );
+
+    foreach ($files as $name => $file) {
+        if (!$file->isDir()) {
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
+            
+            // Skip hidden files like .gitkeep
+            if (!str_starts_with($relativePath, '.')) {
+                if (file_exists($filePath) && is_readable($filePath)) {
+                    $zip->addFile($filePath, 'files/' . $relativePath);
+                    $attachmentCount++;
+                }
+            }
+        }
+    }
+}
+
+// Add metadata file with linking information
+if (!empty($metadataInfo)) {
+    $metadataContent = json_encode($metadataInfo, JSON_PRETTY_PRINT);
+    $zip->addFromString('poznote_attachments_metadata.json', $metadataContent);
+}
+
+// Create a simple index file
+$indexContent = '<html><head><title>Poznote Attachments Export</title></head><body>';
+$indexContent .= '<h1>Poznote Attachments Export</h1>';
+$indexContent .= '<p>Total files exported: ' . $attachmentCount . '</p>';
+$indexContent .= '<p>Notes with attachments: ' . count($metadataInfo) . '</p>';
+$indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';
+if ($attachmentCount == 0) {
+    $indexContent .= '<p>No attachments found in your notes.</p>';
+} else {
+    $indexContent .= '<ul>';
+    $indexContent .= '<li><strong>files/</strong> - Physical attachment files</li>';
+    $indexContent .= '<li><strong>poznote_attachments_metadata.json</strong> - Linking information</li>';
+    $indexContent .= '</ul>';
+    $indexContent .= '<p><strong>Important:</strong> For proper restoration, import the database first, then use this attachments export.</p>';
+}
+$indexContent .= '</body></html>';
+
+$zip->addFromString('README.html', $indexContent);
+
+$zip->close();
+
+// Clear any output buffer
+ob_end_clean();
+
+// Check if ZIP file was created successfully
+if (!file_exists($zipFileName)) {
+    die('Attachments export file could not be created - ZIP file not found');
+}
+
+if (filesize($zipFileName) == 0) {
+    unlink($zipFileName);
+    die('Attachments export file could not be created - ZIP file is empty');
+}
+
+// Send file to browser
+header('Content-Type: application/zip');
+header('Content-Disposition: attachment; filename="poznote_attachments_export.zip"');
+header('Content-Length: ' . filesize($zipFileName));
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: 0');
+
+readfile($zipFileName);
+unlink($zipFileName);
+?>
     $files = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($attachmentsPath), 
         RecursiveIteratorIterator::LEAVES_ONLY

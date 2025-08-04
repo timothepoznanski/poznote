@@ -251,14 +251,10 @@ function importNotesZip($uploadedFile) {
 function importAttachmentsZip($uploadedFile) {
     global $con;
     
-    error_log("DEBUG: Starting importAttachmentsZip function");
-    
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
         return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
     }
-    
-    error_log("DEBUG: File type check passed");
     
     $tempFile = '/tmp/poznote_attachments_import_' . uniqid() . '.zip';
     
@@ -267,9 +263,7 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Error uploading file'];
     }
     
-    error_log("DEBUG: File moved to temp directory");
-    
-    // Determine attachments directory
+    // Find attachments directory
     $attachmentsPaths = [
         realpath('attachments'),
         realpath('../data/attachments'),
@@ -288,9 +282,7 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Attachments directory not found'];
     }
     
-    error_log("DEBUG: Attachments directory found: " . $attachmentsPath);
-    
-    // Extract ZIP file
+    // Open ZIP file
     $zip = new ZipArchive();
     $result = $zip->open($tempFile);
     
@@ -299,59 +291,58 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Cannot open ZIP file. Error code: ' . $result];
     }
     
-    error_log("DEBUG: ZIP file opened successfully");
-    
     $extractedCount = 0;
-    $metadataFound = false;
+    $linkedCount = 0;
     $metadata = [];
+    $hasMetadata = false;
     
-    error_log("DEBUG: Starting first pass for metadata");
-    
-    // First pass: extract metadata file if it exists
+    // First: Check if we have metadata
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $filename = $zip->getNameIndex($i);
-        
-        if ($filename === '_poznote_attachments_metadata.json') {
-            error_log("DEBUG: Found metadata file");
+        if ($filename === 'poznote_attachments_metadata.json') {
             $metadataContent = $zip->getFromIndex($i);
             if ($metadataContent) {
-                $decodedMetadata = json_decode($metadataContent, true);
-                if ($decodedMetadata && is_array($decodedMetadata)) {
-                    $metadata = $decodedMetadata;
-                    $metadataFound = true;
-                    error_log("DEBUG: Found attachment metadata with " . count($metadata) . " entries");
-                } else {
-                    error_log("DEBUG: Failed to decode attachment metadata JSON");
+                $decoded = json_decode($metadataContent, true);
+                if ($decoded && is_array($decoded)) {
+                    $metadata = $decoded;
+                    $hasMetadata = true;
                 }
             }
             break;
         }
     }
     
-    error_log("DEBUG: Starting second pass for file extraction");
-    
-    // Second pass: extract files
+    // Second: Extract all files
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $filename = $zip->getNameIndex($i);
         
-        // Skip directories, index files, and metadata file
-        if (!str_ends_with($filename, '/') && $filename !== 'index.html' && $filename !== '_poznote_attachments_metadata.json') {
+        // Skip directories and metadata files
+        if (!str_ends_with($filename, '/') && 
+            $filename !== 'README.html' && 
+            $filename !== 'poznote_attachments_metadata.json') {
+            
+            // Handle files in 'files/' subdirectory or root
             $baseName = basename($filename);
             $targetPath = $attachmentsPath . '/' . $baseName;
             
             // Extract file
             if ($zip->extractTo($attachmentsPath, $filename)) {
-                // Move to correct location if extracted to subdirectory
+                // If file was extracted to subdirectory, move it to root
                 $extractedPath = $attachmentsPath . '/' . $filename;
                 if ($extractedPath !== $targetPath && file_exists($extractedPath)) {
-                    rename($extractedPath, $targetPath);
-                    // Clean up any empty directories
-                    $dir = dirname($extractedPath);
-                    if ($dir !== $attachmentsPath && is_dir($dir) && count(scandir($dir)) === 2) {
-                        rmdir($dir);
+                    if (rename($extractedPath, $targetPath)) {
+                        // Clean up empty directories
+                        $dir = dirname($extractedPath);
+                        if ($dir !== $attachmentsPath && is_dir($dir)) {
+                            @rmdir($dir);
+                        }
                     }
                 }
-                $extractedCount++;
+                
+                if (file_exists($targetPath)) {
+                    chmod($targetPath, 0644);
+                    $extractedCount++;
+                }
             }
         }
     }
@@ -359,88 +350,72 @@ function importAttachmentsZip($uploadedFile) {
     $zip->close();
     unlink($tempFile);
     
-    error_log("DEBUG: Files extracted: " . $extractedCount);
-    
-    // Set proper permissions
+    // Set directory permissions
     chmod($attachmentsPath, 0755);
-    $files = glob($attachmentsPath . '/*');
-    foreach ($files as $file) {
-        if (is_file($file)) {
-            chmod($file, 0644);
-        }
-    }
     
-    error_log("DEBUG: Starting metadata linking process");
-    
-    // If metadata was found, try to link attachments to notes
-    $linkedCount = 0;
-    if ($metadataFound && !empty($metadata)) {
-        error_log("DEBUG: Processing " . count($metadata) . " metadata entries");
-        foreach ($metadata as $meta) {
-            $noteId = $meta['note_id'];
-            $attachment = $meta['attachment'];
-            $filename = $attachment['filename'];
+    // Third: Link files to notes if we have metadata
+    if ($hasMetadata && !empty($metadata)) {
+        foreach ($metadata as $item) {
+            $noteId = $item['note_id'];
+            $attachmentData = $item['attachment_data'];
+            $filename = $attachmentData['filename'];
             
-            // Check if the file exists in the attachments directory
+            // Check if file exists and note exists
             if (file_exists($attachmentsPath . '/' . $filename)) {
-                // Check if the note still exists
                 $checkQuery = "SELECT id, attachments FROM entries WHERE id = ?";
-                $checkStmt = $con->prepare($checkQuery);
-                $checkStmt->bind_param("i", $noteId);
-                $checkStmt->execute();
-                $checkResult = $checkStmt->get_result();
-                
-                if ($checkResult->num_rows > 0) {
-                    $noteRow = $checkResult->fetch_assoc();
-                    $currentAttachments = $noteRow['attachments'] ? json_decode($noteRow['attachments'], true) : [];
+                if ($stmt = $con->prepare($checkQuery)) {
+                    $stmt->bind_param("i", $noteId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
                     
-                    // Check if attachment isn't already linked
-                    $alreadyExists = false;
-                    foreach ($currentAttachments as $existing) {
-                        if ($existing['filename'] === $filename) {
-                            $alreadyExists = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!$alreadyExists) {
-                        // Add the attachment to the note
-                        $currentAttachments[] = $attachment;
+                    if ($result->num_rows > 0) {
+                        $row = $result->fetch_assoc();
+                        $currentAttachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
                         
-                        // Update the database
-                        $updateQuery = "UPDATE entries SET attachments = ? WHERE id = ?";
-                        $updateStmt = $con->prepare($updateQuery);
-                        $attachmentsJson = json_encode($currentAttachments);
-                        $updateStmt->bind_param("si", $attachmentsJson, $noteId);
-                        
-                        if ($updateStmt->execute()) {
-                            $linkedCount++;
-                            error_log("DEBUG: Linked attachment {$filename} to note {$noteId}");
+                        // Check if attachment is not already linked
+                        $exists = false;
+                        if (is_array($currentAttachments)) {
+                            foreach ($currentAttachments as $existing) {
+                                if (isset($existing['filename']) && $existing['filename'] === $filename) {
+                                    $exists = true;
+                                    break;
+                                }
+                            }
                         } else {
-                            error_log("DEBUG: Failed to link attachment {$filename} to note {$noteId}");
+                            $currentAttachments = [];
+                        }
+                        
+                        if (!$exists) {
+                            $currentAttachments[] = $attachmentData;
+                            $updateQuery = "UPDATE entries SET attachments = ? WHERE id = ?";
+                            if ($updateStmt = $con->prepare($updateQuery)) {
+                                $attachmentsJson = json_encode($currentAttachments);
+                                $updateStmt->bind_param("si", $attachmentsJson, $noteId);
+                                if ($updateStmt->execute()) {
+                                    $linkedCount++;
+                                }
+                            }
                         }
                     }
-                } else {
-                    error_log("DEBUG: Note {$noteId} not found for attachment {$filename}");
                 }
-            } else {
-                error_log("DEBUG: Attachment file {$filename} not found for linking");
             }
         }
-    } else {
-        error_log("DEBUG: No metadata found or metadata is empty");
     }
     
-    $message = "Extracted {$extractedCount} files";
-    if ($metadataFound) {
+    // Create result message
+    $message = "Successfully imported {$extractedCount} files";
+    if ($hasMetadata) {
         $message .= " and linked {$linkedCount} attachments to notes";
     } else {
-        $message .= " (no metadata found - files not linked to notes)";
+        $message .= " (no metadata found - files copied but not linked to notes)";
     }
     
-    error_log("DEBUG: Import completed successfully");
-    
-    return ['success' => true, 'count' => $extractedCount, 'linked' => $linkedCount, 'message' => $message];
+    return [
+        'success' => true, 
+        'count' => $extractedCount, 
+        'linked' => $linkedCount,
+        'message' => $message
+    ];
 }
 
 $backups = [];
