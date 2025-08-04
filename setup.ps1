@@ -293,11 +293,13 @@ function Install-Poznote {
                     Write-Status "Starting application update..."
                     Write-Status "Pulling latest changes from repository..."
                     try {
-                        $gitOutput = git pull origin main 2>&1
+                        Write-Host ""
+                        $gitOutput = git pull origin main
+                        Write-Host ""
                         if ($LASTEXITCODE -eq 0) {
                             Write-Success "Successfully pulled latest changes"
                         } else {
-                            Write-Warning "Git pull completed with warnings."
+                            Write-Warning "Git pull completed with warnings, but continuing..."
                         }
                     }
                     catch {

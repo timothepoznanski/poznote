@@ -343,9 +343,12 @@ main() {
                     print_status "Starting application update..."
                     
                     print_status "📥 Pulling latest changes from repository..."
-                    if git pull origin main 2>/dev/null; then
+                    echo
+                    if git pull origin main; then
+                        echo
                         print_success "✅ Successfully pulled latest changes"
                     else
+                        echo
                         print_warning "⚠️  Git pull failed or no changes, continuing with local files"
                     fi
                     
