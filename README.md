@@ -144,7 +144,7 @@ docker compose up -d
 **Persistent Volumes:**
 - 📁 `./data/entries` - Your note files (HTML format)
 - 📎 `./data/attachments` - File attachments  
-- 💾 `./data/mysql` - Database files
+- 🗄️ `./data/mysql` - Database files
 
 ## 🔄 Updates
 
@@ -157,40 +157,33 @@ docker compose down
 docker compose up -d --build
 ```
 
-## 💾 Data Management
-
-### Understanding Backup Types
+## Data Management
 
 Poznote offers different backup options depending on your needs:
 
 **📝 Complete Application Restore**: Requires all 3 components
 - Notes (HTML files) + Attachments + Database
-- Use this for full Poznote restoration on a new server
+- Use this for full Poznote restoration (new server or current installation)
 
 **📖 Offline Notes Consultation**: Notes export only
 - Export notes as ZIP → Contains HTML files + `index.html` menu
 - Open `index.html` in any browser to browse your notes offline
 - No Poznote installation needed, works anywhere
 
-**🔄 Partial Restore**: Individual components
-- Notes only: Restore your content without attachments
-- Attachments only: Restore files without notes  
-- Database only: Restore metadata and structure (⚠️ **Note**: Database contains only note metadata like titles, tags, dates - not the actual note content which is stored in HTML files)
+⚠️ Database contains only note metadata like titles, tags, dates - not the actual note content which is stored in HTML files
 
 ### 💾 Backup
 
-Poznote includes built-in backup functionality through the web interface:
-
-**Access Path**: Settings → "Export/Import Database"
+Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
 Available backup options:
 - **📝 Export Notes** - Download complete ZIP with all your notes
 - **📎 Export Attachments** - Download all file attachments  
-- **💾 Export Database** - Download SQL dump
+- **🗄️ Export Database** - Download SQL dump
 
 #### Manual Backup
 
-For automated backup scripts, you can manually copy these directories:
+You can manually copy these directories:
 
 ```bash
 # Backup your notes
