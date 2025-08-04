@@ -40,8 +40,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 # Clone the repository
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
-
-# Make the script executable and run it
 chmod +x setup.sh
 ./setup.sh
 ```
@@ -83,8 +81,6 @@ The script will automatically:
 # Clone the repository
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
-
-# Run the PowerShell script
 .\setup.ps1
 ```
 
@@ -146,7 +142,7 @@ Then select option 2 (Change configuration) from the menu.
 
 The script will:
 - 📋 Show your current configuration
-- ✏️ Allow you to update password and port
+- ✏️ Allow you to update username, password and port
 - 🔄 Restart services automatically
 - 🛡️ Preserve all your data
 
@@ -166,17 +162,6 @@ After modifying the `.env` file, restart the application:
 docker compose down
 docker compose up -d
 ```
-
-### Docker Architecture
-
-**Services:**
-- 🌐 **webserver** - Apache/PHP serving the application
-- 🗄️ **database** - MySQL for data storage
-
-**Persistent Volumes:**
-- 📁 `./data/entries` - Your note files (HTML format)
-- 📎 `./data/attachments` - File attachments  
-- 🗄️ `./data/mysql` - Database files
 
 ## Updates
 
@@ -273,32 +258,16 @@ docker compose up -d
 docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
 ```
 
-## Troubleshooting
+### Docker Architecture
 
-### Upload Issues on Windows
+**Services:**
+- 🌐 **webserver** - Apache/PHP serving the application
+- 🗄️ **database** - MySQL for data storage
 
-If you experience "upload failed" errors on Windows Desktop, try these solutions:
-
-1. **Quick Fix - Restart Container:**
-   ```bash
-   docker compose down
-   docker compose up -d --build
-   ```
-
-2. **Check Diagnostic Page:**
-   Visit `http://localhost:8040/test_upload.php` to see detailed information about your upload configuration.
-
-3. **Fix Permissions:**
-   ```bash
-   docker compose exec webserver chmod -R 777 /var/www/html/attachments
-   ```
-
-4. **View Logs:**
-   ```bash
-   docker compose logs webserver
-   ```
-
-For detailed troubleshooting steps, see [TROUBLESHOOTING_UPLOAD.md](TROUBLESHOOTING_UPLOAD.md).
+**Persistent Volumes:**
+- 📁 `./data/entries` - Your note files (HTML format)
+- 📎 `./data/attachments` - File attachments  
+- 🗄️ `./data/mysql` - Database files
 
 ## API
 

@@ -61,12 +61,19 @@ reconfigure_poznote() {
     load_env_config
     
     echo -e "\n${BLUE}Current configuration:${NC}"
-    echo -e "  • Web Port: ${HTTP_WEB_PORT}"
+    echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
+    echo -e "  • Web Port: ${HTTP_WEB_PORT}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
     # Get new values
+    read -p "Username [$POZNOTE_USERNAME]: " NEW_POZNOTE_USERNAME
+    POZNOTE_USERNAME=${NEW_POZNOTE_USERNAME:-$POZNOTE_USERNAME}
+
+    read -p "Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
+    POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
+
     read -p "Web Server Port [$HTTP_WEB_PORT]: " NEW_HTTP_WEB_PORT
     HTTP_WEB_PORT=${NEW_HTTP_WEB_PORT:-$HTTP_WEB_PORT}
 
@@ -141,6 +148,7 @@ load_env_config() {
 # Get template values
 get_template_values() {
     if [ -f ".env.template" ]; then
+        TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2)
     fi
@@ -154,6 +162,19 @@ get_user_config() {
     if [ "$is_update" = "true" ]; then
         print_status "Current configuration will be preserved. Press Enter to keep current values:"
         echo
+    fi
+    
+    # Get username
+    if [ "$is_update" = "true" ] && [ -n "$POZNOTE_USERNAME" ]; then
+        read -p "Username (current: $POZNOTE_USERNAME): " NEW_USERNAME
+        POZNOTE_USERNAME=${NEW_USERNAME:-$POZNOTE_USERNAME}
+    else
+        read -p "Username (default: $TEMPLATE_USERNAME): " POZNOTE_USERNAME
+        POZNOTE_USERNAME=${POZNOTE_USERNAME:-$TEMPLATE_USERNAME}
+        
+        if [ -z "$POZNOTE_USERNAME" ]; then
+            POZNOTE_USERNAME="admin"
+        fi
     fi
     
     # Get password
@@ -199,6 +220,7 @@ create_env_file() {
     fi
     
     cp ".env.template" ".env"
+    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
     
@@ -261,7 +283,7 @@ show_info() {
     echo
     print_status "📋 Access Information:"
     echo "  🌐 URL: http://localhost:$HTTP_WEB_PORT"
-    echo "  🔑 Username: admin"
+    echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: [the password you configured]"
     echo
     print_status "🔧 Management Commands:"
@@ -308,13 +330,14 @@ main() {
         
         if [ -n "$HTTP_WEB_PORT" ]; then
             echo -e "\n${BLUE}Current configuration:${NC}"
-            echo -e "  • Web Port: ${HTTP_WEB_PORT}"
+            echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
+            echo -e "  • Web Port: ${HTTP_WEB_PORT}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
         echo -e "  1) Update application (pull latest code)"
-        echo -e "  2) Change configuration (password/port)"
+        echo -e "  2) Change configuration (username/password/port)"
         echo -e "  3) Cancel"
         
         while true; do
