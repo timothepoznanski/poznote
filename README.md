@@ -234,7 +234,6 @@ Available backup options:
 - To backup your database:
 
 ```bash
-# Backup database
 docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
 ```
 
