@@ -1,19 +1,8 @@
 # Ignore data directories (Docker volumes for database, entries, attachments)
 data/
 
-# Ignore entries in source directory  
-src/entries/*
-!src/entries/index.php
-
-# Ignore attachments in source directory
-src/attachments/*
-!src/attachments/.gitkeep
-
 # Environment files (these should not be committed)
 .env
-
-# Docker compose files
-docker-compose-dev.yml
 
 # Docker volumes and temporary files
 .docker/
