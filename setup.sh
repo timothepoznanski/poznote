@@ -61,7 +61,7 @@ reconfigure_poznote() {
     load_env_config
     
     echo -e "\n${BLUE}Current configuration:${NC}"
-    echo -e "  • URL: ${GREEN}http://localhost:${HTTP_WEB_PORT}${NC}"
+    echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
 
@@ -93,7 +93,7 @@ reconfigure_poznote() {
     echo -e "=========================================${NC}\n"
     
     echo -e "${GREEN}Your Poznote configuration has been updated!${NC}"
-    echo -e "${BLUE}Access your instance at: ${GREEN}http://localhost:$HTTP_WEB_PORT${NC}"
+    echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
 }
 
@@ -282,7 +282,7 @@ show_info() {
     echo "========================================="
     echo
     print_status "📋 Access Information:"
-    echo "  🌐 URL: http://localhost:$HTTP_WEB_PORT"
+    echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
 
@@ -314,7 +314,7 @@ main() {
         
         if [ -n "$HTTP_WEB_PORT" ]; then
             echo -e "\n${BLUE}Current configuration:${NC}"
-            echo -e "  • URL: ${GREEN}http://localhost:${HTTP_WEB_PORT}${NC}"
+            echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
         fi
