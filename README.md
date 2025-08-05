@@ -50,7 +50,7 @@ Try Poznote without installing anything! A live demo is available at:
 ### Windows
 
 **Prerequisites:**
-- **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
+- Install **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
 
 #### Option 1: Automated Setup
 
