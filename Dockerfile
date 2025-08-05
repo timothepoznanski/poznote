@@ -18,27 +18,21 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 # Copy php.ini
 COPY php.ini /usr/local/etc/php/
 
-# Copy src files
-COPY ./src/ /var/www/html/
+# Note: Source files are mounted as volumes, not copied
 
-# Create directories for data volumes with proper permissions for Windows Docker
+# Create directories for data volumes with proper permissions
 RUN mkdir -p /var/www/html/entries /var/www/html/attachments && \
-    chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && \
-    chmod -R 777 /var/www/html/entries /var/www/html/attachments
+    chown -R www-data:www-data /var/www/html && \
+    chmod -R 777 /var/www/html
 
-# Create a startup script to ensure permissions are correct on Windows
-RUN echo '#!/bin/bash\n\
-# Ensure proper permissions on startup (important for Windows Docker)\n\
-chmod -R 777 /var/www/html/attachments\n\
-chmod -R 777 /var/www/html/entries\n\
-chown -R www-data:www-data /var/www/html/attachments\n\
-chown -R www-data:www-data /var/www/html/entries\n\
-# Start Apache\n\
-exec apache2-foreground\n\
-' > /usr/local/bin/start-poznote.sh && chmod +x /usr/local/bin/start-poznote.sh
+# Enable Apache mod_rewrite if needed
+RUN a2enmod rewrite
 
 # Expose port HTTP
 EXPOSE 80
 
-# Use our custom startup script
-CMD ["/usr/local/bin/start-poznote.sh"]
+# Set working directory
+WORKDIR /var/www/html
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]
