@@ -5,7 +5,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
 
-A powerful, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
+A powerful, self-hosted, open-source, responsive note-taking tool with advanced search capabilities and full control over your data.
 
 ## Features
 
