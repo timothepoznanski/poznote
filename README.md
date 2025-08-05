@@ -9,16 +9,15 @@ A powerful note-taking tool with full control over your data.
 
 ## Features
 
-- 📝 **Rich Text Editor** - Write and format notes with ease
-- 🔍 **Powerful Search** - Find your notes instantly with advanced search
-- 🏷️ **Tag System** - Organize notes with flexible tagging
-- 📎 **File Attachments** - Attach files directly to your notes
-- 📱 **Responsive Design** - Works perfectly on all devices
-- 🔒 **Self-Hosted** - Complete control over your data
-- 💾 **Backup & Export** - Built-in backup and export functionality
-- 🗑️ **Trash System** - Recover accidentally deleted notes
-- 🌐 **REST API** - Programmatic access to your notes
-- 🐳 **Docker Ready** - Easy deployment with Docker Compose
+- 📝 Rich Text Editor
+- 🔍 Powerful Search
+- 🏷️ Tag System
+- 📎 File Attachments
+- 📱 Responsive Desig
+- 🔒 Self-Hosted
+- 💾 Built-in backup and export
+- 🗑️ Trash System
+- 🌐 REST API
 
 ## Demo
 
