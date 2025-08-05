@@ -59,7 +59,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             <code>./setup.sh</code> or <code>.\setup.ps1</code>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
-                    GitHub Repository
+                    See all informations here
                 </a>
             </p>
         </div>
