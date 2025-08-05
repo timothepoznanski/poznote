@@ -13,7 +13,9 @@ docker network create npm-poznote-demo-webserver-net
 docker network create poznote-demo_internal-net 
 Projet npm -> Modifier le docker compose puis -> docker compose up -d 
 
-cd /root/poznote.com/poznote-demo && git pull origin main && docker compose down && docker compose -f docker-compose.yml -f docker-compose-reverse-proxy-demo.yml up -d --build
+git clone https://github.com/timothepoznanski/poznote.git poznote-demo
+cd poznote-demo
+docker compose down && docker compose -f docker-compose.yml -f docker-compose-reverse-proxy-demo.yml up -d --build
 
 Demo update :
 
