@@ -12,6 +12,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 ## Table of Contents
 
 - [Features](#features)
+- [Demo](#demo)
 - [Installation](#installation)
 - [Change login, password or port](#change-login-password-or-port)
 - [Update Poznote application](#update-poznote-application)
@@ -31,6 +32,18 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux. The inter
 - 🗑️ **Trash System** - Recover accidentally deleted notes
 - 🌐 **REST API** - Programmatic access to your notes
 - 🐳 **Docker Ready** - Easy deployment with Docker Compose
+
+## Demo
+
+Try Poznote without installing anything! A live demo is available at:
+
+**🌐 Demo URL:** [https://poznote.com](https://poznote.com)
+
+**Login credentials:**
+- **Username:** `demo`
+- **Password:** `demo`
+
+*Note: The demo environment is reset periodically. Any notes you create will not be permanently saved.*
 
 ## Installation
 

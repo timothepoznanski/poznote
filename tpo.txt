@@ -8,4 +8,7 @@ git pull origin main && docker compose down && docker compose -f docker-compose.
 
 Demo :
 
+docker network create npm-poznote-demo-webserver-net
+docker network create poznote-demo_internal-net 
+Projet npm -> Modifier le docker compose puis -> docker compose up -d 
 git pull origin main && docker compose down && docker compose -f docker-compose.yml -f docker-compose-reverse-proxy-demo.yml up -d --build
