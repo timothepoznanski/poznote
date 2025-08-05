@@ -266,6 +266,10 @@ if($note != '') {
                         <i class="fas fa-code-branch"></i>
                         <span>GitHub Repository</span>
                     </div>
+                    <div class="settings-menu-item" onclick="showContactPopup();">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contact</span>
+                    </div>
                     <div class="settings-menu-item" onclick="koFiAction();">
                         <i class="fas fa-coffee"></i>
                         <span>Support me</span>
@@ -420,6 +424,10 @@ if($note != '') {
                 <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <i class="fas fa-code-branch"></i>
                     <span>GitHub Repository</span>
+                </div>
+                <div class="settings-menu-item" onclick="showContactPopup();">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
                 </div>
                 <div class="settings-menu-item" onclick="koFiAction();">
                     <i class="fas fa-coffee"></i>

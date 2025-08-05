@@ -739,6 +739,56 @@ function showNotificationPopup(message, type = 'success') {
     popup.addEventListener('click', hideNotification);
 }
 
+// Function to show contact popup
+function showContactPopup() {
+    var contactModal = `
+        <div id="contactModal" class="modal" style="display: block;">
+            <div class="modal-content" style="max-width: 400px; text-align: center;">
+                <span class="close" onclick="closeContactModal()" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                <h3 style="margin-bottom: 20px; color: #333;">Contact</h3>
+                <div style="margin: 20px 0;">
+                    <i class="fas fa-envelope" style="color: #007DB8; font-size: 24px; margin-bottom: 10px;"></i>
+                    <p style="font-size: 16px; margin: 10px 0;">Pour toute question ou support :</p>
+                    <p style="font-size: 18px; font-weight: bold; color: #007DB8; margin: 15px 0;">
+                        <a href="mailto:contact.poznote@gmail.com" style="color: #007DB8; text-decoration: none;">
+                            contact.poznote@gmail.com
+                        </a>
+                    </p>
+                </div>
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button onclick="closeContactModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing contact modal if any
+    var existingModal = document.getElementById('contactModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', contactModal);
+    
+    // Close modal when clicking outside
+    document.getElementById('contactModal').addEventListener('click', function(e) {
+        if (e.target.id === 'contactModal') {
+            closeContactModal();
+        }
+    });
+}
+
+// Function to close contact popup
+function closeContactModal() {
+    var modal = document.getElementById('contactModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // Folder management functions
 function newFolder() {
     document.getElementById('newFolderModal').style.display = 'block';
