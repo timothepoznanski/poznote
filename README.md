@@ -7,8 +7,6 @@
 
 A powerful, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
 
-Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
-
 ## Features
 
 - 📝 **Rich Text Editor** - Write and format notes with ease
@@ -46,6 +44,8 @@ Try Poznote without installing anything! A live demo is available at:
 - [API](#api)
 
 ## Installation
+
+Poznote runs in Docker and works seamlessly on both Windows and Linux.
 
 ### Windows
 
