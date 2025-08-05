@@ -21,7 +21,8 @@ services:
     volumes:
       - "./data/entries:/var/www/html/entries"
       - "./data/attachments:/var/www/html/attachments"
-    command: /bin/sh -c "chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && apache2-foreground"
+      - "./src:/var/www/html"
+    command: /bin/sh -c "chown -R www-data:www-data /var/www/html && apache2-foreground"
 
   # DATABASE
   database:
