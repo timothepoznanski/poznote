@@ -13,7 +13,7 @@ services:
       MYSQL_HOST: database
       MYSQL_USER: poznote_user
       MYSQL_DATABASE: poznote_db
-      MYSQL_PASSWORD: RGG45!566vfgdfgv
+      MYSQL_PASSWORD: RGG45566vfgdfgv
       POZNOTE_USERNAME: ${POZNOTE_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
     ports:
@@ -30,10 +30,10 @@ services:
     volumes:
       - "./data/mysql:/var/lib/mysql"
     environment:
-      MYSQL_ROOT_PASSWORD: sfs466!sfdgGH
+      MYSQL_ROOT_PASSWORD: sfs466sfdgGH
       MYSQL_DATABASE: poznote_db
       MYSQL_USER: poznote_user
-      MYSQL_PASSWORD: RGG45!566vfgdfgv
+      MYSQL_PASSWORD: RGG45566vfgdfgv
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
