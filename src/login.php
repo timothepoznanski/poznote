@@ -55,7 +55,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         </form>
         
         <div class="login-note">
-            <p>Si vous avez oublié votre mot de passe, vous pouvez relancer le script de configuration :</p>
+            <p>Forgot your password? Run the setup script to update the app, change credentials, or port:</p>
             <code>./setup.sh</code>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
