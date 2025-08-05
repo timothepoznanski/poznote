@@ -9,6 +9,23 @@ A powerful, self-hosted, open-source note-taking tool with advanced search capab
 
 Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
 
+## 🚀 Quick Start (Windows)
+
+**Prerequisites:** Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+
+```powershell
+# Clone and run Poznote in 3 simple steps
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote
+.\setup.ps1
+```
+
+That's it! The setup script will guide you through configuration and start Poznote automatically.
+
+**Default access:** `http://localhost:8040` (username: `admin`, password: `admin123`)
+
+---
+
 ## Table of Contents
 
 - [Features](#features)

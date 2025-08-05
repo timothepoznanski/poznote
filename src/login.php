@@ -55,16 +55,11 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         </form>
         
         <div class="login-note">
-            <p>Run the setup script again if you:</p>
-            <ul>
-                <li>Forgot your password</li>
-                <li>Want to update Poznote</li>
-                <li>Need to change credentials or port</li>
-            </ul>
-            <code>./setup.sh</code>
+            <p>Run the setup script again if you forgot your password, want to update Poznote or need to change credentials or port</p>
+            <code>./setup.sh</code> or <code>.\setup.ps1</code>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
-                    <i class="fas fa-code-branch"></i> GitHub Repository
+                    GitHub Repository
                 </a>
             </p>
         </div>
