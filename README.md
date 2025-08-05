@@ -53,6 +53,9 @@ Try Poznote without installing anything! A live demo is available at:
 - **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
 
 #### Option 1: Automated Setup
+
+Open PowerShell in the directory where you want to install Poznote and execute the following commands:
+
 ```powershell
 git clone https://github.com/timothepoznanski/poznote.git
 cd poznote
@@ -68,6 +71,9 @@ The script will automatically:
 #### Option 2: Manual Setup
 
 1. **Clone the repository**
+   
+   Open PowerShell in the directory where you want to install Poznote and execute the following commands:
+   
    ```powershell
    git clone https://github.com/timothepoznanski/poznote.git
    cd poznote
