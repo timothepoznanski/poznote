@@ -5,22 +5,19 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
 
-A powerful, self-hosted, open-source note-taking tool with advanced search capabilities and full control over your data. 🤩
-
-Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
+A powerful note-taking tool with full control over your data.
 
 ## Features
 
-- 📝 **Rich Text Editor** - Write and format notes with ease
-- 🔍 **Powerful Search** - Find your notes instantly with advanced search
-- 🏷️ **Tag System** - Organize notes with flexible tagging
-- 📎 **File Attachments** - Attach files directly to your notes
-- 📱 **Responsive Design** - Works perfectly on all devices
-- 🔒 **Self-Hosted** - Complete control over your data
-- 💾 **Backup & Export** - Built-in backup and export functionality
-- 🗑️ **Trash System** - Recover accidentally deleted notes
-- 🌐 **REST API** - Programmatic access to your notes
-- 🐳 **Docker Ready** - Easy deployment with Docker Compose
+- 📝 Rich Text Editor
+- 🔍 Powerful Search
+- 🏷️ Tag System
+- 📎 File Attachments
+- 📱 Responsive Desig
+- 🔒 Self-Hosted
+- 💾 Built-in backup and export
+- 🗑️ Trash System
+- 🌐 REST API
 
 ## Demo
 
@@ -36,8 +33,6 @@ Try Poznote without installing anything! A live demo is available at:
 
 ## Table of Contents
 
-- [Features](#features)
-- [Demo](#demo)
 - [Installation](#installation)
 - [Change login, password or port](#change-login-password-or-port)
 - [Update Poznote application](#update-poznote-application)
@@ -46,6 +41,8 @@ Try Poznote without installing anything! A live demo is available at:
 - [API](#api)
 
 ## Installation
+
+Poznote runs in Docker and works seamlessly on both Windows and Linux.
 
 ### Windows
 
