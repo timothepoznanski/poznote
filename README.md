@@ -33,8 +33,6 @@ Try Poznote without installing anything! A live demo is available at:
 
 ## Table of Contents
 
-- [Features](#features)
-- [Demo](#demo)
 - [Installation](#installation)
 - [Change login, password or port](#change-login-password-or-port)
 - [Update Poznote application](#update-poznote-application)
