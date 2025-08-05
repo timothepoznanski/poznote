@@ -9,17 +9,6 @@ A powerful, self-hosted, open-source note-taking tool with advanced search capab
 
 Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
 
-## Table of Contents
-
-- [Features](#features)
-- [Demo](#demo)
-- [Installation](#installation)
-- [Change login, password or port](#change-login-password-or-port)
-- [Update Poznote application](#update-poznote-application)
-- [Backup and Restore](#backup-and-restore)
-- [Docker Architecture](#docker-architecture)
-- [API](#api)
-
 ## Features
 
 - 📝 **Rich Text Editor** - Write and format notes with ease
@@ -44,6 +33,17 @@ Try Poznote without installing anything! A live demo is available at:
 - **Password:** `demo`
 
 *Note: The demo environment is reset periodically. Any notes you create will not be permanently saved.*
+
+## Table of Contents
+
+- [Features](#features)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Change login, password or port](#change-login-password-or-port)
+- [Update Poznote application](#update-poznote-application)
+- [Backup and Restore](#backup-and-restore)
+- [Docker Architecture](#docker-architecture)
+- [API](#api)
 
 ## Installation
 
