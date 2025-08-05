@@ -9,27 +9,9 @@ A powerful, self-hosted, open-source note-taking tool with advanced search capab
 
 Poznote runs in Docker and works seamlessly on both Windows and Linux. The interface is fully responsive across all devices, from desktop to mobile.
 
-## 🚀 Quick Start (Windows)
-
-**Prerequisites:** Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-```powershell
-# Clone and run Poznote in 3 simple steps
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote
-.\setup.ps1
-```
-
-That's it! The setup script will guide you through configuration and start Poznote automatically.
-
-**Default access:** `http://localhost:8040` (username: `admin`, password: `admin123`)
-
----
-
 ## Table of Contents
 
 - [Features](#features)
-- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Change login, password or port](#change-login-password-or-port)
 - [Update Poznote application](#update-poznote-application)
@@ -50,18 +32,55 @@ That's it! The setup script will guide you through configuration and start Pozno
 - 🌐 **REST API** - Programmatic access to your notes
 - 🐳 **Docker Ready** - Easy deployment with Docker Compose
 
-## Prerequisites
-
-### Linux/macOS
-- **[Docker Engine](https://docs.docker.com/engine/install/)** (v20.10+)
-- **[Docker Compose](https://docs.docker.com/compose/install/)** (v2.0+)
-
-### Windows
-- **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
-
 ## Installation
 
+### Windows
+
+**Prerequisites:**
+- **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
+
+#### Option 1: Automated Setup
+```powershell
+git clone https://github.com/timothepoznanski/poznote.git
+cd poznote
+.\setup.ps1
+```
+
+The script will automatically:
+- ✅ Verify Docker installation
+- 🔍 Detect existing installations
+- 📋 Guide you through configuration  
+- 🚀 Start Poznote with your settings
+
+#### Option 2: Manual Setup
+
+1. **Clone the repository**
+   ```powershell
+   git clone https://github.com/timothepoznanski/poznote.git
+   cd poznote
+   ```
+
+2. **Configure environment**
+   ```powershell
+   copy .env.template .env
+   notepad .env
+   ```
+
+3. **Customize settings**
+   - Change `POZNOTE_USERNAME=admin` to your preferred username
+   - Change `POZNOTE_PASSWORD=admin123` to a secure password
+   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+
+4. **Start Poznote**
+   ```powershell
+   docker compose up -d --build
+   ```
+
 ### Linux/macOS
+
+**Prerequisites:**
+- **[Docker Engine](https://docs.docker.com/engine/install/)** (v20.10+)
+- **[Docker Compose](https://docs.docker.com/compose/install/)** (v2.0+)
 
 #### Option 1: Automated Setup
 
@@ -99,45 +118,6 @@ The script will automatically:
 
 4. **Start Poznote**
    ```bash
-   docker compose up -d --build
-   ```
-
-### Windows
-
-#### Option 1: Automated Setup
-```powershell
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote
-.\setup.ps1
-```
-
-The script will automatically:
-- ✅ Verify Docker installation
-- 🔍 Detect existing installations
-- 📋 Guide you through configuration  
-- 🚀 Start Poznote with your settings
-
-#### Option 2: Manual Setup
-
-1. **Clone the repository**
-   ```powershell
-   git clone https://github.com/timothepoznanski/poznote.git
-   cd poznote
-   ```
-
-2. **Configure environment**
-   ```powershell
-   copy .env.template .env
-   notepad .env
-   ```
-
-3. **Customize settings**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-
-4. **Start Poznote**
-   ```powershell
    docker compose up -d --build
    ```
 
