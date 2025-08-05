@@ -21,10 +21,6 @@ COPY php.ini /usr/local/etc/php/
 # Copy src files
 COPY ./src/ /var/www/html/
 
-# Copy initialization script
-COPY ./init-directories.sh /usr/local/bin/init-directories.sh
-RUN chmod +x /usr/local/bin/init-directories.sh
-
 # Create directories for data volumes with proper permissions for Windows Docker
 RUN mkdir -p /var/www/html/entries /var/www/html/attachments && \
     chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && \
