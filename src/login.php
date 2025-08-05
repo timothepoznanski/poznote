@@ -55,7 +55,12 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         </form>
         
         <div class="login-note">
-            <p>Forgot your password? Run the setup script to update the app, change credentials, or port:</p>
+            <p>Run the setup script again if you:</p>
+            <ul>
+                <li>Forgot your password</li>
+                <li>Want to update Poznote</li>
+                <li>Need to change credentials or port</li>
+            </ul>
             <code>./setup.sh</code>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
