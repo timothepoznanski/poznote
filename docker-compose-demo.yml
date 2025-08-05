@@ -1,0 +1,42 @@
+services:  
+  
+  # WEB      
+  webserver-demo:       
+    build:
+      context: . # Use the current directory as the build context
+      dockerfile: Dockerfile # Specify the Dockerfile to use
+    restart: always      
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: database
+      MYSQL_USER: poznote_user
+      MYSQL_DATABASE: poznote_db
+      MYSQL_PASSWORD: RGG45!566vfgdfgv
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME:-admin}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data/entries:/var/www/html/entries"
+      - "./data/attachments:/var/www/html/attachments"
+    command: /bin/sh -c "chown -R www-data:www-data /var/www/html/entries /var/www/html/attachments && apache2-foreground"
+
+  # DATABASE
+  database-demo:
+    image: mysql:9.3.0
+    restart: always
+    volumes:
+      - "./data/mysql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: sfs466!sfdgGH
+      MYSQL_DATABASE: poznote_db
+      MYSQL_USER: poznote_user
+      MYSQL_PASSWORD: RGG45!566vfgdfgv
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      interval: 10s
+      retries: 10
+      start_period: 40s

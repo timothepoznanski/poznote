@@ -1,0 +1,16 @@
+services:
+  webserver:
+    networks:
+      - npm-poznote-demo-webserver-net
+      - internal-net
+
+  database:
+    networks:
+      - internal-net
+
+networks:
+  npm-poznote-demo-webserver-net:
+    external: true
+  internal-net:
+    external: true
+    name: poznote-demo_internal-net
