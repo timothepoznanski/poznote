@@ -28,6 +28,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Poznote</title>
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
@@ -52,6 +53,16 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             
             <button type="submit" class="login-button">Login</button>
         </form>
+        
+        <div class="login-note">
+            <p>Si vous avez oublié votre mot de passe, vous pouvez relancer le script de configuration :</p>
+            <code>./setup.sh</code>
+            <p class="github-link">
+                <a href="https://github.com/timothepoznanski/poznote" target="_blank">
+                    <i class="fab fa-github"></i> GitHub Repository
+                </a>
+            </p>
+        </div>
     </div>
 </body>
 </html>

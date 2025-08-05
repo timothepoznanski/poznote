@@ -143,6 +143,62 @@ input[type="password"]::placeholder {
     font-size: 0.8125rem;
 }
 
+.login-note {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #4a5568;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.login-note p {
+    margin: 0 0 0.75rem 0;
+}
+
+.login-note p:last-child {
+    margin-bottom: 0;
+}
+
+.login-note code {
+    background: #edf2f7;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-size: 0.8125rem;
+    color: #2d3748;
+    display: inline-block;
+    margin: 0.5rem 0;
+}
+
+.github-link {
+    margin-top: 1rem !important;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.github-link a {
+    color: #3182ce;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.github-link a:hover {
+    color: #2c5282;
+    text-decoration: underline;
+}
+
+.github-link i {
+    font-size: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
     body {
@@ -169,5 +225,15 @@ input[type="password"]::placeholder {
     
     .info {
         font-size: 0.8125rem;
+    }
+    
+    .login-note {
+        font-size: 0.8125rem;
+        margin-top: 1.5rem;
+        padding: 0.875rem;
+    }
+    
+    .login-note code {
+        font-size: 0.75rem;
     }
 }
