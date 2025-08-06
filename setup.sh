@@ -199,7 +199,7 @@ get_port_with_validation() {
         if [ -z "$port" ]; then
             port=$default_port
             if [ "$first_attempt" = "true" ]; then
-                print_status "Using default port: $port"
+                echo -e "${BLUE}[INFO]${NC} Using default port: $port" >&2
             fi
         fi
         
@@ -299,16 +299,11 @@ create_env_file() {
     
     cp ".env.template" ".env"
     
-    # Escape special characters for sed
-    local escaped_username=$(printf '%s\n' "$POZNOTE_USERNAME" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    local escaped_password=$(printf '%s\n' "$POZNOTE_PASSWORD" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    local escaped_port=$(printf '%s\n' "$HTTP_WEB_PORT" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    local escaped_app_name=$(printf '%s\n' "$APP_NAME" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    
-    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$escaped_username/" .env
-    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$escaped_password/" .env
-    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$escaped_port/" .env
-    sed -i "s/^APP_NAME=.*/APP_NAME=$escaped_app_name/" .env
+    # Use a different approach - direct replacement with awk
+    awk -v username="$POZNOTE_USERNAME" 'BEGIN{FS=OFS="="} /^POZNOTE_USERNAME=/ {$2=username} {print}' .env > .env.tmp && mv .env.tmp .env
+    awk -v password="$POZNOTE_PASSWORD" 'BEGIN{FS=OFS="="} /^POZNOTE_PASSWORD=/ {$2=password} {print}' .env > .env.tmp && mv .env.tmp .env
+    awk -v port="$HTTP_WEB_PORT" 'BEGIN{FS=OFS="="} /^HTTP_WEB_PORT=/ {$2=port} {print}' .env > .env.tmp && mv .env.tmp .env
+    awk -v appname="$APP_NAME" 'BEGIN{FS=OFS="="} /^APP_NAME=/ {$2=appname} {print}' .env > .env.tmp && mv .env.tmp .env
     
     print_success ".env file created from template"
 }
