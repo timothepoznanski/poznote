@@ -160,6 +160,7 @@ get_template_values() {
 # Check if port is already in use
 check_port_available() {
     local port=$1
+    
     if command -v netstat &> /dev/null; then
         if netstat -ln | grep -q ":$port "; then
             return 1  # Port is in use
@@ -189,6 +190,7 @@ get_port_with_validation() {
     local prompt="$1"
     local default_port="$2"
     local port
+    local first_attempt=true
     
     while true; do
         read -p "$prompt" port
@@ -196,18 +198,27 @@ get_port_with_validation() {
         # If empty input, use default
         if [ -z "$port" ]; then
             port=$default_port
+            if [ "$first_attempt" = "true" ]; then
+                print_status "Using default port: $port"
+            fi
         fi
         
         # Validate port range
         if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
             print_warning "Invalid port number '$port'. Please enter a port between 1 and 65535."
+            first_attempt=false
             continue
         fi
         
         # Check if port is available
         if ! check_port_available "$port"; then
-            print_warning "Port $port is already in use. Please choose a different port."
-            print_status "Tip: For multiple instances on the same server, use different ports (e.g., 8040, 8041, 8042)."
+            if [ "$port" = "$default_port" ] && [ "$first_attempt" = "true" ]; then
+                print_warning "Default port $port is already in use on this server."
+            else
+                print_warning "Port $port is already in use."
+            fi
+            print_status "Please choose a different port (e.g., 8041, 8042, 8043)."
+            first_attempt=false
             continue
         fi
         
