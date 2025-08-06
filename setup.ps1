@@ -147,7 +147,7 @@ function Test-PortAvailable {
 
 # Get and validate port with availability check
 function Get-PortWithValidation {
-    param([string]$Prompt, [string]$Default)
+    param([string]$Prompt, [string]$Default, [string]$CurrentPort = $null)
     
     while ($true) {
         $portInput = Get-UserInput $Prompt $Default
@@ -157,6 +157,11 @@ function Get-PortWithValidation {
         if (-not [int]::TryParse($portInput, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
             Write-Warning "Invalid port number '$portInput'. Please enter a port between 1 and 65535."
             continue
+        }
+        
+        # Skip availability check if this is the current port (for reconfiguration)
+        if ($CurrentPort -and $port.ToString() -eq $CurrentPort) {
+            return $port.ToString()
         }
         
         # Check if port is available
@@ -253,7 +258,7 @@ function Reconfigure-Poznote {
     # Get new values
     $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
     $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
-    $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT']
+    $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT'] $existingConfig['HTTP_WEB_PORT']
     $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME'])) { 'Poznote' } else { $existingConfig['APP_NAME'] }
     $APP_NAME = Get-UserInput "Application Name" $defaultAppName
 
