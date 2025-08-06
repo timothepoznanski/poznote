@@ -54,8 +54,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux.
 Open PowerShell in the directory where you want to install Poznote and execute the following commands:
 
 ```powershell
-# Choose an instance name (examples: poznote-tom, poznote-test, etc.)
-$instanceName = Read-Host "Enter instance name (e.g., poznote-tom, poznote-test)"
+$instanceName = Read-Host "Choose an instance name (e.g., poznote-tom, poznote-test)"
 git clone https://github.com/timothepoznanski/poznote.git $instanceName
 cd $instanceName
 .\setup.ps1
@@ -74,8 +73,7 @@ The script will automatically:
    Open PowerShell in the directory where you want to install Poznote and execute the following commands:
    
    ```powershell
-   # Choose an instance name (examples: poznote-tom, poznote-test, etc.)
-   $instanceName = Read-Host "Enter instance name (e.g., poznote-tom, poznote-test)"
+   $instanceName = Read-Host "Choose an instance name (e.g., poznote-tom, poznote-test)"
    git clone https://github.com/timothepoznanski/poznote.git $instanceName
    cd $instanceName
    ```
@@ -105,8 +103,7 @@ The script will automatically:
 #### Option 1: Automated Setup
 
 ```bash
-# Choose an instance name (examples: poznote-tom, poznote-test, etc.)
-read -p "Enter instance name (e.g., poznote-tom, poznote-test): " instanceName
+read -p "Choose an instance name (e.g., poznote-tom, poznote-test): " instanceName
 git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
 cd "$instanceName"
 chmod +x setup.sh
@@ -123,8 +120,7 @@ The script will automatically:
 
 1. **Choose instance name and clone the repository**
    ```bash
-   # Choose an instance name (examples: poznote-tom, poznote-test, etc.)
-   read -p "Enter instance name (e.g., poznote-tom, poznote-test): " instanceName
+   read -p "Choose an instance name (e.g., poznote-tom, poznote-test): " instanceName
    git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
    cd "$instanceName"
    ```
