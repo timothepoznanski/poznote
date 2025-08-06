@@ -124,15 +124,19 @@ function Get-UserInput {
 function Test-PortAvailable {
     param([int]$Port)
     try {
-        $connection = Test-NetConnection -ComputerName "localhost" -Port $Port -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-        return -not $connection.TcpTestSucceeded
+        # Use a completely silent method
+        $listener = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
+        $portInUse = $listener | Where-Object { $_.Port -eq $Port }
+        return $null -eq $portInUse
     }
     catch {
-        # If Test-NetConnection fails, try alternative method
         try {
-            $listener = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
-            $portInUse = $listener | Where-Object { $_.Port -eq $Port }
-            return $null -eq $portInUse
+            # Alternative silent method using TcpClient
+            $client = New-Object System.Net.Sockets.TcpClient
+            $result = $client.BeginConnect("localhost", $Port, $null, $null)
+            $success = $result.AsyncWaitHandle.WaitOne(100) -and $client.Connected
+            $client.Close()
+            return -not $success
         }
         catch {
             # If all else fails, assume port is available
