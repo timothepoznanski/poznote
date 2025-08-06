@@ -75,7 +75,7 @@ reconfigure_poznote() {
     read -p "Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
     POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
 
-    HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT")
+    HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT" "$HTTP_WEB_PORT")
 
     read -p "Application Name [${APP_NAME:-Poznote}]: " NEW_APP_NAME
     APP_NAME=${NEW_APP_NAME:-${APP_NAME:-Poznote}}
@@ -189,6 +189,7 @@ check_port_available() {
 get_port_with_validation() {
     local prompt="$1"
     local default_port="$2"
+    local current_port="$3"  # Optional: current port to exclude from availability check
     local port
     local first_attempt=true
     
@@ -208,6 +209,12 @@ get_port_with_validation() {
             print_warning "Invalid port number '$port'. Please enter a port between 1 and 65535."
             first_attempt=false
             continue
+        fi
+        
+        # Skip availability check if this is the current port (for reconfiguration)
+        if [ -n "$current_port" ] && [ "$port" = "$current_port" ]; then
+            echo "$port"
+            break
         fi
         
         # Check if port is available - force display to stderr to ensure visibility
@@ -265,7 +272,7 @@ get_user_config() {
     
     # Get port with availability check
     if [ "$is_update" = "true" ] && [ -n "$HTTP_WEB_PORT" ]; then
-        HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (current: $HTTP_WEB_PORT, press Enter to keep or enter new): " "$HTTP_WEB_PORT")
+        HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (current: $HTTP_WEB_PORT, press Enter to keep or enter new): " "$HTTP_WEB_PORT" "$HTTP_WEB_PORT")
     else
         HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (default: ${TEMPLATE_PORT:-8040}): " "${TEMPLATE_PORT:-8040}")
     fi
