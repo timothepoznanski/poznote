@@ -242,6 +242,7 @@ function Reconfigure-Poznote {
     Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  • App Name: $($existingConfig['APP_NAME'] -or 'Poznote')" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -249,6 +250,7 @@ function Reconfigure-Poznote {
     $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
     $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
     $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT']
+    $APP_NAME = Get-UserInput "Application Name" ($existingConfig['APP_NAME'] -or 'Poznote')
 
     if ($POZNOTE_PASSWORD -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
@@ -261,6 +263,7 @@ function Reconfigure-Poznote {
         $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
         $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
+        $envContent = $envContent -replace "(?m)^APP_NAME=.*", "APP_NAME=$APP_NAME"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success "Configuration updated from template successfully!"
     }
@@ -433,6 +436,7 @@ function Install-Poznote {
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
         $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
+        $APP_NAME = Get-UserInput "Application Name" ($templateConfig["APP_NAME"] -or "Poznote")
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
             Write-Warning "You are using the default password! Please change it for production use."
@@ -446,6 +450,7 @@ function Install-Poznote {
         $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
         $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
+        $envContent = $envContent -replace "(?m)^APP_NAME=.*", "APP_NAME=$APP_NAME"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success ".env file created from template successfully!"
     }

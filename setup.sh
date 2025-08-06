@@ -64,6 +64,7 @@ reconfigure_poznote() {
     echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
+    echo -e "  • App Name: ${APP_NAME:-Poznote}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -76,6 +77,9 @@ reconfigure_poznote() {
 
     read -p "Web Server Port [$HTTP_WEB_PORT]: " NEW_HTTP_WEB_PORT
     HTTP_WEB_PORT=${NEW_HTTP_WEB_PORT:-$HTTP_WEB_PORT}
+
+    read -p "Application Name [${APP_NAME:-Poznote}]: " NEW_APP_NAME
+    APP_NAME=${NEW_APP_NAME:-${APP_NAME:-Poznote}}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -149,6 +153,7 @@ get_template_values() {
         TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
+        TEMPLATE_APP_NAME=$(grep "^APP_NAME=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
     fi
 }
 
@@ -246,6 +251,19 @@ get_user_config() {
         HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (default: ${TEMPLATE_PORT:-8040}): " "${TEMPLATE_PORT:-8040}")
     fi
     
+    # Get application name
+    if [ "$is_update" = "true" ] && [ -n "$APP_NAME" ]; then
+        read -p "Application Name (current: $APP_NAME): " NEW_APP_NAME
+        APP_NAME=${NEW_APP_NAME:-$APP_NAME}
+    else
+        read -p "Application Name (default: ${TEMPLATE_APP_NAME:-Poznote}): " APP_NAME
+        APP_NAME=${APP_NAME:-${TEMPLATE_APP_NAME:-Poznote}}
+        
+        if [ -z "$APP_NAME" ]; then
+            APP_NAME="Poznote"
+        fi
+    fi
+    
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
@@ -264,6 +282,7 @@ create_env_file() {
     sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
+    sed -i "s/^APP_NAME=.*/APP_NAME=$APP_NAME/" .env
     
     print_success ".env file created from template"
 }
