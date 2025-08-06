@@ -292,6 +292,8 @@ function Reconfigure-Poznote {
             Write-Host "$POZNOTE_USERNAME" -ForegroundColor $Colors.Yellow
             Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
             Write-Host "$POZNOTE_PASSWORD" -ForegroundColor $Colors.Yellow
+            Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
+            Write-Host "$APP_NAME" -ForegroundColor $Colors.Yellow
         } else {
             Write-Error "Failed to restart Poznote."
             exit 1
@@ -328,11 +330,12 @@ function Install-Poznote {
             Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+            Write-Host "  • App Name: $($existingConfig['APP_NAME'] -or 'Poznote')" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
         Write-Host "  1) Update application (pull latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change configuration (username/password/port)" -ForegroundColor $Colors.White
+        Write-Host "  2) Change configuration (username/password/port/App name)" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
         
         do {
@@ -524,6 +527,7 @@ function Install-Poznote {
         $finalUsername = if ($POZNOTE_USERNAME) { $POZNOTE_USERNAME } else { $envVars['POZNOTE_USERNAME'] }
         $finalPassword = if ($POZNOTE_PASSWORD) { $POZNOTE_PASSWORD } else { $envVars['POZNOTE_PASSWORD'] }
         $finalPort = if ($HTTP_WEB_PORT) { $HTTP_WEB_PORT } else { $envVars['HTTP_WEB_PORT'] }
+        $finalAppName = if ($APP_NAME) { $APP_NAME } else { $envVars['APP_NAME'] -or 'Poznote' }
         
         Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "http://localhost:$finalPort" -ForegroundColor $Colors.Green
@@ -531,6 +535,8 @@ function Install-Poznote {
         Write-Host "$finalUsername" -ForegroundColor $Colors.Yellow
         Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalPassword" -ForegroundColor $Colors.Yellow
+        Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "$finalAppName" -ForegroundColor $Colors.Yellow
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"
