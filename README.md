@@ -54,8 +54,10 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux.
 Open PowerShell in the directory where you want to install Poznote and execute the following commands:
 
 ```powershell
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote
+# Choose an instance name (examples: poznote-tom, poznote-test, etc.)
+$instanceName = Read-Host "Enter instance name (e.g., poznote-tom, poznote-test)"
+git clone https://github.com/timothepoznanski/poznote.git $instanceName
+cd $instanceName
 .\setup.ps1
 ```
 
@@ -67,13 +69,15 @@ The script will automatically:
 
 #### Option 2: Manual Setup
 
-1. **Clone the repository**
+1. **Choose instance name and clone the repository**
    
    Open PowerShell in the directory where you want to install Poznote and execute the following commands:
    
    ```powershell
-   git clone https://github.com/timothepoznanski/poznote.git
-   cd poznote
+   # Choose an instance name (examples: poznote-tom, poznote-test, etc.)
+   $instanceName = Read-Host "Enter instance name (e.g., poznote-tom, poznote-test)"
+   git clone https://github.com/timothepoznanski/poznote.git $instanceName
+   cd $instanceName
    ```
 
 2. **Configure environment**
@@ -101,8 +105,10 @@ The script will automatically:
 #### Option 1: Automated Setup
 
 ```bash
-git clone https://github.com/timothepoznanski/poznote.git
-cd poznote
+# Choose an instance name (examples: poznote-tom, poznote-test, etc.)
+read -p "Enter instance name (e.g., poznote-tom, poznote-test): " instanceName
+git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
+cd "$instanceName"
 chmod +x setup.sh
 ./setup.sh
 ```
@@ -115,10 +121,12 @@ The script will automatically:
 
 #### Option 2: Manual Setup
 
-1. **Clone the repository**
+1. **Choose instance name and clone the repository**
    ```bash
-   git clone https://github.com/timothepoznanski/poznote.git
-   cd poznote
+   # Choose an instance name (examples: poznote-tom, poznote-test, etc.)
+   read -p "Enter instance name (e.g., poznote-tom, poznote-test): " instanceName
+   git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
+   cd "$instanceName"
    ```
 
 2. **Configure environment**
