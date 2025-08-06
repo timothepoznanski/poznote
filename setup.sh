@@ -210,14 +210,14 @@ get_port_with_validation() {
             continue
         fi
         
-        # Check if port is available
+        # Check if port is available - force display to stderr to ensure visibility
         if ! check_port_available "$port"; then
             if [ "$port" = "$default_port" ] && [ "$first_attempt" = "true" ]; then
-                print_warning "Default port $port is already in use on this server."
+                echo -e "${YELLOW}[WARNING]${NC} Default port $port is already in use on this server." >&2
             else
-                print_warning "Port $port is already in use."
+                echo -e "${YELLOW}[WARNING]${NC} Port $port is already in use." >&2
             fi
-            print_status "Please choose a different port (e.g., 8041, 8042, 8043)."
+            echo -e "${BLUE}[INFO]${NC} Please choose a different port (e.g., 8041, 8042, 8043)." >&2
             first_attempt=false
             continue
         fi
@@ -298,10 +298,17 @@ create_env_file() {
     fi
     
     cp ".env.template" ".env"
-    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
-    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
-    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
-    sed -i "s/^APP_NAME=.*/APP_NAME=$APP_NAME/" .env
+    
+    # Escape special characters for sed
+    local escaped_username=$(printf '%s\n' "$POZNOTE_USERNAME" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    local escaped_password=$(printf '%s\n' "$POZNOTE_PASSWORD" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    local escaped_port=$(printf '%s\n' "$HTTP_WEB_PORT" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    local escaped_app_name=$(printf '%s\n' "$APP_NAME" | sed 's/[[\.*^$()+?{|]/\\&/g')
+    
+    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$escaped_username/" .env
+    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$escaped_password/" .env
+    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$escaped_port/" .env
+    sed -i "s/^APP_NAME=.*/APP_NAME=$escaped_app_name/" .env
     
     print_success ".env file created from template"
 }
