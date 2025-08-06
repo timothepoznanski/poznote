@@ -34,4 +34,28 @@ function requireAuth() {
         exit;
     }
 }
+
+function requireApiAuth() {
+    // For API endpoints, check session first
+    if (isAuthenticated()) {
+        return;
+    }
+    
+    // If no session, try HTTP Basic Auth
+    if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+        header('HTTP/1.1 401 Unauthorized');
+        header('WWW-Authenticate: Basic realm="Poznote API"');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Authentication required']);
+        exit;
+    }
+    
+    // Validate credentials
+    if (!authenticate($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+        header('HTTP/1.1 401 Unauthorized');
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Invalid credentials']);
+        exit;
+    }
+}
 ?>

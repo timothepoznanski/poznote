@@ -1,6 +1,6 @@
 <?php
 require 'auth.php';
-requireAuth();
+requireApiAuth();
 
 // Prevent any output before JSON response
 ob_start();

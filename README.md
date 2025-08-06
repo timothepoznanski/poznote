@@ -335,23 +335,39 @@ Poznote provides a RESTful API for programmatic access to your notes.
 
 ### Authentication
 
-All API requests require authentication using the same credentials configured in your `.env` file.
+All API requests require authentication using the same credentials configured in your `.env` file for each instance.
 
 ### Available Endpoints
 
 #### List Notes
 ```bash
+# For default instance on port 8040
 curl -u username:password http://localhost:8040/api_list_notes.php
+
+# For instance on different port (e.g., poznote-work on port 8041)
+curl -u username:password http://localhost:8041/api_list_notes.php
 ```
 
 #### Create Note
 ```bash
+# For default instance on port 8040
 curl -X POST http://localhost:8040/api_create_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"heading": "My Note", "tags": "personal,important"}'
+
+# For instance on different port (e.g., poznote-work on port 8041)
+curl -X POST http://localhost:8041/api_create_note.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"heading": "Work Note", "tags": "work,project"}'
 ```
 
 #### More Endpoints
 - `api_favorites.php` - Manage favorite notes
 - `api_attachments.php` - Handle file attachments
+
+**Note**: Each instance has its own API endpoint based on its configured port. Make sure to:
+- Use the correct port for each instance
+- Use the credentials configured for that specific instance
+- Sessions are isolated per instance, so API authentication is also isolated

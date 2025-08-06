@@ -1,5 +1,8 @@
 <?php
 // API to create a new note
+require 'auth.php';
+requireApiAuth();
+
 header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
