@@ -1,4 +1,8 @@
 <?php
+// Set unique session name based on environment to avoid conflicts between instances
+$instance_id = $_ENV['POZNOTE_INSTANCE'] ?? 'NO-INSTANCE-ID-FOUND';
+$session_name = 'POZNOTE_' . strtoupper($instance_id);
+session_name($session_name);
 session_start();
 
 // Configuration des identifiants - vous pouvez changer ces valeurs

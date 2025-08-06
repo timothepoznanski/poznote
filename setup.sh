@@ -149,6 +149,7 @@ get_template_values() {
         TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2)
+        TEMPLATE_INSTANCE=$(grep "^POZNOTE_INSTANCE=" .env.template | cut -d'=' -f2)
     fi
 }
 
@@ -203,6 +204,15 @@ get_user_config() {
         HTTP_WEB_PORT=8040
     fi
     
+    # Get instance ID
+    if [ "$is_update" = "true" ] && [ -n "$POZNOTE_INSTANCE" ]; then
+        read -p "Instance ID (current: $POZNOTE_INSTANCE): " NEW_INSTANCE
+        POZNOTE_INSTANCE=${NEW_INSTANCE:-$POZNOTE_INSTANCE}
+    else
+        read -p "Instance ID (default: $TEMPLATE_INSTANCE): " POZNOTE_INSTANCE
+        POZNOTE_INSTANCE=${POZNOTE_INSTANCE:-$TEMPLATE_INSTANCE:-prod}
+    fi
+    
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
@@ -221,6 +231,7 @@ create_env_file() {
     sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
+    sed -i "s/^POZNOTE_INSTANCE=.*/POZNOTE_INSTANCE=$POZNOTE_INSTANCE/" .env
     
     print_success ".env file created from template"
 }
