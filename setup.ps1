@@ -120,6 +120,52 @@ function Get-UserInput {
     return $input
 }
 
+# Check if port is already in use
+function Test-PortAvailable {
+    param([int]$Port)
+    try {
+        $connection = Test-NetConnection -ComputerName "localhost" -Port $Port -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
+        return -not $connection.TcpTestSucceeded
+    }
+    catch {
+        # If Test-NetConnection fails, try alternative method
+        try {
+            $listener = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
+            $portInUse = $listener | Where-Object { $_.Port -eq $Port }
+            return $null -eq $portInUse
+        }
+        catch {
+            # If all else fails, assume port is available
+            return $true
+        }
+    }
+}
+
+# Get and validate port with availability check
+function Get-PortWithValidation {
+    param([string]$Prompt, [string]$Default)
+    
+    while ($true) {
+        $portInput = Get-UserInput $Prompt $Default
+        
+        # Validate port is numeric and in valid range
+        $port = 0
+        if (-not [int]::TryParse($portInput, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
+            Write-Warning "Invalid port number '$portInput'. Please enter a port between 1 and 65535."
+            continue
+        }
+        
+        # Check if port is available
+        if (-not (Test-PortAvailable -Port $port)) {
+            Write-Warning "Port $port is already in use. Please choose a different port."
+            Write-Status "Tip: For multiple instances on the same server, use different ports (e.g., 8040, 8041, 8042)."
+            continue
+        }
+        
+        return $port.ToString()
+    }
+}
+
 # Manage Docker containers
 function Update-DockerContainers {
     Write-Status "Stopping existing containers..."
@@ -202,7 +248,7 @@ function Reconfigure-Poznote {
     # Get new values
     $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
     $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
-    $HTTP_WEB_PORT = Get-UserInput "Web Server Port" $existingConfig['HTTP_WEB_PORT']
+    $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT']
 
     if ($POZNOTE_PASSWORD -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
@@ -386,7 +432,7 @@ function Install-Poznote {
         # Get configuration
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
-        $HTTP_WEB_PORT = Get-UserInput "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
+        $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
             Write-Warning "You are using the default password! Please change it for production use."

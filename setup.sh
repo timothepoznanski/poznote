@@ -152,6 +152,57 @@ get_template_values() {
     fi
 }
 
+# Check if port is already in use
+check_port_available() {
+    local port=$1
+    if command -v netstat &> /dev/null; then
+        netstat -ln | grep -q ":$port "
+        return $?
+    elif command -v ss &> /dev/null; then
+        ss -ln | grep -q ":$port "
+        return $?
+    elif command -v lsof &> /dev/null; then
+        lsof -i :$port &> /dev/null
+        return $?
+    else
+        # If no tools available, assume port is free
+        return 1
+    fi
+}
+
+# Get and validate port with availability check
+get_port_with_validation() {
+    local prompt="$1"
+    local default_port="$2"
+    local port
+    
+    while true; do
+        read -p "$prompt" port
+        port=${port:-$default_port}
+        
+        # Ensure we have a valid port number
+        if [ -z "$port" ]; then
+            port=$default_port
+        fi
+        
+        # Validate port range
+        if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
+            print_warning "Invalid port number '$port'. Please enter a port between 1 and 65535."
+            continue
+        fi
+        
+        # Check if port is available
+        if check_port_available "$port"; then
+            print_warning "Port $port is already in use. Please choose a different port."
+            print_status "Tip: For multiple instances on the same server, use different ports (e.g., 8040, 8041, 8042)."
+            continue
+        fi
+        
+        echo "$port"
+        break
+    done
+}
+
 # Get user input for configuration
 get_user_config() {
     local is_update=$1
@@ -188,24 +239,11 @@ get_user_config() {
         fi
     fi
     
-    # Get port
+    # Get port with availability check
     if [ "$is_update" = "true" ] && [ -n "$HTTP_WEB_PORT" ]; then
-        read -p "HTTP Port (current: $HTTP_WEB_PORT): " NEW_PORT
-        HTTP_WEB_PORT=${NEW_PORT:-$HTTP_WEB_PORT}
+        HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (current: $HTTP_WEB_PORT, press Enter to keep or enter new): " "$HTTP_WEB_PORT")
     else
-        read -p "HTTP Port (default: $TEMPLATE_PORT): " HTTP_WEB_PORT
-        HTTP_WEB_PORT=${HTTP_WEB_PORT:-$TEMPLATE_PORT:-8040}
-    fi
-    
-    # Ensure we have a valid port number
-    if [ -z "$HTTP_WEB_PORT" ]; then
-        HTTP_WEB_PORT=8040
-    fi
-    
-    # Validate port
-    if ! [[ "$HTTP_WEB_PORT" =~ ^[0-9]+$ ]] || [ "$HTTP_WEB_PORT" -lt 1 ] || [ "$HTTP_WEB_PORT" -gt 65535 ]; then
-        print_warning "Invalid port number '$HTTP_WEB_PORT'. Using default: 8040"
-        HTTP_WEB_PORT=8040
+        HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (default: ${TEMPLATE_PORT:-8040}): " "${TEMPLATE_PORT:-8040}")
     fi
     
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then

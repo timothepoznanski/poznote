@@ -88,6 +88,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
    ```powershell
@@ -135,6 +136,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
    ```bash
@@ -150,6 +152,35 @@ Where `YOUR_SERVER` depends on your environment:
 - `localhost`
 - Your server's IP address
 - Your domain name
+
+### Running Multiple Instances
+
+You can run multiple Poznote instances on the same server by using different instance names and ports:
+
+```bash
+# First instance
+read -p "Choose an instance name: " instanceName  # Example: poznote-personal
+git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
+cd "$instanceName"
+./setup.sh  # Configure with port 8040
+
+# Second instance (in a different directory)
+cd ..
+read -p "Choose another instance name: " instanceName  # Example: poznote-work
+git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
+cd "$instanceName"
+./setup.sh  # Configure with port 8041
+```
+
+**Important**: 
+- Each instance must use a **different port** (the setup script will check and prompt if a port is already in use)
+- Each instance will have **isolated PHP sessions** - login on one instance doesn't affect others
+- You can use different usernames/passwords for each instance
+
+**Example configuration**:
+- `poznote-personal`: Port 8040, username "alice", password "personal123"
+- `poznote-work`: Port 8041, username "bob", password "work456"
+- `poznote-demo`: Port 8042, username "demo", password "demo123"
 
 ## Change login, password or port
 
