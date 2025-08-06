@@ -148,7 +148,7 @@ get_template_values() {
     if [ -f ".env.template" ]; then
         TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
-        TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2)
+        TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
     fi
 }
 
@@ -197,9 +197,14 @@ get_user_config() {
         HTTP_WEB_PORT=${HTTP_WEB_PORT:-$TEMPLATE_PORT:-8040}
     fi
     
+    # Ensure we have a valid port number
+    if [ -z "$HTTP_WEB_PORT" ]; then
+        HTTP_WEB_PORT=8040
+    fi
+    
     # Validate port
     if ! [[ "$HTTP_WEB_PORT" =~ ^[0-9]+$ ]] || [ "$HTTP_WEB_PORT" -lt 1 ] || [ "$HTTP_WEB_PORT" -gt 65535 ]; then
-        print_warning "Invalid port number. Using default: 8040"
+        print_warning "Invalid port number '$HTTP_WEB_PORT'. Using default: 8040"
         HTTP_WEB_PORT=8040
     fi
     

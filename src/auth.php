@@ -1,8 +1,4 @@
 <?php
-// Set unique session name based on port to avoid conflicts between instances
-$port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
-$session_name = 'POZNOTE_' . $port;
-session_name($session_name);
 session_start();
 
 // Configuration des identifiants - vous pouvez changer ces valeurs

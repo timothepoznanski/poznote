@@ -16,7 +16,6 @@ services:
       MYSQL_PASSWORD: RGG45566vfgdfgv
       POZNOTE_USERNAME: ${POZNOTE_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT:-8040}
     ports:
       - "${HTTP_WEB_PORT}:80"
     volumes:
