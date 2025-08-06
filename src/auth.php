@@ -1,7 +1,12 @@
 <?php
+// Configure session name based on configured port to allow multiple instances
+$configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+$session_name = 'POZNOTE_SESSION_' . $configured_port;
+session_name($session_name);
+
 session_start();
 
-// Configuration des identifiants - vous pouvez changer ces valeurs
+// Authentication configuration - you can change these values
 define("AUTH_USERNAME", $_ENV['POZNOTE_USERNAME'] ?? 'admin');
 define("AUTH_PASSWORD", $_ENV['POZNOTE_PASSWORD'] ?? 'admin123');
 
