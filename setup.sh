@@ -162,17 +162,26 @@ get_template_values() {
 check_port_available() {
     local port=$1
     if command -v netstat &> /dev/null; then
-        netstat -ln | grep -q ":$port "
-        return $?
+        if netstat -ln | grep -q ":$port "; then
+            return 1  # Port is in use
+        else
+            return 0  # Port is available
+        fi
     elif command -v ss &> /dev/null; then
-        ss -ln | grep -q ":$port "
-        return $?
+        if ss -ln | grep -q ":$port "; then
+            return 1  # Port is in use
+        else
+            return 0  # Port is available
+        fi
     elif command -v lsof &> /dev/null; then
-        lsof -i :$port &> /dev/null
-        return $?
+        if lsof -i :$port &> /dev/null; then
+            return 1  # Port is in use
+        else
+            return 0  # Port is available
+        fi
     else
         # If no tools available, assume port is free
-        return 1
+        return 0
     fi
 }
 
@@ -184,9 +193,8 @@ get_port_with_validation() {
     
     while true; do
         read -p "$prompt" port
-        port=${port:-$default_port}
         
-        # Ensure we have a valid port number
+        # If empty input, use default
         if [ -z "$port" ]; then
             port=$default_port
         fi
@@ -198,7 +206,7 @@ get_port_with_validation() {
         fi
         
         # Check if port is available
-        if check_port_available "$port"; then
+        if ! check_port_available "$port"; then
             print_warning "Port $port is already in use. Please choose a different port."
             print_status "Tip: For multiple instances on the same server, use different ports (e.g., 8040, 8041, 8042)."
             continue
