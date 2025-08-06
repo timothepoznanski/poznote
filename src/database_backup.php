@@ -434,7 +434,7 @@ $backups = [];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Database Export/Import</title>
+    <title>Database Export/Import - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">

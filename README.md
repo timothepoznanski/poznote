@@ -88,6 +88,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
@@ -136,6 +137,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
@@ -209,10 +211,24 @@ The script will:
 Open the folder of your project and edit the `.env` file to customize your installation:
 
 ```bash
-POZNOTE_USERNAME=admin            
-POZNOTE_PASSWORD=admin123        
-HTTP_WEB_PORT=8040             
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123
+HTTP_WEB_PORT=8040
+APP_NAME=Poznote
 ```
+
+**Configuration options:**
+- `POZNOTE_USERNAME` - Username for authentication
+- `POZNOTE_PASSWORD` - Password for authentication  
+- `HTTP_WEB_PORT` - Port where the application will be accessible
+- `APP_NAME` - Application name displayed in the interface (page titles, headers, welcome message)
+
+3. **Customize settings**
+   - Change `POZNOTE_USERNAME=admin` to your preferred username
+   - Change `POZNOTE_PASSWORD=admin123` to a secure password
+   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)```
 
 After modifying the `.env` file, restart the application:
 

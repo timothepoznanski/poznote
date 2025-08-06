@@ -97,7 +97,7 @@ if($note != '') {
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title>Poznote</title>
+    <title><?php echo APP_NAME; ?></title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
@@ -237,8 +237,8 @@ if($note != '') {
         <?php if ($is_mobile): ?>
         <div class="left-header">
             <a href="https://timpoz.com" target="_blank" class="left-header-logo">
-                <img src="favicon.ico" alt="Poznote" class="left-header-favicon">
-                <span class="left-header-text">Poznote</span>
+                <img src="favicon.ico" alt="<?php echo APP_NAME; ?>" class="left-header-favicon">
+                <span class="left-header-text"><?php echo APP_NAME; ?></span>
             </a>
         </div>
         <div class="containbuttons">
@@ -396,8 +396,8 @@ if($note != '') {
     <?php if (!$is_mobile): ?>
     <div class="left-header">
         <a href="https://timpoz.com" target="_blank" class="left-header-logo">
-            <img src="favicon.ico" alt="Poznote" class="left-header-favicon">
-            <span class="left-header-text">Poznote</span>
+            <img src="favicon.ico" alt="<?php echo APP_NAME; ?>" class="left-header-favicon">
+            <span class="left-header-text"><?php echo APP_NAME; ?></span>
         </a>
     </div>
     <div class="containbuttons">
@@ -852,7 +852,7 @@ if($note != '') {
                 echo '                <img src="favicon.ico" alt="Poznote" class="poznote-favicon">';
                 echo '            </div>';
                 echo '        </div>';
-                echo '        <h2 class="welcome-title">Poznote</h2>';
+                echo '        <h2 class="welcome-title">' . APP_NAME . '</h2>';
                 echo '        <p class="welcome-description">Create your first note to get started</p>';
                 echo '        <div class="welcome-actions">';
                 echo '            <button class="welcome-btn welcome-btn-primary" onclick="createFirstNote()">';
