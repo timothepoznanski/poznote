@@ -214,7 +214,7 @@ get_port_with_validation() {
         # Skip availability check if this is the current port (for reconfiguration)
         if [ -n "$current_port" ] && [ "$port" = "$current_port" ]; then
             echo "$port"
-            break
+            return 0
         fi
         
         # Check if port is available - force display to stderr to ensure visibility
@@ -230,7 +230,7 @@ get_port_with_validation() {
         fi
         
         echo "$port"
-        break
+        return 0
     done
 }
 
