@@ -21,8 +21,8 @@ jobs:
           set -e
           echo "🚀 Starting production deployment.."
           
-          # Define project directory
-          PROJECT_DIR="/root/poznote/poznote"
+          # Define project directory from secrets
+          PROJECT_DIR="${{ secrets.PROD_PROJECT_PATH }}"
           
           # Check if project directory exists, if not clone the repository
           if [ ! -d "$PROJECT_DIR" ]; then
@@ -32,7 +32,7 @@ jobs:
             mkdir -p "$(dirname "$PROJECT_DIR")"
             
             # Clone the repository
-            echo "� Cloning repository for first deployment..."
+            echo "Cloning repository for first deployment..."
             cd "$(dirname "$PROJECT_DIR")"
             git clone https://github.com/timothepoznanski/poznote.git
             
