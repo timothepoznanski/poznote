@@ -17,6 +17,7 @@ services:
       POZNOTE_USERNAME: ${POZNOTE_USERNAME:-admin}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD:-admin123}
       HTTP_WEB_PORT: ${HTTP_WEB_PORT:-8040}
+      APP_NAME: ${APP_NAME:-Poznote}
     ports:
       - "${HTTP_WEB_PORT}:80"
     volumes:
