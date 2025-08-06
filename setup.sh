@@ -75,8 +75,7 @@ reconfigure_poznote() {
     read -p "Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
     POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
 
-    read -p "Web Server Port [$HTTP_WEB_PORT]: " NEW_HTTP_WEB_PORT
-    HTTP_WEB_PORT=${NEW_HTTP_WEB_PORT:-$HTTP_WEB_PORT}
+    HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT")
 
     read -p "Application Name [${APP_NAME:-Poznote}]: " NEW_APP_NAME
     APP_NAME=${NEW_APP_NAME:-${APP_NAME:-Poznote}}
