@@ -64,6 +64,7 @@ reconfigure_poznote() {
     echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
+    echo -e "  • Instance ID: ${POZNOTE_INSTANCE}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -76,6 +77,9 @@ reconfigure_poznote() {
 
     read -p "Web Server Port [$HTTP_WEB_PORT]: " NEW_HTTP_WEB_PORT
     HTTP_WEB_PORT=${NEW_HTTP_WEB_PORT:-$HTTP_WEB_PORT}
+
+    read -p "Instance ID [$POZNOTE_INSTANCE]: " NEW_POZNOTE_INSTANCE
+    POZNOTE_INSTANCE=${NEW_POZNOTE_INSTANCE:-$POZNOTE_INSTANCE}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -326,11 +330,12 @@ main() {
             echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
+            echo -e "  • Instance ID: ${POZNOTE_INSTANCE}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
         echo -e "  1) Update application (pull latest code)"
-        echo -e "  2) Change configuration (username/password/port)"
+        echo -e "  2) Change configuration (username/password/port/instance)"
         echo -e "  3) Cancel"
         
         while true; do
