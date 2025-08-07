@@ -142,7 +142,15 @@ check_existing_installation() {
 load_env_config() {
     if [ -f ".env" ]; then
         print_status "Loading existing configuration..."
-        source ".env"
+        # Use a safer method to load .env that doesn't execute arbitrary commands
+        while IFS='=' read -r key value; do
+            # Skip empty lines and comments
+            [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+            # Remove leading/trailing whitespace and quotes from value
+            value=$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//")
+            # Export the variable
+            export "$key"="$value"
+        done < ".env"
         print_success "Configuration loaded"
     fi
 }
