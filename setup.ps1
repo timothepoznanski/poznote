@@ -49,39 +49,52 @@ REQUIREMENTS:
 function Test-Docker {
     try {
         # Check if Docker is available and running
-        $dockerVersion = docker --version 2>$null
-        if (-not $dockerVersion) { throw "Docker not found" }
+        Write-Status "Checking if Docker is available..."
+        $dockerVersion = & docker --version 2>&1
+        if ($LASTEXITCODE -ne 0) { 
+            throw "Docker command failed with exit code $LASTEXITCODE" 
+        }
+        Write-Status "Docker version: $dockerVersion"
         
         Write-Status "Checking if Docker is running..."
-        $dockerInfo = docker info 2>$null
-        if (-not $dockerInfo) {
+        $dockerInfo = & docker info 2>&1
+        if ($LASTEXITCODE -ne 0) {
             Write-Error "Docker is installed but not running."
             Write-Host "Please start Docker Desktop and wait for it to be ready, then run this script again." -ForegroundColor $Colors.Yellow
+            Write-Host "Docker info error: $dockerInfo" -ForegroundColor $Colors.Red
             return $false
         }
         
         # Verify Docker functionality
         Write-Status "Verifying Docker functionality..."
-        $testOutput = docker ps 2>&1
+        $testOutput = & docker ps 2>&1
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Docker daemon is not responding properly."
             Write-Host "Please make sure Docker Desktop is fully started and try again." -ForegroundColor $Colors.Yellow
+            Write-Host "Docker ps error: $testOutput" -ForegroundColor $Colors.Red
             return $false
         }
         
         # Check Docker Compose
-        $composeVersion = docker compose version 2>$null
-        if (-not $composeVersion) {
-            $composeVersion = docker-compose --version 2>$null
-            if (-not $composeVersion) { throw "Docker Compose not found" }
+        Write-Status "Checking Docker Compose..."
+        $composeVersion = & docker compose version 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Status "Trying legacy docker-compose..."
+            $composeVersion = & docker-compose --version 2>&1
+            if ($LASTEXITCODE -ne 0) { 
+                throw "Docker Compose not found. Exit codes: compose=$LASTEXITCODE" 
+            }
         }
+        Write-Status "Docker Compose version: $composeVersion"
         
         Write-Success "Docker and Docker Compose are installed and running"
         return $true
     }
     catch {
         Write-Error "Docker or Docker Compose is not installed or not accessible."
+        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
         Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
+        Write-Host "Make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
         return $false
     }
 }
