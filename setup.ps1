@@ -124,25 +124,36 @@ function Get-UserInput {
 function Test-PasswordSecurity {
     param([string]$Password)
     
+    $hasError = $false
+    
     # Check minimum length
     if ($Password.Length -lt 8) {
         Write-Warning "Password must be at least 8 characters long."
-        return $false
+        $hasError = $true
     }
     
     # Check for forbidden characters
     $forbiddenChars = '[$`"''\\|&;<>(){}[\]~#%=?+ ]'
     if ($Password -match $forbiddenChars) {
         Write-Warning "Password contains forbidden characters."
-        Write-Host "Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Yellow
-        Write-Host "Please use only: letters, numbers, and these safe symbols: @ - _ . , ! *" -ForegroundColor Yellow
-        return $false
+        $hasError = $true
     }
     
     # Check if password is too simple
     if ($Password -match '^[a-zA-Z]+$' -or $Password -match '^[0-9]+$') {
         Write-Warning "Password should contain a mix of letters and numbers for better security."
-        Write-Host "Consider adding numbers or safe special characters: @ - _ . , ! *" -ForegroundColor Yellow
+        $hasError = $true
+    }
+    
+    # Show rules if there's an error
+    if ($hasError) {
+        Write-Host ""
+        Write-Host "Password requirements:" -ForegroundColor Blue
+        Write-Host "  • Minimum 8 characters" -ForegroundColor White
+        Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host "  • Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Red
+        Write-Host ""
         return $false
     }
     

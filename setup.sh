@@ -255,25 +255,35 @@ get_port_with_validation() {
 validate_password() {
     local password="$1"
     local forbidden_chars='$`"\|&;<>(){}[]~!#%=?+'
+    local has_error=false
     
     # Check minimum length
     if [ ${#password} -lt 8 ]; then
         print_warning "Password must be at least 8 characters long."
-        return 1
+        has_error=true
     fi
     
     # Check for forbidden characters
     if [[ "$password" =~ [\$\`\"\'\\\|\&\;\<\>\(\)\{\}\[\]\~\#\%\=\?\+[:space:]] ]]; then
         print_warning "Password contains forbidden characters."
-        echo "Forbidden characters: \$ \` \" ' \\ | & ; < > ( ) { } [ ] ~ # % = ? + spaces"
-        echo "Please use only: letters, numbers, and these safe symbols: @ - _ . , ! *"
-        return 1
+        has_error=true
     fi
     
     # Check if password is too simple
     if [[ "$password" =~ ^[a-zA-Z]+$ ]] || [[ "$password" =~ ^[0-9]+$ ]]; then
         print_warning "Password should contain a mix of letters and numbers for better security."
-        echo "Consider adding numbers or safe special characters: @ - _ . , ! *"
+        has_error=true
+    fi
+    
+    # Show rules if there's an error
+    if [ "$has_error" = true ]; then
+        echo
+        echo "Password requirements:"
+        echo "  • Minimum 8 characters"
+        echo "  • Mix of letters and numbers recommended"
+        echo "  • Allowed special characters: @ - _ . , ! *"
+        echo "  • Forbidden characters: \$ \` \" ' \\ | & ; < > ( ) { } [ ] ~ # % = ? + spaces"
+        echo
         return 1
     fi
     
