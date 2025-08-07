@@ -64,7 +64,7 @@ reconfigure_poznote() {
     echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
-    echo -e "  • App Name: ${APP_NAME:-Poznote}"
+    echo -e "  • Application Name Displayed: ${APP_NAME:-Poznote}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -96,7 +96,7 @@ reconfigure_poznote() {
     echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
-    echo -e "${BLUE}App Name: ${YELLOW}${APP_NAME:-Poznote}${NC}"
+    echo -e "${BLUE}Application Name Displayed: ${YELLOW}${APP_NAME:-Poznote}${NC}"
 }
 
 # Check Docker installation
@@ -369,7 +369,7 @@ show_info() {
     echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
-    echo "  📱 App Name: ${APP_NAME_DISPLAYED:-Poznote}"
+    echo "  📱 Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
     
     if [ "$is_update" != "true" ]; then
         echo
@@ -408,12 +408,12 @@ main() {
             echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
-            echo -e "  • App Name: ${APP_NAME:-Poznote}"
+            echo -e "  • Application Name Displayed: ${APP_NAME:-Poznote}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
         echo -e "  1) Update application (pull latest code)"
-        echo -e "  2) Change configuration (username/password/port/App name)"
+        echo -e "  2) Change configuration (username/password/port/Application name displayed)"
         echo -e "  3) Cancel"
         
         while true; do

@@ -251,7 +251,7 @@ function Reconfigure-Poznote {
     Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
+    Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -302,7 +302,7 @@ function Reconfigure-Poznote {
             Write-Host "$POZNOTE_USERNAME" -ForegroundColor $Colors.Yellow
             Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
             Write-Host "$POZNOTE_PASSWORD" -ForegroundColor $Colors.Yellow
-            Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
+            Write-Host "Application Name Displayed: " -NoNewline -ForegroundColor $Colors.Blue
             Write-Host "$APP_NAME_DISPLAYED" -ForegroundColor $Colors.Yellow
         } else {
             Write-Error "Failed to restart Poznote."
@@ -340,12 +340,12 @@ function Install-Poznote {
             Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
+            Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
         Write-Host "  1) Update application (pull latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change configuration (username/password/port/App name)" -ForegroundColor $Colors.White
+        Write-Host "  2) Change configuration (username/password/port/Application name displayed)" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
         
         do {
@@ -546,7 +546,7 @@ function Install-Poznote {
         Write-Host "$finalUsername" -ForegroundColor $Colors.Yellow
         Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalPassword" -ForegroundColor $Colors.Yellow
-        Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "Application Name Displayed: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalAppName" -ForegroundColor $Colors.Yellow
         Write-Host ""
         Write-Host "To update Poznote, change username/password/port or modify the application name, run:" -ForegroundColor $Colors.Blue
