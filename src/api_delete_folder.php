@@ -1,0 +1,143 @@
+<?php
+require 'auth.php';
+require 'db_connect.php';
+
+// Vérifier l'authentification
+if (!isAuthenticated()) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Authentication required']);
+    exit;
+}
+
+// Vérifier la méthode HTTP
+if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed. Use DELETE.']);
+    exit;
+}
+
+// Lire les données JSON
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid JSON']);
+    exit;
+}
+
+// Valider les données
+if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
+    http_response_code(400);
+    echo json_encode(['error' => 'folder_name is required']);
+    exit;
+}
+
+$folder_name = trim($data['folder_name']);
+
+// Vérifier que le dossier n'est pas protégé
+if ($folder_name === 'Uncategorized') {
+    http_response_code(400);
+    echo json_encode(['error' => 'Cannot delete the Uncategorized folder']);
+    exit;
+}
+
+try {
+    // Vérifier si le dossier existe
+    $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
+    $stmt->bind_param("s", $folder_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $folder_exists_in_table = $result->fetch_row()[0] > 0;
+    
+    // Vérifier si le dossier contient des notes
+    $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0");
+    $stmt->bind_param("s", $folder_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $notes_count = $result->fetch_row()[0];
+    
+    // Vérifier si le dossier contient des notes dans la corbeille
+    $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1");
+    $stmt->bind_param("s", $folder_name);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $trash_notes_count = $result->fetch_row()[0];
+    
+    $total_notes = $notes_count + $trash_notes_count;
+    
+    // Si le dossier n'existe ni dans la table folders ni comme dossier utilisé
+    if (!$folder_exists_in_table && $total_notes == 0) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Folder not found']);
+        exit;
+    }
+    
+    // Commencer la transaction
+    $con->autocommit(false);
+    
+    try {
+        // Déplacer toutes les notes de ce dossier vers "Uncategorized"
+        if ($total_notes > 0) {
+            $stmt = $con->prepare("UPDATE entries SET folder = 'Uncategorized', updated = NOW() WHERE folder = ?");
+            $stmt->bind_param("s", $folder_name);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to move notes to Uncategorized');
+            }
+        }
+        
+        // Supprimer le dossier de la table folders
+        if ($folder_exists_in_table) {
+            $stmt = $con->prepare("DELETE FROM folders WHERE name = ?");
+            $stmt->bind_param("s", $folder_name);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to delete folder from database');
+            }
+        }
+        
+        // Supprimer le dossier physique
+        $folder_path = __DIR__ . '/entries/' . $folder_name;
+        $folder_deleted = false;
+        
+        if (is_dir($folder_path)) {
+            // Vérifier que le dossier est vide (sauf les fichiers cachés)
+            $files = array_diff(scandir($folder_path), array('.', '..'));
+            
+            if (empty($files)) {
+                $folder_deleted = rmdir($folder_path);
+            } else {
+                // Le dossier contient encore des fichiers, ne pas le supprimer physiquement
+                $folder_deleted = false;
+            }
+        }
+        
+        // Valider la transaction
+        $con->commit();
+        $con->autocommit(true);
+        
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Folder deleted successfully',
+            'folder' => [
+                'name' => $folder_name,
+                'notes_moved' => $total_notes,
+                'notes_in_active' => $notes_count,
+                'notes_in_trash' => $trash_notes_count,
+                'physical_folder_deleted' => $folder_deleted,
+                'folder_path' => $folder_path
+            ]
+        ]);
+        
+    } catch (Exception $e) {
+        // Annuler la transaction en cas d'erreur
+        $con->rollback();
+        $con->autocommit(true);
+        throw $e;
+    }
+    
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+}
+?>

@@ -377,3 +377,42 @@ curl -X POST http://localhost:8040/api_create_note.php \
   -H "Content-Type: application/json" \
   -d '{"heading": "My Note", "tags": "personal,important"}'
 ```
+
+#### Create Folder
+```bash
+curl -X POST http://localhost:8040/api_create_folder.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"folder_name": "Work Projects"}'
+```
+
+#### Move Note to Folder
+```bash
+curl -X POST http://localhost:8040/api_move_note.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": "123", "folder_name": "Work Projects"}'
+```
+
+#### Delete Note
+```bash
+# Soft delete (move to trash)
+curl -X DELETE http://localhost:8040/api_delete_note.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": "123"}'
+
+# Permanent delete
+curl -X DELETE http://localhost:8040/api_delete_note.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": "123", "permanent": true}'
+```
+
+#### Delete Folder
+```bash
+curl -X DELETE http://localhost:8040/api_delete_folder.php \
+  -u username:password \
+  -H "Content-Type: application/json" \
+  -d '{"folder_name": "Work Projects"}'
+```
