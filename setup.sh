@@ -72,8 +72,17 @@ reconfigure_poznote() {
     read -p "Username [$POZNOTE_USERNAME]: " NEW_POZNOTE_USERNAME
     POZNOTE_USERNAME=${NEW_POZNOTE_USERNAME:-$POZNOTE_USERNAME}
 
-    read -p "Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
-    POZNOTE_PASSWORD=${NEW_POZNOTE_PASSWORD:-$POZNOTE_PASSWORD}
+    while true; do
+        read -p "Password [$POZNOTE_PASSWORD]: " NEW_POZNOTE_PASSWORD
+        if [ -z "$NEW_POZNOTE_PASSWORD" ]; then
+            # Keep current password
+            break
+        elif validate_password "$NEW_POZNOTE_PASSWORD"; then
+            POZNOTE_PASSWORD="$NEW_POZNOTE_PASSWORD"
+            break
+        fi
+        echo "Please try again with a valid password."
+    done
 
     HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT" "$HTTP_WEB_PORT")
 
@@ -242,6 +251,35 @@ get_port_with_validation() {
     done
 }
 
+# Validate password for security and compatibility
+validate_password() {
+    local password="$1"
+    local forbidden_chars='$`"\|&;<>(){}[]~!#%=?+'
+    
+    # Check minimum length
+    if [ ${#password} -lt 8 ]; then
+        print_warning "Password must be at least 8 characters long."
+        return 1
+    fi
+    
+    # Check for forbidden characters
+    if [[ "$password" =~ [\$\`\"\'\\|&\;<>\(\)\{\}\[\]~#%=\?+[:space:]] ]]; then
+        print_warning "Password contains forbidden characters."
+        echo "Forbidden characters: \$ \` \" ' \\ | & ; < > ( ) { } [ ] ~ # % = ? + spaces"
+        echo "Please use only: letters, numbers, and these safe symbols: @ - _ . , ! *"
+        return 1
+    fi
+    
+    # Check if password is too simple
+    if [[ "$password" =~ ^[a-zA-Z]+$ ]] || [[ "$password" =~ ^[0-9]+$ ]]; then
+        print_warning "Password should contain a mix of letters and numbers for better security."
+        echo "Consider adding numbers or safe special characters: @ - _ . , ! *"
+        return 1
+    fi
+    
+    return 0
+}
+
 # Get user input for configuration
 get_user_config() {
     local is_update=$1
@@ -266,16 +304,39 @@ get_user_config() {
     fi
     
     # Get password
+    echo
+    print_status "Password requirements:"
+    echo "  • Minimum 8 characters"
+    echo "  • Mix of letters and numbers recommended"
+    echo "  • Allowed special characters: @ - _ . , ! *"
+    echo
+    
     if [ "$is_update" = "true" ] && [ -n "$POZNOTE_PASSWORD" ]; then
-        read -p "Poznote Password (current: [hidden], press Enter to keep): " NEW_PASSWORD
-        POZNOTE_PASSWORD=${NEW_PASSWORD:-$POZNOTE_PASSWORD}
+        while true; do
+            read -p "Poznote Password (current: [hidden], press Enter to keep): " NEW_PASSWORD
+            if [ -z "$NEW_PASSWORD" ]; then
+                # Keep current password
+                break
+            elif validate_password "$NEW_PASSWORD"; then
+                POZNOTE_PASSWORD="$NEW_PASSWORD"
+                break
+            fi
+            echo "Please try again with a valid password."
+        done
     else
-        read -p "Poznote Password (default: $TEMPLATE_PASSWORD): " POZNOTE_PASSWORD
-        POZNOTE_PASSWORD=${POZNOTE_PASSWORD:-$TEMPLATE_PASSWORD}
-        
-        if [ -z "$POZNOTE_PASSWORD" ]; then
-            POZNOTE_PASSWORD="admin123"
-        fi
+        while true; do
+            read -p "Poznote Password (default: $TEMPLATE_PASSWORD): " POZNOTE_PASSWORD
+            POZNOTE_PASSWORD=${POZNOTE_PASSWORD:-$TEMPLATE_PASSWORD}
+            
+            if [ -z "$POZNOTE_PASSWORD" ]; then
+                POZNOTE_PASSWORD="admin123"
+            fi
+            
+            if validate_password "$POZNOTE_PASSWORD"; then
+                break
+            fi
+            echo "Please try again with a valid password."
+        done
     fi
     
     # Get port with availability check

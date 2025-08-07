@@ -120,6 +120,54 @@ function Get-UserInput {
     return $input
 }
 
+# Validate password for security and compatibility
+function Test-PasswordSecurity {
+    param([string]$Password)
+    
+    # Check minimum length
+    if ($Password.Length -lt 8) {
+        Write-Warning "Password must be at least 8 characters long."
+        return $false
+    }
+    
+    # Check for forbidden characters
+    $forbiddenChars = '[$`"''\\|&;<>(){}[\]~#%=?+ ]'
+    if ($Password -match $forbiddenChars) {
+        Write-Warning "Password contains forbidden characters."
+        Write-Host "Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Yellow
+        Write-Host "Please use only: letters, numbers, and these safe symbols: @ - _ . , ! *" -ForegroundColor Yellow
+        return $false
+    }
+    
+    # Check if password is too simple
+    if ($Password -match '^[a-zA-Z]+$' -or $Password -match '^[0-9]+$') {
+        Write-Warning "Password should contain a mix of letters and numbers for better security."
+        Write-Host "Consider adding numbers or safe special characters: @ - _ . , ! *" -ForegroundColor Yellow
+        return $false
+    }
+    
+    return $true
+}
+
+# Get password with validation
+function Get-SecurePassword {
+    param([string]$Prompt, [string]$Default, [bool]$AllowEmpty = $false)
+    
+    while ($true) {
+        $password = Get-UserInput $Prompt $Default
+        
+        if ([string]::IsNullOrWhiteSpace($password) -and $AllowEmpty) {
+            return $Default
+        }
+        
+        if (Test-PasswordSecurity $password) {
+            return $password
+        }
+        
+        Write-Host "Please try again with a valid password." -ForegroundColor Yellow
+    }
+}
+
 # Check if port is already in use
 function Test-PortAvailable {
     param([int]$Port)
@@ -257,7 +305,15 @@ function Reconfigure-Poznote {
 
     # Get new values
     $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
-    $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
+    
+    Write-Host ""
+    Write-Status "Password requirements:"
+    Write-Host "  • Minimum 8 characters" -ForegroundColor White
+    Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
+    Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+    Write-Host ""
+    
+    $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $existingConfig['POZNOTE_PASSWORD'] $true
     $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT'] $existingConfig['HTTP_WEB_PORT']
     $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] }
     $APP_NAME_DISPLAYED = Get-UserInput "Application Name Displayed" $defaultAppName
@@ -447,7 +503,16 @@ function Install-Poznote {
         
         # Get configuration
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
-        $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
+        
+        Write-Host ""
+        Write-Status "Password requirements:"
+        Write-Host "  • Minimum 8 characters" -ForegroundColor White
+        Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host "  • Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Red
+        Write-Host ""
+        
+        $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"] $false
         $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
         # Use default value for new installations
         $APP_NAME_DISPLAYED = "Poznote"
