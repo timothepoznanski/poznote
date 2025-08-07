@@ -263,7 +263,7 @@ validate_password() {
     fi
     
     # Check for forbidden characters
-    if [[ "$password" =~ [\$\`\"\'\\|&\;<>\(\)\{\}\[\]~#%=\?+[:space:]] ]]; then
+    if [[ "$password" =~ [\$\`\"\'\\\|\&\;\<\>\(\)\{\}\[\]\~\#\%\=\?\+[:space:]] ]]; then
         print_warning "Password contains forbidden characters."
         echo "Forbidden characters: \$ \` \" ' \\ | & ; < > ( ) { } [ ] ~ # % = ? + spaces"
         echo "Please use only: letters, numbers, and these safe symbols: @ - _ . , ! *"
