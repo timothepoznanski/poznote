@@ -13,7 +13,8 @@ A powerful note-taking tool with full control over your data.
 - 🔍 Powerful Search
 - 🏷️ Tag System
 - 📎 File Attachments
-- 📱 Responsive Desig
+- 📱 Responsive Design
+- 🖥️ Multi-instance
 - 🔒 Self-Hosted
 - 💾 Built-in backup and export
 - 🗑️ Trash System
