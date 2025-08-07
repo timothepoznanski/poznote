@@ -282,7 +282,6 @@ validate_password() {
         echo "  • Minimum 8 characters"
         echo "  • Mix of letters and numbers recommended"
         echo "  • Allowed special characters: @ - _ . , ! *"
-        echo "  • Forbidden characters: \$ \` \" ' \\ | & ; < > ( ) { } [ ] ~ # % = ? + spaces"
         echo
         return 1
     fi

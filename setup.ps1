@@ -152,7 +152,6 @@ function Test-PasswordSecurity {
         Write-Host "  • Minimum 8 characters" -ForegroundColor White
         Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
         Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
-        Write-Host "  • Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Red
         Write-Host ""
         return $false
     }
@@ -520,7 +519,6 @@ function Install-Poznote {
         Write-Host "  • Minimum 8 characters" -ForegroundColor White
         Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
         Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
-        Write-Host "  • Forbidden characters: `$ `` `" ' \ | & ; < > ( ) { } [ ] ~ # % = ? + spaces" -ForegroundColor Red
         Write-Host ""
         
         $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"] $false
