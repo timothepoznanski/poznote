@@ -363,11 +363,58 @@ Poznote provides a RESTful API for programmatic access to your notes.
 
 All API requests require authentication using the same credentials configured in your `.env` file for each instance.
 
+### HTTP Response Codes
+
+The API uses standard HTTP status codes to indicate the success or failure of requests:
+
+| Code | Status | Description |
+|------|--------|-------------|
+| **200** | OK | Request successful (for updates, deletes) |
+| **201** | Created | Resource created successfully |
+| **400** | Bad Request | Invalid request data (missing parameters, invalid JSON, etc.) |
+| **401** | Unauthorized | Authentication failed or missing credentials |
+| **404** | Not Found | Requested resource (note, folder) does not exist |
+| **405** | Method Not Allowed | HTTP method not supported for this endpoint |
+| **409** | Conflict | Resource already exists (duplicate folder name) |
+| **500** | Internal Server Error | Server error (database issues, file system errors) |
+
+**Error Response Format:**
+```json
+{
+  "error": "Error message description",
+  "details": "Additional error details (optional)"
+}
+```
+
+**Success Response Format:**
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": { /* response data */ }
+}
+```
+
 ### Available Endpoints
 
 #### List Notes
 ```bash
 curl -u username:password http://localhost:8040/api_list_notes.php
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "notes": [
+    {
+      "id": "123",
+      "heading": "My Note",
+      "tags": "personal,important",
+      "created": "2025-01-15 10:30:00"
+    }
+  ]
+}
 ```
 
 #### Create Note
@@ -378,12 +425,37 @@ curl -X POST http://localhost:8040/api_create_note.php \
   -d '{"heading": "My Note", "tags": "personal,important"}'
 ```
 
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Note created successfully",
+  "note_id": "124"
+}
+```
+
 #### Create Folder
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
+```
+
+**Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Folder 'Work Projects' created successfully",
+  "folder_path": "/var/www/html/data/entries/Work Projects"
+}
+```
+
+**Error Response (409 Conflict):**
+```json
+{
+  "error": "Folder 'Work Projects' already exists"
+}
 ```
 
 #### Move Note to Folder
@@ -394,6 +466,22 @@ curl -X POST http://localhost:8040/api_move_note.php \
   -d '{"note_id": "123", "folder_name": "Work Projects"}'
 ```
 
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Note moved successfully to folder 'Work Projects'",
+  "new_file_path": "/var/www/html/data/entries/Work Projects/123.html"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "error": "Note with ID 123 not found"
+}
+```
+
 #### Delete Note
 ```bash
 # Soft delete (move to trash)
@@ -401,12 +489,34 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"note_id": "123"}'
+```
 
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Note moved to trash successfully"
+}
+```
+
+```bash
 # Permanent delete
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"note_id": "123", "permanent": true}'
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Note permanently deleted",
+  "files_deleted": {
+    "html_file": "/var/www/html/data/entries/123.html",
+    "attachments": ["file1.pdf", "image.jpg"]
+  }
+}
 ```
 
 #### Delete Folder
@@ -416,3 +526,28 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Folder 'Work Projects' deleted successfully",
+  "notes_moved": {
+    "total": 5,
+    "active": 3,
+    "trash": 2
+  },
+  "folder_removed": "/var/www/html/data/entries/Work Projects"
+}
+```
+
+**Error Response (400 Bad Request) - Protected Folder:**
+```json
+{
+  "error": "Cannot delete the Uncategorized folder"
+}
+```
+
+**⚠️ Protected Folders:**
+- The `Uncategorized` folder cannot be deleted as it serves as the default location for notes without a specific folder
+- When a folder is deleted, all its notes are automatically moved to `Uncategorized` to prevent data loss
