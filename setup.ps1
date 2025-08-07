@@ -449,8 +449,8 @@ function Install-Poznote {
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
         $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
-        $defaultAppName = if ([string]::IsNullOrWhiteSpace($templateConfig["APP_NAME_DISPLAYED"])) { "Poznote" } else { $templateConfig["APP_NAME_DISPLAYED"] }
-        $APP_NAME_DISPLAYED = Get-UserInput "Application Name" $defaultAppName
+        # Use default value for new installations
+        $APP_NAME_DISPLAYED = "Poznote"
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
             Write-Warning "You are using the default password! Please change it for production use."
@@ -548,6 +548,9 @@ function Install-Poznote {
         Write-Host "$finalPassword" -ForegroundColor $Colors.Yellow
         Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalAppName" -ForegroundColor $Colors.Yellow
+        Write-Host ""
+        Write-Host "To update Poznote, change username/password/port or modify the application name, run:" -ForegroundColor $Colors.Blue
+        Write-Host "  .\setup.ps1" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"

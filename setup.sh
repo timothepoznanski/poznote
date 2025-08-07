@@ -282,12 +282,8 @@ get_user_config() {
         read -p "Application Name (current: $APP_NAME_DISPLAYED): " NEW_APP_NAME
         APP_NAME_DISPLAYED=${NEW_APP_NAME:-$APP_NAME_DISPLAYED}
     else
-        read -p "Application Name (default: ${TEMPLATE_APP_NAME:-Poznote}): " APP_NAME_DISPLAYED
-        APP_NAME_DISPLAYED=${APP_NAME_DISPLAYED:-${TEMPLATE_APP_NAME:-Poznote}}
-        
-        if [ -z "$APP_NAME_DISPLAYED" ]; then
-            APP_NAME_DISPLAYED="Poznote"
-        fi
+        # Use default value for new installations
+        APP_NAME_DISPLAYED="Poznote"
     fi
     
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
@@ -373,7 +369,13 @@ show_info() {
     echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
-    echo "  📱 App Name: ${APP_NAME:-Poznote}"
+    echo "  📱 App Name: ${APP_NAME_DISPLAYED:-Poznote}"
+    
+    if [ "$is_update" != "true" ]; then
+        echo
+        print_status "⚙️  To update Poznote, change username/password/port or modify the application name, run:"
+        echo "  ./setup.sh"
+    fi
 
 }
 
