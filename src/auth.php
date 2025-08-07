@@ -9,7 +9,7 @@ session_start();
 // Authentication configuration - you can change these values
 define("AUTH_USERNAME", $_ENV['POZNOTE_USERNAME'] ?? 'admin');
 define("AUTH_PASSWORD", $_ENV['POZNOTE_PASSWORD'] ?? 'admin123');
-define("APP_NAME", $_ENV['APP_NAME'] ?? 'Poznote');
+define("APP_NAME_DISPLAYED", $_ENV['APP_NAME_DISPLAYED'] ?? 'Poznote');
 
 function isAuthenticated() {
     return isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true;

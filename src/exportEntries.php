@@ -33,7 +33,7 @@ $fileCount = 0;
 
 // Create index file
 $indexContent = '<html><head><title>Note Index</title></head><body>';
-$indexContent .= '<h1>' . APP_NAME . ' Notes Export</h1>';
+$indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Notes Export</h1>';
 $query_right = 'SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC';
 $res_right = $con->query($query_right);
 

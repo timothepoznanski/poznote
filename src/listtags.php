@@ -26,7 +26,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Tags - <?php echo APP_NAME; ?></title>
+<title>Tags - <?php echo APP_NAME_DISPLAYED; ?></title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link rel="stylesheet" href="css/font-awesome.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>

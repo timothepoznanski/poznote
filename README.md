@@ -34,7 +34,7 @@ Try Poznote without installing anything! A live demo is available at:
 ## Table of Contents
 
 - [Installation](#installation)
-- [Change Login, Password, Application Name, or Port](#change-login-password-application-name-or-port)
+- [Change Login, Password, Application Name Displayed, or Port](#change-login-password-application-name-displayed-or-port)
 - [Update Poznote application](#update-poznote-application)
 - [Backup and Restore](#backup-and-restore)
 - [Docker Architecture](#docker-architecture)
@@ -88,7 +88,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
+   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
@@ -137,7 +137,7 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
+   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 4. **Start Poznote**
@@ -184,7 +184,7 @@ cd "$instanceName"
 - `poznote-work`: Port 8041, username "bob", password "work456"
 - `poznote-demo`: Port 8042, username "demo", password "demo123"
 
-## Change Login, Password, Application Name, or Port
+## Change Login, Password, Application Name Displayed, or Port
 
 ### Option 1: Automated Configuration Change
 
@@ -214,20 +214,20 @@ Open the folder of your project and edit the `.env` file to customize your insta
 POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin123
 HTTP_WEB_PORT=8040
-APP_NAME=Poznote
+APP_NAME_DISPLAYED=Poznote
 ```
 
 **Configuration options:**
 - `POZNOTE_USERNAME` - Username for authentication
 - `POZNOTE_PASSWORD` - Password for authentication  
 - `HTTP_WEB_PORT` - Port where the application will be accessible
-- `APP_NAME` - Application name displayed in the interface
+- `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
 
 3. **Customize settings**
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME=Poznote` to customize the application name displayed in the interface
+   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)```
 
 After modifying the `.env` file, restart the application:

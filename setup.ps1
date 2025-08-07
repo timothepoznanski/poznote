@@ -251,7 +251,7 @@ function Reconfigure-Poznote {
     Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME'])) { 'Poznote' } else { $existingConfig['APP_NAME'] })" -ForegroundColor $Colors.White
+    Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -259,8 +259,8 @@ function Reconfigure-Poznote {
     $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
     $POZNOTE_PASSWORD = Get-UserInput "Poznote Password" $existingConfig['POZNOTE_PASSWORD']
     $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT'] $existingConfig['HTTP_WEB_PORT']
-    $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME'])) { 'Poznote' } else { $existingConfig['APP_NAME'] }
-    $APP_NAME = Get-UserInput "Application Name" $defaultAppName
+    $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] }
+    $APP_NAME_DISPLAYED = Get-UserInput "Application Name" $defaultAppName
 
     if ($POZNOTE_PASSWORD -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
@@ -273,7 +273,7 @@ function Reconfigure-Poznote {
         $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
         $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
-        $envContent = $envContent -replace "(?m)^APP_NAME=.*", "APP_NAME=$APP_NAME"
+        $envContent = $envContent -replace "(?m)^APP_NAME_DISPLAYED=.*", "APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success "Configuration updated from template successfully!"
     }
@@ -303,7 +303,7 @@ function Reconfigure-Poznote {
             Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
             Write-Host "$POZNOTE_PASSWORD" -ForegroundColor $Colors.Yellow
             Write-Host "App Name: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "$APP_NAME" -ForegroundColor $Colors.Yellow
+            Write-Host "$APP_NAME_DISPLAYED" -ForegroundColor $Colors.Yellow
         } else {
             Write-Error "Failed to restart Poznote."
             exit 1
@@ -340,7 +340,7 @@ function Install-Poznote {
             Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME'])) { 'Poznote' } else { $existingConfig['APP_NAME'] })" -ForegroundColor $Colors.White
+            Write-Host "  • App Name: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
@@ -449,8 +449,8 @@ function Install-Poznote {
         $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
         $POZNOTE_PASSWORD = Get-UserInput "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"]
         $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
-        $defaultAppName = if ([string]::IsNullOrWhiteSpace($templateConfig["APP_NAME"])) { "Poznote" } else { $templateConfig["APP_NAME"] }
-        $APP_NAME = Get-UserInput "Application Name" $defaultAppName
+        $defaultAppName = if ([string]::IsNullOrWhiteSpace($templateConfig["APP_NAME_DISPLAYED"])) { "Poznote" } else { $templateConfig["APP_NAME_DISPLAYED"] }
+        $APP_NAME_DISPLAYED = Get-UserInput "Application Name" $defaultAppName
         
         if ($POZNOTE_PASSWORD -eq "admin123") {
             Write-Warning "You are using the default password! Please change it for production use."
@@ -464,7 +464,7 @@ function Install-Poznote {
         $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
         $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
-        $envContent = $envContent -replace "(?m)^APP_NAME=.*", "APP_NAME=$APP_NAME"
+        $envContent = $envContent -replace "(?m)^APP_NAME_DISPLAYED=.*", "APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED"
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success ".env file created from template successfully!"
     }
@@ -538,7 +538,7 @@ function Install-Poznote {
         $finalUsername = if ($POZNOTE_USERNAME) { $POZNOTE_USERNAME } else { $envVars['POZNOTE_USERNAME'] }
         $finalPassword = if ($POZNOTE_PASSWORD) { $POZNOTE_PASSWORD } else { $envVars['POZNOTE_PASSWORD'] }
         $finalPort = if ($HTTP_WEB_PORT) { $HTTP_WEB_PORT } else { $envVars['HTTP_WEB_PORT'] }
-        $finalAppName = if ($APP_NAME) { $APP_NAME } else { $envVars['APP_NAME'] -or 'Poznote' }
+        $finalAppName = if ($APP_NAME_DISPLAYED) { $APP_NAME_DISPLAYED } else { $envVars['APP_NAME_DISPLAYED'] -or 'Poznote' }
         
         Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "http://localhost:$finalPort" -ForegroundColor $Colors.Green

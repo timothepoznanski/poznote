@@ -148,7 +148,7 @@ $zip->addFromString('_poznote_attachments_metadata.json', $metadataContent);
 
 // Create a simple index file
 $indexContent = '<html><head><title>Attachments Index</title></head><body>';
-$indexContent .= '<h1>' . APP_NAME . ' Attachments Export</h1>';
+$indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Attachments Export</h1>';
 $indexContent .= '<p>Total attachments: ' . $attachmentCount . '</p>';
 $indexContent .= '<p>Total notes with attachments: ' . count($metadata) . '</p>';
 $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';

@@ -15,7 +15,7 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<title>Trash - <?php echo APP_NAME; ?></title>
+<title>Trash - <?php echo APP_NAME_DISPLAYED; ?></title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link rel="stylesheet" href="css/font-awesome.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>

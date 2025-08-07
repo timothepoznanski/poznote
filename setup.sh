@@ -278,15 +278,15 @@ get_user_config() {
     fi
     
     # Get application name
-    if [ "$is_update" = "true" ] && [ -n "$APP_NAME" ]; then
-        read -p "Application Name (current: $APP_NAME): " NEW_APP_NAME
-        APP_NAME=${NEW_APP_NAME:-$APP_NAME}
+    if [ "$is_update" = "true" ] && [ -n "$APP_NAME_DISPLAYED" ]; then
+        read -p "Application Name (current: $APP_NAME_DISPLAYED): " NEW_APP_NAME
+        APP_NAME_DISPLAYED=${NEW_APP_NAME:-$APP_NAME_DISPLAYED}
     else
-        read -p "Application Name (default: ${TEMPLATE_APP_NAME:-Poznote}): " APP_NAME
-        APP_NAME=${APP_NAME:-${TEMPLATE_APP_NAME:-Poznote}}
+        read -p "Application Name (default: ${TEMPLATE_APP_NAME:-Poznote}): " APP_NAME_DISPLAYED
+        APP_NAME_DISPLAYED=${APP_NAME_DISPLAYED:-${TEMPLATE_APP_NAME:-Poznote}}
         
-        if [ -z "$APP_NAME" ]; then
-            APP_NAME="Poznote"
+        if [ -z "$APP_NAME_DISPLAYED" ]; then
+            APP_NAME_DISPLAYED="Poznote"
         fi
     fi
     

@@ -26,7 +26,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - <?php echo APP_NAME; ?></title>
+    <title>Login - <?php echo APP_NAME_DISPLAYED; ?></title>
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -35,9 +35,9 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <img src="favicon.ico" alt="<?php echo APP_NAME; ?>" class="logo-favicon">
+                <img src="favicon.ico" alt="<?php echo APP_NAME_DISPLAYED; ?>" class="logo-favicon">
             </div>
-            <h1 class="login-title"><?php echo APP_NAME; ?></h1>
+            <h1 class="login-title"><?php echo APP_NAME_DISPLAYED; ?></h1>
         </div>
         
         <form method="POST">
