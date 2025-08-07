@@ -9,7 +9,7 @@ require 'auth.php';
 requireAuth();
 
 ob_start();
-require 'config.php';
+require_once 'config.php';
 
 // Détection mobile par user agent (doit être fait AVANT tout output et ne jamais être redéfini)
 $is_mobile = false;

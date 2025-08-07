@@ -2,7 +2,7 @@
 require 'auth.php';
 requireAuth();
 
-require 'config.php';
+require_once 'config.php';
 require 'db_connect.php';
 
 $search = $_POST['search'] ?? '';

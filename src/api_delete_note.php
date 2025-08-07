@@ -1,19 +1,16 @@
 <?php
 require 'auth.php';
-require 'db_connect.php';
-include 'functions.php';
+requireApiAuth();
 
-// Vérifier l'authentification
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
-}
+header('Content-Type: application/json');
+require_once 'config.php';
+require_once 'db_connect.php';
+include 'functions.php';
 
 // Vérifier la méthode HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed. Use DELETE.']);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed. Use DELETE.']);
     exit;
 }
 
@@ -23,14 +20,14 @@ $data = json_decode($json, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid JSON']);
+    echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
     exit;
 }
 
 // Valider les données
 if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
     http_response_code(400);
-    echo json_encode(['error' => 'note_id is required']);
+    echo json_encode(['success' => false, 'message' => 'note_id is required']);
     exit;
 }
 
@@ -47,7 +44,7 @@ try {
     
     if (!$note) {
         http_response_code(404);
-        echo json_encode(['error' => 'Note not found']);
+        echo json_encode(['success' => false, 'message' => 'Note not found']);
         exit;
     }
     
@@ -102,7 +99,7 @@ try {
             ]);
         } else {
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to delete note from database']);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete note from database']);
         }
         
     } else {
@@ -110,7 +107,7 @@ try {
         
         if ($note['trash'] == 1) {
             http_response_code(400);
-            echo json_encode(['error' => 'Note is already in trash']);
+            echo json_encode(['success' => false, 'message' => 'Note is already in trash']);
             exit;
         }
         
@@ -131,12 +128,12 @@ try {
             ]);
         } else {
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to move note to trash']);
+            echo json_encode(['success' => false, 'message' => 'Failed to move note to trash']);
         }
     }
     
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
 ?>

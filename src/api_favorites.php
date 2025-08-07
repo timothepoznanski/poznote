@@ -6,7 +6,7 @@ requireApiAuth();
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
 
-require 'config.php';
+require_once 'config.php';
 include 'db_connect.php';
 
 header('Content-Type: application/json');

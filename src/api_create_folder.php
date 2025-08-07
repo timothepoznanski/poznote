@@ -1,18 +1,15 @@
 <?php
 require 'auth.php';
-require 'db_connect.php';
+requireApiAuth();
 
-// Vérifier l'authentification
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
-}
+header('Content-Type: application/json');
+require_once 'config.php';
+require_once 'db_connect.php';
 
 // Vérifier la méthode HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed. Use POST.']);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed. Use POST.']);
     exit;
 }
 

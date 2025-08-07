@@ -3,7 +3,7 @@
 	requireAuth();
 	
 	date_default_timezone_set('UTC');
-	require 'config.php';
+	require_once 'config.php';
 	include 'db_connect.php';
 	
 	$now = $_POST['now'];

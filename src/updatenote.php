@@ -7,7 +7,7 @@
 // error_reporting(-1);
                        
 	date_default_timezone_set('UTC');
-	require 'config.php';
+	require_once 'config.php';
 	include 'functions.php';
 	include 'db_connect.php';
 	

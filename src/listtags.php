@@ -2,7 +2,7 @@
 require 'auth.php';
 requireAuth();
 
-require 'config.php';
+require_once 'config.php';
 include 'db_connect.php';
 
 $res = $con->query('SELECT tags FROM entries WHERE trash = 0');

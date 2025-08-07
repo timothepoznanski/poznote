@@ -4,7 +4,7 @@
 	
 	date_default_timezone_set('UTC');
 	include 'functions.php';
-	require 'config.php';
+	require_once 'config.php';
 	include 'db_connect.php';
     
     // Delete all files and attachments from trash entries

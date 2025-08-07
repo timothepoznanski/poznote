@@ -1,18 +1,19 @@
 <?php
 require 'auth.php';
-require 'db_connect.php';
+requireApiAuth();
 
-// Vérifier l'authentification
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
-}
+header('Content-Type: application/json');
+require_once        if (!mkdir($new_folder_path, 0777, true)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to create destination folder directory']);
+            exit;
+        }fig.php';
+require_once 'db_connect.php';
 
 // Vérifier la méthode HTTP
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed. Use POST.']);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed. Use POST.']);
     exit;
 }
 
@@ -22,20 +23,20 @@ $data = json_decode($json, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid JSON']);
+    echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
     exit;
 }
 
 // Valider les données
 if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
     http_response_code(400);
-    echo json_encode(['error' => 'note_id is required']);
+    echo json_encode(['success' => false, 'message' => 'note_id is required']);
     exit;
 }
 
 if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
     http_response_code(400);
-    echo json_encode(['error' => 'folder_name is required']);
+    echo json_encode(['success' => false, 'message' => 'folder_name is required']);
     exit;
 }
 
@@ -50,9 +51,10 @@ try {
     $result = $stmt->get_result();
     $note = $result->fetch_assoc();
     
-    if (!$note) {
+    if ($stmt->num_rows === 0) {
+        $stmt->close();
         http_response_code(404);
-        echo json_encode(['error' => 'Note not found']);
+        echo json_encode(['success' => false, 'message' => 'Note not found']);
         exit;
     }
     
@@ -75,7 +77,7 @@ try {
         
         if (!$folder_exists && $folder_name !== 'Uncategorized') {
             http_response_code(404);
-            echo json_encode(['error' => 'Folder not found']);
+            echo json_encode(['success' => false, 'message' => 'Folder not found']);
             exit;
         }
     }
@@ -93,7 +95,7 @@ try {
     // Vérifier que le fichier de la note existe
     if (!file_exists($old_file_path)) {
         http_response_code(404);
-        echo json_encode(['error' => 'Note file not found at: ' . $old_file_path]);
+        echo json_encode(['success' => false, 'message' => 'Note file not found at: ' . $old_file_path]);
         exit;
     }
     
@@ -101,7 +103,7 @@ try {
     if ($folder_name !== 'Uncategorized' && !file_exists($new_folder_path)) {
         if (!mkdir($new_folder_path, 0755, true)) {
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to create destination folder directory']);
+            echo json_encode(['success' => false, 'message' => 'Failed to create destination folder directory']);
             exit;
         }
     }
@@ -109,7 +111,7 @@ try {
     // Déplacer le fichier
     if (!rename($old_file_path, $new_file_path)) {
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to move note file']);
+        echo json_encode(['success' => false, 'message' => 'Failed to move note file']);
         exit;
     }
     
@@ -139,6 +141,6 @@ try {
     }
     
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
 ?>

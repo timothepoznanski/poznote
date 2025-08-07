@@ -10,7 +10,7 @@ require_once 'db_connect.php';
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
     exit;
 }
 
@@ -23,7 +23,7 @@ $folder = isset($input['folder']) ? trim($input['folder']) : 'Uncategorized';
 
 if ($heading === '') {
     http_response_code(400);
-    echo json_encode(['error' => 'The heading field is required']);
+    echo json_encode(['success' => false, 'message' => 'The heading field is required']);
     exit;
 }
 
@@ -34,6 +34,6 @@ if ($stmt->execute()) {
     echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
 } else {
     http_response_code(500);
-    echo json_encode(['error' => 'Error while creating the note']);
+    echo json_encode(['success' => false, 'message' => 'Error while creating the note']);
 }
 $stmt->close();

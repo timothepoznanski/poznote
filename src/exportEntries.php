@@ -3,7 +3,7 @@ require 'auth.php';
 requireAuth();
 
 include 'functions.php';
-require 'config.php';
+require_once 'config.php';
 include 'db_connect.php';
 
 // Start output buffering to prevent any unwanted output

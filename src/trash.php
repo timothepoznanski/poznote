@@ -4,7 +4,7 @@ requireAuth();
 
 @ob_start();
 include 'functions.php';
-require 'config.php';
+require_once 'config.php';
 include 'db_connect.php';
 
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
