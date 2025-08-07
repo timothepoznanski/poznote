@@ -34,7 +34,7 @@ Try Poznote without installing anything! A live demo is available at:
 ## Table of Contents
 
 - [Installation](#installation)
-- [Change login, password or port](#change-login-password-or-port)
+- [Change Login, Password, Application Name, or Port](#change-login-password-application-name-or-port)
 - [Update Poznote application](#update-poznote-application)
 - [Backup and Restore](#backup-and-restore)
 - [Docker Architecture](#docker-architecture)
@@ -54,7 +54,7 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux.
 Open PowerShell in the directory where you want to install Poznote and execute the following commands:
 
 ```powershell
-$instanceName = Read-Host "Choose an instance name (e.g., poznote-tom, poznote-test, poznote-2)"
+$instanceName = Read-Host "Choose an instance name (poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
 git clone https://github.com/timothepoznanski/poznote.git $instanceName
 cd $instanceName
 .\setup.ps1
@@ -73,7 +73,7 @@ The script will automatically:
    Open PowerShell in the directory where you want to install Poznote and execute the following commands:
    
    ```powershell
-   $instanceName = Read-Host "Choose an instance name (e.g., poznote-tom, poznote-test, poznote-2)"
+   $instanceName = Read-Host "Choose an instance name (poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
    git clone https://github.com/timothepoznanski/poznote.git $instanceName
    cd $instanceName
    ```
@@ -105,7 +105,7 @@ The script will automatically:
 #### Option 1: Automated Setup
 
 ```bash
-read -p "Choose an instance name (e.g., poznote-tom, poznote-test, poznote-2): " instanceName
+read -p "Choose an instance name (poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
 git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
 cd "$instanceName"
 chmod +x setup.sh
@@ -122,7 +122,7 @@ The script will automatically:
 
 1. **Choose instance name and clone the repository**
    ```bash
-   read -p "Choose an instance name (e.g., poznote-tom, poznote-test, poznote-2): " instanceName
+   read -p "Choose an instance name (poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
    git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
    cd "$instanceName"
    ```
@@ -184,7 +184,7 @@ cd "$instanceName"
 - `poznote-work`: Port 8041, username "bob", password "work456"
 - `poznote-demo`: Port 8042, username "demo", password "demo123"
 
-## Change login, password or port
+## Change Login, Password, Application Name, or Port
 
 ### Option 1: Automated Configuration Change
 
@@ -221,7 +221,7 @@ APP_NAME=Poznote
 - `POZNOTE_USERNAME` - Username for authentication
 - `POZNOTE_PASSWORD` - Password for authentication  
 - `HTTP_WEB_PORT` - Port where the application will be accessible
-- `APP_NAME` - Application name displayed in the interface (page titles, headers, welcome message)
+- `APP_NAME` - Application name displayed in the interface
 
 3. **Customize settings**
    - Change `POZNOTE_USERNAME=admin` to your preferred username
@@ -238,6 +238,11 @@ docker compose up -d
 ```
 
 ## Update Poznote application
+
+You can update Poznote to the latest version using either the automated script or manual commands.
+
+- **Automated Update**: Use the provided setup script to pull the latest code and restart the application while preserving your data and configuration.
+- **Manual Update**: Pull the latest code from the repository and rebuild the Docker containers.
 
 ### Option 1: Automated Update
 
@@ -298,7 +303,7 @@ Available backup options:
 - To backup your database:
 
 ```bash
-docker compose exec database mysqldump -u root -psfs466!sfdgGH poznote_db > backup.sql
+docker compose exec database mysqldump -u root -psfs466sfdgGH poznote_db > backup.sql
 ```
 
 ### Restore
@@ -331,7 +336,7 @@ docker compose up -d
 
 ```bash
 # Import SQL backup into database
-docker compose exec -T database mysql -u root -psfs466!sfdgGH poznote_db < backup.sql
+docker compose exec -T database mysql -u root -psfs466sfdgGH poznote_db < backup.sql
 ```
 
 ### Docker Architecture
