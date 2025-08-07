@@ -66,6 +66,7 @@ The script will automatically:
 - 🔍 Detect existing installations
 - 📋 Guide you through configuration  
 - 🚀 Start Poznote with your settings
+- 📝 Set default application name to "Poznote" (can be changed later)
 
 #### Option 2: Manual Setup
 
@@ -89,8 +90,8 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
 
 4. **Start Poznote**
    ```powershell
@@ -118,6 +119,7 @@ The script will automatically:
 - 🔍 Detect existing installations  
 - 📋 Guide you through configuration
 - 🚀 Start Poznote with your settings
+- 📝 Set default application name to "Poznote" (can be changed later)
 
 #### Option 2: Manual Setup
 
@@ -138,8 +140,8 @@ The script will automatically:
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
 
 4. **Start Poznote**
    ```bash
@@ -203,7 +205,7 @@ Then select option 2 (Change configuration) from the menu.
 
 The script will:
 - 📋 Show your current configuration
-- ✏️ Allow you to update username, password and port
+- ✏️ Allow you to update username, password, port and application name
 - 🔄 Restart services automatically
 - 🛡️ Preserve all your data
 
@@ -224,14 +226,16 @@ APP_NAME_DISPLAYED=Poznote
 - `HTTP_WEB_PORT` - Port where the application will be accessible
 - `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
 
-3. **Customize settings**
+**To modify settings manually:**
+
+1. **Edit the .env file**
    - Change `POZNOTE_USERNAME=admin` to your preferred username
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
    - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)```
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
-After modifying the `.env` file, restart the application:
+2. **Restart the application**
 
 ```bash
 docker compose down
