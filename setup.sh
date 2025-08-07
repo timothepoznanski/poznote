@@ -64,7 +64,7 @@ reconfigure_poznote() {
     echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
-    echo -e "  • Application Name Displayed: ${APP_NAME:-Poznote}"
+    echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -77,8 +77,8 @@ reconfigure_poznote() {
 
     HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT" "$HTTP_WEB_PORT")
 
-    read -p "Application Name [${APP_NAME:-Poznote}]: " NEW_APP_NAME
-    APP_NAME=${NEW_APP_NAME:-${APP_NAME:-Poznote}}
+    read -p "Application Name [${APP_NAME_DISPLAYED:-Poznote}]: " NEW_APP_NAME
+    APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -96,7 +96,7 @@ reconfigure_poznote() {
     echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
-    echo -e "${BLUE}Application Name Displayed: ${YELLOW}${APP_NAME:-Poznote}${NC}"
+    echo -e "${BLUE}Application Name Displayed: ${YELLOW}${APP_NAME_DISPLAYED:-Poznote}${NC}"
 }
 
 # Check Docker installation
@@ -153,7 +153,7 @@ get_template_values() {
         TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
-        TEMPLATE_APP_NAME=$(grep "^APP_NAME=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
+        TEMPLATE_APP_NAME=$(grep "^APP_NAME_DISPLAYED=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
     fi
 }
 
@@ -302,11 +302,11 @@ create_env_file() {
     
     cp ".env.template" ".env"
     
-    # Use a different approach - direct replacement with awk
-    awk -v username="$POZNOTE_USERNAME" 'BEGIN{FS=OFS="="} /^POZNOTE_USERNAME=/ {$2=username} {print}' .env > .env.tmp && mv .env.tmp .env
-    awk -v password="$POZNOTE_PASSWORD" 'BEGIN{FS=OFS="="} /^POZNOTE_PASSWORD=/ {$2=password} {print}' .env > .env.tmp && mv .env.tmp .env
-    awk -v port="$HTTP_WEB_PORT" 'BEGIN{FS=OFS="="} /^HTTP_WEB_PORT=/ {$2=port} {print}' .env > .env.tmp && mv .env.tmp .env
-    awk -v appname="$APP_NAME" 'BEGIN{FS=OFS="="} /^APP_NAME=/ {$2=appname} {print}' .env > .env.tmp && mv .env.tmp .env
+    # Use sed for more robust replacement that handles spaces
+    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
+    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
+    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
+    sed -i "s/^APP_NAME_DISPLAYED=.*/APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED/" .env
     
     print_success ".env file created from template"
 }
@@ -408,7 +408,7 @@ main() {
             echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
-            echo -e "  • Application Name Displayed: ${APP_NAME:-Poznote}"
+            echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
