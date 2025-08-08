@@ -530,14 +530,14 @@ body {
     overflow-x: hidden;
     padding: 16px;
     box-sizing: border-box;
-    background: #F7F6F2;
+    background: #F8FAFC;
     flex-shrink: 0;
 }
 
 .resize-handle {
     width: 3px;
     height: 100vh;
-    background: #F7F6F2;
+    background: #FAFAFA;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
