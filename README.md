@@ -27,8 +27,8 @@ Try Poznote without installing anything! A live demo is available at:
 **🌐 Demo URL:** [https://poznote.com](https://poznote.com)
 
 **Login credentials:**
-- **Username:** `demo`
-- **Password:** `demo`
+- **Username:** `admin`
+- **Password:** `poznote!demo`
 
 *Note: The demo environment is reset periodically. Any notes you create will not be permanently saved.*
 
