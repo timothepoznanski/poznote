@@ -124,7 +124,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save {
+.btn-checkbox, .btn-separator, .btn-save {
     display: flex !important;
 }
 
@@ -150,7 +150,7 @@ body {
     display: flex !important;
 }
 
-/* Hide ALL action buttons when text is selected (including separator and save) */
+/* Hide ALL action buttons when text is selected (including separator and save), but keep checkbox visible */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-save,
 .show-format-buttons .btn-favorite, 
@@ -160,6 +160,56 @@ body {
 .show-format-buttons .btn-info, 
 .show-format-buttons .btn-trash {
     display: none !important;
+}
+
+/* Keep checkbox always visible, even when text is selected */
+.show-format-buttons .btn-checkbox {
+    display: flex !important;
+}
+
+/* Styles pour les cases à cocher sur mobile */
+.noteentry label {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.noteentry label input[type="checkbox"] {
+    cursor: pointer !important;
+    transform: scale(1.2) !important; /* Légèrement plus grand sur mobile */
+    margin: 0 12px 0 0 !important; /* Plus d'espace sur mobile */
+}
+
+.noteentry label span[contenteditable="true"] {
+    outline: none !important;
+    border: none !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text !important;
+    font-size: 16px !important; /* Taille adaptée au mobile */
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    min-width: 20px !important;
+}
+
+.noteentry label span[contenteditable="true"]:focus {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    border-radius: 2px !important;
+}
+
+.noteentry label span[contenteditable="true"]:empty:before {
+    content: "Tapez votre tâche ici" !important;
+    color: #999 !important;
+    font-style: italic !important;
+}
+
+/* Style pour les tâches cochées sur mobile */
+.noteentry label:has(input[type="checkbox"]:checked) span {
+    text-decoration: line-through !important;
+    opacity: 0.6 !important;
+    color: #6c757d !important;
 }
 
 /* Increase text size for code blocks on mobile */

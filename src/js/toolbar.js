@@ -124,6 +124,91 @@ function toggleCodeBlock() {
   }, 100);
 }
 
+function insertCheckbox() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  const noteentry = container.closest && container.closest('.noteentry');
+  
+  if (!noteentry) return;
+  
+  // Créer la case à cocher avec du texte éditable
+  try {
+    const checkboxHTML = '<label style="display: inline-flex; align-items: center; margin: 0; cursor: pointer;"><input type="checkbox" style="margin-right: 8px;" onchange="this.closest(\'.noteentry\').dispatchEvent(new Event(\'input\', {bubbles:true}))"> <span contenteditable="true" style="white-space: nowrap; outline: none;"></span></label><br>';
+    const success = document.execCommand('insertHTML', false, checkboxHTML);
+    
+    if (success) {
+      // Déclenche un événement input
+      noteentry.dispatchEvent(new Event('input', {bubbles:true}));
+      return;
+    }
+  } catch (e) {
+    // execCommand a échoué, utiliser l'approche manuelle
+  }
+  
+  // Fallback : insertion manuelle
+  const checkboxContainer = document.createElement('label');
+  checkboxContainer.style.display = 'inline-flex';
+  checkboxContainer.style.alignItems = 'center';
+  checkboxContainer.style.margin = '0';
+  checkboxContainer.style.cursor = 'pointer';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.style.marginRight = '8px';
+  checkbox.onchange = function() {
+    this.closest('.noteentry').dispatchEvent(new Event('input', {bubbles:true}));
+  };
+  
+  const textSpan = document.createElement('span');
+  textSpan.contentEditable = 'true';
+  textSpan.style.whiteSpace = 'nowrap';
+  textSpan.style.outline = 'none';
+  textSpan.textContent = ''; // Texte vide par défaut
+  
+  const lineBreak = document.createElement('br');
+  
+  checkboxContainer.appendChild(checkbox);
+  checkboxContainer.appendChild(textSpan);
+  
+  // Déclencher un événement beforeinput pour l'historique d'annulation
+  const beforeInputEvent = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+    inputType: 'insertText',
+    data: null
+  });
+  
+  if (noteentry.dispatchEvent(beforeInputEvent)) {
+    // Insérer l'élément
+    if (!range.collapsed) {
+      range.deleteContents();
+    }
+    range.insertNode(lineBreak);
+    range.insertNode(checkboxContainer);
+    
+    // Positionner le curseur après l'élément inséré
+    range.setStartAfter(lineBreak);
+    range.setEndAfter(lineBreak);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    
+    // Déclencher l'événement input
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      inputType: 'insertText',
+      data: null
+    });
+    noteentry.dispatchEvent(inputEvent);
+  }
+}
+
+// S'assurer que la fonction est disponible dans le scope global
+window.insertCheckbox = insertCheckbox;
+
 function insertSeparator() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
@@ -186,6 +271,9 @@ function insertSeparator() {
   }
 }
 
+// S'assurer que les fonctions sont disponibles dans le scope global
+window.insertSeparator = insertSeparator;
+
 // ==============================================
 // MOBILE TOOLBAR BEHAVIOR (affichage conditionnel)
 // ==============================================
@@ -247,3 +335,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// S'assurer que toutes les fonctions de toolbar sont disponibles dans le scope global
+window.addLinkToNote = addLinkToNote;
+window.toggleRedColor = toggleRedColor;
+window.toggleYellowHighlight = toggleYellowHighlight;
+window.changeFontSize = changeFontSize;
+window.toggleCodeBlock = toggleCodeBlock;

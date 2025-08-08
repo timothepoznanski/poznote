@@ -1635,6 +1635,56 @@ hr {
     color: #ffe066 !important;
 }
 
+.toolbar-btn i.fas.fa-check-square {
+    color: #007DB8 !important; /* Même couleur que les autres boutons */
+}
+
+.toolbar-btn:hover i.fas.fa-check-square,
+.toolbar-btn:focus i.fas.fa-check-square {
+    color: #005a8a !important; /* Couleur hover comme les autres boutons */
+}
+
+/* Styles pour les cases à cocher dans les notes */
+.noteentry label {
+    user-select: none;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.noteentry label input[type="checkbox"] {
+    cursor: pointer;
+    transform: scale(1.1);
+    margin: 0 8px 0 0 !important;
+}
+
+.noteentry label span[contenteditable="true"] {
+    outline: none;
+    border: none;
+    user-select: text;
+    cursor: text;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 20px;
+}
+
+.noteentry label span[contenteditable="true"]:focus {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 2px;
+}
+
+.noteentry label span[contenteditable="true"]:empty:before {
+    content: "Tapez votre tâche ici";
+    color: #999;
+    font-style: italic;
+}
+
+/* Style pour les tâches cochées */
+.noteentry label:has(input[type="checkbox"]:checked) span {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #6c757d;
+}
+
 /* FOLDER STYLES */
 
 .folder-header {

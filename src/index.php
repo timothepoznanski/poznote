@@ -747,6 +747,7 @@ if($note != '') {
                 
                 // Boutons d'actions sur la note (desktop seulement)
                 if (!$is_mobile) {
+                    echo '<button type="button" class="toolbar-btn btn-checkbox note-action-btn" title="Add checkbox" onclick="insertCheckbox()"><i class="fas fa-check-square"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                 }
