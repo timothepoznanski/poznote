@@ -46,27 +46,40 @@ REQUIREMENTS:
 }
 
 # Check Docker installation and status
-function Test-Docker {
+function Test-DockerInstallation {
     try {
-        # Check if Docker is available and running
-        Write-Status "Checking if Docker is available..."
+        Write-Status "Checking if Docker is installed..."
         $dockerVersion = & docker --version 2>&1
         if ($LASTEXITCODE -ne 0) { 
-            throw "Docker command failed with exit code $LASTEXITCODE" 
+            Write-Error "Docker is not installed or not accessible."
+            Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
+            Write-Host "Error details: $dockerVersion" -ForegroundColor $Colors.Red
+            return $false
         }
-        Write-Status "Docker version: $dockerVersion"
-        
-        Write-Status "Checking if Docker is running..."
+        Write-Success "Docker is installed: $dockerVersion"
+        return $true
+    }
+    catch {
+        Write-Error "Failed to check Docker installation."
+        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
+        Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
+        return $false
+    }
+}
+
+function Test-DockerRunning {
+    try {
+        Write-Status "Checking if Docker Desktop is running..."
         $dockerInfo = & docker info 2>&1
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "Docker is installed but not running."
+            Write-Error "Docker Desktop is not running."
             Write-Host "Please start Docker Desktop and wait for it to be ready, then run this script again." -ForegroundColor $Colors.Yellow
             Write-Host "Docker info error: $dockerInfo" -ForegroundColor $Colors.Red
             return $false
         }
         
         # Verify Docker functionality
-        Write-Status "Verifying Docker functionality..."
+        Write-Status "Verifying Docker daemon functionality..."
         $testOutput = & docker ps 2>&1
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Docker daemon is not responding properly."
@@ -75,28 +88,65 @@ function Test-Docker {
             return $false
         }
         
-        # Check Docker Compose
-        Write-Status "Checking Docker Compose..."
-        $composeVersion = & docker compose version 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Status "Trying legacy docker-compose..."
-            $composeVersion = & docker-compose --version 2>&1
-            if ($LASTEXITCODE -ne 0) { 
-                throw "Docker Compose not found. Exit codes: compose=$LASTEXITCODE" 
-            }
-        }
-        Write-Status "Docker Compose version: $composeVersion"
-        
-        Write-Success "Docker and Docker Compose are installed and running"
+        Write-Success "Docker Desktop is running and functional"
         return $true
     }
     catch {
-        Write-Error "Docker or Docker Compose is not installed or not accessible."
+        Write-Error "Failed to check Docker Desktop status."
         Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
-        Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
-        Write-Host "Make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
+        Write-Host "Please make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
         return $false
     }
+}
+
+function Test-DockerCompose {
+    try {
+        Write-Status "Checking Docker Compose availability..."
+        $composeVersion = & docker compose version 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Status "Modern 'docker compose' not found, trying legacy 'docker-compose'..."
+            $composeVersion = & docker-compose --version 2>&1
+            if ($LASTEXITCODE -ne 0) { 
+                Write-Error "Docker Compose is not available."
+                Write-Host "Neither 'docker compose' nor 'docker-compose' commands work." -ForegroundColor $Colors.Red
+                Write-Host "Please make sure Docker Desktop is properly installed with Compose plugin." -ForegroundColor $Colors.Yellow
+                Write-Host "Error details: $composeVersion" -ForegroundColor $Colors.Red
+                return $false
+            } else {
+                Write-Warning "Using legacy docker-compose command"
+            }
+        }
+        Write-Success "Docker Compose is available: $composeVersion"
+        return $true
+    }
+    catch {
+        Write-Error "Failed to check Docker Compose."
+        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
+        Write-Host "Please make sure Docker Desktop is properly installed with Compose plugin." -ForegroundColor $Colors.Yellow
+        return $false
+    }
+}
+
+function Test-Docker {
+    Write-Status "Performing Docker environment checks..."
+    
+    # Check Docker installation
+    if (-not (Test-DockerInstallation)) { 
+        return $false 
+    }
+    
+    # Check if Docker Desktop is running
+    if (-not (Test-DockerRunning)) { 
+        return $false 
+    }
+    
+    # Check Docker Compose
+    if (-not (Test-DockerCompose)) { 
+        return $false 
+    }
+    
+    Write-Success "All Docker components are ready!"
+    return $true
 }
 
 # Check if this is an existing installation
