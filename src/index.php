@@ -745,9 +745,11 @@ if($note != '') {
                 echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fas fa-code"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fas fa-eraser"></i></button>';
                 
+                // Bouton checkbox toujours disponible (desktop et mobile)
+                echo '<button type="button" class="toolbar-btn btn-checkbox'.$note_action_class.'" title="Add checkbox" onclick="insertCheckbox()"><i class="fas fa-check-square"></i></button>';
+                
                 // Boutons d'actions sur la note (desktop seulement)
                 if (!$is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-checkbox note-action-btn" title="Add checkbox" onclick="insertCheckbox()"><i class="fas fa-check-square"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                 }

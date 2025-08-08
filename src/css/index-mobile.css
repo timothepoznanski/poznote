@@ -150,7 +150,8 @@ body {
     display: flex !important;
 }
 
-/* Hide ALL action buttons when text is selected (including separator and save), but keep checkbox visible */
+/* Hide ALL action buttons when text is selected (including checkbox, separator and save) */
+.show-format-buttons .btn-checkbox,
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-save,
 .show-format-buttons .btn-favorite, 
@@ -160,11 +161,6 @@ body {
 .show-format-buttons .btn-info, 
 .show-format-buttons .btn-trash {
     display: none !important;
-}
-
-/* Keep checkbox always visible, even when text is selected */
-.show-format-buttons .btn-checkbox {
-    display: flex !important;
 }
 
 /* Styles pour les cases à cocher sur mobile */
