@@ -46,6 +46,13 @@
 	if($con->query($query)) {
 		die(formatDateTime(strtotime($updated_date))); // If writing the query in base is ok then we exit
 	} else {
-		die('Database error occurred');
+		// Return error details as JSON
+		header('Content-Type: application/json');
+		echo json_encode([
+			'status' => 'error',
+			'message' => 'Database error: ' . $con->error,
+			'query_error' => mysqli_error($con)
+		]);
+		die();
 	}
 ?>

@@ -479,17 +479,36 @@ function updatenote(){
     })
     .then(response => response.text())
     .then(function(data) {
-        if(data=='1') {
-            editedButNotSaved = 0;
-            var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
-            if (lastUpdatedElem) lastUpdatedElem.innerHTML = 'Last Saved Today';
-        } else {
-            editedButNotSaved = 0;
-            var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
-            if (lastUpdatedElem) lastUpdatedElem.innerHTML = data;
+        try {
+            // Try to parse as JSON first (for error responses)
+            var jsonData = JSON.parse(data);
+            if (jsonData.status === 'error') {
+                showNotificationPopup('Error saving note: ' + jsonData.message, 'error');
+                editedButNotSaved = 1; // Keep the edited flag since save failed
+                updateNoteEnCours = 0;
+                setSaveButtonRed(true); // Keep save button red to indicate unsaved changes
+                return;
+            }
+        } catch(e) {
+            // If not JSON, treat as normal response (date string or '1')
+            if(data=='1') {
+                editedButNotSaved = 0;
+                var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
+                if (lastUpdatedElem) lastUpdatedElem.innerHTML = 'Last Saved Today';
+            } else {
+                editedButNotSaved = 0;
+                var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
+                if (lastUpdatedElem) lastUpdatedElem.innerHTML = data;
+            }
+            updateNoteEnCours = 0;
+            setSaveButtonRed(false);
         }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error while saving: ' + error.message, 'error');
+        editedButNotSaved = 1; // Keep the edited flag since save failed
         updateNoteEnCours = 0;
-        setSaveButtonRed(false);
+        setSaveButtonRed(true); // Keep save button red to indicate unsaved changes
     });
     var newNotesElem = document.getElementById('newnotes');
     if (newNotesElem) {
@@ -535,11 +554,24 @@ function deleteNote(iid){
     })
     .then(response => response.text())
     .then(function(data) {
-        if(data=='1') {
-            window.location.href = "index.php";
-        } else {
-            showNotificationPopup(data, 'error');
+        try {
+            // Try to parse as JSON first (for error responses)
+            var jsonData = JSON.parse(data);
+            if (jsonData.status === 'error') {
+                showNotificationPopup('Error deleting note: ' + jsonData.message, 'error');
+                return;
+            }
+        } catch(e) {
+            // If not JSON, treat as normal response
+            if(data=='1') {
+                window.location.href = "index.php";
+            } else {
+                showNotificationPopup('Error deleting note: ' + data, 'error');
+            }
         }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error while deleting: ' + error.message, 'error');
     });
 }
 

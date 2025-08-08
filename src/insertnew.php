@@ -26,7 +26,7 @@ if ($stmt->execute()) {
 } else {
 	echo json_encode([
 		'status' => 0,
-		'error' => 'Database error occurred'
+		'error' => 'Database error: ' . $con->error
 	]);
 }
 ?>
