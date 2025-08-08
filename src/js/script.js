@@ -593,7 +593,7 @@ function deleteNote(iid){
 // The functions below trigger the `update()` function when a note is modified. This simply sets a flag indicating that the note has been modified, but it does not save the changes.
 
 
-// Déclenche update() sur keyup, input, et paste dans .noteentry
+// Triggers update() on keyup, input, and paste in .noteentry
 ['keyup', 'input', 'paste'].forEach(eventType => {
   document.body.addEventListener(eventType, function(e) {
     if (e.target.classList.contains('name_doss')) {
@@ -609,7 +609,7 @@ function deleteNote(iid){
         update();
       }
     } else if (e.target.tagName === 'INPUT') {
-      // Ne déclenche update() que pour les inputs de note
+      // Only trigger update() for note inputs
       if (
         e.target.classList.contains('searchbar') ||
         e.target.id === 'search' ||
@@ -618,7 +618,7 @@ function deleteNote(iid){
       ) {
         return;
       }
-      // On déclenche update() pour les champs de note : titre et tags
+      // We trigger update() for note fields: title and tags
       if (
         e.target.classList.contains('css-title') ||
         (e.target.id && e.target.id.startsWith('inp')) ||
@@ -634,7 +634,7 @@ function deleteNote(iid){
   });
 });
 
-// Réinitialise noteid quand la barre de recherche reçoit le focus
+// Reset noteid when the search bar receives focus
 document.body.addEventListener('focusin', function(e) {
   if (e.target.classList.contains('searchbar') || e.target.id === 'search' || e.target.classList.contains('searchtrash')) {
     noteid = -1;
@@ -668,12 +668,12 @@ function displayEditInProgress(){
     setSaveButtonRed(true);
 }
 
-// Met à jour la couleur du bouton sauvegarder
+// Update the color of the save button
 function setSaveButtonRed(isRed) {
-    // On prend le premier bouton .toolbar-btn qui contient .fa-save
+    // Take the first .toolbar-btn that contains .fa-save
     var saveBtn = document.querySelector('.toolbar-btn > .fa-save')?.parentElement;
     if (!saveBtn) {
-        // fallback: bouton avec icône save
+        // fallback: button with save icon
         var btns = document.querySelectorAll('.toolbar-btn');
         btns.forEach(function(btn){
             if(btn.querySelector && btn.querySelector('.fa-save')) saveBtn = btn;
@@ -802,7 +802,7 @@ function showContactPopup() {
                 </div>
                 <div class="modal-buttons" style="margin-top: 20px;">
                     <button onclick="closeContactModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                        Fermer
+                        Close
                     </button>
                 </div>
             </div>
@@ -1512,7 +1512,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleSettingsMenu(event) {
     event.stopPropagation();
     
-    // Détecter si on est en mode mobile
+    // Detect if we're in mobile mode
     const isMobile = window.innerWidth <= 800;
     const menuId = isMobile ? 'settingsMenuMobile' : 'settingsMenu';
     const menu = document.getElementById(menuId);
@@ -1581,10 +1581,10 @@ function unfoldAllFolders() {
 }
 
 function koFiAction() {
-    // Ouvrir la page Ko-fi dans un nouvel onglet
+    // Open Ko-fi page in a new tab
     window.open('https://ko-fi.com/Q5Q61IECOW', '_blank');
     
-    // Fermer le menu paramètres (both mobile and desktop)
+    // Close settings menu (both mobile and desktop)
     const settingsMenu = document.getElementById('settingsMenu');
     const settingsMenuMobile = document.getElementById('settingsMenuMobile');
     if (settingsMenu) settingsMenu.style.display = 'none';
@@ -1758,11 +1758,11 @@ if (document.readyState === 'loading') {
     addCopyButtonsToCodeBlocks();
 }
 
-// Gestion de l'affichage des boutons de formatage selon la sélection de texte (desktop uniquement)
+// Handling the display of formatting buttons based on text selection (desktop only)
 function initTextSelectionHandlers() {
-    // Vérifier si on est en mode desktop
+    // Check if we're in desktop mode
     if (window.innerWidth <= 800) {
-        return; // Ne pas activer sur mobile
+        return; // Don't activate on mobile
     }
     
     let selectionTimeout;
@@ -1774,22 +1774,22 @@ function initTextSelectionHandlers() {
             const textFormatButtons = document.querySelectorAll('.text-format-btn');
             const noteActionButtons = document.querySelectorAll('.note-action-btn');
             
-            // Vérifier si la sélection contient du texte
+            // Check if the selection contains text
             if (selection && selection.toString().trim().length > 0) {
                 const range = selection.getRangeAt(0);
                 const container = range.commonAncestorContainer;
                 
-                // Améliorer la détection de la zone éditable
+                // Improve detection of editable area
                 let currentElement = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
                 let editableElement = null;
                 
-                // Remonter dans l'arbre DOM pour trouver une zone éditable
+                // Go up the DOM tree to find an editable area
                 let isTitleOrTagField = false;
                 while (currentElement && currentElement !== document.body) {
                     
-                    // Vérifier l'élément actuel et ses enfants directs pour les champs titre/tags
+                    // Check the current element and its direct children for title/tag fields
                     function checkElementAndChildren(element) {
-                        // Vérifier l'élément lui-même
+                        // Check the element itself
                         if (element.classList && 
                             (element.classList.contains('css-title') || 
                              element.classList.contains('add-margin') ||
@@ -1797,7 +1797,7 @@ function initTextSelectionHandlers() {
                             return true;
                         }
                         
-                        // Vérifier les enfants directs (pour le cas <h4><input class="css-title"...></h4>)
+                        // Check direct children (for the case <h4><input class="css-title"...></h4>)
                         if (element.children) {
                             for (let child of element.children) {
                                 if (child.classList && 
@@ -1827,7 +1827,7 @@ function initTextSelectionHandlers() {
                 }
                 
                 if (isTitleOrTagField) {
-                    // Texte sélectionné dans un champ de titre ou de tags : garder l'état normal (actions visibles, formatage caché)
+                    // Text selected in a title or tags field: keep normal state (actions visible, formatting hidden)
                     textFormatButtons.forEach(btn => {
                         btn.classList.remove('show-on-selection');
                     });
@@ -1835,7 +1835,7 @@ function initTextSelectionHandlers() {
                         btn.classList.remove('hide-on-selection');
                     });
                 } else if (editableElement) {
-                    // Texte sélectionné dans une zone éditable : afficher les boutons de formatage, cacher les actions
+                    // Text selected in an editable area: show formatting buttons, hide actions
                     textFormatButtons.forEach(btn => {
                         btn.classList.add('show-on-selection');
                     });
@@ -1843,7 +1843,7 @@ function initTextSelectionHandlers() {
                         btn.classList.add('hide-on-selection');
                     });
                 } else {
-                    // Texte sélectionné mais pas dans une zone éditable : cacher tout
+                    // Text selected but not in an editable area: hide everything
                     textFormatButtons.forEach(btn => {
                         btn.classList.remove('show-on-selection');
                     });
@@ -1852,7 +1852,7 @@ function initTextSelectionHandlers() {
                     });
                 }
             } else {
-                // Pas de sélection de texte : afficher les actions, cacher le formatage
+                // No text selection: show actions, hide formatting
                 textFormatButtons.forEach(btn => {
                     btn.classList.remove('show-on-selection');
                 });
@@ -1860,22 +1860,22 @@ function initTextSelectionHandlers() {
                     btn.classList.remove('hide-on-selection');
                 });
             }
-        }, 50); // Délai court pour éviter les appels trop fréquents
+        }, 50); // Short delay to avoid too frequent calls
     }
     
-    // Écouter les changements de sélection
+    // Listen to selection changes
     document.addEventListener('selectionchange', handleSelectionChange);
     
-    // Écouter aussi les clics pour gérer les cas où la sélection est supprimée
+    // Also listen to clicks to handle cases where selection is removed
     document.addEventListener('click', (e) => {
-        // Attendre un peu pour que la sélection soit mise à jour
+        // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
     
-    // Gérer le redimensionnement de la fenêtre
+    // Handle window resizing
     window.addEventListener('resize', () => {
         if (window.innerWidth <= 800) {
-            // Si on passe en mode mobile, réinitialiser l'état des boutons
+            // If switching to mobile mode, reset button state
             const textFormatButtons = document.querySelectorAll('.text-format-btn');
             const noteActionButtons = document.querySelectorAll('.note-action-btn');
             textFormatButtons.forEach(btn => {
@@ -1885,14 +1885,14 @@ function initTextSelectionHandlers() {
                 btn.classList.remove('hide-on-selection');
             });
         } else {
-            // Si on passe en mode desktop, appliquer la logique de sélection
+            // If switching to desktop mode, apply selection logic
             handleSelectionChange();
         }
     });
 }
 
-// Les gestionnaires de sélection de texte sont désactivés
-// pour éviter le masquage automatique de la toolbar
+// Text selection handlers are disabled
+// to avoid automatic hiding of the toolbar
 document.addEventListener('DOMContentLoaded', initTextSelectionHandlers);
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTextSelectionHandlers);
