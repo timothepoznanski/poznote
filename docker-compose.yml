@@ -30,6 +30,7 @@ services:
   database:
     image: mysql:9.3.0
     restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
     volumes:
       - "./data/mysql:/var/lib/mysql"
     environment:
