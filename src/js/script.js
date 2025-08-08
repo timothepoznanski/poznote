@@ -554,20 +554,34 @@ function deleteNote(iid){
     })
     .then(response => response.text())
     .then(function(data) {
+        var trimmed = (data || '').trim();
+        // Fast path: legacy success response '1'
+        if (trimmed === '1') {
+            window.location.href = "index.php";
+            return;
+        }
+        // Try to parse JSON (could be error or a structured success in future)
         try {
-            // Try to parse as JSON first (for error responses)
-            var jsonData = JSON.parse(data);
-            if (jsonData.status === 'error') {
-                showNotificationPopup('Error deleting note: ' + jsonData.message, 'error');
+            var jsonData = JSON.parse(trimmed);
+            // Case where backend still returns bare 1 (parsed as number) – already handled above, but safety:
+            if (jsonData === 1) {
+                window.location.href = "index.php";
                 return;
             }
-        } catch(e) {
-            // If not JSON, treat as normal response
-            if(data=='1') {
-                window.location.href = "index.php";
-            } else {
-                showNotificationPopup('Error deleting note: ' + data, 'error');
+            if (jsonData && jsonData.status === 'error') {
+                showNotificationPopup('Error deleting note: ' + (jsonData.message || 'Unknown error'), 'error');
+                return;
             }
+            // Allow for future success shape {status: 'ok'} or similar
+            if (jsonData && (jsonData.status === 'ok' || jsonData.status === 'success')) {
+                window.location.href = "index.php";
+                return;
+            }
+            // Fallback: not recognized structure -> redirect if optimistic
+            window.location.href = "index.php";
+        } catch(e) {
+            // Not JSON and not '1' -> show error
+            showNotificationPopup('Error deleting note: ' + trimmed, 'error');
         }
     })
     .catch(function(error) {
