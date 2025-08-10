@@ -119,7 +119,7 @@ body {
 /* Hide formatting buttons by default on mobile */
 .btn-bold, .btn-italic, .btn-underline, .btn-strikethrough,
 .btn-link, .btn-unlink, .btn-color, .btn-highlight,
-.btn-list-ul, .btn-list-ol, .btn-text-height, .btn-code, .btn-eraser {
+.btn-list-ul, .btn-list-ol, .btn-text-height, .btn-code, .btn-inline-code, .btn-eraser {
     display: none !important;
 }
 
@@ -146,6 +146,7 @@ body {
 .show-format-buttons .btn-list-ol, 
 .show-format-buttons .btn-text-height, 
 .show-format-buttons .btn-code, 
+.show-format-buttons .btn-inline-code,
 .show-format-buttons .btn-eraser {
     display: flex !important;
 }

@@ -124,6 +124,52 @@ function toggleCodeBlock() {
   }, 100);
 }
 
+function toggleInlineCode() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  
+  // Vérifier si on est déjà dans un élément code inline
+  const existingCode = container.closest ? container.closest('code') : null;
+  if (existingCode && existingCode.tagName === 'CODE' && existingCode.parentNode.tagName !== 'PRE') {
+    // On est dans un code inline, le retirer
+    const text = existingCode.textContent;
+    existingCode.outerHTML = text;
+    return;
+  }
+  
+  // Si pas de sélection, insérer un code inline vide
+  if (sel.isCollapsed) {
+    document.execCommand('insertHTML', false, '<code></code>');
+    // Positionner le curseur à l'intérieur du code
+    const codeElement = container.querySelector('code:empty') || container.closest('.noteentry').querySelector('code:empty');
+    if (codeElement) {
+      const newRange = document.createRange();
+      newRange.setStart(codeElement, 0);
+      newRange.setEnd(codeElement, 0);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+    return;
+  }
+  
+  // Récupérer le texte sélectionné
+  const selectedText = sel.toString();
+  if (!selectedText.trim()) return;
+  
+  // Échapper le HTML et créer le code inline
+  const escapedText = selectedText
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  
+  const codeHTML = `<code>${escapedText}</code>`;
+  document.execCommand('insertHTML', false, codeHTML);
+}
+
 function insertCheckbox() {
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
@@ -342,3 +388,4 @@ window.toggleRedColor = toggleRedColor;
 window.toggleYellowHighlight = toggleYellowHighlight;
 window.changeFontSize = changeFontSize;
 window.toggleCodeBlock = toggleCodeBlock;
+window.toggleInlineCode = toggleInlineCode;
