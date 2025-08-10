@@ -509,55 +509,7 @@ if($note != '') {
                 } else {
                     // No notes available, create a demo note
                     require_once 'functions.php';
-                    
-                    $demo_heading = "Welcome to " . APP_NAME_DISPLAYED . "!";
-                    $demo_content = "<h3>✨ Welcome to your note-taking app!</h3>
-
-<p>This is a <strong>demo note</strong> to help you get started. Here are some features you can try:</p>
-
-<h4>📝 Text Formatting</h4>
-<ul>
-<li><strong>Bold text</strong> for emphasis</li>
-<li><em>Italic text</em> for style</li>
-<li><u>Underlined text</u> for highlighting</li>
-<li><span style=\"background-color: yellow;\">Highlighted text</span> for important points</li>
-<li><code>Code snippets</code> for technical notes</li>
-</ul>
-
-<h4>✅ Task Management</h4>
-<label><input type=\"checkbox\" checked> Completed task</label><br>
-<label><input type=\"checkbox\"> Task to do</label><br>
-<label><input type=\"checkbox\"> Another pending task</label>
-
-<h4>📋 Lists</h4>
-<ol>
-<li>Numbered lists for ordered items</li>
-<li>Great for step-by-step instructions</li>
-<li>Or any sequential content</li>
-</ol>
-
-<h4>🔗 Links and More</h4>
-<p>You can add <a href=\"https://example.com\">links</a> to your notes.</p>
-
-<hr>
-
-<p><em>💡 Tip: Select text to see formatting options, or use the toolbar buttons to add elements like checkboxes and separators!</em></p>
-
-<p>Start editing this note or create a new one to begin your note-taking journey!</p>";
-                    
-                    $demo_tags = "demo,welcome,tutorial";
-                    $demo_folder = "Getting Started";
-                    
-                    // Insert the demo note
-                    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), NOW())");
-                    $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
-                    $stmt->execute();
-                    $demo_note_id = $stmt->insert_id;
-                    $stmt->close();
-                    
-                    // Create the HTML file for the demo note
-                    $demo_filename = getEntriesRelativePath() . $demo_note_id . ".html";
-                    file_put_contents($demo_filename, $demo_content);
+                    $demo_note_id = createDemoNote($con);
                     
                     // Now fetch the demo note to display it
                     $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
@@ -593,55 +545,7 @@ if($note != '') {
             } else {
                 // No notes available, create a demo note
                 require_once 'functions.php';
-                
-                $demo_heading = "Welcome to " . APP_NAME_DISPLAYED . "!";
-                $demo_content = "<h3>✨ Welcome to your note-taking app!</h3>
-
-<p>This is a <strong>demo note</strong> to help you get started. Here are some features you can try:</p>
-
-<h4>📝 Text Formatting</h4>
-<ul>
-<li><strong>Bold text</strong> for emphasis</li>
-<li><em>Italic text</em> for style</li>
-<li><u>Underlined text</u> for highlighting</li>
-<li><span style=\"background-color: yellow;\">Highlighted text</span> for important points</li>
-<li><code>Code snippets</code> for technical notes</li>
-</ul>
-
-<h4>✅ Task Management</h4>
-<label><input type=\"checkbox\" checked> Completed task</label><br>
-<label><input type=\"checkbox\"> Task to do</label><br>
-<label><input type=\"checkbox\"> Another pending task</label>
-
-<h4>📋 Lists</h4>
-<ol>
-<li>Numbered lists for ordered items</li>
-<li>Great for step-by-step instructions</li>
-<li>Or any sequential content</li>
-</ol>
-
-<h4>🔗 Links and More</h4>
-<p>You can add <a href=\"https://example.com\">links</a> to your notes.</p>
-
-<hr>
-
-<p><em>💡 Tip: Select text to see formatting options, or use the toolbar buttons to add elements like checkboxes and separators!</em></p>
-
-<p>Start editing this note or create a new one to begin your note-taking journey!</p>";
-                
-                $demo_tags = "demo,welcome,tutorial";
-                $demo_folder = "Getting Started";
-                
-                // Insert the demo note
-                $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), NOW())");
-                $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
-                $stmt->execute();
-                $demo_note_id = $stmt->insert_id;
-                $stmt->close();
-                
-                // Create the HTML file for the demo note
-                $demo_filename = getEntriesRelativePath() . $demo_note_id . ".html";
-                file_put_contents($demo_filename, $demo_content);
+                $demo_note_id = createDemoNote($con);
                 
                 // Now fetch the demo note to display it
                 $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
