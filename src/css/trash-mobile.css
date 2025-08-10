@@ -8,6 +8,7 @@
     
     html {
         overflow: auto !important;
+        overflow-y: scroll !important;
         height: auto !important;
         position: static !important;
         max-height: none !important;
@@ -17,6 +18,7 @@
     
     body {
         overflow: auto !important;
+        overflow-y: scroll !important;
         height: auto !important;
         position: static !important;
         max-height: none !important;
@@ -25,7 +27,7 @@
     }
     
     body.trash-page {
-        overflow-y: auto !important;
+        overflow-y: scroll !important;
         overflow-x: hidden !important;
         height: auto !important;
         min-height: 100vh !important;

@@ -1,7 +1,7 @@
 /* Styles pour la page trash */
 
 html {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: auto;
 }
 
@@ -11,7 +11,7 @@ body.trash-page {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     position: static;
     display: block;
