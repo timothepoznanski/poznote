@@ -90,7 +90,7 @@ function getAttachmentsRelativePath() {
  */
 function createDemoNote($con) {
     // Create the first demo note (kitchen renovation)
-    $demo_heading = "Kitchen Renovation Project Ideas";
+    $demo_heading = "DEMO : Kitchen Renovation Project Ideas";
     $demo_content = "Planning a major home renovation can be both exciting and overwhelming. Here's my current progress on transforming our outdated kitchen into a modern, functional space.
 
 <p><img src=\"https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80\" alt=\"Modern kitchen\" style=\"width: 100%; max-width: 500px; border-radius: 8px; margin-bottom: 1rem;\"></p>
@@ -157,7 +157,7 @@ Kitchen Design Co: <a href=\"https://www.kitchendesign.com\">www.kitchendesign.c
  * Returns the ID of the created demo note
  */
 function createTechDemoNote($con) {
-    $demo_heading = "Web Development Project Setup";
+    $demo_heading = "DEMO : Web Development Project Setup";
     $demo_content = "Setting up a new full-stack web application with modern tools and best practices. This project will serve as a foundation for <span style=\"color: red;\">future development work</span>.
 
 <p><img src=\"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80\" alt=\"Code on screen\" style=\"width: 100%; max-width: 500px; border-radius: 8px; margin-bottom: 1rem;\"></p>
@@ -197,7 +197,7 @@ function createTechDemoNote($con) {
 <code>npm test</code> - Run test suite</p>
 
 <h4>Sample API endpoint:</h4>
-<pre><code>// Express.js route for user authentication
+<pre>// Express.js route for user authentication
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   
@@ -218,9 +218,9 @@ app.post('/api/auth/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-</code></pre>
+</pre>
 
-<hr>
+<br><hr><br>
 
 <h4>🔗 Resources</h4>
 <p>Documentation: <a href=\"https://react.dev\">React Official Docs</a><br>
