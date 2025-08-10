@@ -1,8 +1,50 @@
 /* Styles pour la page trash */
 
+/* Override des règles globales qui cachent les scrollbars */
+body.trash-page {
+    scrollbar-width: auto !important; /* Firefox - Override global rule */
+    -ms-overflow-style: scrollbar !important; /* Internet Explorer 10+ - Override global rule */
+}
+
+body.trash-page::-webkit-scrollbar {
+    display: block !important; /* Override global rule that hides scrollbars */
+    width: 8px !important;
+    background-color: #f1f1f1 !important;
+}
+
+body.trash-page::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1 !important;
+    border-radius: 8px !important;
+}
+
+body.trash-page::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8 !important;
+}
+
 html {
     overflow-y: scroll;
-    height: auto;
+    height: 100%;
+}
+
+/* Override global rules for html on trash page */
+body.trash-page html {
+    scrollbar-width: auto !important;
+    -ms-overflow-style: scrollbar !important;
+}
+
+body.trash-page html::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    background-color: #f1f1f1 !important;
+}
+
+body.trash-page html::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1 !important;
+    border-radius: 8px !important;
+}
+
+body.trash-page html::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8 !important;
 }
 
 body.trash-page {
@@ -11,18 +53,19 @@ body.trash-page {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    overflow-y: scroll;
+    height: 100%;
+    overflow-y: scroll !important;
     overflow-x: hidden;
     position: static;
     display: block;
-    height: auto;
     max-height: none;
     box-sizing: border-box;
 }
 
 .trash-container {
-    min-height: 100vh;
+    min-height: calc(100vh + 1px); /* Force scroll by making content slightly taller */
     position: relative;
+    padding-bottom: 50px; /* Extra space to ensure scrolling */
 }
 
 .trash-header {
