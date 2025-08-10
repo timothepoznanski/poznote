@@ -124,7 +124,7 @@ function createDemoNote($con) {
 
 <p><strong>Total estimated:</strong> $56,500</p>
 
-<hr>
+<br><hr><br>
 
 <h4>📞 Useful contacts</h4>
 <p>Architect: <a href=\"tel:5551234567\">Sarah Johnson - (555) 123-4567</a><br>
