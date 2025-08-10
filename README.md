@@ -101,8 +101,8 @@ The script will automatically:
 ### Linux/macOS
 
 **Prerequisites:**
-- **[Docker Engine](https://docs.docker.com/engine/install/)** (v20.10+)
-- **[Docker Compose](https://docs.docker.com/compose/install/)** (v2.0+)
+- **[Docker Engine](https://docs.docker.com/engine/install/)**
+- **[Docker Compose](https://docs.docker.com/compose/install/)**
 
 #### Option 1: Automated Setup
 
