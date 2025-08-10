@@ -507,24 +507,32 @@ if($note != '') {
                         $res_right->data_seek(0);
                     }
                 } else {
-                    // No notes available, create a demo note
+                    // No notes available, try to create demo notes
                     require_once 'functions.php';
                     $demo_note_id = createDemoNote($con);
                     
-                    // Now fetch the demo note to display it
-                    $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
-                    if($res_right && $res_right->num_rows > 0) {
-                        $latest_note = $res_right->fetch_assoc();
-                        $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                        // Reset the result pointer for display
-                        $res_right->data_seek(0);
-                        
-                        // Redirect to the demo note to refresh the page with the new note
-                        echo "<script>
-                        // Redirect to show the demo note regardless of current URL state
-                        window.location.href = 'index.php?note=" . $demo_note_id . "';
-                        </script>";
+                    // If demo notes were created, display them
+                    if ($demo_note_id !== null) {
+                        // Now fetch the demo note to display it
+                        $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
+                        if($res_right && $res_right->num_rows > 0) {
+                            $latest_note = $res_right->fetch_assoc();
+                            $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                            // Reset the result pointer for display
+                            $res_right->data_seek(0);
+                            
+                            // Redirect to the demo note to refresh the page with the new note
+                            echo "<script>
+                            // Redirect to show the demo note regardless of current URL state
+                            window.location.href = 'index.php?note=" . $demo_note_id . "';
+                            </script>";
+                        }
+                    } else {
+                        // Demo notes were not created (already exist in trash)
+                        // Initialize $res_right as empty result to avoid undefined variable error
+                        $res_right = null;
                     }
+                    // If demo notes were not created (already exist in trash), do nothing
                 }
             }
         } else {
@@ -543,24 +551,33 @@ if($note != '') {
                     $res_right->data_seek(0);
                 }
             } else {
-                // No notes available, create a demo note
+                // No notes available, try to create demo notes
                 require_once 'functions.php';
                 $demo_note_id = createDemoNote($con);
                 
-                // Now fetch the demo note to display it
-                $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
-                if($res_right && $res_right->num_rows > 0) {
-                    $latest_note = $res_right->fetch_assoc();
-                    $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                    // Reset the result pointer for display
-                    $res_right->data_seek(0);
-                    
-                    // Redirect to the demo note to refresh the page with the new note
-                    echo "<script>
-                    // Redirect to show the demo note regardless of current URL state
-                    window.location.href = 'index.php?note=" . $demo_note_id . "';
-                    </script>";
+                // If demo notes were created, display them
+                if ($demo_note_id !== null) {
+                    // Now fetch the demo note to display it
+                    $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
+                    if($res_right && $res_right->num_rows > 0) {
+                        $latest_note = $res_right->fetch_assoc();
+                        $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                        // Reset the result pointer for display
+                        $res_right->data_seek(0);
+                        
+                        // Redirect to the demo note to refresh the page with the new note
+                        echo "<script>
+                        // Redirect to show the demo note regardless of current URL state
+                        window.location.href = 'index.php?note=" . $demo_note_id . "';
+                        </script>";
+                    }
+                } else {
+                    // Demo notes were not created (already exist in trash)
+                    // Initialize $res_right as empty result to avoid undefined variable error
+                    $res_right = null;
                 }
+                // If demo notes were not created (already exist in trash), do nothing
+                // The page will show the welcome screen instead
             }
         }
     ?>

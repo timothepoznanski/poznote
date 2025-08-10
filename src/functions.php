@@ -89,6 +89,18 @@ function getAttachmentsRelativePath() {
  * Returns the ID of the tech demo note (development note)
  */
 function createDemoNote($con) {
+    // Check if demo notes already exist in trash - if so, don't recreate them
+    $check_demo_query = "SELECT COUNT(*) as demo_count FROM entries WHERE 
+        (heading = 'Kitchen Renovation Project Ideas' OR heading = 'Web Development Project Setup') 
+        AND trash = 1";
+    $check_result = $con->query($check_demo_query);
+    $demo_count = $check_result->fetch_assoc()['demo_count'];
+    
+    // If demo notes exist in trash, don't recreate them - return null
+    if ($demo_count > 0) {
+        return null;
+    }
+    
     // Create the first demo note (kitchen renovation)
     $demo_heading = "Kitchen Renovation Project Ideas";
     $demo_content = "Planning a major home renovation can be both exciting and overwhelming. Here's my current progress on transforming our outdated kitchen into a modern, functional space.
