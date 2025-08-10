@@ -649,7 +649,16 @@ if($note != '') {
                 
                 // Determine if this folder should be open
                 $should_be_open = false;
-                if($is_search_mode) {
+                
+                // Check if we have very few notes (likely just created demo notes)
+                $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
+                $total_notes_result = $con->query($total_notes_query);
+                $total_notes = $total_notes_result->fetch_assoc()['total'];
+                
+                if($total_notes <= 3) {
+                    // If we have very few notes (demo notes just created), open all folders
+                    $should_be_open = true;
+                } else if($is_search_mode) {
                     // In search mode: open folders that have results
                     $should_be_open = isset($folders_with_results[$folderName]);
                 } else if($note != '') {

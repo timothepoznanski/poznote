@@ -86,11 +86,11 @@ function getAttachmentsRelativePath() {
 
 /**
  * Create demo notes when no notes exist
- * Returns the ID of the first created demo note
+ * Returns the ID of the tech demo note (development note)
  */
 function createDemoNote($con) {
     // Create the first demo note (kitchen renovation)
-    $demo_heading = "DEMO : Kitchen Renovation Project Ideas";
+    $demo_heading = "Kitchen Renovation Project Ideas";
     $demo_content = "Planning a major home renovation can be both exciting and overwhelming. Here's my current progress on transforming our outdated kitchen into a modern, functional space.
 
 <p><img src=\"https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80\" alt=\"Modern kitchen\" style=\"width: 100%; max-width: 500px; border-radius: 8px; margin-bottom: 1rem;\"></p>
@@ -135,8 +135,8 @@ Kitchen Design Co: <a href=\"https://www.kitchendesign.com\">www.kitchendesign.c
     $demo_tags = "home,renovation,project,kitchen";
     $demo_folder = "Personal Projects";
     
-    // Insert the first demo note
-    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), NOW())");
+    // Insert the first demo note with favorite = 1
+    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, favorite, created, updated) VALUES (?, ?, ?, 1, NOW(), NOW())");
     $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
     $stmt->execute();
     $first_demo_note_id = $stmt->insert_id;
@@ -146,10 +146,11 @@ Kitchen Design Co: <a href=\"https://www.kitchendesign.com\">www.kitchendesign.c
     $demo_filename = getEntriesRelativePath() . $first_demo_note_id . ".html";
     file_put_contents($demo_filename, $demo_content);
     
-    // Create the second demo note (tech)
+    // Create the second demo note (tech) - this will be the selected one
     $tech_demo_id = createTechDemoNote($con);
     
-    return $first_demo_note_id;
+    // Return the tech demo ID so it gets selected by default
+    return $tech_demo_id;
 }
 
 /**
@@ -157,7 +158,7 @@ Kitchen Design Co: <a href=\"https://www.kitchendesign.com\">www.kitchendesign.c
  * Returns the ID of the created demo note
  */
 function createTechDemoNote($con) {
-    $demo_heading = "DEMO : Web Development Project Setup";
+    $demo_heading = "Web Development Project Setup";
     $demo_content = "Setting up a new full-stack web application with modern tools and best practices. This project will serve as a foundation for <span style=\"color: red;\">future development work</span>.
 
 <p><img src=\"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80\" alt=\"Code on screen\" style=\"width: 100%; max-width: 500px; border-radius: 8px; margin-bottom: 1rem;\"></p>
@@ -231,8 +232,8 @@ Repository: <a href=\"https://github.com/user/project\">GitHub Project</a></p>
     $demo_tags = "development,web,react,typescript,project";
     $demo_folder = "Development";
     
-    // Insert the demo note with favorite = 1
-    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, favorite, created, updated) VALUES (?, ?, ?, 1, NOW(), NOW())");
+    // Insert the demo note (not favorite)
+    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 SECOND))");
     $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
     $stmt->execute();
     $demo_note_id = $stmt->insert_id;
