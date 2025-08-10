@@ -508,6 +508,8 @@ if($note != '') {
                     }
                 } else {
                     // No notes available, create a demo note
+                    require_once 'functions.php';
+                    
                     $demo_heading = "Welcome to " . APP_NAME_DISPLAYED . "!";
                     $demo_content = "<h3>✨ Welcome to your note-taking app!</h3>
 
@@ -547,11 +549,15 @@ if($note != '') {
                     $demo_folder = "Getting Started";
                     
                     // Insert the demo note
-                    $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, created, updated) VALUES (?, ?, ?, ?, NOW(), NOW())");
-                    $stmt->bind_param('ssss', $demo_heading, $demo_content, $demo_tags, $demo_folder);
+                    $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), NOW())");
+                    $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
                     $stmt->execute();
                     $demo_note_id = $stmt->insert_id;
                     $stmt->close();
+                    
+                    // Create the HTML file for the demo note
+                    $demo_filename = getEntriesRelativePath() . $demo_note_id . ".html";
+                    file_put_contents($demo_filename, $demo_content);
                     
                     // Now fetch the demo note to display it
                     $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
@@ -563,9 +569,8 @@ if($note != '') {
                         
                         // Redirect to the demo note to refresh the page with the new note
                         echo "<script>
-                        if (window.location.search === '' || window.location.search === '?') {
-                            window.location.href = 'index.php?note=" . $demo_note_id . "';
-                        }
+                        // Redirect to show the demo note regardless of current URL state
+                        window.location.href = 'index.php?note=" . $demo_note_id . "';
                         </script>";
                     }
                 }
@@ -587,6 +592,8 @@ if($note != '') {
                 }
             } else {
                 // No notes available, create a demo note
+                require_once 'functions.php';
+                
                 $demo_heading = "Welcome to " . APP_NAME_DISPLAYED . "!";
                 $demo_content = "<h3>✨ Welcome to your note-taking app!</h3>
 
@@ -626,11 +633,15 @@ if($note != '') {
                 $demo_folder = "Getting Started";
                 
                 // Insert the demo note
-                $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, created, updated) VALUES (?, ?, ?, ?, NOW(), NOW())");
-                $stmt->bind_param('ssss', $demo_heading, $demo_content, $demo_tags, $demo_folder);
+                $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, created, updated) VALUES (?, ?, ?, NOW(), NOW())");
+                $stmt->bind_param('sss', $demo_heading, $demo_tags, $demo_folder);
                 $stmt->execute();
                 $demo_note_id = $stmt->insert_id;
                 $stmt->close();
+                
+                // Create the HTML file for the demo note
+                $demo_filename = getEntriesRelativePath() . $demo_note_id . ".html";
+                file_put_contents($demo_filename, $demo_content);
                 
                 // Now fetch the demo note to display it
                 $res_right = $con->query("SELECT * FROM entries WHERE id = $demo_note_id");
@@ -642,9 +653,8 @@ if($note != '') {
                     
                     // Redirect to the demo note to refresh the page with the new note
                     echo "<script>
-                    if (window.location.search === '' || window.location.search === '?') {
-                        window.location.href = 'index.php?note=" . $demo_note_id . "';
-                    }
+                    // Redirect to show the demo note regardless of current URL state
+                    window.location.href = 'index.php?note=" . $demo_note_id . "';
                     </script>";
                 }
             }
