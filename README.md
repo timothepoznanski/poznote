@@ -20,17 +20,9 @@ A powerful note-taking tool with full control over your data.
 - 🗑️ Trash System
 - 🌐 REST API
 
-## Demo
+![alt text](image.png)
 
-Try Poznote without installing anything! A live demo is available at:
-
-**🌐 Demo URL:** [https://poznote.com](https://poznote.com)
-
-**Login credentials:**
-- **Username:** `admin`
-- **Password:** `poznote!demo`
-
-*Note: The demo environment is reset periodically. Any notes you create will not be permanently saved.*
+![alt text](image-1.png)
 
 ## Table of Contents
 
