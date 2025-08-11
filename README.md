@@ -413,6 +413,16 @@ http://YOUR_SERVER:HTTP_WEB_PORT/
 
 ### 🛠️ Available Endpoints
 
+**Quick Reference:**
+- `GET /api_list_notes.php` - List all notes
+- `POST /api_create_note.php` - Create a new note
+- `POST /api_create_folder.php` - Create a new folder
+- `POST /api_move_note.php` - Move note to folder
+- `DELETE /api_delete_note.php` - Delete note (soft/permanent)
+- `DELETE /api_delete_folder.php` - Delete folder
+
+---
+
 #### 📋 List Notes
 
 **Retrieves all your notes with their metadata.**
