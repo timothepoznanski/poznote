@@ -7,10 +7,10 @@ RUN docker-php-ext-install mysqli
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev \
-    zip \
-    vim \
     default-mysql-client \
-    && docker-php-ext-install zip
+    && docker-php-ext-install mysqli zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy apache config
 COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
@@ -21,9 +21,7 @@ COPY php.ini /usr/local/etc/php/
 # Note: Source files are mounted as volumes, not copied
 
 # Create directories for data volumes with proper permissions
-RUN mkdir -p /var/www/html/entries /var/www/html/attachments && \
-    chown -R www-data:www-data /var/www/html && \
-    chmod -R 777 /var/www/html
+RUN mkdir -p /var/www/html/entries /var/www/html/attachments 
 
 # Enable Apache mod_rewrite if needed
 RUN a2enmod rewrite
