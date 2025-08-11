@@ -357,15 +357,31 @@ docker compose exec -T database mysql -u root -psfs466sfdgGH poznote_db < backup
 
 ## API
 
-Poznote provides a RESTful API for programmatic access to your notes.
+Poznote provides a comprehensive REST API for programmatic access to your notes and folders.
 
-### Authentication
+### 🔐 Authentication
 
-All API requests require authentication using the same credentials configured in your `.env` file for each instance.
+All API requests require HTTP Basic authentication using the same credentials configured in your `.env` file.
 
-### HTTP Response Codes
+**Authentication format:**
+```bash
+curl -u username:password http://localhost:8040/api_endpoint.php
+```
 
-The API uses standard HTTP status codes to indicate the success or failure of requests:
+### 📡 Base URL
+
+The API is accessible at your Poznote instance address:
+```
+http://YOUR_SERVER:HTTP_WEB_PORT/
+```
+
+**Examples:**
+- `http://localhost:8040/` (local installation)
+- `http://myserver.com:8040/` (remote server)
+
+### 📝 Response Format
+
+#### HTTP Status Codes
 
 | Code | Status | Description |
 |------|--------|-------------|
@@ -378,7 +394,7 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 | **409** | Conflict | Resource already exists (duplicate folder name) |
 | **500** | Internal Server Error | Server error (database issues, file system errors) |
 
-**Error Response Format:**
+#### Error Response Format
 ```json
 {
   "error": "Error message description",
@@ -386,7 +402,7 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 }
 ```
 
-**Success Response Format:**
+#### Success Response Format
 ```json
 {
   "success": true,
@@ -395,9 +411,12 @@ The API uses standard HTTP status codes to indicate the success or failure of re
 }
 ```
 
-### Available Endpoints
+### 🛠️ Available Endpoints
 
-#### List Notes
+#### 📋 List Notes
+
+**Retrieves all your notes with their metadata.**
+
 ```bash
 curl -u username:password http://localhost:8040/api_list_notes.php
 ```
@@ -411,19 +430,37 @@ curl -u username:password http://localhost:8040/api_list_notes.php
       "id": "123",
       "heading": "My Note",
       "tags": "personal,important",
-      "created": "2025-01-15 10:30:00"
+      "folder": "Projects",
+      "created": "2025-01-15 10:30:00",
+      "updated": "2025-01-16 14:20:00",
+      "favorite": 0,
+      "trash": 0
     }
   ]
 }
 ```
 
-#### Create Note
+---
+
+#### ✏️ Create Note
+
+**Creates a new note with a title and optional tags.**
+
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
-  -d '{"heading": "My Note", "tags": "personal,important"}'
+  -d '{
+    "heading": "My New Note",
+    "tags": "personal,important",
+    "folder": "Projects"
+  }'
 ```
+
+**Parameters:**
+- `heading` (required): Note title
+- `tags` (optional): Comma-separated tags
+- `folder` (optional): Folder name (default: "Uncategorized")
 
 **Response (201 Created):**
 ```json
@@ -434,13 +471,21 @@ curl -X POST http://localhost:8040/api_create_note.php \
 }
 ```
 
-#### Create Folder
+---
+
+#### 📁 Create Folder
+
+**Creates a new folder to organize your notes.**
+
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
+
+**Parameters:**
+- `folder_name` (required): Name of the folder to create
 
 **Response (201 Created):**
 ```json
@@ -451,20 +496,32 @@ curl -X POST http://localhost:8040/api_create_folder.php \
 }
 ```
 
-**Error Response (409 Conflict):**
+**Error (409 Conflict):**
 ```json
 {
   "error": "Folder 'Work Projects' already exists"
 }
 ```
 
-#### Move Note to Folder
+---
+
+#### 📂 Move Note
+
+**Moves a note to a specific folder.**
+
 ```bash
 curl -X POST http://localhost:8040/api_move_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
-  -d '{"note_id": "123", "folder_name": "Work Projects"}'
+  -d '{
+    "note_id": "123",
+    "folder_name": "Work Projects"
+  }'
 ```
+
+**Parameters:**
+- `note_id` (required): ID of the note to move
+- `folder_name` (required): Destination folder name
 
 **Response (200 OK):**
 ```json
@@ -475,16 +532,21 @@ curl -X POST http://localhost:8040/api_move_note.php \
 }
 ```
 
-**Error Response (404 Not Found):**
+**Error (404 Not Found):**
 ```json
 {
   "error": "Note with ID 123 not found"
 }
 ```
 
-#### Delete Note
+---
+
+#### 🗑️ Delete Note
+
+**Deletes a note (soft delete to trash or permanent deletion).**
+
+**Soft delete (move to trash):**
 ```bash
-# Soft delete (move to trash)
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
@@ -499,12 +561,15 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 }
 ```
 
+**Permanent delete:**
 ```bash
-# Permanent delete
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
-  -d '{"note_id": "123", "permanent": true}'
+  -d '{
+    "note_id": "123",
+    "permanent": true
+  }'
 ```
 
 **Response (200 OK):**
@@ -519,13 +584,21 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 }
 ```
 
-#### Delete Folder
+---
+
+#### 🗂️ Delete Folder
+
+**Deletes a folder and moves all its notes to "Uncategorized".**
+
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
+
+**Parameters:**
+- `folder_name` (required): Name of the folder to delete
 
 **Response (200 OK):**
 ```json
@@ -541,13 +614,38 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 }
 ```
 
-**Error Response (400 Bad Request) - Protected Folder:**
+**Error (400 Bad Request) - Protected Folder:**
 ```json
 {
   "error": "Cannot delete the Uncategorized folder"
 }
 ```
 
-**⚠️ Protected Folders:**
+### ⚠️ Protected Folders
+
 - The `Uncategorized` folder cannot be deleted as it serves as the default location for notes without a specific folder
 - When a folder is deleted, all its notes are automatically moved to `Uncategorized` to prevent data loss
+
+### 💡 Usage Examples
+
+**Complete workflow:**
+```bash
+# 1. Create a folder
+curl -X POST http://localhost:8040/api_create_folder.php \
+  -u admin:mypassword \
+  -H "Content-Type: application/json" \
+  -d '{"folder_name": "My Projects"}'
+
+# 2. Create a note in this folder
+curl -X POST http://localhost:8040/api_create_note.php \
+  -u admin:mypassword \
+  -H "Content-Type: application/json" \
+  -d '{
+    "heading": "Project Ideas",
+    "tags": "brainstorming,important",
+    "folder": "My Projects"
+  }'
+
+# 3. List all notes
+curl -u admin:mypassword http://localhost:8040/api_list_notes.php
+```
