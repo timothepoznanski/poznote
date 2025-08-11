@@ -2392,11 +2392,12 @@ input[type="search"]::-webkit-search-results-decoration {
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    width: 320px;
+    width: 360px;
     max-height: 400px;
     overflow-y: auto;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
+    padding: 10px;
 }
 
 .emoji-picker-header {
@@ -2411,8 +2412,9 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .emoji-category {
-    padding: 15px 20px;
+    padding: 15px 0;
     border-bottom: 1px solid #f0f0f0;
+    width: 100%;
 }
 
 .emoji-category:last-child {
@@ -2430,14 +2432,17 @@ input[type="search"]::-webkit-search-results-decoration {
 .emoji-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 8px;
+    gap: 10px;
     justify-items: center;
+    padding: 5px 15px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .emoji-item {
-    font-size: 20px;
-    width: 32px;
-    height: 32px;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2478,19 +2483,21 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Mobile responsive styles for emoji picker */
 @media (max-width: 800px) {
     .emoji-picker {
-        width: 280px !important;
+        width: 300px !important;
         max-height: 350px !important;
+        padding: 8px !important;
     }
     
     .emoji-grid {
-        grid-template-columns: repeat(6, 1fr) !important;
+        grid-template-columns: repeat(7, 1fr) !important;
         gap: 8px !important;
+        padding: 3px 12px !important;
     }
     
     .emoji-item {
         font-size: 16px !important;
-        width: 30px !important;
-        height: 30px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
     
     .emoji-picker-header {
@@ -2499,10 +2506,11 @@ input[type="search"]::-webkit-search-results-decoration {
     }
     
     .emoji-category {
-        padding: 10px 12px !important;
+        padding: 10px 0 !important;
     }
     
     .emoji-category-title {
         font-size: 13px !important;
+        padding: 0 12px !important;
     }
 }
