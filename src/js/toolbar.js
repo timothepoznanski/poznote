@@ -70,7 +70,7 @@ function toggleYellowHighlight() {
 }
 
 function changeFontSize() {
-  const size = prompt('Taille de police (1-7):', '3');
+  const size = prompt('Font size (1-7):', '3');
   if (size) document.execCommand('fontSize', false, size);
 }
 
@@ -82,7 +82,7 @@ function toggleCodeBlock() {
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   
-  // Si déjà dans un bloc code, on le retire
+  // If already in a code block, remove it
   const existingPre = container.closest ? container.closest('pre') : null;
   if (existingPre) {
     const text = existingPre.textContent;
@@ -90,9 +90,9 @@ function toggleCodeBlock() {
     return;
   }
   
-  // Sinon, créer un bloc code avec le texte sélectionné
+  // Otherwise, create a code block with the selected text
   if (sel.isCollapsed) {
-    // Pas de sélection : insérer un bloc vide
+    // No selection: insert empty block
     document.execCommand('insertHTML', false, '<pre class="code-block"><br></pre>');
     // Add copy button to newly created code block
     setTimeout(() => {
@@ -103,11 +103,11 @@ function toggleCodeBlock() {
     return;
   }
   
-  // Récupérer le texte sélectionné
+  // Get selected text
   const selectedText = sel.toString();
   if (!selectedText.trim()) return;
   
-  // Échapper le HTML et créer le bloc code
+  // Escape HTML and create code block
   const escapedText = selectedText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -132,19 +132,19 @@ function toggleInlineCode() {
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   
-  // Vérifier si on est déjà dans un élément code inline
+  // Check if we're already in an inline code element
   const existingCode = container.closest ? container.closest('code') : null;
   if (existingCode && existingCode.tagName === 'CODE' && existingCode.parentNode.tagName !== 'PRE') {
-    // On est dans un code inline, le retirer
+    // We're in inline code, remove it
     const text = existingCode.textContent;
     existingCode.outerHTML = text;
     return;
   }
   
-  // Si pas de sélection, insérer un code inline vide
+  // If no selection, insert empty inline code
   if (sel.isCollapsed) {
     document.execCommand('insertHTML', false, '<code></code>');
-    // Positionner le curseur à l'intérieur du code
+    // Position cursor inside the code
     const codeElement = container.querySelector('code:empty') || container.closest('.noteentry').querySelector('code:empty');
     if (codeElement) {
       const newRange = document.createRange();
@@ -156,11 +156,11 @@ function toggleInlineCode() {
     return;
   }
   
-  // Récupérer le texte sélectionné
+  // Get selected text
   const selectedText = sel.toString();
   if (!selectedText.trim()) return;
   
-  // Échapper le HTML et créer le code inline
+  // Escape HTML and create inline code
   const escapedText = selectedText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -181,27 +181,27 @@ function insertSeparator() {
   
   if (!noteentry) return;
   
-  // Essayer d'abord avec execCommand pour les navigateurs qui le supportent encore
+  // Try execCommand first for browsers that still support it
   try {
     const hrHTML = '<hr style="border: none; border-top: 1px solid #bbb; margin: 12px 0;">';
     const success = document.execCommand('insertHTML', false, hrHTML);
     
     if (success) {
-      // Déclenche un événement input
+      // Trigger input event
       noteentry.dispatchEvent(new Event('input', {bubbles:true}));
       return;
     }
   } catch (e) {
-    // execCommand a échoué, utiliser l'approche manuelle
+    // execCommand failed, use manual approach
   }
   
-  // Fallback : insertion manuelle avec support d'annulation via l'API moderne
+  // Fallback: manual insertion with undo support via modern API
   const hr = document.createElement('hr');
   hr.style.border = 'none';
   hr.style.borderTop = '1px solid #bbb';
   hr.style.margin = '12px 0';
   
-  // Déclencher un événement beforeinput pour l'historique d'annulation
+  // Trigger beforeinput event for undo history
   const beforeInputEvent = new InputEvent('beforeinput', {
     bubbles: true,
     cancelable: true,
@@ -210,19 +210,19 @@ function insertSeparator() {
   });
   
   if (noteentry.dispatchEvent(beforeInputEvent)) {
-    // Insérer l'élément
+    // Insert the element
     if (!range.collapsed) {
       range.deleteContents();
     }
     range.insertNode(hr);
     
-    // Positionner le curseur après le HR
+    // Position cursor after the HR
     range.setStartAfter(hr);
     range.setEndAfter(hr);
     sel.removeAllRanges();
     sel.addRange(range);
     
-    // Déclencher l'événement input
+    // Trigger input event
     const inputEvent = new InputEvent('input', {
       bubbles: true,
       inputType: 'insertText',
@@ -232,61 +232,178 @@ function insertSeparator() {
   }
 }
 
-// S'assurer que les fonctions sont disponibles dans le scope global
+function toggleEmojiPicker() {
+  const existingPicker = document.querySelector('.emoji-picker');
+  
+  if (existingPicker) {
+    existingPicker.remove();
+    return;
+  }
+  
+  // Create emoji popup
+  const picker = document.createElement('div');
+  picker.className = 'emoji-picker';
+  
+  // Simplified popular emojis collection
+  const emojis = ['😀', '😃', '😄', '😊', '😍', '😘', '😎', '🤔', '😅', '😂', '😢', '😭', '😡', '👍', '👎', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '✅', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];  
+  
+  // Create picker content
+  let content = '<div class="emoji-category">';
+  content += '<div class="emoji-grid">';
+  
+  emojis.forEach(emoji => {
+    content += `<span class="emoji-item" data-emoji="${emoji}">${emoji}</span>`;
+  });
+  
+  content += '</div></div>';
+  
+  picker.innerHTML = content;
+  
+  // Position picker near emoji button
+  document.body.appendChild(picker);
+  
+  // Position picker with overflow management
+  const emojiBtn = document.querySelector('.btn-emoji');
+  if (emojiBtn) {
+    const rect = emojiBtn.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const isMobile = windowWidth <= 800;
+    
+    // Picker dimensions according to screen
+    const pickerWidth = isMobile ? Math.min(280, windowWidth - 40) : 320;
+    const pickerHeight = isMobile ? 350 : 400;
+    
+    picker.style.position = 'fixed';
+    picker.style.width = pickerWidth + 'px';
+    picker.style.maxHeight = pickerHeight + 'px';
+    
+    // Calculate vertical position
+    let top = rect.bottom + 10;
+    if (top + pickerHeight > windowHeight - 20) {
+      // If picker overflows bottom, place above button
+      top = rect.top - pickerHeight - 10;
+      if (top < 20) {
+        // If it doesn't fit above either, center vertically
+        top = Math.max(20, (windowHeight - pickerHeight) / 2);
+      }
+    }
+    
+    // Calculate horizontal position
+    let left;
+    if (isMobile) {
+      // On mobile, center in screen
+      left = (windowWidth - pickerWidth) / 2;
+    } else {
+      // On desktop, center on button
+      left = rect.left - (pickerWidth / 2) + (rect.width / 2);
+      if (left + pickerWidth > windowWidth - 20) {
+        left = windowWidth - pickerWidth - 20;
+      }
+      if (left < 20) {
+        left = 20;
+      }
+    }
+    
+    picker.style.top = top + 'px';
+    picker.style.left = left + 'px';
+  }
+  
+  // Handle emoji clicks
+  picker.addEventListener('click', function(e) {
+    if (e.target.classList.contains('emoji-item')) {
+      const emoji = e.target.getAttribute('data-emoji');
+      insertEmoji(emoji);
+      picker.remove();
+    }
+  });
+  
+  // Close picker when clicking outside
+  setTimeout(() => {
+    document.addEventListener('click', function closeEmojiPicker(e) {
+      if (!picker.contains(e.target) && !e.target.closest('.btn-emoji')) {
+        picker.remove();
+        document.removeEventListener('click', closeEmojiPicker);
+      }
+    });
+  }, 100);
+}
+
+function insertEmoji(emoji) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  const noteentry = container.closest && container.closest('.noteentry');
+  
+  if (!noteentry) return;
+  
+  // Insert emoji
+  document.execCommand('insertText', false, emoji);
+  
+  // Trigger input event
+  if (noteentry) {
+    noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+  }
+}
+
+// Ensure functions are available in global scope
 window.insertSeparator = insertSeparator;
 
 // ==============================================
-// MOBILE TOOLBAR BEHAVIOR (affichage conditionnel)
+// MOBILE TOOLBAR BEHAVIOR (conditional display)
 // ==============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Vérifier si on est sur mobile
+    // Check if on mobile
     const isMobile = window.innerWidth <= 800;
     
-    if (!isMobile) return; // Ne pas exécuter ce script sur desktop
+    if (!isMobile) return; // Don't execute this script on desktop
     
     let selectionTimer;
     
-    // Fonction pour afficher/cacher les boutons de formatage
+    // Function to show/hide formatting buttons
     function toggleFormatButtons() {
         const selection = window.getSelection();
         const toolbar = document.querySelector('.note-edit-toolbar');
         
         if (selection.toString().length > 0) {
-            // Il y a du texte sélectionné, afficher les boutons de formatage
+            // Text is selected, show formatting buttons
             if (toolbar) {
                 toolbar.classList.add('show-format-buttons');
             }
         } else {
-            // Pas de sélection, cacher les boutons de formatage
+            // No selection, hide formatting buttons
             if (toolbar) {
                 toolbar.classList.remove('show-format-buttons');
             }
         }
     }
     
-    // Écouter les événements de sélection
+    // Listen to selection events
     document.addEventListener('selectionchange', function() {
-        // Utiliser un timer pour éviter trop d'appels
+        // Use timer to avoid too many calls
         clearTimeout(selectionTimer);
         selectionTimer = setTimeout(toggleFormatButtons, 100);
     });
     
-    // Écouter aussi les clics sur les éléments éditables
+    // Also listen to clicks on editable elements
     document.addEventListener('click', function(e) {
         if (e.target.closest('.noteentry')) {
             setTimeout(toggleFormatButtons, 100);
         }
     });
     
-    // Écouter les événements tactiles pour mobile
+    // Listen to touch events for mobile
     document.addEventListener('touchend', function(e) {
         if (e.target.closest('.noteentry')) {
             setTimeout(toggleFormatButtons, 150);
         }
     });
     
-    // Cacher les boutons quand on clique en dehors d'une note
+    // Hide buttons when clicking outside a note
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.notecard')) {
             const toolbar = document.querySelector('.note-edit-toolbar');
@@ -297,10 +414,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// S'assurer que toutes les fonctions de toolbar sont disponibles dans le scope global
+// Ensure all toolbar functions are available in global scope
 window.addLinkToNote = addLinkToNote;
 window.toggleRedColor = toggleRedColor;
 window.toggleYellowHighlight = toggleYellowHighlight;
 window.changeFontSize = changeFontSize;
 window.toggleCodeBlock = toggleCodeBlock;
 window.toggleInlineCode = toggleInlineCode;
+window.toggleEmojiPicker = toggleEmojiPicker;
+window.insertEmoji = insertEmoji;

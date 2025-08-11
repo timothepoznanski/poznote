@@ -807,6 +807,7 @@ if($note != '') {
                 // Boutons d'actions sur la note (desktop seulement)
                 if (!$is_mobile) {
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                 }
                 
@@ -845,6 +846,7 @@ if($note != '') {
                     
                     // Boutons d'action sur la note 
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                     
                     // Bouton favoris avec icône étoile

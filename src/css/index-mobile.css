@@ -153,6 +153,7 @@ body {
 
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
+.show-format-buttons .btn-emoji,
 .show-format-buttons .btn-save,
 .show-format-buttons .btn-favorite, 
 .show-format-buttons .btn-folder, 
