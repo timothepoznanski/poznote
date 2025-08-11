@@ -124,7 +124,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-checkbox, .btn-separator, .btn-save {
+.btn-separator, .btn-save {
     display: flex !important;
 }
 
@@ -151,8 +151,7 @@ body {
     display: flex !important;
 }
 
-/* Hide ALL action buttons when text is selected (including checkbox, separator and save) */
-.show-format-buttons .btn-checkbox,
+/* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-save,
 .show-format-buttons .btn-favorite, 
@@ -170,12 +169,6 @@ body {
     -webkit-user-select: none !important;
     margin: 0 !important;
     padding: 0 !important;
-}
-
-.noteentry label input[type="checkbox"] {
-    cursor: pointer !important;
-    transform: scale(1.2) !important; /* Légèrement plus grand sur mobile */
-    margin: 0 12px 0 0 !important; /* Plus d'espace sur mobile */
 }
 
 .noteentry label span[contenteditable="true"] {
@@ -200,13 +193,6 @@ body {
     content: "Tapez votre tâche ici" !important;
     color: #999 !important;
     font-style: italic !important;
-}
-
-/* Style pour les tâches cochées sur mobile */
-.noteentry label:has(input[type="checkbox"]:checked) span {
-    text-decoration: line-through !important;
-    opacity: 0.6 !important;
-    color: #6c757d !important;
 }
 
 /* Increase text size for code blocks on mobile */

@@ -1651,12 +1651,6 @@ hr {
     padding: 0 !important;
 }
 
-.noteentry label input[type="checkbox"] {
-    cursor: pointer;
-    transform: scale(1.1);
-    margin: 0 8px 0 0 !important;
-}
-
 .noteentry label span[contenteditable="true"] {
     outline: none;
     border: none;
@@ -1676,13 +1670,6 @@ hr {
     content: "Tapez votre tâche ici";
     color: #999;
     font-style: italic;
-}
-
-/* Style pour les tâches cochées */
-.noteentry label:has(input[type="checkbox"]:checked) span {
-    text-decoration: line-through;
-    opacity: 0.6;
-    color: #6c757d;
 }
 
 /* FOLDER STYLES */
