@@ -52,13 +52,6 @@ cd $instanceName
 .\setup.ps1
 ```
 
-The script will automatically:
-- ✅ Verify Docker installation
-- 🔍 Detect existing installations
-- 📋 Guide you through configuration  
-- 🚀 Start Poznote with your settings
-- 📝 Set default application name to "Poznote" (can be changed later)
-
 ### Linux/macOS
 
 **Prerequisites:**
@@ -72,13 +65,6 @@ cd "$instanceName"
 chmod +x setup.sh
 ./setup.sh
 ```
-
-The script will automatically:
-- ✅ Verify Docker installation
-- 🔍 Detect existing installations  
-- 📋 Guide you through configuration
-- 🚀 Start Poznote with your settings
-- 📝 Set default application name to "Poznote" (can be changed later)
 
 ### Access URLs
 
