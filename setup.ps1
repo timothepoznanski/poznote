@@ -486,6 +486,8 @@ function Install-Poznote {
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
             Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
+            Write-Host "  • MySQL Database: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_DATABASE'])) { '[default]' } else { $existingConfig['MYSQL_DATABASE'] })" -ForegroundColor $Colors.White
+            Write-Host "  • MySQL User: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_USER'])) { '[default]' } else { $existingConfig['MYSQL_USER'] })" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green

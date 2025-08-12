@@ -543,6 +543,8 @@ main() {
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
             echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
+            echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
+            echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
