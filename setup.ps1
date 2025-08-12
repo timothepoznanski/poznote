@@ -373,6 +373,8 @@ function Reconfigure-Poznote {
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
     Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
+    Write-Host "  • MySQL Database: $($existingConfig['MYSQL_DATABASE'])" -ForegroundColor $Colors.White
+    Write-Host "  • MySQL User: $($existingConfig['MYSQL_USER'])" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -391,6 +393,13 @@ function Reconfigure-Poznote {
     $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] }
     $APP_NAME_DISPLAYED = Get-UserInput "Application Name Displayed" $defaultAppName
 
+    # MySQL Configuration
+    Write-Host "`nMySQL Database Configuration:" -ForegroundColor $Colors.Blue
+    $MYSQL_ROOT_PASSWORD = Get-UserInput "MySQL Root Password [hidden current value]" $existingConfig['MYSQL_ROOT_PASSWORD']
+    $MYSQL_DATABASE = Get-UserInput "MySQL Database Name" $existingConfig['MYSQL_DATABASE']
+    $MYSQL_USER = Get-UserInput "MySQL User" $existingConfig['MYSQL_USER']
+    $MYSQL_PASSWORD = Get-UserInput "MySQL User Password [hidden current value]" $existingConfig['MYSQL_PASSWORD']
+
     if ($POZNOTE_PASSWORD -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
     }
@@ -403,6 +412,13 @@ function Reconfigure-Poznote {
         $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
         $envContent = $envContent -replace "(?m)^APP_NAME_DISPLAYED=.*", "APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED"
+        
+        # Update MySQL configuration
+        if ($MYSQL_ROOT_PASSWORD) { $envContent = $envContent -replace "(?m)^MYSQL_ROOT_PASSWORD=.*", "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" }
+        if ($MYSQL_DATABASE) { $envContent = $envContent -replace "(?m)^MYSQL_DATABASE=.*", "MYSQL_DATABASE=$MYSQL_DATABASE" }
+        if ($MYSQL_USER) { $envContent = $envContent -replace "(?m)^MYSQL_USER=.*", "MYSQL_USER=$MYSQL_USER" }
+        if ($MYSQL_PASSWORD) { $envContent = $envContent -replace "(?m)^MYSQL_PASSWORD=.*", "MYSQL_PASSWORD=$MYSQL_PASSWORD" }
+        
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success "Configuration updated from template successfully!"
     }
@@ -688,6 +704,10 @@ function Install-Poznote {
         Write-Host ""
         Write-Host "To update Poznote, change username/password/port or modify the application name displayed, run:" -ForegroundColor $Colors.Blue
         Write-Host "  .\setup.ps1" -ForegroundColor $Colors.Green
+        Write-Host ""
+        Write-Host "Configuration tip:" -ForegroundColor $Colors.Blue
+        Write-Host "  To customize MySQL database settings (passwords, database name, user), run:" -ForegroundColor $Colors.Yellow
+        Write-Host "  .\setup.ps1 and select option 2 (Change configuration)" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
         Write-Host "  • Change the default password if you haven't already"

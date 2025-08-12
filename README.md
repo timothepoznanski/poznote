@@ -32,6 +32,7 @@ A powerful note-taking tool with full control over your data.
 - [Backup and Restore](#backup-and-restore)
 - [Docker Architecture](#docker-architecture)
 - [API](#api)
+- [Advanced Configuration](#advanced-configuration)
 
 ## Installation
 
@@ -41,8 +42,6 @@ Poznote runs in Docker and works seamlessly on both Windows and Linux.
 
 **Prerequisites:**
 - Install **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
-
-#### Option 1: Automated Setup
 
 Open PowerShell in the directory where you want to install Poznote and execute the following commands:
 
@@ -60,43 +59,11 @@ The script will automatically:
 - 🚀 Start Poznote with your settings
 - 📝 Set default application name to "Poznote" (can be changed later)
 
-#### Option 2: Manual Setup
-
-1. **Choose instance name and clone the repository**
-   
-   Open PowerShell in the directory where you want to install Poznote and execute the following commands:
-   
-   ```powershell
-   $instanceName = Read-Host "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
-   git clone https://github.com/timothepoznanski/poznote.git $instanceName
-   cd $instanceName
-   ```
-
-2. **Configure environment**
-   ```powershell
-   copy .env.template .env
-   notepad .env
-   ```
-
-3. **Customize settings**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
-   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
-
-4. **Start Poznote**
-   ```powershell
-   docker compose up -d --build
-   ```
-
 ### Linux/macOS
 
 **Prerequisites:**
 - **[Docker Engine](https://docs.docker.com/engine/install/)**
 - **[Docker Compose](https://docs.docker.com/compose/install/)**
-
-#### Option 1: Automated Setup
 
 ```bash
 read -p "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
@@ -112,33 +79,6 @@ The script will automatically:
 - 📋 Guide you through configuration
 - 🚀 Start Poznote with your settings
 - 📝 Set default application name to "Poznote" (can be changed later)
-
-#### Option 2: Manual Setup
-
-1. **Choose instance name and clone the repository**
-   ```bash
-   read -p "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
-   git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
-   cd "$instanceName"
-   ```
-
-2. **Configure environment**
-   ```bash
-   cp .env.template .env
-   vim .env
-   ```
-
-3. **Customize settings**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
-   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
-
-4. **Start Poznote**
-   ```bash
-   docker compose up -d --build
-   ```
 
 ### Access URLs
 
@@ -181,8 +121,6 @@ cd "$instanceName"
 
 ## Change Login, Password, Application Name Displayed, or Port
 
-### Option 1: Automated Configuration Change
-
 **Linux/macOS:**
 ```bash
 ./setup.sh
@@ -201,47 +139,9 @@ The script will:
 - 🔄 Restart services automatically
 - 🛡️ Preserve all your data
 
-### Option 2: Manual Configuration Change
-
-Open the folder of your project and edit the `.env` file to customize your installation:
-
-```bash
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123
-HTTP_WEB_PORT=8040
-APP_NAME_DISPLAYED=Poznote
-```
-
-**Configuration options:**
-- `POZNOTE_USERNAME` - Username for authentication
-- `POZNOTE_PASSWORD` - Password for authentication  
-- `HTTP_WEB_PORT` - Port where the application will be accessible
-- `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
-
-**To modify settings manually:**
-
-1. **Edit the .env file**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
-
-2. **Restart the application**
-
-```bash
-docker compose down
-docker compose up -d
-```
-
 ## Update Poznote application
 
-You can update Poznote to the latest version using either the automated script or manual commands.
-
-- **Automated Update**: Use the provided setup script to pull the latest code and restart the application while preserving your data and configuration.
-- **Manual Update**: Pull the latest code from the repository and rebuild the Docker containers.
-
-### Option 1: Automated Update
+You can update Poznote to the latest version using the automated script.
 
 **Linux/macOS:**
 ```bash
@@ -260,14 +160,6 @@ The script will:
 - 🛡️ Preserve your existing configuration and data
 - 🚀 Restart services with updates
 
-### Option 2: Manual Update
-
-To update Poznote manually to the latest version:
-
-```bash
-git pull origin main && docker compose down && docker compose up -d --build
-```
-
 ## Backup and Restore
 
 Poznote offers different backup options depending on your needs.
@@ -284,8 +176,6 @@ Poznote offers different backup options depending on your needs.
 
 ### Backup
 
-#### Option 1: Backup through the web interface
-
 Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
 
 Available backup options:
@@ -293,48 +183,12 @@ Available backup options:
 - **📎 Export Attachments** - Download all file attachments  
 - **🗄️ Export Database** - Download SQL dump
 
-#### Option 2: Manual backups
-
-- To backup your notes, copy your html files found in `./data/entries`
-- To backup your attachements, copy your files found in `./data/attachments`
-- To backup your database:
-
-```bash
-docker compose exec database mysqldump -u root -psfs466sfdgGH poznote_db > backup.sql
-```
-
 ### Restore
-
-#### Option 1: Restore through the web interface
 
 Poznote includes built-in restore functionality through the web interface in Settings → "Export/Import Database"
 
 **⚠️ Warning**: Database import will completely replace your current data!  
 **ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
-
-#### Option 2: Manual restore
-
-**Restore notes and attachments**
-```bash
-# Stop Poznote
-docker compose down
-```
-
-Copy your files to `./data/entries/` and `./data/attachments/`
-
-Then restart Poznote:
-
-```bash
-# Start Poznote
-docker compose up -d
-```
-
-**Restore database from SQL**
-
-```bash
-# Import SQL backup into database
-docker compose exec -T database mysql -u root -psfs466sfdgGH poznote_db < backup.sql
-```
 
 ### Docker Architecture
 
@@ -648,6 +502,147 @@ curl -X POST http://localhost:8040/api_create_note.php \
     "folder": "My Projects"
   }'
 
+```bash
 # 3. List all notes
 curl -u admin:mypassword http://localhost:8040/api_list_notes.php
+```
+
+## Advanced Configuration
+
+This section contains optional manual configuration methods for advanced users who prefer more control over the setup process.
+
+### Manual Installation Setup
+
+#### Windows - Manual Setup
+
+1. **Choose instance name and clone the repository**
+   
+   Open PowerShell in the directory where you want to install Poznote and execute the following commands:
+   
+   ```powershell
+   $instanceName = Read-Host "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
+   git clone https://github.com/timothepoznanski/poznote.git $instanceName
+   cd $instanceName
+   ```
+
+2. **Configure environment**
+   ```powershell
+   copy .env.template .env
+   notepad .env
+   ```
+
+3. **Customize settings**
+   - Change `POZNOTE_USERNAME=admin` to your preferred username
+   - Change `POZNOTE_PASSWORD=admin123` to a secure password
+   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
+
+4. **Start Poznote**
+   ```powershell
+   docker compose up -d --build
+   ```
+
+#### Linux/macOS - Manual Setup
+
+1. **Choose instance name and clone the repository**
+   ```bash
+   read -p "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
+   git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
+   cd "$instanceName"
+   ```
+
+2. **Configure environment**
+   ```bash
+   cp .env.template .env
+   vim .env
+   ```
+
+3. **Customize settings**
+   - Change `POZNOTE_USERNAME=admin` to your preferred username
+   - Change `POZNOTE_PASSWORD=admin123` to a secure password
+   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
+
+4. **Start Poznote**
+   ```bash
+   docker compose up -d --build
+   ```
+
+### Manual Configuration Change
+
+Open the folder of your project and edit the `.env` file to customize your installation:
+
+```bash
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123
+HTTP_WEB_PORT=8040
+APP_NAME_DISPLAYED=Poznote
+```
+
+**Configuration options:**
+- `POZNOTE_USERNAME` - Username for authentication
+- `POZNOTE_PASSWORD` - Password for authentication  
+- `HTTP_WEB_PORT` - Port where the application will be accessible
+- `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
+
+**To modify settings manually:**
+
+1. **Edit the .env file**
+   - Change `POZNOTE_USERNAME=admin` to your preferred username
+   - Change `POZNOTE_PASSWORD=admin123` to a secure password
+   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
+   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
+   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+
+2. **Restart the application**
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+### Manual Update
+
+To update Poznote manually to the latest version:
+
+```bash
+git pull origin main && docker compose down && docker compose up -d --build
+```
+
+### Manual Backup and Restore
+
+#### Manual Backups
+
+- To backup your notes, copy your html files found in `./data/entries`
+- To backup your attachements, copy your files found in `./data/attachments`
+- To backup your database:
+
+```bash
+docker compose exec database mysqldump -u root -psfs466sfdgGH poznote_db > backup.sql
+```
+
+#### Manual Restore
+
+**Restore notes and attachments**
+```bash
+# Stop Poznote
+docker compose down
+```
+
+Copy your files to `./data/entries/` and `./data/attachments/`
+
+Then restart Poznote:
+
+```bash
+# Start Poznote
+docker compose up -d
+```
+
+**Restore database from SQL**
+
+```bash
+# Import SQL backup into database
+docker compose exec -T database mysql -u root -psfs466sfdgGH poznote_db < backup.sql
 ```

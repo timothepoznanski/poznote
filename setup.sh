@@ -65,6 +65,8 @@ reconfigure_poznote() {
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
     echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
+    echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
+    echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -88,6 +90,20 @@ reconfigure_poznote() {
 
     read -p "Application Name [${APP_NAME_DISPLAYED:-Poznote}]: " NEW_APP_NAME
     APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
+
+    # MySQL Configuration
+    echo -e "\n${BLUE}MySQL Database Configuration:${NC}"
+    read -p "MySQL Root Password [${MYSQL_ROOT_PASSWORD:-[hidden]}]: " NEW_MYSQL_ROOT_PASSWORD
+    MYSQL_ROOT_PASSWORD=${NEW_MYSQL_ROOT_PASSWORD:-$MYSQL_ROOT_PASSWORD}
+
+    read -p "MySQL Database Name [${MYSQL_DATABASE}]: " NEW_MYSQL_DATABASE
+    MYSQL_DATABASE=${NEW_MYSQL_DATABASE:-$MYSQL_DATABASE}
+
+    read -p "MySQL User [${MYSQL_USER}]: " NEW_MYSQL_USER
+    MYSQL_USER=${NEW_MYSQL_USER:-$MYSQL_USER}
+
+    read -p "MySQL User Password [${MYSQL_PASSWORD:-[hidden]}]: " NEW_MYSQL_PASSWORD
+    MYSQL_PASSWORD=${NEW_MYSQL_PASSWORD:-$MYSQL_PASSWORD}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -364,6 +380,32 @@ get_user_config() {
         APP_NAME_DISPLAYED="Poznote"
     fi
     
+    # Get MySQL configuration (only for option 2 - configuration change)
+    if [ "$is_update" = "true" ]; then
+        echo
+        print_status "MySQL Database Configuration:"
+        
+        # Get template values for MySQL
+        if [ -f ".env.template" ]; then
+            TEMPLATE_MYSQL_ROOT_PASSWORD=$(grep "^MYSQL_ROOT_PASSWORD=" .env.template | cut -d'=' -f2)
+            TEMPLATE_MYSQL_DATABASE=$(grep "^MYSQL_DATABASE=" .env.template | cut -d'=' -f2)
+            TEMPLATE_MYSQL_USER=$(grep "^MYSQL_USER=" .env.template | cut -d'=' -f2)
+            TEMPLATE_MYSQL_PASSWORD=$(grep "^MYSQL_PASSWORD=" .env.template | cut -d'=' -f2)
+        fi
+        
+        read -p "MySQL Root Password [${MYSQL_ROOT_PASSWORD:-${TEMPLATE_MYSQL_ROOT_PASSWORD}}]: " NEW_MYSQL_ROOT_PASSWORD
+        MYSQL_ROOT_PASSWORD=${NEW_MYSQL_ROOT_PASSWORD:-${MYSQL_ROOT_PASSWORD:-${TEMPLATE_MYSQL_ROOT_PASSWORD}}}
+        
+        read -p "MySQL Database Name [${MYSQL_DATABASE:-${TEMPLATE_MYSQL_DATABASE}}]: " NEW_MYSQL_DATABASE
+        MYSQL_DATABASE=${NEW_MYSQL_DATABASE:-${MYSQL_DATABASE:-${TEMPLATE_MYSQL_DATABASE}}}
+        
+        read -p "MySQL User [${MYSQL_USER:-${TEMPLATE_MYSQL_USER}}]: " NEW_MYSQL_USER
+        MYSQL_USER=${NEW_MYSQL_USER:-${MYSQL_USER:-${TEMPLATE_MYSQL_USER}}}
+        
+        read -p "MySQL User Password [${MYSQL_PASSWORD:-${TEMPLATE_MYSQL_PASSWORD}}]: " NEW_MYSQL_PASSWORD
+        MYSQL_PASSWORD=${NEW_MYSQL_PASSWORD:-${MYSQL_PASSWORD:-${TEMPLATE_MYSQL_PASSWORD}}}
+    fi
+    
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
@@ -385,6 +427,20 @@ create_env_file() {
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
     sed -i "s/^APP_NAME_DISPLAYED=.*/APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED/" .env
+    
+    # Update MySQL configuration if variables are set
+    if [ -n "$MYSQL_ROOT_PASSWORD" ]; then
+        sed -i "s/^MYSQL_ROOT_PASSWORD=.*/MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD/" .env
+    fi
+    if [ -n "$MYSQL_DATABASE" ]; then
+        sed -i "s/^MYSQL_DATABASE=.*/MYSQL_DATABASE=$MYSQL_DATABASE/" .env
+    fi
+    if [ -n "$MYSQL_USER" ]; then
+        sed -i "s/^MYSQL_USER=.*/MYSQL_USER=$MYSQL_USER/" .env
+    fi
+    if [ -n "$MYSQL_PASSWORD" ]; then
+        sed -i "s/^MYSQL_PASSWORD=.*/MYSQL_PASSWORD=$MYSQL_PASSWORD/" .env
+    fi
     
     print_success ".env file created from template"
 }
@@ -538,6 +594,11 @@ main() {
         create_env_file
         manage_containers "update"
         show_info "false"
+        
+        echo
+        print_status "💡 Configuration tip:"
+        echo -e "  ${YELLOW}To customize MySQL database settings (passwords, database name, user), run:${NC}"
+        echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
 
