@@ -36,7 +36,7 @@ A powerful note-taking tool with full control over your data.
 
 ## Installation
 
-Poznote runs in Docker and works seamlessly on both Windows and Linux.
+Poznote runs in Docker.
 
 ### Windows
 
