@@ -105,7 +105,7 @@ cd "$instanceName"
 - `poznote-work`: Port 8041, username "bob", password "work456"
 - `poznote-demo`: Port 8042, username "demo", password "demo123"
 
-## Change Login, Password, Application Name Displayed, or Port
+## Update settings (Password, displayed name, database etc.)
 
 **Linux/macOS:**
 ```bash
