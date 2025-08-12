@@ -565,6 +565,10 @@ POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin123
 HTTP_WEB_PORT=8040
 APP_NAME_DISPLAYED=Poznote
+MYSQL_ROOT_PASSWORD=sfs466sfdgGH
+MYSQL_DATABASE=poznote_db
+MYSQL_USER=poznote_user
+MYSQL_PASSWORD=RGG45566vfgdfgv
 ```
 
 **Configuration options:**
@@ -572,6 +576,10 @@ APP_NAME_DISPLAYED=Poznote
 - `POZNOTE_PASSWORD` - Password for authentication  
 - `HTTP_WEB_PORT` - Port where the application will be accessible
 - `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
+- `MYSQL_ROOT_PASSWORD` - MySQL root password
+- `MYSQL_DATABASE` - MySQL database name
+- `MYSQL_USER` - MySQL user for the application
+- `MYSQL_PASSWORD` - MySQL user password
 
 **To modify settings manually:**
 
@@ -580,6 +588,7 @@ APP_NAME_DISPLAYED=Poznote
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
    - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
+   - Optionally modify MySQL settings for custom database configuration
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 2. **Restart the application**
@@ -606,7 +615,7 @@ git pull origin main && docker compose down && docker compose up -d --build
 - To backup your database:
 
 ```bash
-docker compose exec database mysqldump -u root -psfs466sfdgGH poznote_db > backup.sql
+docker compose exec database mysqldump -u root -p<YOUR_MYSQL_ROOT_PASSWORD> poznote_db > backup.sql
 ```
 
 #### Manual Restore
@@ -630,5 +639,5 @@ docker compose up -d
 
 ```bash
 # Import SQL backup into database
-docker compose exec -T database mysql -u root -psfs466sfdgGH poznote_db < backup.sql
+docker compose exec -T database mysql -u root -p<YOUR_MYSQL_ROOT_PASSWORD> poznote_db < backup.sql
 ```

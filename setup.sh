@@ -233,9 +233,6 @@ get_port_with_validation() {
         # If empty input, use default
         if [ -z "$port" ]; then
             port=$default_port
-            if [ "$first_attempt" = "true" ]; then
-                echo -e "${BLUE}[INFO]${NC} Using default port: $port" >&2
-            fi
         fi
         
         # Validate port range
