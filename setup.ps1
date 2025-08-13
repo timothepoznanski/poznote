@@ -519,7 +519,7 @@ function Install-Poznote {
                         $composeCmd = Update-DockerContainers
                         
                         Write-Host @"
-    Update Complete!
+Update Complete!
 "@ -ForegroundColor $Colors.Green
                         
                         Write-Host "Your Poznote installation has been updated successfully!" -ForegroundColor $Colors.Green
