@@ -608,7 +608,7 @@ function Install-Poznote {
         Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
         Write-Host ""
         
-        $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password (IMPORTANT: Change from default!)" $templateConfig["POZNOTE_PASSWORD"] $false
+        $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $templateConfig["POZNOTE_PASSWORD"] $false
         $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
         # Use default value for new installations
         $APP_NAME_DISPLAYED = "Poznote"
