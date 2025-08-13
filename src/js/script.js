@@ -1930,6 +1930,15 @@ function clearSearch() {
 
 // Function to check for updates
 function checkForUpdates() {
+    // Close settings menus
+    const settingsMenu = document.getElementById('settingsMenu');
+    const settingsMenuMobile = document.getElementById('settingsMenuMobile');
+    if (settingsMenu) settingsMenu.style.display = 'none';
+    if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
+    
+    // Show the checking modal
+    showUpdateCheckModal();
+    
     // Detect if we're in mobile mode
     const isMobile = window.innerWidth <= 800;
     const updateItemId = isMobile ? 'update-check-item-mobile' : 'update-check-item';
@@ -1951,7 +1960,9 @@ function checkForUpdates() {
                     finalUpdateStatus.textContent = 'Error: ' + data.error;
                     finalUpdateStatus.style.display = 'block';
                     finalUpdateStatus.style.color = '#e53935';
-                    showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
+                    
+                    // Update checking modal with error
+                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection.', 'error');
                 } else if (data.has_updates) {
                     updateUpdateIcons(true, false);
                     let statusText = `${data.current_version} → ${data.remote_version}`;
@@ -1960,14 +1971,19 @@ function checkForUpdates() {
                     }
                     finalUpdateStatus.textContent = statusText;
                     finalUpdateStatus.style.display = 'block';
-                    finalUpdateStatus.style.color = '#4caf50';
+                    finalUpdateStatus.style.color = '#007DB8';
+                    
+                    // Close checking modal and show update modal
+                    closeUpdateCheckModal();
                     showUpdateInstructions();
                 } else {
                     updateUpdateIcons(false, false);
                     finalUpdateStatus.textContent = `Current version: ${data.current_version}`;
                     finalUpdateStatus.style.display = 'block';
                     finalUpdateStatus.style.color = '#666';
-                    showNotificationPopup('✅ Your Poznote installation is up to date!', 'success');
+                    
+                    // Update checking modal with success
+                    showUpdateCheckResult('✅ You\'re up to date!', `Current version: ${data.current_version}`, 'success');
                 }
             }
             // Store the status for persistence
@@ -1984,7 +2000,10 @@ function checkForUpdates() {
                 finalUpdateStatus.style.display = 'block';
                 finalUpdateStatus.style.color = '#e53935';
             }
-            showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
+            
+            // Update checking modal with error
+            showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection.', 'error');
+            
             // Store error status
             localStorage.setItem('lastUpdateStatus', JSON.stringify({
                 hasUpdates: false,
@@ -1995,15 +2014,63 @@ function checkForUpdates() {
 
 // Function to show update instructions
 function showUpdateInstructions() {
-    const message = `🎉 New update available!<br><br>
+    // Show the update modal instead of notification popup
+    document.getElementById('updateModal').style.display = 'block';
+}
 
-Your data will be preserved during the update.<br><br>
+// Function to close update modal
+function closeUpdateModal() {
+    document.getElementById('updateModal').style.display = 'none';
+}
 
-Please follow the update instructions on GitHub:<br><br>
+// Function to go to update instructions on GitHub
+function goToUpdateInstructions() {
+    window.open('https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-poznote-application', '_blank');
+    closeUpdateModal();
+}
 
-<a href="https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-poznote-application" target="_blank" style="color: #007DB8; text-decoration: underline; font-weight: bold;">Click here for update instructions</a>`;
+// Function to show update check modal
+function showUpdateCheckModal() {
+    const modal = document.getElementById('updateCheckModal');
+    const statusElement = document.getElementById('updateCheckStatus');
+    const buttonsElement = document.getElementById('updateCheckButtons');
     
-    showNotificationPopupWithHTML(message, 'info', false); // false = no auto-hide
+    // Reset modal state
+    modal.querySelector('h3').textContent = 'Checking for Updates...';
+    statusElement.textContent = 'Please wait while we check for updates...';
+    statusElement.style.color = '#555';
+    buttonsElement.style.display = 'none';
+    
+    modal.style.display = 'block';
+}
+
+// Function to show update check result
+function showUpdateCheckResult(title, message, type) {
+    const modal = document.getElementById('updateCheckModal');
+    const titleElement = modal.querySelector('h3');
+    const statusElement = document.getElementById('updateCheckStatus');
+    const buttonsElement = document.getElementById('updateCheckButtons');
+    
+    // Update content
+    titleElement.textContent = title;
+    statusElement.textContent = message;
+    
+    // Update colors based on type
+    if (type === 'error') {
+        titleElement.style.color = '#e53935';
+        statusElement.style.color = '#e53935';
+    } else if (type === 'success') {
+        titleElement.style.color = '#007DB8';
+        statusElement.style.color = '#007DB8';
+    }
+    
+    // Show buttons
+    buttonsElement.style.display = 'flex';
+}
+
+// Function to close update check modal
+function closeUpdateCheckModal() {
+    document.getElementById('updateCheckModal').style.display = 'none';
 }
 
 // Function to show notification popup with HTML support
@@ -2074,7 +2141,7 @@ function updateUpdateIcons(hasUpdates, isError = false) {
         iconColor = '#ff9800';
     } else {
         iconClass = 'fas fa-check-circle';
-        iconColor = '#4caf50';
+        iconColor = '#007DB8';
     }
     
     // Update desktop icon
@@ -2133,6 +2200,20 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Could not parse last update status:', e);
         }
     }
+    
+    // Close update modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const updateModal = document.getElementById('updateModal');
+        const updateCheckModal = document.getElementById('updateCheckModal');
+        
+        if (event.target === updateModal) {
+            closeUpdateModal();
+        }
+        
+        if (event.target === updateCheckModal) {
+            closeUpdateCheckModal();
+        }
+    });
     
     // Check if we should do an update check (max once per day)
     const lastCheck = localStorage.getItem('lastUpdateCheck');

@@ -112,6 +112,30 @@ if($note != '') {
     <div id="notificationOverlay" class="notification-overlay"></div>
     <div id="notificationPopup"></div>
     
+    <!-- Update Modal -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <h3>🎉 New Update Available!</h3>
+            <p>A new version of Poznote is available. Your data will be preserved during the update.</p>
+            <p>Would you like to go to GitHub for update instructions?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+                <button type="button" class="btn-update" onclick="goToUpdateInstructions()">Update</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Check Modal -->
+    <div id="updateCheckModal" class="modal">
+        <div class="modal-content">
+            <h3>Checking for Updates...</h3>
+            <p id="updateCheckStatus">Please wait while we check for updates...</p>
+            <div class="modal-buttons" id="updateCheckButtons" style="display: none;">
+                <button type="button" class="btn-cancel" onclick="closeUpdateCheckModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal for creating new folder -->
     <div id="newFolderModal" class="modal">
         <div class="modal-content">

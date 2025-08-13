@@ -1952,6 +1952,60 @@ hr {
     background-color: #e9ecef;
 }
 
+/* Update Modal Specific Styles */
+#updateModal .modal-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+#updateModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+}
+
+#updateModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+#updateModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#updateModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#updateModal .btn-update {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#updateModal .btn-update:hover {
+    background-color: #0056b3 !important;
+}
+
+/* Update Check Modal Specific Styles */
+#updateCheckModal .modal-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+#updateCheckModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+}
+
+#updateCheckModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
 .close {
     color: #aaa;
     float: right;

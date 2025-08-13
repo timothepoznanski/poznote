@@ -498,7 +498,6 @@ show_info() {
     echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
-    echo "  📱 Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
     echo
     
     if [ "$is_update" != "true" ]; then
