@@ -119,7 +119,7 @@ if($note != '') {
             <p>A new version of Poznote is available. Your data will be preserved during the update.</p>
             <div class="modal-buttons">
                 <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
-                <button type="button" class="btn-update" onclick="goToUpdateInstructions()">Update</button>
+                <button type="button" class="btn-update" onclick="goToUpdateInstructions()">See Update instructions</button>
             </div>
         </div>
     </div>
