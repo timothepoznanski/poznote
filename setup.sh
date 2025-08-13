@@ -36,8 +36,8 @@ FEATURES:
     • Automatic detection of existing installations
     • Interactive menu with options:
       - New installation (fresh setup)
-      - Update application (pull latest code)
-      - Change configuration (password/port)
+      - Update application (get latest code)
+      - Change configuration (password/port/name/database etc.)
     • Configuration preservation during updates
 
 REQUIREMENTS:
@@ -551,7 +551,7 @@ main() {
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
-        echo -e "  1) Update application (pull latest code)"
+        echo -e "  1) Update application (password/port/name/database etc.)"
         echo -e "  2) Change settings"
         echo -e "  3) Cancel"
         

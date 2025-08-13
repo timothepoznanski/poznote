@@ -27,7 +27,7 @@ A powerful note-taking tool with full control over your data.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Change Login, Password, Application Name Displayed, or Port](#change-login-password-application-name-displayed-or-port)
+- [Update settings](#update-settings-password-displayed-name-database-etc)
 - [Update Poznote application](#update-poznote-application)
 - [Backup and Restore](#backup-and-restore)
 - [Docker Architecture](#docker-architecture)
@@ -36,7 +36,7 @@ A powerful note-taking tool with full control over your data.
 
 ## Installation
 
-Poznote runs in Docker.
+Poznote is designed to run seamlessly in Docker containers, making installation and updates simple and consistent across all platforms.
 
 ### Windows
 
@@ -111,13 +111,12 @@ cd "$instanceName"
 ```bash
 ./setup.sh
 ```
-Then select option 2 (Change configuration) from the menu.
 
 **Windows:**
 ```powershell
 .\setup.ps1
 ```
-Then select option 2 (Change configuration) from the menu.
+Then select option 2 (Change settings) from the menu.
 
 The script will:
 - 📋 Show your current configuration
@@ -133,7 +132,6 @@ You can update Poznote to the latest version using the automated script.
 ```bash
 ./setup.sh
 ```
-Then select option 1 (Update application) from the menu.
 
 **Windows:**
 ```powershell

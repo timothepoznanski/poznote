@@ -34,8 +34,8 @@ FEATURES:
     • Automatic detection of existing installations
     • Interactive menu with options:
       - New installation (fresh setup)
-      - Update application (pull latest code)
-      - Change configuration (password/port)
+      - Update application (get latest code)
+      - Change settings (password/port/name/database etc.)
     • Configuration preservation during updates
 
 REQUIREMENTS:
@@ -497,8 +497,8 @@ function Install-Poznote {
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
-        Write-Host "  1) Update application (pull latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change settings" -ForegroundColor $Colors.White
+        Write-Host "  1) Update application (get latest code)" -ForegroundColor $Colors.White
+        Write-Host "  2) Change settings (password/port/name/database etc.)" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
         
         do {
