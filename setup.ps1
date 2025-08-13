@@ -433,13 +433,12 @@ function Reconfigure-Poznote {
         $stopOutput = docker compose down 2>&1
         $startOutput = docker compose up -d 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Success "Poznote restarted successfully with new configuration!"
+            Write-Success "Poznote restarted successfully with new configuration!`n"
             
             Write-Host @"
-    Configuration Update Complete!
 "@ -ForegroundColor $Colors.Green
             
-            Write-Host "Your Poznote configuration has been updated!" -ForegroundColor $Colors.Green
+            Write-Host "Your Poznote configuration has been updated!`n" -ForegroundColor $Colors.Green
             Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
             Write-Host "http://localhost:$HTTP_WEB_PORT" -ForegroundColor $Colors.Green
             Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
@@ -471,7 +470,6 @@ function Install-Poznote {
     if ($isExisting) {
         # Existing installation - show menu
         Write-Host @"
-    Poznote Management Menu
 "@ -ForegroundColor $Colors.Blue
         
         $existingConfig = Get-ExistingEnvConfig
@@ -490,7 +488,7 @@ function Install-Poznote {
             Write-Host "  • MySQL User Password: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_PASSWORD'])) { '[default]' } else { $existingConfig['MYSQL_PASSWORD'] })" -ForegroundColor $Colors.White
         }
         
-        Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
+        Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green
         Write-Host "  1) Update application (get latest code)" -ForegroundColor $Colors.White
         Write-Host "  2) Change settings (password/port/name/database etc.)" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
@@ -673,10 +671,9 @@ function Install-Poznote {
     }
     
     if ($success) {
-        Write-Success "Poznote has been started successfully!"
+        Write-Success "Poznote has been started successfully!`n"
         
         Write-Host @"
-    Installation Complete!
 "@ -ForegroundColor $Colors.Green
         
         # Use the variables directly instead of reading from file
@@ -694,11 +691,11 @@ function Install-Poznote {
         Write-Host "Application Name Displayed: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalAppName" -ForegroundColor $Colors.Yellow
         Write-Host ""
-        Write-Host "To update Poznote, change username/password/port or modify the application name displayed, run:" -ForegroundColor $Colors.Blue
+        Write-Host "To update Poznote, change settings, run:`n" -ForegroundColor $Colors.Blue
         Write-Host "  .\setup.ps1" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Host "Configuration tip:" -ForegroundColor $Colors.Blue
-        Write-Host "  To customize MySQL database settings (passwords, database name, user), run:" -ForegroundColor $Colors.Yellow
+        Write-Host "  To customize MySQL database settings (passwords, database name, user etc.), run:`n" -ForegroundColor $Colors.Yellow
         Write-Host "  .\setup.ps1 and select option 2 (Change configuration)" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
