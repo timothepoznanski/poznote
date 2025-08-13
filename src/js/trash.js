@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Gestion de la recherche dans les notes de la corbeille
-    const searchInput = document.getElementById('searchInput');
+    const searchInput = document.getElementById('searchInput'); 
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
