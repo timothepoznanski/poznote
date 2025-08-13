@@ -18,7 +18,7 @@ function checkForUpdates() {
     ];
     
     try {
-        // Get current version from version.txt
+        // Get current version from version.txt 
         $version_file = 'version.txt';
         if (file_exists($version_file)) {
             $current_version = trim(file_get_contents($version_file));
