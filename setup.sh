@@ -525,6 +525,38 @@ check_updates_only() {
     fi
 }
 
+# Function to install Git pre-commit hook for automatic versioning
+install_git_hook() {
+    print_status "📋 Installing Git pre-commit hook for automatic versioning..."
+    
+    # Create the hook file
+    cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+
+# Pre-commit hook to automatically update version.txt
+# This runs locally before each commit
+
+# Get the directory of the repository
+REPO_DIR=$(git rev-parse --show-toplevel)
+
+# Generate new version in format YYMMDDHHmm
+NEW_VERSION=$(date +%y%m%d%H%M)
+
+# Update version.txt
+echo $NEW_VERSION > "$REPO_DIR/src/version.txt"
+
+# Add version.txt to the commit
+git add "$REPO_DIR/src/version.txt"
+
+echo "Auto-updated version to: $NEW_VERSION"
+EOF
+
+    # Make it executable
+    chmod +x .git/hooks/pre-commit
+    
+    print_success "✅ Git pre-commit hook installed successfully!"
+}
+
 # Main function
 main() {
     # Handle command line arguments
@@ -580,6 +612,7 @@ main() {
                     
                     print_status "Preserving existing configuration..."
                     manage_containers "update"
+                    install_git_hook
                     show_info "true"
                     exit 0
                     ;;
@@ -603,6 +636,7 @@ main() {
         get_user_config "false"
         create_env_file
         manage_containers "update"
+        install_git_hook
         show_info "false"
         
         echo

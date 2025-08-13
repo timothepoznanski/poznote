@@ -458,6 +458,43 @@ function Reconfigure-Poznote {
     }
 }
 
+# Function to install Git pre-commit hook for automatic versioning
+function Install-GitHook {
+    Write-Status "📋 Installing Git pre-commit hook for automatic versioning..."
+    
+    try {
+        # Create the hook content
+        $hookContent = @'
+#!/bin/bash
+
+# Pre-commit hook to automatically update version.txt
+# This runs locally before each commit
+
+# Get the directory of the repository
+REPO_DIR=$(git rev-parse --show-toplevel)
+
+# Generate new version in format YYMMDDHHmm
+NEW_VERSION=$(date +%y%m%d%H%M)
+
+# Update version.txt
+echo $NEW_VERSION > "$REPO_DIR/src/version.txt"
+
+# Add version.txt to the commit
+git add "$REPO_DIR/src/version.txt"
+
+echo "Auto-updated version to: $NEW_VERSION"
+'@
+        
+        # Create the hook file
+        $hookContent | Out-File -FilePath ".git/hooks/pre-commit" -Encoding ASCII -NoNewline
+        
+        Write-Success "✅ Git pre-commit hook installed successfully!"
+    }
+    catch {
+        Write-Warning "⚠️ Could not install Git hook: $($_.Exception.Message)"
+    }
+}
+
 # Main installation function
 function Install-Poznote {
     # Check Docker first
@@ -517,6 +554,9 @@ function Install-Poznote {
                     
                     try {
                         $composeCmd = Update-DockerContainers
+                        
+                        # Install Git hook for automatic versioning
+                        Install-GitHook
                         
                         Write-Host @"
 Update Complete!
@@ -671,6 +711,9 @@ Poznote Installation Script
     
     if ($success) {
         Write-Success "Poznote has been started successfully!`n"
+        
+        # Install Git hook for automatic versioning
+        Install-GitHook
         
         Write-Host @"
 "@ -ForegroundColor $Colors.Green
