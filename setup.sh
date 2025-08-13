@@ -48,7 +48,7 @@ EOF
 
 # Reconfigure existing installation
 reconfigure_poznote() {
-    echo -e "${BLUE}Poznote Configuration Update${NC}"
+    echo -e "${BLUE}\nPoznote Configuration Update\n${NC}"
 
     if [ ! -f ".env" ]; then
         print_error "No existing configuration found (.env file missing)."
@@ -58,8 +58,8 @@ reconfigure_poznote() {
 
     load_env_config
     
-    echo -e "\n${BLUE}Current configuration:${NC}"
-    echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
+    echo -e "\n${BLUE}Current configuration:\n${NC}"
+    echo -e "  • URL: http://your-server:${HTTP_WEB_PORT}"
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
     echo -e "  • Port: ${HTTP_WEB_PORT}"
@@ -93,7 +93,6 @@ reconfigure_poznote() {
     APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
 
     # MySQL Configuration
-    echo -e "\n${BLUE}MySQL Database Configuration:${NC}"
     read -p "MySQL Root Password [${MYSQL_ROOT_PASSWORD:-[hidden]}]: " NEW_MYSQL_ROOT_PASSWORD
     MYSQL_ROOT_PASSWORD=${NEW_MYSQL_ROOT_PASSWORD:-$MYSQL_ROOT_PASSWORD}
 
@@ -114,13 +113,13 @@ reconfigure_poznote() {
     create_env_file
     manage_containers "restart"
     
-    echo -e "\n${GREEN}Configuration Update Complete!${NC}\n"
-    
-    echo -e "${GREEN}Your Poznote configuration has been updated!${NC}"
-    echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
+    echo -e "\n${GREEN}Configuration Update Complete!${NC}"
+    echo -e "${GREEN}Your Poznote configuration has been updated!${NC}\n"
+    echo -e "${BLUE}Access your instance at: ${YELLOW}http://your-server:$HTTP_WEB_PORT${NC}"
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
     echo -e "${BLUE}Application Name Displayed: ${YELLOW}${APP_NAME_DISPLAYED:-Poznote}${NC}"
+    echo
 }
 
 # Check Docker installation
@@ -307,7 +306,7 @@ get_user_config() {
     get_template_values
     
     if [ "$is_update" = "true" ]; then
-        print_status "Current configuration will be preserved. Press Enter to keep current values:"
+        print_status "Current configuration will be preserved. Press Enter to keep current values:\n"
         echo
     fi
     
@@ -409,6 +408,7 @@ get_user_config() {
 
 # Create or update .env file
 create_env_file() {
+    echo
     print_status "Creating .env file..."
     
     if [ ! -f ".env.template" ]; then
@@ -493,11 +493,12 @@ show_info() {
         print_success "🎉 Poznote has been successfully installed!"
     fi
     echo
-    print_status "📋 Access Information:"
+    print_status "📋 Access Information:\n"
     echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
     echo "  📱 Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
+    echo
     
     if [ "$is_update" != "true" ]; then
         echo
@@ -515,21 +516,16 @@ main() {
         "") ;; # No arguments, proceed normally
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
-
-    echo "🗒️ Poznote Installation & Update Tool  "
-    echo
     
     check_docker
     
     if check_existing_installation; then
-        # Existing installation - show menu
-        echo -e "⚙️ Poznote Management Menu"
-        
+        # Existing installation - show menu        
         load_env_config
         
         if [ -n "$HTTP_WEB_PORT" ]; then
-            echo -e "\n${BLUE}Current configuration:${NC}"
-            echo -e "  • URL: ${GREEN}http://your-server:${HTTP_WEB_PORT}${NC}"
+            echo -e "\n${BLUE}Current configuration:\n${NC}"
+            echo -e "  • URL: http://your-server:${HTTP_WEB_PORT}"
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
             echo -e "  • Port: ${HTTP_WEB_PORT}"
@@ -540,9 +536,9 @@ main() {
             echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
         fi
         
-        echo -e "\n${GREEN}What would you like to do?${NC}"
-        echo -e "  1) Update application (password/port/name/database etc.)"
-        echo -e "  2) Change settings"
+        echo -e "\n${GREEN}What would you like to do?${NC}\n"
+        echo -e "  1) Update application (get latest code)"
+        echo -e "  2) Change settings (password/port/name/database etc.)"
         echo -e "  3) Cancel"
         
         while true; do
@@ -551,6 +547,7 @@ main() {
             
             case $choice in
                 1)
+                    echo
                     print_status "Starting application update..."
                     
                     print_status "📥 Pulling latest changes from repository..."

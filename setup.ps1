@@ -354,7 +354,9 @@ function Update-DockerContainers {
 # Reconfigure existing installation
 function Reconfigure-Poznote {
     Write-Host @"
+
     Poznote Configuration Update
+
 "@ -ForegroundColor $Colors.Blue
 
     if (-not (Test-Path ".env")) {
@@ -365,7 +367,7 @@ function Reconfigure-Poznote {
 
     $existingConfig = Get-ExistingEnvConfig
     
-    Write-Host "`nCurrent configuration:" -ForegroundColor $Colors.Blue
+    Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
     Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
     Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
     Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
@@ -475,7 +477,7 @@ function Install-Poznote {
         $existingConfig = Get-ExistingEnvConfig
         
         if ($existingConfig.Count -gt 0) {
-            Write-Host "`nCurrent configuration:" -ForegroundColor $Colors.Blue
+            Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
             Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
             Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
             Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
@@ -497,7 +499,7 @@ function Install-Poznote {
             $choice = Read-Host "`nPlease select an option (1-3)"
             switch ($choice) {
                 "1" {
-                    Write-Status "Starting application update..."
+                    Write-Status "\nStarting application update..."
                     Write-Status "Pulling latest changes from repository..."
                     try {
                         Write-Host ""
