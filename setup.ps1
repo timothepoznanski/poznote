@@ -694,15 +694,6 @@ Poznote Installation Script
         Write-Host "To update Poznote, change settings, run:`n" -ForegroundColor $Colors.Blue
         Write-Host "  .\setup.ps1" -ForegroundColor $Colors.Green
         Write-Host ""
-        Write-Host "Configuration tip:" -ForegroundColor $Colors.Blue
-        Write-Host "  To customize MySQL database settings (passwords, database name, user etc.), run:`n" -ForegroundColor $Colors.Yellow
-        Write-Host "  .\setup.ps1 and select option 2 (Change configuration)" -ForegroundColor $Colors.Green
-        Write-Host ""
-        Write-Host "Important Security Notes:" -ForegroundColor $Colors.Yellow
-        Write-Host "  • Change the default password if you haven't already"
-        Write-Host "  • Use HTTPS in production"
-        Write-Host ""
-        Write-Status "Wait a few seconds for the database to initialize before accessing the web interface."
     } else {
         Write-Error "Failed to start Poznote. Please check the error messages above."
         Write-Host "Error Output:" -ForegroundColor $Colors.Red
