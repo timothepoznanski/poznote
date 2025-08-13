@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - 'src/version.txt'
 
+permissions:
+  contents: write
+
 jobs:
   update-version:
     runs-on: ubuntu-latest
