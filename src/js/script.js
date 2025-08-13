@@ -1326,6 +1326,67 @@ let allFolders = [];
 let selectedFolderOption = null;
 let highlightedIndex = -1;
 
+// Recent folders management
+function getRecentFolders() {
+    const recent = localStorage.getItem('poznote_recent_folders');
+    return recent ? JSON.parse(recent) : [];
+}
+
+function addToRecentFolders(folderName) {
+    let recentFolders = getRecentFolders();
+    
+    // Remove if already exists
+    recentFolders = recentFolders.filter(folder => folder !== folderName);
+    
+    // Add to beginning
+    recentFolders.unshift(folderName);
+    
+    // Keep only last 2
+    recentFolders = recentFolders.slice(0, 2);
+    
+    // Save to localStorage
+    localStorage.setItem('poznote_recent_folders', JSON.stringify(recentFolders));
+}
+
+function loadRecentFolders(currentFolder) {
+    const recentFolders = getRecentFolders();
+    const recentFoldersList = document.getElementById('recentFoldersList');
+    const recentFoldersSection = document.getElementById('recentFoldersSection');
+    
+    // Filter out the current folder
+    const availableRecent = recentFolders.filter(folder => folder !== currentFolder);
+    
+    if (availableRecent.length === 0) {
+        recentFoldersSection.style.display = 'none';
+        return;
+    }
+    
+    recentFoldersSection.style.display = 'block';
+    recentFoldersList.innerHTML = '';
+    
+    availableRecent.forEach(folder => {
+        const folderItem = document.createElement('div');
+        folderItem.className = 'recent-folder-item';
+        folderItem.innerHTML = `
+            <span class="recent-folder-icon">📁</span>
+            <span>${folder}</span>
+        `;
+        folderItem.onclick = () => selectRecentFolder(folder);
+        recentFoldersList.appendChild(folderItem);
+    });
+}
+
+function selectRecentFolder(folderName) {
+    const input = document.getElementById('folderSearchInput');
+    const dropdown = document.getElementById('folderDropdown');
+    
+    input.value = folderName;
+    selectedFolderOption = folderName;
+    dropdown.classList.remove('show');
+    updateMoveButton(folderName, true);
+    hideMoveFolderError();
+}
+
 function handleFolderSearch() {
     const input = document.getElementById('folderSearchInput');
     const dropdown = document.getElementById('folderDropdown');
@@ -1497,6 +1558,9 @@ function executeFolderAction() {
     .then(response => response.json())
     .then(function(data) {
         if (data.success) {
+            // Add to recent folders
+            addToRecentFolders(folderToMoveTo);
+            
             closeModal('moveNoteFolderModal');
             location.reload();
         } else {
@@ -1546,6 +1610,9 @@ function showMoveFolderDialog(noteId) {
         if (data.success) {
             // Store all folders (excluding current folder)
             allFolders = data.folders.filter(folder => folder !== currentFolder);
+            
+            // Load recent folders
+            loadRecentFolders(currentFolder);
             
             // Reset the interface
             const input = document.getElementById('folderSearchInput');

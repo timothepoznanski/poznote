@@ -207,6 +207,14 @@ if($note != '') {
                        oninput="handleFolderSearch()" 
                        onkeydown="handleFolderKeydown(event)">
                 
+                <!-- Recent folders -->
+                <div id="recentFoldersSection" class="recent-folders-section">
+                    <div class="recent-folders-label">Recent folders:</div>
+                    <div id="recentFoldersList" class="recent-folders-list">
+                        <!-- Recent folders will be loaded here -->
+                    </div>
+                </div>
+                
                 <!-- Dropdown with matching folders -->
                 <div id="folderDropdown" class="folder-dropdown">
                     <!-- Matching folders will appear here -->
