@@ -573,11 +573,6 @@ main() {
                     if git pull origin main; then
                         echo
                         print_success "✅ Successfully pulled latest changes"
-                        
-                        # Update version file for update checking
-                        print_status "📝 Updating version file..."
-                        git rev-parse HEAD | cut -c1-8 > src/version.txt
-                        print_success "✅ Version file updated"
                     else
                         echo
                         print_warning "⚠️  Git pull failed or no changes, continuing with local files"
