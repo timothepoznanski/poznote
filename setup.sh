@@ -502,7 +502,7 @@ show_info() {
     
     if [ "$is_update" != "true" ]; then
         echo
-        print_status "⚙️  To update Poznote, change username/password/port or modify the application name, run:"
+        print_status "⚙️  To update Poznote, change settings, run:`n"
         echo "  ./setup.sh"
     fi
 
@@ -607,7 +607,7 @@ main() {
         
         echo
         print_status "💡 Configuration tip:"
-        echo -e "  ${YELLOW}To customize MySQL database settings (passwords, database name, user), run:${NC}"
+        echo -e "  ${YELLOW}To customize MySQL database settings (passwords, database name, user), run:`n${NC}"
         echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
