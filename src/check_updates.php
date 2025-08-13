@@ -19,7 +19,7 @@ function checkForUpdates() {
     
     try {
         // Get current version from version.txt
-        $version_file = '../version.txt';
+        $version_file = 'version.txt';
         if (file_exists($version_file)) {
             $current_version = trim(file_get_contents($version_file));
         } else {
@@ -30,7 +30,7 @@ function checkForUpdates() {
         $result['current_version'] = $current_version;
         
         // Query GitHub API to get the version.txt from the main branch
-        $github_api_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/version.txt';
+        $github_api_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/src/version.txt';
         
         $context = stream_context_create([
             'http' => [
