@@ -2345,7 +2345,7 @@ function checkForUpdates() {
     showUpdateCheckModal();
     
     fetch('check_updates.php')
-        .then(response => response.json())
+        .then(response => response.json()) 
         .then(data => {
             if (data.error) {
                 // Update checking modal with error
