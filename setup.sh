@@ -554,7 +554,7 @@ main() {
             echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
         fi
         
-        echo -e "\n${GREEN}What would you like to do?${NC}\n\n"
+        echo -e "\n${GREEN}What would you like to do?${NC}\n"
         echo -e "  1) Update application (get latest code)"
         echo -e "  2) Change settings (password/port/name/database etc.)"
         echo -e "  3) Cancel"
