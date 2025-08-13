@@ -689,3 +689,4 @@ docker compose up -d
 # Import SQL backup into database
 docker compose exec -T database mysql -u root -p<YOUR_MYSQL_ROOT_PASSWORD> poznote_db < backup.sql
 ```
+# Test du système de versioning automatique
