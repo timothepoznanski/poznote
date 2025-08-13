@@ -20,6 +20,7 @@ A powerful note-taking tool with full control over your data.
 - 🗑️ Trash System
 - 🌐 REST API
 
+
 ![alt text](image.png)
 
 ![alt text](image-1.png)
