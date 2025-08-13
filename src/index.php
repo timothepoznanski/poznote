@@ -136,6 +136,18 @@ if($note != '') {
         </div>
     </div>
     
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure you want to proceed?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+                <button type="button" class="btn-primary" id="confirmButton" onclick="executeConfirmedAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal for creating new folder -->
     <div id="newFolderModal" class="modal">
         <div class="modal-content">
@@ -282,9 +294,13 @@ if($note != '') {
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
                     </div>
-                    <div class="settings-menu-item" onclick="window.location = 'database_backup.php';">
-                        <i class="fas fa-database"></i>
-                        <span>Export/Import</span>
+                    <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
+                        <i class="fas fa-download"></i>
+                        <span>Backup (Export)</span>
+                    </div>
+                    <div class="settings-menu-item" onclick="window.location = 'restore_import.php';">
+                        <i class="fas fa-upload"></i>
+                        <span>Restore (Import)</span>
                     </div>
                     <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
                         <i id="update-icon-mobile" class="fas fa-sync-alt"></i>
@@ -446,9 +462,13 @@ if($note != '') {
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>
                 </div>
-                <div class="settings-menu-item" onclick="window.location = 'database_backup.php';">
-                    <i class="fas fa-database"></i>
-                    <span>Export/Import</span>
+                <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
+                    <i class="fas fa-download"></i>
+                    <span>Backup (Export)</span>
+                </div>
+                <div class="settings-menu-item" onclick="window.location = 'restore_import.php';">
+                    <i class="fas fa-upload"></i>
+                    <span>Restore (Import)</span>
                 </div>
                 <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
                     <i id="update-icon-desktop" class="fas fa-sync-alt"></i>

@@ -2006,6 +2006,34 @@ hr {
     color: #555;
 }
 
+/* Confirmation Modal Specific Styles */
+#confirmModal .modal-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+#confirmModal .modal-content h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#confirmModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+    font-size: 16px;
+}
+
+#confirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#confirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
 .close {
     color: #aaa;
     float: right;

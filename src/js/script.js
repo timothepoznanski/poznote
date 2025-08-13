@@ -791,7 +791,6 @@ function showContactPopup() {
         <div id="contactModal" class="modal" style="display: block;">
             <div class="modal-content" style="max-width: 400px; text-align: center;">
                 <span class="close" onclick="closeContactModal()" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
-                <h3 style="margin-bottom: 20px; color: #333;">Contact</h3>
                 <div style="margin: 20px 0;">
                     <i class="fas fa-envelope" style="color: #007DB8; font-size: 24px; margin-bottom: 10px;"></i>
                     <p style="font-size: 18px; font-weight: bold; color: #007DB8; margin: 15px 0;">
@@ -1037,10 +1036,16 @@ function deleteFolder(folderName) {
 }
 
 function emptyFolder(folderName) {
-    if (!confirm(`Are you sure you want to move all notes from "${folderName}" to trash?`)) {
-        return;
-    }
-    
+    showConfirmModal(
+        'Empty Folder',
+        `Are you sure you want to move all notes from "${folderName}" to trash?`,
+        function() {
+            executeEmptyFolder(folderName);
+        }
+    );
+}
+
+function executeEmptyFolder(folderName) {
     var params = new URLSearchParams({
         action: 'empty_folder',
         folder_name: folderName
@@ -2073,6 +2078,33 @@ function closeUpdateCheckModal() {
     document.getElementById('updateCheckModal').style.display = 'none';
 }
 
+// Confirmation Modal Functions
+let confirmedActionCallback = null;
+
+function showConfirmModal(title, message, callback) {
+    const modal = document.getElementById('confirmModal');
+    const titleElement = document.getElementById('confirmTitle');
+    const messageElement = document.getElementById('confirmMessage');
+    
+    titleElement.textContent = title;
+    messageElement.textContent = message;
+    confirmedActionCallback = callback;
+    
+    modal.style.display = 'block';
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+    confirmedActionCallback = null;
+}
+
+function executeConfirmedAction() {
+    if (confirmedActionCallback) {
+        confirmedActionCallback();
+    }
+    closeConfirmModal();
+}
+
 // Function to show notification popup with HTML support
 function showNotificationPopupWithHTML(message, type = 'success', autoHide = true) {
     var popup = document.getElementById('notificationPopup');
@@ -2205,6 +2237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('click', function(event) {
         const updateModal = document.getElementById('updateModal');
         const updateCheckModal = document.getElementById('updateCheckModal');
+        const confirmModal = document.getElementById('confirmModal');
         
         if (event.target === updateModal) {
             closeUpdateModal();
@@ -2212,6 +2245,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (event.target === updateCheckModal) {
             closeUpdateCheckModal();
+        }
+        
+        if (event.target === confirmModal) {
+            closeConfirmModal();
         }
     });
     

@@ -7,6 +7,19 @@
     /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
 }
 
+.navigation {
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007cba;
+}
+
+.navigation .btn {
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
 .backup-section {
     margin-bottom: 30px;
     padding: 20px;
