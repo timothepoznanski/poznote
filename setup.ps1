@@ -354,9 +354,7 @@ function Update-DockerContainers {
 # Reconfigure existing installation
 function Reconfigure-Poznote {
     Write-Host @"
-=========================================
     Poznote Configuration Update
-=========================================
 "@ -ForegroundColor $Colors.Blue
 
     if (-not (Test-Path ".env")) {
@@ -436,11 +434,7 @@ function Reconfigure-Poznote {
             Write-Success "Poznote restarted successfully with new configuration!"
             
             Write-Host @"
-
-=========================================
     Configuration Update Complete!
-=========================================
-
 "@ -ForegroundColor $Colors.Green
             
             Write-Host "Your Poznote configuration has been updated!" -ForegroundColor $Colors.Green
@@ -475,9 +469,7 @@ function Install-Poznote {
     if ($isExisting) {
         # Existing installation - show menu
         Write-Host @"
-=========================================
     Poznote Management Menu
-=========================================
 "@ -ForegroundColor $Colors.Blue
         
         $existingConfig = Get-ExistingEnvConfig
@@ -527,11 +519,7 @@ function Install-Poznote {
                         $composeCmd = Update-DockerContainers
                         
                         Write-Host @"
-
-=========================================
     Update Complete!
-=========================================
-
 "@ -ForegroundColor $Colors.Green
                         
                         Write-Host "Your Poznote installation has been updated successfully!" -ForegroundColor $Colors.Green
@@ -556,9 +544,7 @@ function Install-Poznote {
     
     # Fresh installation
     Write-Host @"
-=========================================
     Poznote Installation Script
-=========================================
 "@ -ForegroundColor $Colors.Green
 
     # Check if .env already exists
@@ -688,11 +674,7 @@ function Install-Poznote {
         Write-Success "Poznote has been started successfully!"
         
         Write-Host @"
-
-=========================================
     Installation Complete!
-=========================================
-
 "@ -ForegroundColor $Colors.Green
         
         # Use the variables directly instead of reading from file

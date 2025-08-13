@@ -48,9 +48,7 @@ EOF
 
 # Reconfigure existing installation
 reconfigure_poznote() {
-    echo -e "${BLUE}========================================="
-    echo -e "    Poznote Configuration Update"
-    echo -e "=========================================${NC}"
+    echo -e "${BLUE}Poznote Configuration Update${NC}"
 
     if [ ! -f ".env" ]; then
         print_error "No existing configuration found (.env file missing)."
@@ -116,9 +114,7 @@ reconfigure_poznote() {
     create_env_file
     manage_containers "restart"
     
-    echo -e "\n${GREEN}========================================="
-    echo -e "    Configuration Update Complete!"
-    echo -e "=========================================${NC}\n"
+    echo -e "\n${GREEN}Configuration Update Complete!${NC}\n"
     
     echo -e "${GREEN}Your Poznote configuration has been updated!${NC}"
     echo -e "${BLUE}Access your instance at: ${GREEN}http://your-server:$HTTP_WEB_PORT${NC}"
@@ -491,13 +487,11 @@ show_info() {
     local is_update=$1
     
     echo
-    echo "========================================="
     if [ "$is_update" = "true" ]; then
         print_success "🎉 Poznote has been successfully updated!"
     else
         print_success "🎉 Poznote has been successfully installed!"
     fi
-    echo "========================================="
     echo
     print_status "📋 Access Information:"
     echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
@@ -522,18 +516,14 @@ main() {
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
 
-    echo "======================================="
-    echo "  🗒️  Poznote Installation & Update Tool  "
-    echo "======================================="
+    echo "🗒️ Poznote Installation & Update Tool  "
     echo
     
     check_docker
     
     if check_existing_installation; then
         # Existing installation - show menu
-        echo -e "${BLUE}========================================="
-        echo -e "    Poznote Management Menu"
-        echo -e "=========================================${NC}"
+        echo -e "⚙️ Poznote Management Menu"
         
         load_env_config
         
