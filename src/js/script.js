@@ -1512,14 +1512,15 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleSettingsMenu(event) {
     event.stopPropagation();
     
-    // Detect if we're in mobile mode
-    const isMobile = window.innerWidth <= 800;
-    const menuId = isMobile ? 'settingsMenuMobile' : 'settingsMenu';
-    const menu = document.getElementById(menuId);
+    // Try to find the available menu (mobile or desktop)
+    let menu = document.getElementById('settingsMenuMobile');
+    if (!menu) {
+        menu = document.getElementById('settingsMenu');
+    }
     
     // Check if menu exists to prevent null reference error
     if (!menu) {
-        console.error('Settings menu element not found:', menuId);
+        console.error('No settings menu element found (neither mobile nor desktop)');
         return;
     }
     
@@ -1923,4 +1924,84 @@ window.testCopyFunction = function(text) {
 // Function to clear search and return to main view
 function clearSearch() {
     window.location.href = 'index.php';
+}
+
+// UPDATE CHECK FUNCTIONS
+
+// Function to check for updates
+function checkForUpdates() {
+    // Detect if we're in mobile mode
+    const isMobile = window.innerWidth <= 800;
+    const updateItemId = isMobile ? 'update-check-item-mobile' : 'update-check-item';
+    const updateStatusId = isMobile ? 'update-status-mobile' : 'update-status';
+    
+    const updateItem = document.getElementById(updateItemId);
+    const updateStatus = document.getElementById(updateStatusId);
+    
+    // Fallback: try to find either element if the primary one doesn't exist
+    const finalUpdateItem = updateItem || document.getElementById('update-check-item') || document.getElementById('update-check-item-mobile');
+    const finalUpdateStatus = updateStatus || document.getElementById('update-status') || document.getElementById('update-status-mobile');
+    
+    fetch('check_updates.php')
+        .then(response => response.json())
+        .then(data => {
+            if (finalUpdateStatus) {
+                if (data.error) {
+                    finalUpdateStatus.textContent = 'Error: ' + data.error;
+                    finalUpdateStatus.style.display = 'block';
+                    finalUpdateStatus.style.color = '#e53935';
+                    showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
+                } else if (data.has_updates) {
+                    let statusText = `${data.current_version} → ${data.remote_version}`;
+                    if (data.remote_date) {
+                        statusText += ` (${data.remote_date})`;
+                    }
+                    finalUpdateStatus.textContent = statusText;
+                    finalUpdateStatus.style.display = 'block';
+                    finalUpdateStatus.style.color = '#4caf50';
+                    showUpdateInstructions();
+                } else {
+                    finalUpdateStatus.textContent = `Current version: ${data.current_version}`;
+                    finalUpdateStatus.style.display = 'block';
+                    finalUpdateStatus.style.color = '#666';
+                    showNotificationPopup('✅ Your Poznote installation is up to date!', 'success');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Update check failed:', error);
+            if (finalUpdateStatus) {
+                finalUpdateStatus.textContent = 'Check failed';
+                finalUpdateStatus.style.display = 'block';
+                finalUpdateStatus.style.color = '#e53935';
+            }
+            showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
+        });
+}
+
+// Function to show update instructions
+function showUpdateInstructions() {
+    const message = `🎉 New update available!
+
+To update your Poznote installation:
+
+1. Stop the application:
+   docker compose down
+
+2. Run the setup script:
+   ./setup.sh
+
+3. Select "Update application"
+
+Or manually:
+git pull origin main && docker compose up -d --build
+
+⚠️ Your data will be preserved during the update.`;
+    
+    showNotificationPopup(message, 'info');
+}
+
+// Function to show update notification
+function showUpdateNotification() {
+    showNotificationPopup('🎉 New update available! Click "Check for Updates" in settings to see details.', 'info');
 }

@@ -27,10 +27,11 @@ USAGE:
     ./setup.sh [OPTIONS]
 
 OPTIONS:
-    -h, --help       Show this help message
+    -h, --help         Show this help message
+    --check-updates    Check for available updates (for internal use)
 
 EXAMPLES:
-    ./setup.sh       Interactive menu for installation, update, or configuration
+    ./setup.sh         Interactive menu for installation, update, or configuration
 
 FEATURES:
     • Automatic detection of existing installations
@@ -508,11 +509,29 @@ show_info() {
 
 }
 
+# Function to check for updates (can be called by PHP)
+check_updates_only() {
+    local current_commit=$(git rev-parse HEAD 2>/dev/null | cut -c1-8)
+    local current_branch=$(git branch --show-current 2>/dev/null || echo "main")
+    
+    # Fetch latest info
+    git fetch origin $current_branch 2>/dev/null
+    local remote_commit=$(git rev-parse origin/$current_branch 2>/dev/null | cut -c1-8)
+    
+    if [ "$current_commit" != "$remote_commit" ]; then
+        local behind_count=$(git rev-list --count HEAD..origin/$current_branch 2>/dev/null || echo "0")
+        echo "UPDATE_AVAILABLE:$current_commit:$remote_commit:$behind_count:$current_branch"
+    else
+        echo "UP_TO_DATE:$current_commit:$current_commit:0:$current_branch"
+    fi
+}
+
 # Main function
 main() {
     # Handle command line arguments
     case "$1" in
         -h|--help) show_help; exit 0 ;;
+        --check-updates) check_updates_only; exit 0 ;;
         "") ;; # No arguments, proceed normally
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
@@ -555,6 +574,11 @@ main() {
                     if git pull origin main; then
                         echo
                         print_success "✅ Successfully pulled latest changes"
+                        
+                        # Update version file for update checking
+                        print_status "📝 Updating version file..."
+                        git rev-parse HEAD | cut -c1-8 > src/version.txt
+                        print_success "✅ Version file updated"
                     else
                         echo
                         print_warning "⚠️  Git pull failed or no changes, continuing with local files"

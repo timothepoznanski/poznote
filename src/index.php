@@ -262,6 +262,11 @@ if($note != '') {
                         <i class="fas fa-database"></i>
                         <span>Export/Import</span>
                     </div>
+                    <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Check for Updates</span>
+                        <small id="update-status-mobile" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
+                    </div>
                     <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                         <i class="fas fa-code-branch"></i>
                         <span>GitHub Repository</span>
@@ -420,6 +425,11 @@ if($note != '') {
                 <div class="settings-menu-item" onclick="window.location = 'database_backup.php';">
                     <i class="fas fa-database"></i>
                     <span>Export/Import</span>
+                </div>
+                <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Check for Updates</span>
+                    <small id="update-status" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
                 </div>
                 <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <i class="fas fa-code-branch"></i>

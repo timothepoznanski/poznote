@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Menu</title>
+</head>
+<body>
+    <h1>Debug Settings Menu</h1>
+    
+    <script>
+        // Check which menus exist
+        const mobileMenu = document.getElementById('settingsMenuMobile');
+        const desktopMenu = document.getElementById('settingsMenu');
+        
+        console.log('Mobile menu exists:', !!mobileMenu);
+        console.log('Desktop menu exists:', !!desktopMenu);
+        
+        if (mobileMenu) {
+            console.log('Mobile menu element:', mobileMenu);
+        }
+        
+        if (desktopMenu) {
+            console.log('Desktop menu element:', desktopMenu);
+        }
+        
+        // Show results on page
+        document.body.innerHTML += '<p>Mobile menu exists: ' + !!mobileMenu + '</p>';
+        document.body.innerHTML += '<p>Desktop menu exists: ' + !!desktopMenu + '</p>';
+        document.body.innerHTML += '<p>Window width: ' + window.innerWidth + '</p>';
+        document.body.innerHTML += '<p>User agent: ' + navigator.userAgent + '</p>';
+    </script>
+</body>
+</html>
