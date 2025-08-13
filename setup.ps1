@@ -633,7 +633,6 @@ Poznote Installation Script
             }
         }
         Write-Success "Data directories created!"
-        Write-Warning "Note: On Windows with Docker Desktop, file permissions are handled automatically."
     }
     
     # Start Docker containers
