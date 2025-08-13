@@ -177,7 +177,7 @@ input[type="password"]::placeholder {
 .github-link {
     margin-top: 1rem !important;
     padding-top: 0.75rem;
-    border-top: 1px solid #e2e8f0;
+    /* border-top: 1px solid #e2e8f0; */
 }
 
 .github-link a {

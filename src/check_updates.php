@@ -20,22 +20,23 @@ function checkForUpdates() {
     ];
     
     try {
-        // Méthode 1: Vérifier avec un fichier VERSION local
-        $version_file = 'version.txt';
-        if (file_exists($version_file)) {
-            $current_version = trim(file_get_contents($version_file));
-            $result['current_version'] = $current_version;
+        // Get current version from Git
+        $git_command = 'git rev-parse HEAD 2>/dev/null';
+        $git_hash = shell_exec($git_command);
+        
+        if ($git_hash && strlen(trim($git_hash)) >= 8) {
+            $current_version = substr(trim($git_hash), 0, 8);
         } else {
-            // Fallback: utiliser la date du fichier index.php
-            $current_version = date('Y-m-d H:i:s', filemtime('index.php'));
-            $result['current_version'] = $current_version;
-            $result['current_date'] = $current_version;
+            // Fallback: use modification date of index.php
+            $current_version = date('Ymd-His', filemtime('index.php'));
+            $result['current_date'] = date('Y-m-d H:i:s', filemtime('index.php'));
         }
         
-        // Méthode 2: Interroger l'API GitHub
+        $result['current_version'] = $current_version;
+        
+        // Query GitHub API
         $github_api_url = 'https://api.github.com/repos/timothepoznanski/poznote/commits/main';
         
-        // Créer le contexte pour la requête HTTP
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
@@ -67,13 +68,17 @@ function checkForUpdates() {
         $result['remote_version'] = $remote_commit;
         $result['remote_date'] = $remote_date;
         
-        // Comparer les versions
-        if (file_exists($version_file)) {
-            // Si on a un fichier version, comparer les commits
+        // Compare versions intelligently
+        if (preg_match('/^[a-f0-9]{8}$/', $current_version)) {
+            // Current version is a Git hash, compare directly
             $result['has_updates'] = ($current_version !== $remote_commit);
         } else {
-            // Sinon, comparer les dates (si remote est plus récent que notre fichier)
-            $current_timestamp = filemtime('index.php');
+            // Current version is a date/timestamp, compare with remote date
+            if (preg_match('/^\d{8}-\d{6}$/', $current_version)) {
+                $current_timestamp = DateTime::createFromFormat('Ymd-His', $current_version)->getTimestamp();
+            } else {
+                $current_timestamp = filemtime('index.php');
+            }
             $remote_timestamp = strtotime($github_data['commit']['committer']['date']);
             $result['has_updates'] = ($remote_timestamp > $current_timestamp);
         }

@@ -28,6 +28,7 @@ A powerful note-taking tool with full control over your data.
 
 - [Installation](#installation)
 - [Update settings](#update-settings-password-displayed-name-database-etc)
+- [Forgot your password?](#forgot-your-password)
 - [Update Poznote application](#update-poznote-application)
 - [Backup and Restore](#backup-and-restore)
 - [Docker Architecture](#docker-architecture)
@@ -123,6 +124,51 @@ The script will:
 - ✏️ Allow you to update username, password, port and application name
 - 🔄 Restart services automatically
 - 🛡️ Preserve all your data
+
+## Forgot your password?
+
+If you've forgotten your password, you can reset it using the setup script:
+
+**Linux/macOS:**
+```bash
+./setup.sh
+```
+
+**Windows:**
+```powershell
+.\setup.ps1
+```
+
+1. Select option **2 (Change settings)** from the menu
+2. When prompted for the current password, you can enter any value or leave it empty
+3. The script will allow you to set a new password
+4. Your data and notes will remain intact
+
+**Alternative method - Direct environment file edit:**
+
+If you prefer to edit the configuration directly:
+
+1. **Stop the application:**
+   ```bash
+   docker-compose down
+   ```
+
+2. **Edit the environment file:**
+   ```bash
+   nano .env
+   ```
+
+3. **Change the password line:**
+   ```
+   POZNOTE_PASSWORD=your_new_password
+   ```
+
+4. **Restart the application:**
+   ```bash
+   docker-compose up -d
+   ```
+
+> ⚠️ **Important:** Make sure to use a strong password for security. Your notes contain sensitive information!
 
 ## Update Poznote application
 

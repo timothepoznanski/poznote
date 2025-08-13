@@ -53,15 +53,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             
             <button type="submit" class="login-button">Login</button>
         </form>
-        
-        <div class="login-note">
-            <p>Run the setup script again if you forgot your password, want to update the application or need to change credentials, application displayed name or port</p>
-            <code>./setup.sh</code> or <code>.\setup.ps1</code>
             <p class="github-link">
-                <a href="https://github.com/timothepoznanski/poznote" target="_blank">
-                    See all informations here
+                <a href="https://github.com/timothepoznanski/poznote#forgot-your-password" target="_blank">
+                    Forgot your password?
                 </a>
-            </p>
         </div>
     </div>
 </body>

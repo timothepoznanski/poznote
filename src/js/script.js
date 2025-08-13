@@ -2333,7 +2333,7 @@ function clearSearch() {
 
 // UPDATE CHECK FUNCTIONS
 
-// Function to check for updates
+// Function to check for updates (manual check from settings menu)
 function checkForUpdates() {
     // Close settings menus
     const settingsMenu = document.getElementById('settingsMenu');
@@ -2344,76 +2344,25 @@ function checkForUpdates() {
     // Show the checking modal
     showUpdateCheckModal();
     
-    // Detect if we're in mobile mode
-    const isMobile = window.innerWidth <= 800;
-    const updateItemId = isMobile ? 'update-check-item-mobile' : 'update-check-item';
-    const updateStatusId = isMobile ? 'update-status-mobile' : 'update-status';
-    
-    const updateItem = document.getElementById(updateItemId);
-    const updateStatus = document.getElementById(updateStatusId);
-    
-    // Fallback: try to find either element if the primary one doesn't exist
-    const finalUpdateItem = updateItem || document.getElementById('update-check-item') || document.getElementById('update-check-item-mobile');
-    const finalUpdateStatus = updateStatus || document.getElementById('update-status') || document.getElementById('update-status-mobile');
-    
     fetch('check_updates.php')
         .then(response => response.json())
         .then(data => {
-            if (finalUpdateStatus) {
-                if (data.error) {
-                    updateUpdateIcons(false, true);
-                    finalUpdateStatus.textContent = 'Error: ' + data.error;
-                    finalUpdateStatus.style.display = 'block';
-                    finalUpdateStatus.style.color = '#e53935';
-                    
-                    // Update checking modal with error
-                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection.', 'error');
-                } else if (data.has_updates) {
-                    updateUpdateIcons(true, false);
-                    let statusText = `${data.current_version} → ${data.remote_version}`;
-                    if (data.remote_date) {
-                        statusText += ` (${data.remote_date})`;
-                    }
-                    finalUpdateStatus.textContent = statusText;
-                    finalUpdateStatus.style.display = 'block';
-                    finalUpdateStatus.style.color = '#007DB8';
-                    
-                    // Close checking modal and show update modal
-                    closeUpdateCheckModal();
-                    showUpdateInstructions();
-                } else {
-                    updateUpdateIcons(false, false);
-                    finalUpdateStatus.textContent = `Current version: ${data.current_version}`;
-                    finalUpdateStatus.style.display = 'block';
-                    finalUpdateStatus.style.color = '#666';
-                    
-                    // Update checking modal with success
-                    showUpdateCheckResult('✅ You\'re up to date!', `Current version: ${data.current_version}`, 'success');
-                }
+            if (data.error) {
+                // Update checking modal with error
+                showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection.', 'error');
+            } else if (data.has_updates) {
+                // Close checking modal and show update modal
+                closeUpdateCheckModal();
+                showUpdateInstructions();
+            } else {
+                // Update checking modal with success
+                showUpdateCheckResult('✅ You\'re up to date!', `Current version: ${data.current_version}`, 'success');
             }
-            // Store the status for persistence
-            localStorage.setItem('lastUpdateStatus', JSON.stringify({
-                hasUpdates: data.has_updates || false,
-                isError: !!data.error
-            }));
         })
         .catch(error => {
             console.error('Update check failed:', error);
-            updateUpdateIcons(false, true);
-            if (finalUpdateStatus) {
-                finalUpdateStatus.textContent = 'Check failed';
-                finalUpdateStatus.style.display = 'block';
-                finalUpdateStatus.style.color = '#e53935';
-            }
-            
             // Update checking modal with error
             showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection.', 'error');
-            
-            // Store error status
-            localStorage.setItem('lastUpdateStatus', JSON.stringify({
-                hasUpdates: false,
-                isError: true
-            }));
         });
 }
 
@@ -2552,87 +2501,8 @@ function showNotificationPopupWithHTML(message, type = 'success', autoHide = tru
     }
 }
 
-// Function to show update notification
-function showUpdateNotification() {
-    showUpdateInstructions(); // Use the same detailed popup as manual check
-}
-
-// Function to update the update check icons based on status
-function updateUpdateIcons(hasUpdates, isError = false) {
-    const desktopIcon = document.getElementById('update-icon-desktop');
-    const mobileIcon = document.getElementById('update-icon-mobile');
-    
-    // Define icon classes
-    let iconClass, iconColor;
-    
-    if (isError) {
-        iconClass = 'fas fa-exclamation-triangle';
-        iconColor = '#e53935';
-    } else if (hasUpdates) {
-        iconClass = 'fas fa-arrow-up';
-        iconColor = '#ff9800';
-    } else {
-        iconClass = 'fas fa-check-circle';
-        iconColor = '#007DB8';
-    }
-    
-    // Update desktop icon
-    if (desktopIcon) {
-        desktopIcon.className = iconClass;
-        desktopIcon.style.color = iconColor;
-    }
-    
-    // Update mobile icon
-    if (mobileIcon) {
-        mobileIcon.className = iconClass;
-        mobileIcon.style.color = iconColor;
-    }
-}
-
-// Silent update check on page load
-function silentUpdateCheck() {
-    fetch('check_updates.php')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                // Update icons to show error
-                updateUpdateIcons(false, true);
-            } else if (data.has_updates) {
-                // Update icons to show updates available
-                updateUpdateIcons(true, false);
-                // Only show notification if there's an update available
-                showUpdateNotification();
-            } else {
-                // Update icons to show up to date
-                updateUpdateIcons(false, false);
-            }
-            // Store the last check time and status
-            localStorage.setItem('lastUpdateCheck', Date.now().toString());
-            localStorage.setItem('lastUpdateStatus', JSON.stringify({
-                hasUpdates: data.has_updates || false,
-                isError: !!data.error
-            }));
-        })
-        .catch(error => {
-            // Silent failure - but update icon to show error
-            updateUpdateIcons(false, true);
-            console.log('Silent update check failed:', error);
-        });
-}
-
-// Auto-check for updates on page load
+// Auto-setup for modals on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Restore icon state from last check
-    const lastStatus = localStorage.getItem('lastUpdateStatus');
-    if (lastStatus) {
-        try {
-            const status = JSON.parse(lastStatus);
-            updateUpdateIcons(status.hasUpdates, status.isError);
-        } catch (e) {
-            console.log('Could not parse last update status:', e);
-        }
-    }
-    
     // Close update modal when clicking outside
     window.addEventListener('click', function(event) {
         const updateModal = document.getElementById('updateModal');
@@ -2656,14 +2526,4 @@ document.addEventListener('DOMContentLoaded', function() {
             closeNoteInfoModal();
         }
     });
-    
-    // Check if we should do an update check (max once per day)
-    const lastCheck = localStorage.getItem('lastUpdateCheck');
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
-    
-    if (!lastCheck || (now - parseInt(lastCheck)) > oneDay) {
-        // Wait 3 seconds after page load to avoid interfering with initial loading
-        setTimeout(silentUpdateCheck, 3000);
-    }
 });
