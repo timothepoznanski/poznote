@@ -18,3 +18,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Version file (generated dynamically)
+src/version.txt

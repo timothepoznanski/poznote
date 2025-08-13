@@ -1341,8 +1341,8 @@ function addToRecentFolders(folderName) {
     // Add to beginning
     recentFolders.unshift(folderName);
     
-    // Keep only last 2
-    recentFolders = recentFolders.slice(0, 2);
+    // Keep only last 3
+    recentFolders = recentFolders.slice(0, 3);
     
     // Save to localStorage
     localStorage.setItem('poznote_recent_folders', JSON.stringify(recentFolders));
