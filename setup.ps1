@@ -376,6 +376,8 @@ function Reconfigure-Poznote {
     Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
     Write-Host "  • MySQL Database: $($existingConfig['MYSQL_DATABASE'])" -ForegroundColor $Colors.White
     Write-Host "  • MySQL User: $($existingConfig['MYSQL_USER'])" -ForegroundColor $Colors.White
+    Write-Host "  • MySQL Root Password: $($existingConfig['MYSQL_ROOT_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  • MySQL User Password: $($existingConfig['MYSQL_PASSWORD'])" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -490,11 +492,13 @@ function Install-Poznote {
             Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
             Write-Host "  • MySQL Database: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_DATABASE'])) { '[default]' } else { $existingConfig['MYSQL_DATABASE'] })" -ForegroundColor $Colors.White
             Write-Host "  • MySQL User: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_USER'])) { '[default]' } else { $existingConfig['MYSQL_USER'] })" -ForegroundColor $Colors.White
+            Write-Host "  • MySQL Root Password: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_ROOT_PASSWORD'])) { '[default]' } else { $existingConfig['MYSQL_ROOT_PASSWORD'] })" -ForegroundColor $Colors.White
+            Write-Host "  • MySQL User Password: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_PASSWORD'])) { '[default]' } else { $existingConfig['MYSQL_PASSWORD'] })" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?" -ForegroundColor $Colors.Green
         Write-Host "  1) Update application (pull latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change configuration (username/password/port/Application name displayed)" -ForegroundColor $Colors.White
+        Write-Host "  2) Change settings" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
         
         do {

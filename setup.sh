@@ -68,6 +68,8 @@ reconfigure_poznote() {
     echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
     echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
     echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
+    echo -e "  • MySQL Root Password: ${MYSQL_ROOT_PASSWORD:-[default]}"
+    echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -544,11 +546,13 @@ main() {
             echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
             echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
             echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
+            echo -e "  • MySQL Root Password: ${MYSQL_ROOT_PASSWORD:-[default]}"
+            echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}"
         echo -e "  1) Update application (pull latest code)"
-        echo -e "  2) Change configuration (username/password/port/Application name displayed)"
+        echo -e "  2) Change settings"
         echo -e "  3) Cancel"
         
         while true; do
