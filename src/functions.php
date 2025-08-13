@@ -31,7 +31,7 @@ function getEntriesPath() {
             chgrp('entries', 'www-data');
         }
     }
-    return realpath('entries'); 
+    return realpath('entries');
 }
 
 /**
