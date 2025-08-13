@@ -144,31 +144,9 @@ If you've forgotten your password, you can reset it using the setup script:
 3. The script will allow you to set a new password
 4. Your data and notes will remain intact
 
-**Alternative method - Direct environment file edit:**
-
-If you prefer to edit the configuration directly:
-
-1. **Stop the application:**
-   ```bash
-   docker-compose down
-   ```
-
-2. **Edit the environment file:**
-   ```bash
-   nano .env
-   ```
-
-3. **Change the password line:**
-   ```
-   POZNOTE_PASSWORD=your_new_password
-   ```
-
-4. **Restart the application:**
-   ```bash
-   docker-compose up -d
-   ```
-
 > ⚠️ **Important:** Make sure to use a strong password for security. Your notes contain sensitive information!
+> 
+> 🔧 **Advanced users:** See the [Advanced Configuration](#advanced-configuration) section for alternative password reset methods.
 
 ## Update Poznote application
 
@@ -540,6 +518,32 @@ curl -u admin:mypassword http://localhost:8040/api_list_notes.php
 ## Advanced Configuration
 
 This section contains optional manual configuration methods for advanced users who prefer more control over the setup process.
+
+### Alternative Password Reset Method
+
+If you prefer to reset your password by editing the configuration directly:
+
+1. **Stop the application:**
+   ```bash
+   docker-compose down
+   ```
+
+2. **Edit the environment file:**
+   ```bash
+   nano .env
+   ```
+
+3. **Change the password line:**
+   ```
+   POZNOTE_PASSWORD=your_new_password
+   ```
+
+4. **Restart the application:**
+   ```bash
+   docker-compose up -d
+   ```
+
+> ⚠️ **Warning:** This method requires command-line access and basic Docker knowledge. For most users, the setup script method is recommended.
 
 ### Manual Installation Setup
 
