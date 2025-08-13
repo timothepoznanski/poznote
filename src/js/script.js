@@ -2003,11 +2003,11 @@ Please follow the update instructions on GitHub:<br><br>
 
 <a href="https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-poznote-application" target="_blank" style="color: #007DB8; text-decoration: underline; font-weight: bold;">Click here for update instructions</a>`;
     
-    showNotificationPopupWithHTML(message, 'info');
+    showNotificationPopupWithHTML(message, 'info', false); // false = no auto-hide
 }
 
 // Function to show notification popup with HTML support
-function showNotificationPopupWithHTML(message, type = 'success') {
+function showNotificationPopupWithHTML(message, type = 'success', autoHide = true) {
     var popup = document.getElementById('notificationPopup');
     var overlay = document.getElementById('notificationOverlay');
     popup.innerHTML = message; // Use innerHTML instead of innerText for HTML support
@@ -2047,8 +2047,10 @@ function showNotificationPopupWithHTML(message, type = 'success') {
         }
     });
 
-    // Auto-hide after 10 seconds (longer for update instructions)
-    setTimeout(hideNotification, 10000);
+    // Auto-hide only if requested
+    if (autoHide) {
+        setTimeout(hideNotification, 10000);
+    }
 }
 
 // Function to show update notification
