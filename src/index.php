@@ -148,6 +148,21 @@ if($note != '') {
         </div>
     </div>
     
+    <!-- Note Info Modal -->
+    <div id="noteInfoModal" class="modal">
+        <div class="modal-content">
+            <h3>Note Information</h3>
+            <div id="noteInfoContent">
+                <p><strong>Note ID:</strong> <span id="noteInfoId"></span></p>
+                <p><strong>Created:</strong> <span id="noteInfoCreated"></span></p>
+                <p><strong>Last modified:</strong> <span id="noteInfoUpdated"></span></p>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-primary" onclick="closeNoteInfoModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal for creating new folder -->
     <div id="newFolderModal" class="modal">
         <div class="modal-content">
@@ -179,47 +194,34 @@ if($note != '') {
     
     <!-- Modal for moving note to folder from toolbar -->
     <div id="moveNoteFolderModal" class="modal">
-        <div class="modal-content move-folder-modal">
-            <h3>Change Folder</h3>
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('moveNoteFolderModal')">&times;</span>
+            <h3>Move Note to Folder</h3>
+            <p>Search or enter a folder name:</p>
             
-            <!-- Search/Filter bar -->
-            <div class="folder-search-section">
-                <div class="searchbar-input-wrapper">
-                    <input type="text" id="moveFolderFilter" class="search form-control searchbar-input" placeholder="Search or select a folder..." oninput="filterMoveFolders()">
-                </div>
-            </div>
-            
-            <!-- Suggested folders (always visible) -->
-            <div class="suggested-folders-section" id="suggestedFoldersSection">
-                <div class="suggested-folders-list" id="suggestedFoldersList">
-                    <!-- Suggested folders will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Folders list (hidden by default) -->
-            <div class="folders-selection-list" id="foldersSelectionList">
-                <!-- Folders will be loaded here -->
-            </div>
-            
-            <!-- Create new folder section -->
-            <div class="create-folder-section" id="createFolderSection">
-                <input type="text" id="moveNewFolderName" placeholder="Enter new folder name" maxlength="255">
-                <div class="create-folder-buttons">
-                    <button type="button" onclick="createAndMoveToNewFolder()">Create & Move</button>
-                    <button type="button" onclick="cancelCreateNewFolder()">Cancel</button>
+            <!-- Smart folder search/input -->
+            <div class="folder-search-container">
+                <input type="text" id="folderSearchInput" class="folder-search-input" 
+                       placeholder="Type to search folders or create new..." 
+                       autocomplete="off" maxlength="255"
+                       oninput="handleFolderSearch()" 
+                       onkeydown="handleFolderKeydown(event)">
+                
+                <!-- Dropdown with matching folders -->
+                <div id="folderDropdown" class="folder-dropdown">
+                    <!-- Matching folders will appear here -->
                 </div>
             </div>
             
             <!-- Action buttons -->
             <div class="modal-buttons">
-                <button type="button" onclick="moveNoteToSelectedFolder()">Move</button>
-                <button type="button" id="createNewFolderBtn" onclick="showCreateNewFolderInput()">+ Create New Folder</button>
-                <button type="button" onclick="closeModal('moveNoteFolderModal')">Cancel</button>
+                <button type="button" id="moveActionButton" class="btn-primary" onclick="executeFolderAction()">Move</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('moveNoteFolderModal')">Cancel</button>
             </div>
             
             <!-- Error message display -->
-            <div id="moveFolderErrorMessage" class="modal-error-message">
-                Please select a folder
+            <div id="moveFolderErrorMessage" class="modal-error-message" style="display: none;">
+                Please enter a folder name
             </div>
         </div>
     </div>
@@ -233,6 +235,18 @@ if($note != '') {
             <div class="modal-buttons">
                 <button onclick="saveFolderName()">Save</button>
                 <button onclick="closeModal('editFolderModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for deleting folder -->
+    <div id="deleteFolderModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Folder</h3>
+            <p id="deleteFolderMessage"></p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteFolderModal')">Cancel</button>
+                <button type="button" class="btn-danger" onclick="executeDeleteFolder()">Delete Folder</button>
             </div>
         </div>
     </div>

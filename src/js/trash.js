@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('icon_restore_trash')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
-            if (noteid && confirm('Do you want to restore this note?')) {
-                restoreNote(noteid);
+            if (noteid) {
+                showRestoreConfirmModal(noteid);
             }
         }
         
         if (e.target.classList.contains('icon_trash_trash')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
-            if (noteid && confirm('Do you want to permanently delete this note? This action cannot be undone.')) {
-                permanentlyDeleteNote(noteid);
+            if (noteid) {
+                showDeleteConfirmModal(noteid);
             }
         }
     });
@@ -53,9 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (emptyTrashBtn) {
         emptyTrashBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            if (confirm('Do you want to empty the trash completely? This action cannot be undone.')) {
-                emptyTrash();
-            }
+            showEmptyTrashConfirmModal();
         });
     }
 });
@@ -96,12 +94,12 @@ function restoreNote(noteid) {
                 noteElement.style.display = 'none';
             }
         } else {
-            alert('Error restoring the note: ' + data);
+            showInfoModal('Restore Error', 'Error restoring the note: ' + data);
         }
     })
     .catch(error => {
         console.error('Error during restoration:', error);
-        alert('Error restoring the note');
+        showInfoModal('Restore Error', 'Error restoring the note');
     });
 }
 
@@ -122,12 +120,12 @@ function permanentlyDeleteNote(noteid) {
                 noteElement.style.display = 'none';
             }
         } else {
-            alert('Error during permanent deletion: ' + data);
+            showInfoModal('Delete Error', 'Error during permanent deletion: ' + data);
         }
     })
     .catch(error => {
         console.error('Error during deletion:', error);
-        alert('Error during permanent deletion of the note');
+        showInfoModal('Delete Error', 'Error during permanent deletion of the note');
     });
 }
 
@@ -144,14 +142,98 @@ function emptyTrash() {
             // Succès - rediriger vers trash.php pour actualiser la page
             window.location.href = 'trash.php';
         } else {
-            alert('Error emptying trash: ' + data);
+            showInfoModal('Empty Trash Error', 'Error emptying trash: ' + data);
         }
     })
     .catch(error => {
         console.error('Error during trash emptying:', error);
-        alert('Error emptying trash');
+        showInfoModal('Empty Trash Error', 'Error emptying trash');
     });
 }
+
+// Modal management for restore and delete confirmations
+let currentNoteIdForAction = null;
+
+function showInfoModal(title, message) {
+    document.getElementById('infoModalTitle').textContent = title;
+    document.getElementById('infoModalMessage').textContent = message;
+    document.getElementById('infoModal').style.display = 'block';
+}
+
+function closeInfoModal() {
+    document.getElementById('infoModal').style.display = 'none';
+}
+
+function showEmptyTrashConfirmModal() {
+    document.getElementById('emptyTrashConfirmModal').style.display = 'block';
+}
+
+function closeEmptyTrashConfirmModal() {
+    document.getElementById('emptyTrashConfirmModal').style.display = 'none';
+}
+
+function executeEmptyTrash() {
+    emptyTrash();
+    closeEmptyTrashConfirmModal();
+}
+
+function showRestoreConfirmModal(noteId) {
+    currentNoteIdForAction = noteId;
+    document.getElementById('restoreConfirmModal').style.display = 'block';
+}
+
+function closeRestoreConfirmModal() {
+    document.getElementById('restoreConfirmModal').style.display = 'none';
+    currentNoteIdForAction = null;
+}
+
+function executeRestoreNote() {
+    if (currentNoteIdForAction) {
+        restoreNote(currentNoteIdForAction);
+    }
+    closeRestoreConfirmModal();
+}
+
+function showDeleteConfirmModal(noteId) {
+    currentNoteIdForAction = noteId;
+    document.getElementById('deleteConfirmModal').style.display = 'block';
+}
+
+function closeDeleteConfirmModal() {
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    currentNoteIdForAction = null;
+}
+
+function executePermanentDelete() {
+    if (currentNoteIdForAction) {
+        permanentlyDeleteNote(currentNoteIdForAction);
+    }
+    closeDeleteConfirmModal();
+}
+
+// Close modals when clicking outside
+window.addEventListener('click', function(event) {
+    const restoreModal = document.getElementById('restoreConfirmModal');
+    const deleteModal = document.getElementById('deleteConfirmModal');
+    const infoModal = document.getElementById('infoModal');
+    const emptyTrashModal = document.getElementById('emptyTrashConfirmModal');
+    
+    if (event.target === restoreModal) {
+        closeRestoreConfirmModal();
+    }
+    
+    if (event.target === deleteModal) {
+        closeDeleteConfirmModal();
+    }
+    
+    if (event.target === infoModal) {
+        closeInfoModal();
+    }
+    
+    if (event.target === emptyTrashModal) {
+        closeEmptyTrashConfirmModal();
+    }
+});
 
 // Optimisation pour mobile : gestion du scroll
 if (window.innerWidth <= 800) {

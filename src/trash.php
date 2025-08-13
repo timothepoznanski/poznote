@@ -89,6 +89,53 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 		</div>
 	</div>
 	
+	<!-- Empty Trash Confirmation Modal -->
+	<div id="emptyTrashConfirmModal" class="modal">
+		<div class="modal-content">
+			<h3>Empty Trash</h3>
+			<p>Do you want to empty the trash completely? This action cannot be undone.</p>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" onclick="closeEmptyTrashConfirmModal()">Cancel</button>
+				<button type="button" class="btn-danger" onclick="executeEmptyTrash()">Empty Trash</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Information Modal -->
+	<div id="infoModal" class="modal">
+		<div class="modal-content">
+			<h3 id="infoModalTitle">Information</h3>
+			<p id="infoModalMessage"></p>
+			<div class="modal-buttons">
+				<button type="button" class="btn-primary" onclick="closeInfoModal()">Close</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Restore Confirmation Modal -->
+	<div id="restoreConfirmModal" class="modal">
+		<div class="modal-content">
+			<h3>Restore Note</h3>
+			<p>Do you want to restore this note?</p>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" onclick="closeRestoreConfirmModal()">Cancel</button>
+				<button type="button" class="btn-primary" onclick="executeRestoreNote()">Restore</button>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Delete Confirmation Modal -->
+	<div id="deleteConfirmModal" class="modal">
+		<div class="modal-content">
+			<h3>Permanently Delete Note</h3>
+			<p>Do you want to permanently delete this note? This action cannot be undone.</p>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" onclick="closeDeleteConfirmModal()">Cancel</button>
+				<button type="button" class="btn-danger" onclick="executePermanentDelete()">Delete Forever</button>
+			</div>
+		</div>
+	</div>
+	
 	<script src="js/script.js"></script>
 	<script src="js/trash.js"></script>
 </body>

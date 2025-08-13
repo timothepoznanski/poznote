@@ -48,8 +48,17 @@ function toggleNoteMenu(noteId) {
 function showNoteInfo(noteId, created, updated) {
     const createdDate = new Date(created).toLocaleString();
     const updatedDate = new Date(updated).toLocaleString();
-    const message = `Note ID: ${noteId}\nCreated: ${createdDate}\nLast modified: ${updatedDate}`;
-    showNotificationPopup(message);
+    
+    document.getElementById('noteInfoId').textContent = noteId;
+    document.getElementById('noteInfoCreated').textContent = createdDate;
+    document.getElementById('noteInfoUpdated').textContent = updatedDate;
+    
+    document.getElementById('noteInfoModal').style.display = 'block';
+}
+
+// Function to close note info modal
+function closeNoteInfoModal() {
+    document.getElementById('noteInfoModal').style.display = 'none';
 }
 
 // Function to toggle the vertical toolbar menu (legacy - keeping for compatibility)
@@ -996,36 +1005,10 @@ function deleteFolder(folderName) {
                 return;
             }
             
-            // For folders with notes, ask for confirmation
-            var confirmMessage = `Are you sure you want to delete the folder "${folderName}"? \n${noteCount} note${noteCount > 1 ? 's' : ''} will be moved to "Uncategorized".\n\nIf you want to delete all the notes of this fold instead, you can move them to "Uncategorized" folder then empty it.`;
+            // For folders with notes, show confirmation modal
+            var confirmMessage = `Are you sure you want to delete the folder "${folderName}"? \n${noteCount} note${noteCount > 1 ? 's' : ''} will be moved to "Uncategorized".\n\nIf you want to delete all the notes of this folder instead, you can move them to "Uncategorized" folder then empty it.`;
             
-            if (!confirm(confirmMessage)) {
-                return;
-            }
-            
-            // Proceed with deletion
-            var deleteParams = new URLSearchParams({
-                action: 'delete',
-                folder_name: folderName
-            });
-            
-            fetch("folder_operations.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: deleteParams.toString()
-            })
-            .then(response => response.json())
-            .then(function(data) {
-                if (data.success) {
-                    showNotificationPopup('Folder deleted successfully');
-                    location.reload();
-                } else {
-                    showNotificationPopup('Error: ' + data.error, 'error');
-                }
-            })
-            .catch(error => {
-                showNotificationPopup('Error deleting folder: ' + error, 'error');
-            });
+            showDeleteFolderModal(folderName, confirmMessage);
         } else {
             showNotificationPopup('Error checking folder contents: ' + data.error, 'error');
         }
@@ -1033,6 +1016,45 @@ function deleteFolder(folderName) {
     .catch(error => {
         showNotificationPopup('Error checking folder contents: ' + error, 'error');
     });
+}
+
+let currentFolderToDelete = null;
+
+function showDeleteFolderModal(folderName, message) {
+    currentFolderToDelete = folderName;
+    document.getElementById('deleteFolderMessage').textContent = message;
+    document.getElementById('deleteFolderModal').style.display = 'block';
+}
+
+function executeDeleteFolder() {
+    if (currentFolderToDelete) {
+        // Proceed with deletion
+        var deleteParams = new URLSearchParams({
+            action: 'delete',
+            folder_name: currentFolderToDelete
+        });
+        
+        fetch("folder_operations.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: deleteParams.toString()
+        })
+        .then(response => response.json())
+        .then(function(data) {
+            if (data.success) {
+                showNotificationPopup('Folder deleted successfully');
+                location.reload();
+            } else {
+                showNotificationPopup('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showNotificationPopup('Error deleting folder: ' + error, 'error');
+        });
+    }
+    
+    closeModal('deleteFolderModal');
+    currentFolderToDelete = null;
 }
 
 function emptyFolder(folderName) {
@@ -1103,22 +1125,112 @@ function filterMoveFolders() {
         }
     });
     
-    // Show "no folders found" message if no folders match
+    // Show "create folder" option if no folders match
     let noFoldersMsg = foldersList.querySelector('.no-folders-found');
+    let createFolderOption = foldersList.querySelector('.create-folder-option');
     
     if (visibleCount === 0 && filterText.length > 0) {
-        if (!noFoldersMsg) {
-            noFoldersMsg = document.createElement('div');
-            noFoldersMsg.className = 'no-folders-found';
-            noFoldersMsg.textContent = 'No folders found matching "' + filterText + '"';
-            foldersList.appendChild(noFoldersMsg);
-        } else {
-            noFoldersMsg.textContent = 'No folders found matching "' + filterText + '"';
-            noFoldersMsg.style.display = 'block';
+        // Hide the "no folders found" message
+        if (noFoldersMsg) {
+            noFoldersMsg.style.display = 'none';
         }
-    } else if (noFoldersMsg) {
-        noFoldersMsg.style.display = 'none';
+        
+        // Show or create the "create folder" option
+        if (!createFolderOption) {
+            createFolderOption = document.createElement('div');
+            createFolderOption.className = 'create-folder-option folder-option';
+            createFolderOption.innerHTML = `
+                <i class="fas fa-plus-circle" style="color: #007DB8; margin-right: 8px;"></i>
+                <span class="folder-name">Create folder: "<strong id="new-folder-name">${filterText}</strong>"</span>
+            `;
+            createFolderOption.onclick = function() {
+                createAndSelectNewFolder(filterText);
+            };
+            foldersList.appendChild(createFolderOption);
+        } else {
+            document.getElementById('new-folder-name').textContent = filterText;
+            createFolderOption.style.display = 'flex';
+        }
+    } else {
+        // Hide the create folder option when not needed
+        if (createFolderOption) {
+            createFolderOption.style.display = 'none';
+        }
+        
+        // Show regular "no folders found" message if needed (when filterText is empty)
+        if (visibleCount === 0 && filterText.length === 0) {
+            if (!noFoldersMsg) {
+                noFoldersMsg = document.createElement('div');
+                noFoldersMsg.className = 'no-folders-found';
+                noFoldersMsg.textContent = 'No folders available';
+                foldersList.appendChild(noFoldersMsg);
+            } else {
+                noFoldersMsg.textContent = 'No folders available';
+                noFoldersMsg.style.display = 'block';
+            }
+        } else if (noFoldersMsg) {
+            noFoldersMsg.style.display = 'none';
+        }
     }
+}
+
+function createAndSelectNewFolder(folderName) {
+    // Create the new folder via API
+    fetch('api_create_folder.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'folder_name=' + encodeURIComponent(folderName)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the move folder input with the new folder name
+            document.getElementById('moveFolderFilter').value = folderName;
+            
+            // Hide the folders list
+            document.getElementById('foldersSelectionList').style.display = 'none';
+            
+            // Refresh the folders list for future use
+            refreshFoldersList();
+            
+            // Show success message
+            showNotificationPopup(`Folder "${folderName}" created successfully!`, 'success');
+        } else {
+            showNotificationPopup('Error creating folder: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error creating folder:', error);
+        showNotificationPopup('Error creating folder: ' + error, 'error');
+    });
+}
+
+function refreshFoldersList() {
+    // Get the current note ID from the modal
+    const noteId = document.getElementById('moveNoteModal').dataset.noteId;
+    
+    if (!noteId) return;
+    
+    var params = new URLSearchParams({
+        action: 'get_folders'
+    });
+    
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success) {
+            loadFoldersIntoSelectionList(data.folders, noteId);
+        }
+    })
+    .catch(error => {
+        console.error('Error refreshing folders list:', error);
+    });
 }
 
 function selectFolderForMove(folderName, element) {
@@ -1209,6 +1321,204 @@ function moveNoteToSelectedFolder(targetFolder = null) {
     });
 }
 
+// Smart folder search functions
+let allFolders = [];
+let selectedFolderOption = null;
+let highlightedIndex = -1;
+
+function handleFolderSearch() {
+    const input = document.getElementById('folderSearchInput');
+    const dropdown = document.getElementById('folderDropdown');
+    const searchTerm = input.value.trim();
+    
+    if (searchTerm.length === 0) {
+        dropdown.classList.remove('show');
+        updateMoveButton('');
+        return;
+    }
+    
+    // Filter folders that match the search term
+    const matchingFolders = allFolders.filter(folder => 
+        folder.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    // Update dropdown content
+    updateDropdown(matchingFolders, searchTerm);
+    
+    // Update button text based on exact match
+    const exactMatch = allFolders.find(folder => 
+        folder.toLowerCase() === searchTerm.toLowerCase()
+    );
+    
+    updateMoveButton(searchTerm, exactMatch);
+    
+    // Show dropdown if there are matches or if we want to show create option
+    dropdown.classList.add('show');
+}
+
+function updateDropdown(matchingFolders, searchTerm) {
+    const dropdown = document.getElementById('folderDropdown');
+    dropdown.innerHTML = '';
+    highlightedIndex = -1;
+    selectedFolderOption = null;
+    
+    // Add matching folders
+    matchingFolders.forEach((folder, index) => {
+        const option = document.createElement('div');
+        option.className = 'folder-option';
+        option.innerHTML = `
+            <span class="folder-option-icon">📁</span>
+            <span>${folder}</span>
+        `;
+        option.onclick = () => selectFolder(folder);
+        dropdown.appendChild(option);
+    });
+    
+    // Add "Create new folder" option if no exact match
+    const exactMatch = allFolders.find(folder => 
+        folder.toLowerCase() === searchTerm.toLowerCase()
+    );
+    
+    if (searchTerm && !exactMatch) {
+        const createOption = document.createElement('div');
+        createOption.className = 'folder-option create-folder-option';
+        createOption.innerHTML = `
+            <span class="folder-option-icon">➕</span>
+            <span>Create folder "${searchTerm}"</span>
+        `;
+        createOption.onclick = () => selectCreateFolder(searchTerm);
+        dropdown.appendChild(createOption);
+    }
+}
+
+function updateMoveButton(searchTerm, exactMatch = false) {
+    const button = document.getElementById('moveActionButton');
+    
+    if (!searchTerm) {
+        button.textContent = 'Move';
+        button.disabled = true;
+    } else if (exactMatch) {
+        button.textContent = 'Move';
+        button.disabled = false;
+    } else {
+        button.textContent = 'Create & Move';
+        button.disabled = false;
+    }
+}
+
+function selectFolder(folderName) {
+    const input = document.getElementById('folderSearchInput');
+    const dropdown = document.getElementById('folderDropdown');
+    
+    input.value = folderName;
+    selectedFolderOption = folderName;
+    dropdown.classList.remove('show');
+    updateMoveButton(folderName, true);
+    hideMoveFolderError();
+}
+
+function selectCreateFolder(folderName) {
+    selectedFolderOption = folderName;
+    document.getElementById('folderDropdown').classList.remove('show');
+    updateMoveButton(folderName, false);
+    hideMoveFolderError();
+}
+
+function handleFolderKeydown(event) {
+    const dropdown = document.getElementById('folderDropdown');
+    const options = dropdown.querySelectorAll('.folder-option');
+    
+    if (!dropdown.classList.contains('show') || options.length === 0) {
+        return;
+    }
+    
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
+            updateHighlight(options);
+            break;
+            
+        case 'ArrowUp':
+            event.preventDefault();
+            highlightedIndex = Math.max(highlightedIndex - 1, -1);
+            updateHighlight(options);
+            break;
+            
+        case 'Enter':
+            event.preventDefault();
+            if (highlightedIndex >= 0) {
+                options[highlightedIndex].click();
+            } else {
+                executeFolderAction();
+            }
+            break;
+            
+        case 'Escape':
+            dropdown.classList.remove('show');
+            highlightedIndex = -1;
+            break;
+    }
+}
+
+function updateHighlight(options) {
+    options.forEach((option, index) => {
+        option.classList.toggle('highlighted', index === highlightedIndex);
+    });
+}
+
+function executeFolderAction() {
+    // Check if a valid note is selected
+    if (!noteid || noteid == -1 || noteid == '' || noteid == null) {
+        showNotificationPopup('Please select a note first before moving it to a folder.');
+        return;
+    }
+    
+    const searchTerm = document.getElementById('folderSearchInput').value.trim();
+    
+    if (!searchTerm) {
+        showMoveFolderError('Please enter a folder name');
+        return;
+    }
+    
+    const folderToMoveTo = selectedFolderOption || searchTerm;
+    
+    const params = new URLSearchParams({
+        action: 'move_note',
+        note_id: noteid,
+        folder: folderToMoveTo
+    });
+    
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success) {
+            closeModal('moveNoteFolderModal');
+            location.reload();
+        } else {
+            showNotificationPopup('Error: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showNotificationPopup('Error moving note: ' + error);
+    });
+}
+
+function showMoveFolderError(message) {
+    const errorDiv = document.getElementById('moveFolderErrorMessage');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function hideMoveFolderError() {
+    const errorDiv = document.getElementById('moveFolderErrorMessage');
+    errorDiv.style.display = 'none';
+}
+
 function showMoveFolderDialog(noteId) {
     // Check if a valid note is selected
     if (!noteId || noteId == -1 || noteId == '' || noteId == null) {
@@ -1218,11 +1528,11 @@ function showMoveFolderDialog(noteId) {
     
     noteid = noteId; // Set the current note ID
     
-    // Get and store the current folder of the note
-    currentNoteFolder = document.getElementById('folder' + noteId).value;
+    // Get current folder of the note
+    const currentFolder = document.getElementById('folder' + noteId).value;
     
     // Load folders
-    var params = new URLSearchParams({
+    const params = new URLSearchParams({
         action: 'get_folders'
     });
     
@@ -1234,22 +1544,45 @@ function showMoveFolderDialog(noteId) {
     .then(response => response.json())
     .then(function(data) {
         if (data.success) {
-            loadFoldersIntoSelectionList(data.folders, noteId);
-            loadSuggestedFolders(noteId);
+            // Store all folders (excluding current folder)
+            allFolders = data.folders.filter(folder => folder !== currentFolder);
             
-            // Reset UI state
-            document.getElementById('moveFolderFilter').value = '';
-            document.getElementById('createFolderSection').style.display = 'none';
-            document.getElementById('createNewFolderBtn').style.display = 'inline-block';
-            document.getElementById('moveNewFolderName').value = '';
+            // Reset the interface
+            const input = document.getElementById('folderSearchInput');
+            const dropdown = document.getElementById('folderDropdown');
             
-            // Hide any error message
+            input.value = '';
+            dropdown.classList.remove('show');
+            dropdown.innerHTML = '';
+            
+            selectedFolderOption = null;
+            highlightedIndex = -1;
+            
+            updateMoveButton('');
             hideMoveFolderError();
             
+            // Show the modal and focus on input
             document.getElementById('moveNoteFolderModal').style.display = 'block';
+            setTimeout(() => {
+                input.focus();
+            }, 100);
         }
+    })
+    .catch(error => {
+        showNotificationPopup('Error loading folders: ' + error);
     });
 }
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('folderDropdown');
+    const input = document.getElementById('folderSearchInput');
+    
+    if (dropdown && input && !dropdown.contains(event.target) && !input.contains(event.target)) {
+        dropdown.classList.remove('show');
+        highlightedIndex = -1;
+    }
+});
 
 // Functions to handle folder selection error messages
 function showMoveFolderError(message) {
@@ -2238,6 +2571,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const updateModal = document.getElementById('updateModal');
         const updateCheckModal = document.getElementById('updateCheckModal');
         const confirmModal = document.getElementById('confirmModal');
+        const noteInfoModal = document.getElementById('noteInfoModal');
         
         if (event.target === updateModal) {
             closeUpdateModal();
@@ -2249,6 +2583,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (event.target === confirmModal) {
             closeConfirmModal();
+        }
+        
+        if (event.target === noteInfoModal) {
+            closeNoteInfoModal();
         }
     });
     
