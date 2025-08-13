@@ -1947,11 +1947,13 @@ function checkForUpdates() {
         .then(data => {
             if (finalUpdateStatus) {
                 if (data.error) {
+                    updateUpdateIcons(false, true);
                     finalUpdateStatus.textContent = 'Error: ' + data.error;
                     finalUpdateStatus.style.display = 'block';
                     finalUpdateStatus.style.color = '#e53935';
                     showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
                 } else if (data.has_updates) {
+                    updateUpdateIcons(true, false);
                     let statusText = `${data.current_version} → ${data.remote_version}`;
                     if (data.remote_date) {
                         statusText += ` (${data.remote_date})`;
@@ -1961,47 +1963,182 @@ function checkForUpdates() {
                     finalUpdateStatus.style.color = '#4caf50';
                     showUpdateInstructions();
                 } else {
+                    updateUpdateIcons(false, false);
                     finalUpdateStatus.textContent = `Current version: ${data.current_version}`;
                     finalUpdateStatus.style.display = 'block';
                     finalUpdateStatus.style.color = '#666';
                     showNotificationPopup('✅ Your Poznote installation is up to date!', 'success');
                 }
             }
+            // Store the status for persistence
+            localStorage.setItem('lastUpdateStatus', JSON.stringify({
+                hasUpdates: data.has_updates || false,
+                isError: !!data.error
+            }));
         })
         .catch(error => {
             console.error('Update check failed:', error);
+            updateUpdateIcons(false, true);
             if (finalUpdateStatus) {
                 finalUpdateStatus.textContent = 'Check failed';
                 finalUpdateStatus.style.display = 'block';
                 finalUpdateStatus.style.color = '#e53935';
             }
             showNotificationPopup('❌ Failed to check for updates. Please check your internet connection.', 'error');
+            // Store error status
+            localStorage.setItem('lastUpdateStatus', JSON.stringify({
+                hasUpdates: false,
+                isError: true
+            }));
         });
 }
 
 // Function to show update instructions
 function showUpdateInstructions() {
-    const message = `🎉 New update available!
+    const message = `🎉 New update available!<br><br>
 
-To update your Poznote installation:
+Your data will be preserved during the update.<br><br>
 
-1. Stop the application:
-   docker compose down
+Please follow the update instructions on GitHub:<br><br>
 
-2. Run the setup script:
-   ./setup.sh
-
-3. Select "Update application"
-
-Or manually:
-git pull origin main && docker compose up -d --build
-
-⚠️ Your data will be preserved during the update.`;
+<a href="https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-poznote-application" target="_blank" style="color: #007DB8; text-decoration: underline; font-weight: bold;">Click here for update instructions</a>`;
     
-    showNotificationPopup(message, 'info');
+    showNotificationPopupWithHTML(message, 'info');
+}
+
+// Function to show notification popup with HTML support
+function showNotificationPopupWithHTML(message, type = 'success') {
+    var popup = document.getElementById('notificationPopup');
+    var overlay = document.getElementById('notificationOverlay');
+    popup.innerHTML = message; // Use innerHTML instead of innerText for HTML support
+    
+    // Remove existing type classes
+    popup.classList.remove('notification-success', 'notification-error');
+    
+    // Add appropriate type class
+    if (type === 'error') {
+        popup.classList.add('notification-error');
+    } else {
+        popup.classList.add('notification-success');
+    }
+    
+    // Show overlay and popup
+    overlay.style.display = 'block';
+    popup.style.display = 'block';
+
+    // Function to hide notification
+    function hideNotification() {
+        popup.style.display = 'none';
+        overlay.style.display = 'none';
+        overlay.removeEventListener('click', hideNotification);
+        popup.removeEventListener('click', hideNotification);
+    }
+
+    // Hide when clicking overlay or popup (but not on links)
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            hideNotification();
+        }
+    });
+    
+    popup.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'A') { // Don't hide when clicking links
+            hideNotification();
+        }
+    });
+
+    // Auto-hide after 10 seconds (longer for update instructions)
+    setTimeout(hideNotification, 10000);
 }
 
 // Function to show update notification
 function showUpdateNotification() {
-    showNotificationPopup('🎉 New update available! Click "Check for Updates" in settings to see details.', 'info');
+    showUpdateInstructions(); // Use the same detailed popup as manual check
 }
+
+// Function to update the update check icons based on status
+function updateUpdateIcons(hasUpdates, isError = false) {
+    const desktopIcon = document.getElementById('update-icon-desktop');
+    const mobileIcon = document.getElementById('update-icon-mobile');
+    
+    // Define icon classes
+    let iconClass, iconColor;
+    
+    if (isError) {
+        iconClass = 'fas fa-exclamation-triangle';
+        iconColor = '#e53935';
+    } else if (hasUpdates) {
+        iconClass = 'fas fa-arrow-up';
+        iconColor = '#ff9800';
+    } else {
+        iconClass = 'fas fa-check-circle';
+        iconColor = '#4caf50';
+    }
+    
+    // Update desktop icon
+    if (desktopIcon) {
+        desktopIcon.className = iconClass;
+        desktopIcon.style.color = iconColor;
+    }
+    
+    // Update mobile icon
+    if (mobileIcon) {
+        mobileIcon.className = iconClass;
+        mobileIcon.style.color = iconColor;
+    }
+}
+
+// Silent update check on page load
+function silentUpdateCheck() {
+    fetch('check_updates.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                // Update icons to show error
+                updateUpdateIcons(false, true);
+            } else if (data.has_updates) {
+                // Update icons to show updates available
+                updateUpdateIcons(true, false);
+                // Only show notification if there's an update available
+                showUpdateNotification();
+            } else {
+                // Update icons to show up to date
+                updateUpdateIcons(false, false);
+            }
+            // Store the last check time and status
+            localStorage.setItem('lastUpdateCheck', Date.now().toString());
+            localStorage.setItem('lastUpdateStatus', JSON.stringify({
+                hasUpdates: data.has_updates || false,
+                isError: !!data.error
+            }));
+        })
+        .catch(error => {
+            // Silent failure - but update icon to show error
+            updateUpdateIcons(false, true);
+            console.log('Silent update check failed:', error);
+        });
+}
+
+// Auto-check for updates on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore icon state from last check
+    const lastStatus = localStorage.getItem('lastUpdateStatus');
+    if (lastStatus) {
+        try {
+            const status = JSON.parse(lastStatus);
+            updateUpdateIcons(status.hasUpdates, status.isError);
+        } catch (e) {
+            console.log('Could not parse last update status:', e);
+        }
+    }
+    
+    // Check if we should do an update check (max once per day)
+    const lastCheck = localStorage.getItem('lastUpdateCheck');
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    
+    if (!lastCheck || (now - parseInt(lastCheck)) > oneDay) {
+        // Wait 3 seconds after page load to avoid interfering with initial loading
+        setTimeout(silentUpdateCheck, 3000);
+    }
+});

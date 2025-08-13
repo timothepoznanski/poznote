@@ -263,7 +263,7 @@ if($note != '') {
                         <span>Export/Import</span>
                     </div>
                     <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
-                        <i class="fas fa-sync-alt"></i>
+                        <i id="update-icon-mobile" class="fas fa-sync-alt"></i>
                         <span>Check for Updates</span>
                         <small id="update-status-mobile" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
                     </div>
@@ -427,7 +427,7 @@ if($note != '') {
                     <span>Export/Import</span>
                 </div>
                 <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
-                    <i class="fas fa-sync-alt"></i>
+                    <i id="update-icon-desktop" class="fas fa-sync-alt"></i>
                     <span>Check for Updates</span>
                     <small id="update-status" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
                 </div>
