@@ -544,7 +544,7 @@ function Install-Poznote {
     
     # Fresh installation
     Write-Host @"
-    Poznote Installation Script
+Poznote Installation Script
 "@ -ForegroundColor $Colors.Green
 
     # Check if .env already exists
