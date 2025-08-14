@@ -11,61 +11,61 @@ function formatDateTime($t) {
 
 /**
  * Get the correct entries directory path (dev or prod environment)
- * Now unified: always use 'entries' directory in webroot
+ * Now unified: always use 'data/entries' directory in webroot
  */
 function getEntriesPath() {
-    // Always use the same path - Docker volumes handle the mapping
-    $path = realpath('entries');
+    // Always use the data/entries path - Docker volumes handle the mapping
+    $path = realpath('data/entries');
     
     if ($path && is_dir($path)) {
         return $path;
     }
     
-    // Fallback: create entries directory in current location
+    // Fallback: create entries directory in data location
     // This should rarely happen as Docker creates the directories
-    if (!is_dir('entries')) {
-        mkdir('entries', 0755, true);
+    if (!is_dir('data/entries')) {
+        mkdir('data/entries', 0755, true);
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown('entries', 'www-data');
-            chgrp('entries', 'www-data');
+            chown('data/entries', 'www-data');
+            chgrp('data/entries', 'www-data');
         }
     }
-    return realpath('entries');
+    return realpath('data/entries');
 }
 
 /**
  * Get the correct attachments directory path (dev or prod environment)
- * Now unified: always use 'attachments' directory in webroot
+ * Now unified: always use 'data/attachments' directory in webroot
  */
 function getAttachmentsPath() {
-    // Always use the same path - Docker volumes handle the mapping
-    $path = realpath('attachments');
+    // Always use the data/attachments path - Docker volumes handle the mapping
+    $path = realpath('data/attachments');
     
     if ($path && is_dir($path)) {
         return $path;
     }
     
-    // Fallback: create attachments directory in current location
+    // Fallback: create attachments directory in data location
     // This should rarely happen as Docker creates the directories
-    if (!is_dir('attachments')) {
-        if (!mkdir('attachments', 0777, true)) {
-            error_log("Failed to create attachments directory");
+    if (!is_dir('data/attachments')) {
+        if (!mkdir('data/attachments', 0777, true)) {
+            error_log("Failed to create data/attachments directory");
             return false;
         }
         
         // Set proper permissions
-        chmod('attachments', 0777);
+        chmod('data/attachments', 0777);
         
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown('attachments', 'www-data');
-            chgrp('attachments', 'www-data');
+            chown('data/attachments', 'www-data');
+            chgrp('data/attachments', 'www-data');
         }
         
-        error_log("Created attachments directory: " . realpath('attachments'));
+        error_log("Created attachments directory: " . realpath('data/attachments'));
     }
-    return realpath('attachments');
+    return realpath('data/attachments');
 }
 
 /**
