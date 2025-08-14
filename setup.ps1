@@ -296,9 +296,9 @@ function Get-PortWithValidation {
     }
 }
 
-# Manage Docker containers
-function Update-DockerContainers {
-    Write-Status "Stopping existing containers..."
+# Manage Docker container
+function Update-DockerContainer {
+    Write-Status "Stopping existing container..."
     
     # Try docker compose, fallback to docker-compose
     $composeCmd = "docker compose"
@@ -328,7 +328,7 @@ function Update-DockerContainers {
         Write-Warning "Image pull failed, but continuing with build..."
     }
     
-    Write-Status "Building and starting updated containers..."
+    Write-Status "Building and starting updated container..."
     try {
         if ($composeCmd -eq "docker compose") {
             $buildOutput = docker compose up -d --build --force-recreate 2>&1
@@ -337,15 +337,15 @@ function Update-DockerContainers {
         }
         
         if ($LASTEXITCODE -eq 0) {
-            Write-Success "Containers updated successfully!"
+            Write-Success "Container updated successfully!"
             return $composeCmd
         } else {
-            throw "Failed to update containers: $buildOutput"
+            throw "Failed to update container: $buildOutput"
         }
     }
     catch {
         Write-Error "Exception during container update: $($_.Exception.Message)"
-        throw "Failed to update containers: $($_.Exception.Message)"
+        throw "Failed to update container: $($_.Exception.Message)"
     }
 }
 
@@ -416,7 +416,7 @@ function Reconfigure-Poznote {
         Write-Success "Configuration updated from template successfully!"
     }
 
-    # Restart containers
+    # Restart container
     Write-Status "Restarting Poznote with new configuration..."
     
     try {
@@ -540,7 +540,7 @@ function Install-Poznote {
                     Write-Status "Preserving existing configuration..."
                     
                     try {
-                        $composeCmd = Update-DockerContainers
+                        $composeCmd = Update-DockerContainer
                         
                         # Install Git hook for automatic versioning
                         Install-GitHook
@@ -662,7 +662,7 @@ Poznote Installation Script
         Write-Success "Data directories created!"
     }
     
-    # Start Docker containers
+    # Start Docker container
     Write-Status "Starting Poznote with Docker Compose..."
     
     $dockerComposeCmd = ""
