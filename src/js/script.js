@@ -2339,11 +2339,7 @@ function silentVersionCheck() {
     const lastCheck = localStorage.getItem('lastVersionCheck');
     const now = Date.now();
     const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    
-    console.log('Silent version check triggered');
-    console.log('Last check:', lastCheck ? new Date(parseInt(lastCheck)) : 'Never');
-    console.log('Time since last check:', lastCheck ? (now - parseInt(lastCheck)) / 1000 / 60 / 60 : 'N/A', 'hours');
-    
+        
     if (lastCheck && (now - parseInt(lastCheck)) < oneDayMs) {
         // Already checked today, skip
         return;
