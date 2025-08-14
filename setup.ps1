@@ -154,7 +154,7 @@ function Test-ExistingInstallation {
     $indicators = @(
         (Test-Path "./data/entries"),
         (Test-Path "./data/attachments"),
-        (Test-Path "./data/mysql"),
+        (Test-Path "./data/poznote.db"),
         ((Test-Path ".env") -and -not ((Test-Path ".env.template") -and ((Get-Content ".env" -Raw) -eq (Get-Content ".env.template" -Raw))))
     )
     
@@ -374,10 +374,7 @@ function Reconfigure-Poznote {
     Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
     Write-Host "  • Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
     Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
-    Write-Host "  • MySQL Database: $($existingConfig['MYSQL_DATABASE'])" -ForegroundColor $Colors.White
-    Write-Host "  • MySQL User: $($existingConfig['MYSQL_USER'])" -ForegroundColor $Colors.White
-    Write-Host "  • MySQL Root Password: $($existingConfig['MYSQL_ROOT_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  • MySQL User Password: $($existingConfig['MYSQL_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  • SQLite Database: $(if ([string]::IsNullOrWhiteSpace($existingConfig['SQLITE_DATABASE'])) { '/var/www/html/data/poznote.db' } else { $existingConfig['SQLITE_DATABASE'] })" -ForegroundColor $Colors.White
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
 
@@ -396,12 +393,10 @@ function Reconfigure-Poznote {
     $defaultAppName = if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] }
     $APP_NAME_DISPLAYED = Get-UserInput "Application Name Displayed" $defaultAppName
 
-    # MySQL Configuration
-    Write-Host "`nMySQL Database Configuration:" -ForegroundColor $Colors.Blue
-    $MYSQL_ROOT_PASSWORD = Get-UserInput "MySQL Root Password [hidden current value]" $existingConfig['MYSQL_ROOT_PASSWORD']
-    $MYSQL_DATABASE = Get-UserInput "MySQL Database Name" $existingConfig['MYSQL_DATABASE']
-    $MYSQL_USER = Get-UserInput "MySQL User" $existingConfig['MYSQL_USER']
-    $MYSQL_PASSWORD = Get-UserInput "MySQL User Password [hidden current value]" $existingConfig['MYSQL_PASSWORD']
+    # SQLite Configuration
+    Write-Host "`nSQLite Database Configuration:" -ForegroundColor $Colors.Blue
+    $defaultSqlitePath = if ([string]::IsNullOrWhiteSpace($existingConfig['SQLITE_DATABASE'])) { '/var/www/html/data/poznote.db' } else { $existingConfig['SQLITE_DATABASE'] }
+    $SQLITE_DATABASE = Get-UserInput "SQLite Database Path" $defaultSqlitePath
 
     if ($POZNOTE_PASSWORD -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
@@ -416,11 +411,8 @@ function Reconfigure-Poznote {
         $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
         $envContent = $envContent -replace "(?m)^APP_NAME_DISPLAYED=.*", "APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED"
         
-        # Update MySQL configuration
-        if ($MYSQL_ROOT_PASSWORD) { $envContent = $envContent -replace "(?m)^MYSQL_ROOT_PASSWORD=.*", "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" }
-        if ($MYSQL_DATABASE) { $envContent = $envContent -replace "(?m)^MYSQL_DATABASE=.*", "MYSQL_DATABASE=$MYSQL_DATABASE" }
-        if ($MYSQL_USER) { $envContent = $envContent -replace "(?m)^MYSQL_USER=.*", "MYSQL_USER=$MYSQL_USER" }
-        if ($MYSQL_PASSWORD) { $envContent = $envContent -replace "(?m)^MYSQL_PASSWORD=.*", "MYSQL_PASSWORD=$MYSQL_PASSWORD" }
+        # Update SQLite configuration
+        if ($SQLITE_DATABASE) { $envContent = $envContent -replace "(?m)^SQLITE_DATABASE=.*", "SQLITE_DATABASE=$SQLITE_DATABASE" }
         
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success "Configuration updated from template successfully!"
@@ -519,10 +511,7 @@ function Install-Poznote {
             Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
             Write-Host "  • Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
             Write-Host "  • Application Name Displayed: $(if ([string]::IsNullOrWhiteSpace($existingConfig['APP_NAME_DISPLAYED'])) { 'Poznote' } else { $existingConfig['APP_NAME_DISPLAYED'] })" -ForegroundColor $Colors.White
-            Write-Host "  • MySQL Database: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_DATABASE'])) { '[default]' } else { $existingConfig['MYSQL_DATABASE'] })" -ForegroundColor $Colors.White
-            Write-Host "  • MySQL User: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_USER'])) { '[default]' } else { $existingConfig['MYSQL_USER'] })" -ForegroundColor $Colors.White
-            Write-Host "  • MySQL Root Password: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_ROOT_PASSWORD'])) { '[default]' } else { $existingConfig['MYSQL_ROOT_PASSWORD'] })" -ForegroundColor $Colors.White
-            Write-Host "  • MySQL User Password: $(if ([string]::IsNullOrWhiteSpace($existingConfig['MYSQL_PASSWORD'])) { '[default]' } else { $existingConfig['MYSQL_PASSWORD'] })" -ForegroundColor $Colors.White
+            Write-Host "  • SQLite Database: $(if ([string]::IsNullOrWhiteSpace($existingConfig['SQLITE_DATABASE'])) { '/var/www/html/data/poznote.db' } else { $existingConfig['SQLITE_DATABASE'] })" -ForegroundColor $Colors.White
         }
         
         Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green

@@ -65,10 +65,7 @@ reconfigure_poznote() {
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
     echo -e "  • Port: ${HTTP_WEB_PORT}"
     echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
-    echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
-    echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
-    echo -e "  • MySQL Root Password: ${MYSQL_ROOT_PASSWORD:-[default]}"
-    echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
+    echo -e "  • SQLite Database: ${SQLITE_DATABASE:-/var/www/html/data/poznote.db}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -93,18 +90,8 @@ reconfigure_poznote() {
     read -p "Application Name [${APP_NAME_DISPLAYED:-Poznote}]: " NEW_APP_NAME
     APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
 
-    # MySQL Configuration
-    read -p "MySQL Root Password [${MYSQL_ROOT_PASSWORD:-[hidden]}]: " NEW_MYSQL_ROOT_PASSWORD
-    MYSQL_ROOT_PASSWORD=${NEW_MYSQL_ROOT_PASSWORD:-$MYSQL_ROOT_PASSWORD}
-
-    read -p "MySQL Database Name [${MYSQL_DATABASE}]: " NEW_MYSQL_DATABASE
-    MYSQL_DATABASE=${NEW_MYSQL_DATABASE:-$MYSQL_DATABASE}
-
-    read -p "MySQL User [${MYSQL_USER}]: " NEW_MYSQL_USER
-    MYSQL_USER=${NEW_MYSQL_USER:-$MYSQL_USER}
-
-    read -p "MySQL User Password [${MYSQL_PASSWORD:-[hidden]}]: " NEW_MYSQL_PASSWORD
-    MYSQL_PASSWORD=${NEW_MYSQL_PASSWORD:-$MYSQL_PASSWORD}
+    read -p "SQLite Database Path [${SQLITE_DATABASE:-/var/www/html/data/poznote.db}]: " NEW_SQLITE_DATABASE
+    SQLITE_DATABASE=${NEW_SQLITE_DATABASE:-${SQLITE_DATABASE:-/var/www/html/data/poznote.db}}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -150,7 +137,7 @@ check_existing_installation() {
     local indicators=0
     [ -d "./data/entries" ] && ((indicators++))
     [ -d "./data/attachments" ] && ((indicators++))
-    [ -d "./data/mysql" ] && ((indicators++))
+    [ -f "./data/poznote.db" ] && ((indicators++))
     
     # Count .env only if it's different from template
     if [ -f ".env" ] && [ -f ".env.template" ]; then
@@ -186,6 +173,7 @@ get_template_values() {
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
         TEMPLATE_APP_NAME=$(grep "^APP_NAME_DISPLAYED=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
+        TEMPLATE_SQLITE_DATABASE=$(grep "^SQLITE_DATABASE=" .env.template | cut -d'=' -f2)
     fi
 }
 
@@ -376,30 +364,18 @@ get_user_config() {
         APP_NAME_DISPLAYED="Poznote"
     fi
     
-    # Get MySQL configuration (only for option 2 - configuration change)
+    # Get SQLite configuration (only for option 2 - configuration change)
     if [ "$is_update" = "true" ]; then
         echo
-        print_status "MySQL Database Configuration:"
+        print_status "SQLite Database Configuration:"
         
-        # Get template values for MySQL
+        # Get template values for SQLite
         if [ -f ".env.template" ]; then
-            TEMPLATE_MYSQL_ROOT_PASSWORD=$(grep "^MYSQL_ROOT_PASSWORD=" .env.template | cut -d'=' -f2)
-            TEMPLATE_MYSQL_DATABASE=$(grep "^MYSQL_DATABASE=" .env.template | cut -d'=' -f2)
-            TEMPLATE_MYSQL_USER=$(grep "^MYSQL_USER=" .env.template | cut -d'=' -f2)
-            TEMPLATE_MYSQL_PASSWORD=$(grep "^MYSQL_PASSWORD=" .env.template | cut -d'=' -f2)
+            TEMPLATE_SQLITE_DATABASE=$(grep "^SQLITE_DATABASE=" .env.template | cut -d'=' -f2)
         fi
         
-        read -p "MySQL Root Password [${MYSQL_ROOT_PASSWORD:-${TEMPLATE_MYSQL_ROOT_PASSWORD}}]: " NEW_MYSQL_ROOT_PASSWORD
-        MYSQL_ROOT_PASSWORD=${NEW_MYSQL_ROOT_PASSWORD:-${MYSQL_ROOT_PASSWORD:-${TEMPLATE_MYSQL_ROOT_PASSWORD}}}
-        
-        read -p "MySQL Database Name [${MYSQL_DATABASE:-${TEMPLATE_MYSQL_DATABASE}}]: " NEW_MYSQL_DATABASE
-        MYSQL_DATABASE=${NEW_MYSQL_DATABASE:-${MYSQL_DATABASE:-${TEMPLATE_MYSQL_DATABASE}}}
-        
-        read -p "MySQL User [${MYSQL_USER:-${TEMPLATE_MYSQL_USER}}]: " NEW_MYSQL_USER
-        MYSQL_USER=${NEW_MYSQL_USER:-${MYSQL_USER:-${TEMPLATE_MYSQL_USER}}}
-        
-        read -p "MySQL User Password [${MYSQL_PASSWORD:-${TEMPLATE_MYSQL_PASSWORD}}]: " NEW_MYSQL_PASSWORD
-        MYSQL_PASSWORD=${NEW_MYSQL_PASSWORD:-${MYSQL_PASSWORD:-${TEMPLATE_MYSQL_PASSWORD}}}
+        read -p "SQLite Database Path [${SQLITE_DATABASE:-${TEMPLATE_SQLITE_DATABASE}}]: " NEW_SQLITE_DATABASE
+        SQLITE_DATABASE=${NEW_SQLITE_DATABASE:-${SQLITE_DATABASE:-${TEMPLATE_SQLITE_DATABASE}}}
     fi
     
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
@@ -425,18 +401,9 @@ create_env_file() {
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
     sed -i "s/^APP_NAME_DISPLAYED=.*/APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED/" .env
     
-    # Update MySQL configuration if variables are set
-    if [ -n "$MYSQL_ROOT_PASSWORD" ]; then
-        sed -i "s/^MYSQL_ROOT_PASSWORD=.*/MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD/" .env
-    fi
-    if [ -n "$MYSQL_DATABASE" ]; then
-        sed -i "s/^MYSQL_DATABASE=.*/MYSQL_DATABASE=$MYSQL_DATABASE/" .env
-    fi
-    if [ -n "$MYSQL_USER" ]; then
-        sed -i "s/^MYSQL_USER=.*/MYSQL_USER=$MYSQL_USER/" .env
-    fi
-    if [ -n "$MYSQL_PASSWORD" ]; then
-        sed -i "s/^MYSQL_PASSWORD=.*/MYSQL_PASSWORD=$MYSQL_PASSWORD/" .env
+    # Update SQLite configuration if variable is set
+    if [ -n "$SQLITE_DATABASE" ]; then
+        sed -i "s|^SQLITE_DATABASE=.*|SQLITE_DATABASE=$SQLITE_DATABASE|" .env
     fi
     
     print_success ".env file created from template"
@@ -580,10 +547,7 @@ main() {
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
             echo -e "  • Port: ${HTTP_WEB_PORT}"
             echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
-            echo -e "  • MySQL Database: ${MYSQL_DATABASE:-[default]}"
-            echo -e "  • MySQL User: ${MYSQL_USER:-[default]}"
-            echo -e "  • MySQL Root Password: ${MYSQL_ROOT_PASSWORD:-[default]}"
-            echo -e "  • MySQL User Password: ${MYSQL_PASSWORD:-[default]}"
+            echo -e "  • SQLite Database: ${SQLITE_DATABASE:-/var/www/html/data/poznote.db}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}\n"
@@ -641,7 +605,7 @@ main() {
         
         echo
         print_status "💡 Configuration tip:"
-        echo -e "  ${YELLOW}To customize MySQL database settings (passwords, database name, user), run:${NC}"
+        echo -e "  ${YELLOW}To customize SQLite database settings (database path), run:${NC}"
         echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
