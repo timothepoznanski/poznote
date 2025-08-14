@@ -112,17 +112,6 @@ if($note != '') {
     <div id="notificationOverlay" class="notification-overlay"></div>
     <div id="notificationPopup"></div>
     
-    <!-- Update Available Notification -->
-    <div id="updateNotification" class="update-notification">
-        <button class="close-btn" onclick="hideUpdateNotification()">&times;</button>
-        <h4>🎉 Update Available!</h4>
-        <p>A new version of Poznote is ready to install.</p>
-        <div class="update-notification-buttons">
-            <button onclick="hideUpdateNotification(true)">Later</button>
-            <button class="primary" onclick="hideUpdateNotification(true); checkForUpdates();">View Details</button>
-        </div>
-    </div>
-    
     <!-- Update Modal -->
     <div id="updateModal" class="modal">
         <div class="modal-content">

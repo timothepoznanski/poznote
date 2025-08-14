@@ -2361,9 +2361,10 @@ function silentVersionCheck() {
             console.log('Version check response:', data);
             
             if (!data.error && data.has_updates) {
-                console.log('Update available, showing notification');
-                // Show discrete notification for available update
-                showUpdateAvailableNotification(data.remote_version, data.current_version);
+                console.log('Update available, showing update modal');
+                // Show the same modal as manual check - update available
+                showUpdateBadge(); // Still show badge on menu icon
+                showUpdateInstructions(); // Show the standard update modal
             } else {
                 console.log('No update available or error occurred');
             }
@@ -2375,48 +2376,10 @@ function silentVersionCheck() {
         });
 }
 
-// Show a discrete notification when update is available
-function showUpdateAvailableNotification(remoteVersion, currentVersion) {
-    // Get the existing notification element
-    const notification = document.getElementById('updateNotification');
-    if (!notification) {
-        console.error('Update notification element not found');
-        return;
-    }
-    
-    // Update the notification content with version info
-    const messageElement = notification.querySelector('p');
-    if (messageElement) {
-        messageElement.textContent = `Version ${remoteVersion} is available. You're currently running ${currentVersion}.`;
-    }
-    
-    // Show the notification with slide-in animation
-    notification.style.display = 'block';
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Show update badge on menu icons
-    showUpdateBadge();
-    
-    // Note: Notification will only be hidden when user clicks "Later" or "View Details"
-}
-
-// Hide the update notification
-function hideUpdateNotification(removeBadge = false) {
-    const notification = document.getElementById('updateNotification');
-    if (notification) {
-        notification.classList.remove('show');
-        // Hide after animation completes
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 400);
-    }
-    
-    // Only hide the update badge if explicitly requested (when user clicks "Later")
-    if (removeBadge) {
-        hideUpdateBadge();
-    }
+// Hide the update badge (simplified since we removed the notification element)
+function hideUpdateNotification() {
+    // This function is now only used to hide the badge when user dismisses update
+    hideUpdateBadge();
 }
 
 // Show update badge on menu icons
