@@ -2399,14 +2399,11 @@ function showUpdateAvailableNotification(remoteVersion, currentVersion) {
     // Show update badge on menu icons
     showUpdateBadge();
     
-    // Auto-hide after 15 seconds
-    setTimeout(() => {
-        hideUpdateNotification();
-    }, 15000);
+    // Note: Notification will only be hidden when user clicks "Later" or "View Details"
 }
 
 // Hide the update notification
-function hideUpdateNotification() {
+function hideUpdateNotification(removeBadge = false) {
     const notification = document.getElementById('updateNotification');
     if (notification) {
         notification.classList.remove('show');
@@ -2416,8 +2413,10 @@ function hideUpdateNotification() {
         }, 400);
     }
     
-    // Also hide the update badge when notification is dismissed
-    hideUpdateBadge();
+    // Only hide the update badge if explicitly requested (when user clicks "Later")
+    if (removeBadge) {
+        hideUpdateBadge();
+    }
 }
 
 // Show update badge on menu icons
@@ -2664,10 +2663,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Automatic daily version checking
-    // Delay initial check by 10 seconds to allow page to fully load
+    // Delay initial check by 3 seconds to allow page to fully load
     setTimeout(function() {
         silentVersionCheck();
-    }, 10000);
+    }, 3000);
     
     // Add temporary test function for development (can be removed in production)
     window.testUpdateCheck = function() {

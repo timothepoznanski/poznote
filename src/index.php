@@ -118,8 +118,8 @@ if($note != '') {
         <h4>🎉 Update Available!</h4>
         <p>A new version of Poznote is ready to install.</p>
         <div class="update-notification-buttons">
-            <button onclick="hideUpdateNotification()">Later</button>
-            <button class="primary" onclick="hideUpdateNotification(); checkForUpdates();">View Details</button>
+            <button onclick="hideUpdateNotification(true)">Later</button>
+            <button class="primary" onclick="hideUpdateNotification(true); checkForUpdates();">View Details</button>
         </div>
     </div>
     
