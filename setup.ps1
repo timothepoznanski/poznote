@@ -338,8 +338,6 @@ function Update-DockerContainers {
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Containers updated successfully!"
-            Write-Status "Waiting for database to be ready..."
-            Start-Sleep -Seconds 15
             return $composeCmd
         } else {
             throw "Failed to update containers: $buildOutput"
