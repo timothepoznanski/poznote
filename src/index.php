@@ -83,16 +83,70 @@ if (!empty($_POST['unified_search'])) {
 $note = $_GET['note'] ?? '';
 $folder_filter = $_GET['folder'] ?? '';
 
-// Determine current note folder early for JavaScript
-$current_note_folder = 'Uncategorized';
-if($note != '') {
-    $stmt = $con->prepare("SELECT folder FROM entries WHERE trash = 0 AND heading = ?");
-    $stmt->execute([$note]);
-    $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    if($note_data) {
-        $current_note_folder = $note_data["folder"] ?: 'Uncategorized';
-    }
-}
+        // Determine default note folder before JavaScript
+        $default_note_folder = null; // Track folder of default note
+        $res_right = null; // Initialize $res_right to avoid undefined variable error
+        
+        if($note!='') // If the note is not empty, it means we have just clicked on a note.
+        {          
+            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
+            $stmt->execute([$note]);
+            $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if($note_data) {
+                $current_note_folder = $note_data["folder"] ?: 'Uncategorized';
+                // Prepare result for right column
+                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
+                $stmt_right->execute([$note]);
+                $res_right = $stmt_right;
+            } else {
+                // Si la note demandée n'existe pas, afficher la dernière note mise à jour
+                $note = ''; // Reset note to trigger showing latest note
+                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0");
+                $check_stmt->execute();
+                $note_count_row = $check_stmt->fetch(PDO::FETCH_ASSOC);
+                $note_count = $note_count_row['note_count'];
+                
+                if ($note_count > 0) {
+                    // Show the most recently updated note
+                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
+                    $stmt_right->execute();
+                    $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                    if($latest_note) {
+                        $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                        // Reset statement to be used in display loop
+                        $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
+                        $stmt_right->execute();
+                        $res_right = $stmt_right;
+                    }
+                } else {
+                    // No notes available, show welcome screen
+                    $res_right = null;
+                }
+            }
+        } else {
+            // No specific note requested, check if we have notes to show the latest one
+            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0");
+            $check_stmt->execute();
+            $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
+            
+            if ($note_count > 0) {
+                // Show the most recently updated note
+                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
+                $stmt_right->execute();
+                $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                if($latest_note) {
+                    $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                    // Reset statement to be used in display loop
+                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
+                    $stmt_right->execute();
+                    $res_right = $stmt_right;
+                }
+            } else {
+                // No notes available, show welcome screen
+                $res_right = null;
+            }
+        }
 ?>
 
 <html>
@@ -527,59 +581,6 @@ if($note != '') {
         </form>
     </div>
     <?php endif; ?>
-        
-    <?php
-        // Determine default note folder before JavaScript
-        $default_note_folder = null; // Track folder of default note
-        
-        if($note!='') // If the note is not empty, it means we have just clicked on a note.
-        {          
-            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
-            $stmt->execute([$note]);
-            $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            // Si la note demandée n'existe pas, afficher la dernière note mise à jour
-            if(!$note_data) {
-                $note = ''; // Reset note to trigger showing latest note
-                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE $where_clause");
-                $check_stmt->execute($search_params);
-                $note_count_row = $check_stmt->fetch(PDO::FETCH_ASSOC);
-                $note_count = $note_count_row['note_count'];
-                
-                if ($note_count > 0) {
-                    // Show the most recently updated note
-                    $stmt_right = $con->prepare($query_right_secure);
-                    $stmt_right->execute($search_params);
-                    $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                    if($latest_note) {
-                        $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                    }
-                } else {
-                    // No notes available, show welcome screen
-                    $res_right = null;
-                }
-            }
-        } else {
-            // No specific note requested, check if we have notes to show the latest one
-            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE $where_clause");
-            $check_stmt->execute($search_params);
-            $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
-            
-            if ($note_count > 0) {
-                // Show the most recently updated note
-                $stmt_right = $con->prepare($query_right_secure);
-                $stmt_right->execute($search_params);
-                $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                if($latest_note) {
-                    $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                }
-            } else {
-                // No notes available, show welcome screen
-                $res_right = null;
-                // The page will show the welcome screen instead
-            }
-        }
-    ?>
         
     <script>
         // Variables for folder management

@@ -2346,22 +2346,17 @@ function silentVersionCheck() {
     
     if (lastCheck && (now - parseInt(lastCheck)) < oneDayMs) {
         // Already checked today, skip
-        console.log('Already checked within 24 hours, skipping');
         return;
     }
-    
-    console.log('Performing silent version check...'); 
-    
+        
     // Perform silent check
     fetch('check_updates.php')
         .then(response => response.json())
         .then(data => {
             // Store the check timestamp
             localStorage.setItem('lastVersionCheck', now.toString());
-            console.log('Version check response:', data);
             
             if (!data.error && data.has_updates) {
-                console.log('Update available, showing update modal');
                 // Show the same modal as manual check - update available
                 showUpdateBadge(); // Still show badge on menu icon
                 showUpdateInstructions(); // Show the standard update modal
