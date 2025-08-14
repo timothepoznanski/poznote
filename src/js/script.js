@@ -2333,6 +2333,139 @@ function clearSearch() {
 
 // UPDATE CHECK FUNCTIONS
 
+// Automatic version check (once per day)
+function silentVersionCheck() {
+    // Check if we should run the check (once per day)
+    const lastCheck = localStorage.getItem('lastVersionCheck');
+    const now = Date.now();
+    const oneDayMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    console.log('Silent version check triggered');
+    console.log('Last check:', lastCheck ? new Date(parseInt(lastCheck)) : 'Never');
+    console.log('Time since last check:', lastCheck ? (now - parseInt(lastCheck)) / 1000 / 60 / 60 : 'N/A', 'hours');
+    
+    if (lastCheck && (now - parseInt(lastCheck)) < oneDayMs) {
+        // Already checked today, skip
+        console.log('Already checked within 24 hours, skipping');
+        return;
+    }
+    
+    console.log('Performing silent version check...');
+    
+    // Perform silent check
+    fetch('check_updates.php')
+        .then(response => response.json())
+        .then(data => {
+            // Store the check timestamp
+            localStorage.setItem('lastVersionCheck', now.toString());
+            console.log('Version check response:', data);
+            
+            if (!data.error && data.has_updates) {
+                console.log('Update available, showing notification');
+                // Show discrete notification for available update
+                showUpdateAvailableNotification(data.remote_version, data.current_version);
+            } else {
+                console.log('No update available or error occurred');
+            }
+            // If no update or error, do nothing (silent)
+        })
+        .catch(error => {
+            // Silent failure - don't bother the user
+            console.log('Silent version check failed:', error);
+        });
+}
+
+// Show a discrete notification when update is available
+function showUpdateAvailableNotification(remoteVersion, currentVersion) {
+    // Get the existing notification element
+    const notification = document.getElementById('updateNotification');
+    if (!notification) {
+        console.error('Update notification element not found');
+        return;
+    }
+    
+    // Update the notification content with version info
+    const messageElement = notification.querySelector('p');
+    if (messageElement) {
+        messageElement.textContent = `Version ${remoteVersion} is available. You're currently running ${currentVersion}.`;
+    }
+    
+    // Show the notification with slide-in animation
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Show update badge on menu icons
+    showUpdateBadge();
+    
+    // Auto-hide after 15 seconds
+    setTimeout(() => {
+        hideUpdateNotification();
+    }, 15000);
+}
+
+// Hide the update notification
+function hideUpdateNotification() {
+    const notification = document.getElementById('updateNotification');
+    if (notification) {
+        notification.classList.remove('show');
+        // Hide after animation completes
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 400);
+    }
+    
+    // Also hide the update badge when notification is dismissed
+    hideUpdateBadge();
+}
+
+// Show update badge on menu icons
+function showUpdateBadge() {
+    // Add badge to desktop menu icon
+    const desktopIcon = document.getElementById('update-icon-desktop');
+    const desktopItem = document.getElementById('update-check-item');
+    if (desktopIcon && desktopItem && !desktopItem.querySelector('.update-badge')) {
+        desktopItem.style.position = 'relative';
+        const badge = document.createElement('div');
+        badge.className = 'update-badge';
+        badge.innerHTML = '!';
+        desktopItem.appendChild(badge);
+    }
+    
+    // Add badge to mobile menu icon
+    const mobileIcon = document.getElementById('update-icon-mobile');
+    const mobileItem = document.getElementById('update-check-item-mobile');
+    if (mobileIcon && mobileItem && !mobileItem.querySelector('.update-badge')) {
+        mobileItem.style.position = 'relative';
+        const badge = document.createElement('div');
+        badge.className = 'update-badge';
+        badge.innerHTML = '!';
+        mobileItem.appendChild(badge);
+    }
+}
+
+// Hide update badge from menu icons
+function hideUpdateBadge() {
+    // Remove badge from desktop menu
+    const desktopItem = document.getElementById('update-check-item');
+    if (desktopItem) {
+        const badge = desktopItem.querySelector('.update-badge');
+        if (badge) {
+            badge.remove();
+        }
+    }
+    
+    // Remove badge from mobile menu
+    const mobileItem = document.getElementById('update-check-item-mobile');
+    if (mobileItem) {
+        const badge = mobileItem.querySelector('.update-badge');
+        if (badge) {
+            badge.remove();
+        }
+    }
+}
+
 // Function to check for updates (manual check from settings menu)
 function checkForUpdates() {
     // Close settings menus
@@ -2340,6 +2473,9 @@ function checkForUpdates() {
     const settingsMenuMobile = document.getElementById('settingsMenuMobile');
     if (settingsMenu) settingsMenu.style.display = 'none';
     if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
+    
+    // Remove update badge since user is manually checking
+    hideUpdateBadge();
     
     // Show the checking modal
     showUpdateCheckModal();
@@ -2526,4 +2662,17 @@ document.addEventListener('DOMContentLoaded', function() {
             closeNoteInfoModal();
         }
     });
+    
+    // Automatic daily version checking
+    // Delay initial check by 10 seconds to allow page to fully load
+    setTimeout(function() {
+        silentVersionCheck();
+    }, 10000);
+    
+    // Add temporary test function for development (can be removed in production)
+    window.testUpdateCheck = function() {
+        console.log('Manual trigger of silent version check for testing');
+        localStorage.removeItem('lastVersionCheck'); // Force check regardless of timing
+        silentVersionCheck();
+    };
 });

@@ -1130,6 +1130,138 @@ img {
     margin: 8px 0;
 }
 
+/* AUTOMATIC UPDATE NOTIFICATION */
+
+/* Discrete update notification that slides in from the right */
+.update-notification {
+    position: fixed;
+    top: 20px;
+    right: -400px; /* Start off-screen */
+    width: 350px;
+    background: linear-gradient(135deg, #007DB8 0%, #0056b3 100%);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 125, 184, 0.3);
+    z-index: 1001;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    display: none;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.update-notification.show {
+    right: 20px;
+    opacity: 1;
+    display: block;
+}
+
+.update-notification h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.update-notification p {
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+.update-notification-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.update-notification button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.update-notification button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.update-notification button.primary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #007DB8;
+}
+
+.update-notification button.primary:hover {
+    background: white;
+    transform: translateY(-1px);
+}
+
+.update-notification .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.update-notification .close-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* Keyframe animations */
+@keyframes slideInRight {
+    from {
+        right: -400px;
+        opacity: 0;
+    }
+    to {
+        right: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        right: 20px;
+        opacity: 1;
+    }
+    to {
+        right: -400px;
+        opacity: 0;
+    }
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+    .update-notification {
+        top: 10px;
+        right: -320px;
+        left: 10px;
+        width: auto;
+        margin-right: 10px;
+    }
+    
+    .update-notification.show {
+        right: 10px;
+    }
+}
+
 /* MENU RIGHT */
 
 .icon_download{
