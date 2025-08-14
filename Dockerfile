@@ -18,8 +18,8 @@ COPY php.ini /usr/local/etc/php/
 
 # Note: Source files are mounted as volumes, not copied
 
-# Create directories for data volumes
-RUN mkdir -p /var/www/html/entries /var/www/html/attachments /var/www/html/data 
+# Create directory for data volume (entries and attachments are inside data/)
+RUN mkdir -p /var/www/html/data 
 
 # Enable Apache mod_rewrite if needed
 RUN a2enmod rewrite
