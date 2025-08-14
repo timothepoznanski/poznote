@@ -2378,7 +2378,7 @@ function silentVersionCheck() {
 
 // Hide the update badge (simplified since we removed the notification element)
 function hideUpdateNotification() {
-    // This function is now only used to hide the badge when user dismisses update
+    // This function is now only used to hide the badge when user dismisses update 
     hideUpdateBadge();
 }
 
