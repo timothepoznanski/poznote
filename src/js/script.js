@@ -44,89 +44,109 @@ function toggleNoteMenu(noteId) {
     }
 }
 
-// Function to show note information in a better formatted way
+// Function to show note information with dates (robust version)
 function showNoteInfo(noteId, created, updated) {
-    console.log("showNoteInfo called with:", { noteId, created, updated });
-    
     try {
-        // Vérifier que les éléments DOM existent
-        const modal = document.getElementById('noteInfoModal');
-        const idElement = document.getElementById('noteInfoId');
-        const createdElement = document.getElementById('noteInfoCreated');
-        const updatedElement = document.getElementById('noteInfoUpdated');
+        // Clean and format the dates
+        let createdText = "Non disponible";
+        let updatedText = "Non disponible";
         
-        if (!modal || !idElement || !createdElement || !updatedElement) {
-            console.error("Missing DOM elements for note info modal");
-            alert("Erreur: Éléments de l'interface manquants");
-            return;
+        // Try to parse and format created date
+        if (created) {
+            try {
+                const createdDate = new Date(created);
+                if (!isNaN(createdDate.getTime())) {
+                    createdText = createdDate.toLocaleString('fr-FR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            } catch (e) {
+                createdText = created; // Use raw value as fallback
+            }
         }
         
-        // Traitement des dates avec gestion d'erreur
-        let createdDate, updatedDate;
-        
-        try {
-            // Les dates viennent de PHP au format ISO (YYYY-MM-DD HH:MM:SS)
-            createdDate = new Date(created);
-            updatedDate = new Date(updated);
-            
-            // Vérifier que les dates sont valides
-            if (isNaN(createdDate.getTime())) {
-                console.warn("Invalid created date:", created);
-                createdDate = new Date();
+        // Try to parse and format updated date
+        if (updated) {
+            try {
+                const updatedDate = new Date(updated);
+                if (!isNaN(updatedDate.getTime())) {
+                    updatedText = updatedDate.toLocaleString('fr-FR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            } catch (e) {
+                updatedText = updated; // Use raw value as fallback
             }
-            if (isNaN(updatedDate.getTime())) {
-                console.warn("Invalid updated date:", updated);
-                updatedDate = new Date();
-            }
-        } catch (dateError) {
-            console.error("Date parsing error:", dateError);
-            createdDate = new Date();
-            updatedDate = new Date();
         }
         
-        // Formatter les dates en français
-        const dateOptions = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            timeZone: 'Europe/Paris'
-        };
-        
-        // Remplir le modal avec les informations
-        idElement.textContent = noteId;
-        createdElement.textContent = createdDate.toLocaleString('fr-FR', dateOptions);
-        updatedElement.textContent = updatedDate.toLocaleString('fr-FR', dateOptions);
-        
-        // Afficher le modal
-        modal.style.display = 'block';
-        
-        // Ajouter un gestionnaire pour fermer en cliquant à l'extérieur
-        modal.onclick = function(event) {
-            if (event.target === modal) {
-                closeNoteInfoModal();
-            }
-        };
-        
-        console.log("Note info modal displayed successfully");
+        // Show the information in a styled modal
+        showNoteModal(noteId, createdText, updatedText);
         
     } catch (error) {
         console.error("Error in showNoteInfo:", error);
-        alert("Erreur lors de l'affichage des informations: " + error.message);
+        alert("Erreur lors de l'affichage des informations de la note: " + error.message);
     }
 }
 
-// Function to close note info modal
+// Function to show note information in a styled modal
+function showNoteModal(noteId, createdText, updatedText) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('noteInfoModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal HTML
+    const modalHTML = `
+        <div id="noteInfoModal" class="modal" style="display: flex;">
+            <div class="modal-content note-info-modal">
+                <h3><i class="fa fa-info-circle" style="color: #007DB8; margin-right: 8px;"></i>Informations de la note</h3>
+                <div class="note-info-content">
+                    <div class="info-row">
+                        <span class="info-label">ID :</span>
+                        <span class="info-value">${noteId}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Créée :</span>
+                        <span class="info-value">${createdText}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Modifiée :</span>
+                        <span class="info-value">${updatedText}</span>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="closeNoteInfoModal()" class="btn-primary">Fermer</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Add click outside to close
+    const modal = document.getElementById('noteInfoModal');
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeNoteInfoModal();
+        }
+    });
+}
+
+// Function to close the note info modal
 function closeNoteInfoModal() {
     const modal = document.getElementById('noteInfoModal');
     if (modal) {
-        modal.style.display = 'none';
-        modal.onclick = null; // Supprimer le gestionnaire d'événement
-        console.log("Note info modal closed");
-    } else {
-        console.error("Note info modal not found");
+        modal.remove();
     }
 }
 

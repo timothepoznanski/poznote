@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test JavaScript Functions Direct</title>
+</head>
+<body>
+    <h2>Test direct des fonctions JavaScript Poznote</h2>
+    
+    <div id="console" style="background:#f0f0f0;padding:10px;font-family:monospace;min-height:300px;"></div>
+    
+    <p><strong>Tests simples :</strong></p>
+    <button onclick="testBasic()">Test de base</button>
+    <button onclick="testWithRealData()">Test avec vraies données</button>
+    
+    <p><strong>Tests directs avec console :</strong></p>
+    <button onclick="testInConsole()">Test dans console</button>
+    
+    <!-- Inclure le vrai script de Poznote -->
+    <script src="js/script.js"></script>
+    
+    <script>
+        function log(message) {
+            console.log(message);
+            const consoleDiv = document.getElementById('console');
+            consoleDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function testBasic() {
+            log("=== TEST DE BASE ===");
+            log("typeof window: " + typeof window);
+            log("typeof document: " + typeof document);
+            log("typeof showNoteInfo: " + typeof showNoteInfo);
+            log("typeof downloadFile: " + typeof downloadFile);
+            
+            // Lister toutes les fonctions globales qui contiennent "Note" ou "download"
+            const funcs = [];
+            for (let prop in window) {
+                if (typeof window[prop] === 'function' && (prop.toLowerCase().includes('note') || prop.toLowerCase().includes('download'))) {
+                    funcs.push(prop);
+                }
+            }
+            log("Fonctions trouvées: " + funcs.join(', '));
+        }
+        
+        function testWithRealData() {
+            log("=== TEST AVEC DONNÉES RÉELLES ===");
+            
+            // Test showNoteInfo
+            try {
+                if (typeof showNoteInfo !== 'undefined') {
+                    log("Appel showNoteInfo...");
+                    showNoteInfo('13', '2025-08-14 18:46:28', '2025-08-14 18:46:44');
+                    log("showNoteInfo - OK");
+                } else {
+                    log("ERROR: showNoteInfo n'existe pas");
+                }
+            } catch (e) {
+                log("ERROR showNoteInfo: " + e.message);
+            }
+            
+            // Test downloadFile
+            try {
+                if (typeof downloadFile !== 'undefined') {
+                    log("Appel downloadFile...");
+                    downloadFile('data/entries/13.html', 'cvb');
+                    log("downloadFile - OK");
+                } else {
+                    log("ERROR: downloadFile n'existe pas");
+                }
+            } catch (e) {
+                log("ERROR downloadFile: " + e.message);
+            }
+        }
+        
+        function testInConsole() {
+            log("=== TEST DANS CONSOLE ===");
+            log("Ouvrez la console du navigateur (F12) et regardez les logs");
+            
+            // Tests dans la console
+            console.group("Test Poznote Functions");
+            console.log("showNoteInfo:", typeof showNoteInfo, showNoteInfo);
+            console.log("downloadFile:", typeof downloadFile, downloadFile);
+            
+            if (typeof showNoteInfo === 'function') {
+                console.log("Test showNoteInfo...");
+                try {
+                    showNoteInfo('test', '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+                } catch (e) {
+                    console.error("Erreur showNoteInfo:", e);
+                }
+            }
+            
+            if (typeof downloadFile === 'function') {
+                console.log("Test downloadFile...");
+                try {
+                    downloadFile('test.html', 'test');
+                } catch (e) {
+                    console.error("Erreur downloadFile:", e);
+                }
+            }
+            console.groupEnd();
+        }
+        
+        // Test automatique au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            log("Page chargée, tests automatiques...");
+            setTimeout(testBasic, 1000); // Attendre que script.js soit chargé
+        });
+        
+        // Capturer toutes les erreurs JavaScript
+        window.onerror = function(message, source, lineno, colno, error) {
+            log("ERREUR JS: " + message + " dans " + source + ":" + lineno);
+            return false;
+        };
+        
+        window.addEventListener('error', function(e) {
+            log("ERREUR EVENT: " + e.message);
+        });
+    </script>
+</body>
+</html>

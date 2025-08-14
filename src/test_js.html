@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test JavaScript Poznote</title>
+</head>
+<body>
+    <h2>Test des boutons JavaScript</h2>
+    
+    <p>Test avec des données simples :</p>
+    <button onclick="testDownload()">Test Download Simple</button>
+    <button onclick="testInfo()">Test Info Simple</button>
+    
+    <p>Test avec des données complexes :</p>
+    <button onclick="downloadFile('data/entries/1.html', 'Test Note')">Test Download Direct</button>
+    <button onclick="showNoteInfo('1', '2024-01-01 12:00:00', '2024-01-01 13:00:00')">Test Info Direct</button>
+    
+    <p>Console des tests :</p>
+    <div id="console" style="background:#f0f0f0;padding:10px;font-family:monospace;min-height:200px;"></div>
+    
+    <script>
+        // Functions pour les tests simples
+        function testDownload() {
+            log("testDownload called - OK");
+            if (typeof downloadFile !== 'undefined') {
+                downloadFile('test.html', 'Test');
+            } else {
+                log("ERROR: downloadFile function not found");
+            }
+        }
+        
+        function testInfo() {
+            log("testInfo called - OK");
+            if (typeof showNoteInfo !== 'undefined') {
+                showNoteInfo('test', '2024-01-01', '2024-01-01');
+            } else {
+                log("ERROR: showNoteInfo function not found");
+            }
+        }
+        
+        // Function de logging
+        function log(message) {
+            console.log(message);
+            document.getElementById('console').innerHTML += message + '<br>';
+        }
+        
+        // Test de base au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            log("=== TESTS DE BASE ===");
+            log("typeof downloadFile: " + typeof downloadFile);
+            log("typeof showNoteInfo: " + typeof showNoteInfo);
+            
+            // Try to load the functions from script.js
+            if (typeof downloadFile === 'undefined') {
+                log("Trying to define downloadFile...");
+                window.downloadFile = function(url, filename) {
+                    log("downloadFile called with: " + url + ", " + filename);
+                    // Create download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                };
+            }
+            
+            if (typeof showNoteInfo === 'undefined') {
+                log("Trying to define showNoteInfo...");
+                window.showNoteInfo = function(noteId, created, updated) {
+                    log("showNoteInfo called with: " + noteId + ", " + created + ", " + updated);
+                    alert("Note Info:\nID: " + noteId + "\nCreated: " + created + "\nUpdated: " + updated);
+                };
+            }
+        });
+        
+        // Capture all errors
+        window.onerror = function(message, source, lineno, colno, error) {
+            log("ERROR: " + message + " at " + source + ":" + lineno);
+            return false;
+        };
+    </script>
+    
+    <!-- Try to load the actual Poznote scripts -->
+    <script src="js/script.js"></script>
+</body>
+</html>

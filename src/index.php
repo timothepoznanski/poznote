@@ -841,11 +841,42 @@ $folder_filter = $_GET['folder'] ?? '';
                     
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.json_encode($title).')"><i class="fas fa-download"></i></button>';
-                    // Encode dates safely for JavaScript
-                    $created_json = json_encode($row['created'], JSON_HEX_QUOT | JSON_HEX_APOS);
-                    $updated_json = json_encode($row['updated'], JSON_HEX_QUOT | JSON_HEX_APOS);
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json.', '.$updated_json.')"><i class="fas fa-info-circle"></i></button>';
+                    
+                    // Encode title safely for JavaScript
+                    $title_safe = $title ?? 'Note';
+                    $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    if ($title_json === false) $title_json = '"Note"';
+                    
+                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.$title_json.')"><i class="fas fa-download"></i></button>';
+                    
+                    // Generate dates safely for JavaScript with robust encoding
+                    $created_raw = $row['created'] ?? '';
+                    $updated_raw = $row['updated'] ?? '';
+                    
+                    // Clean and validate dates
+                    $created_clean = trim($created_raw);
+                    $updated_clean = trim($updated_raw);
+                    
+                    // Use timestamp validation and formatting for safety
+                    $created_timestamp = strtotime($created_clean);
+                    $updated_timestamp = strtotime($updated_clean);
+                    
+                    $final_created = $created_timestamp ? date('Y-m-d H:i:s', $created_timestamp) : date('Y-m-d H:i:s');
+                    $final_updated = $updated_timestamp ? date('Y-m-d H:i:s', $updated_timestamp) : date('Y-m-d H:i:s');
+                    
+                    // Encode with ALL safety flags to handle emojis and special characters
+                    $created_json = json_encode($final_created, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $updated_json = json_encode($final_updated, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    
+                    // Final safety check
+                    if ($created_json === false) $created_json = '"' . date('Y-m-d H:i:s') . '"';
+                    if ($updated_json === false) $updated_json = '"' . date('Y-m-d H:i:s') . '"';
+                    
+                    // Escape quotes for HTML attributes to prevent onclick corruption
+                    $created_json_escaped = htmlspecialchars($created_json, ENT_QUOTES);
+                    $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
+                    
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 } else {
                     // Boutons individuels pour mobile (toujours visibles)
@@ -872,10 +903,31 @@ $folder_filter = $_GET['folder'] ?? '';
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
                     echo '<a href="'.$filename.'" download="'.$title.'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
-                    // Encode dates safely for JavaScript
-                    $created_json = json_encode($row['created'], JSON_HEX_QUOT | JSON_HEX_APOS);
-                    $updated_json = json_encode($row['updated'], JSON_HEX_QUOT | JSON_HEX_APOS);
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json.', '.$updated_json.')"><i class="fas fa-info-circle"></i></button>';
+                    
+                    // Generate dates safely for JavaScript (same logic as desktop)
+                    $created_raw = $row['created'] ?? '';
+                    $updated_raw = $row['updated'] ?? '';
+                    
+                    $created_clean = trim($created_raw);
+                    $updated_clean = trim($updated_raw);
+                    
+                    $created_timestamp = strtotime($created_clean);
+                    $updated_timestamp = strtotime($updated_clean);
+                    
+                    $final_created = $created_timestamp ? date('Y-m-d H:i:s', $created_timestamp) : date('Y-m-d H:i:s');
+                    $final_updated = $updated_timestamp ? date('Y-m-d H:i:s', $updated_timestamp) : date('Y-m-d H:i:s');
+                    
+                    $created_json = json_encode($final_created, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $updated_json = json_encode($final_updated, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    
+                    if ($created_json === false) $created_json = '"' . date('Y-m-d H:i:s') . '"';
+                    if ($updated_json === false) $updated_json = '"' . date('Y-m-d H:i:s') . '"';
+                    
+                    // Escape quotes for HTML attributes (mobile version)
+                    $created_json_escaped = htmlspecialchars($created_json, ENT_QUOTES);
+                    $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
+                    
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 }
                 
@@ -954,6 +1006,5 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/welcome.js"></script>
-<script src="js/debug-info.js"></script>
 
 </html>

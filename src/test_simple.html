@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Simple JavaScript</title>
+</head>
+<body>
+    <h2>Test Simple des Appels JavaScript</h2>
+    
+    <div id="debug"></div>
+    
+    <button onclick="testSimple()">Test 1: Simple</button>
+    <button onclick="testWithDates()">Test 2: Avec dates</button>
+    <button onclick="testWithEmoji()">Test 3: Avec emoji</button>
+    
+    <script>
+        function debug(msg) {
+            document.getElementById('debug').innerHTML += msg + '<br>';
+            console.log(msg);
+        }
+        
+        function testSimple() {
+            debug("=== TEST SIMPLE ===");
+            try {
+                // Test le plus simple possible
+                alert("Test simple OK");
+                debug("✅ Test simple réussi");
+            } catch (e) {
+                debug("❌ Erreur test simple: " + e.message);
+            }
+        }
+        
+        function testWithDates() {
+            debug("=== TEST AVEC DATES ===");
+            try {
+                // Test avec les dates exactes de votre diagnostic
+                const created = "2025-08-14 18:46:28";
+                const updated = "2025-08-14 18:46:44";
+                
+                debug("Created: " + created);
+                debug("Updated: " + updated);
+                
+                // Générer le même appel que votre système
+                const call = "showNoteInfo('13', \"" + created + "\", \"" + updated + "\")";
+                debug("Call généré: " + call);
+                
+                // Tester l'exécution
+                eval(call);
+                debug("✅ Test avec dates réussi");
+            } catch (e) {
+                debug("❌ Erreur test dates: " + e.message);
+            }
+        }
+        
+        function testWithEmoji() {
+            debug("=== TEST AVEC EMOJI ===");
+            try {
+                // Test avec le contenu qui contient des emojis
+                const content = "cfdfg 😡😭";
+                const title = "cvb";
+                
+                debug("Content: " + content);
+                debug("Title: " + title);
+                
+                // Test JSON encoding
+                const titleJson = JSON.stringify(title);
+                const contentJson = JSON.stringify(content);
+                
+                debug("Title JSON: " + titleJson);
+                debug("Content JSON: " + contentJson);
+                
+                debug("✅ Test avec emoji réussi");
+            } catch (e) {
+                debug("❌ Erreur test emoji: " + e.message);
+            }
+        }
+        
+        // Définir les fonctions manquantes
+        function showNoteInfo(id, created, updated) {
+            alert("Note Info:\nID: " + id + "\nCreated: " + created + "\nUpdated: " + updated);
+        }
+        
+        function downloadFile(filename, title) {
+            alert("Download:\nFile: " + filename + "\nTitle: " + title);
+        }
+        
+        // Test automatique
+        debug("Page chargée, prêt pour les tests");
+    </script>
+</body>
+</html>

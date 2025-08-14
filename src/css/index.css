@@ -2996,3 +2996,61 @@ input[type="search"]::-webkit-search-results-decoration {
     margin-top: 10px;
     border: 1px solid #f5c6cb;
 }
+
+/* NOTE INFO MODAL STYLES */
+.note-info-modal {
+    min-width: 350px;
+    max-width: 500px;
+}
+
+.note-info-content {
+    margin: 20px 0;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #37352F;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-right: 15px;
+}
+
+.info-value {
+    color: #007DB8;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    flex-grow: 1;
+}
+
+.note-info-modal .modal-buttons {
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.note-info-modal .modal-buttons .btn-primary {
+    background-color: #007DB8;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.note-info-modal .modal-buttons .btn-primary:hover {
+    background-color: #005a8a;
+}
