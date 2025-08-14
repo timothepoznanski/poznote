@@ -830,7 +830,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.json_encode($title).')"><i class="fas fa-download"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.json_encode($row['created']).', '.json_encode($row['updated']).')"><i class="fas fa-info-circle"></i></button>';
+                    // Encode dates safely for JavaScript
+                    $created_json = json_encode($row['created'], JSON_HEX_QUOT | JSON_HEX_APOS);
+                    $updated_json = json_encode($row['updated'], JSON_HEX_QUOT | JSON_HEX_APOS);
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json.', '.$updated_json.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 } else {
                     // Boutons individuels pour mobile (toujours visibles)
@@ -857,7 +860,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
                     echo '<a href="'.$filename.'" download="'.$title.'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.json_encode($row['created']).', '.json_encode($row['updated']).')"><i class="fas fa-info-circle"></i></button>';
+                    // Encode dates safely for JavaScript
+                    $created_json = json_encode($row['created'], JSON_HEX_QUOT | JSON_HEX_APOS);
+                    $updated_json = json_encode($row['updated'], JSON_HEX_QUOT | JSON_HEX_APOS);
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json.', '.$updated_json.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 }
                 
