@@ -847,7 +847,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     if ($title_json === false) $title_json = '"Note"';
                     
-                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.$title_json.')"><i class="fas fa-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fas fa-download"></i></button>';
                     
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -902,7 +902,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
-                    echo '<a href="'.$filename.'" download="'.$title.'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
+                    echo '<a href="'.$filename.'" download="'.htmlspecialchars($title, ENT_QUOTES).'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
                     
                     // Generate dates safely for JavaScript (same logic as desktop)
                     $created_raw = $row['created'] ?? '';
