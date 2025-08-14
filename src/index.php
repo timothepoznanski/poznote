@@ -208,14 +208,26 @@ $folder_filter = $_GET['folder'] ?? '';
     <!-- Note Info Modal -->
     <div id="noteInfoModal" class="modal">
         <div class="modal-content">
-            <h3>Note Information</h3>
+            <span class="close" onclick="closeNoteInfoModal()">&times;</span>
+            <h3><i class="fas fa-info-circle"></i> Informations de la note</h3>
             <div id="noteInfoContent">
-                <p><strong>Note ID:</strong> <span id="noteInfoId"></span></p>
-                <p><strong>Created:</strong> <span id="noteInfoCreated"></span></p>
-                <p><strong>Last modified:</strong> <span id="noteInfoUpdated"></span></p>
+                <div class="info-row">
+                    <strong><i class="fas fa-hashtag"></i> ID de la note:</strong> 
+                    <span id="noteInfoId" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <strong><i class="fas fa-calendar-plus"></i> Date de création:</strong> 
+                    <span id="noteInfoCreated" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <strong><i class="fas fa-calendar-check"></i> Dernière modification:</strong> 
+                    <span id="noteInfoUpdated" class="info-value"></span>
+                </div>
             </div>
             <div class="modal-buttons">
-                <button type="button" class="btn-primary" onclick="closeNoteInfoModal()">Close</button>
+                <button type="button" class="btn-primary" onclick="closeNoteInfoModal()">
+                    <i class="fas fa-times"></i> Fermer
+                </button>
             </div>
         </div>
     </div>
@@ -942,5 +954,6 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/welcome.js"></script>
+<script src="js/debug-info.js"></script>
 
 </html>

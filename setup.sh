@@ -99,7 +99,7 @@ reconfigure_poznote() {
 
     # Update .env file
     create_env_file
-    manage_containers "restart"
+    manage_container "restart"
     
     echo -e "\n${GREEN}Configuration Update Complete!${NC}"
     echo -e "${GREEN}Your Poznote configuration has been updated!${NC}\n"
@@ -409,28 +409,28 @@ create_env_file() {
     print_success ".env file created from template"
 }
 
-# Manage Docker containers
-manage_containers() {
+# Manage Docker container
+manage_container() {
     local action=$1
     
     case $action in
         "update")
-            print_status "Updating Poznote containers..."
+            print_status "Updating Poznote container..."
             
-            # Stop existing containers if running
+            # Stop existing container if running
             if docker compose ps -q 2>/dev/null | grep -q .; then
-                print_status "Stopping existing containers..."
+                print_status "Stopping existing container..."
                 docker compose down
             fi
             
             print_status "Pulling latest Docker images..."
             docker compose pull
             
-            print_status "Building and starting containers..."
+            print_status "Building and starting container..."
             docker compose up -d --build
             ;;
         "restart")
-            print_status "Restarting containers with new configuration..."
+            print_status "Restarting container with new configuration..."
             docker compose down
             docker compose up -d
             ;;
@@ -440,11 +440,11 @@ manage_containers() {
     print_status "Waiting for services to start..."
     sleep 15
     
-    # Check if containers are running
+    # Check if container is running
     if docker compose ps | grep -q "Up"; then
-        print_success "Poznote containers are running"
+        print_success "Poznote container is running"
     else
-        print_error "Failed to start containers"
+        print_error "Failed to start container"
         docker compose logs
         exit 1
     fi
@@ -575,7 +575,7 @@ main() {
                     fi
                     
                     print_status "Preserving existing configuration..."
-                    manage_containers "update"
+                    manage_container "update"
                     install_git_hook
                     show_info "true"
                     exit 0
@@ -599,7 +599,7 @@ main() {
         
         get_user_config "false"
         create_env_file
-        manage_containers "update"
+        manage_container "update"
         install_git_hook
         show_info "false"
         

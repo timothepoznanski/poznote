@@ -2084,6 +2084,57 @@ hr {
     background-color: #e9ecef;
 }
 
+/* Note Info Modal Specific Styles */
+#noteInfoModal .modal-content {
+    max-width: 450px;
+    text-align: left;
+}
+
+#noteInfoModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007DB8;
+    padding-bottom: 10px;
+}
+
+#noteInfoModal .modal-content h3 i {
+    margin-right: 8px;
+}
+
+#noteInfoModal .info-row {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #007DB8;
+}
+
+#noteInfoModal .info-row strong {
+    min-width: 180px;
+    color: #333;
+    font-weight: 600;
+}
+
+#noteInfoModal .info-row strong i {
+    margin-right: 6px;
+    color: #007DB8;
+    width: 16px;
+    text-align: center;
+}
+
+#noteInfoModal .info-value {
+    color: #555;
+    font-family: monospace;
+    background-color: #fff;
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    flex: 1;
+    margin-left: 10px;
+}
+
 /* Update Modal Specific Styles */
 #updateModal .modal-content {
     text-align: center;

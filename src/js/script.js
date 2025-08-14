@@ -46,19 +46,88 @@ function toggleNoteMenu(noteId) {
 
 // Function to show note information in a better formatted way
 function showNoteInfo(noteId, created, updated) {
-    const createdDate = new Date(created).toLocaleString();
-    const updatedDate = new Date(updated).toLocaleString();
+    console.log("showNoteInfo called with:", { noteId, created, updated });
     
-    document.getElementById('noteInfoId').textContent = noteId;
-    document.getElementById('noteInfoCreated').textContent = createdDate;
-    document.getElementById('noteInfoUpdated').textContent = updatedDate;
-    
-    document.getElementById('noteInfoModal').style.display = 'block';
+    try {
+        // Vérifier que les éléments DOM existent
+        const modal = document.getElementById('noteInfoModal');
+        const idElement = document.getElementById('noteInfoId');
+        const createdElement = document.getElementById('noteInfoCreated');
+        const updatedElement = document.getElementById('noteInfoUpdated');
+        
+        if (!modal || !idElement || !createdElement || !updatedElement) {
+            console.error("Missing DOM elements for note info modal");
+            alert("Erreur: Éléments de l'interface manquants");
+            return;
+        }
+        
+        // Traitement des dates avec gestion d'erreur
+        let createdDate, updatedDate;
+        
+        try {
+            // Les dates viennent de PHP au format ISO (YYYY-MM-DD HH:MM:SS)
+            createdDate = new Date(created);
+            updatedDate = new Date(updated);
+            
+            // Vérifier que les dates sont valides
+            if (isNaN(createdDate.getTime())) {
+                console.warn("Invalid created date:", created);
+                createdDate = new Date();
+            }
+            if (isNaN(updatedDate.getTime())) {
+                console.warn("Invalid updated date:", updated);
+                updatedDate = new Date();
+            }
+        } catch (dateError) {
+            console.error("Date parsing error:", dateError);
+            createdDate = new Date();
+            updatedDate = new Date();
+        }
+        
+        // Formatter les dates en français
+        const dateOptions = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: 'Europe/Paris'
+        };
+        
+        // Remplir le modal avec les informations
+        idElement.textContent = noteId;
+        createdElement.textContent = createdDate.toLocaleString('fr-FR', dateOptions);
+        updatedElement.textContent = updatedDate.toLocaleString('fr-FR', dateOptions);
+        
+        // Afficher le modal
+        modal.style.display = 'block';
+        
+        // Ajouter un gestionnaire pour fermer en cliquant à l'extérieur
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                closeNoteInfoModal();
+            }
+        };
+        
+        console.log("Note info modal displayed successfully");
+        
+    } catch (error) {
+        console.error("Error in showNoteInfo:", error);
+        alert("Erreur lors de l'affichage des informations: " + error.message);
+    }
 }
 
 // Function to close note info modal
 function closeNoteInfoModal() {
-    document.getElementById('noteInfoModal').style.display = 'none';
+    const modal = document.getElementById('noteInfoModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.onclick = null; // Supprimer le gestionnaire d'événement
+        console.log("Note info modal closed");
+    } else {
+        console.error("Note info modal not found");
+    }
 }
 
 // Function to toggle the vertical toolbar menu (legacy - keeping for compatibility)
@@ -481,7 +550,7 @@ function updatenote(){
         entrycontent: entcontent,
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
-    fetch("updatenote_debug.php", {
+    fetch("updatenote.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
