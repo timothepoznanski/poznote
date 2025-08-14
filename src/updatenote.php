@@ -37,8 +37,23 @@
 	
     $filename = getEntriesRelativePath() . $id . ".html";
 	
-	// Write HTML content to file
-	file_put_contents($filename, $entry);
+	// Write HTML content to file with error checking
+	$write_result = file_put_contents($filename, $entry);
+	if ($write_result === false) {
+		error_log("Failed to write HTML file: $filename");
+		error_log("Entry content length: " . strlen($entry));
+		error_log("Directory exists: " . (is_dir(dirname($filename)) ? 'yes' : 'no'));
+		error_log("Directory writable: " . (is_writable(dirname($filename)) ? 'yes' : 'no'));
+		
+		// Return error to client
+		header('Content-Type: application/json');
+		echo json_encode([
+			'status' => 'error',
+			'message' => 'Failed to save HTML content',
+			'file_error' => 'Cannot write to file: ' . $filename
+		]);
+		die();
+	}
     
 	$updated_date = date("Y-m-d H:i:s", $seconds);
 	
