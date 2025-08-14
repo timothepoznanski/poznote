@@ -481,7 +481,7 @@ function updatenote(){
         entrycontent: entcontent,
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
-    fetch("updatenote.php", {
+    fetch("updatenote_debug.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
