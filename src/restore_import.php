@@ -80,18 +80,26 @@ function restoreBackup($uploadedFile) {
     
     // Validate SQL file content
     $content = file_get_contents($tempFile);
-    if (strpos($content, 'mysqldump') === false && strpos($content, 'CREATE TABLE') === false) {
+    if (strpos($content, 'CREATE TABLE') === false && strpos($content, 'INSERT') === false) {
         unlink($tempFile);
         return ['success' => false, 'error' => 'File does not appear to be a valid SQL dump'];
     }
     
-    $host = MYSQL_HOST;
-    $user = MYSQL_USER;
-    $password = MYSQL_PASSWORD;
-    $database = MYSQL_DATABASE;
+    $dbPath = SQLITE_DATABASE;
+    
+    // First, backup current database
+    $backupPath = $dbPath . '.backup.' . date('Y-m-d_H-i-s');
+    if (file_exists($dbPath)) {
+        copy($dbPath, $backupPath);
+    }
+    
+    // Remove current database
+    if (file_exists($dbPath)) {
+        unlink($dbPath);
+    }
     
     // Restore database
-    $command = "mysql -h {$host} -u {$user} -p{$password} {$database} < {$tempFile} 2>&1";
+    $command = "sqlite3 {$dbPath} < {$tempFile} 2>&1";
     
     exec($command, $output, $returnCode);
     
@@ -104,8 +112,8 @@ function restoreBackup($uploadedFile) {
         return ['success' => true];
     } else {
         $errorMessage = implode("\n", $output);
-        // Clean up common mysqldump error messages that might be in the file
-        $errorMessage = str_replace('mysqldump: Error:', 'SQL Import Error:', $errorMessage);
+        // Clean up common SQL import error messages that might be in the file
+        $errorMessage = str_replace('SQLite Import Error:', 'SQL Import Error:', $errorMessage);
         return ['success' => false, 'error' => $errorMessage];
     }
 }

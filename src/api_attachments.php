@@ -173,13 +173,11 @@ function handleUpload() {
         // Get current attachments
         $query = "SELECT attachments FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);
-        $stmt->bind_param("i", $note_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt->execute([$note_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $current_attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
+        if ($result) {
+            $current_attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
             
             // Add new attachment
             $new_attachment = [
@@ -197,9 +195,8 @@ function handleUpload() {
             $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
             $update_stmt = $con->prepare($update_query);
             $attachments_json = json_encode($current_attachments);
-            $update_stmt->bind_param("si", $attachments_json, $note_id);
             
-            if ($update_stmt->execute()) {
+            if ($update_stmt->execute([$attachments_json, $note_id])) {
                 error_log("File uploaded successfully: $original_name");
                 echo json_encode(['success' => true, 'message' => 'File uploaded successfully']);
             } else {
@@ -236,13 +233,11 @@ function handleList() {
     
     $query = "SELECT attachments FROM entries WHERE id = ?";
     $stmt = $con->prepare($query);
-    $stmt->bind_param("i", $note_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$note_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
+    if ($result) {
+        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
         echo json_encode(['success' => true, 'attachments' => $attachments]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Note not found']);
@@ -263,13 +258,11 @@ function handleDelete() {
     // Get current attachments
     $query = "SELECT attachments FROM entries WHERE id = ?";
     $stmt = $con->prepare($query);
-    $stmt->bind_param("i", $note_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$note_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
+    if ($result) {
+        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
         
         // Find and remove attachment
         $file_to_delete = null;
@@ -293,9 +286,8 @@ function handleDelete() {
             $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
             $update_stmt = $con->prepare($update_query);
             $attachments_json = json_encode($updated_attachments);
-            $update_stmt->bind_param("si", $attachments_json, $note_id);
             
-            if ($update_stmt->execute()) {
+            if ($update_stmt->execute([$attachments_json, $note_id])) {
                 echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Database update failed']);
@@ -322,13 +314,11 @@ function handleDownload() {
     // Get attachment info
     $query = "SELECT attachments FROM entries WHERE id = ?";
     $stmt = $con->prepare($query);
-    $stmt->bind_param("i", $note_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$note_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
+    if ($result) {
+        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
         
         foreach ($attachments as $attachment) {
             if ($attachment['id'] === $attachment_id) {

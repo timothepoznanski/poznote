@@ -30,8 +30,8 @@ $metadataInfo = [];
 $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
 $queryResult = $con->query($query);
 
-if ($queryResult && $queryResult->num_rows > 0) {
-    while ($row = $queryResult->fetch_assoc()) {
+if ($queryResult) {
+    while ($row = $queryResult->fetch(PDO::FETCH_ASSOC)) {
         $attachments = json_decode($row['attachments'], true);
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {
@@ -128,7 +128,7 @@ $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT 
 $queryResult = $con->query($query);
 
 if ($queryResult) {
-    while ($row = $queryResult->fetch_assoc()) {
+    while ($row = $queryResult->fetch(PDO::FETCH_ASSOC)) {
         $attachments = json_decode($row['attachments'], true);
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {

@@ -9,11 +9,18 @@ $search = $_POST['search'] ?? '';
 $tags = [];
 
 $tagSql = "SELECT tags FROM entries WHERE tags IS NOT NULL AND tags != '' AND trash = 0";
-if (!empty($search)) $tagSql .= " AND tags LIKE '%$search%'";
+$params = [];
 
-$tagRs = $con->query($tagSql);
-if ($tagRs && $tagRs->num_rows > 0) {
-    while ($row = mysqli_fetch_array($tagRs, MYSQLI_ASSOC)) {
+if (!empty($search)) {
+    $tagSql .= " AND tags LIKE ?";
+    $params[] = '%' . $search . '%';
+}
+
+$tagRs = $con->prepare($tagSql);
+$tagRs->execute($params);
+
+while ($row = $tagRs->fetch(PDO::FETCH_ASSOC)) {
+    if ($row) {
         $tags = array_merge($tags, explode(',', $row['tags']));
     }
 }

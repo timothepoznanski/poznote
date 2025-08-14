@@ -58,11 +58,19 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 		
 		<div class="trash-content">
 		<?php
-		$search_condition = $search ? " AND (heading LIKE '%$search%' OR entry LIKE '%$search%')" : '';
-		$res = $con->query("SELECT * FROM entries WHERE trash = 1$search_condition ORDER BY updated DESC LIMIT 50");
+		$search_condition = $search ? " AND (heading LIKE ? OR entry LIKE ?)" : '';
+		$sql = "SELECT * FROM entries WHERE trash = 1$search_condition ORDER BY updated DESC LIMIT 50";
 		
-		if ($res && $res->num_rows > 0) {
-			while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+		if ($search) {
+			$stmt = $con->prepare($sql);
+			$searchParam = "%$search%";
+			$stmt->execute([$searchParam, $searchParam]);
+		} else {
+			$stmt = $con->query($sql);
+		}
+		
+		if ($stmt) {
+			while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 				$id = $row['id'];
 				$filename = getEntriesRelativePath() . $id . ".html";
 				$entryfinal = file_exists($filename) ? file_get_contents($filename) : '';

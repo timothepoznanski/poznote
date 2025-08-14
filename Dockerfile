@@ -1,11 +1,12 @@
 # Dockerfile used by docker-compose.yml
 FROM php:8.3.23-apache-bullseye
 
-# Install necessary dependencies
+# Install necessary dependencies  
 RUN apt-get update && apt-get install -y \
     libzip-dev \
-    default-mysql-client \
-    && docker-php-ext-install mysqli zip \
+    sqlite3 \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo pdo_sqlite zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,7 +19,7 @@ COPY php.ini /usr/local/etc/php/
 # Note: Source files are mounted as volumes, not copied
 
 # Create directories for data volumes
-RUN mkdir -p /var/www/html/entries /var/www/html/attachments 
+RUN mkdir -p /var/www/html/entries /var/www/html/attachments /var/www/html/data 
 
 # Enable Apache mod_rewrite if needed
 RUN a2enmod rewrite

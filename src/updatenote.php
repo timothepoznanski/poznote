@@ -26,9 +26,10 @@
 	
     $tags = str_replace(' ', ',', $_POST['tags'] ?? '');	
 	
-	$query = "SELECT * FROM entries WHERE id = $id";
-	$res = $con->query($query);
-	$row = mysqli_fetch_array($res, MYSQLI_ASSOC);
+	$query = "SELECT * FROM entries WHERE id = ?";
+	$stmt = $con->prepare($query);
+	$stmt->execute([$id]);
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	if (!$row) {
 		die('Note not found');
@@ -41,17 +42,18 @@
     
 	$updated_date = date("Y-m-d H:i:s", $seconds);
 	
-	$query = "UPDATE entries SET heading = '" . mysqli_real_escape_string($con, $heading) . "', entry = '" . mysqli_real_escape_string($con, $entrycontent) . "', created = created, updated = '$updated_date', tags = '" . mysqli_real_escape_string($con, $tags) . "', folder = '" . mysqli_real_escape_string($con, $folder) . "' WHERE id = $id";
+	$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ? WHERE id = ?";
+	$stmt = $con->prepare($query);
     
-	if($con->query($query)) {
+	if($stmt->execute([$heading, $entrycontent, $updated_date, $tags, $folder, $id])) {
 		die(formatDateTime(strtotime($updated_date))); // If writing the query in base is ok then we exit
 	} else {
 		// Return error details as JSON
 		header('Content-Type: application/json');
 		echo json_encode([
 			'status' => 'error',
-			'message' => 'Database error: ' . $con->error,
-			'query_error' => mysqli_error($con)
+			'message' => 'Database error: ' . $stmt->errorInfo()[2],
+			'query_error' => $stmt->errorInfo()[2]
 		]);
 		die();
 	}

@@ -3,11 +3,7 @@ require 'auth.php';
 requireApiAuth();
 
 header('Content-Type: application/json');
-require_once        if (!mkdir($new_folder_path, 0777, true)) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Failed to create destination folder directory']);
-            exit;
-        }fig.php';
+require_once 'config.php';
 require_once 'db_connect.php';
 
 // Vérifier la méthode HTTP
@@ -46,13 +42,10 @@ $folder_name = trim($data['folder_name']);
 try {
     // Vérifier que la note existe
     $stmt = $con->prepare("SELECT heading, folder FROM entries WHERE id = ?");
-    $stmt->bind_param("s", $note_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $note = $result->fetch_assoc();
+    $stmt->execute([$note_id]);
+    $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($stmt->num_rows === 0) {
-        $stmt->close();
+    if (!$note) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Note not found']);
         exit;
@@ -62,18 +55,14 @@ try {
     
     // Vérifier que le dossier de destination existe (dans la table folders ou comme dossier utilisé dans entries)
     $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-    $stmt->bind_param("s", $folder_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $folder_exists = $result->fetch_row()[0] > 0;
+    $stmt->execute([$folder_name]);
+    $folder_exists = $stmt->fetchColumn() > 0;
     
     if (!$folder_exists) {
         // Vérifier si le dossier existe déjà dans les entries
         $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
-        $stmt->bind_param("s", $folder_name);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $folder_exists = $result->fetch_row()[0] > 0;
+        $stmt->execute([$folder_name]);
+        $folder_exists = $stmt->fetchColumn() > 0;
         
         if (!$folder_exists && $folder_name !== 'Uncategorized') {
             http_response_code(404);
@@ -116,9 +105,8 @@ try {
     }
     
     // Mettre à jour la base de données
-    $stmt = $con->prepare("UPDATE entries SET folder = ?, updated = NOW() WHERE id = ?");
-    $stmt->bind_param("ss", $folder_name, $note_id);
-    $stmt->execute();
+    $stmt = $con->prepare("UPDATE entries SET folder = ?, updated = datetime('now') WHERE id = ?");
+    $stmt->execute([$folder_name, $note_id]);
     
     http_response_code(200);
     echo json_encode([

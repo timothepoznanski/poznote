@@ -45,24 +45,19 @@ if ($folder_name === 'Uncategorized') {
 try {
     // Vérifier si le dossier existe
     $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-    $stmt->bind_param("s", $folder_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $folder_exists_in_table = $result->fetch_row()[0] > 0;
+    $stmt->execute([$folder_name]);
+    $folder_exists_in_table = $stmt->fetchColumn() > 0;
     
     // Vérifier si le dossier contient des notes
     $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0");
-    $stmt->bind_param("s", $folder_name);
+    $stmt->execute([$folder_name]);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $notes_count = $result->fetch_row()[0];
+    $notes_count = $stmt->fetchColumn();
     
     // Vérifier si le dossier contient des notes dans la corbeille
     $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1");
-    $stmt->bind_param("s", $folder_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $trash_notes_count = $result->fetch_row()[0];
+    $stmt->execute([$folder_name]);
+    $trash_notes_count = $stmt->fetchColumn();
     
     $total_notes = $notes_count + $trash_notes_count;
     
@@ -74,25 +69,19 @@ try {
     }
     
     // Commencer la transaction
-    $con->autocommit(false);
+    $con->beginTransaction();
     
     try {
         // Déplacer toutes les notes de ce dossier vers "Uncategorized"
         if ($total_notes > 0) {
-            $stmt = $con->prepare("UPDATE entries SET folder = 'Uncategorized', updated = NOW() WHERE folder = ?");
-            $stmt->bind_param("s", $folder_name);
-            if (!$stmt->execute()) {
-                throw new Exception('Failed to move notes to Uncategorized');
-            }
+            $stmt = $con->prepare("UPDATE entries SET folder = 'Uncategorized', updated = datetime('now') WHERE folder = ?");
+            $stmt->execute([$folder_name]);
         }
         
         // Supprimer le dossier de la table folders
         if ($folder_exists_in_table) {
             $stmt = $con->prepare("DELETE FROM folders WHERE name = ?");
-            $stmt->bind_param("s", $folder_name);
-            if (!$stmt->execute()) {
-                throw new Exception('Failed to delete folder from database');
-            }
+            $stmt->execute([$folder_name]);
         }
         
         // Supprimer le dossier physique
@@ -113,7 +102,7 @@ try {
         
         // Valider la transaction
         $con->commit();
-        $con->autocommit(true);
+        $con->commit();
         
         http_response_code(200);
         echo json_encode([
@@ -132,7 +121,7 @@ try {
     } catch (Exception $e) {
         // Annuler la transaction en cas d'erreur
         $con->rollback();
-        $con->autocommit(true);
+        $con->commit();
         throw $e;
     }
     

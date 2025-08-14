@@ -25,17 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Récupérer l'état actuel du favori
         $query = "SELECT favorite FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);
-        $stmt->bind_param("s", $noteId);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt->execute([$noteId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($result->num_rows === 0) {
+        if (!$result) {
             echo json_encode(['success' => false, 'message' => 'Note not found']);
             exit;
         }
         
-        $row = $result->fetch_assoc();
-        $currentFavorite = $row['favorite'];
+        $currentFavorite = $result['favorite'];
         
         // Basculer l'état du favori
         $newFavorite = $currentFavorite ? 0 : 1;
@@ -43,9 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Mettre à jour la base de données
         $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
         $updateStmt = $con->prepare($updateQuery);
-        $updateStmt->bind_param("is", $newFavorite, $noteId);
         
-        if ($updateStmt->execute()) {
+        if ($updateStmt->execute([$newFavorite, $noteId])) {
             echo json_encode([
                 'success' => true, 
                 'is_favorite' => $newFavorite

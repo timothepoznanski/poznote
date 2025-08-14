@@ -27,13 +27,11 @@ if ($heading === '') {
     exit;
 }
 
-$stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, updated) VALUES (?, ?, ?, NOW())");
-$stmt->bind_param('sss', $heading, $tags, $folder);
+$stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, updated) VALUES (?, ?, ?, datetime('now'))");
 
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
+if ($stmt->execute([$heading, $tags, $folder])) {
+    echo json_encode(['success' => true, 'id' => $con->lastInsertId()]);
 } else {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error while creating the note']);
 }
-$stmt->close();

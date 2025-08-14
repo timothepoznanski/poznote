@@ -52,10 +52,8 @@ foreach ($forbidden_chars as $char) {
 try {
     // Vérifier si le dossier existe déjà
     $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-    $stmt->bind_param("s", $folder_name);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $count = $result->fetch_row()[0];
+    $stmt->execute([$folder_name]);
+    $count = $stmt->fetchColumn();
     
     if ($count > 0) {
         http_response_code(409);
@@ -64,11 +62,10 @@ try {
     }
     
     // Créer le dossier dans la base de données
-    $stmt = $con->prepare("INSERT INTO folders (name, created) VALUES (?, NOW())");
-    $stmt->bind_param("s", $folder_name);
-    $stmt->execute();
+    $stmt = $con->prepare("INSERT INTO folders (name, created) VALUES (?, datetime('now'))");
+    $stmt->execute([$folder_name]);
     
-    $folder_id = $con->insert_id;
+    $folder_id = $con->lastInsertId();
     
     // Créer le dossier physique
     $folder_path = __DIR__ . '/entries/' . $folder_name;
@@ -76,8 +73,7 @@ try {
         if (!mkdir($folder_path, 0755, true)) {
             // Rollback de la base de données si la création du dossier échoue
             $stmt = $con->prepare("DELETE FROM folders WHERE id = ?");
-            $stmt->bind_param("i", $folder_id);
-            $stmt->execute();
+            $stmt->execute([$folder_id]);
             
             http_response_code(500);
             echo json_encode(['error' => 'Failed to create folder directory']);

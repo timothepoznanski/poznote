@@ -10,13 +10,11 @@
 	
 	// Get note data before deletion to access attachments
 	$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
-	$stmt->bind_param("i", $id);
-	$stmt->execute();
-	$result = $stmt->get_result();
+	$stmt->execute([$id]);
+	$result = $stmt->fetch(PDO::FETCH_ASSOC);
 	
-	if ($result->num_rows > 0) {
-		$row = $result->fetch_assoc();
-		$attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
+	if ($result) {
+		$attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
 		
 		// Delete attachment files from filesystem
 		if (is_array($attachments) && !empty($attachments)) {
@@ -36,5 +34,6 @@
 	if (file_exists($filename)) unlink($filename);
 	
 	// Delete database entry
-	echo $con->query("DELETE FROM entries WHERE id = $id") ? 1 : 'Database error occurred';
+	$stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+	echo $stmt->execute([$id]) ? 1 : 'Database error occurred';
 ?>

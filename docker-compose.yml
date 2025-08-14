@@ -6,14 +6,8 @@ services:
       context: . #  Use the current directory as the build context
       dockerfile: Dockerfile # Specify the Dockerfile to use
     restart: always      
-    depends_on:
-      database:
-        condition: service_healthy
     environment:
-      MYSQL_HOST: database
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      SQLITE_DATABASE: /var/www/html/data/poznote.db
       POZNOTE_USERNAME: ${POZNOTE_USERNAME}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
       HTTP_WEB_PORT: ${HTTP_WEB_PORT}
@@ -23,24 +17,6 @@ services:
     volumes:
       - "./data/entries:/var/www/html/entries"
       - "./data/attachments:/var/www/html/attachments"
+      - "./data:/var/www/html/data"
       - "./src:/var/www/html"
-    command: /bin/sh -c "chown -R www-data:www-data /var/www/html && chmod 755 /var/www/html && chmod -R 755 /var/www/html/entries /var/www/html/attachments && apache2-foreground"
-
-  # DATABASE
-  database:
-    image: mysql:9.3.0
-    restart: always
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - "./data/mysql:/var/lib/mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      interval: 10s
-      retries: 10
-      start_period: 40s
+    command: /bin/sh -c "chown -R www-data:www-data /var/www/html && chmod 755 /var/www/html && chmod -R 755 /var/www/html/entries /var/www/html/attachments /var/www/html/data && apache2-foreground"

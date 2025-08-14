@@ -37,9 +37,9 @@ $indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Notes Export</h1>';
 $query_right = 'SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC';
 $res_right = $con->query($query_right);
 
-if ($res_right && $res_right->num_rows > 0) {
+if ($res_right && $res_right) {
     $indexContent .= '<ul>';
-    while($row = mysqli_fetch_array($res_right, MYSQLI_ASSOC)) {
+    while($row = $res_right->fetch(PDO::FETCH_ASSOC)) {
         $title = $row["heading"] ?: 'Untitled note';
         $folder = $row["folder"] ?: 'Uncategorized';
         $tags = $row["tags"] ? ' - ' . $row["tags"] : '';

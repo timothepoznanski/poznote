@@ -3,7 +3,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?logo=mysql)](https://www.mysql.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
 A powerful note-taking tool with full control over your data.
 
@@ -202,13 +202,12 @@ Poznote includes built-in restore functionality through the web interface in Set
 ### Docker Architecture
 
 **Services:**
-- 🌐 **webserver** - Apache/PHP serving the application
-- 🗄️ **database** - MySQL for data storage
+- 🌐 **webserver** - Apache/PHP serving the application with embedded SQLite
 
 **Persistent Volumes:**
 - 📁 `./data/entries` - Your note files (HTML format)
 - 📎 `./data/attachments` - File attachments  
-- 🗄️ `./data/mysql` - Database files
+- 🗄️ `./data/poznote.db` - SQLite database file
 
 ## API
 
@@ -614,10 +613,7 @@ POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin123
 HTTP_WEB_PORT=8040
 APP_NAME_DISPLAYED=Poznote
-MYSQL_ROOT_PASSWORD=sfs466sfdgGH
-MYSQL_DATABASE=poznote_db
-MYSQL_USER=poznote_user
-MYSQL_PASSWORD=RGG45566vfgdfgv
+SQLITE_DATABASE=/var/www/html/data/poznote.db
 ```
 
 **Configuration options:**
@@ -625,10 +621,7 @@ MYSQL_PASSWORD=RGG45566vfgdfgv
 - `POZNOTE_PASSWORD` - Password for authentication  
 - `HTTP_WEB_PORT` - Port where the application will be accessible
 - `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
-- `MYSQL_ROOT_PASSWORD` - MySQL root password
-- `MYSQL_DATABASE` - MySQL database name
-- `MYSQL_USER` - MySQL user for the application
-- `MYSQL_PASSWORD` - MySQL user password
+- `SQLITE_DATABASE` - Path to the SQLite database file
 
 **To modify settings manually:**
 
@@ -637,7 +630,6 @@ MYSQL_PASSWORD=RGG45566vfgdfgv
    - Change `POZNOTE_PASSWORD=admin123` to a secure password
    - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
    - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
-   - Optionally modify MySQL settings for custom database configuration
    - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
 
 2. **Restart the application**
@@ -664,7 +656,8 @@ git pull origin main && docker compose down && docker compose up -d --build
 - To backup your database:
 
 ```bash
-docker compose exec database mysqldump -u root -p<YOUR_MYSQL_ROOT_PASSWORD> poznote_db > backup.sql
+# Copy the SQLite database file
+cp ./data/poznote.db ./backup_poznote_$(date +%Y%m%d_%H%M%S).db
 ```
 
 #### Manual Restore
@@ -677,17 +670,16 @@ docker compose down
 
 Copy your files to `./data/entries/` and `./data/attachments/`
 
-Then restart Poznote:
+**Restore database from backup**
 
 ```bash
+# Stop Poznote
+docker compose down
+
+# Replace the database file with your backup
+cp ./backup_poznote_YYYYMMDD_HHMMSS.db ./data/poznote.db
+
 # Start Poznote
 docker compose up -d
-```
-
-**Restore database from SQL**
-
-```bash
-# Import SQL backup into database
-docker compose exec -T database mysql -u root -p<YOUR_MYSQL_ROOT_PASSWORD> poznote_db < backup.sql
 ```
 # Test du système de versioning automatique

@@ -37,10 +37,8 @@ $permanent = isset($data['permanent']) ? (bool)$data['permanent'] : false;
 try {
     // Vérifier que la note existe
     $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ?");
-    $stmt->bind_param("s", $note_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $note = $result->fetch_assoc();
+    $stmt->execute([$note_id]);
+    $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
         http_response_code(404);
@@ -82,7 +80,7 @@ try {
         
         // Supprimer l'entrée de la base de données
         $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
-        $stmt->bind_param("s", $note_id);
+        // PDO uses execute with array -  $note_id);
         $success = $stmt->execute();
         
         if ($success) {
@@ -111,9 +109,8 @@ try {
             exit;
         }
         
-        $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = NOW() WHERE id = ?");
-        $stmt->bind_param("s", $note_id);
-        $success = $stmt->execute();
+        $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
+        $success = $stmt->execute([$note_id]);
         
         if ($success) {
             http_response_code(200);

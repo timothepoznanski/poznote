@@ -11,12 +11,11 @@
 	$created_date = date("Y-m-d H:i:s", (int)$now);
 	
 // Insert the new note
-$query = "INSERT INTO entries (heading, entry, folder, created, updated) VALUES ('Untitled note', '', ?, '$created_date', '$created_date')";
+$query = "INSERT INTO entries (heading, entry, folder, created, updated) VALUES ('Untitled note', '', ?, ?, ?)";
 $stmt = $con->prepare($query);
-$stmt->bind_param("s", $folder);
 
-if ($stmt->execute()) {
-	$id = $con->insert_id;
+if ($stmt->execute([$folder, $created_date, $created_date])) {
+	$id = $con->lastInsertId();
 	// Return both the heading and the id (for future-proofing)
 	echo json_encode([
 		'status' => 1,
@@ -26,7 +25,7 @@ if ($stmt->execute()) {
 } else {
 	echo json_encode([
 		'status' => 0,
-		'error' => 'Database error: ' . $con->error
+		'error' => 'Database error: ' . $stmt->errorInfo()[2]
 	]);
 }
 ?>

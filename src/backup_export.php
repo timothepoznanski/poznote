@@ -27,15 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 function createBackup() {
-    $host = MYSQL_HOST;
-    $user = MYSQL_USER;
-    $password = MYSQL_PASSWORD;
-    $database = MYSQL_DATABASE;
+    $dbPath = SQLITE_DATABASE;
     
     $filename = "poznote_backup_" . date('Y-m-d_H-i-s') . ".sql";
     
-    // Use mysqldump to create backup
-    $command = "mysqldump -h {$host} -u {$user} -p{$password} {$database} 2>&1";
+    // Use sqlite3 to create backup
+    $command = "sqlite3 {$dbPath} .dump 2>&1";
     
     $output = [];
     exec($command, $output, $returnCode);

@@ -23,18 +23,21 @@ switch($action) {
         }
         
         // Check if folder already exists in entries or folders table
-        $check1 = $con->query("SELECT COUNT(*) as count FROM entries WHERE folder = '" . mysqli_real_escape_string($con, $folderName) . "'");
-        $check2 = $con->query("SELECT COUNT(*) as count FROM folders WHERE name = '" . mysqli_real_escape_string($con, $folderName) . "'");
+        $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
+        $check1->execute([$folderName]);
+        $result1 = $check1->fetch(PDO::FETCH_ASSOC);
         
-        $result1 = $check1->fetch_assoc();
-        $result2 = $check2->fetch_assoc();
+        $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
+        $check2->execute([$folderName]);
+        $result2 = $check2->fetch(PDO::FETCH_ASSOC);
         
         if ($result1['count'] > 0 || $result2['count'] > 0) {
             echo json_encode(['success' => false, 'error' => 'Folder already exists']);
         } else {
             // Create folder in folders table
-            $query = "INSERT INTO folders (name) VALUES ('" . mysqli_real_escape_string($con, $folderName) . "')";
-            if ($con->query($query)) {
+            $query = "INSERT INTO folders (name) VALUES (?)";
+            $stmt = $con->prepare($query);
+            if ($stmt->execute([$folderName])) {
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -57,10 +60,13 @@ switch($action) {
         }
         
         // Update entries and folders table
-        $query1 = "UPDATE entries SET folder = '" . mysqli_real_escape_string($con, $newName) . "' WHERE folder = '" . mysqli_real_escape_string($con, $oldName) . "'";
-        $query2 = "UPDATE folders SET name = '" . mysqli_real_escape_string($con, $newName) . "' WHERE name = '" . mysqli_real_escape_string($con, $oldName) . "'";
+        $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
+        $query2 = "UPDATE folders SET name = ? WHERE name = ?";
         
-        if ($con->query($query1) && $con->query($query2)) {
+        $stmt1 = $con->prepare($query1);
+        $stmt2 = $con->prepare($query2);
+        
+        if ($stmt1->execute([$newName, $oldName]) && $stmt2->execute([$newName, $oldName])) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -75,11 +81,14 @@ switch($action) {
         }
         
         // Move all notes from this folder to Uncategorized
-        $query1 = "UPDATE entries SET folder = 'Uncategorized' WHERE folder = '" . mysqli_real_escape_string($con, $folderName) . "'";
+        $query1 = "UPDATE entries SET folder = 'Uncategorized' WHERE folder = ?";
         // Delete folder from folders table
-        $query2 = "DELETE FROM folders WHERE name = '" . mysqli_real_escape_string($con, $folderName) . "'";
+        $query2 = "DELETE FROM folders WHERE name = ?";
         
-        if ($con->query($query1) && $con->query($query2)) {
+        $stmt1 = $con->prepare($query1);
+        $stmt2 = $con->prepare($query2);
+        
+        if ($stmt1->execute([$folderName]) && $stmt2->execute([$folderName])) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -96,16 +105,20 @@ switch($action) {
         
         if (!empty($noteId)) {
             // New ID-based approach
-            $query = "UPDATE entries SET folder = '" . mysqli_real_escape_string($con, $targetFolder) . "' WHERE id = " . intval($noteId);
+            $query = "UPDATE entries SET folder = ? WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $success = $stmt->execute([$targetFolder, intval($noteId)]);
         } elseif (!empty($noteHeading)) {
             // Legacy heading-based approach
-            $query = "UPDATE entries SET folder = '" . mysqli_real_escape_string($con, $targetFolder) . "' WHERE heading = '" . mysqli_real_escape_string($con, $noteHeading) . "'";
+            $query = "UPDATE entries SET folder = ? WHERE heading = ?";
+            $stmt = $con->prepare($query);
+            $success = $stmt->execute([$targetFolder, $noteHeading]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Note ID or heading is required']);
-            exit;
+            break;
         }
         
-        if ($con->query($query)) {
+        if ($success) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -123,14 +136,14 @@ switch($action) {
         $folders = ['Uncategorized'];
         
         // Add folders from entries
-        while($row = mysqli_fetch_array($result1, MYSQLI_ASSOC)) {
+        while($row = $result1->fetch(PDO::FETCH_ASSOC)) {
             if ($row['name'] !== 'Uncategorized' && !in_array($row['name'], $folders)) {
                 $folders[] = $row['name'];
             }
         }
         
         // Add folders from folders table
-        while($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)) {
+        while($row = $result2->fetch(PDO::FETCH_ASSOC)) {
             if ($row['name'] !== 'Uncategorized' && !in_array($row['name'], $folders)) {
                 $folders[] = $row['name'];
             }
@@ -154,7 +167,7 @@ switch($action) {
         $suggestedFolders = ['Uncategorized']; // Always include Uncategorized first
         
         // Add recent folders
-        while($row = mysqli_fetch_array($recentResult, MYSQLI_ASSOC)) {
+        while($row = $recentResult->fetch(PDO::FETCH_ASSOC)) {
             if ($row['folder'] !== 'Uncategorized' && !in_array($row['folder'], $suggestedFolders)) {
                 $suggestedFolders[] = $row['folder'];
             }
@@ -165,7 +178,7 @@ switch($action) {
             $popularQuery = "SELECT folder, COUNT(*) as count FROM entries WHERE folder IS NOT NULL AND folder != '' AND folder != 'Uncategorized' AND trash = 0 GROUP BY folder ORDER BY count DESC LIMIT 3";
             $popularResult = $con->query($popularQuery);
             
-            while($row = mysqli_fetch_array($popularResult, MYSQLI_ASSOC)) {
+            while($row = $popularResult->fetch(PDO::FETCH_ASSOC)) {
                 if (!in_array($row['folder'], $suggestedFolders) && count($suggestedFolders) < 4) {
                     $suggestedFolders[] = $row['folder'];
                 }
@@ -181,7 +194,7 @@ switch($action) {
         $result = $con->query($query);
         
         $counts = [];
-        while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+        while($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $folder = $row['folder'] ?: 'Uncategorized';
             $counts[$folder] = (int)$row['count'];
         }
@@ -190,7 +203,7 @@ switch($action) {
         $favoriteQuery = "SELECT COUNT(*) as count FROM entries WHERE trash = 0 AND favorite = 1";
         $favoriteResult = $con->query($favoriteQuery);
         if ($favoriteResult) {
-            $favoriteData = $favoriteResult->fetch_assoc();
+            $favoriteData = $favoriteResult->fetch(PDO::FETCH_ASSOC);
             $counts['Favorites'] = (int)$favoriteData['count'];
         }
         
@@ -206,10 +219,11 @@ switch($action) {
         }
         
         // Move all notes from this folder to trash
-        $query = "UPDATE entries SET trash = 1 WHERE folder = '" . mysqli_real_escape_string($con, $folderName) . "' AND trash = 0";
+        $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0";
+        $stmt = $con->prepare($query);
         
-        if ($con->query($query)) {
-            $affected_rows = $con->affected_rows;
+        if ($stmt->execute([$folderName])) {
+            $affected_rows = $stmt->rowCount();
             echo json_encode(['success' => true, 'message' => "Moved $affected_rows notes to trash"]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error occurred']);
@@ -225,11 +239,12 @@ switch($action) {
         }
         
         // Count notes in this folder
-        $query = "SELECT COUNT(*) as count FROM entries WHERE folder = '" . mysqli_real_escape_string($con, $folderName) . "' AND trash = 0";
-        $result = $con->query($query);
+        $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$folderName]);
         
-        if ($result) {
-            $row = $result->fetch_assoc();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
             echo json_encode(['success' => true, 'count' => intval($row['count'])]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error occurred']);

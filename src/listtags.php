@@ -9,7 +9,7 @@ $res = $con->query('SELECT tags FROM entries WHERE trash = 0');
 $tags_list = [];
 $count_tags = 0;
 
-while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {   
+while($row = $res->fetch(PDO::FETCH_ASSOC)) {   
 	$words = explode(',', $row['tags']);
 	foreach($words as $word) {
 		$count_tags++;

@@ -22,18 +22,22 @@ include 'functions.php';
 include 'db_connect.php';
 
 // Vérification des colonnes (seulement à l'ouverture de l'application)
-$result = $con->query("SHOW COLUMNS FROM entries LIKE 'folder'");
-if ($result->num_rows == 0) {
+// En SQLite, on utilise PRAGMA table_info pour vérifier les colonnes
+$stmt = $con->query("PRAGMA table_info(entries)");
+$columns = [];
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $columns[] = $row['name'];
+}
+
+if (!in_array('folder', $columns)) {
     $con->query("ALTER TABLE entries ADD COLUMN folder varchar(255) DEFAULT 'Uncategorized'");
 }
 
-$result = $con->query("SHOW COLUMNS FROM entries LIKE 'favorite'");
-if ($result->num_rows == 0) {
-    $con->query("ALTER TABLE entries ADD COLUMN favorite TINYINT(1) DEFAULT 0");
+if (!in_array('favorite', $columns)) {
+    $con->query("ALTER TABLE entries ADD COLUMN favorite INTEGER DEFAULT 0");
 }
 
-$result = $con->query("SHOW COLUMNS FROM entries LIKE 'attachments'");
-if ($result->num_rows == 0) {
+if (!in_array('attachments', $columns)) {
     $con->query("ALTER TABLE entries ADD COLUMN attachments TEXT DEFAULT NULL");
 }
 
@@ -82,10 +86,10 @@ $folder_filter = $_GET['folder'] ?? '';
 // Determine current note folder early for JavaScript
 $current_note_folder = 'Uncategorized';
 if($note != '') {
-    $query_note_folder = "SELECT folder FROM entries WHERE trash = 0 AND heading = '" . mysqli_real_escape_string($con, $note) . "'";
-    $res_note_folder = $con->query($query_note_folder);
-    if($res_note_folder && $res_note_folder->num_rows > 0) {
-        $note_data = mysqli_fetch_array($res_note_folder, MYSQLI_ASSOC);
+    $stmt = $con->prepare("SELECT folder FROM entries WHERE trash = 0 AND heading = ?");
+    $stmt->execute([$note]);
+    $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    if($note_data) {
         $current_note_folder = $note_data["folder"] ?: 'Uncategorized';
     }
 }
@@ -391,70 +395,38 @@ if($note != '') {
     <!-- Depending on the cases, we create the queries. -->  
         
     <?php
-    // Build search conditions for notes and tags séparément
-    $search_condition = '';
+    // RECHERCHE SÉCURISÉE TEMPORAIRE
+    // TODO: Remplacer par la version complète avec toutes les fonctionnalités
+    $where_conditions = ["trash = 0"];
+    $search_params = [];
     
-    if ($using_unified_search) {
-        // For unified search, only search in selected areas
-        if (!empty($search) && !empty($tags_search)) {
-            // Both selected: search in notes OR tags (broader search)
-            $terms = explode(' ', trim($search)); // Using $search since both contain the same value
-            foreach ($terms as $term) {
-                if (!empty(trim($term))) {
-                    $search_condition .= " AND ((heading LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%' OR entry LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%') OR tags LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%')";
-                }
-            }
-        } else if (!empty($search)) {
-            // Only notes selected
-            $terms = explode(' ', trim($search));
-            foreach ($terms as $term) {
-                if (!empty(trim($term))) {
-                    $search_condition .= " AND (heading LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%' OR entry LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%')";
-                }
-            }
-        } else if (!empty($tags_search)) {
-            // Only tags selected
-            $terms = explode(' ', trim($tags_search));
-            foreach ($terms as $term) {
-                if (!empty(trim($term))) {
-                    $search_condition .= " AND tags LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%'";
-                }
-            }
-        }
-    } else {
-        // For separate searches, search in both areas if either is present (legacy behavior)
-        if (!empty($search)) {
-            $terms = explode(' ', trim($search));
-            foreach ($terms as $term) {
-                if (!empty(trim($term))) {
-                    $search_condition .= " AND (heading LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%' OR entry LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%')";
-                }
-            }
-        }
-        if (!empty($tags_search)) {
-            $terms = explode(' ', trim($tags_search));
-            foreach ($terms as $term) {
-                if (!empty(trim($term))) {
-                    $search_condition .= " AND tags LIKE '%" . mysqli_real_escape_string($con, trim($term)) . "%'";
-                }
-            }
-        }
+    // Recherche simple sécurisée (version de base)
+    if (!empty($search)) {
+        $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+        $search_params[] = '%' . $search . '%';
+        $search_params[] = '%' . $search . '%';
     }
     
-    // Debug removed - search working correctly
+    if (!empty($tags_search)) {
+        $where_conditions[] = "tags LIKE ?";
+        $search_params[] = '%' . $tags_search . '%';
+    }
     
-    // Add folder filter condition
-    $folder_condition = '';
+    // Filtre de dossier sécurisé
     if (!empty($folder_filter)) {
         if ($folder_filter === 'Favorites') {
-            $folder_condition = " AND favorite = 1";
+            $where_conditions[] = "favorite = 1";
         } else {
-            $folder_condition = " AND folder = '" . mysqli_real_escape_string($con, $folder_filter) . "'";
+            $where_conditions[] = "folder = ?";
+            $search_params[] = $folder_filter;
         }
     }
     
-    $query_left = "SELECT heading, folder, favorite FROM entries WHERE trash = 0$search_condition$folder_condition ORDER BY folder, updated DESC";
-    $query_right = "SELECT * FROM entries WHERE trash = 0$search_condition$folder_condition ORDER BY updated DESC LIMIT 1";
+    $where_clause = implode(" AND ", $where_conditions);
+    
+    // Requêtes préparées sécurisées
+    $query_left_secure = "SELECT heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
+    $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
     <!-- MENU -->
@@ -562,24 +534,25 @@ if($note != '') {
         
         if($note!='') // If the note is not empty, it means we have just clicked on a note.
         {          
-            $query_note = "SELECT * FROM entries WHERE trash = 0 AND heading = '" . mysqli_real_escape_string($con, $note) . "'";
-            $res_right = $con->query($query_note);
+            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
+            $stmt->execute([$note]);
+            $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
             
             // Si la note demandée n'existe pas, afficher la dernière note mise à jour
-            if(!$res_right || $res_right->num_rows == 0) {
+            if(!$note_data) {
                 $note = ''; // Reset note to trigger showing latest note
-                $check_notes_query = "SELECT COUNT(*) as note_count FROM entries WHERE trash = 0$search_condition$folder_condition";
-                $check_result = $con->query($check_notes_query);
-                $note_count = $check_result->fetch_assoc()['note_count'];
+                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE $where_clause");
+                $check_stmt->execute($search_params);
+                $note_count_row = $check_stmt->fetch(PDO::FETCH_ASSOC);
+                $note_count = $note_count_row['note_count'];
                 
                 if ($note_count > 0) {
                     // Show the most recently updated note
-                    $res_right = $con->query($query_right);
-                    if($res_right && $res_right->num_rows > 0) {
-                        $latest_note = $res_right->fetch_assoc();
+                    $stmt_right = $con->prepare($query_right_secure);
+                    $stmt_right->execute($search_params);
+                    $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                    if($latest_note) {
                         $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                        // Reset the result pointer for display
-                        $res_right->data_seek(0);
                     }
                 } else {
                     // No notes available, show welcome screen
@@ -588,18 +561,17 @@ if($note != '') {
             }
         } else {
             // No specific note requested, check if we have notes to show the latest one
-            $check_notes_query = "SELECT COUNT(*) as note_count FROM entries WHERE trash = 0$search_condition$folder_condition";
-            $check_result = $con->query($check_notes_query);
-            $note_count = $check_result->fetch_assoc()['note_count'];
+            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE $where_clause");
+            $check_stmt->execute($search_params);
+            $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
             
             if ($note_count > 0) {
                 // Show the most recently updated note
-                $res_right = $con->query($query_right);
-                if($res_right && $res_right->num_rows > 0) {
-                    $latest_note = $res_right->fetch_assoc();
+                $stmt_right = $con->prepare($query_right_secure);
+                $stmt_right->execute($search_params);
+                $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                if($latest_note) {
                     $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
-                    // Reset the result pointer for display
-                    $res_right->data_seek(0);
                 }
             } else {
                 // No notes available, show welcome screen
@@ -629,14 +601,15 @@ if($note != '') {
         $is_search_mode = !empty($search) || !empty($tags_search);
         
         // Exécution de la requête pour la colonne de gauche
-        $res_query_left = $con->query($query_left);
+        $stmt_left = $con->prepare($query_left_secure);
+        $stmt_left->execute($search_params);
         
         // Group notes by folder for hierarchical display
         $folders = [];
         $folders_with_results = []; // Track folders that have search results
         $favorites = []; // Store favorite notes
         
-        while($row1 = mysqli_fetch_array($res_query_left, MYSQLI_ASSOC)) {
+        while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
             $folder = $row1["folder"] ?: 'Uncategorized';
             if (!isset($folders[$folder])) {
                 $folders[$folder] = [];
@@ -664,7 +637,7 @@ if($note != '') {
         
         // Add empty folders from folders table
         $empty_folders_query = $con->query("SELECT name FROM folders ORDER BY name");
-        while($folder_row = mysqli_fetch_array($empty_folders_query, MYSQLI_ASSOC)) {
+        while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
             if (!isset($folders[$folder_row['name']])) {
                 $folders[$folder_row['name']] = [];
             }
@@ -697,7 +670,7 @@ if($note != '') {
                 // Check if we have very few notes (likely just created demo notes)
                 $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
                 $total_notes_result = $con->query($total_notes_query);
-                $total_notes = $total_notes_result->fetch_assoc()['total'];
+                $total_notes = $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
                 
                 if($total_notes <= 3) {
                     // If we have very few notes (demo notes just created), open all folders
@@ -711,12 +684,10 @@ if($note != '') {
                         $should_be_open = true;
                     } else if ($folderName === 'Favoris') {
                         // Open Favoris folder if the current note is favorite
-                        $query_check_favorite = "SELECT favorite FROM entries WHERE trash = 0 AND heading = '" . mysqli_real_escape_string($con, $note) . "'";
-                        $res_check_favorite = $con->query($query_check_favorite);
-                        if ($res_check_favorite && $res_check_favorite->num_rows > 0) {
-                            $favorite_data = $res_check_favorite->fetch_assoc();
-                            $should_be_open = $favorite_data['favorite'] == 1;
-                        }
+                        $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ?");
+                        $stmt_check_favorite->execute([$note]);
+                        $favorite_data = $stmt_check_favorite->fetch(PDO::FETCH_ASSOC);
+                        $should_be_open = $favorite_data && $favorite_data['favorite'] == 1;
                     }
                 } else if($default_note_folder) {
                     // If no specific note selected but default note loaded: open its folder
@@ -793,8 +764,8 @@ if($note != '') {
             // Right-side list based on the query created earlier //		
             
             // Check if we should display a note or welcome message
-            if ($res_right && $res_right->num_rows > 0) {
-                while($row = mysqli_fetch_array($res_right, MYSQLI_ASSOC))
+            if ($res_right && $res_right) {
+                while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
@@ -857,8 +828,8 @@ if($note != '') {
                     
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', \''.addslashes($title).'\')"><i class="fas fa-download"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', \''.addslashes($row['created']).'\', \''.addslashes($row['updated']).'\')"><i class="fas fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.json_encode($title).')"><i class="fas fa-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.json_encode($row['created']).', '.json_encode($row['updated']).')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 } else {
                     // Boutons individuels pour mobile (toujours visibles)
@@ -885,7 +856,7 @@ if($note != '') {
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
                     echo '<a href="'.$filename.'" download="'.$title.'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', \''.addslashes($row['created']).'\', \''.addslashes($row['updated']).'\')"><i class="fas fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.json_encode($row['created']).', '.json_encode($row['updated']).')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 }
                 
