@@ -2350,7 +2350,7 @@ function silentVersionCheck() {
         return;
     }
     
-    console.log('Performing silent version check...');
+    console.log('Performing silent version check...'); 
     
     // Perform silent check
     fetch('check_updates.php')
