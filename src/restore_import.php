@@ -432,6 +432,13 @@ function importAttachmentsZip($uploadedFile) {
                     <label for="backup_file">SQL file to import:</label>
                     <input type="file" id="backup_file" name="backup_file" accept=".sql" required>
                 </div>
+                
+                <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
+                    <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
+                    <strong>Automatic Backup:</strong> Your current database will be automatically backed up before import. 
+                    Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
+                </div>
+                
                 <button type="button" class="btn btn-primary" onclick="showImportConfirmation()">
                     <i class="fas fa-upload"></i> Import Database
                 </button>
@@ -578,10 +585,16 @@ function importAttachmentsZip($uploadedFile) {
         }
 
         function proceedWithImport() {
-            const form = document.querySelector('form[method="post"][action=""]');
-            const actionInput = form.querySelector('input[name="action"]');
-            actionInput.value = 'restore';
-            form.submit();
+            const form = document.querySelector('form[method="post"]');
+            if (form) {
+                const actionInput = form.querySelector('input[name="action"]');
+                if (actionInput) {
+                    actionInput.value = 'restore';
+                }
+                form.submit();
+            } else {
+                alert('Form not found. Please try again.');
+            }
         }
 
         // Notes Import Functions

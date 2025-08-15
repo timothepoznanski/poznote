@@ -133,6 +133,14 @@ Run the setup script and select "Update application". The script will pull updat
 
 Poznote includes built-in backup functionality accessible through Settings → "Export/Import Database".
 
+### Automatic Database Backup
+
+🔒 **Safety Feature:** Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
+
+- **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
+- **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)
+- **Purpose:** Allows recovery if import fails or data needs to be rolled back
+
 ### Backup Options
 
 - **📝 Export Notes** - Complete ZIP with all your notes (Allows offline viewing without Poznote)
