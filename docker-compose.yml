@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile # Specify the Dockerfile to use
     restart: always      
     environment:
-      SQLITE_DATABASE: /var/www/html/data/poznote.db
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
       POZNOTE_USERNAME: ${POZNOTE_USERNAME}
       POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
       HTTP_WEB_PORT: ${HTTP_WEB_PORT}
