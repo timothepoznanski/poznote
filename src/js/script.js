@@ -48,15 +48,15 @@ function toggleNoteMenu(noteId) {
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
     try {
         // Clean and format the dates
-        let createdText = "Non disponible";
-        let updatedText = "Non disponible";
+        let createdText = "Not available";
+        let updatedText = "Not available";
         
         // Try to parse and format created date
         if (created) {
             try {
                 const createdDate = new Date(created);
                 if (!isNaN(createdDate.getTime())) {
-                    createdText = createdDate.toLocaleString('fr-FR', {
+                    createdText = createdDate.toLocaleString('en-US', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
@@ -74,7 +74,7 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
             try {
                 const updatedDate = new Date(updated);
                 if (!isNaN(updatedDate.getTime())) {
-                    updatedText = updatedDate.toLocaleString('fr-FR', {
+                    updatedText = updatedDate.toLocaleString('en-US', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
@@ -88,22 +88,25 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
         }
         
         // Process additional data
-        let folderText = folder || "Non classé";
+        let folderText = folder || "Uncategorized";
         let isFavorite = parseInt(favorite) === 1;
-        let tagsText = tags && tags.trim() !== '' ? tags : "Aucun tag";
+        let tagsText = tags && tags.trim() !== '' ? tags : "No tags";
         let attachmentsCountText = parseInt(attachmentsCount) || 0;
         
+        // Generate filename (noteId + .html)
+        let filename = noteId + ".html";
+        
         // Show the information in a styled modal
-        showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCountText);
+        showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCountText, filename);
         
     } catch (error) {
         console.error("Error in showNoteInfo:", error);
-        alert("Erreur lors de l'affichage des informations de la note: " + error.message);
+        alert("Error displaying note information: " + error.message);
     }
 }
 
 // Function to show note information in a styled modal with complete details
-function showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCount) {
+function showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCount, filename) {
     // Remove existing modal if any
     const existingModal = document.getElementById('noteInfoModal');
     if (existingModal) {
@@ -111,23 +114,24 @@ function showNoteModal(noteId, createdText, updatedText, folderText, isFavorite,
     }
     
     // Create simple text list
-    const favoriteText = isFavorite ? 'Oui' : 'Non';
+    const favoriteText = isFavorite ? 'Yes' : 'No';
     
     // Create ultra simple modal
     const modalHTML = `
         <div id="noteInfoModal" class="modal" style="display: flex;">
-            <div style="background: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: auto; min-width: 250px; max-width: 400px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="background: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: auto; min-width: 280px; max-width: 450px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
                 <h3 style="margin-top: 0; margin-bottom: 15px; color: #007DB8; font-size: 18px; font-weight: 600;">Note #${noteId}</h3>
                 <div style="line-height: 1.8; margin: 15px 0;">
-                    <div style="margin: 8px 0;"><strong>Dossier:</strong> ${folderText}</div>
-                    <div style="margin: 8px 0;"><strong>Favoris:</strong> ${favoriteText}</div>
-                    <div style="margin: 8px 0;"><strong>Pièces jointes:</strong> ${attachmentsCount}</div>
+                    <div style="margin: 8px 0;"><strong>Filename:</strong> ${filename}</div>
+                    <div style="margin: 8px 0;"><strong>Folder:</strong> ${folderText}</div>
+                    <div style="margin: 8px 0;"><strong>Favorite:</strong> ${favoriteText}</div>
+                    <div style="margin: 8px 0;"><strong>Attachments:</strong> ${attachmentsCount}</div>
                     <div style="margin: 8px 0;"><strong>Tags:</strong> ${tagsText}</div>
-                    <div style="margin: 8px 0;"><strong>Créée:</strong> ${createdText}</div>
-                    <div style="margin: 8px 0;"><strong>Modifiée:</strong> ${updatedText}</div>
+                    <div style="margin: 8px 0;"><strong>Created:</strong> ${createdText}</div>
+                    <div style="margin: 8px 0;"><strong>Modified:</strong> ${updatedText}</div>
                 </div>
-                <div style="text-align: center; margin-top: 20px;">
-                    <button onclick="closeNoteInfoModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">Fermer</button>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button onclick="closeNoteInfoModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">Close</button>
                 </div>
             </div>
         </div>
