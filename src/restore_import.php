@@ -327,6 +327,61 @@ function importAttachmentsZip($uploadedFile) {
         .btn-cancel:hover {
             background-color: #e9ecef;
         }
+
+        /* Alert message styling */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .custom-alert-content {
+            background-color: #fefefe;
+            margin: 20% auto;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            width: 350px;
+            max-width: 90%;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .custom-alert-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #dc3545;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .custom-alert-content p {
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .alert-ok-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.2s;
+            background-color: #007DB8;
+            color: white;
+        }
+
+        .alert-ok-button:hover {
+            background-color: #005a8a;
+        }
     </style>
 </head>
 <body>
@@ -406,7 +461,7 @@ function importAttachmentsZip($uploadedFile) {
                     <label for="notes_file">ZIP file containing notes:</label>
                     <input type="file" id="notes_file" name="notes_file" accept=".zip" required>
                 </div>
-                <button type="submit" class="btn btn-primary" onclick="return confirm('This will import all HTML files from the ZIP. Continue?')">
+                <button type="button" class="btn btn-primary" onclick="showNotesImportConfirmation()">
                     <i class="fas fa-upload"></i> Import Notes (ZIP)
                 </button>
             </form>
@@ -435,7 +490,7 @@ function importAttachmentsZip($uploadedFile) {
                     <label for="attachments_file">ZIP file containing attachments:</label>
                     <input type="file" id="attachments_file" name="attachments_file" accept=".zip" required>
                 </div>
-                <button type="submit" class="btn btn-primary" onclick="return confirm('This will import all files from the ZIP to attachments folder. Continue?')">
+                <button type="button" class="btn btn-primary" onclick="showAttachmentsImportConfirmation()">
                     <i class="fas fa-upload"></i> Import Attachments (ZIP)
                 </button>
             </form>
@@ -462,11 +517,57 @@ function importAttachmentsZip($uploadedFile) {
         </div>
     </div>
 
+    <!-- Notes Import Confirmation Modal -->
+    <div id="notesImportConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Import Notes?</h3>
+            <p>This will import all HTML files from the ZIP. Files will be added to your existing notes collection.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideNotesImportConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithNotesImport()">
+                    Yes, Import Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attachments Import Confirmation Modal -->
+    <div id="attachmentsImportConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Import Attachments?</h3>
+            <p>This will import all files from the ZIP to attachments folder. Files will be added to your existing attachments.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideAttachmentsImportConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithAttachmentsImport()">
+                    Yes, Import Attachments
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="customAlert" class="custom-alert">
+        <div class="custom-alert-content">
+            <h3 id="alertTitle">No File Selected</h3>
+            <p id="alertMessage">Please select a file before proceeding with the import.</p>
+            <button type="button" class="alert-ok-button" onclick="hideCustomAlert()">
+                OK
+            </button>
+        </div>
+    </div>
+
     <script>
+        // Database Import Functions
         function showImportConfirmation() {
             const fileInput = document.getElementById('backup_file');
             if (!fileInput.files.length) {
-                alert('Please select a SQL file first.');
+                showCustomAlert('No SQL File Selected', 'Please select a SQL file before proceeding with the database import.');
                 return;
             }
             document.getElementById('importConfirmModal').style.display = 'block';
@@ -477,15 +578,75 @@ function importAttachmentsZip($uploadedFile) {
         }
 
         function proceedWithImport() {
-            // Submit the form
-            const form = document.querySelector('form[method="post"]');
+            const form = document.querySelector('form[method="post"][action=""]');
+            const actionInput = form.querySelector('input[name="action"]');
+            actionInput.value = 'restore';
             form.submit();
         }
 
+        // Notes Import Functions
+        function showNotesImportConfirmation() {
+            const fileInput = document.getElementById('notes_file');
+            if (!fileInput.files.length) {
+                showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing HTML notes before proceeding with the import.');
+                return;
+            }
+            document.getElementById('notesImportConfirmModal').style.display = 'block';
+        }
+
+        function hideNotesImportConfirmation() {
+            document.getElementById('notesImportConfirmModal').style.display = 'none';
+        }
+
+        function proceedWithNotesImport() {
+            const forms = document.querySelectorAll('form[method="post"]');
+            const notesForm = Array.from(forms).find(form => 
+                form.querySelector('input[name="action"][value="import_notes"]')
+            );
+            if (notesForm) {
+                notesForm.submit();
+            }
+        }
+
+        // Attachments Import Functions
+        function showAttachmentsImportConfirmation() {
+            const fileInput = document.getElementById('attachments_file');
+            if (!fileInput.files.length) {
+                showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing attachments before proceeding with the import.');
+                return;
+            }
+            document.getElementById('attachmentsImportConfirmModal').style.display = 'block';
+        }
+
+        function hideAttachmentsImportConfirmation() {
+            document.getElementById('attachmentsImportConfirmModal').style.display = 'none';
+        }
+
+        function proceedWithAttachmentsImport() {
+            const forms = document.querySelectorAll('form[method="post"]');
+            const attachmentsForm = Array.from(forms).find(form => 
+                form.querySelector('input[name="action"][value="import_attachments"]')
+            );
+            if (attachmentsForm) {
+                attachmentsForm.submit();
+            }
+        }
+
+        // Custom Alert Functions
+        function showCustomAlert(title = 'No File Selected', message = 'Please select a file before proceeding with the import.') {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById('customAlert').style.display = 'block';
+        }
+
+        function hideCustomAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+
         // Close modal when clicking outside
-        document.getElementById('importConfirmModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideImportConfirmation();
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('import-confirm-modal') || e.target.classList.contains('custom-alert')) {
+                e.target.style.display = 'none';
             }
         });
 
@@ -493,6 +654,9 @@ function importAttachmentsZip($uploadedFile) {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 hideImportConfirmation();
+                hideNotesImportConfirmation();
+                hideAttachmentsImportConfirmation();
+                hideCustomAlert();
             }
         });
     </script>
