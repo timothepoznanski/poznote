@@ -7,13 +7,6 @@
 
 A powerful self-hosted note-taking application with full control over your data.
 
-PozNote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
-
-- **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux/macOS)
-- **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
-
-*Real-world example: Successfully deployed on a Debian VPS (Hostinger) with HTTPS enabled through Nginx Proxy Manager for secure remote access.*
-
 ## Features
 
 - 📝 Rich Text Editor
@@ -42,7 +35,12 @@ PozNote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 ## Installation
 
-Poznote runs in Docker containers for easy installation and updates across all platforms.
+PozNote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
+
+- **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux/macOS)
+- **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
+
+*Real-world example: Successfully deployed on a Debian VPS (Hostinger) with HTTPS enabled through Nginx Proxy Manager for secure remote access.*
 
 ### Prerequisites
 
