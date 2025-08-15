@@ -262,14 +262,16 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 
 For advanced users who prefer direct configuration:
 
-**Manual Setup:**
-1. Copy `.env.template` to `.env`
-2. Edit configuration values
-3. Run `docker compose up -d --build`
+**Change settings:**
+
+1. Edit configuration values in `.env`
+2. Run `docker compose up -d --build`
 
 **Update Poznote to the latest version:** 
 
-```git pull origin main && docker compose down && docker compose up -d --build```
+```bash
+git pull origin main && docker compose down && docker compose up -d --build
+```
 
 **Backup:** 
 
