@@ -33,7 +33,6 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
-- [Docker Data Structure](#docker-data-structure)
 - [API Documentation](#api-documentation)
 - [Advanced Usage](#advanced-usage)
 
@@ -43,8 +42,6 @@ PozNote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 - **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux/macOS)
 - **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
-
-*Real-world example: Successfully deployed on a Debian VPS (Hostinger) with HTTPS enabled through Nginx Proxy Manager for secure remote access.*
 
 ### Prerequisites
 
@@ -76,7 +73,13 @@ chmod +x setup.sh
 
 ### Access Your Instance
 
-After installation, access Poznote at: `http://localhost:YOUR_PORT`
+After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
+
+where YOUR_SERVER depends on your environment:
+
+- localhost
+- Your server's IP address
+- Your domain name
 
 The setup script will display the exact URL and credentials.
 
@@ -120,19 +123,13 @@ Select option 2 (Change settings) from the menu. The script will preserve all yo
 
 ## Reset Password
 
-If you've forgotten your password:
-
-1. Run the setup script and select "Change settings"
-2. Enter any value for the current password (it will be ignored)
-3. Set your new password
-4. Your notes and data remain intact
+If you've forgotten your password, run the setup script and select "Change settings".
 
 ## Update Application
 
 To update Poznote to the latest version:
 
-1. Run the setup script and select "Update application"
-2. The script will pull updates while preserving your configuration and data
+Run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
 
 ## Backup and Restore
 
@@ -140,7 +137,7 @@ Poznote includes built-in backup functionality accessible through Settings → "
 
 ### Backup Options
 
-- **📝 Export Notes** - Complete ZIP with all your notes (includes offline viewer)
+- **📝 Export Notes** - Complete ZIP with all your notes (Allows offline viewing without Poznote)
 - **📎 Export Attachments** - All file attachments as ZIP
 - **🗄️ Export Database** - SQLite database dump
 
@@ -150,23 +147,6 @@ Poznote includes built-in backup functionality accessible through Settings → "
 - **Offline Viewing** - Exported notes work independently with included `index.html`
 
 ⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
-
-## Docker Data Structure
-
-**Persistent Volumes:**
-```
-data/
-├── database/          # SQLite database
-│   └── poznote.db
-├── entries/          # Note content (HTML files)  
-│   ├── 1.html
-│   └── 2.html
-└── attachments/      # File attachments
-    └── uploaded_files
-```
-
-**Services:**
-- 🌐 **webserver** - Apache/PHP with embedded SQLite
 
 ## API Documentation
 
