@@ -32,7 +32,7 @@ if ($result !== TRUE) {
 $fileCount = 0;
 
 // Create index file
-$indexContent = '<html><head><title>Note Index</title></head><body>';
+$indexContent = '<html><head><meta charset="UTF-8"><title>Note Index</title></head><body>';
 $indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Notes Export</h1>';
 $query_right = 'SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC';
 $res_right = $con->query($query_right);
@@ -40,9 +40,9 @@ $res_right = $con->query($query_right);
 if ($res_right && $res_right) {
     $indexContent .= '<ul>';
     while($row = $res_right->fetch(PDO::FETCH_ASSOC)) {
-        $title = $row["heading"] ?: 'Untitled note';
-        $folder = $row["folder"] ?: 'Uncategorized';
-        $tags = $row["tags"] ? ' - ' . $row["tags"] : '';
+        $title = htmlspecialchars($row["heading"] ?: 'Untitled note', ENT_QUOTES, 'UTF-8');
+        $folder = htmlspecialchars($row["folder"] ?: 'Uncategorized', ENT_QUOTES, 'UTF-8');
+        $tags = $row["tags"] ? ' - ' . htmlspecialchars($row["tags"], ENT_QUOTES, 'UTF-8') : '';
         $indexContent .= '<li><a href="./'.$row['id'].'.html">'.$title.'</a> (' . $folder . $tags.')</li>';
     }
     $indexContent .= '</ul>';
