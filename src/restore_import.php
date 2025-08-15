@@ -253,6 +253,136 @@ function importAttachmentsZip($uploadedFile) {
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Custom confirmation modal for import */
+        .import-confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .import-confirm-modal-content {
+            background-color: #ffffff;
+            margin: 10% auto;
+            padding: 0;
+            border: none;
+            border-radius: 12px;
+            width: 480px;
+            max-width: 90%;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .import-confirm-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px 24px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .import-confirm-header i {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .import-confirm-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .import-confirm-body {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .import-confirm-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            color: #856404;
+        }
+
+        .import-confirm-warning strong {
+            color: #dc3545;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .import-confirm-list {
+            text-align: left;
+            margin: 12px 0;
+            padding-left: 20px;
+        }
+
+        .import-confirm-list li {
+            margin: 6px 0;
+            color: #495057;
+        }
+
+        .import-confirm-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .import-confirm-buttons button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+
+        .btn-danger-confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger-confirm:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-secondary-cancel {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary-cancel:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+    </style>
 </head>
 <body>
     <div class="backup-container">
@@ -302,7 +432,7 @@ function importAttachmentsZip($uploadedFile) {
                     <label for="backup_file">SQL file to import:</label>
                     <input type="file" id="backup_file" name="backup_file" accept=".sql" required>
                 </div>
-                <button type="submit" class="btn btn-primary" onclick="return confirm('⚠️ Are you sure you want to import this database? This will replace ALL your current data including notes, folders, tags, and settings. This action cannot be undone!')">
+                <button type="button" class="btn btn-primary" onclick="showImportConfirmation()">
                     <i class="fas fa-upload"></i> Import Database
                 </button>
             </form>
@@ -369,5 +499,78 @@ function importAttachmentsZip($uploadedFile) {
         <!-- Bottom padding for better spacing -->
         <div style="padding-bottom: 50px;"></div>
     </div>
+
+    <!-- Custom Import Confirmation Modal -->
+    <div id="importConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <div class="import-confirm-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Database Import Warning</h3>
+            </div>
+            <div class="import-confirm-body">
+                <div class="import-confirm-warning">
+                    <strong>⚠️ CRITICAL WARNING</strong>
+                    This action will completely replace your current database!
+                </div>
+                
+                <p><strong>This will permanently delete:</strong></p>
+                <ul class="import-confirm-list">
+                    <li>All your existing notes and content</li>
+                    <li>All folders and organization</li>
+                    <li>All tags and categories</li>
+                    <li>All settings and preferences</li>
+                    <li>All attachments and files</li>
+                </ul>
+                
+                <p style="color: #dc3545; font-weight: 600; margin-top: 16px;">
+                    This action cannot be undone!
+                </p>
+                
+                <div class="import-confirm-buttons">
+                    <button type="button" class="btn-secondary-cancel" onclick="hideImportConfirmation()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn-danger-confirm" onclick="proceedWithImport()">
+                        <i class="fas fa-upload"></i> Yes, Import Database
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showImportConfirmation() {
+            const fileInput = document.getElementById('backup_file');
+            if (!fileInput.files.length) {
+                alert('Please select a SQL file first.');
+                return;
+            }
+            document.getElementById('importConfirmModal').style.display = 'block';
+        }
+
+        function hideImportConfirmation() {
+            document.getElementById('importConfirmModal').style.display = 'none';
+        }
+
+        function proceedWithImport() {
+            // Submit the form
+            const form = document.querySelector('form[method="post"]');
+            form.submit();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('importConfirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideImportConfirmation();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideImportConfirmation();
+            }
+        });
+    </script>
 </body>
 </html>
