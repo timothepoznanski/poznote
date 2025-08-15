@@ -282,7 +282,7 @@ Copy `./data/` directory (contains entries, attachments, database)
 
 Replace `./data/` directory and restart container
 
-**Password Reset**
+**Password Reset:**
 
 1. Stop Poznote: `docker compose down`
 2. Edit `.env` file: `POZNOTE_PASSWORD=new_password`  
