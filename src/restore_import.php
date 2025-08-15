@@ -347,7 +347,7 @@ function importAttachmentsZip($uploadedFile) {
         <div class="warning">
             <h4>⚠️ Important Notes:</h4>
             <ul>
-                <li><strong>Database restore</strong> will replace ALL your current data</li>
+                <li><strong>Database restore</strong> will replace note titles, tags, search index and metadata (not note content)</li>
                 <li><strong>Notes import</strong> will add to existing notes (no overwrite)</li>
                 <li><strong>Attachments import</strong> will add to existing attachments (no overwrite)</li>
                 <li>Always backup your current data before restoring</li>
@@ -357,7 +357,7 @@ function importAttachmentsZip($uploadedFile) {
         <!-- Import Database Section -->
         <div class="backup-section">
             <h3><i class="fas fa-database"></i> Import Database</h3>
-            <p><strong>⚠️ Warning:</strong> This will replace all your current data!</p>
+            <p><strong>⚠️ Warning:</strong> This will replace note titles, tags, search index and metadata, but not the actual note content!</p>
             
             <?php if ($restore_message): ?>
                 <div class="alert alert-success">
@@ -449,7 +449,7 @@ function importAttachmentsZip($uploadedFile) {
     <div id="importConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
             <h3>Are you sure?</h3>
-            <p>This will replace ALL your current data. This action cannot be undone.</p>
+            <p>This will replace note titles, tags, search index and metadata, but not the actual note content. This action cannot be undone.</p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideImportConfirmation()">
