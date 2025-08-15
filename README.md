@@ -267,11 +267,17 @@ For advanced users who prefer direct configuration:
 2. Edit configuration values
 3. Run `docker compose up -d --build`
 
-**Update:** `git pull origin main && docker compose down && docker compose up -d --build`
+**Update Poznote to the latest version:** 
 
-**Backup:** Copy `./data/` directory (contains entries, attachments, database)
+```git pull origin main && docker compose down && docker compose up -d --build```
 
-**Restore:** Replace `./data/` directory and restart container
+**Backup:** 
+
+Copy `./data/` directory (contains entries, attachments, database)
+
+**Restore:** 
+
+Replace `./data/` directory and restart container
 
 **Password Reset**
 
