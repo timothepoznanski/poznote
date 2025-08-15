@@ -29,12 +29,15 @@ A powerful note-taking application that puts you in complete control of your dat
 ## Table of Contents
 
 - [Installation](#installation)
+- [Access Your Instance](#access-your-instance)
+- [Multiple Instances](#multiple-instances)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
+- [Docker Data Structure](#docker-data-structure)
 - [API Documentation](#api-documentation)
-- [Advanced Usage](#advanced-usage)
+- [Manual Operations](#manual-operations)
 
 ## Installation
 
@@ -71,7 +74,7 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-### Access Your Instance
+## Access Your Instance
 
 After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
 
@@ -83,7 +86,7 @@ where YOUR_SERVER depends on your environment:
 
 The setup script will display the exact URL and credentials.
 
-### Multiple Instances
+## Multiple Instances
 
 You can run multiple isolated Poznote instances:
 
@@ -99,11 +102,6 @@ git clone https://github.com/timothepoznanski/poznote.git poznote-work
 cd poznote-work
 ./setup.sh  # Configure with port 8041
 ```
-
-Each instance has:
-- Separate authentication and data
-- Different ports (8040, 8041, etc.)
-- Independent configuration
 
 ## Change Settings
 
@@ -260,27 +258,14 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 
 **Note:** The `Uncategorized` folder cannot be deleted. When a folder is deleted, all its notes are moved to `Uncategorized`.
 
-## Advanced Usage
-
-### Manual Configuration
+## Manual Operations
 
 For advanced users who prefer direct configuration:
-
-**Environment Variables (.env file):**
-```bash
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123  
-HTTP_WEB_PORT=8040
-APP_NAME_DISPLAYED=Poznote
-SQLITE_DATABASE=/var/www/html/data/database/poznote.db
-```
 
 **Manual Setup:**
 1. Copy `.env.template` to `.env`
 2. Edit configuration values
 3. Run `docker compose up -d --build`
-
-### Manual Operations
 
 **Update:** `git pull origin main && docker compose down && docker compose up -d --build`
 
@@ -288,9 +273,8 @@ SQLITE_DATABASE=/var/www/html/data/database/poznote.db
 
 **Restore:** Replace `./data/` directory and restart container
 
-### Password Reset (CLI)
+**Password Reset**
 
-Alternative method for password reset:
 1. Stop: `docker compose down`
 2. Edit `.env` file: `POZNOTE_PASSWORD=new_password`  
 3. Restart: `docker compose up -d`
