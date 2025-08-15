@@ -1,6 +1,7 @@
 <?php
 require_once 'auth.php';
 require_once 'config.php';
+require_once 'functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -131,21 +132,10 @@ function importNotesZip($uploadedFile) {
         return ['success' => false, 'error' => 'Error uploading file'];
     }
     
-    // Determine entries directory
-    $entriesPaths = [
-        realpath('entries'),
-        realpath('../data/entries'),
-    ];
+    // Get entries directory using the proper function
+    $entriesPath = getEntriesPath();
     
-    $entriesPath = null;
-    foreach ($entriesPaths as $path) {
-        if ($path && is_dir($path)) {
-            $entriesPath = $path;
-            break;
-        }
-    }
-    
-    if (!$entriesPath) {
+    if (!$entriesPath || !is_dir($entriesPath)) {
         unlink($tempFile);
         return ['success' => false, 'error' => 'Cannot find entries directory'];
     }
@@ -204,21 +194,10 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => 'Error uploading file'];
     }
     
-    // Determine attachments directory
-    $attachmentsPaths = [
-        realpath('attachments'),
-        realpath('../data/attachments'),
-    ];
+    // Get attachments directory using the proper function
+    $attachmentsPath = getAttachmentsPath();
     
-    $attachmentsPath = null;
-    foreach ($attachmentsPaths as $path) {
-        if ($path && is_dir($path)) {
-            $attachmentsPath = $path;
-            break;
-        }
-    }
-    
-    if (!$attachmentsPath) {
+    if (!$attachmentsPath || !is_dir($attachmentsPath)) {
         unlink($tempFile);
         return ['success' => false, 'error' => 'Cannot find attachments directory'];
     }

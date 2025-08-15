@@ -207,7 +207,19 @@ Poznote includes built-in restore functionality through the web interface in Set
 **Persistent Volumes:**
 - 📁 `./data/entries` - Your note files (HTML format)
 - 📎 `./data/attachments` - File attachments  
-- 🗄️ `./data/poznote.db` - SQLite database file
+- 🗄️ `./data/database/poznote.db` - SQLite database file
+
+**Data Structure:**
+```
+data/
+├── database/          # Database files
+│   └── poznote.db
+├── entries/          # Note content (HTML files)
+│   ├── 1.html
+│   └── 2.html
+└── attachments/      # File attachments
+    └── uploaded_files
+```
 
 ## API
 
@@ -613,7 +625,7 @@ POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin123
 HTTP_WEB_PORT=8040
 APP_NAME_DISPLAYED=Poznote
-SQLITE_DATABASE=/var/www/html/data/poznote.db
+SQLITE_DATABASE=/var/www/html/data/database/poznote.db
 ```
 
 **Configuration options:**
