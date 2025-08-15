@@ -5,21 +5,18 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
-A powerful note-taking tool with full control over your data.
+A powerful self-hosted note-taking application with full control over your data.
 
 ## Features
 
-- 📝 Rich Text Editor
-- 🔍 Powerful Search
-- 🏷️ Tag System
-- 📎 File Attachments
-- 📱 Responsive Design
-- 🖥️ Multi-instance
-- 🔒 Self-Hosted
-- 💾 Built-in backup and export
-- 🗑️ Trash System
-- 🌐 REST API
-
+- 📝 Rich Text Editor with file attachments
+- 🔍 Powerful search and tag system
+-  Responsive design for all devices
+- 🖥️ Multi-instance support
+- 🔒 Self-hosted with secure authentication
+- 💾 Built-in backup and export tools
+- 🗑️ Trash system with restore functionality
+- 🌐 REST API for automation
 
 ![alt text](image.png)
 
@@ -28,107 +25,76 @@ A powerful note-taking tool with full control over your data.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Update settings](#update-settings-password-displayed-name-database-etc)
-- [Forgot your password?](#forgot-your-password)
-- [Update Poznote application](#update-poznote-application)
+- [Configuration](#configuration)
 - [Backup and Restore](#backup-and-restore)
-- [Docker Architecture](#docker-architecture)
-- [API](#api)
-- [Advanced Configuration](#advanced-configuration)
+- [API Documentation](#api-documentation)
+- [Advanced Usage](#advanced-usage)
 
 ## Installation
 
-Poznote is designed to run seamlessly in Docker containers, making installation and updates simple and consistent across all platforms.
+Poznote runs in Docker containers for easy installation and updates across all platforms.
 
-### Windows
+### Prerequisites
 
-**Prerequisites:**
-- Install **[Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)**
+**Windows:**
+- [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
 
-Open PowerShell in the directory where you want to install Poznote and execute the following commands:
+**Linux/macOS:**
+- [Docker Engine](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
+### Quick Start
+
+**Windows (PowerShell):**
 ```powershell
-$instanceName = Read-Host "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
+$instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.)"
 git clone https://github.com/timothepoznanski/poznote.git $instanceName
 cd $instanceName
 .\setup.ps1
 ```
 
-### Linux/macOS
-
-**Prerequisites:**
-- **[Docker Engine](https://docs.docker.com/engine/install/)**
-- **[Docker Compose](https://docs.docker.com/compose/install/)**
-
+**Linux/macOS:**
 ```bash
-read -p "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
+read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.): " instanceName
 git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
 cd "$instanceName"
 chmod +x setup.sh
 ./setup.sh
 ```
 
-### Access URLs
+### Access Your Instance
 
-After starting Poznote, you can access it at:
-- **URL Pattern**: `http://YOUR_SERVER:HTTP_WEB_PORT`
+After installation, access Poznote at: `http://localhost:YOUR_PORT`
 
-Where `YOUR_SERVER` depends on your environment:
-- `localhost`
-- Your server's IP address
-- Your domain name
+The setup script will display the exact URL and credentials.
 
-### Running Multiple Instances
+### Multiple Instances
 
-You can run multiple Poznote instances on the same server by using different instance names and ports:
+You can run multiple isolated Poznote instances:
 
 ```bash
-# First instance
-read -p "Choose an instance name: " instanceName  # Example: poznote-personal
-git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
-cd "$instanceName"
+# Personal notes
+git clone https://github.com/timothepoznanski/poznote.git poznote-personal
+cd poznote-personal
 ./setup.sh  # Configure with port 8040
 
-# Second instance (in a different directory)
+# Work notes  
 cd ..
-read -p "Choose another instance name: " instanceName  # Example: poznote-work
-git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
-cd "$instanceName"
+git clone https://github.com/timothepoznanski/poznote.git poznote-work
+cd poznote-work
 ./setup.sh  # Configure with port 8041
 ```
 
-**Important**: 
-- Each instance must use a **different port** (the setup script will check and prompt if a port is already in use)
-- Each instance will have **isolated PHP sessions** - login on one instance doesn't affect others
-- You can use different usernames/passwords for each instance
+Each instance has:
+- Separate authentication and data
+- Different ports (8040, 8041, etc.)
+- Independent configuration
 
-**Example configuration**:
-- `poznote-personal`: Port 8040, username "alice", password "personal123"
-- `poznote-work`: Port 8041, username "bob", password "work456"
-- `poznote-demo`: Port 8042, username "demo", password "demo123"
+## Configuration
 
-## Update settings (Password, displayed name, database etc.)
+### Update Settings
 
-**Linux/macOS:**
-```bash
-./setup.sh
-```
-
-**Windows:**
-```powershell
-.\setup.ps1
-```
-Then select option 2 (Change settings) from the menu.
-
-The script will:
-- 📋 Show your current configuration
-- ✏️ Allow you to update username, password, port and application name
-- 🔄 Restart services automatically
-- 🛡️ Preserve all your data
-
-## Forgot your password?
-
-If you've forgotten your password, you can reset it using the setup script:
+To change your username, password, port, or application name:
 
 **Linux/macOS:**
 ```bash
@@ -140,188 +106,112 @@ If you've forgotten your password, you can reset it using the setup script:
 .\setup.ps1
 ```
 
-1. Select option **2 (Change settings)** from the menu
-2. When prompted for the current password, you can enter any value or leave it empty
-3. The script will allow you to set a new password
-4. Your data and notes will remain intact
+Select option 2 (Change settings) from the menu. The script will preserve all your data.
 
-> ⚠️ **Important:** Make sure to use a strong password for security. Your notes contain sensitive information!
-> 
-> 🔧 **Advanced users:** See the [Advanced Configuration](#advanced-configuration) section for alternative password reset methods.
+### Reset Password
 
-## Update Poznote application
+If you've forgotten your password:
 
-You can update Poznote to the latest version using the automated script.
+1. Run the setup script and select "Change settings"
+2. Enter any value for the current password (it will be ignored)
+3. Set your new password
+4. Your notes and data remain intact
 
-**Linux/macOS:**
-```bash
-./setup.sh
-```
+### Update Application
 
-**Windows:**
-```powershell
-.\setup.ps1
-```
-Then select option 1 (Update application) from the menu.
+To update Poznote to the latest version:
 
-The script will:
-- 🔄 Pull the latest code automatically
-- 🛡️ Preserve your existing configuration and data
-- 🚀 Restart services with updates
+1. Run the setup script and select "Update application"
+2. The script will pull updates while preserving your configuration and data
 
 ## Backup and Restore
 
-Poznote offers different backup options depending on your needs.
+Poznote includes built-in backup functionality accessible through Settings → "Export/Import Database".
 
-**Complete Application Restore**:
-- Requires all 3 components: Notes (HTML files) + Attachments + Database
-- Use this for full Poznote restoration (new server or current installation)
+### Backup Options
 
-**Offline Notes Consultation (without Poznote)**:
-- Export notes as ZIP file → Contains all HTML files + `index.html` menu
-- No Poznote installation needed, works anywhere
+- **📝 Export Notes** - Complete ZIP with all your notes (includes offline viewer)
+- **📎 Export Attachments** - All file attachments as ZIP
+- **🗄️ Export Database** - SQLite database dump
 
-⚠️ Database contains only note metadata like titles, tags, dates - not the actual note content which is stored in HTML files
+### Restore Options
 
-### Backup
+- **Complete Restore** - Requires notes + attachments + database for full functionality
+- **Offline Viewing** - Exported notes work independently with included `index.html`
 
-Poznote includes built-in backup functionality through the web interface in Settings → "Export/Import Database"
+⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
-Available backup options:
-- **📝 Export Notes** - Download complete ZIP with all your notes
-- **📎 Export Attachments** - Download all file attachments  
-- **🗄️ Export Database** - Download SQL dump
-
-### Restore
-
-Poznote includes built-in restore functionality through the web interface in Settings → "Export/Import Database"
-
-**⚠️ Warning**: Database import will completely replace your current data!  
-**ℹ️ Important**: Database contains only metadata (titles, tags, dates) - actual note content is stored in HTML files.
-
-### Docker Architecture
-
-**Services:**
-- 🌐 **webserver** - Apache/PHP serving the application with embedded SQLite
+### Docker Data Structure
 
 **Persistent Volumes:**
-- 📁 `./data/entries` - Your note files (HTML format)
-- 📎 `./data/attachments` - File attachments  
-- 🗄️ `./data/database/poznote.db` - SQLite database file
-
-**Data Structure:**
 ```
 data/
-├── database/          # Database files
+├── database/          # SQLite database
 │   └── poznote.db
-├── entries/          # Note content (HTML files)
+├── entries/          # Note content (HTML files)  
 │   ├── 1.html
 │   └── 2.html
 └── attachments/      # File attachments
     └── uploaded_files
 ```
 
-## API
+**Services:**
+- 🌐 **webserver** - Apache/PHP with embedded SQLite
 
-Poznote provides a comprehensive REST API for programmatic access to your notes and folders.
+## API Documentation
 
-### 🔐 Authentication
+Poznote provides a REST API for programmatic access to notes and folders.
 
-All API requests require HTTP Basic authentication using the same credentials configured in your `.env` file.
+### Authentication
 
-**Authentication format:**
+All API requests require HTTP Basic authentication:
 ```bash
 curl -u username:password http://localhost:8040/api_endpoint.php
 ```
 
-### 📡 Base URL
+### Base URL
 
-The API is accessible at your Poznote instance address:
+Access the API at your Poznote instance:
 ```
 http://YOUR_SERVER:HTTP_WEB_PORT/
 ```
 
-**Examples:**
-- `http://localhost:8040/` (local installation)
-- `http://myserver.com:8040/` (remote server)
+### Response Format
 
-### 📝 Response Format
+**HTTP Status Codes:**
+- `200` - Success (updates, deletes)
+- `201` - Created  
+- `400` - Bad Request
+- `401` - Unauthorized
+- `404` - Not Found
+- `409` - Conflict (duplicate)
+- `500` - Server Error
 
-#### HTTP Status Codes
-
-| Code | Status | Description |
-|------|--------|-------------|
-| **200** | OK | Request successful (for updates, deletes) |
-| **201** | Created | Resource created successfully |
-| **400** | Bad Request | Invalid request data (missing parameters, invalid JSON, etc.) |
-| **401** | Unauthorized | Authentication failed or missing credentials |
-| **404** | Not Found | Requested resource (note, folder) does not exist |
-| **405** | Method Not Allowed | HTTP method not supported for this endpoint |
-| **409** | Conflict | Resource already exists (duplicate folder name) |
-| **500** | Internal Server Error | Server error (database issues, file system errors) |
-
-#### Error Response Format
-```json
-{
-  "error": "Error message description",
-  "details": "Additional error details (optional)"
-}
-```
-
-#### Success Response Format
+**Success Response:**
 ```json
 {
   "success": true,
-  "message": "Operation completed successfully",
+  "message": "Operation completed",
   "data": { /* response data */ }
 }
 ```
 
-### 🛠️ Available Endpoints
+**Error Response:**
+```json
+{
+  "error": "Error description",
+  "details": "Additional details (optional)"
+}
+```
 
-**Quick Reference:**
-- `GET /api_list_notes.php` - List all notes
-- `POST /api_create_note.php` - Create a new note
-- `POST /api_create_folder.php` - Create a new folder
-- `POST /api_move_note.php` - Move note to folder
-- `DELETE /api_delete_note.php` - Delete note (soft/permanent)
-- `DELETE /api_delete_folder.php` - Delete folder
+### Endpoints
 
----
-
-#### 📋 List Notes
-
-**Retrieves all your notes with their metadata.**
-
+#### List Notes
 ```bash
 curl -u username:password http://localhost:8040/api_list_notes.php
 ```
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "notes": [
-    {
-      "id": "123",
-      "heading": "My Note",
-      "tags": "personal,important",
-      "folder": "Projects",
-      "created": "2025-01-15 10:30:00",
-      "updated": "2025-01-16 14:20:00",
-      "favorite": 0,
-      "trash": 0
-    }
-  ]
-}
-```
-
----
-
-#### ✏️ Create Note
-
-**Creates a new note with a title and optional tags.**
-
+#### Create Note
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
   -u username:password \
@@ -333,26 +223,7 @@ curl -X POST http://localhost:8040/api_create_note.php \
   }'
 ```
 
-**Parameters:**
-- `heading` (required): Note title
-- `tags` (optional): Comma-separated tags
-- `folder` (optional): Folder name (default: "Uncategorized")
-
-**Response (201 Created):**
-```json
-{
-  "success": true,
-  "message": "Note created successfully",
-  "note_id": "124"
-}
-```
-
----
-
-#### 📁 Create Folder
-
-**Creates a new folder to organize your notes.**
-
+#### Create Folder
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
   -u username:password \
@@ -360,31 +231,7 @@ curl -X POST http://localhost:8040/api_create_folder.php \
   -d '{"folder_name": "Work Projects"}'
 ```
 
-**Parameters:**
-- `folder_name` (required): Name of the folder to create
-
-**Response (201 Created):**
-```json
-{
-  "success": true,
-  "message": "Folder 'Work Projects' created successfully",
-  "folder_path": "/var/www/html/data/entries/Work Projects"
-}
-```
-
-**Error (409 Conflict):**
-```json
-{
-  "error": "Folder 'Work Projects' already exists"
-}
-```
-
----
-
-#### 📂 Move Note
-
-**Moves a note to a specific folder.**
-
+#### Move Note
 ```bash
 curl -X POST http://localhost:8040/api_move_note.php \
   -u username:password \
@@ -395,50 +242,15 @@ curl -X POST http://localhost:8040/api_move_note.php \
   }'
 ```
 
-**Parameters:**
-- `note_id` (required): ID of the note to move
-- `folder_name` (required): Destination folder name
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "message": "Note moved successfully to folder 'Work Projects'",
-  "new_file_path": "/var/www/html/data/entries/Work Projects/123.html"
-}
-```
-
-**Error (404 Not Found):**
-```json
-{
-  "error": "Note with ID 123 not found"
-}
-```
-
----
-
-#### 🗑️ Delete Note
-
-**Deletes a note (soft delete to trash or permanent deletion).**
-
-**Soft delete (move to trash):**
+#### Delete Note
 ```bash
+# Soft delete (to trash)
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
   -d '{"note_id": "123"}'
-```
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "message": "Note moved to trash successfully"
-}
-```
-
-**Permanent delete:**
-```bash
+# Permanent delete
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u username:password \
   -H "Content-Type: application/json" \
@@ -448,24 +260,7 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
   }'
 ```
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "message": "Note permanently deleted",
-  "files_deleted": {
-    "html_file": "/var/www/html/data/entries/123.html",
-    "attachments": ["file1.pdf", "image.jpg"]
-  }
-}
-```
-
----
-
-#### 🗂️ Delete Folder
-
-**Deletes a folder and moves all its notes to "Uncategorized".**
-
+#### Delete Folder
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -u username:password \
@@ -473,211 +268,39 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -d '{"folder_name": "Work Projects"}'
 ```
 
-**Parameters:**
-- `folder_name` (required): Name of the folder to delete
+**Note:** The `Uncategorized` folder cannot be deleted. When a folder is deleted, all its notes are moved to `Uncategorized`.
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "message": "Folder 'Work Projects' deleted successfully",
-  "notes_moved": {
-    "total": 5,
-    "active": 3,
-    "trash": 2
-  },
-  "folder_removed": "/var/www/html/data/entries/Work Projects"
-}
-```
+## Advanced Usage
 
-**Error (400 Bad Request) - Protected Folder:**
-```json
-{
-  "error": "Cannot delete the Uncategorized folder"
-}
-```
+### Manual Configuration
 
-### ⚠️ Protected Folders
+For advanced users who prefer direct configuration:
 
-- The `Uncategorized` folder cannot be deleted as it serves as the default location for notes without a specific folder
-- When a folder is deleted, all its notes are automatically moved to `Uncategorized` to prevent data loss
-
-### 💡 Usage Examples
-
-**Complete workflow:**
-```bash
-# 1. Create a folder
-curl -X POST http://localhost:8040/api_create_folder.php \
-  -u admin:mypassword \
-  -H "Content-Type: application/json" \
-  -d '{"folder_name": "My Projects"}'
-
-# 2. Create a note in this folder
-curl -X POST http://localhost:8040/api_create_note.php \
-  -u admin:mypassword \
-  -H "Content-Type: application/json" \
-  -d '{
-    "heading": "Project Ideas",
-    "tags": "brainstorming,important",
-    "folder": "My Projects"
-  }'
-
-```bash
-# 3. List all notes
-curl -u admin:mypassword http://localhost:8040/api_list_notes.php
-```
-
-## Advanced Configuration
-
-This section contains optional manual configuration methods for advanced users who prefer more control over the setup process.
-
-### Alternative Password Reset Method
-
-If you prefer to reset your password by editing the configuration directly:
-
-1. **Stop the application:**
-   ```bash
-   docker-compose down
-   ```
-
-2. **Edit the environment file:**
-   ```bash
-   nano .env
-   ```
-
-3. **Change the password line:**
-   ```
-   POZNOTE_PASSWORD=your_new_password
-   ```
-
-4. **Restart the application:**
-   ```bash
-   docker-compose up -d
-   ```
-
-> ⚠️ **Warning:** This method requires command-line access and basic Docker knowledge. For most users, the setup script method is recommended.
-
-### Manual Installation Setup
-
-#### Windows - Manual Setup
-
-1. **Choose instance name and clone the repository**
-   
-   Open PowerShell in the directory where you want to install Poznote and execute the following commands:
-   
-   ```powershell
-   $instanceName = Read-Host "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.)"
-   git clone https://github.com/timothepoznanski/poznote.git $instanceName
-   cd $instanceName
-   ```
-
-2. **Configure environment**
-   ```powershell
-   copy .env.template .env
-   notepad .env
-   ```
-
-3. **Customize settings**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
-   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
-
-4. **Start Poznote**
-   ```powershell
-   docker compose up -d --build
-   ```
-
-#### Linux/macOS - Manual Setup
-
-1. **Choose instance name and clone the repository**
-   ```bash
-   read -p "Choose an instance name (poznote, poznote-tom, poznote-perso, poznote-pro, my-notes etc.): " instanceName
-   git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
-   cd "$instanceName"
-   ```
-
-2. **Configure environment**
-   ```bash
-   cp .env.template .env
-   vim .env
-   ```
-
-3. **Customize settings**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
-   - **Note**: The application name displayed defaults to "Poznote". You can change it later by running the setup script again.
-
-4. **Start Poznote**
-   ```bash
-   docker compose up -d --build
-   ```
-
-### Manual Configuration Change
-
-Open the folder of your project and edit the `.env` file to customize your installation:
-
+**Environment Variables (.env file):**
 ```bash
 POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123
+POZNOTE_PASSWORD=admin123  
 HTTP_WEB_PORT=8040
 APP_NAME_DISPLAYED=Poznote
 SQLITE_DATABASE=/var/www/html/data/database/poznote.db
 ```
 
-**Configuration options:**
-- `POZNOTE_USERNAME` - Username for authentication
-- `POZNOTE_PASSWORD` - Password for authentication  
-- `HTTP_WEB_PORT` - Port where the application will be accessible
-- `APP_NAME_DISPLAYED` - **Application name displayed** in the interface
-- `SQLITE_DATABASE` - Path to the SQLite database file
+**Manual Setup:**
+1. Copy `.env.template` to `.env`
+2. Edit configuration values
+3. Run `docker compose up -d --build`
 
-**To modify settings manually:**
+### Manual Operations
 
-1. **Edit the .env file**
-   - Change `POZNOTE_USERNAME=admin` to your preferred username
-   - Change `POZNOTE_PASSWORD=admin123` to a secure password
-   - Optionally modify `HTTP_WEB_PORT=8040` if the port is already in use
-   - Optionally modify `APP_NAME_DISPLAYED=Poznote` to customize the **application name displayed** in the interface
-   - **Note**: If you plan to run multiple instances on the same server, each instance must use a different port (e.g., 8040, 8041, 8042)
+**Update:** `git pull origin main && docker compose down && docker compose up -d --build`
 
-2. **Restart the application**
+**Backup:** Copy `./data/` directory (contains entries, attachments, database)
 
-```bash
-docker compose down
-docker compose up -d
-```
+**Restore:** Replace `./data/` directory and restart container
 
-### Manual Update
+### Password Reset (CLI)
 
-To update Poznote manually to the latest version:
-
-```bash
-git pull origin main && docker compose down && docker compose up -d --build
-```
-
-### Manual Backup and Restore
-
-#### Manual Backups
-
-- To backup your notes, copy your html files found in `./data/entries`
-- To backup your attachements, copy your attachement files found in `./data/attachments`
-- To backup your database, copy your database file found in `./data`
-
-#### Manual Restore
-
-**Restore notes, attachments and database**
-```bash
-# Stop Poznote
-docker compose down
-```
-
-Copy your files to `./data/entries/`, `./data/attachments/` and `./data`
-
-```bash
-# Start Poznote
-docker compose up -d
-```
+Alternative method for password reset:
+1. Stop: `docker compose down`
+2. Edit `.env` file: `POZNOTE_PASSWORD=new_password`  
+3. Restart: `docker compose up -d`
