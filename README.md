@@ -652,33 +652,20 @@ git pull origin main && docker compose down && docker compose up -d --build
 #### Manual Backups
 
 - To backup your notes, copy your html files found in `./data/entries`
-- To backup your attachements, copy your files found in `./data/attachments`
-- To backup your database:
-
-```bash
-# Copy the SQLite database file
-cp ./data/poznote.db ./backup_poznote_$(date +%Y%m%d_%H%M%S).db
-```
+- To backup your attachements, copy your attachement files found in `./data/attachments`
+- To backup your database, copy your database file found in `./data`
 
 #### Manual Restore
 
-**Restore notes and attachments**
+**Restore notes, attachments and database**
 ```bash
 # Stop Poznote
 docker compose down
 ```
 
-Copy your files to `./data/entries/` and `./data/attachments/`
-
-**Restore database from backup**
+Copy your files to `./data/entries/`, `./data/attachments/` and `./data`
 
 ```bash
-# Stop Poznote
-docker compose down
-
-# Replace the database file with your backup
-cp ./backup_poznote_YYYYMMDD_HHMMSS.db ./data/poznote.db
-
 # Start Poznote
 docker compose up -d
 ```
