@@ -682,4 +682,3 @@ cp ./backup_poznote_YYYYMMDD_HHMMSS.db ./data/poznote.db
 # Start Poznote
 docker compose up -d
 ```
-# Test du système de versioning automatique

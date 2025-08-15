@@ -876,7 +876,31 @@ $folder_filter = $_GET['folder'] ?? '';
                     $created_json_escaped = htmlspecialchars($created_json, ENT_QUOTES);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
+                    // Prepare additional data for note info
+                    $folder_name = $row['folder'] ?? 'Uncategorized';
+                    if ($folder_name === 'Uncategorized') $folder_name = 'Non classé';
+                    $is_favorite = intval($row['favorite'] ?? 0);
+                    $tags_data = $row['tags'] ?? '';
+                    
+                    // Encode additional data safely for JavaScript
+                    $folder_json = json_encode($folder_name, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $favorite_json = json_encode($is_favorite, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $tags_json = json_encode($tags_data, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    
+                    // Safety checks
+                    if ($folder_json === false) $folder_json = '"Uncategorized"';
+                    if ($favorite_json === false) $favorite_json = '0';
+                    if ($tags_json === false) $tags_json = '""';
+                    if ($attachments_count_json === false) $attachments_count_json = '0';
+                    
+                    // Escape for HTML attributes
+                    $folder_json_escaped = htmlspecialchars($folder_json, ENT_QUOTES);
+                    $favorite_json_escaped = htmlspecialchars($favorite_json, ENT_QUOTES);
+                    $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
+                    $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
+                    
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 } else {
                     // Boutons individuels pour mobile (toujours visibles)
@@ -927,7 +951,30 @@ $folder_filter = $_GET['folder'] ?? '';
                     $created_json_escaped = htmlspecialchars($created_json, ENT_QUOTES);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
+                    // Prepare additional data for note info (mobile)
+                    $folder_name = $row['folder'] ?? 'Uncategorized';
+                    $is_favorite = intval($row['favorite'] ?? 0);
+                    $tags_data = $row['tags'] ?? '';
+                    
+                    // Encode additional data safely for JavaScript
+                    $folder_json = json_encode($folder_name, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $favorite_json = json_encode($is_favorite, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $tags_json = json_encode($tags_data, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    
+                    // Safety checks
+                    if ($folder_json === false) $folder_json = '"Uncategorized"';
+                    if ($favorite_json === false) $favorite_json = '0';
+                    if ($tags_json === false) $tags_json = '""';
+                    if ($attachments_count_json === false) $attachments_count_json = '0';
+                    
+                    // Escape for HTML attributes
+                    $folder_json_escaped = htmlspecialchars($folder_json, ENT_QUOTES);
+                    $favorite_json_escaped = htmlspecialchars($favorite_json, ENT_QUOTES);
+                    $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
+                    $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
+                    
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 }
                 

@@ -44,8 +44,8 @@ function toggleNoteMenu(noteId) {
     }
 }
 
-// Function to show note information with dates (robust version)
-function showNoteInfo(noteId, created, updated) {
+// Function to show note information with complete details
+function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
     try {
         // Clean and format the dates
         let createdText = "Non disponible";
@@ -87,8 +87,14 @@ function showNoteInfo(noteId, created, updated) {
             }
         }
         
+        // Process additional data
+        let folderText = folder || "Non classé";
+        let isFavorite = parseInt(favorite) === 1;
+        let tagsText = tags && tags.trim() !== '' ? tags : "Aucun tag";
+        let attachmentsCountText = parseInt(attachmentsCount) || 0;
+        
         // Show the information in a styled modal
-        showNoteModal(noteId, createdText, updatedText);
+        showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCountText);
         
     } catch (error) {
         console.error("Error in showNoteInfo:", error);
@@ -96,35 +102,32 @@ function showNoteInfo(noteId, created, updated) {
     }
 }
 
-// Function to show note information in a styled modal
-function showNoteModal(noteId, createdText, updatedText) {
+// Function to show note information in a styled modal with complete details
+function showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCount) {
     // Remove existing modal if any
     const existingModal = document.getElementById('noteInfoModal');
     if (existingModal) {
         existingModal.remove();
     }
     
-    // Create modal HTML
+    // Create simple text list
+    const favoriteText = isFavorite ? 'Oui' : 'Non';
+    
+    // Create ultra simple modal
     const modalHTML = `
         <div id="noteInfoModal" class="modal" style="display: flex;">
-            <div class="modal-content note-info-modal">
-                <h3><i class="fa fa-info-circle" style="color: #007DB8; margin-right: 8px;"></i>Informations de la note</h3>
-                <div class="note-info-content">
-                    <div class="info-row">
-                        <span class="info-label">ID :</span>
-                        <span class="info-value">${noteId}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Créée :</span>
-                        <span class="info-value">${createdText}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Modifiée :</span>
-                        <span class="info-value">${updatedText}</span>
-                    </div>
+            <div style="background: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: auto; min-width: 250px; max-width: 400px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007DB8; font-size: 18px; font-weight: 600;">Note #${noteId}</h3>
+                <div style="line-height: 1.8; margin: 15px 0;">
+                    <div style="margin: 8px 0;"><strong>Dossier:</strong> ${folderText}</div>
+                    <div style="margin: 8px 0;"><strong>Favoris:</strong> ${favoriteText}</div>
+                    <div style="margin: 8px 0;"><strong>Pièces jointes:</strong> ${attachmentsCount}</div>
+                    <div style="margin: 8px 0;"><strong>Tags:</strong> ${tagsText}</div>
+                    <div style="margin: 8px 0;"><strong>Créée:</strong> ${createdText}</div>
+                    <div style="margin: 8px 0;"><strong>Modifiée:</strong> ${updatedText}</div>
                 </div>
-                <div class="modal-buttons">
-                    <button onclick="closeNoteInfoModal()" class="btn-primary">Fermer</button>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="closeNoteInfoModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">Fermer</button>
                 </div>
             </div>
         </div>
