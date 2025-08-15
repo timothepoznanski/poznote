@@ -29,8 +29,11 @@ A powerful note-taking application that puts you in complete control of your dat
 ## Table of Contents
 
 - [Installation](#installation)
-- [Configuration](#configuration)
+- [Change Settings](#change-settings)
+- [Reset Password](#reset-password)
+- [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
+- [Docker Data Structure](#docker-data-structure)
 - [API Documentation](#api-documentation)
 - [Advanced Usage](#advanced-usage)
 
@@ -99,9 +102,7 @@ Each instance has:
 - Different ports (8040, 8041, etc.)
 - Independent configuration
 
-## Configuration
-
-### Update Settings
+## Change Settings
 
 To change your username, password, port, or application name:
 
@@ -117,7 +118,7 @@ To change your username, password, port, or application name:
 
 Select option 2 (Change settings) from the menu. The script will preserve all your data.
 
-### Reset Password
+## Reset Password
 
 If you've forgotten your password:
 
@@ -126,7 +127,7 @@ If you've forgotten your password:
 3. Set your new password
 4. Your notes and data remain intact
 
-### Update Application
+## Update Application
 
 To update Poznote to the latest version:
 
@@ -150,7 +151,7 @@ Poznote includes built-in backup functionality accessible through Settings → "
 
 ⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
-### Docker Data Structure
+## Docker Data Structure
 
 **Persistent Volumes:**
 ```
