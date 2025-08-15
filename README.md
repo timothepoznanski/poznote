@@ -264,8 +264,9 @@ For advanced users who prefer direct configuration:
 
 **Change settings:**
 
-1. Edit configuration values in `.env`
-2. Run `docker compose up -d --build`
+1. Stop Poznote: `docker compose down`
+2. Edit `.env` file
+3. Restart Poznote: `docker compose up -d`
 
 **Update Poznote to the latest version:** 
 
@@ -283,6 +284,6 @@ Replace `./data/` directory and restart container
 
 **Password Reset**
 
-1. Stop: `docker compose down`
+1. Stop Poznote: `docker compose down`
 2. Edit `.env` file: `POZNOTE_PASSWORD=new_password`  
-3. Restart: `docker compose up -d`
+3. Restart Poznote: `docker compose up -d`
