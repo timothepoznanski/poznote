@@ -20,6 +20,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
 
+## Examples
 
 ![alt text](image.png)
 
