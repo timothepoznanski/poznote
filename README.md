@@ -9,14 +9,17 @@ A powerful self-hosted note-taking application with full control over your data.
 
 ## Features
 
-- 📝 Rich Text Editor with file attachments
-- 🔍 Powerful search and tag system
--  Responsive design for all devices
+- 📝 Rich Text Editor
+- 🔍 Powerful Search
+- 🏷️ Tag system
+- 📎 File Attachments
+- 📱 Responsive design for all devices
 - 🖥️ Multi-instance support
 - 🔒 Self-hosted with secure authentication
 - 💾 Built-in backup and export tools
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
+
 
 ![alt text](image.png)
 
