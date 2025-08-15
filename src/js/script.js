@@ -2095,6 +2095,11 @@ function koFiAction() {
 
 // Function to download a file
 function downloadFile(url, filename) {
+    // Ensure the filename has .html extension
+    if (filename && !filename.toLowerCase().endsWith('.html') && !filename.toLowerCase().endsWith('.htm')) {
+        filename = filename + '.html';
+    }
+    
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
