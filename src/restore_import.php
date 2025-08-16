@@ -386,7 +386,7 @@ function importAttachmentsZip($uploadedFile) {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-upload"></i> Restore (Import)</h1>
+        <h1><i class="fas fa-download"></i> Restore (Import)</h1>
         <p>Import data from backup files.</p>
         
         <div class="navigation">
@@ -394,7 +394,7 @@ function importAttachmentsZip($uploadedFile) {
                 <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
             <a href="backup_export.php" class="btn btn-secondary">
-                <i class="fas fa-download"></i> Go to Backup (Export)
+                <i class="fas fa-upload"></i> Go to Backup (Export)
             </a>
         </div>
         

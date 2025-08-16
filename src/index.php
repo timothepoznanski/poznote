@@ -386,11 +386,11 @@ $folder_filter = $_GET['folder'] ?? '';
                         <span>Unfold All Folders</span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
-                        <i class="fas fa-download"></i>
+                        <i class="fas fa-upload"></i>
                         <span>Backup (Export)</span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'restore_import.php';">
-                        <i class="fas fa-upload"></i>
+                        <i class="fas fa-download"></i>
                         <span>Restore (Import)</span>
                     </div>
                     <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
@@ -522,11 +522,11 @@ $folder_filter = $_GET['folder'] ?? '';
                     <span>Unfold All Folders</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
-                    <i class="fas fa-download"></i>
+                    <i class="fas fa-upload"></i>
                     <span>Backup (Export)</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'restore_import.php';">
-                    <i class="fas fa-upload"></i>
+                    <i class="fas fa-download"></i>
                     <span>Restore (Import)</span>
                 </div>
                 <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
@@ -743,6 +743,8 @@ $folder_filter = $_GET['folder'] ?? '';
                 if (!empty($search)) $params[] = 'search=' . urlencode($search);
                 if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
                 if (!empty($folder_filter)) $params[] = 'folder=' . urlencode($folder_filter);
+                if ($preserve_notes) $params[] = 'preserve_notes=1';
+                if ($preserve_tags) $params[] = 'preserve_tags=1';
                 $params[] = 'note=' . urlencode($row1["heading"]);
                 $link = 'index.php?' . implode('&', $params);
                 
@@ -794,7 +796,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 // Boutons de formatage (cachés par défaut sur mobile, visibles lors de sélection)
                 echo '<div class="note-edit-toolbar">';
                 if ($is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'index.php\'"><i class="fas fa-home"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="goHomeWithSearch()"><i class="fas fa-home"></i></button>';
                 }
                 
                 // Boutons de formatage de texte (visibles seulement lors de sélection en desktop)
@@ -1013,7 +1015,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo '        <h2 class="welcome-title">No notes found</h2>';
                 echo '        <p class="welcome-description">Your search didn\'t return any results. Try different keywords or check your spelling.</p>';
                 echo '        <div class="welcome-actions">';
-                echo '            <button class="welcome-btn welcome-btn-secondary" onclick="clearSearch()">';
+                echo '            <button class="welcome-btn welcome-btn-secondary" onclick="clearUnifiedSearch()">';
                 echo '                <i class="fas fa-times"></i>';
                 echo '                Clear search';
                 echo '            </button>';

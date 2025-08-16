@@ -66,7 +66,7 @@ function createBackup() {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-download"></i> Backup (Export)</h1>
+        <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
         <p>Export your data for backup or migration purposes.</p>
         
         <div class="navigation">
@@ -74,7 +74,7 @@ function createBackup() {
                 <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
             <a href="restore_import.php" class="btn btn-secondary">
-                <i class="fas fa-upload"></i> Go to Restore (Import)
+                <i class="fas fa-download"></i> Go to Restore (Import)
             </a>
         </div>
         

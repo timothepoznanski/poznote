@@ -2546,7 +2546,7 @@ function checkForUpdates() {
                 showUpdateInstructions();
             } else {
                 // Update checking modal with success
-                showUpdateCheckResult('✅ You\'re up to date!', `Current version: ${data.current_version}`, 'success');
+                showUpdateCheckResult('✅ You\'re up to date!', '', 'success');
             }
         })
         .catch(error => {
@@ -2603,13 +2603,19 @@ function showUpdateCheckResult(title, message, type) {
     if (type === 'error') {
         titleElement.style.color = '#e53935';
         statusElement.style.color = '#e53935';
+        // Show buttons for errors
+        buttonsElement.style.display = 'flex';
     } else if (type === 'success') {
         titleElement.style.color = '#007DB8';
         statusElement.style.color = '#007DB8';
+        // Hide buttons for success
+        buttonsElement.style.display = 'none';
+        
+        // Auto-close after 3 seconds for success
+        setTimeout(() => {
+            closeUpdateCheckModal();
+        }, 3000);
     }
-    
-    // Show buttons
-    buttonsElement.style.display = 'flex';
 }
 
 // Function to close update check modal
