@@ -35,6 +35,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
+- [Offline View](#offline-view)
 - [Docker Data Structure](#docker-data-structure)
 - [API Documentation](#api-documentation)
 - [Manual Operations](#manual-operations)
@@ -125,9 +126,9 @@ If you've forgotten your password, run the setup script and select "Change setti
 
 ## Update Application
 
-To update Poznote to the latest version:
+You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
 
-Run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+To update Poznote to the latest version, run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
 
 ## Backup and Restore
 
@@ -153,6 +154,17 @@ Poznote includes built-in backup functionality accessible through Settings → "
 - **Offline Viewing** - Exported notes work independently with included `index.html`
 
 ⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
+
+## Offline View
+
+When you export notes using the **📝 Export Notes** option, you get a ZIP file containing all your notes in HTML format along with a special `index.html` file. This creates a completely standalone offline version of your notes that works without Poznote installed.
+
+**Features of offline view:**
+- **Search by title and tags** - Find notes quickly using the search functionality of your browser
+- **No installation required** - Works in any web browser
+- **Portable** - Share or archive your notes easily
+
+Simply extract the ZIP file and open `index.html` in any web browser to access your notes offline.
 
 ## API Documentation
 
