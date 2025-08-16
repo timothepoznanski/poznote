@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Récupérer l'état actuel du favori
+        // Get current favorite status
         $query = "SELECT favorite FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);
         $stmt->execute([$noteId]);
@@ -35,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $currentFavorite = $result['favorite'];
         
-        // Basculer l'état du favori
+        // Toggle favorite status
         $newFavorite = $currentFavorite ? 0 : 1;
         
-        // Mettre à jour la base de données
+        // Update database
         $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
         $updateStmt = $con->prepare($updateQuery);
         

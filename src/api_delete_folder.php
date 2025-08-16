@@ -2,21 +2,21 @@
 require 'auth.php';
 require 'db_connect.php';
 
-// Vérifier l'authentification
+// Verify authentication
 if (!isAuthenticated()) {
     http_response_code(401);
     echo json_encode(['error' => 'Authentication required']);
     exit;
 }
 
-// Vérifier la méthode HTTP
+// Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed. Use DELETE.']);
     exit;
 }
 
-// Lire les données JSON
+// Read JSON data
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
@@ -26,7 +26,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Valider les données
+// Validate data
 if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
     http_response_code(400);
     echo json_encode(['error' => 'folder_name is required']);

@@ -6,14 +6,14 @@ header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
 
-// Vérifier la méthode HTTP
+// Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed. Use POST.']);
     exit;
 }
 
-// Lire les données JSON
+// Read JSON data
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
@@ -23,7 +23,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Valider les données
+// Validate data
 if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'note_id is required']);
@@ -40,7 +40,7 @@ $note_id = trim($data['note_id']);
 $folder_name = trim($data['folder_name']);
 
 try {
-    // Vérifier que la note existe
+    // Verify that note exists
     $stmt = $con->prepare("SELECT heading, folder FROM entries WHERE id = ?");
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -53,13 +53,13 @@ try {
     
     $current_folder = $note['folder'];
     
-    // Vérifier que le dossier de destination existe (dans la table folders ou comme dossier utilisé dans entries)
+    // Verify that destination folder exists (dans la table folders ou comme dossier utilisé dans entries)
     $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
     $stmt->execute([$folder_name]);
     $folder_exists = $stmt->fetchColumn() > 0;
     
     if (!$folder_exists) {
-        // Vérifier si le dossier existe déjà dans les entries
+        // Check if folder already exists in entries
         $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
         $stmt->execute([$folder_name]);
         $folder_exists = $stmt->fetchColumn() > 0;

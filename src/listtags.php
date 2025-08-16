@@ -12,8 +12,8 @@ $count_tags = 0;
 while($row = $res->fetch(PDO::FETCH_ASSOC)) {   
 	$words = explode(',', $row['tags']);
 	foreach($words as $word) {
-		$word = trim($word); // Nettoyer les espaces
-		if (!empty($word)) { // Vérifier que le tag n'est pas vide
+		$word = trim($word); // Clean spaces
+		if (!empty($word)) { // Verify that tag is not empty
 			$count_tags++;
 			if (!in_array($word, $tags_list)) {
 				$tags_list[] = $word;

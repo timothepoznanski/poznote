@@ -7,14 +7,14 @@ require_once 'config.php';
 require_once 'db_connect.php';
 include 'functions.php';
 
-// Vérifier la méthode HTTP
+// Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed. Use DELETE.']);
     exit;
 }
 
-// Lire les données JSON
+// Read JSON data
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
 
@@ -24,7 +24,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-// Valider les données
+// Validate data
 if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'note_id is required']);

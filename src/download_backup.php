@@ -2,7 +2,7 @@
 require_once 'auth.php';
 require_once 'config.php';
 
-// Vérifier que l'utilisateur est connecté
+// Verify that user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     header('Location: login.php');
     exit;
@@ -15,7 +15,7 @@ if (empty($filename)) {
     die('Nom de fichier manquant');
 }
 
-// Sécurité : vérifier que le nom de fichier est valide
+// Security: verify that filename is valid
 if (!preg_match('/^poznote_backup_.*\.sql$/', $filename)) {
     http_response_code(400);
     die('Nom de fichier invalide');
@@ -24,20 +24,20 @@ if (!preg_match('/^poznote_backup_.*\.sql$/', $filename)) {
 $backupDir = '/var/www/html/backups';
 $filepath = $backupDir . '/' . $filename;
 
-// Vérifier que le fichier existe
+// Verify that file exists
 if (!file_exists($filepath)) {
     http_response_code(404);
     die('Fichier non trouvé');
 }
 
-// Définir les en-têtes pour le téléchargement
+// Set headers for download
 header('Content-Type: application/sql');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Content-Length: ' . filesize($filepath));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-// Lire et envoyer le fichier
+// Read and send file
 readfile($filepath);
 exit;
 ?>

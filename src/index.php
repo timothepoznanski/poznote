@@ -4,14 +4,14 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Vérification de l'authentification
+// Authentication check
 require 'auth.php';
 requireAuth();
 
 ob_start();
 require_once 'config.php';
 
-// Détection mobile par user agent (doit être fait AVANT tout output et ne jamais être redéfini)
+// Mobile detection by user agent (must be done BEFORE any output and never redefined)
 $is_mobile = false;
 if (isset($_SERVER['HTTP_USER_AGENT'])) {
     $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
@@ -21,8 +21,8 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
 include 'functions.php';
 include 'db_connect.php';
 
-// Vérification des colonnes (seulement à l'ouverture de l'application)
-// En SQLite, on utilise PRAGMA table_info pour vérifier les colonnes
+// Column verification (only on application startup)
+// In SQLite, we use PRAGMA table_info to check columns
 $stmt = $con->query("PRAGMA table_info(entries)");
 $columns = [];
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -100,7 +100,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 $stmt_right->execute([$note]);
                 $res_right = $stmt_right;
             } else {
-                // Si la note demandée n'existe pas, afficher la dernière note mise à jour
+                // If the requested note doesn't exist, display the last updated note
                 $note = ''; // Reset note to trigger showing latest note
                 $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0");
                 $check_stmt->execute();
@@ -461,12 +461,12 @@ $folder_filter = $_GET['folder'] ?? '';
     <!-- Depending on the cases, we create the queries. -->  
         
     <?php
-    // RECHERCHE SÉCURISÉE TEMPORAIRE
-    // TODO: Remplacer par la version complète avec toutes les fonctionnalités
+    // SECURE SEARCH TEMPORARY
+    // TODO: Replace with complete version with all functionalities
     $where_conditions = ["trash = 0"];
     $search_params = [];
     
-    // Recherche simple sécurisée (version de base)
+    // Simple secure search (basic version)
     if (!empty($search)) {
         $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
         $search_params[] = '%' . $search . '%';
@@ -478,7 +478,7 @@ $folder_filter = $_GET['folder'] ?? '';
         $search_params[] = '%' . $tags_search . '%';
     }
     
-    // Filtre de dossier sécurisé
+    // Secure folder filter
     if (!empty($folder_filter)) {
         if ($folder_filter === 'Favorites') {
             $where_conditions[] = "favorite = 1";
@@ -490,7 +490,7 @@ $folder_filter = $_GET['folder'] ?? '';
     
     $where_clause = implode(" AND ", $where_conditions);
     
-    // Requêtes préparées sécurisées
+    // Secure prepared queries
     $query_left_secure = "SELECT heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
@@ -554,7 +554,7 @@ $folder_filter = $_GET['folder'] ?? '';
         </div>
         <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-trash-alt"></span></span></div>
         <?php
-        // Croix rouge retirée
+        // Red cross removed
         ?>
     </div>
     <?php endif; ?>
@@ -613,7 +613,7 @@ $folder_filter = $_GET['folder'] ?? '';
         // Determine which folders should be open
         $is_search_mode = !empty($search) || !empty($tags_search);
         
-        // Exécution de la requête pour la colonne de gauche
+        // Execute query for left column
         $stmt_left = $con->prepare($query_left_secure);
         $stmt_left->execute($search_params);
         
@@ -667,7 +667,7 @@ $folder_filter = $_GET['folder'] ?? '';
         
         // Display folders and notes
         foreach($folders as $folderName => $notes) {
-            // En mode recherche, ne pas afficher les dossiers vides
+            // In search mode, don't display empty folders
             if ($is_search_mode && empty($notes)) {
                 continue;
             }
@@ -720,9 +720,9 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo "<span class='folder-note-count'>(" . count($notes) . ")</span>";
                 echo "<span class='folder-actions'>";
                 
-                // Actions différentes selon le type de dossier
+                // Different actions depending on folder type
                 if ($folderName === 'Favorites') {
-                    // Pas d'actions pour le dossier Favorites (il se gère automatiquement)
+                    // No actions for Favorites folder (it manages itself automatically)
                 } else if ($folderName === 'Uncategorized') {
                     echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
@@ -738,7 +738,7 @@ $folder_filter = $_GET['folder'] ?? '';
             // Display notes in folder
             foreach($notes as $row1) {
                 $isSelected = ($note === $row1["heading"]) ? 'selected-note' : '';
-                // Préserver l'état de recherche dans les liens de notes
+                // Preserve search state in note links
                 $params = [];
                 if (!empty($search)) $params[] = 'search=' . urlencode($search);
                 if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
@@ -788,12 +788,12 @@ $folder_filter = $_GET['folder'] ?? '';
                     $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                
            
-                // Affichage harmonisé desktop/mobile :
+                // Harmonized desktop/mobile display:
                 echo '<div id="note'.$row['id'].'" class="notecard">';
                 echo '<div class="innernote">';
                 // Ligne 1 : barre d’édition centrée (plus de date)
                 echo '<div class="note-header">';
-                // Boutons de formatage (cachés par défaut sur mobile, visibles lors de sélection)
+                // Formatting buttons (hidden by default on mobile, visible during selection)
                 echo '<div class="note-edit-toolbar">';
                 if ($is_mobile) {
                     // Construire l'URL de retour à l'accueil avec préservation de la recherche
@@ -816,7 +816,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
                 }
                 
-                // Boutons de formatage de texte (visibles seulement lors de sélection en desktop)
+                // Text formatting buttons (visible only during selection on desktop)
                 $text_format_class = $is_mobile ? '' : ' text-format-btn';
                 $note_action_class = $is_mobile ? '' : ' note-action-btn';
                 echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fas fa-bold"></i></button>';
@@ -834,16 +834,16 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fas fa-terminal"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fas fa-eraser"></i></button>';
              
-                // Boutons d'actions sur la note (desktop seulement)
+                // Note action buttons (desktop only)
                 if (!$is_mobile) {
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                 }
                 
-                // Boutons d'actions sur la note (desktop seulement, remplacent le menu déroulant)
+                // Note action buttons (desktop only, replace dropdown menu)
                 if (!$is_mobile) {
-                    // Calculer le nombre d'attachments pour déterminer la couleur du bouton attachments
+                    // Calculate number of attachments to determine button color
                     $attachments_count = 0;
                     if (!empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
@@ -852,7 +852,7 @@ $folder_filter = $_GET['folder'] ?? '';
                         }
                     }
                     
-                    // Bouton favoris avec icône étoile
+                    // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
                     $star_class = $is_favorite ? 'fas' : 'far';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
@@ -922,8 +922,8 @@ $folder_filter = $_GET['folder'] ?? '';
                     echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
                 } else {
-                    // Boutons individuels pour mobile (toujours visibles)
-                    // Calculer le nombre d'attachments pour le bouton mobile
+                    // Individual buttons for mobile (always visible)
+                    // Calculate number of attachments for mobile button
                     $attachments_count = 0;
                     if (!empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
@@ -932,12 +932,12 @@ $folder_filter = $_GET['folder'] ?? '';
                         }
                     }
                     
-                    // Boutons d'action sur la note 
+                    // Note action buttons 
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                     
-                    // Bouton favoris avec icône étoile
+                    // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
                     $star_class = $is_favorite ? 'fas' : 'far';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
@@ -1012,7 +1012,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: 'Uncategorized', ENT_QUOTES).'"/>';
                 // Titre
                 echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
-                // Contenu de la note
+                // Note content
                 echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text or paste images" contenteditable="true">'.$entryfinal.'</div>';
                 echo '<div class="note-bottom-space"></div>';
                 echo '</div>';

@@ -1,7 +1,7 @@
-// JavaScript pour la page des tags
+// JavaScript for tags page
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion de la recherche/filtrage des tags
+    // Tag search/filtering management
     const searchInput = document.getElementById('tagsSearchInput');
     
     if (searchInput) {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             filterTags();
         });
         
-        // Ajouter aussi un événement keyup pour plus de compatibilité mobile
+        // Also add keyup event for better mobile compatibility
         searchInput.addEventListener('keyup', function() {
             filterTags();
         });
@@ -37,7 +37,7 @@ function filterTags() {
         }
     }
     
-    // Mettre à jour le compteur de résultats
+    // Update results counter
     updateSearchResults(visibleCount, filter);
 }
 

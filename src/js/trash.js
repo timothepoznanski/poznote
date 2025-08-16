@@ -1,7 +1,7 @@
-// JavaScript pour la page trash
+// JavaScript for trash page
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion de la recherche dans les notes de la corbeille
+    // Trash notes search management
     const searchInput = document.getElementById('searchInput'); 
     if (searchInput) {
         searchInput.addEventListener('input', function() {
@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Afficher le nombre de résultats
+            // Display number of results
             updateSearchResults(visibleCount, searchTerm);
         });
     }
     
-    // Gestion des boutons de restauration et suppression définitive
+    // Management of restore and permanent delete buttons
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('icon_restore_trash')) {
             e.preventDefault();
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Gestion du bouton "Vider la corbeille"
+    // Management of "Empty trash" button
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
     if (emptyTrashBtn) {
         emptyTrashBtn.addEventListener('click', function(e) {
@@ -88,7 +88,7 @@ function restoreNote(noteid) {
     .then(response => response.text())
     .then(data => {
         if (data === '1') {
-            // Supprimer visuellement la note de la liste
+            // Visually remove note from list
             const noteElement = document.getElementById('note' + noteid);
             if (noteElement) {
                 noteElement.style.display = 'none';
@@ -114,7 +114,7 @@ function permanentlyDeleteNote(noteid) {
     .then(response => response.text())
     .then(data => {
         if (data === '1') {
-            // Supprimer visuellement la note de la liste
+            // Visually remove note from list
             const noteElement = document.getElementById('note' + noteid);
             if (noteElement) {
                 noteElement.style.display = 'none';
@@ -139,7 +139,7 @@ function emptyTrash() {
     .then(response => response.text())
     .then(data => {
         if (data === '1') {
-            // Succès - rediriger vers trash.php pour actualiser la page
+            // Success - redirect to trash.php to refresh page
             window.location.href = 'trash.php';
         } else {
             showInfoModal('Empty Trash Error', 'Error emptying trash: ' + data);
@@ -235,7 +235,7 @@ window.addEventListener('click', function(event) {
     }
 });
 
-// Optimisation pour mobile : gestion du scroll
+// Mobile optimization: scroll management
 if (window.innerWidth <= 800) {
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
