@@ -209,24 +209,24 @@ $folder_filter = $_GET['folder'] ?? '';
     <div id="noteInfoModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeNoteInfoModal()">&times;</span>
-            <h3><i class="fas fa-info-circle"></i> Informations de la note</h3>
+            <h3><i class="fas fa-info-circle"></i> Note Information</h3>
             <div id="noteInfoContent">
                 <div class="info-row">
-                    <strong><i class="fas fa-hashtag"></i> ID de la note:</strong> 
+                    <strong><i class="fas fa-hashtag"></i> Note ID:</strong> 
                     <span id="noteInfoId" class="info-value"></span>
                 </div>
                 <div class="info-row">
-                    <strong><i class="fas fa-calendar-plus"></i> Date de création:</strong> 
+                    <strong><i class="fas fa-calendar-plus"></i> Creation date:</strong> 
                     <span id="noteInfoCreated" class="info-value"></span>
                 </div>
                 <div class="info-row">
-                    <strong><i class="fas fa-calendar-check"></i> Dernière modification:</strong> 
+                    <strong><i class="fas fa-calendar-check"></i> Last modified:</strong> 
                     <span id="noteInfoUpdated" class="info-value"></span>
                 </div>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="btn-primary" onclick="closeNoteInfoModal()">
-                    <i class="fas fa-times"></i> Fermer
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
@@ -360,7 +360,7 @@ $folder_filter = $_GET['folder'] ?? '';
     <!-- LEFT COLUMN -->	
     <div id="left_col">
 
-        <!-- Menu pour mobile -->
+        <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
         <div class="left-header">
             <a href="https://timpoz.com" target="_blank" class="left-header-logo">
@@ -420,7 +420,7 @@ $folder_filter = $_GET['folder'] ?? '';
         </div>
         <?php endif; ?>
 
-        <!-- Barre de recherche unifiée pour mobile -->
+        <!-- Unified search bar for mobile -->
         <?php if ($is_mobile): ?>
         <div class="mobile-search-container">
             <form id="unified-search-form-mobile" action="index.php" method="POST">
@@ -772,7 +772,7 @@ $folder_filter = $_GET['folder'] ?? '';
     <!-- RIGHT COLUMN -->	
     <div id="right_col">
     
-        <!-- Barre de recherche supprimée de la colonne de droite (desktop) -->
+        <!-- Search bar removed from right column (desktop) -->
         
         <?php        
             
@@ -796,7 +796,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 // Formatting buttons (hidden by default on mobile, visible during selection)
                 echo '<div class="note-edit-toolbar">';
                 if ($is_mobile) {
-                    // Construire l'URL de retour à l'accueil avec préservation de la recherche
+                    // Build home URL with search preservation
                     $home_url = 'index.php';
                     $home_params = [];
                     if (!empty($search)) {
@@ -1010,7 +1010,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 
                 // Hidden folder value for the note
                 echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: 'Uncategorized', ENT_QUOTES).'"/>';
-                // Titre
+                // Title
                 echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
                 // Note content
                 echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text or paste images" contenteditable="true">'.$entryfinal.'</div>';

@@ -71,24 +71,24 @@ try {
         }
     }
     
-    // Déterminer les chemins des fichiers
+    // Determine file paths
     $old_file_path = __DIR__ . '/entries/' . ($current_folder !== 'Uncategorized' ? $current_folder . '/' : '') . $note_id . '.html';
     $new_folder_path = __DIR__ . '/entries/' . ($folder_name !== 'Uncategorized' ? $folder_name : '');
     $new_file_path = $new_folder_path . '/' . $note_id . '.html';
     
-    // Si le dossier de destination est 'Uncategorized', placer le fichier à la racine
+    // If destination folder is Uncategorized, place file at root
     if ($folder_name === 'Uncategorized') {
         $new_file_path = __DIR__ . '/entries/' . $note_id . '.html';
     }
     
-    // Vérifier que le fichier de la note existe
+    // Verify that note file exists
     if (!file_exists($old_file_path)) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Note file not found at: ' . $old_file_path]);
         exit;
     }
     
-    // Créer le dossier de destination s'il n'existe pas physiquement
+    // Create destination folder if it does not exist physically
     if ($folder_name !== 'Uncategorized' && !file_exists($new_folder_path)) {
         if (!mkdir($new_folder_path, 0755, true)) {
             http_response_code(500);
@@ -97,7 +97,7 @@ try {
         }
     }
     
-    // Déplacer le fichier
+    // Move file
     if (!rename($old_file_path, $new_file_path)) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Failed to move note file']);
@@ -123,7 +123,7 @@ try {
     ]);
     
 } catch (Exception $e) {
-    // En cas d'erreur, essayer de remettre le fichier à sa place
+    // In case of error, try to put file back in place
     if (isset($new_file_path) && isset($old_file_path) && file_exists($new_file_path) && !file_exists($old_file_path)) {
         rename($new_file_path, $old_file_path);
     }

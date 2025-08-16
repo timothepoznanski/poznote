@@ -3,13 +3,13 @@ require 'auth.php';
 
 $error = '';
 
-// Si déjà authentifié, rediriger vers l'accueil
+// If already authenticated, redirect to home
 if (isAuthenticated()) {
     header('Location: index.php');
     exit;
 }
 
-// Traitement du formulaire de connexion
+// Login form processing
 if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];

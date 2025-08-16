@@ -35,7 +35,7 @@ if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
 
 $folder_name = trim($data['folder_name']);
 
-// Vérifier que le dossier n'est pas protégé
+// Verify that folder is not protected
 if ($folder_name === 'Uncategorized') {
     http_response_code(400);
     echo json_encode(['error' => 'Cannot delete the Uncategorized folder']);
@@ -43,64 +43,64 @@ if ($folder_name === 'Uncategorized') {
 }
 
 try {
-    // Vérifier si le dossier existe
+    // Check if folder exists
     $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
     $stmt->execute([$folder_name]);
     $folder_exists_in_table = $stmt->fetchColumn() > 0;
     
-    // Vérifier si le dossier contient des notes
+    // Check if folder contains notes
     $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0");
     $stmt->execute([$folder_name]);
     $stmt->execute();
     $notes_count = $stmt->fetchColumn();
     
-    // Vérifier si le dossier contient des notes dans la corbeille
+    // Check if folder contains notes dans la corbeille
     $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1");
     $stmt->execute([$folder_name]);
     $trash_notes_count = $stmt->fetchColumn();
     
     $total_notes = $notes_count + $trash_notes_count;
     
-    // Si le dossier n'existe ni dans la table folders ni comme dossier utilisé
+    // If folder exists neither in folders table nor as used folder
     if (!$folder_exists_in_table && $total_notes == 0) {
         http_response_code(404);
         echo json_encode(['error' => 'Folder not found']);
         exit;
     }
     
-    // Commencer la transaction
+    // Start transaction
     $con->beginTransaction();
     
     try {
-        // Déplacer toutes les notes de ce dossier vers "Uncategorized"
+        // Move all notes from this folder to Uncategorized
         if ($total_notes > 0) {
             $stmt = $con->prepare("UPDATE entries SET folder = 'Uncategorized', updated = datetime('now') WHERE folder = ?");
             $stmt->execute([$folder_name]);
         }
         
-        // Supprimer le dossier de la table folders
+        // Delete folder from folders table
         if ($folder_exists_in_table) {
             $stmt = $con->prepare("DELETE FROM folders WHERE name = ?");
             $stmt->execute([$folder_name]);
         }
         
-        // Supprimer le dossier physique
+        // Delete physical folder
         $folder_path = __DIR__ . '/entries/' . $folder_name;
         $folder_deleted = false;
         
         if (is_dir($folder_path)) {
-            // Vérifier que le dossier est vide (sauf les fichiers cachés)
+            // Verify that folder is empty (except hidden files)
             $files = array_diff(scandir($folder_path), array('.', '..'));
             
             if (empty($files)) {
                 $folder_deleted = rmdir($folder_path);
             } else {
-                // Le dossier contient encore des fichiers, ne pas le supprimer physiquement
+                // Folder still contains files, do not delete physically
                 $folder_deleted = false;
             }
         }
         
-        // Valider la transaction
+        // Commit transaction
         $con->commit();
         $con->commit();
         
@@ -119,7 +119,7 @@ try {
         ]);
         
     } catch (Exception $e) {
-        // Annuler la transaction en cas d'erreur
+        // Rollback transaction on error
         $con->rollback();
         $con->commit();
         throw $e;

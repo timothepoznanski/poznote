@@ -49,7 +49,7 @@ try {
     if ($permanent) {
         // Suppression permanente
         
-        // Supprimer les fichiers d'attachements
+        // Delete attachment files
         $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
         $deleted_attachments = [];
         
@@ -66,7 +66,7 @@ try {
             }
         }
         
-        // Supprimer le fichier HTML
+        // Delete HTML file
         $html_file_path = __DIR__ . '/entries/';
         if ($note['folder'] && $note['folder'] !== 'Uncategorized') {
             $html_file_path .= $note['folder'] . '/';
@@ -78,7 +78,7 @@ try {
             $html_deleted = unlink($html_file_path);
         }
         
-        // Supprimer l'entrée de la base de données
+        // Delete database entry
         $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
         // PDO uses execute with array -  $note_id);
         $success = $stmt->execute();
