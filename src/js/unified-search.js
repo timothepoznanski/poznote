@@ -92,51 +92,57 @@ function clearUnifiedSearch() {
     window.location.href = url;
 }
 
-// Function to go back to home while preserving search state
+// Function to go back to home while preserving search state (fallback for JavaScript calls)
 function goHomeWithSearch() {
-    // Check if there's an active search
-    const desktopSearchInput = document.getElementById('unified-search');
-    const mobileSearchInput = document.getElementById('unified-search-mobile');
-    const hasDesktopSearch = desktopSearchInput && desktopSearchInput.value.trim() !== '';
-    const hasMobileSearch = mobileSearchInput && mobileSearchInput.value.trim() !== '';
-    
-    // If there's an active search, preserve it
-    if (hasDesktopSearch || hasMobileSearch) {
-        // Build URL preserving current search parameters
-        let url = 'index.php';
-        const params = new URLSearchParams();
+    try {
+        // Check if there's an active search
+        const desktopSearchInput = document.getElementById('unified-search');
+        const mobileSearchInput = document.getElementById('unified-search-mobile');
+        const hasDesktopSearch = desktopSearchInput && desktopSearchInput.value.trim() !== '';
+        const hasMobileSearch = mobileSearchInput && mobileSearchInput.value.trim() !== '';
         
-        // Check current search type and value
-        const notesActive = document.getElementById('search-notes-btn') && document.getElementById('search-notes-btn').classList.contains('active');
-        const tagsActive = document.getElementById('search-tags-btn') && document.getElementById('search-tags-btn').classList.contains('active');
-        const notesMobileActive = document.getElementById('search-notes-btn-mobile') && document.getElementById('search-notes-btn-mobile').classList.contains('active');
-        const tagsMobileActive = document.getElementById('search-tags-btn-mobile') && document.getElementById('search-tags-btn-mobile').classList.contains('active');
-        
-        // Get the search value
-        const searchValue = hasDesktopSearch ? desktopSearchInput.value.trim() : mobileSearchInput.value.trim();
-        
-        // Add search parameters based on active type
-        if (notesActive || notesMobileActive) {
-            params.set('search', searchValue);
-            params.set('preserve_notes', '1');
-        } else if (tagsActive || tagsMobileActive) {
-            params.set('tags_search', searchValue);
-            params.set('preserve_tags', '1');
+        // If there's an active search, preserve it
+        if (hasDesktopSearch || hasMobileSearch) {
+            // Build URL preserving current search parameters
+            let url = 'index.php';
+            const params = new URLSearchParams();
+            
+            // Check current search type and value
+            const notesActive = document.getElementById('search-notes-btn') && document.getElementById('search-notes-btn').classList.contains('active');
+            const tagsActive = document.getElementById('search-tags-btn') && document.getElementById('search-tags-btn').classList.contains('active');
+            const notesMobileActive = document.getElementById('search-notes-btn-mobile') && document.getElementById('search-notes-btn-mobile').classList.contains('active');
+            const tagsMobileActive = document.getElementById('search-tags-btn-mobile') && document.getElementById('search-tags-btn-mobile').classList.contains('active');
+            
+            // Get the search value
+            const searchValue = hasDesktopSearch ? desktopSearchInput.value.trim() : mobileSearchInput.value.trim();
+            
+            // Add search parameters based on active type
+            if (notesActive || notesMobileActive) {
+                params.set('search', searchValue);
+                params.set('preserve_notes', '1');
+            } else if (tagsActive || tagsMobileActive) {
+                params.set('tags_search', searchValue);
+                params.set('preserve_tags', '1');
+            }
+            
+            // Preserve current folder filter if it exists
+            const currentFolder = new URLSearchParams(window.location.search).get('folder');
+            if (currentFolder) {
+                params.set('folder', currentFolder);
+            }
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            window.location.href = url;
+        } else {
+            // No active search, just go to home
+            window.location.href = 'index.php';
         }
-        
-        // Preserve current folder filter if it exists
-        const currentFolder = new URLSearchParams(window.location.search).get('folder');
-        if (currentFolder) {
-            params.set('folder', currentFolder);
-        }
-        
-        if (params.toString()) {
-            url += '?' + params.toString();
-        }
-        
-        window.location.href = url;
-    } else {
-        // No active search, just go to home
+    } catch (error) {
+        // Fallback: simple navigation to home
+        console.error('Error in goHomeWithSearch:', error);
         window.location.href = 'index.php';
     }
 }

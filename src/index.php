@@ -796,7 +796,24 @@ $folder_filter = $_GET['folder'] ?? '';
                 // Boutons de formatage (cachés par défaut sur mobile, visibles lors de sélection)
                 echo '<div class="note-edit-toolbar">';
                 if ($is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="goHomeWithSearch()"><i class="fas fa-home"></i></button>';
+                    // Construire l'URL de retour à l'accueil avec préservation de la recherche
+                    $home_url = 'index.php';
+                    $home_params = [];
+                    if (!empty($search)) {
+                        $home_params[] = 'search=' . urlencode($search);
+                        $home_params[] = 'preserve_notes=1';
+                    }
+                    if (!empty($tags_search)) {
+                        $home_params[] = 'tags_search=' . urlencode($tags_search);
+                        $home_params[] = 'preserve_tags=1';
+                    }
+                    if (!empty($folder_filter)) {
+                        $home_params[] = 'folder=' . urlencode($folder_filter);
+                    }
+                    if (!empty($home_params)) {
+                        $home_url .= '?' . implode('&', $home_params);
+                    }
+                    echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
                 }
                 
                 // Boutons de formatage de texte (visibles seulement lors de sélection en desktop)
