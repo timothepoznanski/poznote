@@ -2569,7 +2569,7 @@ function closeUpdateModal() {
 
 // Function to go to update instructions on GitHub
 function goToUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-poznote-application', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-application', '_blank');
     closeUpdateModal();
 }
 
