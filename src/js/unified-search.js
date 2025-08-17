@@ -313,18 +313,28 @@ function toggleSearchType(type, isMobile) {
         // Update hidden inputs with current search value before submitting
         updateHiddenInputs(isMobile);
         
-        // Submit the form to trigger the search
-        const formId = isMobile ? 'unified-search-form-mobile' : 'unified-search-form';
-        const form = document.getElementById(formId);
-        if (form) {
-            form.submit();
-        }
+        // Instead of triggering form submission, directly submit with excluded folders
+        submitSearchWithExcludedFolders(isMobile);
     } else {
         // If no content, just focus the search input to encourage typing
         if (searchInput) {
             searchInput.focus();
         }
     }
+}
+
+function submitSearchWithExcludedFolders(isMobile) {
+    const suffix = isMobile ? '-mobile' : '';
+    const formId = 'unified-search-form' + suffix;
+    const form = document.getElementById(formId);
+    
+    if (!form) return;
+    
+    // Add excluded folders to form before submission
+    addExcludedFoldersToForm(form, isMobile);
+    
+    // Submit the form normally (this will bypass our event handler to avoid recursion)
+    form.submit();
 }
 
 function handleUnifiedSearchSubmit(e, isMobile) {
@@ -383,6 +393,63 @@ function handleUnifiedSearchSubmit(e, isMobile) {
     
     // Update hidden inputs before form submission
     updateHiddenInputs(isMobile);
+    
+    // Add excluded folders to form data - this handles normal form submissions
+    addExcludedFoldersToForm(e.target, isMobile);
+    
+    // Let the form submit normally (don't prevent default)
+}
+
+function addExcludedFoldersToForm(form, isMobile) {
+    // Get excluded folders from our folder search system
+    const excludedFolders = getExcludedFoldersFromLocalStorage();
+    
+    // Debug logging
+    console.log('addExcludedFoldersToForm called:', {
+        excludedFolders: excludedFolders,
+        formId: form.id,
+        isMobile: isMobile
+    });
+    
+    if (excludedFolders.length > 0) {
+        // Remove any existing excluded_folders input
+        const existingInput = form.querySelector('input[name="excluded_folders"]');
+        if (existingInput) {
+            existingInput.remove();
+            console.log('Removed existing excluded_folders input');
+        }
+        
+        // Add new hidden input with excluded folders
+        const excludedInput = document.createElement('input');
+        excludedInput.type = 'hidden';
+        excludedInput.name = 'excluded_folders';
+        excludedInput.value = JSON.stringify(excludedFolders);
+        form.appendChild(excludedInput);
+        
+        console.log('Added excluded_folders input with value:', excludedInput.value);
+    } else {
+        console.log('No excluded folders to add');
+    }
+}
+
+function getExcludedFoldersFromLocalStorage() {
+    const excludedFolders = [];
+    
+    // Instead of relying on DOM elements, read directly from localStorage
+    // We'll scan localStorage for all keys that start with 'folder_search_'
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('folder_search_')) {
+            const state = localStorage.getItem(key);
+            if (state === 'excluded') {
+                // Extract folder name from key (remove 'folder_search_' prefix)
+                const folderName = key.substring('folder_search_'.length);
+                excludedFolders.push(folderName);
+            }
+        }
+    }
+    
+    return excludedFolders;
 }
 
 function showSearchValidationError(isMobile) {

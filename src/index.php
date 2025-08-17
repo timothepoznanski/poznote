@@ -44,6 +44,25 @@ if (!in_array('attachments', $columns)) {
 $search = $_POST['search'] ?? $_GET['search'] ?? '';
 $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
 
+// Handle folder exclusions from search
+$excluded_folders = [];
+if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
+    $excluded_folders = json_decode($_POST['excluded_folders'], true);
+    if (!is_array($excluded_folders)) {
+        $excluded_folders = [];
+    }
+    // Debug: uncomment to see what folders are being excluded
+    if (!empty($excluded_folders)) {
+        error_log("Excluded folders: " . print_r($excluded_folders, true));
+    }
+    if (!empty($_POST)) {
+        error_log("POST search: " . $search . ", tags_search: " . $tags_search);
+        error_log("POST unified_search: " . ($_POST['unified_search'] ?? 'empty'));
+        error_log("POST search_in_notes: " . ($_POST['search_in_notes'] ?? 'empty'));
+        error_log("POST search_in_tags: " . ($_POST['search_in_tags'] ?? 'empty'));
+    }
+}
+
 // Handle search type preservation when clearing search
 $preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
 $preserve_tags = isset($_GET['preserve_tags']) && $_GET['preserve_tags'] === '1';
@@ -165,6 +184,7 @@ $folder_filter = $_GET['folder'] ?? '';
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
 
     <div class="main-container">
+
 
     <!-- Notification popup -->
     <div id="notificationOverlay" class="notification-overlay"></div>
@@ -488,7 +508,37 @@ $folder_filter = $_GET['folder'] ?? '';
         }
     }
     
+    // Exclude folders from search if specified
+    if (!empty($excluded_folders)) {
+        $exclude_placeholders = [];
+        $exclude_favorite = false;
+        
+        foreach ($excluded_folders as $excludedFolder) {
+            if ($excludedFolder === 'Favorites') {
+                // For Favorites, exclude favorite notes
+                $exclude_favorite = true;
+            } else {
+                $exclude_placeholders[] = "?";
+                $search_params[] = $excludedFolder;
+            }
+        }
+        
+        // Add folder exclusion condition
+        if (!empty($exclude_placeholders)) {
+            $where_conditions[] = "(folder IS NULL OR folder NOT IN (" . implode(", ", $exclude_placeholders) . "))";
+        }
+        
+        // Add favorite exclusion condition
+        if ($exclude_favorite) {
+            $where_conditions[] = "(favorite IS NULL OR favorite != 1)";
+        }
+    }
+    
     $where_clause = implode(" AND ", $where_conditions);
+    
+    // Debug: uncomment to see the final query and parameters
+    // error_log("Where clause: " . $where_clause);
+    // error_log("Search params: " . print_r($search_params, true));
     
     // Secure prepared queries
     $query_left_secure = "SELECT heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
@@ -722,11 +772,14 @@ $folder_filter = $_GET['folder'] ?? '';
                 
                 // Different actions depending on folder type
                 if ($folderName === 'Favorites') {
-                    // No actions for Favorites folder (it manages itself automatically)
+                    // Search filter icon for Favorites folder
+                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
                 } else if ($folderName === 'Uncategorized') {
+                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
                     echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
                 } else {
+                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
                     echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
                     echo "<i class='fas fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
                 }

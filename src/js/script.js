@@ -2735,4 +2735,96 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('lastVersionCheck'); // Force check regardless of timing
         silentVersionCheck();
     };
+    
+    // Initialize folder search filters on page load
+    initializeFolderSearchFilters();
 });
+
+// FOLDER SEARCH FILTERING FUNCTIONALITY
+
+/**
+ * Initialize folder search filters from localStorage
+ */
+function initializeFolderSearchFilters() {
+    const folderSearchBtns = document.querySelectorAll('.folder-search-btn');
+    folderSearchBtns.forEach(btn => {
+        const folderName = btn.getAttribute('data-folder');
+        const isExcluded = getFolderSearchState(folderName) === 'excluded';
+        
+        if (isExcluded) {
+            btn.classList.add('excluded');
+            btn.title = 'Include in search (currently excluded)';
+        } else {
+            btn.classList.remove('excluded');
+            btn.title = 'Exclude from search (currently included)';
+        }
+    });
+}
+
+/**
+ * Toggle folder search filter state
+ */
+function toggleFolderSearchFilter(folderName) {
+    const btn = document.querySelector(`.folder-search-btn[data-folder="${folderName}"]`);
+    if (!btn) return;
+    
+    const isCurrentlyExcluded = btn.classList.contains('excluded');
+    
+    if (isCurrentlyExcluded) {
+        // Switch to included (blue)
+        btn.classList.remove('excluded');
+        btn.title = 'Exclude from search (currently included)';
+        setFolderSearchState(folderName, 'included');
+    } else {
+        // Switch to excluded (red)
+        btn.classList.add('excluded');
+        btn.title = 'Include in search (currently excluded)';
+        setFolderSearchState(folderName, 'excluded');
+    }
+    
+    // If we're currently in search mode, refresh search results
+    const searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+    const currentSearch = searchInput ? searchInput.value.trim() : '';
+    
+    if (currentSearch) {
+        // Trigger a new search to apply the filter
+        setTimeout(() => {
+            performFilteredSearch();
+        }, 100);
+    }
+}
+
+/**
+ * Get folder search state from localStorage
+ */
+function getFolderSearchState(folderName) {
+    const key = `folder_search_${folderName}`;
+    return localStorage.getItem(key) || 'included'; // Default to included
+}
+
+/**
+ * Set folder search state in localStorage
+ */
+function setFolderSearchState(folderName, state) {
+    const key = `folder_search_${folderName}`;
+    localStorage.setItem(key, state);
+}
+
+/**
+ * Perform filtered search taking into account excluded folders
+ */
+function performFilteredSearch() {
+    const searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+    if (!searchInput || !searchInput.value.trim()) return;
+    
+    // Simply trigger the form submission - the excluded folders will be added by the unified search system
+    const form = document.getElementById('unified-search-form') || document.getElementById('unified-search-form-mobile');
+    if (form) {
+        // Create a fake submit event to trigger the unified search handler
+        const submitEvent = new Event('submit', {
+            bubbles: true,
+            cancelable: true
+        });
+        form.dispatchEvent(submitEvent);
+    }
+}

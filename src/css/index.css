@@ -1916,14 +1916,30 @@ hr {
     opacity: 1;
 }
 
-.folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
+.folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn {
     font-size: 12px;
     color: #007DB8;
     margin-left: 8px;
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.folder-search-btn {
+    color: #007DB8; /* Blue by default (included in search) */
+}
+
+.folder-search-btn.excluded {
+    color: #dc3545; /* Red when excluded from search */
+}
+
+.folder-search-btn:hover {
+    background-color: rgba(0, 125, 184, 0.2);
+}
+
+.folder-search-btn.excluded:hover {
+    background-color: rgba(220, 53, 69, 0.2);
 }
 
 .folder-edit-btn:hover {
