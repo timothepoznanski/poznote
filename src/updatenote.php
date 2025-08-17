@@ -37,6 +37,12 @@
 	
     $filename = getEntriesRelativePath() . $id . ".html";
 	
+	// Ensure the entries directory exists
+	$entriesDir = dirname($filename);
+	if (!is_dir($entriesDir)) {
+		mkdir($entriesDir, 0755, true);
+	}
+	
 	// Write HTML content to file with error checking
 	$write_result = file_put_contents($filename, $entry);
 	if ($write_result === false) {

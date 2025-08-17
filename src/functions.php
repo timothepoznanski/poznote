@@ -70,17 +70,17 @@ function getAttachmentsPath() {
 
 /**
  * Get the relative path for entries (for file operations)
- * Now unified: always use 'data/entries/' 
+ * Now unified: always use '../data/entries/' to go up from src/ directory
  */
 function getEntriesRelativePath() {
-    return 'data/entries/';
+    return '../data/entries/';
 }
 
 /**
  * Get the relative path for attachments (for file operations)
- * Now unified: always use 'data/attachments/'
+ * Now unified: always use '../data/attachments/' to go up from src/ directory
  */
 function getAttachmentsRelativePath() {
-    return 'data/attachments/';
+    return '../data/attachments/';
 }
 ?>
