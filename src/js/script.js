@@ -2828,3 +2828,213 @@ function performFilteredSearch() {
         form.dispatchEvent(submitEvent);
     }
 }
+
+/**
+ * SEARCH HIGHLIGHTING FUNCTIONALITY
+ * Highlights search terms in note content similar to browser's Ctrl+F
+ */
+
+/**
+ * Highlight search terms in all note content areas
+ */
+function highlightSearchTerms() {
+    // Get current search terms from the unified search input
+    const searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+    if (!searchInput) return;
+    
+    const searchTerm = searchInput.value.trim();
+    if (!searchTerm) {
+        clearSearchHighlights();
+        return;
+    }
+    
+    // Check if we're in notes search mode
+    const notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
+    if (!notesBtn || !notesBtn.classList.contains('active')) {
+        return; // Only highlight in notes search mode
+    }
+    
+    // Find all note content areas
+    const noteContents = document.querySelectorAll('.noteentry');
+    
+    // Clear existing highlights first
+    clearSearchHighlights();
+    
+    // Split search term into words and filter out empty ones
+    const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+    
+    if (searchWords.length === 0) return;
+    
+    let totalHighlights = 0;
+    
+    noteContents.forEach((noteContent) => {
+        const highlightCount = highlightInElement(noteContent, searchWords);
+        totalHighlights += highlightCount;
+    });
+    
+    // Also highlight in note titles
+    const noteTitles = document.querySelectorAll('.css-title');
+    noteTitles.forEach(noteTitle => {
+        const highlightCount = highlightInElement(noteTitle, searchWords);
+        totalHighlights += highlightCount;
+    });
+}
+
+/**
+ * Highlight search words within a specific element
+ */
+function highlightInElement(element, searchWords) {
+    let highlightCount = 0;
+    
+    // Create a combined regex pattern for all search words
+    const escapedWords = searchWords.map(word => escapeRegExp(word));
+    const pattern = escapedWords.join('|');
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    
+    // Function to recursively process text nodes
+            function processTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (regex.test(text)) {
+                        // Replace the text node with highlighted content
+                        const highlightedHTML = text.replace(regex, '<span class="search-highlight" style="background-color: #ffff00 !important; color: #000 !important; font-weight: normal !important; font-family: inherit !important;">$1</span>');
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = highlightedHTML;
+                        
+                        // Count highlights
+                        const highlights = tempDiv.querySelectorAll('.search-highlight');
+                        highlightCount += highlights.length;
+                        
+                        // Replace the text node with highlighted nodes
+                        const parent = node.parentNode;
+                        while (tempDiv.firstChild) {
+                            parent.insertBefore(tempDiv.firstChild, node);
+                        }
+                        parent.removeChild(node);
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('search-highlight')) {
+                    // Process child nodes (but don't process already highlighted spans)
+                    const children = Array.from(node.childNodes);
+                    children.forEach(child => processTextNodes(child));
+                }
+            }    processTextNodes(element);
+    return highlightCount;
+}
+
+/**
+ * Clear all search highlights
+ */
+function clearSearchHighlights() {
+    const highlights = document.querySelectorAll('.search-highlight');
+    highlights.forEach(highlight => {
+        const parent = highlight.parentNode;
+        // Replace the highlight span with its text content
+        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+        // Normalize the parent to merge adjacent text nodes
+        parent.normalize();
+    });
+}
+
+/**
+ * Escape special regex characters
+ */
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Initialize search highlighting when page loads
+ */
+function initializeSearchHighlighting() {
+    // Highlight terms if we're already in search mode when page loads
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('search')) {
+        // Wait a bit for the DOM to be fully ready
+        setTimeout(function() {
+            highlightSearchTerms();
+        }, 1000);
+    }
+    
+    // Listen for search form submissions to trigger highlighting
+    const searchForms = document.querySelectorAll('#unified-search-form, #unified-search-form-mobile');
+    searchForms.forEach(form => {
+        form.addEventListener('submit', () => {
+            // Highlight after a short delay to allow page reload/update
+            setTimeout(highlightSearchTerms, 100);
+        });
+    });
+    
+    // Listen for search input changes in notes mode
+    const searchInputs = document.querySelectorAll('#unified-search, #unified-search-mobile');
+    searchInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
+            if (notesBtn && notesBtn.classList.contains('active')) {
+                // Clear highlights immediately when typing
+                clearSearchHighlights();
+            }
+        });
+    });
+    
+    // Listen for search type changes to clear highlights when switching away from notes
+    const searchTypeBtns = document.querySelectorAll('[id^="search-"][id$="-btn"], [id^="search-"][id$="-btn-mobile"]');
+    searchTypeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTimeout(() => {
+                const isNotesMode = btn.id.includes('notes') && btn.classList.contains('active');
+                if (!isNotesMode) {
+                    clearSearchHighlights();
+                } else {
+                    // If switching to notes mode, highlight after a short delay
+                    setTimeout(highlightSearchTerms, 100);
+                }
+            }, 50);
+        });
+    });
+    
+    // Add a manual trigger after page load for testing
+    setTimeout(function() {
+        const searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+        if (searchInput && searchInput.value.trim()) {
+            highlightSearchTerms();
+        }
+    }, 2000);
+}
+
+// Initialize highlighting when DOM is ready
+document.addEventListener('DOMContentLoaded', initializeSearchHighlighting);
+
+// Also initialize if DOM is already loaded
+if (document.readyState !== 'loading') {
+    initializeSearchHighlighting();
+}
+
+// Add a global test function for debugging
+window.testHighlight = function() {
+    // Force set search input for testing
+    const searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+    if (searchInput) {
+        searchInput.value = 'test'; // Put a test search term
+    }
+    
+    // Force set notes button as active for testing
+    const notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
+    if (notesBtn) {
+        notesBtn.classList.add('active');
+    }
+    
+    highlightSearchTerms();
+};
+
+// Add a global function to clear highlights for testing
+window.clearHighlights = function() {
+    clearSearchHighlights();
+};
+
+// Add a function to create test content for debugging
+window.createTestContent = function() {
+    const noteContents = document.querySelectorAll('.noteentry');
+    if (noteContents.length > 0) {
+        noteContents[0].innerHTML = 'This is a test note with some test words to highlight. Test again and again.';
+    }
+};

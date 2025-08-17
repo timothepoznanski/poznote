@@ -52,15 +52,15 @@ if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
         $excluded_folders = [];
     }
     // Debug: uncomment to see what folders are being excluded
-    if (!empty($excluded_folders)) {
-        error_log("Excluded folders: " . print_r($excluded_folders, true));
-    }
-    if (!empty($_POST)) {
-        error_log("POST search: " . $search . ", tags_search: " . $tags_search);
-        error_log("POST unified_search: " . ($_POST['unified_search'] ?? 'empty'));
-        error_log("POST search_in_notes: " . ($_POST['search_in_notes'] ?? 'empty'));
-        error_log("POST search_in_tags: " . ($_POST['search_in_tags'] ?? 'empty'));
-    }
+    // if (!empty($excluded_folders)) {
+    //     error_log("Excluded folders: " . print_r($excluded_folders, true));
+    // }
+    // if (!empty($_POST)) {
+    //     error_log("POST search: " . $search . ", tags_search: " . $tags_search);
+    //     error_log("POST unified_search: " . ($_POST['unified_search'] ?? 'empty'));
+    //     error_log("POST search_in_notes: " . ($_POST['search_in_notes'] ?? 'empty'));
+    //     error_log("POST search_in_tags: " . ($_POST['search_in_tags'] ?? 'empty'));
+    // }
 }
 
 // Handle search type preservation when clearing search
@@ -666,6 +666,21 @@ $folder_filter = $_GET['folder'] ?? '';
         // Execute query for left column
         $stmt_left = $con->prepare($query_left_secure);
         $stmt_left->execute($search_params);
+        
+        // Execute query for right column (for search results)
+        if ($is_search_mode) {
+            $stmt_right = $con->prepare($query_right_secure);
+            $stmt_right->execute($search_params);
+            $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
+            if ($search_result) {
+                // Reset statement for display loop
+                $stmt_right = $con->prepare($query_right_secure);
+                $stmt_right->execute($search_params);
+                $res_right = $stmt_right;
+            } else {
+                $res_right = null; // No results found
+            }
+        }
         
         // Group notes by folder for hierarchical display
         $folders = [];

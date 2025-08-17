@@ -198,6 +198,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Highlight search terms when page loads if we're in search mode
+    setTimeout(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('search')) {
+            if (typeof highlightSearchTerms === 'function') {
+                highlightSearchTerms();
+            }
+        }
+    }, 500);
+    
     if (mobileSearchInput) {
         mobileSearchInput.addEventListener('input', function() {
             const foldersBtn = document.getElementById('search-folders-btn-mobile');
