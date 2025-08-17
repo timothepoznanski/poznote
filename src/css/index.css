@@ -1630,7 +1630,7 @@ pre.code-block,
 .copy-code-btn-external {
     position: absolute;
     top: 12px;
-    right: 12px;
+    right: -20px;
     background: rgba(248, 249, 250, 0.9);
     border: 1px solid rgba(222, 226, 230, 0.7);
     border-radius: 4px;
