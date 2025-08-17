@@ -442,13 +442,6 @@ show_info() {
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
     echo
-    
-    if [ "$is_update" != "true" ]; then
-        echo
-        print_status "⚙️  To update Poznote, change settings, run:"
-        echo "  ./setup.sh"
-    fi
-
 }
 
 # Function to check for updates (can be called by PHP)

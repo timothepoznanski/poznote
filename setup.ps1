@@ -710,9 +710,6 @@ Poznote Installation Script
         Write-Host "Application Name Displayed: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$finalAppName" -ForegroundColor $Colors.Yellow
         Write-Host ""
-        Write-Host "To update Poznote, change settings, run:`n" -ForegroundColor $Colors.Blue
-        Write-Host "  .\setup.ps1" -ForegroundColor $Colors.Green
-        Write-Host ""
     } else {
         Write-Error "Failed to start Poznote. Please check the error messages above."
         Write-Host "Error Output:" -ForegroundColor $Colors.Red
