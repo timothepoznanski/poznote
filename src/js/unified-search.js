@@ -404,19 +404,11 @@ function addExcludedFoldersToForm(form, isMobile) {
     // Get excluded folders from our folder search system
     const excludedFolders = getExcludedFoldersFromLocalStorage();
     
-    // Debug logging
-    console.log('addExcludedFoldersToForm called:', {
-        excludedFolders: excludedFolders,
-        formId: form.id,
-        isMobile: isMobile
-    });
-    
     if (excludedFolders.length > 0) {
         // Remove any existing excluded_folders input
         const existingInput = form.querySelector('input[name="excluded_folders"]');
         if (existingInput) {
             existingInput.remove();
-            console.log('Removed existing excluded_folders input');
         }
         
         // Add new hidden input with excluded folders
@@ -425,10 +417,6 @@ function addExcludedFoldersToForm(form, isMobile) {
         excludedInput.name = 'excluded_folders';
         excludedInput.value = JSON.stringify(excludedFolders);
         form.appendChild(excludedInput);
-        
-        console.log('Added excluded_folders input with value:', excludedInput.value);
-    } else {
-        console.log('No excluded folders to add');
     }
 }
 
