@@ -1604,39 +1604,78 @@ pre.code-block,
     width: 100%;
 }
 
-/* Bouton copier pour les blocs de code */
-.copy-code-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 6px 8px;
-    font-size: 12px;
-    cursor: pointer;
-    color: #666;
-    opacity: 0;
-    transition: opacity 0.2s, background-color 0.2s;
-    z-index: 10;
-    font-family: 'Inter', sans-serif !important;
+/* Wrapper pour bloc de code avec bouton externe */
+.code-block-wrapper {
+    position: relative;
+    margin: 15px 35px 15px 0;
 }
 
-.code-block:hover .copy-code-btn,
-.code-block-container:hover .copy-code-btn {
+.code-block-wrapper pre {
+    margin: 0;
+    width: 100%;
+}
+
+/* S'assurer que les blocs de code ont les bonnes marges même sans wrapper */
+.code-block, pre.code-block, .noteentry pre {
+    margin: 15px 35px 15px 0;
+    padding: 15px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    overflow-x: auto;
+    position: relative;
+}
+
+/* Bouton copier externe (en haut à droite du bloc) - Version discrète */
+.copy-code-btn-external {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(248, 249, 250, 0.9);
+    border: 1px solid rgba(222, 226, 230, 0.7);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #6c757d;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif !important;
+    outline: none !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    opacity: 0;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+}
+
+.code-block-wrapper:hover .copy-code-btn-external {
     opacity: 1;
 }
 
-.copy-code-btn:hover {
-    background: #fff;
-    color: #007DB8;
-    border-color: #007DB8;
+.copy-code-btn-external:hover {
+    background: rgba(233, 236, 239, 0.95) !important;
+    border-color: #adb5bd !important;
+    color: #007DB8 !important;
+    opacity: 1 !important;
 }
 
-.copy-code-btn.copied {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
+.copy-code-btn-external:focus,
+.copy-code-btn-external:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.copy-code-btn-external.copied {
+    background: rgba(40, 167, 69, 0.9) !important;
+    color: white !important;
+    border-color: #28a745 !important;
+    opacity: 1 !important;
 }
 
 /* Code inline */

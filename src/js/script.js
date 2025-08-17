@@ -2110,37 +2110,61 @@ function downloadFile(url, filename) {
 
 // Function to add copy buttons to code blocks
 function addCopyButtonsToCodeBlocks() {
-    const codeBlocks = document.querySelectorAll('.code-block, pre.code-block, .noteentry pre');
+    // Expanded selector to catch more code block variations
+    const codeBlocks = document.querySelectorAll('.code-block, pre.code-block, .noteentry pre, pre:not(.no-copy), code.code-block');
     
-    codeBlocks.forEach(codeBlock => {
-        // Check if copy button already exists
-        if (codeBlock.querySelector('.copy-code-btn')) {
+    codeBlocks.forEach((codeBlock, index) => {
+        // Remove any existing internal copy buttons first
+        const existingInternalBtn = codeBlock.querySelector('.copy-code-btn');
+        if (existingInternalBtn) {
+            existingInternalBtn.remove();
+        }
+        
+        // Check if external copy button already exists in the wrapper
+        let wrapper = codeBlock.parentNode;
+        if (wrapper.classList.contains('code-block-wrapper') && wrapper.querySelector('.copy-code-btn-external')) {
             return;
         }
         
-        // Create copy button
+        // Create wrapper div if the code block is not already wrapped
+        if (!wrapper.classList.contains('code-block-wrapper')) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'code-block-wrapper';
+            codeBlock.parentNode.insertBefore(wrapper, codeBlock);
+            wrapper.appendChild(codeBlock);
+        }
+        
+        // Ensure the code block has relative positioning for absolute positioning of the button
+        codeBlock.style.position = 'relative';
+        
+        // Create copy button with more discrete styling
         const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-code-btn';
-        copyBtn.innerHTML = 'Copy';
+        copyBtn.className = 'copy-code-btn-external';
+        copyBtn.innerHTML = '⧉'; // Discrete copy icon
         copyBtn.title = 'Copy code';
+        copyBtn.type = 'button';
+        copyBtn.tabIndex = -1; // Remove from tab order
         
         // Add click event
         copyBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            copyBtn.blur(); // Remove focus immediately
             copyCodeToClipboard(codeBlock, copyBtn);
         });
         
-        // Add button to code block
-        codeBlock.style.position = 'relative';
-        codeBlock.appendChild(copyBtn);
+        // Prevent focus on mousedown
+        copyBtn.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
+        
+        // Add button to the wrapper (it will be positioned absolutely over the code block)
+        wrapper.appendChild(copyBtn);
     });
 }
 
 // Function to copy code to clipboard
 function copyCodeToClipboard(codeBlock, button) {
-    console.log('Copy button clicked'); // Debug log
-    
     // Clone the code block and remove the copy button from the clone
     const clonedBlock = codeBlock.cloneNode(true);
     const copyBtn = clonedBlock.querySelector('.copy-code-btn');
@@ -2149,26 +2173,24 @@ function copyCodeToClipboard(codeBlock, button) {
     }
     
     const text = clonedBlock.textContent || clonedBlock.innerText;
-    console.log('Text to copy:', text); // Debug log
     
     // Use the modern Clipboard API first, then fallback
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-            console.log('Clipboard API success'); // Debug log
             showCopySuccess(button);
         }).catch((err) => {
-            console.log('Clipboard API failed, using fallback:', err); // Debug log
             fallbackCopyToClipboard(text, button);
         });
     } else {
-        console.log('Using fallback copy method directly'); // Debug log
         fallbackCopyToClipboard(text, button);
     }
 }
 
 // Fallback copy method for older browsers
 function fallbackCopyToClipboard(text, button) {
-    console.log('Using fallback copy method'); // Debug log
+    // Force blur before starting the process
+    button.blur();
+    
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -2180,34 +2202,42 @@ function fallbackCopyToClipboard(text, button) {
     
     try {
         const successful = document.execCommand('copy');
-        console.log('Copy command successful:', successful); // Debug log
         if (successful) {
             showCopySuccess(button);
         } else {
             showCopyError(button);
         }
     } catch (err) {
-        console.error('Failed to copy text: ', err);
         showCopyError(button);
     }
     
     document.body.removeChild(textarea);
+    // Force blur again after the operation
+    button.blur();
 }
 
 // Show success feedback
 function showCopySuccess(button) {
+    // Force blur to remove any focus and cursor
+    button.blur();
+    
     const originalContent = button.innerHTML;
-    button.innerHTML = 'Copied!';
+    button.innerHTML = '✓';  // Simple checkmark for success
     button.classList.add('copied');
     
     setTimeout(() => {
         button.innerHTML = originalContent;
         button.classList.remove('copied');
-    }, 2000);
+        // Force blur again to ensure no focus remains
+        button.blur();
+    }, 1500); // Shorter duration for more discrete feedback
 }
 
 // Show error feedback
 function showCopyError(button) {
+    // Force blur to remove any focus and cursor
+    button.blur();
+    
     const originalContent = button.innerHTML;
     button.innerHTML = 'Error';
     button.style.backgroundColor = '#dc3545';
@@ -2217,37 +2247,63 @@ function showCopyError(button) {
         button.innerHTML = originalContent;
         button.style.backgroundColor = '';
         button.style.color = '';
+        // Force blur again to ensure no focus remains
+        button.blur();
     }, 2000);
 }
 
-// Initialize copy buttons when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    addCopyButtonsToCodeBlocks();
+// Function to clean up old internal copy buttons
+function removeOldInternalCopyButtons() {
+    const oldButtons = document.querySelectorAll('.copy-code-btn');
+    oldButtons.forEach(btn => btn.remove());
+}
+
+// Initialize copy buttons when page loads - Multiple strategies for maximum compatibility
+function initializeCopyButtons() {
+    // First remove any old internal buttons
+    removeOldInternalCopyButtons();
     
-    // Also try after a short delay to catch any dynamically loaded content
+    // Then add the new external buttons
+    addCopyButtonsToCodeBlocks();
+}
+
+// Strategy 1: DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCopyButtons();
+    
+    // Also try after multiple delays to catch any dynamically loaded content
     setTimeout(() => {
-        addCopyButtonsToCodeBlocks();
-    }, 1000);
+        initializeCopyButtons();
+    }, 500);
+    
+    setTimeout(() => {
+        initializeCopyButtons();
+    }, 1500);
     
     // Also add copy buttons when content changes (using MutationObserver)
     const observer = new MutationObserver(function(mutations) {
+        let shouldUpdate = false;
         mutations.forEach(function(mutation) {
             if (mutation.type === 'childList') {
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType === 1) { // Element node
                         // Check if the added node is a code block or contains code blocks
-                        if (node.matches && (node.matches('.code-block') || node.matches('pre.code-block') || node.matches('.noteentry pre'))) {
-                            addCopyButtonsToCodeBlocks();
+                        if (node.matches && (node.matches('.code-block') || node.matches('pre.code-block') || node.matches('.noteentry pre') || node.matches('pre:not(.no-copy)') || node.matches('code.code-block'))) {
+                            shouldUpdate = true;
                         } else if (node.querySelectorAll) {
-                            const codeBlocks = node.querySelectorAll('.code-block, pre.code-block, .noteentry pre');
+                            const codeBlocks = node.querySelectorAll('.code-block, pre.code-block, .noteentry pre, pre:not(.no-copy), code.code-block');
                             if (codeBlocks.length > 0) {
-                                addCopyButtonsToCodeBlocks();
+                                shouldUpdate = true;
                             }
                         }
                     }
                 });
             }
         });
+        
+        if (shouldUpdate) {
+            setTimeout(() => initializeCopyButtons(), 100);
+        }
     });
     
     // Start observing
@@ -2257,13 +2313,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Also try to initialize immediately in case DOM is already loaded
+// Strategy 2: If document is already loaded
 if (document.readyState === 'loading') {
-    // DOM is still loading
+    // Document is still loading, DOMContentLoaded will handle it
 } else {
-    // DOM is already loaded
-    addCopyButtonsToCodeBlocks();
+    // Document has already loaded
+    initializeCopyButtons();
+    
+    setTimeout(() => {
+        initializeCopyButtons();
+    }, 100);
+    
+    setTimeout(() => {
+        initializeCopyButtons();
+    }, 500);
 }
+
+// Strategy 3: Window load event (everything including images loaded)
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        initializeCopyButtons();
+    }, 100);
+});
+
+// Strategy 4: Periodic check for the first few seconds (fallback)
+let initRetries = 0;
+const maxRetries = 10;
+const retryInterval = setInterval(() => {
+    initRetries++;
+    
+    const codeBlocks = document.querySelectorAll('.code-block, pre.code-block, .noteentry pre, pre:not(.no-copy), code.code-block');
+    const internalButtonsAdded = document.querySelectorAll('.copy-code-btn');
+    const externalButtonsAdded = document.querySelectorAll('.copy-code-btn-external');
+    const totalButtonsAdded = internalButtonsAdded.length + externalButtonsAdded.length;
+    
+    if (codeBlocks.length > totalButtonsAdded) {
+        initializeCopyButtons();
+    }
+    
+    if (initRetries >= maxRetries) {
+        clearInterval(retryInterval);
+    }
+}, 1000);
 
 // Handling the display of formatting buttons based on text selection (desktop only)
 function initTextSelectionHandlers() {
@@ -2425,6 +2516,58 @@ window.testCopyFunction = function(text) {
     } else {
         showNotificationPopup('Clipboard API not available', 'error');
     }
+};
+
+// Global function to force reinitialize all copy buttons (useful for debugging)
+window.reinitializeCopyButtons = function() {
+    // First remove all existing copy buttons (both types)
+    const existingInternalButtons = document.querySelectorAll('.copy-code-btn');
+    const existingExternalButtons = document.querySelectorAll('.copy-code-btn-external');
+    
+    existingInternalButtons.forEach(btn => btn.remove());
+    existingExternalButtons.forEach(btn => btn.remove());
+    
+    // Also remove wrappers and restore original structure
+    const wrappers = document.querySelectorAll('.code-block-wrapper');
+    wrappers.forEach(wrapper => {
+        const codeBlock = wrapper.querySelector('pre, code');
+        if (codeBlock && wrapper.parentNode) {
+            wrapper.parentNode.insertBefore(codeBlock, wrapper);
+            wrapper.remove();
+        }
+    });
+    
+    // Then add them back
+    initializeCopyButtons();
+    
+    // Check results
+    const newInternalButtons = document.querySelectorAll('.copy-code-btn');
+    const newExternalButtons = document.querySelectorAll('.copy-code-btn-external');
+    
+    return `Reinitialized copy buttons: removed ${existingInternalButtons.length + existingExternalButtons.length}, added ${newInternalButtons.length + newExternalButtons.length}`;
+};
+
+// Global diagnostic function
+window.diagnoseCopyButtons = function() {
+    const codeBlocks = document.querySelectorAll('.code-block, pre.code-block, .noteentry pre, pre:not(.no-copy), code.code-block');
+    const copyButtonsInternal = document.querySelectorAll('.copy-code-btn');
+    const copyButtonsExternal = document.querySelectorAll('.copy-code-btn-external');
+    const wrappers = document.querySelectorAll('.code-block-wrapper');
+    
+    codeBlocks.forEach((block, index) => {
+        const hasInternalButton = block.querySelector('.copy-code-btn');
+        const hasExternalButton = block.parentNode.querySelector('.copy-code-btn-external') || 
+                                   (block.nextElementSibling && block.nextElementSibling.classList.contains('copy-code-btn-external'));
+        const isWrapped = block.parentNode.classList.contains('code-block-wrapper');
+    });
+    
+    return {
+        codeBlocks: codeBlocks.length,
+        internalButtons: copyButtonsInternal.length,
+        externalButtons: copyButtonsExternal.length,
+        wrappers: wrappers.length,
+        readyState: document.readyState
+    };
 };
 
 // Function to clear search and return to main view
