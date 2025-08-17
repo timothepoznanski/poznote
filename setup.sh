@@ -65,7 +65,6 @@ reconfigure_poznote() {
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
     echo -e "  • Port: ${HTTP_WEB_PORT}"
     echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
-    echo -e "  • SQLite Database: ${SQLITE_DATABASE:-/var/www/html/data/poznote.db}"
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -89,9 +88,6 @@ reconfigure_poznote() {
 
     read -p "Application Name [${APP_NAME_DISPLAYED:-Poznote}]: " NEW_APP_NAME
     APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
-
-    read -p "SQLite Database Path [${SQLITE_DATABASE:-/var/www/html/data/poznote.db}]: " NEW_SQLITE_DATABASE
-    SQLITE_DATABASE=${NEW_SQLITE_DATABASE:-${SQLITE_DATABASE:-/var/www/html/data/poznote.db}}
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -173,7 +169,6 @@ get_template_values() {
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
         TEMPLATE_APP_NAME=$(grep "^APP_NAME_DISPLAYED=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
-        TEMPLATE_SQLITE_DATABASE=$(grep "^SQLITE_DATABASE=" .env.template | cut -d'=' -f2)
     fi
 }
 
@@ -364,20 +359,6 @@ get_user_config() {
         APP_NAME_DISPLAYED="Poznote"
     fi
     
-    # Get SQLite configuration (only for option 2 - configuration change)
-    if [ "$is_update" = "true" ]; then
-        echo
-        print_status "SQLite Database Configuration:"
-        
-        # Get template values for SQLite
-        if [ -f ".env.template" ]; then
-            TEMPLATE_SQLITE_DATABASE=$(grep "^SQLITE_DATABASE=" .env.template | cut -d'=' -f2)
-        fi
-        
-        read -p "SQLite Database Path [${SQLITE_DATABASE:-${TEMPLATE_SQLITE_DATABASE}}]: " NEW_SQLITE_DATABASE
-        SQLITE_DATABASE=${NEW_SQLITE_DATABASE:-${SQLITE_DATABASE:-${TEMPLATE_SQLITE_DATABASE}}}
-    fi
-    
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
@@ -400,11 +381,6 @@ create_env_file() {
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
     sed -i "s/^APP_NAME_DISPLAYED=.*/APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED/" .env
-    
-    # Update SQLite configuration if variable is set
-    if [ -n "$SQLITE_DATABASE" ]; then
-        sed -i "s|^SQLITE_DATABASE=.*|SQLITE_DATABASE=$SQLITE_DATABASE|" .env
-    fi
     
     print_success ".env file created from template"
 }
@@ -547,7 +523,6 @@ main() {
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
             echo -e "  • Port: ${HTTP_WEB_PORT}"
             echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
-            echo -e "  • SQLite Database: ${SQLITE_DATABASE:-/var/www/html/data/poznote.db}"
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}\n"
