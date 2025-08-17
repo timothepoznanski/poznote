@@ -130,19 +130,8 @@ check_docker() {
 
 # Check if Poznote is already installed
 check_existing_installation() {
-    local indicators=0
-    [ -d "./data/entries" ] && ((indicators++))
-    [ -d "./data/attachments" ] && ((indicators++))
-    [ -f "./data/poznote.db" ] && ((indicators++))
-    
-    # Count .env only if it's different from template
-    if [ -f ".env" ] && [ -f ".env.template" ]; then
-        ! cmp -s ".env" ".env.template" && ((indicators++))
-    elif [ -f ".env" ] && [ ! -f ".env.template" ]; then
-        ((indicators++))
-    fi
-    
-    [ $indicators -ge 2 ]
+    # Installation is detected if .env file exists
+    [ -f ".env" ]
 }
 
 # Load environment configuration
