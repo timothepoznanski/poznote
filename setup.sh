@@ -442,6 +442,13 @@ show_info() {
     echo "  🔑 Username: $POZNOTE_USERNAME"
     echo "  🔑 Password: $POZNOTE_PASSWORD"
     echo
+    
+    if [ "$is_update" != "true" ]; then
+        echo
+        print_status "⚙️  To update Poznote, change settings, run:"
+        echo "  ./setup.sh"
+    fi
+
 }
 
 # Function to check for updates (can be called by PHP)
@@ -563,13 +570,18 @@ main() {
         done
     else
         # Fresh installation
-        print_status "🆕 Proceeding with fresh installation."
+        print_status "🆕 No existing installation found. Proceeding with fresh installation."
         
         get_user_config "false"
         create_env_file
         manage_container "update"
         install_git_hook
         show_info "false"
+        
+        echo
+        print_status "💡 Configuration tip:"
+        echo -e "  ${YELLOW}To customize SQLite database settings (database path), run:${NC}"
+        echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
 
