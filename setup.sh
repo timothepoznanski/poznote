@@ -570,11 +570,6 @@ main() {
         manage_container "update"
         install_git_hook
         show_info "false"
-        
-        echo
-        print_status "💡 Configuration tip:"
-        echo -e "  ${YELLOW}To customize SQLite database settings (database path), run:${NC}"
-        echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
 
