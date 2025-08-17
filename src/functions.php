@@ -70,17 +70,17 @@ function getAttachmentsPath() {
 
 /**
  * Get the relative path for entries (for file operations)
- * Now using absolute path to work from any location
+ * Use relative path from webroot for Docker compatibility
  */
 function getEntriesRelativePath() {
-    return dirname(__DIR__) . '/data/entries/';
+    return 'data/entries/';
 }
 
 /**
  * Get the relative path for attachments (for file operations)
- * Now using absolute path to work from any location
+ * Use relative path from webroot for Docker compatibility
  */
 function getAttachmentsRelativePath() {
-    return dirname(__DIR__) . '/data/attachments/';
+    return 'data/attachments/';
 }
 ?>
