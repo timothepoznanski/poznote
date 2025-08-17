@@ -60,7 +60,8 @@ PozNote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 **Windows (PowerShell):**
 ```powershell
-$instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.)"
+$instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]"
+if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
 git clone https://github.com/timothepoznanski/poznote.git $instanceName
 cd $instanceName
 .\setup.ps1
@@ -68,7 +69,8 @@ cd $instanceName
 
 **Linux/macOS:**
 ```bash
-read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.): " instanceName
+read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]: " instanceName
+instanceName=${instanceName:-poznote}
 git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
 cd "$instanceName"
 chmod +x setup.sh
