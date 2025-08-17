@@ -2,7 +2,14 @@
 
 // SQLite connection
 try {
-    $con = new PDO('sqlite:' . SQLITE_DATABASE);
+    // Ensure the database directory exists
+    $dbPath = SQLITE_DATABASE;
+    $dbDir = dirname($dbPath);
+    if (!is_dir($dbDir)) {
+        mkdir($dbDir, 0755, true);
+    }
+    
+    $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
     
