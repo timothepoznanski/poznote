@@ -151,15 +151,8 @@ function Test-Docker {
 
 # Check if this is an existing installation
 function Test-ExistingInstallation {
-    $indicators = @(
-        (Test-Path "./data/entries"),
-        (Test-Path "./data/attachments"),
-        (Test-Path "./data/poznote.db"),
-        ((Test-Path ".env") -and -not ((Test-Path ".env.template") -and ((Get-Content ".env" -Raw) -eq (Get-Content ".env.template" -Raw))))
-    )
-    
-    $existingCount = ($indicators | Where-Object { $_ }).Count
-    return $existingCount -ge 2
+    # Installation is detected if .env file exists
+    return Test-Path ".env"
 }
 
 # Load environment configuration
