@@ -137,7 +137,7 @@ check_existing_installation() {
 # Load environment configuration
 load_env_config() {
     if [ -f ".env" ]; then
-        print_status "Loading existing configuration..."
+        print_status "Loading existing configuration..." 
         # Use a safer method to load .env that doesn't execute arbitrary commands
         while IFS='=' read -r key value; do
             # Skip empty lines and comments
