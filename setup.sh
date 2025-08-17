@@ -563,7 +563,7 @@ main() {
         done
     else
         # Fresh installation
-        print_status "🆕 No existing installation found. Proceeding with fresh installation."
+        print_status "🆕 Proceeding with fresh installation."
         
         get_user_config "false"
         create_env_file
