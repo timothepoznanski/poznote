@@ -1932,6 +1932,21 @@ hr {
 
 .folder-search-btn.excluded {
     color: #dc3545; /* Red when excluded from search */
+    position: relative;
+}
+
+/* Add a diagonal line over excluded folder search buttons */
+.folder-search-btn.excluded::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 2px;
+    background-color: #dc3545;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .folder-search-btn:hover {

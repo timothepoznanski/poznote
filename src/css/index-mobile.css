@@ -385,6 +385,24 @@ a.links_arbo_left.selected-note {
     box-sizing: border-box !important;
 }
 
+/* Mobile diagonal line for excluded folder search buttons */
+.folder-search-btn.excluded {
+    position: relative !important;
+}
+
+.folder-search-btn.excluded::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 80% !important;
+    height: 2px !important;
+    background-color: #dc3545 !important;
+    transform: translate(-50%, -50%) rotate(-45deg) !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+
 .folder-content {
     margin-left: 16px !important;
     margin-bottom: 5px !important; /* Reduce spacing under mobile folders (12px → 5px) */
