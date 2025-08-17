@@ -42,10 +42,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         
         <form method="POST">
             <div class="form-group">
-                <input type="text" id="username" name="username" placeholder="Username" required autofocus>
+                <input type="text" id="username" name="username" placeholder="Username" required autofocus autocomplete="username">
             </div>
             <div class="form-group">
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
                 <?php if ($error): ?>
                     <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
