@@ -554,14 +554,80 @@ function updateident(el)
 }
 
 
+/**
+ * Clean search highlights from HTML content before saving
+ * This prevents search highlight spans from being saved in the note content
+ */
+function cleanSearchHighlightsFromHTML(htmlContent) {
+    if (!htmlContent) return htmlContent;
+    
+    // Create a temporary div to work with the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    // Find all search highlight spans and replace them with their text content
+    const highlights = tempDiv.querySelectorAll('.search-highlight');
+    highlights.forEach(highlight => {
+        const parent = highlight.parentNode;
+        // Replace the highlight span with its text content
+        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+        // Normalize the parent to merge adjacent text nodes
+        parent.normalize();
+    });
+    
+    return tempDiv.innerHTML;
+}
+
+/**
+ * Clean search highlights from an element before getting its content
+ * This is a non-destructive operation that works on a clone
+ */
+function cleanSearchHighlightsFromElement(element) {
+    if (!element) return "";
+    
+    // Clone the element to avoid modifying the original
+    const clonedElement = element.cloneNode(true);
+    
+    // Find all search highlight spans and replace them with their text content
+    const highlights = clonedElement.querySelectorAll('.search-highlight');
+    highlights.forEach(highlight => {
+        const parent = highlight.parentNode;
+        // Replace the highlight span with its text content
+        parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+        // Normalize the parent to merge adjacent text nodes
+        parent.normalize();
+    });
+    
+    return clonedElement.innerHTML;
+}
+
 function updatenote(){
     updateNoteEnCours = 1;
     var headi = document.getElementById("inp"+noteid).value;
     var entryElem = document.getElementById("entry"+noteid);
-    var ent = entryElem ? entryElem.innerHTML : "";
+    
+    // Clean search highlights from the content before saving
+    // Use the non-destructive cleaning function that works on a clone
+    var ent = entryElem ? cleanSearchHighlightsFromElement(entryElem) : "";
+    
     // console.log("RESULT :" + ent);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
-    var entcontent = entryElem ? entryElem.textContent : "";
+    
+    // For textContent, we also need to get it from a cleaned clone to ensure
+    // search highlights don't affect the text content calculation
+    var entcontent = entryElem ? cleanSearchHighlightsFromElement(entryElem).replace(/<[^>]*>/g, '') : "";
+    // Alternative: get textContent from the cloned element
+    if (entryElem) {
+        const clonedElement = entryElem.cloneNode(true);
+        const highlights = clonedElement.querySelectorAll('.search-highlight');
+        highlights.forEach(highlight => {
+            const parent = highlight.parentNode;
+            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+            parent.normalize();
+        });
+        entcontent = clonedElement.textContent || "";
+    }
+    
     // console.log("entcontent:" + entcontent);
     // console.log("ent:" + ent);
     var tags = document.getElementById("tags"+noteid).value;

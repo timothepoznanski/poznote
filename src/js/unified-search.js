@@ -1,5 +1,10 @@
 // UNIFIED SEARCH FUNCTIONALITY
 function clearUnifiedSearch() {
+    // Clear search highlights immediately when clearing search
+    if (typeof clearSearchHighlights === 'function') {
+        clearSearchHighlights();
+    }
+    
     // Preserve search type preferences by checking current button states
     const notesActive = document.getElementById('search-notes-btn') && document.getElementById('search-notes-btn').classList.contains('active');
     const tagsActive = document.getElementById('search-tags-btn') && document.getElementById('search-tags-btn').classList.contains('active');
@@ -195,6 +200,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (foldersBtn && foldersBtn.classList.contains('active')) {
                 filterFolders(this.value, false);
             }
+            // Clear highlights immediately when search input is emptied in notes mode
+            const notesBtn = document.getElementById('search-notes-btn');
+            if (notesBtn && notesBtn.classList.contains('active') && this.value.trim() === '') {
+                if (typeof clearSearchHighlights === 'function') {
+                    clearSearchHighlights();
+                }
+            }
         });
     }
     
@@ -213,6 +225,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const foldersBtn = document.getElementById('search-folders-btn-mobile');
             if (foldersBtn && foldersBtn.classList.contains('active')) {
                 filterFolders(this.value, true);
+            }
+            // Clear highlights immediately when search input is emptied in notes mode
+            const notesBtn = document.getElementById('search-notes-btn-mobile');
+            if (notesBtn && notesBtn.classList.contains('active') && this.value.trim() === '') {
+                if (typeof clearSearchHighlights === 'function') {
+                    clearSearchHighlights();
+                }
             }
         });
     }
@@ -286,6 +305,11 @@ function toggleSearchType(type, isMobile) {
     // If button is already active, do nothing (keep it active)
     if (btn.classList.contains('active')) {
         return;
+    }
+    
+    // Clear search highlights when switching away from notes mode
+    if (type !== 'notes' && typeof clearSearchHighlights === 'function') {
+        clearSearchHighlights();
     }
     
     // Deactivate all buttons first
