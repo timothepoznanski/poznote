@@ -19,7 +19,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 $heading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
-$folder = isset($input['folder']) ? trim($input['folder']) : 'Uncategorized';
+$folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Uncategorized';
 
 if ($heading === '') {
     http_response_code(400);

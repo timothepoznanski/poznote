@@ -228,9 +228,14 @@ curl -X POST http://localhost:8040/api_create_note.php \
   -d '{
     "heading": "My New Note",
     "tags": "personal,important",
-    "folder": "Projects"
+    "folder_name": "Projects"
   }'
 ```
+**Required parameters:**
+- `heading` (string) - The note title
+**Optional parameters:**
+- `tags` (string) - Comma-separated tags
+- `folder_name` (string) - Folder name (defaults to "Uncategorized")
 
 #### Create Folder
 ```bash
@@ -239,6 +244,8 @@ curl -X POST http://localhost:8040/api_create_folder.php \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
+**Required parameters:**
+- `folder_name` (string) - The folder name
 
 #### Move Note
 ```bash
@@ -250,6 +257,9 @@ curl -X POST http://localhost:8040/api_move_note.php \
     "folder_name": "Work Projects"
   }'
 ```
+**Required parameters:**
+- `note_id` (string) - The ID of the note to move
+- `folder_name` (string) - The target folder name
 
 #### Delete Note
 ```bash
