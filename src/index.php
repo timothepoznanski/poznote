@@ -669,16 +669,53 @@ $folder_filter = $_GET['folder'] ?? '';
         
         // Execute query for right column (for search results)
         if ($is_search_mode) {
-            $stmt_right = $con->prepare($query_right_secure);
-            $stmt_right->execute($search_params);
-            $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
-            if ($search_result) {
-                // Reset statement for display loop
+            // If a specific note is selected, show that note instead of the most recent one
+            if (!empty($note)) {
+                // Build query to show the selected note if it matches search criteria
+                $where_conditions_with_note = $where_conditions;
+                $search_params_with_note = $search_params;
+                $where_conditions_with_note[] = "heading = ?";
+                $search_params_with_note[] = $note;
+                
+                $where_clause_with_note = implode(" AND ", $where_conditions_with_note);
+                $query_right_with_note = "SELECT * FROM entries WHERE $where_clause_with_note LIMIT 1";
+                
+                $stmt_right = $con->prepare($query_right_with_note);
+                $stmt_right->execute($search_params_with_note);
+                $selected_note_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                
+                if ($selected_note_result) {
+                    // Reset statement for display loop
+                    $stmt_right = $con->prepare($query_right_with_note);
+                    $stmt_right->execute($search_params_with_note);
+                    $res_right = $stmt_right;
+                } else {
+                    // Selected note doesn't match search criteria, show most recent matching note
+                    $stmt_right = $con->prepare($query_right_secure);
+                    $stmt_right->execute($search_params);
+                    $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                    if ($search_result) {
+                        // Reset statement for display loop
+                        $stmt_right = $con->prepare($query_right_secure);
+                        $stmt_right->execute($search_params);
+                        $res_right = $stmt_right;
+                    } else {
+                        $res_right = null; // No results found
+                    }
+                }
+            } else {
+                // No specific note selected, show most recent matching note
                 $stmt_right = $con->prepare($query_right_secure);
                 $stmt_right->execute($search_params);
-                $res_right = $stmt_right;
-            } else {
-                $res_right = null; // No results found
+                $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
+                if ($search_result) {
+                    // Reset statement for display loop
+                    $stmt_right = $con->prepare($query_right_secure);
+                    $stmt_right->execute($search_params);
+                    $res_right = $stmt_right;
+                } else {
+                    $res_right = null; // No results found
+                }
             }
         }
         
