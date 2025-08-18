@@ -35,7 +35,7 @@ FEATURES:
     • Interactive menu with options:
       - New installation (fresh setup)
       - Update application (get latest code)
-      - Change settings (password/port/name/database etc.)
+      - Change settings (password/port/name etc.)
     • Configuration preservation during updates
 
 REQUIREMENTS:
@@ -497,7 +497,7 @@ function Install-Poznote {
         
         Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green
         Write-Host "  1) Update application (get latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change settings (password/port/name/database etc.)" -ForegroundColor $Colors.White
+        Write-Host "  2) Change settings (password/port/name etc.)" -ForegroundColor $Colors.White
         Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
         
         do {
@@ -613,8 +613,6 @@ Poznote Installation Script
             Write-Warning "You are using the default password! Please change it for production use."
         }
         
-        Write-Host "`nUsing template configuration for database and paths..." -ForegroundColor $Colors.Blue
-        
         # Create .env file
         Copy-Item ".env.template" ".env" -Force
         $envContent = Get-Content ".env" -Raw
@@ -625,26 +623,7 @@ Poznote Installation Script
         $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
         Write-Success ".env file created from template successfully!"
     }
-    
-    # Create data directories
-    if (Test-Path ".env") {
-        $envVars = @{}
-        Get-Content ".env" | ForEach-Object {
-            if ($_ -match '^([^#][^=]+)=(.*)$') {
-                $envVars[$matches[1]] = $matches[2]
-            }
-        }
-        
-        Write-Status "Creating data directories..."
-        $directories = @($envVars["DB_DATA_PATH"], $envVars["ENTRIES_DATA_PATH"], $envVars["ATTACHMENTS_DATA_PATH"])
-        foreach ($dir in $directories) {
-            if ($dir -and -not (Test-Path $dir)) {
-                New-Item -ItemType Directory -Path $dir -Force | Out-Null
-            }
-        }
-        Write-Success "Data directories created!"
-    }
-    
+
     # Start Docker container
     Write-Status "Starting Poznote with Docker Compose..."
     

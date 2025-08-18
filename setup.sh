@@ -38,7 +38,7 @@ FEATURES:
     • Interactive menu with options:
       - New installation (fresh setup)
       - Update application (get latest code)
-      - Change configuration (password/port/name/database etc.)
+      - Change configuration (password/port/name etc.)
     • Configuration preservation during updates
 
 REQUIREMENTS:
@@ -516,7 +516,7 @@ main() {
         
         echo -e "\n${GREEN}What would you like to do?${NC}\n"
         echo -e "  1) Update application (get latest code)"
-        echo -e "  2) Change settings (password/port/name/database etc.)"
+        echo -e "  2) Change settings (password/port/name etc.)"
         echo -e "  3) Cancel"
         
         while true; do
@@ -566,11 +566,6 @@ main() {
         manage_container "update"
         install_git_hook
         show_info "false"
-        
-        echo
-        print_status "💡 Configuration tip:"
-        echo -e "  ${YELLOW}To customize SQLite database settings (database path), run:${NC}"
-        echo -e "  ${GREEN}./setup.sh${NC} ${BLUE}and select option 2 (Change configuration)${NC}"
     fi
 }
 
