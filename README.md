@@ -36,7 +36,6 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
-- [Docker Data Structure](#docker-data-structure)
 - [API Documentation](#api-documentation)
 - [Manual Operations](#manual-operations)
 
