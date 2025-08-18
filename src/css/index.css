@@ -1618,7 +1618,7 @@ pre.code-block,
 /* S'assurer que les blocs de code ont les bonnes marges même sans wrapper */
 .code-block, pre.code-block, .noteentry pre {
     margin: 15px 35px 15px 0;
-    padding: 15px;
+    padding: 40px 15px 40px 60px;
     border-radius: 6px;
     background: #f8f9fa;
     border: 1px solid #e9ecef;
