@@ -934,7 +934,7 @@ function createFolder() {
     })
     .then(response => response.json())
     .then(function(data) {
-        console.log('Create folder response:', data); // Debug
+        console.log('Create folder response:', data);
         if (data.success) {
             closeModal('newFolderModal');
             document.getElementById('newFolderName').value = ''; // Clear input
@@ -976,8 +976,6 @@ function selectFolder(folderName, element) {
     
     // Update selected folder
     selectedFolder = folderName;
-    
-    console.log('Selected folder:', selectedFolder);
 }
 
 function editFolderName(oldName) {
@@ -1015,6 +1013,8 @@ function saveFolderName() {
     .then(response => response.json())
     .then(function(data) {
         if (data.success) {
+            // Clean localStorage entries for the old folder name and update recent folders
+            cleanupRenamedFolderInLocalStorage(oldName, newName);
             closeModal('editFolderModal');
             showNotificationPopup('Folder renamed successfully');
             location.reload();
@@ -1025,6 +1025,32 @@ function saveFolderName() {
     .catch(error => {
         showNotificationPopup('Error renaming folder: ' + error, 'error');
     });
+}
+
+/**
+ * Clean localStorage entries when a folder is renamed
+ */
+function cleanupRenamedFolderInLocalStorage(oldName, newName) {
+    if (!oldName || !newName || oldName === newName) return;
+    
+    // Update folder search filter key
+    const oldSearchKey = `folder_search_${oldName}`;
+    const newSearchKey = `folder_search_${newName}`;
+    const searchState = localStorage.getItem(oldSearchKey);
+    if (searchState !== null) {
+        localStorage.setItem(newSearchKey, searchState);
+        localStorage.removeItem(oldSearchKey);
+        console.log(`Updated folder search filter: ${oldName} -> ${newName}`);
+    }
+    
+    // Update recent folders
+    const recentFolders = getRecentFolders();
+    const updatedRecentFolders = recentFolders.map(folder => 
+        folder === oldName ? newName : folder
+    );
+    localStorage.setItem('poznote_recent_folders', JSON.stringify(updatedRecentFolders));
+    
+    console.log(`Updated localStorage for renamed folder: ${oldName} -> ${newName}`);
 }
 
 function deleteFolder(folderName) {
@@ -1095,7 +1121,6 @@ function showDeleteFolderModal(folderName, message) {
 
 function executeDeleteFolder() {
     if (currentFolderToDelete) {
-        // Proceed with deletion
         var deleteParams = new URLSearchParams({
             action: 'delete',
             folder_name: currentFolderToDelete
@@ -1122,6 +1147,39 @@ function executeDeleteFolder() {
     
     closeModal('deleteFolderModal');
     currentFolderToDelete = null;
+}
+
+function cleanupDeletedFolderFromLocalStorage(folderName) {
+    if (!folderName) return;
+    
+    const keysToRemove = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        
+        if (key === `folder_search_${folderName}`) {
+            keysToRemove.push(key);
+        }
+        
+        if (key.startsWith('folder_folder-')) {
+            const folderId = key.substring('folder_'.length);
+            const folderElement = document.getElementById(folderId);
+            if (!folderElement) {
+                keysToRemove.push(key);
+            }
+        }
+    }
+    
+    const recentFolders = getRecentFolders();
+    const updatedRecentFolders = recentFolders.filter(folder => folder !== folderName);
+    if (updatedRecentFolders.length !== recentFolders.length) {
+        localStorage.setItem('poznote_recent_folders', JSON.stringify(updatedRecentFolders));
+    }
+    
+    keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+    });
 }
 
 function emptyFolder(folderName) {
@@ -1959,25 +2017,63 @@ window.onclick = function(event) {
 
 // Restore folder states on page load
 document.addEventListener('DOMContentLoaded', function() {
-    var folderToggles = document.querySelectorAll('.folder-toggle');
-    folderToggles.forEach(function(toggle) {
-        var folderId = toggle.dataset.folderId;
+    setTimeout(function() {
+        if (window.isSearchMode || window.currentNoteFolder) {
+            return;
+        }
+
+        var folderToggles = document.querySelectorAll('.folder-toggle');
         
-        // Don't restore localStorage state if in search mode or if a note is selected
-        // The PHP already set the correct initial state
-        if (!window.isSearchMode && !window.currentNoteFolder) {
-            var state = localStorage.getItem('folder_' + folderId);
-            if (state === 'closed') {
+        folderToggles.forEach(function(toggle) {
+            var folderId = toggle.dataset.folderId;
+            if (folderId) {
+                var state = localStorage.getItem('folder_' + folderId);
                 var content = document.getElementById(folderId);
                 var icon = toggle.querySelector('.folder-icon');
+                
                 if (content && icon) {
-                    content.style.display = 'none';
-                    icon.classList.remove('fa-chevron-down');
-                    icon.classList.add('fa-chevron-right');
+                    if (state === 'closed') {
+                        content.style.display = 'none';
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-right');
+                    } else if (state === 'open') {
+                        content.style.display = 'block';
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-down');
+                    }
                 }
             }
+        });
+
+        // Auto-cleanup orphaned localStorage keys
+        const allFolderKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('folder_')) {
+                allFolderKeys.push(key);
+            }
         }
-    });
+        
+        const currentFolderToggles = document.querySelectorAll('.folder-toggle[data-folder-id]');
+        const currentFolderIds = Array.from(currentFolderToggles).map(toggle => toggle.getAttribute('data-folder-id'));
+        
+        const orphanedKeys = allFolderKeys.filter(key => {
+            if (key.startsWith('folder_search_')) {
+                const folderName = key.replace('folder_search_', '');
+                const folderExists = document.querySelector(`[data-folder="${folderName}"]`);
+                return !folderExists;
+            } else {
+                const folderId = key.replace('folder_', '');
+                return !currentFolderIds.includes(folderId);
+            }
+        });
+        
+        if (orphanedKeys.length > 0) {
+            orphanedKeys.forEach(key => {
+                localStorage.removeItem(key);
+            });
+        }
+    }, 1000);
 });
 
 // Settings menu functions
@@ -2019,6 +2115,7 @@ function foldAllFolders() {
     
     folderContents.forEach(content => {
         content.style.display = 'none';
+        localStorage.setItem('folder_' + content.id, 'closed');
     });
     
     folderIcons.forEach(icon => {
@@ -2039,6 +2136,7 @@ function unfoldAllFolders() {
     
     folderContents.forEach(content => {
         content.style.display = 'block';
+        localStorage.setItem('folder_' + content.id, 'open');
     });
     
     folderIcons.forEach(icon => {
@@ -2917,6 +3015,133 @@ function getFolderSearchState(folderName) {
 function setFolderSearchState(folderName, state) {
     const key = `folder_search_${folderName}`;
     localStorage.setItem(key, state);
+}
+
+/**
+ * Clean localStorage from non-existent folders
+ * Removes folder state and search filter data for folders that no longer exist
+ */
+function cleanupNonExistentFoldersFromLocalStorage() {
+    // Get current existing folders from the server
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ action: 'get_folders' })
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success && data.folders) {
+            const existingFolders = data.folders;
+            const keysToRemove = [];
+            
+            // Check localStorage for folder-related keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key) continue;
+                
+                // Check folder search filter keys (folder_search_FOLDER_NAME)
+                if (key.startsWith('folder_search_')) {
+                    const folderName = key.substring('folder_search_'.length);
+                    if (!existingFolders.includes(folderName)) {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                // For folder state keys (folder_folder-HASH), we need to be more conservative
+                // Only remove if we're sure the folder doesn't exist
+                else if (key.startsWith('folder_folder-')) {
+                    const folderHash = key.substring('folder_'.length); // Get folder-HASH part
+                    // Check if there's a corresponding DOM element
+                    const folderElement = document.getElementById(folderHash);
+                    if (!folderElement) {
+                        // Double check: wait a bit more and check again to be sure
+                        setTimeout(() => {
+                            const folderElementRecheck = document.getElementById(folderHash);
+                            if (!folderElementRecheck) {
+                                console.log('Removing orphaned folder state key:', key);
+                                localStorage.removeItem(key);
+                            }
+                        }, 500);
+                    }
+                }
+            }
+            
+            // Also clean up recent folders list
+            const recentFolders = getRecentFolders();
+            const cleanRecentFolders = recentFolders.filter(folder => existingFolders.includes(folder));
+            if (cleanRecentFolders.length !== recentFolders.length) {
+                localStorage.setItem('poznote_recent_folders', JSON.stringify(cleanRecentFolders));
+                console.log('Cleaned up recent folders list');
+            }
+            
+            // Remove obsolete keys
+            keysToRemove.forEach(key => {
+                console.log('Removing obsolete localStorage key:', key);
+                localStorage.removeItem(key);
+            });
+            
+            if (keysToRemove.length > 0) {
+                console.log(`Cleaned up ${keysToRemove.length} obsolete folder entries from localStorage`);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error cleaning up localStorage:', error);
+    });
+}
+
+/**
+ * Conservative cleanup that only removes search filters and recent folders
+ * Leaves folder states alone to avoid issues
+ */
+function cleanupSearchFiltersOnly() {
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ action: 'get_folders' })
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success && data.folders) {
+            const existingFolders = data.folders;
+            const keysToRemove = [];
+            
+            // Only clean search filter keys, not folder states
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (!key) continue;
+                
+                // Check folder search filter keys (folder_search_FOLDER_NAME)
+                if (key.startsWith('folder_search_')) {
+                    const folderName = key.substring('folder_search_'.length);
+                    if (!existingFolders.includes(folderName)) {
+                        keysToRemove.push(key);
+                    }
+                }
+            }
+            
+            // Clean up recent folders list
+            const recentFolders = getRecentFolders();
+            const cleanRecentFolders = recentFolders.filter(folder => existingFolders.includes(folder));
+            if (cleanRecentFolders.length !== recentFolders.length) {
+                localStorage.setItem('poznote_recent_folders', JSON.stringify(cleanRecentFolders));
+                console.log('Cleaned up recent folders list');
+            }
+            
+            // Remove obsolete search filter keys
+            keysToRemove.forEach(key => {
+                console.log('Removing obsolete search filter key:', key);
+                localStorage.removeItem(key);
+            });
+            
+            if (keysToRemove.length > 0) {
+                console.log(`Cleaned up ${keysToRemove.length} obsolete search filter entries from localStorage`);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error cleaning up search filters:', error);
+    });
 }
 
 /**

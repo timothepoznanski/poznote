@@ -101,26 +101,32 @@ $title = $note['heading'] ?: 'Untitled';
         .button-container {
             text-align: center;
             margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .btn {
-            background: #007DB8;
-            color: white;
+            padding: 12px 25px;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            margin: 0 10px;
-            text-decoration: none;
+            font-size: 14px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
             font-weight: 500;
         }
         
-        .btn:hover {
-            background: #005a8b;
+        .btn-primary {
+            background: #007DB8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #005a8a;
         }
         
         .btn:disabled {
@@ -130,10 +136,13 @@ $title = $note['heading'] ?: 'Untitled';
         
         .btn-secondary {
             background: #6c757d;
+            color: white;
         }
         
         .btn-secondary:hover {
-            background: #545b62;
+            background: #5a6268;
+            color: white;
+            text-decoration: none;
         }
         
         .btn-warning {
@@ -147,10 +156,15 @@ $title = $note['heading'] ?: 'Untitled';
         
         .btn-success {
             background: #28a745;
+            color: white;
         }
         
         .btn-success:hover {
             background: #218838;
+        }
+        
+        .copy-feedback {
+            background: #28a745 !important;
         }
         
         .error-message {
@@ -167,13 +181,13 @@ $title = $note['heading'] ?: 'Untitled';
             display: block;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             body {
-                padding: 10px;
+                padding: 15px;
             }
             
-            .correct-header h1 {
-                font-size: 24px;
+            .note-title h2 {
+                font-size: 18px;
             }
             
             .correct-content {
@@ -181,9 +195,16 @@ $title = $note['heading'] ?: 'Untitled';
                 font-size: 14px;
             }
             
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
             .btn {
-                margin: 5px;
-                padding: 10px 20px;
+                width: 200px;
+                justify-content: center;
+            }
+        }
                 font-size: 14px;
             }
         }
@@ -202,16 +223,16 @@ $title = $note['heading'] ?: 'Untitled';
         </div>
 
         <div class="button-container">
-            <button onclick="generateCorrection()" class="btn" id="generateBtn" <?php echo $auto_generate ? 'disabled' : ''; ?>>
-                <i class="fas fa-spell-check"></i> Regenerate
+            <button onclick="generateCorrection()" class="btn btn-primary" id="generateBtn" <?php echo $auto_generate ? 'disabled' : ''; ?>>
+                <i class="fas fa-redo"></i> Regenerate
             </button>
-            <button onclick="copyToClipboard()" class="btn btn-secondary" id="copyBtn" style="display: none;">
+            <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
                 <i class="fas fa-copy"></i> Copy
             </button>
             <button onclick="applyToNote()" class="btn btn-warning" id="applyBtn" style="display: none;">
                 <i class="fas fa-check"></i> Apply to note
             </button>
-            <a href="index.php" class="btn btn-success">
+            <a href="index.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
         </div>
@@ -286,24 +307,65 @@ $title = $note['heading'] ?: 'Untitled';
         function copyToClipboard() {
             if (!correctedContentText) return;
             
-            const textArea = document.createElement('textarea');
-            textArea.value = correctedContentText;
-            document.body.appendChild(textArea);
-            textArea.select();
+            const copyBtn = document.getElementById('copyBtn');
             
             try {
-                document.execCommand('copy');
-                
-                const copyBtn = document.getElementById('copyBtn');
-                const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = 'Copied!';
-                
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalText;
-                }, 2000);
+                navigator.clipboard.writeText(correctedContentText).then(() => {
+                    // Visual feedback
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyBtn.classList.add('copy-feedback');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('copy-feedback');
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = correctedContentText;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        
+                        const originalHTML = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        copyBtn.classList.add('copy-feedback');
+                        
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                            copyBtn.classList.remove('copy-feedback');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy: ', err);
+                    }
+                    
+                    document.body.removeChild(textArea);
+                });
             } catch (err) {
-                console.error('Failed to copy: ', err);
-            } finally {
+                // Fallback for very old browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = correctedContentText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyBtn.classList.add('copy-feedback');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.remove('copy-feedback');
+                    }, 2000);
+                } catch (fallbackErr) {
+                    console.error('Failed to copy: ', fallbackErr);
+                }
+                
                 document.body.removeChild(textArea);
             }
         }
