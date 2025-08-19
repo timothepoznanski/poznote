@@ -84,75 +84,89 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 8000) {
-        $content = substr($content, 0, 8000) . '...';
+    if (strlen($content) > 12000) {
+        $content = substr($content, 0, 12000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
     
     // Prepare OpenAI request
     $openai_data = [
-        'model' => 'gpt-3.5-turbo',
+        'model' => 'gpt-4o-mini',
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an expert fact-checker and content reviewer. Your role is to analyze the coherence, logic, and accuracy of content.
+                'content' => 'Tu es un vérificateur de faits EXPERT et IMPITOYABLE. Tu dois détecter TOUTES les erreurs factuelles, contradictions et incohérences.
 
-WHAT TO CHECK:
-- Factual accuracy and verifiable information
-- Logical consistency and coherence
-- Contradictory statements
-- Outdated or questionable information
-- Missing context or incomplete arguments
-- Biased or misleading claims
+MISSION: Analyser la véracité et la cohérence du contenu.
 
-WHAT NOT TO CHECK:
-- Do NOT check spelling or grammar
-- Do NOT check punctuation or syntax
-- Do NOT check language form or style
+À DÉTECTER ABSOLUMENT:
+• ERREURS FACTUELLES (ex: "dauphins volants", "Paris capitale de l\'Italie")
+• CONTRADICTIONS internes dans le texte
+• AFFIRMATIONS IMPOSSIBLES ou absurdes
+• INFORMATIONS fausses ou obsolètes
+• INCOHÉRENCES logiques
+• DONNÉES incorrectes
 
-RESPONSE FORMAT:
-If you find issues with content accuracy or logic:
-- [Issue type]: [explanation of the problem]
-- [Issue type]: [explanation of the problem]
+IGNORE COMPLÈTEMENT:
+❌ Orthographe et grammaire 
+❌ Ponctuation et syntaxe
+❌ Style d\'écriture
 
-If content appears accurate and coherent:
-"Le contenu semble cohérent et factuellement correct."
+FORMAT OBLIGATOIRE:
+- Erreur factuelle: [description précise du problème]
+- Contradiction: [description de l\'incohérence]
+- Information douteuse: [explication]
 
-CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the text content and respond EXCLUSIVELY in that same language.
+EXEMPLES d\'erreurs À DÉTECTER:
+- Erreur factuelle: "Les dauphins sont des mammifères volants" (ils sont marins)
+- Erreur factuelle: "La Lune est plus grande que le Soleil"
+- Contradiction: "Il fait chaud" puis "la température est de -10°C"
 
-FOCUS: Content accuracy, logic, and coherence - NOT language form!'
+Si AUCUNE erreur factuelle: "Le contenu semble cohérent et factuellement correct."
+
+ATTENTION: Sois ULTRA-CRITIQUE sur les faits, même les erreurs subtiles!'
             ],
             [
                 'role' => 'user',
-                'content' => "Analyse ce contenu pour sa véracité et sa cohérence: \"$title\"\n\n$content\n\nTâche: Vérifier la logique, la cohérence et l'exactitude factuelle de ce contenu.
+                'content' => "VÉRIFICATION FACTUELLE IMPITOYABLE:
 
-À vérifier:
-- Exactitude des faits présentés
-- Cohérence logique des arguments
-- Contradictions internes
-- Informations potentiellement obsolètes
-- Affirmations douteuses ou non vérifiables
-- Biais ou informations trompeuses
+Titre: \"$title\"
+Contenu: \"$content\"
 
-NE PAS vérifier:
-- Orthographe ou grammaire
-- Ponctuation ou syntaxe
-- Style ou forme linguistique
+TÂCHE CRITIQUE: Trouve TOUTES les erreurs factuelles et contradictions.
 
-Format de réponse:
-Si tu trouves des problèmes:
-- [Type de problème]: [explication du problème]
-- [Type de problème]: [explication du problème]
+CHERCHE SPÉCIFIQUEMENT:
 
-Si le contenu semble correct:
-\"Le contenu semble cohérent et factuellement correct.\"
+1. ERREURS FACTUELLES ÉVIDENTES:
+   - \"dauphins volants\" (ils sont marins!)
+   - \"Paris capitale de l'Allemagne\" 
+   - \"eau bout à 200°C\"
 
-IMPORTANT: Concentre-toi sur le CONTENU et sa véracité, pas sur la forme linguistique!"
+2. CONTRADICTIONS INTERNES:
+   - \"Il fait chaud\" vs \"température -10°C\"
+   - Informations qui se contredisent
+
+3. AFFIRMATIONS IMPOSSIBLES:
+   - Claims scientifiquement fausses
+   - Données incorrectes
+   - Faits historiques erronés
+
+FORMAT DE RÉPONSE:
+- Erreur factuelle: [description précise]
+- Contradiction: [explication détaillée]
+- Information douteuse: [pourquoi c'est problématique]
+
+EXEMPLE pour \"dauphins volants\":
+- Erreur factuelle: \"mammifères volants\" - les dauphins sont des mammifères marins, pas volants
+
+Si AUCUNE erreur factuelle trouvée: \"Le contenu semble cohérent et factuellement correct.\"
+
+IMPORTANT: Ignore l'orthographe/grammaire, concentre-toi sur les FAITS!"
             ]
         ],
-        'max_tokens' => 800,
-        'temperature' => 0.1
+        'max_tokens' => 2000,
+        'temperature' => 0.2
     ];
     
     // Make request to OpenAI

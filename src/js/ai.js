@@ -303,6 +303,6 @@ function autoGenerateTags(noteId) {
         return;
     }
     
-    // Redirect to the dedicated Auto Tags page and start generation automatically
-    window.location.href = 'auto_tags.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
+    // Redirect to the dedicated Auto Tags page
+    window.location.href = 'auto_tags.php?note_id=' + encodeURIComponent(noteId);
 }

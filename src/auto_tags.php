@@ -217,6 +217,11 @@ try {
 </head>
 <body>
     <div class="auto-tags-page">
+        <div class="auto-tags-header">
+            <h1>Auto Generate Tags</h1>
+            <br>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">Automatically generate relevant tags based on your note's content using AI analysis.</p>
+        </div>
 
         <div class="auto-tags-content" id="autoTagsContent">
             <div id="loadingState" class="loading-state" style="display: none;">
@@ -261,14 +266,6 @@ try {
     <script>
         const noteId = <?php echo json_encode($note_id); ?>;
         let generatedTags = [];
-        
-        // Auto-generate tags if requested via URL parameter
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('generate') === '1') {
-                generateTags();
-            }
-        });
         
         async function generateTags() {
             const loadingState = document.getElementById('loadingState');

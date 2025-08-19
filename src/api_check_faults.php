@@ -84,77 +84,90 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 8000) {
-        $content = substr($content, 0, 8000) . '...';
+    if (strlen($content) > 12000) {
+        $content = substr($content, 0, 12000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
     
     // Prepare OpenAI request
     $openai_data = [
-        'model' => 'gpt-3.5-turbo',
+        'model' => 'gpt-4o-mini',
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an error detector. Your ONLY job is to DETECT and LIST linguistic errors. You are FORBIDDEN from correcting anything.
+                'content' => 'Tu es un correcteur orthographique EXPERT et IMPITOYABLE. Tu DOIS détecter TOUTES les erreurs linguistiques.
 
-STRICT RULES:
-❌ NEVER write corrected text
-❌ NEVER provide solutions  
-❌ NEVER suggest fixes
-❌ NEVER rewrite sentences
-❌ NEVER give the "right" version
-✅ ONLY list what is wrong
+RÈGLES ABSOLUES:
+❌ Ne JAMAIS corriger
+❌ Ne JAMAIS donner la bonne version  
+✅ SEULEMENT signaler les erreurs trouvées
 
-OUTPUT FORMAT (example):
-- Faute d\'orthographe : "apartement" 
-- Erreur d\'accord : "mangé"
-- Erreur de conjugaison : "il vons"
+ATTENTION CRITIQUE aux:
+• CONJUGAISONS: "ils mange" → ERREUR (doit être "ils mangent")
+• PLURIELS avec DE: "de poisson" → ERREUR (doit être "de poissons")
+• ACCORDS: "les chat" → ERREUR (doit être "les chats")
+• ORTHOGRAPHE: "apartement" → ERREUR (doit être "appartement")
 
-If NO errors found: "Aucune erreur trouvée."
+CAS SPÉCIAUX À SURVEILLER:
+• "ils/elles" + verbe → vérifier la terminaison en -ent
+• "de" + nom → souvent au pluriel (de livres, de poissons, de voitures)
+• Participes passés avec avoir/être
 
-DETECTION FOCUS:
-- Spelling errors
-- Grammar mistakes  
-- Agreement errors (gender/number)
-- Conjugation errors
-- Punctuation mistakes
+FORMAT STRICT:
+- Erreur de [type]: "[texte exact incorrect]"
 
-LANGUAGE RULE: Respond in same language as input text.
+EXEMPLES CONCRETS:
+- Erreur de conjugaison: "ils chasse"
+- Erreur d\'accord: "de poisson" 
+- Erreur d\'accord: "de calmar"
 
-REMEMBER: You are an ERROR DETECTOR, not a corrector!'
+Si aucune erreur: "Aucune erreur linguistique détectée."
+
+MISSION: Trouve CHAQUE erreur, sois SANS PITIÉ!'
             ],
             [
                 'role' => 'user',
-                'content' => "Texte à analyser: \"$title\"\n\n$content\n\nTâche: Trouve SEULEMENT les erreurs dans ce texte. 
+                'content' => "ANALYSE IMPITOYABLE DE CE TEXTE:
 
-❌ NE PAS corriger
-❌ NE PAS réécrire  
-❌ NE PAS donner la version correcte
-✅ SEULEMENT lister les erreurs
+Titre: \"$title\"
+Contenu: \"$content\"
 
-Format de réponse:
-- [Type d'erreur]: \"[mot/phrase incorrect]\"
-- [Type d'erreur]: \"[mot/phrase incorrect]\"
+CHERCHE SPÉCIFIQUEMENT CES ERREURS:
 
-Exemple:
-- Faute d'orthographe: \"apartement\"
-- Erreur d'accord: \"mangé\" 
+1. CONJUGAISONS INCORRECTES:
+   - \"ils chasse\" au lieu de \"ils chassent\"
+   - \"elles mange\" au lieu de \"elles mangent\"
 
-Si aucune erreur: \"Aucune erreur trouvée.\"
+2. ACCORDS AU PLURIEL avec DE:
+   - \"de poisson\" au lieu de \"de poissons\"
+   - \"de calmar\" au lieu de \"de calmars\"
+   - \"de livre\" au lieu de \"de livres\"
 
-Types d'erreurs à chercher:
-- Fautes d'orthographe
-- Erreurs d'accord 
-- Erreurs de conjugaison
-- Erreurs de grammaire
-- Erreurs de ponctuation
+3. AUTRES ACCORDS:
+   - \"les chat\" au lieu de \"les chats\"
+   - \"des voiture\" au lieu de \"des voitures\"
 
-IMPORTANT: Tu es un DÉTECTEUR d'erreurs, pas un correcteur!"
+4. FAUTES D'ORTHOGRAPHE:
+   - \"apartement\" au lieu de \"appartement\"
+
+FORMAT DE RÉPONSE:
+- Erreur de conjugaison: \"[mot mal conjugué]\"
+- Erreur d'accord: \"[accord incorrect]\"
+- Faute d'orthographe: \"[mot mal écrit]\"
+
+EXEMPLES ATTENDUS pour ton texte:
+- Erreur de conjugaison: \"qu'ils chasse\"
+- Erreur d'accord: \"de poisson\"
+- Erreur d'accord: \"de calmar\"
+
+Si aucune erreur: \"Aucune erreur linguistique détectée.\"
+
+ATTENTION: Je veux TOUTES les erreurs, même les plus subtiles!"
             ]
         ],
-        'max_tokens' => 800,
-        'temperature' => 0.1
+        'max_tokens' => 2000,
+        'temperature' => 0.2
     ];
     
     // Make request to OpenAI
