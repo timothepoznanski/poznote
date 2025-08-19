@@ -191,10 +191,6 @@ $title = $note['heading'] ?: 'Untitled';
 </head>
 <body>
     <div class="correct-page">
-        <div class="note-title">
-            <h2><?php echo htmlspecialchars($title); ?></h2>
-        </div>
-
         <div class="correct-content" id="correctedContent">
             <?php if ($auto_generate): ?>
                 <div class="loading-state">

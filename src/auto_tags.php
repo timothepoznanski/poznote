@@ -253,7 +253,7 @@ try {
             </button>
             
             <a href="index.php" class="btn btn-secondary">
-                <i class="fas fa-times"></i> Close
+                <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
         </div>
     </div>
