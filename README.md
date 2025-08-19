@@ -149,7 +149,6 @@ Poznote includes powerful AI capabilities powered by OpenAI to enhance your note
 When AI features are enabled:
 - Note content is sent to OpenAI's servers for processing
 - Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
-- No data is permanently stored by OpenAI when using the API
 - You can disable AI features at any time in settings
 
 ## Change Settings
