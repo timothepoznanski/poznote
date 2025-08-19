@@ -218,10 +218,7 @@ try {
 </head>
 <body>
     <div class="auto-tags-page">
-        <div class="auto-tags-header">
-            <h1><i class="fas fa-tags"></i> Auto Generate Tags</h1>
-        </div>
-        
+
         <div class="auto-tags-content" id="autoTagsContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-tags"></i>

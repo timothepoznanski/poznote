@@ -202,10 +202,6 @@ try {
 </head>
 <body>
     <div class="better-note-page">
-        <div class="better-note-header">
-            <h1><i class="fas fa-magic"></i> Better Note</h1>
-        </div>
-        
         <div class="better-note-content" id="betterNoteContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-magic"></i>

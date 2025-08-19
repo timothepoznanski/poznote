@@ -18,6 +18,19 @@ async function generateAISummary(noteId) {
 }
 
 /**
+ * Corrects faults in a note using AI
+ */
+async function correctFaults(noteId) {
+    if (!noteId) {
+        console.error('Note ID is required');
+        return;
+    }
+    
+    // Redirect to the dedicated correct faults page and start correction automatically
+    window.location.href = 'correct_faults.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
+}
+
+/**
  * Shows the AI summary modal
  */
 function showAISummaryModal() {

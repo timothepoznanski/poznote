@@ -46,114 +46,19 @@ function toggleNoteMenu(noteId) {
 
 // Function to show note information with complete details
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
+    if (!noteId) {
+        console.error('No noteId provided');
+        alert('Error: No note ID provided');
+        return;
+    }
+    
     try {
-        // Clean and format the dates
-        let createdText = "Not available";
-        let updatedText = "Not available";
-        
-        // Try to parse and format created date
-        if (created) {
-            try {
-                const createdDate = new Date(created);
-                if (!isNaN(createdDate.getTime())) {
-                    createdText = createdDate.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
-            } catch (e) {
-                createdText = created; // Use raw value as fallback
-            }
-        }
-        
-        // Try to parse and format updated date
-        if (updated) {
-            try {
-                const updatedDate = new Date(updated);
-                if (!isNaN(updatedDate.getTime())) {
-                    updatedText = updatedDate.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                }
-            } catch (e) {
-                updatedText = updated; // Use raw value as fallback
-            }
-        }
-        
-        // Process additional data
-        let folderText = folder || "Uncategorized";
-        let isFavorite = parseInt(favorite) === 1;
-        let tagsText = tags && tags.trim() !== '' ? tags : "No tags";
-        let attachmentsCountText = parseInt(attachmentsCount) || 0;
-        
-        // Generate filename (noteId + .html)
-        let filename = noteId + ".html";
-        
-        // Show the information in a styled modal
-        showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCountText, filename);
-        
+        // Redirect to the note info page
+        const url = 'note_info.php?note_id=' + encodeURIComponent(noteId);
+        window.location.href = url;
     } catch (error) {
-        console.error("Error in showNoteInfo:", error);
-        alert("Error displaying note information: " + error.message);
-    }
-}
-
-// Function to show note information in a styled modal with complete details
-function showNoteModal(noteId, createdText, updatedText, folderText, isFavorite, tagsText, attachmentsCount, filename) {
-    // Remove existing modal if any
-    const existingModal = document.getElementById('noteInfoModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // Create simple text list
-    const favoriteText = isFavorite ? 'Yes' : 'No';
-    
-    // Create ultra simple modal
-    const modalHTML = `
-        <div id="noteInfoModal" class="modal" style="display: flex;">
-            <div style="background: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: auto; min-width: 280px; max-width: 450px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                <h3 style="margin-top: 0; margin-bottom: 15px; color: #007DB8; font-size: 18px; font-weight: 600;">Note #${noteId}</h3>
-                <div style="line-height: 1.8; margin: 15px 0;">
-                    <div style="margin: 8px 0;"><strong>Filename:</strong> ${filename}</div>
-                    <div style="margin: 8px 0;"><strong>Folder:</strong> ${folderText}</div>
-                    <div style="margin: 8px 0;"><strong>Favorite:</strong> ${favoriteText}</div>
-                    <div style="margin: 8px 0;"><strong>Attachments:</strong> ${attachmentsCount}</div>
-                    <div style="margin: 8px 0;"><strong>Tags:</strong> ${tagsText}</div>
-                    <div style="margin: 8px 0;"><strong>Created:</strong> ${createdText}</div>
-                    <div style="margin: 8px 0;"><strong>Modified:</strong> ${updatedText}</div>
-                </div>
-                <div style="text-align: center; margin-top: 10px;">
-                    <button onclick="closeNoteInfoModal()" style="background: #007DB8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">Close</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Add modal to DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Add click outside to close
-    const modal = document.getElementById('noteInfoModal');
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeNoteInfoModal();
-        }
-    });
-}
-
-// Function to close the note info modal
-function closeNoteInfoModal() {
-    const modal = document.getElementById('noteInfoModal');
-    if (modal) {
-        modal.remove();
+        console.error('Error in showNoteInfo:', error);
+        alert('Error displaying note information: ' + error.message);
     }
 }
 
@@ -2913,7 +2818,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const updateModal = document.getElementById('updateModal');
         const updateCheckModal = document.getElementById('updateCheckModal');
         const confirmModal = document.getElementById('confirmModal');
-        const noteInfoModal = document.getElementById('noteInfoModal');
         
         if (event.target === updateModal) {
             closeUpdateModal();
@@ -2925,10 +2829,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (event.target === confirmModal) {
             closeConfirmModal();
-        }
-        
-        if (event.target === noteInfoModal) {
-            closeNoteInfoModal();
         }
     });
     

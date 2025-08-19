@@ -225,33 +225,6 @@ $folder_filter = $_GET['folder'] ?? '';
         </div>
     </div>
     
-    <!-- Note Info Modal -->
-    <div id="noteInfoModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeNoteInfoModal()">&times;</span>
-            <h3><i class="fas fa-info-circle"></i> Note Information</h3>
-            <div id="noteInfoContent">
-                <div class="info-row">
-                    <strong><i class="fas fa-hashtag"></i> Note ID:</strong> 
-                    <span id="noteInfoId" class="info-value"></span>
-                </div>
-                <div class="info-row">
-                    <strong><i class="fas fa-calendar-plus"></i> Creation date:</strong> 
-                    <span id="noteInfoCreated" class="info-value"></span>
-                </div>
-                <div class="info-row">
-                    <strong><i class="fas fa-calendar-check"></i> Last modified:</strong> 
-                    <span id="noteInfoUpdated" class="info-value"></span>
-                </div>
-            </div>
-            <div class="modal-buttons">
-                <button type="button" class="btn-primary" onclick="closeNoteInfoModal()">
-                    <i class="fas fa-times"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Modal for creating new folder -->
     <div id="newFolderModal" class="modal">
         <div class="modal-content">
@@ -965,6 +938,10 @@ $folder_filter = $_GET['folder'] ?? '';
                         echo '<i class="fas fa-magic"></i>';
                         echo '<span>Better note</span>';
                         echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="correctFaults(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-spell-check"></i>';
+                        echo '<span>Correct faults</span>';
+                        echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-tags"></i>';
                         echo '<span>AI tags</span>';
@@ -1085,6 +1062,10 @@ $folder_filter = $_GET['folder'] ?? '';
                         echo '<div class="ai-menu-item" onclick="betterNote(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-magic"></i>';
                         echo '<span>Better note</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="correctFaults(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-spell-check"></i>';
+                        echo '<span>Correct faults</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-tags"></i>';

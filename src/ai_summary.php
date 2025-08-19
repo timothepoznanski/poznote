@@ -192,11 +192,7 @@ $is_generating = false;
     </style>
 </head>
 <body>
-    <div class="summary-page">
-        <div class="summary-header">
-            <h1><i class="fas fa-robot"></i> AI Summary</h1>
-        </div>
-        
+    <div class="summary-page">        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-robot"></i>
