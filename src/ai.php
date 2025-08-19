@@ -134,7 +134,7 @@ $ai_enabled = ($ai_enabled === null) ? true : ($ai_enabled === '1'); // Default 
             <form method="POST">
                 <!-- Enable/Disable AI Features -->
                 <div class="form-group" style="text-align: left;">
-                    <label style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px; justify-content: flex-start; width: fit-content;">
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; justify-content: flex-start; width: fit-content;">
                         <input type="checkbox" 
                                name="ai_enabled" 
                                <?php echo $ai_enabled ? 'checked' : ''; ?>
