@@ -217,13 +217,13 @@ http://YOUR_SERVER:HTTP_WEB_PORT/
 
 #### List Notes
 ```bash
-curl -u username:password http://localhost:8040/api_list_notes.php
+curl -u 'username:password' http://localhost:8040/api_list_notes.php
 ```
 
 #### Create Note
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
@@ -240,7 +240,7 @@ curl -X POST http://localhost:8040/api_create_note.php \
 #### Create Folder
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
@@ -250,7 +250,7 @@ curl -X POST http://localhost:8040/api_create_folder.php \
 #### Move Note
 ```bash
 curl -X POST http://localhost:8040/api_move_note.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "note_id": "123",
@@ -265,13 +265,13 @@ curl -X POST http://localhost:8040/api_move_note.php \
 ```bash
 # Soft delete (to trash)
 curl -X DELETE http://localhost:8040/api_delete_note.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"note_id": "123"}'
 
 # Permanent delete
 curl -X DELETE http://localhost:8040/api_delete_note.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "note_id": "123",
@@ -282,7 +282,7 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 #### Delete Folder
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
-  -u username:password \
+  -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects"}'
 ```
