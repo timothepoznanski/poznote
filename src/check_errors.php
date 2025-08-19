@@ -196,7 +196,6 @@ $is_generating = false;
         <div class="summary-header">
             <h1>Content Verification</h1>
             <br>
-            <p style="color: #666; margin: 0 0 15px 0; font-size: 14px; line-height: 1.4;">This tool verifies the accuracy, logical consistency, and coherence of your note content. It checks for factual errors, contradictions, and outdated information without focusing on language form.</p>
             <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
         </div>        
         <div class="summary-content" id="summaryContent">

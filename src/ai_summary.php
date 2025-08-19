@@ -196,7 +196,6 @@ $is_generating = false;
         <div class="summary-header">
             <h1>AI Summary</h1>
             <br>
-            <p style="color: #666; margin: 0 0 15px 0; font-size: 14px; line-height: 1.4;">This tool generates a concise and informative summary of your note, capturing the key points and important information to help you quickly understand the main content.</p>
             <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
         </div>        
         <div class="summary-content" id="summaryContent">
