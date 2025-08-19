@@ -46,6 +46,9 @@ $updatedText = formatDate($note['updated']);
 $folderText = $note['folder'] ?: 'Uncategorized';
 $isFavorite = (int)$note['favorite'] === 1;
 
+// Build full path of the note
+$fullPath = "./data/entries/{$note_id}.html";
+
 // Process tags
 $tags = [];
 if (!empty($note['tags'])) {
@@ -193,6 +196,11 @@ if (!empty($note['attachments'])) {
             <div class="info-row">
                 <div class="info-label">Folder:</div>
                 <div class="info-value"><?php echo htmlspecialchars($folderText); ?></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Full Path:</div>
+                <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
             </div>
 
             <div class="info-row">
