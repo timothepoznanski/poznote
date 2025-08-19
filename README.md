@@ -13,6 +13,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🔍 Powerful Search
 - 🏷️ Tag system
 - 📎 File Attachments
+- 🤖 AI-powered features
 - 📱 Responsive design for all devices
 - 🖥️ Multi-instance support
 - 🔒 Self-hosted with secure authentication
@@ -31,6 +32,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Multiple Instances](#multiple-instances)
+- [AI Features](#ai-features)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
@@ -104,6 +106,51 @@ git clone https://github.com/timothepoznanski/poznote.git poznote-work
 cd poznote-work
 ./setup.sh  # Configure with port 8041
 ```
+
+## AI Features
+
+Poznote includes powerful AI capabilities powered by OpenAI to enhance your note-taking experience. These features are optional and require an OpenAI API key to function.
+
+### Available AI Features
+
+- **🤖 AI Summarization** - Generate intelligent summaries of your notes to quickly understand key points
+- **🏷️ Auto Tag Generation** - Automatically generate relevant tags based on your note content
+- **✨ Note Improvement** - Get AI suggestions to improve the structure, clarity, and quality of your notes
+- **🔧 Grammar & Style Correction** - Automatically detect and correct grammar, spelling, and style issues
+
+### Setup AI Features
+
+1. **Get an OpenAI API Key**
+   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Create an account or sign in
+   - Generate a new API key
+
+2. **Configure Poznote**
+   - Go to **Settings → AI Settings** in your Poznote interface
+   - Enable AI features by checking the box
+   - Enter your OpenAI API key
+   - Save the configuration
+
+3. **Start Using AI Features**
+   - Open any note and look for AI buttons in the toolbar
+   - Use **AI Summary** to generate note summaries
+   - Use **Auto Tags** to suggest relevant tags
+   - Use **Better Note** to improve note quality
+   - Use **Correct Faults** to fix grammar and style issues
+
+### Requirements
+
+- ✅ Active internet connection
+- ✅ Valid OpenAI API key
+- ✅ Sufficient OpenAI credits in your account
+
+### Privacy & Data
+
+When AI features are enabled:
+- Note content is sent to OpenAI's servers for processing
+- Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
+- No data is permanently stored by OpenAI when using the API
+- You can disable AI features at any time in settings
 
 ## Change Settings
 
