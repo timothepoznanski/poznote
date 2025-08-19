@@ -84,27 +84,56 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 8000) {
-        $content = substr($content, 0, 8000) . '...';
+    if (strlen($content) > 6000) {
+        $content = substr($content, 0, 6000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
     
+    // Simple language detection based on common words
+    $language = 'English'; // Default
+    $french_indicators = ['le ', 'la ', 'les ', 'de ', 'du ', 'des ', 'et ', 'à ', 'pour ', 'dans ', 'avec ', 'sur ', 'par ', 'une ', 'un ', 'ce ', 'cette ', 'ces ', 'que ', 'qui ', 'est ', 'sont ', 'avoir ', 'être'];
+    $content_lower = strtolower($content);
+    $french_count = 0;
+    foreach ($french_indicators as $indicator) {
+        if (strpos($content_lower, $indicator) !== false) {
+            $french_count++;
+        }
+    }
+    if ($french_count >= 3) {
+        $language = 'French';
+    }
+
     // Prepare OpenAI request
     $openai_data = [
         'model' => 'gpt-3.5-turbo',
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an assistant that helps summarize notes. Create a concise and informative summary of the provided note. The summary should capture the key points and important information. IMPORTANT: Always respond in the same language as the original note content. If the note is in French, respond in French. If the note is in English, respond in English. If the note is in Spanish, respond in Spanish, etc.'
+                'content' => 'You are an assistant that helps improve notes by enhancing their structure, clarity, and content. Your task is to take a note and make it better by:
+1. Improving grammar and spelling IN THE SAME LANGUAGE
+2. Enhancing clarity and readability IN THE SAME LANGUAGE
+3. Better organization and structure IN THE SAME LANGUAGE
+4. Adding relevant details where appropriate IN THE SAME LANGUAGE
+5. Improving formatting and flow IN THE SAME LANGUAGE
+
+CRITICAL RULES:
+- NEVER translate the content to another language
+- If the note is in French, your response must be 100% in French
+- If the note is in English, your response must be 100% in English
+- If the note is in Spanish, your response must be 100% in Spanish
+- PRESERVE the original language at all costs
+- Only improve the content quality while keeping the exact same language
+
+IMPORTANT: You must detect and maintain the original language. Do not translate or change the language under any circumstances.'
             ],
             [
                 'role' => 'user',
-                'content' => "Here is a note titled \"$title\":\n\n$content\n\nCan you create a concise summary of this note? Please respond in the same language as the note content."
+                'content' => "Here is a note titled \"$title\" that needs improvement (detected language: $language):\n\n$content\n\nIMPORTANT: Improve this note while keeping it in the EXACT SAME LANGUAGE as the original. Do not translate it. The original appears to be in $language, so respond in $language. Enhance structure, clarity, grammar, and overall quality while preserving the original language completely."
             ]
         ],
-        'max_tokens' => 300,
-        'temperature' => 0.5
+        'max_tokens' => 1000,
+        'temperature' => 0.3
     ];
     
     // Make request to OpenAI
@@ -117,7 +146,7 @@ try {
         'Content-Type: application/json',
         'Authorization: Bearer ' . $api_key
     ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 45);
     
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -153,12 +182,12 @@ try {
         exit;
     }
     
-    $summary = trim($openai_response['choices'][0]['message']['content']);
+    $improved_content = trim($openai_response['choices'][0]['message']['content']);
     
-    // Return the summary
+    // Return the improved content
     echo json_encode([
         'success' => true,
-        'summary' => $summary,
+        'improved_content' => $improved_content,
         'note_title' => $title
     ]);
     

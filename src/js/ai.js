@@ -13,39 +13,8 @@ async function generateAISummary(noteId) {
         return;
     }
     
-    currentSummaryNoteId = noteId;
-    
-    // Show the modal
-    showAISummaryModal();
-    
-    try {
-        // Show loading state
-        showLoadingState();
-        
-        const response = await fetch('api_ai_summary.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                note_id: noteId
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            // Show the summary
-            showSummaryResult(data.summary, data.note_title);
-        } else {
-            // Show the error
-            showErrorState(data.error || 'An error occurred while generating the summary');
-        }
-        
-    } catch (error) {
-        console.error('Error generating AI summary:', error);
-        showErrorState('Connection error. Please try again.');
-    }
+    // Redirect to the dedicated AI summary page and start generation automatically
+    window.location.href = 'ai_summary.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
 }
 
 /**
@@ -135,7 +104,7 @@ function showErrorState(errorMessage) {
     
     if (errorDiv) errorDiv.style.display = 'block';
     if (regenerateBtn) regenerateBtn.style.display = 'inline-flex';
-    if (copyBtn) copyBtn.style.display = 'none';
+    if (copyBtn) copyBtn.style.display = 'inline-flex';
 }
 
 /**
@@ -162,8 +131,9 @@ function resetModalState() {
     if (loadingDiv) loadingDiv.style.display = 'block';
     if (contentDiv) contentDiv.style.display = 'none';
     if (errorDiv) errorDiv.style.display = 'none';
-    if (regenerateBtn) regenerateBtn.style.display = 'none';
-    if (copyBtn) copyBtn.style.display = 'none';
+    // Keep buttons always visible
+    if (regenerateBtn) regenerateBtn.style.display = 'inline-flex';
+    if (copyBtn) copyBtn.style.display = 'inline-flex';
 }
 
 /**
@@ -299,10 +269,27 @@ function closeAIMenu() {
 }
 
 /**
- * Placeholder function for "Better note"
- * This function can be implemented later with another AI functionality
+ * Better Note - Improves the note content
  */
 function betterNote(noteId) {
-    console.log('Better note function called for note:', noteId);
-    alert('Better note functionality will be implemented soon!');
+    if (!noteId) {
+        console.error('Note ID is required');
+        return;
+    }
+    
+    // Redirect to the dedicated Better Note page and start generation automatically
+    window.location.href = 'better_note.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
+}
+
+/**
+ * Auto Generate Tags - Generates relevant tags for the note
+ */
+function autoGenerateTags(noteId) {
+    if (!noteId) {
+        console.error('Note ID is required');
+        return;
+    }
+    
+    // Redirect to the dedicated Auto Tags page and start generation automatically
+    window.location.href = 'auto_tags.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
 }

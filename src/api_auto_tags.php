@@ -84,8 +84,8 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 8000) {
-        $content = substr($content, 0, 8000) . '...';
+    if (strlen($content) > 4000) {
+        $content = substr($content, 0, 4000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
@@ -96,15 +96,25 @@ try {
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an assistant that helps summarize notes. Create a concise and informative summary of the provided note. The summary should capture the key points and important information. IMPORTANT: Always respond in the same language as the original note content. If the note is in French, respond in French. If the note is in English, respond in English. If the note is in Spanish, respond in Spanish, etc.'
+                'content' => 'You are an assistant that generates relevant tags for notes. Your task is to analyze the content and create a list of 3-8 relevant tags that best describe the main topics, themes, and subjects covered in the note. 
+
+Rules:
+- Generate between 3 to 8 tags maximum
+- Tags should be single words or short phrases (2-3 words max)
+- Tags should be in the same language as the note content
+- Focus on the main topics, concepts, and themes
+- Avoid generic tags like "note" or "text"
+- Make tags specific and meaningful
+- Use lowercase for consistency
+- Return only the tags as a comma-separated list, nothing else'
             ],
             [
                 'role' => 'user',
-                'content' => "Here is a note titled \"$title\":\n\n$content\n\nCan you create a concise summary of this note? Please respond in the same language as the note content."
+                'content' => "Here is a note titled \"$title\":\n\n$content\n\nGenerate relevant tags for this note. Return only the tags as a comma-separated list."
             ]
         ],
-        'max_tokens' => 300,
-        'temperature' => 0.5
+        'max_tokens' => 100,
+        'temperature' => 0.3
     ];
     
     // Make request to OpenAI
@@ -153,12 +163,21 @@ try {
         exit;
     }
     
-    $summary = trim($openai_response['choices'][0]['message']['content']);
+    $tags_text = trim($openai_response['choices'][0]['message']['content']);
     
-    // Return the summary
+    // Parse the tags from the comma-separated response
+    $tags = array_map('trim', explode(',', $tags_text));
+    $tags = array_filter($tags, function($tag) {
+        return !empty($tag) && strlen($tag) > 1;
+    });
+    
+    // Limit to maximum 8 tags
+    $tags = array_slice($tags, 0, 8);
+    
+    // Return the tags
     echo json_encode([
         'success' => true,
-        'summary' => $summary,
+        'tags' => array_values($tags),
         'note_title' => $title
     ]);
     

@@ -1,0 +1,61 @@
+<?php
+header('Content-Type: application/json');
+
+require 'auth.php';
+requireAuth();
+
+require_once 'config.php';
+include 'db_connect.php';
+
+// Check request method
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+    exit;
+}
+
+// Get JSON input
+$input = json_decode(file_get_contents('php://input'), true);
+
+if (!$input || !isset($input['note_id']) || !isset($input['tags'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Note ID and tags are required']);
+    exit;
+}
+
+$note_id = $input['note_id'];
+$tags = $input['tags'];
+
+try {
+    // Verify note exists
+    $stmt = $con->prepare("SELECT id FROM entries WHERE id = ?");
+    $stmt->execute([$note_id]);
+    $note = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$note) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Note not found']);
+        exit;
+    }
+    
+    // Convert tags array to comma-separated string
+    $tags_string = '';
+    if (is_array($tags) && count($tags) > 0) {
+        $tags_string = implode(', ', array_map('trim', $tags));
+    }
+    
+    // Update the tags in the database
+    $stmt = $con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
+    $stmt->execute([$tags_string, $note_id]);
+    
+    echo json_encode([
+        'success' => true,
+        'message' => 'Tags updated successfully',
+        'applied_tags' => $tags_string
+    ]);
+    
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
+}
+?>
