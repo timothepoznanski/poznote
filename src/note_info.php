@@ -58,9 +58,19 @@ $tagsText = empty($tags) ? 'No tags' : implode(', ', $tags);
 
 // Count attachments
 $attachmentsCount = 0;
-if (!empty($note['attachments'])) {
-    $attachmentsArray = explode(',', $note['attachments']);
-    $attachmentsCount = count(array_filter($attachmentsArray));
+if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
+    // Handle both comma-separated format and JSON format
+    if (substr($note['attachments'], 0, 1) === '[' && substr($note['attachments'], -1) === ']') {
+        // JSON format - decode and count
+        $attachmentsArray = json_decode($note['attachments'], true);
+        if (is_array($attachmentsArray)) {
+            $attachmentsCount = count(array_filter($attachmentsArray));
+        }
+    } else {
+        // Comma-separated format
+        $attachmentsArray = explode(',', $note['attachments']);
+        $attachmentsCount = count(array_filter(array_map('trim', $attachmentsArray)));
+    }
 }
 ?>
 <!DOCTYPE html>
