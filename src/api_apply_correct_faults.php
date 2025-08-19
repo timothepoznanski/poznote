@@ -1,5 +1,10 @@
 <?php
 header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
+
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output, but log them
 
 require 'auth.php';
 requireAuth();
@@ -60,7 +65,7 @@ try {
     }
     
     // Update the last modified timestamp
-    $stmt = $con->prepare("UPDATE entries SET last_modified = CURRENT_TIMESTAMP WHERE id = ?");
+    $stmt = $con->prepare("UPDATE entries SET updated = CURRENT_TIMESTAMP WHERE id = ?");
     $stmt->execute([$note_id]);
     
     echo json_encode([
@@ -69,10 +74,12 @@ try {
     ]);
     
 } catch (PDOException $e) {
+    error_log("Database error in api_apply_correct_faults.php: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Database error']);
+    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 } catch (Exception $e) {
+    error_log("General error in api_apply_correct_faults.php: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Server error']);
+    echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
 }
 ?>

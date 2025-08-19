@@ -206,13 +206,13 @@ $title = $note['heading'] ?: 'Untitled';
 
         <div class="button-container">
             <button onclick="generateCorrection()" class="btn" id="generateBtn" <?php echo $auto_generate ? 'disabled' : ''; ?>>
-                Correct Faults
+                Regenerate
             </button>
             <button onclick="copyToClipboard()" class="btn btn-secondary" id="copyBtn" style="display: none;">
                 Copy
             </button>
             <button onclick="applyToNote()" class="btn btn-warning" id="applyBtn" style="display: none;">
-                Apply
+                Apply to note
             </button>
             <a href="index.php" class="btn btn-success">
                 Back to Notes
@@ -317,6 +317,9 @@ $title = $note['heading'] ?: 'Untitled';
             if (!applyBtn || !correctedContentText) return;
             
             try {
+                applyBtn.disabled = true;
+                applyBtn.innerHTML = '<span>Applying...</span>';
+                
                 const response = await fetch('api_apply_correct_faults.php', {
                     method: 'POST',
                     headers: {
@@ -328,11 +331,19 @@ $title = $note['heading'] ?: 'Untitled';
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
                 
-                const data = await response.json();
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Invalid response format: ' + responseText);
+                }
                 
                 if (data.success) {
                     // Close the window immediately
@@ -343,7 +354,10 @@ $title = $note['heading'] ?: 'Untitled';
                 
             } catch (error) {
                 console.error('Error applying corrections:', error);
-                alert('Connection error. Please try again.');
+                alert('Connection error: ' + error.message);
+            } finally {
+                applyBtn.disabled = false;
+                applyBtn.innerHTML = 'Apply';
             }
         }
     </script>
