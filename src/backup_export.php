@@ -62,21 +62,20 @@ function createBackup() {
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <div class="backup-container">
         <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
         <p>Export your data for backup or migration purposes.</p>
         
-        <div class="navigation">
-            <a href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
-            </a>
-            <a href="restore_import.php" class="btn btn-secondary">
-                <i class="fas fa-download"></i> Go to Restore (Import)
-            </a>
-        </div>
+        <a href="index.php" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Notes
+        </a>
+        <a href="restore_import.php" class="btn btn-secondary">
+            <i class="fas fa-download"></i> Go to Restore (Import)
+        </a>
+
+        <br><br>
         
         <!-- Information Section -->
         <div class="warning">

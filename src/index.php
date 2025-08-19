@@ -407,7 +407,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                         <i class="fas fa-robot"></i>
-                        <span>AI settings</span>
+                        <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                         <i class="fas fa-upload"></i>
@@ -577,7 +577,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                     <i class="fas fa-robot"></i>
-                    <span>AI settings</span>
+                    <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                     <i class="fas fa-upload"></i>
@@ -949,10 +949,29 @@ $folder_filter = $_GET['folder'] ?? '';
              
                 // Note action buttons (desktop only)
                 if (!$is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="generateAISummary(\''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    // AI actions dropdown menu (only if AI is enabled)
+                    if (isAIEnabled()) {
+                        echo '<div class="ai-dropdown">';
+                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<div class="ai-menu" id="aiMenu">';
+                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<span>Summarize note</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="betterNote(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-magic"></i>';
+                        echo '<span>Better note</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
+                        echo '<i class="fas fa-cog"></i>';
+                        echo '<span>AI settings</span>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
                 }
                 
                 // Note action buttons (desktop only, replace dropdown menu)
@@ -1047,10 +1066,29 @@ $folder_filter = $_GET['folder'] ?? '';
                     }
                     
                     // Note action buttons 
-                    echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="generateAISummary(\''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    // AI actions dropdown menu for mobile (only if AI is enabled)
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    if (isAIEnabled()) {
+                        echo '<div class="ai-dropdown mobile">';
+                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<div class="ai-menu" id="aiMenuMobile">';
+                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<span>Summarize note</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="betterNote(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fas fa-magic"></i>';
+                        echo '<span>Better note</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
+                        echo '<i class="fas fa-cog"></i>';
+                        echo '<span>AI settings</span>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
                     
                     // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
@@ -1180,6 +1218,7 @@ $folder_filter = $_GET['folder'] ?? '';
         
     </div>  <!-- Close main-container -->
     
+    <?php if (isAIEnabled()): ?>
     <!-- AI Summary Modal -->
     <div id="aiSummaryModal" class="modal">
         <div class="modal-content ai-summary-simple">
@@ -1209,6 +1248,7 @@ $folder_filter = $_GET['folder'] ?? '';
             </div>
         </div>
     </div>
+    <?php endif; ?>
     
     <script>
     </script>
@@ -1217,6 +1257,8 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/welcome.js"></script>
+<?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
+<?php endif; ?>
 
 </html>

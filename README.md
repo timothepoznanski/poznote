@@ -41,7 +41,7 @@ A powerful note-taking application that puts you in complete control of your dat
 
 ## Installation
 
-PozNote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
+Poznote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
 
 - **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux/macOS)
 - **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser

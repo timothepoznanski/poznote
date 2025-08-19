@@ -1,11 +1,11 @@
 /**
- * Fonctionnalités IA pour PozNote
+ * AI features for Poznote
  */
 
 let currentSummaryNoteId = null;
 
 /**
- * Génère un résumé IA pour une note donnée
+ * Generates an AI summary for a given note
  */
 async function generateAISummary(noteId) {
     if (!noteId) {
@@ -15,11 +15,11 @@ async function generateAISummary(noteId) {
     
     currentSummaryNoteId = noteId;
     
-    // Afficher la modal
+    // Show the modal
     showAISummaryModal();
     
     try {
-        // Afficher l'état de chargement
+        // Show loading state
         showLoadingState();
         
         const response = await fetch('api_ai_summary.php', {
@@ -35,10 +35,10 @@ async function generateAISummary(noteId) {
         const data = await response.json();
         
         if (response.ok && data.success) {
-            // Afficher le résumé
+            // Show the summary
             showSummaryResult(data.summary, data.note_title);
         } else {
-            // Afficher l'erreur
+            // Show the error
             showErrorState(data.error || 'An error occurred while generating the summary');
         }
         
@@ -49,7 +49,7 @@ async function generateAISummary(noteId) {
 }
 
 /**
- * Affiche la modal de résumé IA
+ * Shows the AI summary modal
  */
 function showAISummaryModal() {
     const modal = document.getElementById('aiSummaryModal');
@@ -60,7 +60,7 @@ function showAISummaryModal() {
 }
 
 /**
- * Ferme la modal de résumé IA
+ * Closes the AI summary modal
  */
 function closeAISummaryModal() {
     const modal = document.getElementById('aiSummaryModal');
@@ -68,13 +68,13 @@ function closeAISummaryModal() {
         modal.style.display = 'none';
         document.body.classList.remove('modal-open');
         
-        // Réinitialiser l'état de la modal
+        // Reset modal state
         resetModalState();
     }
 }
 
 /**
- * Affiche l'état de chargement
+ * Shows the loading state
  */
 function showLoadingState() {
     const loadingDiv = document.getElementById('aiSummaryLoading');
@@ -91,7 +91,7 @@ function showLoadingState() {
 }
 
 /**
- * Affiche le résumé généré
+ * Shows the generated summary
  */
 function showSummaryResult(summary, noteTitle) {
     const loadingDiv = document.getElementById('aiSummaryLoading');
@@ -115,7 +115,7 @@ function showSummaryResult(summary, noteTitle) {
 }
 
 /**
- * Affiche l'état d'erreur
+ * Shows the error state
  */
 function showErrorState(errorMessage) {
     const loadingDiv = document.getElementById('aiSummaryLoading');
@@ -139,7 +139,7 @@ function showErrorState(errorMessage) {
 }
 
 /**
- * Régénère le résumé pour la note courante
+ * Regenerates the summary for the current note
  */
 function regenerateCurrentSummary() {
     if (currentSummaryNoteId) {
@@ -148,7 +148,7 @@ function regenerateCurrentSummary() {
 }
 
 /**
- * Réinitialise l'état de la modal
+ * Resets the modal state
  */
 function resetModalState() {
     currentSummaryNoteId = null;
@@ -167,7 +167,7 @@ function resetModalState() {
 }
 
 /**
- * Copie le résumé dans le presse-papier
+ * Copies the summary to clipboard
  */
 async function copyToClipboard() {
     const summaryText = document.getElementById('summaryText');
@@ -176,7 +176,7 @@ async function copyToClipboard() {
     try {
         await navigator.clipboard.writeText(summaryText.textContent);
         
-        // Feedback visuel temporaire
+        // Temporary visual feedback
         const copyBtn = document.getElementById('copyBtn');
         if (copyBtn) {
             const originalText = copyBtn.innerHTML;
@@ -191,7 +191,7 @@ async function copyToClipboard() {
     } catch (err) {
         console.error('Failed to copy text: ', err);
         
-        // Fallback pour les navigateurs plus anciens
+        // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = summaryText.textContent;
         document.body.appendChild(textArea);
@@ -216,7 +216,7 @@ async function copyToClipboard() {
     }
 }
 
-// Gérer la fermeture de la modal en cliquant en dehors
+// Handle modal closing by clicking outside
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('aiSummaryModal');
     if (modal) {
@@ -227,13 +227,82 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Gérer la fermeture avec la touche Échap
+    // Handle closing with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const modal = document.getElementById('aiSummaryModal');
             if (modal && modal.style.display === 'flex') {
                 closeAISummaryModal();
             }
+            
+            // Also close AI menu if open
+            closeAIMenu();
+        }
+    });
+    
+    // Close AI menu if clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.ai-dropdown')) {
+            closeAIMenu();
         }
     });
 });
+
+/**
+ * Global variables for the AI menu
+ */
+let currentAIMenuNoteId = null;
+let isAIMenuOpen = false;
+
+/**
+ * Shows/hides the AI menu
+ */
+function toggleAIMenu(event, noteId) {
+    event.stopPropagation();
+    
+    currentAIMenuNoteId = noteId;
+    
+    // Close all other open menus (settings for example)
+    const settingsMenu = document.getElementById('settingsMenu');
+    const settingsMenuMobile = document.getElementById('settingsMenuMobile');
+    if (settingsMenu) settingsMenu.style.display = 'none';
+    if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
+    
+    // Handle the AI menu
+    const aiMenu = document.getElementById('aiMenu');
+    const aiMenuMobile = document.getElementById('aiMenuMobile');
+    
+    if (isAIMenuOpen) {
+        closeAIMenu();
+    } else {
+        // Determine which menu to use based on platform
+        const activeMenu = aiMenu || aiMenuMobile;
+        if (activeMenu) {
+            activeMenu.style.display = 'block';
+            isAIMenuOpen = true;
+        }
+    }
+}
+
+/**
+ * Closes the AI menu
+ */
+function closeAIMenu() {
+    const aiMenu = document.getElementById('aiMenu');
+    const aiMenuMobile = document.getElementById('aiMenuMobile');
+    
+    if (aiMenu) aiMenu.style.display = 'none';
+    if (aiMenuMobile) aiMenuMobile.style.display = 'none';
+    
+    isAIMenuOpen = false;
+    currentAIMenuNoteId = null;
+}
+
+/**
+ * Placeholder function for "Better note"
+ * This function can be implemented later with another AI functionality
+ */
+function betterNote(noteId) {
+    console.log('Better note function called for note:', noteId);
+    alert('Better note functionality will be implemented soon!');
+}

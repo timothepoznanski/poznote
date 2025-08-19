@@ -18,34 +18,43 @@ $error = '';
 if ($_POST) {
     if (isset($_POST['openai_api_key'])) {
         $api_key = trim($_POST['openai_api_key']);
+        $ai_enabled = isset($_POST['ai_enabled']) ? '1' : '0';
         
         try {
             // Update or insert the API key
             $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
             $stmt->execute(['openai_api_key', $api_key]);
             
-            $message = 'API key saved successfully!';
+            // Update or insert the AI enabled setting
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+            $stmt->execute(['ai_enabled', $ai_enabled]);
+            
+            $message = 'AI settings saved successfully!';
         } catch (Exception $e) {
             $error = 'Error saving configuration: ' . $e->getMessage();
         }
     }
 }
 
-// Get current API key
+// Get current settings
 $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
 $stmt->execute(['openai_api_key']);
 $current_api_key = $stmt->fetchColumn() ?: '';
+
+$stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+$stmt->execute(['ai_enabled']);
+$ai_enabled = $stmt->fetchColumn();
+$ai_enabled = ($ai_enabled === null) ? true : ($ai_enabled === '1'); // Default to enabled
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Artificial Intelligence - PozNote</title>
+    <title>Artificial Intelligence - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .api-key-input {
             position: relative;
@@ -95,16 +104,16 @@ $current_api_key = $stmt->fetchColumn() ?: '';
     </style>
 </head>
 <body>
-    <div class="backup-container">
+    <div class="settings-container">
         <h1><i class="fas fa-robot"></i> Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
-        
-        <div class="navigation">
-            <a href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
-            </a>
-        </div>
-        
+    
+        <a href="index.php" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Notes
+        </a>
+
+        <br><br>
+
         <?php if ($message): ?>
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
@@ -118,11 +127,22 @@ $current_api_key = $stmt->fetchColumn() ?: '';
         <?php endif; ?>
         
         <!-- OpenAI Configuration Section -->
-        <div class="backup-section">
+        <div class="settings-section">
             <h3><i class="fas fa-key"></i> OpenAI Configuration</h3>
             <p>Configure your OpenAI API key to use artificial intelligence features like automatic note summarization.</p>
             
             <form method="POST">
+                <!-- Enable/Disable AI Features -->
+                <div class="form-group" style="text-align: left;">
+                    <label style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px; justify-content: flex-start; width: fit-content;">
+                        <input type="checkbox" 
+                               name="ai_enabled" 
+                               <?php echo $ai_enabled ? 'checked' : ''; ?>
+                               style="margin: 0; transform: scale(1.2);">
+                        <span style="font-weight: 500;">When unchecked, all AI features will be disabled.</span>
+                    </label>
+                </div>
+                
                 <div class="form-group">
                     <label for="openai_api_key">OpenAI API Key</label>
                     <div class="api-key-input">
@@ -136,7 +156,6 @@ $current_api_key = $stmt->fetchColumn() ?: '';
                         </button>
                     </div>
                     <div class="help-text">
-                        Your OpenAI API key to use GPT-3.5-turbo in AI features.
                         <br><a href="https://platform.openai.com/api-keys" target="_blank"><i class="fas fa-external-link-alt"></i> Get an API key from OpenAI</a>
                     </div>
                 </div>
@@ -149,12 +168,7 @@ $current_api_key = $stmt->fetchColumn() ?: '';
         
         <!-- AI Features Information -->
         <div class="warning">
-            <h4>Available AI features:</h4>
-            <ul>
-                <li><strong>Automatic summarization</strong> - Click the robot icon in the toolbar to generate an intelligent summary of your notes</li>
-                <li><strong>More features coming soon</strong> - Additional AI tools will be added in future updates</li>
-            </ul>
-            <p><small><i class="fas fa-info-circle"></i> An internet connection and OpenAI credits are required to use these features.</small></p>
+            <p><i class="fas fa-info-circle"></i> An internet connection and OpenAI credits are required to use these features.</p>
         </div>
         
         <!-- Bottom padding for better spacing -->

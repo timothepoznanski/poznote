@@ -252,7 +252,6 @@ function importAttachmentsZip($uploadedFile) {
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Simple confirmation modal */
         .import-confirm-modal {
@@ -389,14 +388,13 @@ function importAttachmentsZip($uploadedFile) {
         <h1><i class="fas fa-download"></i> Restore (Import)</h1>
         <p>Import data from backup files.</p>
         
-        <div class="navigation">
-            <a href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
-            </a>
-            <a href="backup_export.php" class="btn btn-secondary">
-                <i class="fas fa-upload"></i> Go to Backup (Export)
-            </a>
-        </div>
+        <a href="index.php" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Notes
+        </a>
+        <a href="backup_export.php" class="btn btn-secondary">
+            <i class="fas fa-upload"></i> Go to Backup (Export)
+        </a>
+        <br><br>
         
         <!-- Information Section -->
         <div class="warning">

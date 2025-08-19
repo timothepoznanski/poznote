@@ -83,4 +83,23 @@ function getEntriesRelativePath() {
 function getAttachmentsRelativePath() {
     return 'data/attachments/';
 }
+
+/**
+ * Check if AI features are enabled
+ */
+function isAIEnabled() {
+    global $con;
+    
+    try {
+        $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['ai_enabled']);
+        $ai_enabled = $stmt->fetchColumn();
+        
+        // Default to enabled (true) if setting doesn't exist
+        return ($ai_enabled === null) ? true : ($ai_enabled === '1');
+    } catch (Exception $e) {
+        // Default to enabled if there's an error
+        return true;
+    }
+}
 ?>

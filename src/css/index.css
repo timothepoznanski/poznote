@@ -1461,6 +1461,67 @@ img {
     display: block;
 }
 
+/* AI dropdown styles */
+.ai-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.ai-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 160px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.ai-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.ai-menu-item:last-child {
+    border-bottom: none;
+}
+
+.ai-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.ai-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+/* Mobile AI dropdown adjustments */
+.ai-dropdown.mobile .ai-menu {
+    min-width: 140px;
+    padding: 6px 0;
+}
+
+.ai-dropdown.mobile .ai-menu-item {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
 .search:focus{
     border-bottom: 1px solid #32a1ce;
 }
@@ -1761,6 +1822,11 @@ input {
     width:100%;
     border:0px;
     text-overflow: ellipsis;
+}
+
+input[type="checkbox"], 
+input[type="radio"] {
+    width: auto;
 }
 
 .css-title {
@@ -3227,4 +3293,34 @@ input[type="search"]::-webkit-search-results-decoration {
 @keyframes highlightPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
+}
+
+/* Styles responsive pour les modals sur mobile */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 10% auto;
+        width: calc(100% - 40px);
+        max-width: none;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    
+    .modal-content.ai-summary-simple {
+        margin: 15% auto;
+        width: calc(100% - 30px);
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+    
+    /* Menu AI mobile avec positionnement adapté */
+    .ai-dropdown.mobile .ai-menu {
+        position: fixed;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 120px;
+        margin-top: 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
 }
