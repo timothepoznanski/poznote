@@ -49,53 +49,7 @@ $ai_enabled = ($ai_enabled === '1'); // Convert to boolean
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
-    <style>
-        .api-key-input {
-            position: relative;
-        }
-        
-        .toggle-visibility {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .toggle-visibility:hover {
-            color: #333;
-        }
-        
-        .form-group input[type="text"], 
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 10px 40px 10px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        
-        .help-text {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            line-height: 1.4;
-        }
-        
-        .help-text a {
-            color: #007cba;
-            text-decoration: none;
-        }
-        
-        .help-text a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="css/ai.css">
 </head>
 <body>
     <div class="settings-container">
