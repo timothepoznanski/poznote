@@ -6,6 +6,77 @@ include 'functions.php';
 require_once 'config.php';
 include 'db_connect.php';
 
+// First, check if there are any attachments at all
+$checkQuery = "SELECT COUNT(*) as count FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+$checkResult = $con->query($checkQuery);
+$hasAttachments = false;
+
+if ($checkResult) {
+    $row = $checkResult->fetch(PDO::FETCH_ASSOC);
+    if ($row['count'] > 0) {
+        // Double-check by looking at the actual content
+        $detailQuery = "SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $detailResult = $con->query($detailQuery);
+        while ($detailRow = $detailResult->fetch(PDO::FETCH_ASSOC)) {
+            $attachments = json_decode($detailRow['attachments'], true);
+            if (is_array($attachments) && !empty($attachments)) {
+                $hasAttachments = true;
+                break;
+            }
+        }
+    }
+}
+
+// If no attachments found, display a user-friendly message instead of downloading empty file
+if (!$hasAttachments) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?php echo APP_NAME_DISPLAYED; ?> - Export des pièces jointes</title>
+        <link href="css/index.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/font-awesome.css">
+        <link rel="stylesheet" href="css/ai.css">
+    </head>
+    <body class="ai-page">
+        <div class="summary-page">
+            <div class="summary-header">
+                <h1>Export des pièces jointes</h1>
+                <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">Aucune pièce jointe trouvée</p>
+            </div>
+            
+            <div class="summary-content">
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; color: #6c757d; margin-bottom: 20px;">
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                    <h2 style="color: #333; margin-bottom: 15px; font-size: 24px;">Aucune pièce jointe trouvée</h2>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
+                        Il n'y a actuellement aucune pièce jointe dans vos notes.
+                    </p>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 0; font-size: 16px;">
+                        Pour ajouter des pièces jointes à vos notes, utilisez le bouton <strong><i class="fas fa-paperclip"></i></strong> dans l'éditeur de notes.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="index.php" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Retour aux notes
+                </a>
+                <a href="backup_export.php" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Autres options d'export
+                </a>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 // Start output buffering to prevent any unwanted output
 ob_start();
 
@@ -76,87 +147,13 @@ if (!empty($metadataInfo)) {
     $zip->addFromString('poznote_attachments_metadata.json', $metadataContent);
 }
 
-$zip->close();
-
-// Clear any output buffer
-ob_end_clean();
-
-// Check if ZIP file was created successfully
-if (!file_exists($zipFileName)) {
-    die('Attachments export file could not be created - ZIP file not found');
-}
-
-if (filesize($zipFileName) == 0) {
-    unlink($zipFileName);
-    die('Attachments export file could not be created - ZIP file is empty');
-}
-
-// Send file to browser
-header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="poznote_attachments_export.zip"');
-header('Content-Length: ' . filesize($zipFileName));
-header('Cache-Control: no-cache, must-revalidate');
-header('Expires: 0');
-
-readfile($zipFileName);
-unlink($zipFileName);
-?>
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($attachmentsPath), 
-        RecursiveIteratorIterator::LEAVES_ONLY
-    );
-
-    foreach ($files as $name => $file) {
-        if (!$file->isDir()) {
-            $filePath = $file->getRealPath();
-            $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
-            
-            // Skip hidden files like .gitkeep
-            if (!str_starts_with($relativePath, '.')) {
-                if (file_exists($filePath) && is_readable($filePath)) {
-                    $zip->addFile($filePath, $relativePath);
-                    $attachmentCount++;
-                }
-            }
-        }
-    }
-}
-
-// Create a metadata file with attachment-to-note mappings
-$metadata = [];
-$query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != ''";
-$queryResult = $con->query($query);
-
-if ($queryResult) {
-    while ($row = $queryResult->fetch(PDO::FETCH_ASSOC)) {
-        $attachments = json_decode($row['attachments'], true);
-        if (is_array($attachments) && !empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                $metadata[] = [
-                    'note_id' => $row['id'],
-                    'note_heading' => $row['heading'],
-                    'attachment' => $attachment
-                ];
-            }
-        }
-    }
-}
-
-// Add metadata file to ZIP
-$metadataContent = json_encode($metadata, JSON_PRETTY_PRINT);
-$zip->addFromString('_poznote_attachments_metadata.json', $metadataContent);
-
 // Create a simple index file
 $indexContent = '<html><head><title>Attachments Index</title></head><body>';
 $indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Attachments Export</h1>';
 $indexContent .= '<p>Total attachments: ' . $attachmentCount . '</p>';
-$indexContent .= '<p>Total notes with attachments: ' . count($metadata) . '</p>';
+$indexContent .= '<p>Total notes with attachments: ' . count($metadataInfo) . '</p>';
 $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';
-if ($attachmentCount == 0) {
-    $indexContent .= '<p>No attachments found in your notes.</p>';
-} else {
-    $indexContent .= '<p><strong>Note:</strong> This export includes metadata file for proper restoration.</p>';
-}
+$indexContent .= '<p><strong>Note:</strong> This export includes metadata file for proper restoration.</p>';
 $indexContent .= '</body></html>';
 $zip->addFromString('index.html', $indexContent);
 
@@ -167,7 +164,7 @@ ob_end_clean();
 
 // Check if ZIP file was created successfully
 if (!file_exists($zipFileName)) {
-    die('Attachments export file could not be created - ZIP file not found');
+    die('Attachments export file could not be created - ZIP file creation failed');
 }
 
 if (filesize($zipFileName) == 0) {

@@ -123,19 +123,6 @@ $ai_enabled = ($ai_enabled === '1'); // Convert to boolean
         <div style="padding-bottom: 50px;"></div>
     </div>
 
-    <script>
-        function toggleApiKeyVisibility() {
-            const input = document.getElementById('openai_api_key');
-            const icon = document.getElementById('eye-icon');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        }
-    </script>
+    <script src="js/ai-config.js"></script>
 </body>
 </html>

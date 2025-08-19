@@ -626,9 +626,9 @@ $folder_filter = $_GET['folder'] ?? '';
     <?php endif; ?>
         
     <script>
-        // Variables for folder management
-        var isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
-        var currentNoteFolder = <?php 
+        // Configuration variables for the main page
+        isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
+        currentNoteFolder = <?php 
             if ($note != '' && empty($search) && empty($tags_search)) {
                 echo json_encode($current_note_folder ?? 'Uncategorized');
             } else if ($default_note_folder && empty($search) && empty($tags_search)) {
@@ -1231,9 +1231,8 @@ $folder_filter = $_GET['folder'] ?? '';
     </div>
     <?php endif; ?>
     
-    <script>
-    </script>
 </body>
+<script src="js/index-config.js"></script>
 <script src="js/script.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>

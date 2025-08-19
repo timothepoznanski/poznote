@@ -134,18 +134,6 @@ function createBackup() {
         <div style="padding-bottom: 50px;"></div>
     </div>
     
-    <script>
-    // Function to download notes as ZIP
-    function startDownload() {
-        // Create a direct link to the export script
-        window.location.href = 'exportEntries.php';
-    }
-    
-    // Function to download attachments as ZIP
-    function startAttachmentsDownload() {
-        // Create a direct link to the attachments export script
-        window.location.href = 'exportAttachments.php';
-    }
-    </script>
+    <script src="js/backup-export.js"></script>
 </body>
 </html>
