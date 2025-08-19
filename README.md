@@ -115,8 +115,7 @@ Poznote includes powerful AI capabilities powered by OpenAI to enhance your note
 
 - **🤖 AI Summarization** - Generate intelligent summaries of your notes to quickly understand key points
 - **🏷️ Auto Tag Generation** - Automatically generate relevant tags based on your note content
-- **🔧 Check Faults** - Detect linguistic errors such as spelling mistakes, grammar errors, and agreement issues
-- **🔍 Check Content** - Verify the accuracy, coherence, and logical consistency of your note content
+- ** Check Content** - Verify the accuracy, coherence, and logical consistency of your note content
 
 ### Setup AI Features
 

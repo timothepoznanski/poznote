@@ -18,19 +18,6 @@ async function generateAISummary(noteId) {
 }
 
 /**
- * Checks for linguistic faults in a note using AI
- */
-async function checkFaults(noteId) {
-    if (!noteId) {
-        console.error('Note ID is required');
-        return;
-    }
-    
-    // Redirect to the dedicated fault checking page
-    window.location.href = 'check_faults.php?note_id=' + encodeURIComponent(noteId);
-}
-
-/**
  * Checks for content accuracy and coherence using AI
  */
 async function checkErrors(noteId) {
