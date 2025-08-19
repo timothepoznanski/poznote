@@ -31,7 +31,7 @@ try {
     exit;
 }
 
-$summary = '';
+$error_check = '';
 $error_message = '';
 $is_generating = false;
 
@@ -42,7 +42,7 @@ $is_generating = false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Summary - <?php echo htmlspecialchars($note_title); ?></title>
+    <title>AI Note Check - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="css/font-awesome.css">
     <style>
@@ -192,11 +192,14 @@ $is_generating = false;
     </style>
 </head>
 <body>
-    <div class="summary-page">        
+    <div class="summary-page">
+        <div class="summary-header">
+            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
+        </div>        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-robot"></i>
-                Generating summary...
+                Checking note...
             </div>
             <div id="summaryText" style="display: none;"></div>
             <div id="errorState" class="error-state" style="display: none;">
@@ -204,21 +207,24 @@ $is_generating = false;
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">
-                Click "Generate Summary" to create an AI summary of this note.
+                Click "Check Note" to verify this note for potential errors or inaccuracies.<br>
+                <small style="color: #999; margin-top: 10px; display: block;">
+                    <strong>Language Detection:</strong> The AI will automatically detect and respond in the primary language of your note content.
+                </small>
             </div>
         </div>
         
         <div class="action-buttons">
-            <button onclick="generateSummary()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-magic"></i> Generate Summary
+            <button onclick="checkErrors()" class="btn btn-primary" id="generateBtn">
+                <i class="fas fa-search"></i> Check Note
             </button>
             
             <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
                 <i class="fas fa-copy"></i> Copy
             </button>
             
-            <button onclick="generateSummary()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
-                <i class="fas fa-redo"></i> Regenerate
+            <button onclick="checkErrors()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
+                <i class="fas fa-redo"></i> Re-check
             </button>
             
             <a href="index.php" class="btn btn-secondary">
@@ -230,15 +236,15 @@ $is_generating = false;
     <script>
         const noteId = <?php echo json_encode($note_id); ?>;
         
-        // Auto-generate summary if requested via URL parameter
+        // Auto-generate error check if requested via URL parameter
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('generate') === '1') {
-                generateSummary();
+            if (urlParams.get('check') === '1') {
+                checkErrors();
             }
         });
         
-        async function generateSummary() {
+        async function checkErrors() {
             const loadingState = document.getElementById('loadingState');
             const summaryText = document.getElementById('summaryText');
             const errorState = document.getElementById('errorState');
@@ -255,7 +261,7 @@ $is_generating = false;
             generateBtn.style.display = 'none';
             
             try {
-                const response = await fetch('api_ai_summary.php', {
+                const response = await fetch('api_check_errors.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -271,21 +277,21 @@ $is_generating = false;
                 loadingState.style.display = 'none';
                 
                 if (response.ok && data.success) {
-                    // Show the summary with preserved line breaks
-                    summaryText.innerHTML = data.summary.replace(/\n/g, '<br>');
+                    // Show the error check result with preserved line breaks
+                    summaryText.innerHTML = data.error_check.replace(/\n/g, '<br>');
                     summaryText.style.display = 'block';
                     copyBtn.style.display = 'inline-flex';
                     regenerateBtn.style.display = 'inline-flex';
                 } else {
                     // Show the error
                     const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = data.error || 'An error occurred while generating the summary';
+                    errorMessage.textContent = data.error || 'An error occurred while checking for errors';
                     errorState.style.display = 'block';
                     generateBtn.style.display = 'inline-flex';
                 }
                 
             } catch (error) {
-                console.error('Error generating AI summary:', error);
+                console.error('Error checking for errors:', error);
                 
                 // Hide loading
                 loadingState.style.display = 'none';

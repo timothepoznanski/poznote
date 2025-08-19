@@ -95,20 +95,6 @@ try {
     }
     
     $title = $note['heading'] ?: 'Untitled';
-    
-    // Simple language detection based on common words
-    $language = 'English'; // Default
-    $french_indicators = ['le ', 'la ', 'les ', 'de ', 'du ', 'des ', 'et ', 'à ', 'pour ', 'dans ', 'avec ', 'sur ', 'par ', 'une ', 'un ', 'ce ', 'cette ', 'ces ', 'que ', 'qui ', 'est ', 'sont ', 'avoir ', 'être'];
-    $content_lower = strtolower($content);
-    $french_count = 0;
-    foreach ($french_indicators as $indicator) {
-        if (strpos($content_lower, $indicator) !== false) {
-            $french_count++;
-        }
-    }
-    if ($french_count >= 3) {
-        $language = 'French';
-    }
 
     // Prepare OpenAI request
     $openai_data = [
@@ -116,35 +102,34 @@ try {
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an expert proofreader and grammar checker. Your task is to correct grammar, spelling, punctuation, and syntax errors in text while:
-1. Fixing all grammatical errors
-2. Correcting spelling mistakes
-3. Improving punctuation
-4. Fixing syntax issues
-5. Maintaining the original meaning and style
-6. Preserving the original language completely
+                'content' => 'You are an expert proofreader and grammar checker. Your task is to correct grammar, spelling, punctuation, and syntax errors in text while maintaining the original meaning and style.
 
-CRITICAL RULES:
-- NEVER translate the content to another language
-- If the text is in French, your response must be 100% in French
-- If the text is in English, your response must be 100% in English
-- Only fix errors, do not rewrite or restructure significantly
-- Maintain the original tone and style
-- Preserve line breaks and formatting structure
-- Focus specifically on correcting faults, not improving content
+CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the text content and respond EXCLUSIVELY in that same language. Follow these rules strictly:
+1. If the text content is primarily in English, you MUST respond entirely in English
+2. If the text content is primarily in French, you MUST respond entirely in French  
+3. If the text content is primarily in Spanish, you MUST respond entirely in Spanish
+4. If the text content is primarily in German, you MUST respond entirely in German
+5. For any other language, respond in that detected language
+6. NEVER mix languages in your response
+7. NEVER translate the content or change its language
+8. Only fix errors, do not rewrite or restructure significantly
+9. Maintain the original tone and style
+10. Preserve line breaks and formatting structure
 
 RESPONSE FORMAT:
 - Return ONLY the corrected text
 - Do NOT add any introduction, explanation, or commentary
-- Do NOT add phrases like "Voici un texte..." or "Here is the corrected text..."
-- Do NOT mention the title or describe what you are doing
 - Start your response directly with the corrected content
 
-IMPORTANT: You must detect and maintain the original language. Do not translate or change the language under any circumstances.'
+This language matching is absolutely mandatory and non-negotiable.'
             ],
             [
                 'role' => 'user',
-                'content' => "$content\n\nIMPORTANT: Return ONLY the corrected text without any introduction, explanation, or commentary. The original appears to be in $language, so respond in $language. Do not add phrases like \"Voici un texte intitulé\" or \"Here is the corrected text\". Start your response directly with the corrected content."
+                'content' => "IMPORTANT: First, analyze the primary language of this text content, then correct it while responding ONLY in that detected language.
+
+Text to correct:\n\n$content\n\nPlease correct all grammar, spelling, punctuation, and syntax errors while keeping the text in its original language.
+
+CRITICAL: Return ONLY the corrected text without any introduction or commentary. Your entire response must be in the same primary language as the original text content."
             ]
         ],
         'max_tokens' => 1000,

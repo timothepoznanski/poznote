@@ -31,6 +31,19 @@ async function correctFaults(noteId) {
 }
 
 /**
+ * Checks for errors in a note using AI
+ */
+async function checkErrors(noteId) {
+    if (!noteId) {
+        console.error('Note ID is required');
+        return;
+    }
+    
+    // Redirect to the dedicated check errors page and start checking automatically
+    window.location.href = 'check_errors.php?note_id=' + encodeURIComponent(noteId) + '&check=1';
+}
+
+/**
  * Shows the AI summary modal
  */
 function showAISummaryModal() {

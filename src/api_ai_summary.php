@@ -96,11 +96,27 @@ try {
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an assistant that helps summarize notes. Create a concise and informative summary of the provided note. The summary should capture the key points and important information. IMPORTANT: Always respond in the same language as the original note content. If the note is in French, respond in French. If the note is in English, respond in English. If the note is in Spanish, respond in Spanish, etc.'
+                'content' => 'You are an assistant that helps summarize notes. Create a concise and informative summary of the provided note. The summary should capture the key points and important information. 
+
+CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the note content and respond EXCLUSIVELY in that same language. Follow these rules strictly:
+1. If the note content is primarily in English, you MUST respond entirely in English
+2. If the note content is primarily in French, you MUST respond entirely in French  
+3. If the note content is primarily in Spanish, you MUST respond entirely in Spanish
+4. If the note content is primarily in German, you MUST respond entirely in German
+5. For any other language, respond in that detected language
+6. NEVER mix languages in your response
+7. NEVER translate the content or change its language
+8. Your entire response must be in the same language as the predominant language of the input
+
+This language matching is absolutely mandatory and non-negotiable.'
             ],
             [
                 'role' => 'user',
-                'content' => "Here is a note titled \"$title\":\n\n$content\n\nCan you create a concise summary of this note? Please respond in the same language as the note content."
+                'content' => "IMPORTANT: First, analyze the primary language of this note content, then respond ONLY in that detected language.
+
+Here is a note titled \"$title\":\n\n$content\n\nCan you create a concise summary of this note? 
+
+CRITICAL: Your entire response must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content."
             ]
         ],
         'max_tokens' => 300,

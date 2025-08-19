@@ -84,19 +84,19 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 6000) {
-        $content = substr($content, 0, 6000) . '...';
+    if (strlen($content) > 8000) {
+        $content = substr($content, 0, 8000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
-
+    
     // Prepare OpenAI request
     $openai_data = [
         'model' => 'gpt-3.5-turbo',
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an assistant that helps improve notes by enhancing their structure, clarity, and content. Your task is to take a note and make it better by improving grammar, spelling, clarity, organization, and flow.
+                'content' => 'You are an expert fact-checker and content reviewer. Your role is to carefully analyze the provided note content and identify any potential errors, inaccuracies, inconsistencies, or misleading information. You should check for: factual errors, logical inconsistencies, contradictory statements, outdated information, grammatical errors, spelling mistakes, formatting issues, or any other problems. 
 
 CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the note content and respond EXCLUSIVELY in that same language. Follow these rules strictly:
 1. If the note content is primarily in English, you MUST respond entirely in English
@@ -107,21 +107,20 @@ CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the note 
 6. NEVER mix languages in your response
 7. NEVER translate the content or change its language
 8. Your entire response must be in the same language as the predominant language of the input
-9. Only improve content quality while preserving the exact original language
 
 This language matching is absolutely mandatory and non-negotiable.'
             ],
             [
                 'role' => 'user',
-                'content' => "IMPORTANT: First, analyze the primary language of this note content, then improve it while responding ONLY in that detected language.
+                'content' => "IMPORTANT: First, analyze the primary language of this note content, then respond ONLY in that detected language.
 
-Here is a note titled \"$title\":\n\n$content\n\nPlease improve this note by enhancing its structure, clarity, grammar, and overall quality. 
+Here is a note titled \"$title\":\n\n$content\n\nPlease carefully review this note and identify any potential errors, inaccuracies, inconsistencies, or problems. If you find issues, explain what they are and suggest corrections. If the note appears to be accurate and well-written, mention that as well. Please be thorough but constructive in your analysis. 
 
-CRITICAL: Your entire improved version must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content."
+CRITICAL: Your entire response must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content."
             ]
         ],
-        'max_tokens' => 1000,
-        'temperature' => 0.3
+        'max_tokens' => 500,
+        'temperature' => 0.2
     ];
     
     // Make request to OpenAI
@@ -134,7 +133,7 @@ CRITICAL: Your entire improved version must be written in the same primary langu
         'Content-Type: application/json',
         'Authorization: Bearer ' . $api_key
     ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -170,12 +169,12 @@ CRITICAL: Your entire improved version must be written in the same primary langu
         exit;
     }
     
-    $improved_content = trim($openai_response['choices'][0]['message']['content']);
+    $error_check = trim($openai_response['choices'][0]['message']['content']);
     
-    // Return the improved content
+    // Return the error check result
     echo json_encode([
         'success' => true,
-        'improved_content' => $improved_content,
+        'error_check' => $error_check,
         'note_title' => $title
     ]);
     
