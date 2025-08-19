@@ -175,7 +175,7 @@ Poznote provides a REST API for programmatic access to notes and folders.
 
 All API requests require HTTP Basic authentication:
 ```bash
-curl -u username:password http://localhost:8040/api_endpoint.php
+curl -u 'username:password' http://localhost:8040/API_ENDPOINT_NAME.php
 ```
 
 ### Base URL
