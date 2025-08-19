@@ -34,6 +34,15 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )');
 
+    // Create settings table for configuration
+    $con->exec('CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT
+    )');
+
+    // Set default AI enabled setting for new installations
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_enabled', '1')");
+
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }

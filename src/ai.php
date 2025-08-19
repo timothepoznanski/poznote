@@ -5,12 +5,6 @@ requireAuth();
 require_once 'config.php';
 include 'db_connect.php';
 
-// Create settings table if it doesn't exist
-$con->exec("CREATE TABLE IF NOT EXISTS settings (
-    key TEXT PRIMARY KEY,
-    value TEXT
-)");
-
 $message = '';
 $error = '';
 
@@ -44,16 +38,7 @@ $current_api_key = $stmt->fetchColumn() ?: '';
 $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
 $stmt->execute(['ai_enabled']);
 $ai_enabled = $stmt->fetchColumn();
-
-// Default to enabled for new installations
-if ($ai_enabled === null || $ai_enabled === false) {
-    // Set default value in database for new installations
-    $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
-    $stmt->execute(['ai_enabled', '1']);
-    $ai_enabled = true;
-} else {
-    $ai_enabled = ($ai_enabled === '1');
-}
+$ai_enabled = ($ai_enabled === '1'); // Convert to boolean
 
 ?>
 <!DOCTYPE html>
