@@ -44,7 +44,16 @@ $current_api_key = $stmt->fetchColumn() ?: '';
 $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
 $stmt->execute(['ai_enabled']);
 $ai_enabled = $stmt->fetchColumn();
-$ai_enabled = ($ai_enabled === null) ? true : ($ai_enabled === '1'); // Default to enabled
+
+// Default to enabled for new installations
+if ($ai_enabled === null || $ai_enabled === false) {
+    // Set default value in database for new installations
+    $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+    $stmt->execute(['ai_enabled', '1']);
+    $ai_enabled = true;
+} else {
+    $ai_enabled = ($ai_enabled === '1');
+}
 
 ?>
 <!DOCTYPE html>
