@@ -37,6 +37,7 @@ $title = $note['heading'] ?: 'Untitled';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Correct Faults - <?php echo htmlspecialchars($title); ?></title>
+    <link rel="stylesheet" href="css/font-awesome.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -206,16 +207,16 @@ $title = $note['heading'] ?: 'Untitled';
 
         <div class="button-container">
             <button onclick="generateCorrection()" class="btn" id="generateBtn" <?php echo $auto_generate ? 'disabled' : ''; ?>>
-                Regenerate
+                <i class="fas fa-spell-check"></i> Regenerate
             </button>
             <button onclick="copyToClipboard()" class="btn btn-secondary" id="copyBtn" style="display: none;">
-                Copy
+                <i class="fas fa-copy"></i> Copy
             </button>
             <button onclick="applyToNote()" class="btn btn-warning" id="applyBtn" style="display: none;">
-                Apply to note
+                <i class="fas fa-check"></i> Apply to note
             </button>
             <a href="index.php" class="btn btn-success">
-                Back to Notes
+                <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
         </div>
 

@@ -44,7 +44,7 @@ $is_generating = false;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Summary - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/font-awesome.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -75,7 +75,7 @@ $is_generating = false;
             padding: 30px;
             border-radius: 4px;
             margin-bottom: 30px;
-            min-height: 150px;
+            /* min-height: 150px; */
             line-height: 1.6;
             font-size: 16px;
             border: 1px solid #ddd;
