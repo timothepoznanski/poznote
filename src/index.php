@@ -405,6 +405,10 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
                     </div>
+                    <div class="settings-menu-item" onclick="window.location = 'ai.php';">
+                        <i class="fas fa-robot"></i>
+                        <span>AI settings</span>
+                    </div>
                     <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                         <i class="fas fa-upload"></i>
                         <span>Backup (Export)</span>
@@ -570,6 +574,10 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="settings-menu-item" onclick="unfoldAllFolders();">
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>
+                </div>
+                <div class="settings-menu-item" onclick="window.location = 'ai.php';">
+                    <i class="fas fa-robot"></i>
+                    <span>AI settings</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                     <i class="fas fa-upload"></i>
@@ -941,6 +949,7 @@ $folder_filter = $_GET['folder'] ?? '';
              
                 // Note action buttons (desktop only)
                 if (!$is_mobile) {
+                    echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="generateAISummary(\''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
@@ -1038,6 +1047,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     }
                     
                     // Note action buttons 
+                    echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="generateAISummary(\''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
@@ -1170,6 +1180,36 @@ $folder_filter = $_GET['folder'] ?? '';
         
     </div>  <!-- Close main-container -->
     
+    <!-- AI Summary Modal -->
+    <div id="aiSummaryModal" class="modal">
+        <div class="modal-content ai-summary-simple">
+            <div class="modal-body">
+                <div id="aiSummaryLoading" class="ai-loading">
+                    <i class="fas fa-robot rotating"></i>
+                    <p>Generating summary...</p>
+                </div>
+                <div id="aiSummaryContent" style="display: none;">
+                    <div id="summaryText" class="summary-text-simple"></div>
+                </div>
+                <div id="aiSummaryError" style="display: none;">
+                    <div class="error-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p id="errorMessage"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button id="regenerateSummaryBtn" class="btn btn-primary" onclick="regenerateCurrentSummary()">
+                    <i class="fas fa-redo"></i> Regenerate
+                </button>
+                <button class="btn btn-secondary" onclick="closeAISummaryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
     </script>
 </body>
@@ -1177,5 +1217,6 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/welcome.js"></script>
+<script src="js/ai.js"></script>
 
 </html>

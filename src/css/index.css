@@ -1865,6 +1865,138 @@ hr {
     color: #005a8a !important; /* Couleur hover comme les autres boutons */
 }
 
+/* Styles pour le bouton IA */
+.toolbar-btn i.fas.fa-robot {
+    color: #007DB8 !important; /* Même couleur que les autres boutons */
+}
+
+.toolbar-btn:hover i.fas.fa-robot,
+.toolbar-btn:focus i.fas.fa-robot {
+    color: #005a8a !important; /* Couleur hover comme les autres boutons */
+}
+
+.toolbar-btn.btn-ai.loading i.fas.fa-robot {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Modal pour le résumé IA ultra-simple */
+.modal-content.ai-summary-simple {
+    max-width: 600px;
+    width: 90%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.modal-content.ai-summary-simple .modal-body {
+    padding: 25px;
+    min-height: 200px;
+}
+
+.ai-loading {
+    text-align: center;
+    padding: 30px;
+}
+
+.ai-loading i.rotating {
+    font-size: 2em;
+    color: #007DB8;
+    animation: rotate 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+.ai-loading p {
+    color: #666;
+    font-style: italic;
+}
+
+.summary-text-simple {
+    color: #333;
+    line-height: 1.6;
+    font-size: 15px;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+/* Styles spécifiques pour la modal AI */
+.modal-content.ai-summary-simple .modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-content.ai-summary-simple .modal-footer .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.modal-content.ai-summary-simple .modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-content.ai-summary-simple .modal-footer .btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.modal-content.ai-summary-simple .modal-footer .btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.error-content {
+    text-align: center;
+    padding: 20px;
+    color: #d32f2f;
+}
+
+.error-content i {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.modal-footer .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-footer .btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.modal-footer .btn:hover {
+    opacity: 0.9;
+}
+
 /* Styles pour les cases à cocher dans les notes */
 .noteentry label {
     user-select: none;

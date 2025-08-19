@@ -124,7 +124,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save {
+.btn-separator, .btn-save, .btn-ai {
     display: flex !important;
 }
 
@@ -917,4 +917,36 @@ input[type="search"]::-webkit-search-results-decoration {
 @keyframes highlightPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
+}
+
+/* Modal IA adaptée pour mobile */
+#aiSummaryModal .modal-content {
+    max-width: 95% !important;
+    width: 95% !important;
+    max-height: 90vh !important;
+    margin: 5vh auto !important;
+}
+
+#aiSummaryModal .modal-body {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+}
+
+.ai-loading i.rotating {
+    font-size: 1.5em !important;
+}
+
+.summary-content #summaryText {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.modal-footer {
+    flex-direction: column-reverse !important;
+    gap: 10px !important;
+}
+
+.modal-footer .btn {
+    width: 100% !important;
+    justify-content: center !important;
 }
