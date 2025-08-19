@@ -192,7 +192,13 @@ $is_generating = false;
     </style>
 </head>
 <body>
-    <div class="summary-page">        
+    <div class="summary-page">
+        <div class="summary-header">
+            <h1>AI Summary</h1>
+            <br>
+            <p style="color: #666; margin: 0 0 15px 0; font-size: 14px; line-height: 1.4;">This tool generates a concise and informative summary of your note, capturing the key points and important information to help you quickly understand the main content.</p>
+            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
+        </div>        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-robot"></i>
@@ -204,7 +210,7 @@ $is_generating = false;
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">
-                Click "Generate Summary" to create an AI summary of this note.
+                Click "Generate Summary" below to create an intelligent summary of your note.
             </div>
         </div>
         
@@ -233,9 +239,9 @@ $is_generating = false;
         // Auto-generate summary if requested via URL parameter
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('generate') === '1') {
-                generateSummary();
-            }
+            // Disabled auto-generation: if (urlParams.get('generate') === '1') {
+            //     generateSummary();
+            // }
         });
         
         async function generateSummary() {

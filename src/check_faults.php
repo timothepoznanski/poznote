@@ -30,15 +30,13 @@ try {
     header('Location: index.php');
     exit;
 }
-
-// Don't generate automatically on page load, we'll do it via AJAX
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Better Note - <?php echo htmlspecialchars($note_title); ?></title>
+    <title>Check Faults - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="css/font-awesome.css">
     <style>
@@ -49,32 +47,38 @@ try {
             background-color: #f5f5f5;
         }
         
-        .better-note-page {
+        .summary-page {
             max-width: 800px;
             margin: 0 auto;
         }
         
-        .better-note-header {
+        .summary-header {
             text-align: center;
             margin-bottom: 30px;
         }
         
-        .better-note-header h1 {
+        .summary-header h1 {
             color: #007DB8;
             margin: 0;
             font-size: 28px;
             font-weight: 600;
         }
         
-        .better-note-content {
+        .summary-content {
             background: white;
             padding: 30px;
             border-radius: 4px;
             margin-bottom: 30px;
-            /* min-height: 150px; */
             line-height: 1.6;
             font-size: 16px;
             border: 1px solid #ddd;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: auto;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .loading-state {
@@ -95,21 +99,9 @@ try {
             100% { transform: rotate(360deg); }
         }
         
-        .error-state {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 20px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        .error-state i {
-            margin-right: 10px;
-        }
-        
         .action-buttons {
             text-align: center;
+            margin-bottom: 30px;
             display: flex;
             gap: 15px;
             justify-content: center;
@@ -138,22 +130,9 @@ try {
             background: #005a8a;
         }
         
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         
         .btn-secondary {
@@ -167,12 +146,24 @@ try {
             text-decoration: none;
         }
         
-        .copy-feedback {
-            background: #28a745 !important;
+        .btn-success {
+            background: #28a745;
+            color: white;
         }
         
-        .apply-feedback {
-            background: #ffc107 !important;
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .error-state {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+            margin: 20px 0;
+            display: none;
         }
         
         @media (max-width: 600px) {
@@ -180,11 +171,11 @@ try {
                 padding: 15px;
             }
             
-            .better-note-header h1 {
+            .summary-header h1 {
                 font-size: 24px;
             }
             
-            .better-note-content {
+            .summary-content {
                 padding: 20px;
             }
             
@@ -201,37 +192,39 @@ try {
     </style>
 </head>
 <body>
-    <div class="better-note-page">
-        <div class="better-note-content" id="betterNoteContent">
+    <div class="summary-page">
+        <div class="summary-header">
+            <h1>Check Linguistic Errors</h1>
+            <br>
+            <p style="color: #666; margin: 0 0 15px 0; font-size: 14px; line-height: 1.4;">This tool analyzes your note to identify spelling mistakes, grammar errors, punctuation issues, and agreement problems. It will provide a list of detected linguistic errors without correcting them.</p>
+            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
+        </div>        
+        <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
-                <i class="fas fa-magic"></i>
-                Improving your note...
+                <i class="fas fa-search"></i>
+                Checking for linguistic errors...
             </div>
-            <div id="improvedText" style="display: none;"></div>
+            <div id="summaryText" style="display: none;"></div>
             <div id="errorState" class="error-state" style="display: none;">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">
-                Click "Improve Note" to enhance the content and structure of this note.
+                Click "Check Faults" below to start analyzing your note for linguistic errors.
             </div>
         </div>
         
         <div class="action-buttons">
-            <button onclick="generateBetterNote()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-magic"></i> Improve Note
+            <button onclick="checkFaults()" class="btn btn-primary" id="generateBtn">
+                <i class="fas fa-spell-check"></i> Check Faults
             </button>
             
             <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
                 <i class="fas fa-copy"></i> Copy
             </button>
             
-            <button onclick="applyToNote()" class="btn btn-warning" id="applyBtn" style="display: none;">
-                <i class="fas fa-check"></i> Apply to Note
-            </button>
-            
-            <button onclick="generateBetterNote()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
-                <i class="fas fa-redo"></i> Regenerate
+            <button onclick="checkFaults()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
+                <i class="fas fa-redo"></i> Re-check
             </button>
             
             <a href="index.php" class="btn btn-secondary">
@@ -243,33 +236,32 @@ try {
     <script>
         const noteId = <?php echo json_encode($note_id); ?>;
         
-        // Auto-generate better note if requested via URL parameter
+        // Auto-generate fault check if requested via URL parameter
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('generate') === '1') {
-                generateBetterNote();
-            }
+            // Disabled auto-generation: if (urlParams.get('check') === '1') {
+            //     checkFaults();
+            // }
         });
         
-        async function generateBetterNote() {
+        async function checkFaults() {
             const loadingState = document.getElementById('loadingState');
-            const improvedText = document.getElementById('improvedText');
+            const summaryText = document.getElementById('summaryText');
             const errorState = document.getElementById('errorState');
             const initialState = document.getElementById('initialState');
             const generateBtn = document.getElementById('generateBtn');
             const copyBtn = document.getElementById('copyBtn');
-            const applyBtn = document.getElementById('applyBtn');
             const regenerateBtn = document.getElementById('regenerateBtn');
             
             // Show loading state
             loadingState.style.display = 'block';
-            improvedText.style.display = 'none';
+            summaryText.style.display = 'none';
             errorState.style.display = 'none';
             initialState.style.display = 'none';
             generateBtn.style.display = 'none';
             
             try {
-                const response = await fetch('api_better_note.php', {
+                const response = await fetch('api_check_faults.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -285,25 +277,21 @@ try {
                 loadingState.style.display = 'none';
                 
                 if (response.ok && data.success) {
-                    // Store the original content with line breaks for later use
-                    window.improvedContentText = data.improved_content;
-                    
-                    // Show the improved note with HTML formatting
-                    improvedText.innerHTML = data.improved_content.replace(/\n/g, '<br>');
-                    improvedText.style.display = 'block';
+                    // Show the fault check result with preserved line breaks
+                    summaryText.innerHTML = data.fault_check.replace(/\n/g, '<br>');
+                    summaryText.style.display = 'block';
                     copyBtn.style.display = 'inline-flex';
-                    applyBtn.style.display = 'inline-flex';
                     regenerateBtn.style.display = 'inline-flex';
                 } else {
                     // Show the error
                     const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = data.error || 'An error occurred while improving the note';
+                    errorMessage.textContent = data.error || 'An error occurred while checking for faults';
                     errorState.style.display = 'block';
                     generateBtn.style.display = 'inline-flex';
                 }
                 
             } catch (error) {
-                console.error('Error generating better note:', error);
+                console.error('Error checking for faults:', error);
                 
                 // Hide loading
                 loadingState.style.display = 'none';
@@ -317,29 +305,31 @@ try {
         }
         
         async function copyToClipboard() {
+            const summaryText = document.getElementById('summaryText');
             const copyBtn = document.getElementById('copyBtn');
             
-            if (!copyBtn || !window.improvedContentText) return;
+            if (!summaryText || !copyBtn) return;
             
             try {
-                await navigator.clipboard.writeText(window.improvedContentText);
+                // Get the text content without HTML tags for copying
+                const textToCopy = summaryText.innerText || summaryText.textContent;
+                await navigator.clipboard.writeText(textToCopy);
                 
                 // Visual feedback
                 const originalHTML = copyBtn.innerHTML;
                 copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                copyBtn.classList.add('copy-feedback');
                 
                 setTimeout(() => {
                     copyBtn.innerHTML = originalHTML;
-                    copyBtn.classList.remove('copy-feedback');
                 }, 2000);
                 
             } catch (err) {
-                console.error('Failed to copy text: ', err);
+                console.error('Failed to copy: ', err);
                 
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
-                textArea.value = window.improvedContentText;
+                const textToCopy = summaryText.innerText || summaryText.textContent;
+                textArea.value = textToCopy;
                 document.body.appendChild(textArea);
                 textArea.select();
                 
@@ -348,50 +338,15 @@ try {
                     
                     const originalHTML = copyBtn.innerHTML;
                     copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                    copyBtn.classList.add('copy-feedback');
                     
                     setTimeout(() => {
                         copyBtn.innerHTML = originalHTML;
-                        copyBtn.classList.remove('copy-feedback');
                     }, 2000);
-                    
-                } catch (fallbackErr) {
-                    console.error('Fallback copy failed: ', fallbackErr);
+                } catch (err) {
+                    console.error('Failed to copy: ', err);
                 }
                 
                 document.body.removeChild(textArea);
-            }
-        }
-        
-        async function applyToNote() {
-            const applyBtn = document.getElementById('applyBtn');
-            
-            if (!applyBtn || !window.improvedContentText) return;
-            
-            try {
-                const response = await fetch('api_apply_better_note.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        note_id: noteId,
-                        improved_content: window.improvedContentText
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    // Close the window immediately
-                    window.location.href = 'index.php';
-                } else {
-                    alert('Error applying changes: ' + (data.error || 'Unknown error'));
-                }
-                
-            } catch (error) {
-                console.error('Error applying better note:', error);
-                alert('Connection error. Please try again.');
             }
         }
     </script>

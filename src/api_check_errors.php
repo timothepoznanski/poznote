@@ -96,31 +96,63 @@ try {
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an expert fact-checker and content reviewer. Your role is to carefully analyze the provided note content and identify any potential errors, inaccuracies, inconsistencies, or misleading information. You should check for: factual errors, logical inconsistencies, contradictory statements, outdated information, grammatical errors, spelling mistakes, formatting issues, or any other problems. 
+                'content' => 'You are an expert fact-checker and content reviewer. Your role is to analyze the coherence, logic, and accuracy of content.
 
-CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the note content and respond EXCLUSIVELY in that same language. Follow these rules strictly:
-1. If the note content is primarily in English, you MUST respond entirely in English
-2. If the note content is primarily in French, you MUST respond entirely in French  
-3. If the note content is primarily in Spanish, you MUST respond entirely in Spanish
-4. If the note content is primarily in German, you MUST respond entirely in German
-5. For any other language, respond in that detected language
-6. NEVER mix languages in your response
-7. NEVER translate the content or change its language
-8. Your entire response must be in the same language as the predominant language of the input
+WHAT TO CHECK:
+- Factual accuracy and verifiable information
+- Logical consistency and coherence
+- Contradictory statements
+- Outdated or questionable information
+- Missing context or incomplete arguments
+- Biased or misleading claims
 
-This language matching is absolutely mandatory and non-negotiable.'
+WHAT NOT TO CHECK:
+- Do NOT check spelling or grammar
+- Do NOT check punctuation or syntax
+- Do NOT check language form or style
+
+RESPONSE FORMAT:
+If you find issues with content accuracy or logic:
+- [Issue type]: [explanation of the problem]
+- [Issue type]: [explanation of the problem]
+
+If content appears accurate and coherent:
+"Le contenu semble cohérent et factuellement correct."
+
+CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the text content and respond EXCLUSIVELY in that same language.
+
+FOCUS: Content accuracy, logic, and coherence - NOT language form!'
             ],
             [
                 'role' => 'user',
-                'content' => "IMPORTANT: First, analyze the primary language of this note content, then respond ONLY in that detected language.
+                'content' => "Analyse ce contenu pour sa véracité et sa cohérence: \"$title\"\n\n$content\n\nTâche: Vérifier la logique, la cohérence et l'exactitude factuelle de ce contenu.
 
-Here is a note titled \"$title\":\n\n$content\n\nPlease carefully review this note and identify any potential errors, inaccuracies, inconsistencies, or problems. If you find issues, explain what they are and suggest corrections. If the note appears to be accurate and well-written, mention that as well. Please be thorough but constructive in your analysis. 
+À vérifier:
+- Exactitude des faits présentés
+- Cohérence logique des arguments
+- Contradictions internes
+- Informations potentiellement obsolètes
+- Affirmations douteuses ou non vérifiables
+- Biais ou informations trompeuses
 
-CRITICAL: Your entire response must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content."
+NE PAS vérifier:
+- Orthographe ou grammaire
+- Ponctuation ou syntaxe
+- Style ou forme linguistique
+
+Format de réponse:
+Si tu trouves des problèmes:
+- [Type de problème]: [explication du problème]
+- [Type de problème]: [explication du problème]
+
+Si le contenu semble correct:
+\"Le contenu semble cohérent et factuellement correct.\"
+
+IMPORTANT: Concentre-toi sur le CONTENU et sa véracité, pas sur la forme linguistique!"
             ]
         ],
-        'max_tokens' => 500,
-        'temperature' => 0.2
+        'max_tokens' => 800,
+        'temperature' => 0.1
     ];
     
     // Make request to OpenAI

@@ -42,7 +42,7 @@ $is_generating = false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Note Check - <?php echo htmlspecialchars($note_title); ?></title>
+    <title>Content Verification - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="css/font-awesome.css">
     <style>
@@ -194,12 +194,15 @@ $is_generating = false;
 <body>
     <div class="summary-page">
         <div class="summary-header">
+            <h1>Content Verification</h1>
+            <br>
+            <p style="color: #666; margin: 0 0 15px 0; font-size: 14px; line-height: 1.4;">This tool verifies the accuracy, logical consistency, and coherence of your note content. It checks for factual errors, contradictions, and outdated information without focusing on language form.</p>
             <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
         </div>        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
                 <i class="fas fa-robot"></i>
-                Checking note...
+                Checking content accuracy and coherence...
             </div>
             <div id="summaryText" style="display: none;"></div>
             <div id="errorState" class="error-state" style="display: none;">
@@ -207,16 +210,13 @@ $is_generating = false;
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">
-                Click "Check Note" to verify this note for potential errors or inaccuracies.<br>
-                <small style="color: #999; margin-top: 10px; display: block;">
-                    <strong>Language Detection:</strong> The AI will automatically detect and respond in the primary language of your note content.
-                </small>
+                Click "Check Content" below to start verifying the accuracy and coherence of your note.
             </div>
         </div>
         
         <div class="action-buttons">
             <button onclick="checkErrors()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-search"></i> Check Note
+                <i class="fas fa-search"></i> Check Content
             </button>
             
             <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
@@ -239,9 +239,9 @@ $is_generating = false;
         // Auto-generate error check if requested via URL parameter
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('check') === '1') {
-                checkErrors();
-            }
+            // Disabled auto-generation: if (urlParams.get('check') === '1') {
+            //     checkErrors();
+            // }
         });
         
         async function checkErrors() {

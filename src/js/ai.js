@@ -13,25 +13,25 @@ async function generateAISummary(noteId) {
         return;
     }
     
-    // Redirect to the dedicated AI summary page and start generation automatically
-    window.location.href = 'ai_summary.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
+    // Redirect to the dedicated AI summary page
+    window.location.href = 'ai_summary.php?note_id=' + encodeURIComponent(noteId);
 }
 
 /**
- * Corrects faults in a note using AI
+ * Checks for linguistic faults in a note using AI
  */
-async function correctFaults(noteId) {
+async function checkFaults(noteId) {
     if (!noteId) {
         console.error('Note ID is required');
         return;
     }
     
-    // Redirect to the dedicated correct faults page and start correction automatically
-    window.location.href = 'correct_faults.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
+    // Redirect to the dedicated fault checking page
+    window.location.href = 'check_faults.php?note_id=' + encodeURIComponent(noteId);
 }
 
 /**
- * Checks for errors in a note using AI
+ * Checks for content accuracy and coherence using AI
  */
 async function checkErrors(noteId) {
     if (!noteId) {
@@ -39,8 +39,8 @@ async function checkErrors(noteId) {
         return;
     }
     
-    // Redirect to the dedicated check errors page and start checking automatically
-    window.location.href = 'check_errors.php?note_id=' + encodeURIComponent(noteId) + '&check=1';
+    // Redirect to the dedicated content verification page
+    window.location.href = 'check_errors.php?note_id=' + encodeURIComponent(noteId);
 }
 
 /**
@@ -292,19 +292,6 @@ function closeAIMenu() {
     
     isAIMenuOpen = false;
     currentAIMenuNoteId = null;
-}
-
-/**
- * Better Note - Improves the note content
- */
-function betterNote(noteId) {
-    if (!noteId) {
-        console.error('Note ID is required');
-        return;
-    }
-    
-    // Redirect to the dedicated Better Note page and start generation automatically
-    window.location.href = 'better_note.php?note_id=' + encodeURIComponent(noteId) + '&generate=1';
 }
 
 /**

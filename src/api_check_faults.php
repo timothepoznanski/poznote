@@ -84,44 +84,77 @@ try {
     }
     
     // Limit content length to avoid token limits
-    if (strlen($content) > 6000) {
-        $content = substr($content, 0, 6000) . '...';
+    if (strlen($content) > 8000) {
+        $content = substr($content, 0, 8000) . '...';
     }
     
     $title = $note['heading'] ?: 'Untitled';
-
+    
     // Prepare OpenAI request
     $openai_data = [
         'model' => 'gpt-3.5-turbo',
         'messages' => [
             [
                 'role' => 'system',
-                'content' => 'You are an assistant that helps improve notes by enhancing their structure, clarity, and content. Your task is to take a note and make it better by improving grammar, spelling, clarity, organization, and flow.
+                'content' => 'You are an error detector. Your ONLY job is to DETECT and LIST linguistic errors. You are FORBIDDEN from correcting anything.
 
-CRITICAL LANGUAGE REQUIREMENT: You MUST detect the primary language of the note content and respond EXCLUSIVELY in that same language. Follow these rules strictly:
-1. If the note content is primarily in English, you MUST respond entirely in English
-2. If the note content is primarily in French, you MUST respond entirely in French  
-3. If the note content is primarily in Spanish, you MUST respond entirely in Spanish
-4. If the note content is primarily in German, you MUST respond entirely in German
-5. For any other language, respond in that detected language
-6. NEVER mix languages in your response
-7. NEVER translate the content or change its language
-8. Your entire response must be in the same language as the predominant language of the input
-9. Only improve content quality while preserving the exact original language
+STRICT RULES:
+❌ NEVER write corrected text
+❌ NEVER provide solutions  
+❌ NEVER suggest fixes
+❌ NEVER rewrite sentences
+❌ NEVER give the "right" version
+✅ ONLY list what is wrong
 
-This language matching is absolutely mandatory and non-negotiable.'
+OUTPUT FORMAT (example):
+- Faute d\'orthographe : "apartement" 
+- Erreur d\'accord : "mangé"
+- Erreur de conjugaison : "il vons"
+
+If NO errors found: "Aucune erreur trouvée."
+
+DETECTION FOCUS:
+- Spelling errors
+- Grammar mistakes  
+- Agreement errors (gender/number)
+- Conjugation errors
+- Punctuation mistakes
+
+LANGUAGE RULE: Respond in same language as input text.
+
+REMEMBER: You are an ERROR DETECTOR, not a corrector!'
             ],
             [
                 'role' => 'user',
-                'content' => "IMPORTANT: First, analyze the primary language of this note content, then improve it while responding ONLY in that detected language.
+                'content' => "Texte à analyser: \"$title\"\n\n$content\n\nTâche: Trouve SEULEMENT les erreurs dans ce texte. 
 
-Here is a note titled \"$title\":\n\n$content\n\nPlease improve this note by enhancing its structure, clarity, grammar, and overall quality. 
+❌ NE PAS corriger
+❌ NE PAS réécrire  
+❌ NE PAS donner la version correcte
+✅ SEULEMENT lister les erreurs
 
-CRITICAL: Your entire improved version must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content."
+Format de réponse:
+- [Type d'erreur]: \"[mot/phrase incorrect]\"
+- [Type d'erreur]: \"[mot/phrase incorrect]\"
+
+Exemple:
+- Faute d'orthographe: \"apartement\"
+- Erreur d'accord: \"mangé\" 
+
+Si aucune erreur: \"Aucune erreur trouvée.\"
+
+Types d'erreurs à chercher:
+- Fautes d'orthographe
+- Erreurs d'accord 
+- Erreurs de conjugaison
+- Erreurs de grammaire
+- Erreurs de ponctuation
+
+IMPORTANT: Tu es un DÉTECTEUR d'erreurs, pas un correcteur!"
             ]
         ],
-        'max_tokens' => 1000,
-        'temperature' => 0.3
+        'max_tokens' => 800,
+        'temperature' => 0.1
     ];
     
     // Make request to OpenAI
@@ -134,7 +167,7 @@ CRITICAL: Your entire improved version must be written in the same primary langu
         'Content-Type: application/json',
         'Authorization: Bearer ' . $api_key
     ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -170,12 +203,12 @@ CRITICAL: Your entire improved version must be written in the same primary langu
         exit;
     }
     
-    $improved_content = trim($openai_response['choices'][0]['message']['content']);
+    $fault_check = trim($openai_response['choices'][0]['message']['content']);
     
-    // Return the improved content
+    // Return the fault check result
     echo json_encode([
         'success' => true,
-        'improved_content' => $improved_content,
+        'fault_check' => $fault_check,
         'note_title' => $title
     ]);
     
