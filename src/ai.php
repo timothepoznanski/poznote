@@ -139,7 +139,7 @@ $ai_enabled = ($ai_enabled === null) ? true : ($ai_enabled === '1'); // Default 
                                name="ai_enabled" 
                                <?php echo $ai_enabled ? 'checked' : ''; ?>
                                style="margin: 0; transform: scale(1.2);">
-                        <span style="font-weight: 500;">When unchecked, all AI features will be disabled.</span>
+                        <span style="font-weight: 500;">Enable AI features</span>
                     </label>
                 </div>
                 
