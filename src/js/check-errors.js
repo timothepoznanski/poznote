@@ -8,10 +8,8 @@
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    // Disabled auto-generation: if (urlParams.get('check') === '1') {
-    //     checkErrors();
-    // }
+    // Automatically check content when the page loads
+    checkErrors();
 });
 
 /**

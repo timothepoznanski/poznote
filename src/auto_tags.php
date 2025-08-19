@@ -48,7 +48,7 @@ try {
         <div class="auto-tags-header">
             <h1>Auto Generate Tags</h1>
             <br>
-            <p style="color: #666; font-size: 14px; margin-top: 10px;">Automatically generate relevant tags based on your note's content using AI analysis.</p>
+            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">Note: <?php echo htmlspecialchars($note_title); ?></p>
         </div>
 
         <div class="auto-tags-content" id="autoTagsContent">

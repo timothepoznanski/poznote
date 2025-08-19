@@ -8,10 +8,8 @@
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    // Disabled auto-generation: if (urlParams.get('generate') === '1') {
-    //     generateSummary();
-    // }
+    // Automatically generate summary when the page loads
+    generateSummary();
 });
 
 /**

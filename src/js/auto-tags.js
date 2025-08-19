@@ -7,6 +7,12 @@
 // Note: noteId is set directly in the HTML page before this script loads
 let generatedTags = [];
 
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Automatically generate tags when the page loads
+    generateTags();
+});
+
 /**
  * Generate AI tags for the current note
  */

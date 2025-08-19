@@ -52,7 +52,7 @@ $is_generating = false;
         <div class="summary-header">
             <h1>Content Verification</h1>
             <br>
-            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;"><?php echo htmlspecialchars($note_title); ?></p>
+            <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">Note: <?php echo htmlspecialchars($note_title); ?></p>
         </div>        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
