@@ -537,11 +537,13 @@ body {
 .resize-handle {
     width: 3px;
     height: 100vh;
-    background: #FAFAFA;
+    background: #F8FAFC;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    border-right: 1px solid #ddd;
+    /* border-right: 1px solid #ddd; */
+    border-right: 1px solid #e9ecef;
+
 }
 
 /* LEFT HEADER */
