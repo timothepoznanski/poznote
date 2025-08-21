@@ -413,7 +413,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     </div>
                 </div>
             </div>
-            <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-trash-alt"></span></span></div>
+            <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
         </div>
         <?php endif; ?>
 
@@ -583,7 +583,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 </div>
             </div>
         </div>
-        <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-trash-alt"></span></span></div>
+        <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
         <?php
         // Red cross removed
         ?>
