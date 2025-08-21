@@ -1236,6 +1236,7 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/script.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
+<script src="js/note-loader.js"></script>
 <script src="js/welcome.js"></script>
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>

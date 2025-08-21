@@ -2018,7 +2018,9 @@ window.onclick = function(event) {
 // Restore folder states on page load
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
-        if (window.isSearchMode || window.currentNoteFolder) {
+        // Only skip localStorage restoration in search mode
+        // Allow it even when a note is selected to preserve user folder state
+        if (window.isSearchMode) {
             return;
         }
 
