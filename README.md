@@ -100,20 +100,32 @@ The setup script will display the exact URL and credentials.
 
 ## Multiple Instances
 
-You can run multiple isolated Poznote instances:
+You can run multiple isolated Poznote instances on the same server. Simply run the setup script multiple times with different instance names and ports.
 
-```bash
-# Personal notes
-git clone https://github.com/timothepoznanski/poznote.git poznote-personal
-cd poznote-personal
-./setup.sh  # Configure with port 8040
+Each instance will have:
+- Separate Docker containers
+- Independent data storage
+- Different ports
+- Isolated configurations
 
-# Work notes  
-cd ..
-git clone https://github.com/timothepoznanski/poznote.git poznote-work
-cd poznote-work
-./setup.sh  # Configure with port 8041
+### Example: Personal and Work instances on the same server
+
 ```
+Server: my-server.com
+├── Poznote Personal
+│   ├── Port: 8040
+│   ├── URL: http://my-server.com:8040
+│   ├── Container: poznote-personal-webserver-1
+│   └── Data: ./poznote-personal/data/
+│
+└── Poznote Work
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
+    ├── Container: poznote-work-webserver-1
+    └── Data: ./poznote-work/data/
+```
+
+For deployments on different servers, you only need to run the setup script and use menu option 2 to update the displayed application name parameter - no need for different instance names or ports.
 
 ## AI Features
 

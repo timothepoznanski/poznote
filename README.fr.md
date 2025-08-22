@@ -99,20 +99,32 @@ Le script d'installation affichera l'URL exacte et les identifiants.
 
 ## Instances multiples
 
-Vous pouvez lancer plusieurs instances Poznote isolées :
+Vous pouvez lancer plusieurs instances Poznote isolées sur le même serveur. Il suffit de lancer le script de configuration plusieurs fois avec des noms d'instance et des ports différents.
 
-```bash
-# Notes personnelles
-git clone https://github.com/timothepoznanski/poznote.git poznote-personnel
-cd poznote-personnel
-./setup.sh  # Configurer avec le port 8040
+Chaque instance aura :
+- Des conteneurs Docker séparés
+- Un stockage de données indépendant
+- Des ports différents
+- Des configurations isolées
 
-# Notes professionnelles
-cd ..
-git clone https://github.com/timothepoznanski/poznote.git poznote-travail
-cd poznote-travail
-./setup.sh  # Configurer avec le port 8041
+### Exemple : Instances personnelle et professionnelle sur le même serveur
+
 ```
+Serveur : mon-serveur.com
+├── Poznote Personnel
+│   ├── Port : 8040
+│   ├── URL : http://mon-serveur.com:8040
+│   ├── Conteneur : poznote-personnel-webserver-1
+│   └── Données : ./poznote-personnel/data/
+│
+└── Poznote Travail
+    ├── Port : 8041
+    ├── URL : http://mon-serveur.com:8041
+    ├── Conteneur : poznote-travail-webserver-1
+    └── Données : ./poznote-travail/data/
+```
+
+Pour des déploiements sur des serveurs différents, il suffit juste de lancer le script de configuration et d'utiliser l'option de menu 2 pour mettre à jour le paramètre nom de l'application affiché - pas besoin de noms d'instance ou de ports différents.
 
 ## Fonctionnalités IA
 
