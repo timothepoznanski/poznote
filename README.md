@@ -56,6 +56,11 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 **Linux/macOS:**
 - [Docker Engine](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
+- **Important**: If not running as root, add your user to the docker group:
+  ```bash
+  sudo usermod -aG docker $USER
+  newgrp docker
+  ```
 
 ### Quick Start
 
@@ -64,22 +69,10 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -match "^[a-zA-Z0-9_-]+$")) { Write-Host "⚠️  Name can only contain letters, numbers, hyphens, and underscores." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
 ```
 
-*This command will:*
-- *Ask you to choose an instance name (default: poznote)*
-- *Check for Docker container conflicts before cloning*
-- *Clone the repository with your chosen name*
-- *Run the automated setup*
-
 **Linux/macOS (Bash):**
 ```bash
 check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Docker container '${name}-webserver-1' already exists!"; return 1; fi; return 0; }; while true; do read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-zA-Z0-9_-]+$ ]] && check_conflicts "$instanceName"; then break; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
 ```
-
-*This command will:*
-- *Ask you to choose an instance name (default: poznote)*
-- *Check for Docker container conflicts before cloning*
-- *Clone the repository with your chosen name*
-- *Run the automated setup*
 
 ## Access Your Instance
 
