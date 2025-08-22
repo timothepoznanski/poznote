@@ -127,35 +127,6 @@ function Test-DockerCompose {
     }
 }
 
-# Check for existing Docker containers that might conflict
-function Test-DockerConflicts {
-    param([string]$ProjectName)
-    
-    try {
-        $containerName = "$ProjectName-webserver-1"
-        
-        # Get list of all container names
-        $containerNames = & docker ps -a --format "{{.Names}}" 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to check existing containers."
-            Write-Host "Error details: $containerNames" -ForegroundColor $Colors.Red
-            return $false
-        }
-        
-        # Check if our container name already exists
-        if ($containerNames -contains $containerName) {
-            return $false  # Conflict exists
-        }
-        
-        return $true  # No conflict
-    }
-    catch {
-        Write-Error "Failed to check Docker conflicts."
-        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
-        return $false
-    }
-}
-
 # Get and validate instance name
 function Get-InstanceName {
     $currentDirName = Split-Path -Leaf (Get-Location)
@@ -164,18 +135,10 @@ function Get-InstanceName {
         $instanceName = Get-UserInput "Instance name" $currentDirName
         
         # Validate name format (alphanumeric, hyphens, underscores)
-        if ($instanceName -notmatch '^[a-zA-Z0-9_-]+$') {
-            Write-Warning "Instance name can only contain letters, numbers, hyphens, and underscores."
-            continue
-        }
-        
-        # Check for Docker conflicts
-        if (Test-DockerConflicts $instanceName) {
-            Write-Success "Instance name '$instanceName' is available"
+        if ($instanceName -match '^[a-zA-Z0-9_-]+$') {
             return $instanceName
         } else {
-            Write-Warning "A Docker container with the name '${instanceName}-webserver-1' already exists."
-            Write-Status "Please choose a different instance name."
+            Write-Warning "Instance name can only contain letters, numbers, hyphens, and underscores."
         }
     }
 }

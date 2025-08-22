@@ -18,19 +18,6 @@ print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Check for existing Docker containers that might conflict
-check_docker_conflicts() {
-    local project_name="$1"  # Now takes the instance name as parameter
-    local container_name="${project_name}-webserver-1"
-    
-    # Check if container with same name exists
-    if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
-        return 1  # Conflict exists
-    fi
-    
-    return 0  # No conflict
-}
-
 # Get and validate instance name
 get_instance_name() {
     local current_dir_name=$(basename "$(pwd)")
@@ -41,19 +28,11 @@ get_instance_name() {
         instance_name=${instance_name:-$current_dir_name}
         
         # Validate name format (alphanumeric, hyphens, underscores)
-        if ! [[ "$instance_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-            print_warning "Instance name can only contain letters, numbers, hyphens, and underscores."
-            continue
-        fi
-        
-        # Check for Docker conflicts
-        if check_docker_conflicts "$instance_name"; then
-            print_success "Instance name '$instance_name' is available"
+        if [[ "$instance_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
             echo "$instance_name"
             return 0
         else
-            print_warning "A Docker container with the name '${instance_name}-webserver-1' already exists."
-            print_status "Please choose a different instance name."
+            print_warning "Instance name can only contain letters, numbers, hyphens, and underscores."
         fi
     done
 }
@@ -221,23 +200,6 @@ check_docker() {
     fi
     
     print_success "Docker is installed, running, and accessible"
-}
-
-# Check for existing Docker containers that might conflict
-check_docker_conflicts() {
-    local project_name=$(basename "$(pwd)")
-    local container_name="${project_name}-webserver-1"
-    
-    # Check if container with same name exists
-    if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
-        print_error "A Docker container with the name '${container_name}' already exists."
-        print_warning "This may indicate an existing Poznote installation or a naming conflict."
-        print_status "To resolve this conflict, rename the folder of this new installation to a different name and run the setup script again."
-        echo
-        exit 1
-    fi
-    
-    print_success "No Docker container conflicts detected"
 }
 
 # Check if Poznote is already installed
