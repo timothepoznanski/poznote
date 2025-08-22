@@ -1,12 +1,17 @@
 
 
 <div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:12px; background:#f0f8ff; margin-bottom:20px;">
-<b>🌍 Documentation&nbsp;: &nbsp;
-<a href="README.fr.md">🇫🇷 Français</a> &nbsp;|&nbsp; <a href="README.md">🇬🇧 English</a>
+<b>🌍 Documentation: 
+<a href="README.fr.md">🇫🇷 Français</a> | <a href="README.md">🇬🇧 English</a>
 </b>
 </div>
 
 # Poznote
+
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
 Une application de prise de notes puissante qui vous donne un contrôle total sur vos données. Poznote peut être installée localement sur votre ordinateur ou sur un serveur distant pour accéder à vos notes depuis votre téléphone ou le navigateur web de votre ordinateur.
 

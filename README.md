@@ -1,7 +1,11 @@
 
-# Poznote
+<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:12px; background:#f0f8ff; margin-bottom:20px;">
+<b>🌍 Documentation: 
+<a href="README.md">🇬🇧 English</a> | <a href="README.fr.md">🇫🇷 Français</a>
+</b>
+</div>
 
-[🇫🇷 Lire la documentation en français](README.fr.md)
+# Poznote
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
