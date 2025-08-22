@@ -128,7 +128,7 @@ check_docker_permissions() {
         echo
         echo "  /usr/sbin/usermod -aG docker $USER"
         echo
-        print_status "Go back to your user session and run these commands:"
+        print_status "Then, go back to your user session and run these commands:"
         echo
         echo "  newgrp docker"
         echo "  ./setup.sh"
