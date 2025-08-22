@@ -130,7 +130,7 @@ check_docker_permissions() {
         echo
         print_status "Then, go back to your user session and run these commands:"
         echo
-        echo "  newgrp docker"
+        echo "  newgrp docker && exit"
         echo "  ./setup.sh"
         echo
         exit 1
