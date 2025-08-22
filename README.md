@@ -2,7 +2,7 @@
 <div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.fr.md" style="text-decoration:none; display:flex; align-items:center;">
-  <span>Lire en français</span>
+  <span>Cliquez ici pour lire cette documentation en français</span>
   <img src="https://flagcdn.com/24x18/fr.png" alt="FR flag" style="margin-left:10px;">
 </a>
 </h3>

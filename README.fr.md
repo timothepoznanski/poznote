@@ -3,7 +3,7 @@
 <div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.md" style="text-decoration:none; display:flex; align-items:center;">
-  <span>Read this documentation in English  </span>
+  <span>Click here to read this documentation in English</span>
   <img src="https://flagcdn.com/24x18/gb.png" alt="GB flag" style="margin-left:10px;">
 </a>
 </h3>
