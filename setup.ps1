@@ -359,9 +359,6 @@ function Update-DockerContainer {
                 $buildOutput = docker-compose up -d --build --force-recreate 2>&1
             }
         }
-        } else {
-            $buildOutput = docker-compose up -d --build --force-recreate 2>&1
-        }
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Container updated successfully!"
