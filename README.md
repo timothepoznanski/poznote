@@ -3,7 +3,7 @@
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.fr.md" style="text-decoration:none; display:flex; align-items:center;">
   <span>Lire en français</span>
-  <img src="https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F1EB-1F1F7.svg" width="30" height="30" style="margin-left:10px;">
+  <img src="https://flagcdn.com/24x18/fr.png" alt="FR flag" style="margin-left:10px;">
 </a>
 </h3>
 </div>
