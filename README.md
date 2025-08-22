@@ -1,7 +1,14 @@
 
 <div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:12px; background:#f0f8ff; margin-bottom:20px;">
 <b>🌍 Documentation: 
-<a href="README.md">🇬🇧 English</a> | <a href="README.fr.md">🇫🇷 Français</a>
+<a href="README.md">
+  <img src="https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F1EC-1F1E7.svg" width="20" height="20" style="vertical-align:middle; margin-right:5px;">
+  English
+</a> | 
+<a href="README.fr.md">
+  <img src="https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F1EB-1F1F7.svg" width="20" height="20" style="vertical-align:middle; margin-right:5px;">
+  Français
+</a>
 </b>
 </div>
 
