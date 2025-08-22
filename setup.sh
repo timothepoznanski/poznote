@@ -129,7 +129,7 @@ check_docker_permissions() {
         echo
         print_status "After running these commands, restart this script:"
         echo
-        echo "./setup.sh"
+        echo "  ./setup.sh"
         echo
         exit 1
     fi
