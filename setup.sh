@@ -49,7 +49,7 @@ REQUIREMENTS:
 SETUP DOCKER PERMISSIONS:
     If you get permission errors, add your user to the docker group:
     
-    sudo usermod -aG docker $USER
+    usermod -aG docker $USER
     newgrp docker
     
     Then run this script again.
@@ -119,15 +119,15 @@ reconfigure_poznote() {
 # Check if user is in docker group
 check_docker_permissions() {
     if ! groups "$USER" | grep -q docker; then
+        echo
         print_error "Your user '$USER' is not in the 'docker' group."
         echo
-        print_status "To use Docker without sudo, add your user to the docker group:"
-        echo "  sudo usermod -aG docker $USER"
+        print_status "To use Docker, add your user to the docker group:"
+        echo "  usermod -aG docker $USER"
         echo "  newgrp docker"
         echo
         print_status "After running these commands, restart this script."
         echo
-        print_warning "Alternative: You can also run Docker commands with sudo manually."
         exit 1
     fi
     
@@ -151,12 +151,12 @@ check_docker() {
     # Check if Docker daemon is running and accessible
     if ! docker info &> /dev/null; then
         print_error "Cannot access Docker daemon. This could mean:"
-        echo "  1. Docker service is not running - try: sudo systemctl start docker"
+        echo "  1. Docker service is not running - try: systemctl start docker"
         echo "  2. Docker daemon is not responding"
         echo
         print_status "To start Docker service:"
-        echo "  sudo systemctl start docker"
-        echo "  sudo systemctl enable docker"
+        echo "  systemctl start docker"
+        echo "  systemctl enable docker"
         exit 1
     fi
     
