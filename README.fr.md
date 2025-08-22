@@ -4,7 +4,7 @@
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.md" style="text-decoration:none; display:flex; align-items:center;">
   <span>Read in English</span>
-  <img src="https://flagcdn.com/24x18/gb.png" alt="GB flag" style="margin-left:10px;">
+  <img src="https://flagcdn.com/12x9/gb.png" alt="GB flag" style="margin-left:10px;">
 </a>
 </h3>
 </div>
