@@ -56,7 +56,8 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 **Linux/macOS:**
 - [Docker Engine](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- **Important**: If not running as root, add your user to the docker group:
+- If not running as root, add your user to the docker group:
+
   ```bash
   sudo usermod -aG docker $USER
   newgrp docker
