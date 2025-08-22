@@ -168,6 +168,20 @@ check_docker() {
     print_success "Docker is installed, running, and accessible"
 }
 
+# Check for existing Docker containers that might conflict
+check_docker_conflicts() {
+    local project_name=$(basename "$(pwd)")
+    local container_name="${project_name}-webserver-1"
+    
+    # Check if container with same name exists
+    if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
+        print_error "A Docker container with the name '${container_name}' already exists."
+        exit 1
+    fi
+    
+    print_success "No Docker container conflicts detected"
+}
+
 # Check if Poznote is already installed
 check_existing_installation() {
     # Installation is detected if .env file exists
@@ -604,6 +618,9 @@ main() {
     else
         # Fresh installation
         print_status "🆕 Proceeding with fresh installation."
+        
+        # Check for Docker container conflicts before installation
+        check_docker_conflicts
         
         get_user_config "false"
         create_env_file
