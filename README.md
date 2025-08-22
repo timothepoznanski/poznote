@@ -75,7 +75,7 @@ Docker is a platform that packages and runs applications in isolated containers.
    - **CentOS/RHEL:** Follow the [official guide](https://docs.docker.com/engine/install/centos/)
    - **Arch Linux:** `sudo pacman -S docker docker-compose`
 2. Start Docker: `sudo systemctl start docker && sudo systemctl enable docker`
-3. Add your user to docker group (avoids sudo):
+3. Add your user to docker group:
    ```bash
    sudo usermod -aG docker $USER
    ```
