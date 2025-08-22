@@ -176,6 +176,9 @@ check_docker_conflicts() {
     # Check if container with same name exists
     if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
         print_error "A Docker container with the name '${container_name}' already exists."
+        print_warning "This may indicate an existing Poznote installation or a naming conflict."
+        print_status "To resolve this conflict, rename the folder of this new installation to a different name."
+        echo
         exit 1
     fi
     

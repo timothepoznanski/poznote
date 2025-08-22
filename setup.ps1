@@ -151,9 +151,7 @@ function Test-DockerConflicts {
             Write-Host "  1. Poznote is already installed in this directory" -ForegroundColor $Colors.Yellow
             Write-Host "  2. Another Docker project is using the same name" -ForegroundColor $Colors.Yellow
             Write-Host ""
-            Write-Status "To resolve this:" -ForegroundColor $Colors.Yellow
-            Write-Host "  - If it's an old Poznote installation: docker compose down" -ForegroundColor $Colors.Yellow
-            Write-Host "  - If it's another project: rename this directory or remove the conflicting container" -ForegroundColor $Colors.Yellow
+            Write-Status "To resolve this conflict, rename the folder of this new installation to a different name." -ForegroundColor $Colors.Yellow
             Write-Host ""
             return $false
         }
