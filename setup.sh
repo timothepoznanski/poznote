@@ -36,7 +36,7 @@ print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 # Function to show help
 show_help() {
     cat << 'EOF'
-Poznote Setup Script for Linux/macOS
+Poznote Setup Script for Linux
 
 USAGE:
     ./setup.sh [OPTIONS]

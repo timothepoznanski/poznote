@@ -56,22 +56,32 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 
 Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à déployer partout. Vous pouvez :
 
-- **Lancer localement** sur votre ordinateur avec Docker Desktop (Windows) ou Docker Engine (Linux/macOS)
+- **Lancer localement** sur votre ordinateur avec Docker Desktop (Windows) ou Docker Engine (Linux)
 - **Déployer sur un serveur** pour accéder à vos notes de partout - téléphone, tablette ou tout navigateur web
 
 ### Prérequis
 
+**🐳 Qu'est-ce que Docker ?**
+Docker est une plateforme qui permet d'empaqueter et d'exécuter des applications dans des conteneurs isolés. Poznote utilise Docker pour simplifier l'installation et garantir que l'application fonctionne de la même manière sur tous les systèmes.
+
 **Windows :**
-- [Docker Desktop pour Windows](https://www.docker.com/products/docker-desktop/)
+1. Téléchargez et installez [Docker Desktop pour Windows](https://www.docker.com/products/docker-desktop/)
+2. Suivez l'assistant d'installation (redémarrage requis)
+3. Lancez Docker Desktop depuis le menu Démarrer
+4. Attendez que Docker soit démarré (icône Docker dans la barre des tâches)
 
-**Linux/macOS :**
-- [Docker Engine](https://docs.docker.com/engine/install/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-- Si vous n'êtes pas root, ajoutez votre utilisateur au groupe docker :
-
-```bash
-sudo usermod -aG docker $USER
-```
+**Linux :**
+1. Installez Docker Engine selon votre distribution :
+   - **Ubuntu/Debian :** `curl -fsSL https://get.docker.com | sh`
+   - **CentOS/RHEL :** Suivez le [guide officiel](https://docs.docker.com/engine/install/centos/)
+   - **Arch Linux :** `sudo pacman -S docker docker-compose`
+2. Démarrez Docker : `sudo systemctl start docker && sudo systemctl enable docker`
+3. Ajoutez votre utilisateur au groupe docker :
+   ```bash
+   sudo usermod -aG docker $USER
+   ```
+5. Redémarrez votre session
+4. Testez l'installation : `docker --version && docker compose version`
 
 ### Démarrage rapide
 
@@ -80,7 +90,7 @@ sudo usermod -aG docker $USER
 function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "\nChoisissez un nom d'instance (poznote, poznote-work, mes-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -match "^[a-zA-Z0-9_-]+$")) { Write-Host "⚠️  Le nom ne peut contenir que des lettres, chiffres, tirets et underscores." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Le conteneur Docker '${instanceName}-webserver-1' existe déjà !" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
 ```
 
-**Linux/macOS (Bash) :**
+**Linux (bash) :**
 ```bash
 check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Le conteneur Docker '${name}-webserver-1' existe déjà !"; return 1; fi; return 0; }; while true; do read -p "\nChoisissez un nom d'instance (poznote, poznote-work, mes-notes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-zA-Z0-9_-]+$ ]] && check_conflicts "$instanceName"; then break; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
 ```
@@ -130,7 +140,7 @@ Pour des déploiements sur des serveurs différents, il suffit juste de lancer l
 
 Pour changer votre nom d'utilisateur, mot de passe, port ou nom d'application :
 
-**Linux/macOS :**
+**Linux :**
 ```bash
 ./setup.sh
 ```
