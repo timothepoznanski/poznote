@@ -135,6 +135,12 @@ reconfigure_poznote() {
 # Check Docker installation
 # Check if user is in docker group
 check_docker_permissions() {
+    # Root user doesn't need to be in docker group
+    if [ "$USER" = "root" ]; then
+        print_success "Running as root - Docker permissions OK"
+        return 0
+    fi
+    
     if ! groups "$USER" | grep -q docker; then
         echo
         print_error "Your user '$USER' is not in the 'docker' group."
