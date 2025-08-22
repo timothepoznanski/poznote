@@ -127,22 +127,6 @@ function Test-DockerCompose {
     }
 }
 
-# Get and validate instance name
-function Get-InstanceName {
-    $currentDirName = Split-Path -Leaf (Get-Location)
-    
-    while ($true) {
-        $instanceName = Get-UserInput "Instance name" $currentDirName
-        
-        # Validate name format (alphanumeric, hyphens, underscores)
-        if ($instanceName -match '^[a-zA-Z0-9_-]+$') {
-            return $instanceName
-        } else {
-            Write-Warning "Instance name can only contain letters, numbers, hyphens, and underscores."
-        }
-    }
-}
-
 function Test-Docker {
     Write-Status "Performing Docker environment checks..."
     
@@ -608,9 +592,8 @@ Poznote Installation Script
 "@ -ForegroundColor $Colors.Green
 
     # Get instance name first
-    Write-Host ""
-    Write-Status "Choose an instance name for this installation:"
-    $INSTANCE_NAME = Get-InstanceName
+    $INSTANCE_NAME = Split-Path -Leaf (Get-Location)
+    Write-Status "Using instance name: $INSTANCE_NAME"
     Write-Host ""
 
     # Check if .env already exists

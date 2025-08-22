@@ -18,25 +18,6 @@ print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Get and validate instance name
-get_instance_name() {
-    local current_dir_name=$(basename "$(pwd)")
-    local instance_name
-    
-    while true; do
-        read -p "Instance name (default: $current_dir_name): " instance_name
-        instance_name=${instance_name:-$current_dir_name}
-        
-        # Validate name format (alphanumeric, hyphens, underscores)
-        if [[ "$instance_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-            echo "$instance_name"
-            return 0
-        else
-            print_warning "Instance name can only contain letters, numbers, hyphens, and underscores."
-        fi
-    done
-}
-
 # Check if Poznote is already installed
 
 # Colors for output
@@ -359,9 +340,8 @@ get_user_config() {
     
     # Get instance name (only for new installations)
     if [ "$is_update" != "true" ]; then
-        echo
-        print_status "Choose an instance name for this installation:"
-        INSTANCE_NAME=$(get_instance_name)
+        INSTANCE_NAME=$(basename "$(pwd)")
+        print_status "Using instance name: $INSTANCE_NAME"
         echo
     fi
     
