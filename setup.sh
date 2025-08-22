@@ -122,7 +122,8 @@ check_docker_permissions() {
         echo
         print_error "Your user '$USER' is not in the 'docker' group."
         echo
-        print_status "To use Docker, add your user to the docker group:"
+        print_status "Add your user to the docker group by running these two commands:"
+        echo
         echo "  usermod -aG docker $USER"
         echo "  newgrp docker"
         echo
