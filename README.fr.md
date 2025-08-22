@@ -59,7 +59,7 @@ Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à dép
 - **Lancer localement** sur votre ordinateur avec Docker Desktop (Windows) ou Docker Engine (Linux)
 - **Déployer sur un serveur** pour accéder à vos notes de partout - téléphone, tablette ou tout navigateur web
 
-### Prérequis
+### Prérequis (installation Docker)
 
 **🐳 Qu'est-ce que Docker ?**
 Docker est une plateforme qui permet d'empaqueter et d'exécuter des applications dans des conteneurs isolés. Poznote utilise Docker pour simplifier l'installation et garantir que l'application fonctionne de la même manière sur tous les systèmes.
@@ -83,7 +83,7 @@ Docker est une plateforme qui permet d'empaqueter et d'exécuter des application
 5. Redémarrez votre session
 4. Testez l'installation : `docker --version && docker compose version`
 
-### Démarrage rapide
+### Démarrage rapide (installation Poznote)
 
 **Windows (PowerShell) :**
 ```powershell
