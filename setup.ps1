@@ -129,11 +129,10 @@ function Test-DockerCompose {
 
 # Check for existing Docker containers that might conflict
 function Test-DockerConflicts {
+    param([string]$ProjectName)
+    
     try {
-        Write-Status "Checking for Docker container conflicts..."
-        
-        $projectName = Split-Path -Leaf (Get-Location)
-        $containerName = "$projectName-webserver-1"
+        $containerName = "$ProjectName-webserver-1"
         
         # Get list of all container names
         $containerNames = & docker ps -a --format "{{.Names}}" 2>&1
@@ -145,24 +144,39 @@ function Test-DockerConflicts {
         
         # Check if our container name already exists
         if ($containerNames -contains $containerName) {
-            Write-Error "A Docker container with the name '$containerName' already exists."
-            Write-Host ""
-            Write-Status "This usually means:" -ForegroundColor $Colors.Yellow
-            Write-Host "  1. Poznote is already installed in this directory" -ForegroundColor $Colors.Yellow
-            Write-Host "  2. Another Docker project is using the same name" -ForegroundColor $Colors.Yellow
-            Write-Host ""
-            Write-Status "To resolve this conflict, rename the folder of this new installation to a different name." -ForegroundColor $Colors.Yellow
-            Write-Host ""
-            return $false
+            return $false  # Conflict exists
         }
         
-        Write-Success "No Docker container conflicts detected"
-        return $true
+        return $true  # No conflict
     }
     catch {
         Write-Error "Failed to check Docker conflicts."
         Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
         return $false
+    }
+}
+
+# Get and validate instance name
+function Get-InstanceName {
+    $currentDirName = Split-Path -Leaf (Get-Location)
+    
+    while ($true) {
+        $instanceName = Get-UserInput "Instance name" $currentDirName
+        
+        # Validate name format (alphanumeric, hyphens, underscores)
+        if ($instanceName -notmatch '^[a-zA-Z0-9_-]+$') {
+            Write-Warning "Instance name can only contain letters, numbers, hyphens, and underscores."
+            continue
+        }
+        
+        # Check for Docker conflicts
+        if (Test-DockerConflicts $instanceName) {
+            Write-Success "Instance name '$instanceName' is available"
+            return $instanceName
+        } else {
+            Write-Warning "A Docker container with the name '${instanceName}-webserver-1' already exists."
+            Write-Status "Please choose a different instance name."
+        }
     }
 }
 
@@ -330,30 +344,53 @@ function Get-PortWithValidation {
 
 # Manage Docker container
 function Update-DockerContainer {
+    param([string]$ProjectName = $null)
+    
+    $projectArg = if ($ProjectName) { "-p `"$ProjectName`"" } else { "" }
     Write-Status "Stopping existing container..."
     
     # Try docker compose, fallback to docker-compose
     $composeCmd = "docker compose"
     try {
-        $output = & docker compose down 2>&1
+        if ($ProjectName) {
+            $output = & docker compose -p $ProjectName down 2>&1
+        } else {
+            $output = & docker compose down 2>&1
+        }
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "docker compose down failed, trying docker-compose..."
             $composeCmd = "docker-compose"
-            & docker-compose down 2>&1
+            if ($ProjectName) {
+                & docker-compose -p $ProjectName down 2>&1
+            } else {
+                & docker-compose down 2>&1
+            }
         }
     }
     catch {
         Write-Warning "docker compose not available, using docker-compose..."
         $composeCmd = "docker-compose"
-        & docker-compose down 2>&1
+        if ($ProjectName) {
+            & docker-compose -p $ProjectName down 2>&1
+        } else {
+            & docker-compose down 2>&1
+        }
     }
     
     Write-Status "Pulling latest images..."
     try {
         if ($composeCmd -eq "docker compose") {
-            $pullOutput = docker compose pull 2>&1
+            if ($ProjectName) {
+                $pullOutput = docker compose -p $ProjectName pull 2>&1
+            } else {
+                $pullOutput = docker compose pull 2>&1
+            }
         } else {
-            $pullOutput = docker-compose pull 2>&1
+            if ($ProjectName) {
+                $pullOutput = docker-compose -p $ProjectName pull 2>&1
+            } else {
+                $pullOutput = docker-compose pull 2>&1
+            }
         }
     }
     catch {
@@ -363,7 +400,18 @@ function Update-DockerContainer {
     Write-Status "Building and starting updated container..."
     try {
         if ($composeCmd -eq "docker compose") {
-            $buildOutput = docker compose up -d --build --force-recreate 2>&1
+            if ($ProjectName) {
+                $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
+            } else {
+                $buildOutput = docker compose up -d --build --force-recreate 2>&1
+            }
+        } else {
+            if ($ProjectName) {
+                $buildOutput = docker-compose -p $ProjectName up -d --build --force-recreate 2>&1
+            } else {
+                $buildOutput = docker-compose up -d --build --force-recreate 2>&1
+            }
+        }
         } else {
             $buildOutput = docker-compose up -d --build --force-recreate 2>&1
         }
@@ -596,10 +644,11 @@ Update Complete!
 Poznote Installation Script
 "@ -ForegroundColor $Colors.Green
 
-    # Check for Docker container conflicts before installation
-    if (-not (Test-DockerConflicts)) {
-        exit 1
-    }
+    # Get instance name first
+    Write-Host ""
+    Write-Status "Choose an instance name for this installation:"
+    $INSTANCE_NAME = Get-InstanceName
+    Write-Host ""
 
     # Check if .env already exists
     if (Test-Path ".env") {
@@ -676,7 +725,11 @@ Poznote Installation Script
     
     try {
         Write-Status "Attempting to start with 'docker compose'..."
-        $output = docker compose up -d --build 2>&1
+        if ($INSTANCE_NAME) {
+            $output = docker compose -p $INSTANCE_NAME up -d --build 2>&1
+        } else {
+            $output = docker compose up -d --build 2>&1
+        }
         if ($LASTEXITCODE -eq 0) {
             $dockerComposeCmd = "docker compose"
             $success = $true
@@ -691,7 +744,11 @@ Poznote Installation Script
     if (-not $success) {
         try {
             Write-Status "Attempting to start with 'docker-compose'..."
-            $output = docker-compose up -d --build 2>&1
+            if ($INSTANCE_NAME) {
+                $output = docker-compose -p $INSTANCE_NAME up -d --build 2>&1
+            } else {
+                $output = docker-compose up -d --build 2>&1
+            }
             if ($LASTEXITCODE -eq 0) {
                 $dockerComposeCmd = "docker-compose"
                 $success = $true

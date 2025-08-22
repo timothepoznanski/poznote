@@ -6,8 +6,45 @@
 set -e
 
 # Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
+RED='\033[0;31m# Check for existing Docker containers that might conflict
+check_docker_conflicts() {
+    local project_name="$1"  # Now takes the instance name as parameter
+    local container_name="${project_name}-webserver-1"
+    
+    # Check if container with same name exists
+    if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
+        return 1  # Conflict exists
+    fi
+    
+    return 0  # No conflict
+}
+
+# Get and validate instance name
+get_instance_name() {
+    local current_dir_name=$(basename "$(pwd)")
+    local instance_name
+    
+    while true; do
+        read -p "Instance name (default: $current_dir_name): " instance_name
+        instance_name=${instance_name:-$current_dir_name}
+        
+        # Validate name format (alphanumeric, hyphens, underscores)
+        if ! [[ "$instance_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            print_warning "Instance name can only contain letters, numbers, hyphens, and underscores."
+            continue
+        fi
+        
+        # Check for Docker conflicts
+        if check_docker_conflicts "$instance_name"; then
+            print_success "Instance name '$instance_name' is available"
+            echo "$instance_name"
+            return 0
+        else
+            print_warning "A Docker container with the name '${instance_name}-webserver-1' already exists."
+            print_status "Please choose a different instance name."
+        fi
+    done
+}32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
@@ -177,7 +214,7 @@ check_docker_conflicts() {
     if docker ps -a --format "{{.Names}}" | grep -q "^${container_name}$"; then
         print_error "A Docker container with the name '${container_name}' already exists."
         print_warning "This may indicate an existing Poznote installation or a naming conflict."
-        print_status "To resolve this conflict, rename the folder of this new installation to a different name."
+        print_status "To resolve this conflict, rename the folder of this new installation to a different name and run the setup script again."
         echo
         exit 1
     fi
@@ -340,6 +377,14 @@ get_user_config() {
         echo
     fi
     
+    # Get instance name (only for new installations)
+    if [ "$is_update" != "true" ]; then
+        echo
+        print_status "Choose an instance name for this installation:"
+        INSTANCE_NAME=$(get_instance_name)
+        echo
+    fi
+    
     # Get username
     if [ "$is_update" = "true" ] && [ -n "$POZNOTE_USERNAME" ]; then
         read -p "Username (current: $POZNOTE_USERNAME): " NEW_USERNAME
@@ -434,27 +479,28 @@ create_env_file() {
 # Manage Docker container
 manage_container() {
     local action=$1
+    local project_name=${INSTANCE_NAME:-$(basename "$(pwd)")}
     
     case $action in
         "update")
             print_status "Updating Poznote container..."
             
             # Stop existing container if running
-            if docker compose ps -q 2>/dev/null | grep -q .; then
+            if docker compose -p "$project_name" ps -q 2>/dev/null | grep -q .; then
                 print_status "Stopping existing container..."
-                docker compose down
+                docker compose -p "$project_name" down
             fi
             
             print_status "Pulling latest Docker images..."
-            docker compose pull
+            docker compose -p "$project_name" pull
             
             print_status "Building and starting container..."
-            docker compose up -d --build
+            docker compose -p "$project_name" up -d --build
             ;;
         "restart")
             print_status "Restarting container with new configuration..."
-            docker compose down
-            docker compose up -d
+            docker compose -p "$project_name" down
+            docker compose -p "$project_name" up -d
             ;;
     esac
     
@@ -463,11 +509,11 @@ manage_container() {
     sleep 15
     
     # Check if container is running
-    if docker compose ps | grep -q "Up"; then
+    if docker compose -p "$project_name" ps | grep -q "Up"; then
         print_success "Poznote container is running"
     else
         print_error "Failed to start container"
-        docker compose logs
+        docker compose -p "$project_name" logs
         exit 1
     fi
 }
@@ -491,10 +537,9 @@ show_info() {
     
     if [ "$is_update" != "true" ]; then
         echo
-        print_status "⚙️  To update Poznote, change settings, run:"
-        echo "  ./setup.sh"
+        print_status "⚙️  To update Poznote or change settings, run setup script again"
+        echo
     fi
-
 }
 
 # Function to check for updates (can be called by PHP)
@@ -621,9 +666,6 @@ main() {
     else
         # Fresh installation
         print_status "🆕 Proceeding with fresh installation."
-        
-        # Check for Docker container conflicts before installation
-        check_docker_conflicts
         
         get_user_config "false"
         create_env_file
