@@ -42,12 +42,12 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Multiple Instances](#multiple-instances)
-- [AI Features](#ai-features)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
+- [AI Features](#ai-features)
 - [API Documentation](#api-documentation)
 - [Manual Operations](#manual-operations)
 
@@ -127,48 +127,6 @@ Server: my-server.com
 
 For deployments on different servers, you only need to run the setup script and use menu option 2 to update the displayed application name parameter - no need for different instance names or ports.
 
-## AI Features
-
-Poznote includes powerful AI capabilities powered by OpenAI to enhance your note-taking experience. These features are optional and require an OpenAI API key to function.
-
-### Available AI Features
-
-- **🤖 AI Summarization** - Generate intelligent summaries of your notes to quickly understand key points
-- **🏷️ Auto Tag Generation** - Automatically generate relevant tags based on your note content
-- **🔍 Check Content** - Verify the accuracy, coherence, and logical consistency of your note content
-
-### Setup AI Features
-
-1. **Get an OpenAI API Key**
-   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
-   - Create an account or sign in
-   - Generate a new API key
-
-2. **Configure Poznote**
-   - Go to **Settings → AI Settings** in your Poznote interface
-   - Enable AI features by checking the box
-   - Enter your OpenAI API key
-   - Save the configuration
-
-3. **Start Using AI Features**
-   - Open any note and look for AI buttons in the toolbar
-   - Use **AI Summary** to generate note summaries
-   - Use **Auto Tags** to suggest relevant tags
-   - Use **Correct Faults** to fix grammar and style issues
-
-### Requirements
-
-- ✅ Active internet connection
-- ✅ Valid OpenAI API key
-- ✅ Sufficient OpenAI credits in your account
-
-### Privacy & Data
-
-When AI features are enabled:
-- Note content is sent to OpenAI's servers for processing
-- Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
-- You can disable AI features at any time in settings
-
 ## Change Settings
 
 To change your username, password, port, or application name:
@@ -230,6 +188,48 @@ When you export notes using the **📝 Export Notes** option, you get a ZIP file
 - **Portable** - Share or archive your notes easily
 
 Simply extract the ZIP file and open `index.html` in any web browser to access your notes offline.
+
+## AI Features
+
+Poznote includes powerful AI capabilities powered by OpenAI to enhance your note-taking experience. These features are optional and require an OpenAI API key to function.
+
+### Available AI Features
+
+- **🤖 AI Summarization** - Generate intelligent summaries of your notes to quickly understand key points
+- **🏷️ Auto Tag Generation** - Automatically generate relevant tags based on your note content
+- **🔍 Check Content** - Verify the accuracy, coherence, and logical consistency of your note content
+
+### Setup AI Features
+
+1. **Get an OpenAI API Key**
+   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Create an account or sign in
+   - Generate a new API key
+
+2. **Configure Poznote**
+   - Go to **Settings → AI Settings** in your Poznote interface
+   - Enable AI features by checking the box
+   - Enter your OpenAI API key
+   - Save the configuration
+
+3. **Start Using AI Features**
+   - Open any note and look for AI buttons in the toolbar
+   - Use **AI Summary** to generate note summaries
+   - Use **Auto Tags** to suggest relevant tags
+   - Use **Correct Faults** to fix grammar and style issues
+
+### Requirements
+
+- ✅ Active internet connection
+- ✅ Valid OpenAI API key
+- ✅ Sufficient OpenAI credits in your account
+
+### Privacy & Data
+
+When AI features are enabled:
+- Note content is sent to OpenAI's servers for processing
+- Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
+- You can disable AI features at any time in settings
 
 ## API Documentation
 

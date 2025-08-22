@@ -43,12 +43,12 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - [Installation](#installation)
 - [Accéder à votre instance](#accéder-à-votre-instance)
 - [Instances multiples](#instances-multiples)
-- [Fonctionnalités IA](#fonctionnalités-ia)
 - [Modifier les paramètres](#modifier-les-paramètres)
 - [Réinitialiser le mot de passe](#réinitialiser-le-mot-de-passe)
 - [Mettre à jour l'application](#mettre-à-jour-lapplication)
 - [Sauvegarde et restauration](#sauvegarde-et-restauration)
 - [Vue hors-ligne](#vue-hors-ligne)
+- [Fonctionnalités IA](#fonctionnalités-ia)
 - [Documentation API](#documentation-api)
 - [Opérations manuelles](#opérations-manuelles)
 
@@ -126,48 +126,6 @@ Serveur : mon-serveur.com
 
 Pour des déploiements sur des serveurs différents, il suffit juste de lancer le script de configuration et d'utiliser l'option de menu 2 pour mettre à jour le paramètre nom de l'application affiché - pas besoin de noms d'instance ou de ports différents.
 
-## Fonctionnalités IA
-
-Poznote inclut des fonctionnalités IA puissantes propulsées par OpenAI pour améliorer votre expérience de prise de notes. Ces fonctionnalités sont optionnelles et nécessitent une clé API OpenAI.
-
-### Fonctionnalités IA disponibles
-
-- **🤖 Résumé IA** - Génère des résumés intelligents de vos notes pour comprendre rapidement les points clés
-- **🏷️ Génération automatique de tags** - Génère automatiquement des tags pertinents selon le contenu de la note
-- **🔍 Vérification du contenu** - Vérifie la cohérence, la logique et la grammaire de vos notes
-
-### Configuration des fonctionnalités IA
-
-1. **Obtenez une clé API OpenAI**
-	 - Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
-	 - Créez un compte ou connectez-vous
-	 - Générez une nouvelle clé API
-
-2. **Configurez Poznote**
-	 - Allez dans **Paramètres → Paramètres IA** dans l'interface Poznote
-	 - Activez les fonctionnalités IA
-	 - Entrez votre clé API OpenAI
-	 - Sauvegardez la configuration
-
-3. **Utilisez les fonctionnalités IA**
-	 - Ouvrez une note et cherchez les boutons IA dans la barre d'outils
-	 - Utilisez **Résumé IA** pour générer un résumé
-	 - Utilisez **Tags auto** pour suggérer des tags
-	 - Utilisez **Correction** pour corriger grammaire et style
-
-### Prérequis
-
-- ✅ Connexion internet active
-- ✅ Clé API OpenAI valide
-- ✅ Crédits OpenAI suffisants
-
-### Confidentialité & Données
-
-Lorsque les fonctionnalités IA sont activées :
-- Le contenu des notes est envoyé aux serveurs d'OpenAI pour traitement
-- Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
-- Vous pouvez désactiver l'IA à tout moment dans les paramètres
-
 ## Modifier les paramètres
 
 Pour changer votre nom d'utilisateur, mot de passe, port ou nom d'application :
@@ -229,6 +187,48 @@ Quand vous exportez vos notes via **📝 Exporter les notes**, vous obtenez un Z
 - **Portable** - Partagez ou archivez facilement vos notes
 
 Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans un navigateur pour accéder à vos notes hors-ligne.
+
+## Fonctionnalités IA
+
+Poznote inclut des fonctionnalités IA puissantes propulsées par OpenAI pour améliorer votre expérience de prise de notes. Ces fonctionnalités sont optionnelles et nécessitent une clé API OpenAI.
+
+### Fonctionnalités IA disponibles
+
+- **🤖 Résumé IA** - Génère des résumés intelligents de vos notes pour comprendre rapidement les points clés
+- **🏷️ Génération automatique de tags** - Génère automatiquement des tags pertinents selon le contenu de la note
+- **🔍 Vérification du contenu** - Vérifie la cohérence, la logique et la grammaire de vos notes
+
+### Configuration des fonctionnalités IA
+
+1. **Obtenez une clé API OpenAI**
+   - Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
+   - Créez un compte ou connectez-vous
+   - Générez une nouvelle clé API
+
+2. **Configurez Poznote**
+   - Allez dans **Paramètres → Paramètres IA** dans l'interface Poznote
+   - Activez les fonctionnalités IA
+   - Entrez votre clé API OpenAI
+   - Sauvegardez la configuration
+
+3. **Utilisez les fonctionnalités IA**
+   - Ouvrez une note et cherchez les boutons IA dans la barre d'outils
+   - Utilisez **Résumé IA** pour générer un résumé
+   - Utilisez **Tags auto** pour suggérer des tags
+   - Utilisez **Correction** pour corriger grammaire et style
+
+### Prérequis
+
+- ✅ Connexion internet active
+- ✅ Clé API OpenAI valide
+- ✅ Crédits OpenAI suffisants
+
+### Confidentialité & Données
+
+Lorsque les fonctionnalités IA sont activées :
+- Le contenu des notes est envoyé aux serveurs d'OpenAI pour traitement
+- Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
+- Vous pouvez désactiver l'IA à tout moment dans les paramètres
 
 ## Documentation API
 
