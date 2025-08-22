@@ -60,7 +60,6 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
   ```bash
   sudo usermod -aG docker $USER
-  newgrp docker
   ```
 
 ### Quick Start
