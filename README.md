@@ -59,74 +59,27 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 ### Quick Start
 
-**Windows (PowerShell - One-liner):**
+**Windows (PowerShell):**
 ```powershell
 function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -match "^[a-zA-Z0-9_-]+$")) { Write-Host "⚠️  Name can only contain letters, numbers, hyphens, and underscores." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
 ```
 
-**Windows (PowerShell - Step by step):**
-```powershell
-# Step 1: Define conflict checking function
-function Test-DockerConflict($name) {
-    return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0
-}
+*This command will:*
+- *Ask you to choose an instance name (default: poznote)*
+- *Check for Docker container conflicts before cloning*
+- *Clone the repository with your chosen name*
+- *Run the automated setup*
 
-# Step 2: Choose instance name with conflict checking
-do {
-    $instanceName = Read-Host "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]"
-    if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
-    
-    if (-not ($instanceName -match "^[a-zA-Z0-9_-]+$")) {
-        Write-Host "⚠️  Name can only contain letters, numbers, hyphens, and underscores." -ForegroundColor Yellow
-        continue
-    }
-    
-    if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
-        continue
-    }
-    
-    break
-} while ($true)
-
-# Step 3: Clone and setup
-git clone https://github.com/timothepoznanski/poznote.git $instanceName
-cd $instanceName
-.\setup.ps1
-```
-
-**Linux/macOS (One-liner):**
+**Linux/macOS (Bash):**
 ```bash
 check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Docker container '${name}-webserver-1' already exists!"; return 1; fi; return 0; }; while true; do read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-zA-Z0-9_-]+$ ]] && check_conflicts "$instanceName"; then break; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
 ```
 
-**Linux/macOS (Step by step):**
-```bash
-# Step 1: Define conflict checking function
-check_conflicts() {
-    local name="$1"
-    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
-        echo "⚠️  Docker container '${name}-webserver-1' already exists!"
-        return 1
-    fi
-    return 0
-}
-
-# Step 2: Choose instance name with conflict checking
-while true; do
-    read -p "Choose an instance name (poznote, poznote-work, my-notes, etc.) [poznote]: " instanceName
-    instanceName=${instanceName:-poznote}
-    if [[ "$instanceName" =~ ^[a-zA-Z0-9_-]+$ ]] && check_conflicts "$instanceName"; then
-        break
-    fi
-done
-
-# Step 3: Clone and setup
-git clone https://github.com/timothepoznanski/poznote.git "$instanceName"
-cd "$instanceName"
-chmod +x setup.sh
-./setup.sh
-```
+*This command will:*
+- *Ask you to choose an instance name (default: poznote)*
+- *Check for Docker container conflicts before cloning*
+- *Clone the repository with your chosen name*
+- *Run the automated setup*
 
 ## Access Your Instance
 
