@@ -43,7 +43,16 @@ FEATURES:
 
 REQUIREMENTS:
     - Docker Engine and Docker Compose
+    - User must be in the 'docker' group
     - Bash shell
+
+SETUP DOCKER PERMISSIONS:
+    If you get permission errors, add your user to the docker group:
+    
+    sudo usermod -aG docker $USER
+    newgrp docker
+    
+    Then run this script again.
 EOF
 }
 
@@ -120,12 +129,20 @@ check_docker() {
         exit 1
     fi
     
+    # Check if Docker daemon is accessible
     if ! docker info &> /dev/null; then
-        print_error "Docker is installed but not running. Please start Docker service and try again."
+        print_error "Cannot access Docker daemon. This usually means:"
+        echo "  1. Docker service is not running - try: sudo systemctl start docker"
+        echo "  2. Your user is not in the 'docker' group"
+        echo ""
+        print_status "To add your user to the docker group:"
+        echo "  sudo usermod -aG docker $USER"
+        echo "  newgrp docker"
+        echo "  Then run this script again."
         exit 1
     fi
     
-    print_success "Docker is installed and running"
+    print_success "Docker is installed and accessible"
 }
 
 # Check if Poznote is already installed
