@@ -1,4 +1,7 @@
+
 # Poznote
+
+[🇫🇷 Lire la documentation en français](README.fr.md)
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
