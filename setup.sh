@@ -116,6 +116,25 @@ reconfigure_poznote() {
 }
 
 # Check Docker installation
+# Check if user is in docker group
+check_docker_permissions() {
+    if ! groups "$USER" | grep -q docker; then
+        print_error "Your user '$USER' is not in the 'docker' group."
+        echo
+        print_status "To use Docker without sudo, add your user to the docker group:"
+        echo "  sudo usermod -aG docker $USER"
+        echo "  newgrp docker"
+        echo
+        print_status "After running these commands, restart this script."
+        echo
+        print_warning "Alternative: You can also run Docker commands with sudo manually."
+        exit 1
+    fi
+    
+    print_success "User '$USER' is in the docker group"
+}
+
+# Check Docker installation and accessibility
 check_docker() {
     if ! command -v docker &> /dev/null; then
         print_error "Docker is not installed. Please install Docker first."
@@ -129,20 +148,19 @@ check_docker() {
         exit 1
     fi
     
-    # Check if Docker daemon is accessible
+    # Check if Docker daemon is running and accessible
     if ! docker info &> /dev/null; then
-        print_error "Cannot access Docker daemon. This usually means:"
+        print_error "Cannot access Docker daemon. This could mean:"
         echo "  1. Docker service is not running - try: sudo systemctl start docker"
-        echo "  2. Your user is not in the 'docker' group"
-        echo ""
-        print_status "To add your user to the docker group:"
-        echo "  sudo usermod -aG docker $USER"
-        echo "  newgrp docker"
-        echo "  Then run this script again."
+        echo "  2. Docker daemon is not responding"
+        echo
+        print_status "To start Docker service:"
+        echo "  sudo systemctl start docker"
+        echo "  sudo systemctl enable docker"
         exit 1
     fi
     
-    print_success "Docker is installed and accessible"
+    print_success "Docker is installed, running, and accessible"
 }
 
 # Check if Poznote is already installed
@@ -516,6 +534,10 @@ main() {
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
     
+    # Check Docker permissions first
+    check_docker_permissions
+    
+    # Then check Docker installation and accessibility
     check_docker
     
     if check_existing_installation; then
