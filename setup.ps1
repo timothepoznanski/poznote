@@ -127,6 +127,47 @@ function Test-DockerCompose {
     }
 }
 
+# Check for existing Docker containers that might conflict
+function Test-DockerConflicts {
+    try {
+        Write-Status "Checking for Docker container conflicts..."
+        
+        $projectName = Split-Path -Leaf (Get-Location)
+        $containerName = "$projectName-webserver-1"
+        
+        # Get list of all container names
+        $containerNames = & docker ps -a --format "{{.Names}}" 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to check existing containers."
+            Write-Host "Error details: $containerNames" -ForegroundColor $Colors.Red
+            return $false
+        }
+        
+        # Check if our container name already exists
+        if ($containerNames -contains $containerName) {
+            Write-Error "A Docker container with the name '$containerName' already exists."
+            Write-Host ""
+            Write-Status "This usually means:" -ForegroundColor $Colors.Yellow
+            Write-Host "  1. Poznote is already installed in this directory" -ForegroundColor $Colors.Yellow
+            Write-Host "  2. Another Docker project is using the same name" -ForegroundColor $Colors.Yellow
+            Write-Host ""
+            Write-Status "To resolve this:" -ForegroundColor $Colors.Yellow
+            Write-Host "  - If it's an old Poznote installation: docker compose down" -ForegroundColor $Colors.Yellow
+            Write-Host "  - If it's another project: rename this directory or remove the conflicting container" -ForegroundColor $Colors.Yellow
+            Write-Host ""
+            return $false
+        }
+        
+        Write-Success "No Docker container conflicts detected"
+        return $true
+    }
+    catch {
+        Write-Error "Failed to check Docker conflicts."
+        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
+        return $false
+    }
+}
+
 function Test-Docker {
     Write-Status "Performing Docker environment checks..."
     
@@ -556,6 +597,11 @@ Update Complete!
     Write-Host @"
 Poznote Installation Script
 "@ -ForegroundColor $Colors.Green
+
+    # Check for Docker container conflicts before installation
+    if (-not (Test-DockerConflicts)) {
+        exit 1
+    }
 
     # Check if .env already exists
     if (Test-Path ".env") {
