@@ -2,9 +2,9 @@
 
 <div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0;">
-<a href="README.md" style="text-decoration:none;">
+<a href="README.md" style="text-decoration:none; display:inline-flex; align-items:center;">
   Read in English
-  <img src="https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F1EC-1F1E7.svg" width="30" height="30" style="vertical-align:middle; margin-left:8px;">
+  <img src="https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F1EC-1F1E7.svg" width="30" height="30" style="margin-left:8px;">
 </a>
 </h3>
 </div>
