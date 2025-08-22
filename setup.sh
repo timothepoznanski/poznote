@@ -124,11 +124,11 @@ check_docker_permissions() {
         echo
         print_error "Your user '$USER' is not in the 'docker' group."
         echo
-        print_status "Add your user to the docker group (you must run this command as root or have sudo):"
+        print_status "Run this command as root to add your user to the docker group:"
         echo
-        echo "  /usr/sbin/usermod -aG docker $USER && newgrp docker"
+        echo "  /usr/sbin/usermod -aG docker $USER"
         echo
-        print_status "After running this command, restart the setup script:"
+        print_status "Go back to your user session and restart the setup script:"
         echo
         echo "  ./setup.sh"
         echo
