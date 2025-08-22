@@ -49,10 +49,10 @@ REQUIREMENTS:
 SETUP DOCKER PERMISSIONS:
     If you get permission errors, add your user to the docker group:
     
-    /usr/sbin/usermod -aG docker $USER
+    sudo /usr/sbin/usermod -aG docker $USER
     newgrp docker
     
-    If usermod is not found, use: sudo /usr/sbin/usermod -aG docker $USER
+    Then run this script again.
     
     Then run this script again.
 EOF
@@ -124,11 +124,7 @@ check_docker_permissions() {
         echo
         print_error "Your user '$USER' is not in the 'docker' group."
         echo
-        print_status "Add your user to the docker group by running this command:"
-        echo
-        echo "  /usr/sbin/usermod -aG docker $USER && newgrp docker"
-        echo
-        print_status "If usermod is not found, try with the full path or as root:"
+        print_status "Add your user to the docker group (you must be root or have sudo):"
         echo
         echo "  sudo /usr/sbin/usermod -aG docker $USER && newgrp docker"
         echo
