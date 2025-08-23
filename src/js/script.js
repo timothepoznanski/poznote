@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     uploadButtonContainer.classList.add('show');
                 }
             } else {
-                fileNameDiv.textContent = 'No file chosen';
+                fileNameDiv.textContent = '';
                 // Hide upload button when no file is selected
                 if (uploadButtonContainer) {
                     uploadButtonContainer.classList.remove('show');
@@ -189,7 +189,7 @@ function closeModal(modalId) {
         const uploadButtonContainer = document.querySelector('.upload-button-container');
         
         if (fileInput) fileInput.value = '';
-        if (fileNameDiv) fileNameDiv.textContent = 'No file chosen';
+        if (fileNameDiv) fileNameDiv.textContent = '';
         // Hide upload button when modal closes
         if (uploadButtonContainer) {
             uploadButtonContainer.classList.remove('show');
@@ -253,7 +253,7 @@ function uploadAttachment() {
         
         if (data.success) {
             fileInput.value = ''; // Clear input
-            document.getElementById('selectedFileName').textContent = 'No file chosen'; // Reset filename display
+            document.getElementById('selectedFileName').textContent = ''; // Reset filename display
             
             // Hide upload button after successful upload
             const uploadButtonContainer = document.querySelector('.upload-button-container');
