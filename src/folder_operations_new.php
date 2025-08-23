@@ -1,8 +1,4 @@
 <?php
-// Supprimer l'affichage des erreurs pour éviter de corrompre le JSON
-error_reporting(E_ERROR | E_PARSE);
-ini_set('display_errors', 0);
-
 require 'auth.php';
 requireAuth();
 

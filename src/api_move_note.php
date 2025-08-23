@@ -5,6 +5,7 @@ requireApiAuth();
 header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'default_folder_settings.php';
 
 // Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -64,7 +65,7 @@ try {
         $stmt->execute([$folder_name]);
         $folder_exists = $stmt->fetchColumn() > 0;
         
-        if (!$folder_exists && $folder_name !== 'Uncategorized') {
+        if (!$folder_exists && !isDefaultFolder($folder_name)) {
             http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'Folder not found']);
             exit;
@@ -72,12 +73,12 @@ try {
     }
     
     // Determine file paths
-    $old_file_path = __DIR__ . '/entries/' . ($current_folder !== 'Uncategorized' ? $current_folder . '/' : '') . $note_id . '.html';
-    $new_folder_path = __DIR__ . '/entries/' . ($folder_name !== 'Uncategorized' ? $folder_name : '');
+    $old_file_path = __DIR__ . '/entries/' . (isDefaultFolder($current_folder) ? '' : $current_folder . '/') . $note_id . '.html';
+    $new_folder_path = __DIR__ . '/entries/' . (isDefaultFolder($folder_name) ? '' : $folder_name);
     $new_file_path = $new_folder_path . '/' . $note_id . '.html';
     
-    // If destination folder is Uncategorized, place file at root
-    if ($folder_name === 'Uncategorized') {
+    // If destination folder is the default folder, place file at root
+    if (isDefaultFolder($folder_name)) {
         $new_file_path = __DIR__ . '/entries/' . $note_id . '.html';
     }
     
@@ -89,7 +90,7 @@ try {
     }
     
     // Create destination folder if it does not exist physically
-    if ($folder_name !== 'Uncategorized' && !file_exists($new_folder_path)) {
+    if (!isDefaultFolder($folder_name) && !file_exists($new_folder_path)) {
         if (!mkdir($new_folder_path, 0755, true)) {
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Failed to create destination folder directory']);

@@ -10,6 +10,7 @@
 	require_once 'config.php';
 	include 'functions.php';
 	include 'db_connect.php';
+	require_once 'default_folder_settings.php';
 	
 	if (!isset($_POST['id'])) {
 		die("No ID provided");
@@ -19,7 +20,7 @@
 	$heading = trim($_POST['heading'] ?? '');
 	$entry = $_POST['entry'] ?? ''; // Save the HTML content (including images) in an HTML file.
 	$entrycontent = $_POST['entrycontent'] ?? ''; // Save the text content (without images) in the database.
-	$folder = $_POST['folder'] ?? 'Uncategorized';
+	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes();
 	
 	$now = $_POST['now'];
 	$seconds = (int)$now;

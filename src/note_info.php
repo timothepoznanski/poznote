@@ -4,6 +4,7 @@ requireAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
+require_once 'default_folder_settings.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -43,7 +44,7 @@ function formatDate($dateStr) {
 
 $createdText = formatDate($note['created']);
 $updatedText = formatDate($note['updated']);
-$folderText = $note['folder'] ?: 'Uncategorized';
+$folderText = $note['folder'] ?: getDefaultFolderForNewNotes();
 $isFavorite = (int)$note['favorite'] === 1;
 
 // Build full path of the note

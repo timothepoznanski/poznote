@@ -7,7 +7,39 @@ var editedButNotSaved = 0;  // Flag indicating that the note has been edited set
 var lastudpdate;
 var noteid=-1;
 var updateNoteEnCours = 0;
-var selectedFolder = 'Uncategorized'; // Track currently selected folder
+var selectedFolder = 'Uncategorized'; // Track currently selected folder (will be updated dynamically)
+var defaultFolderName = 'Uncategorized'; // Will be updated on page load
+
+// Function to get the current default folder name
+function getDefaultFolderName() {
+    return defaultFolderName;
+}
+
+// Function to update default folder name
+function updateDefaultFolderName(newName) {
+    defaultFolderName = newName;
+    if (selectedFolder === 'Uncategorized') {
+        selectedFolder = newName;
+    }
+}
+
+// Initialize default folder name on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetch("api_default_folder_settings.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=get_default_folder_name"
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success) {
+            updateDefaultFolderName(data.default_folder_name);
+        }
+    })
+    .catch(error => {
+        console.log('Using default folder name due to error:', error);
+    });
+});
 var currentNoteFolder = null; // Track current folder of note being moved
 var currentNoteIdForAttachments = null; // Track current note for attachments
 
@@ -395,6 +427,99 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to toggle favorite status
 function toggleFavorite(noteId) {
+    // Check if current note has unsaved changes and save it first
+    // Only attempt to save if we have unsaved changes AND the focused note is the same as the favorite button note
+    if (editedButNotSaved === 1 && updateNoteEnCours === 0 && noteid && noteid == noteId) {
+        // Check if all required elements exist before accessing them
+        const entryElement = document.getElementById('inp' + noteId);
+        const tagsElement = document.getElementById('tags' + noteId);
+        const folderElement = document.getElementById('folder' + noteId);
+        const contentElement = document.getElementById('entry' + noteId); // Changed from 'ent' to 'entry'
+        
+        if (entryElement && tagsElement && folderElement && contentElement) {
+            // All elements exist, we can save the note first
+            displaySavingInProgress();
+            
+            // Process content element same way as in updatenote()
+            var ent = contentElement ? cleanSearchHighlightsFromElement(contentElement) : "";
+            ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
+            
+            // For textContent, get it from a cleaned clone
+            var entcontent = "";
+            if (contentElement) {
+                const clonedElement = contentElement.cloneNode(true);
+                const highlights = clonedElement.querySelectorAll('.search-highlight');
+                highlights.forEach(highlight => {
+                    const parent = highlight.parentNode;
+                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                    parent.normalize();
+                });
+                entcontent = clonedElement.textContent || "";
+            }
+            
+            const params = new URLSearchParams({
+                id: noteId,
+                heading: entryElement.value,
+                entry: ent,
+                tags: tagsElement.value,
+                folder: folderElement.value,
+                entrycontent: entcontent,
+                now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
+            });
+            
+            fetch("updatenote.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: params.toString()
+            })
+            .then(response => response.text())
+            .then(function(data) {
+                try {
+                    // Try to parse as JSON first (for error responses)
+                    var jsonData = JSON.parse(data);
+                    if (jsonData.status === 'error') {
+                        showNotificationPopup('Error saving note: ' + jsonData.message, 'error');
+                        editedButNotSaved = 1;
+                        updateNoteEnCours = 0;
+                        setSaveButtonRed(true);
+                        return;
+                    }
+                } catch(e) {
+                    // If not JSON, treat as normal response (save successful)
+                    editedButNotSaved = 0;
+                    var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
+                    if (lastUpdatedElem) {
+                        if(data=='1') {
+                            lastUpdatedElem.innerHTML = 'Last Saved Today';
+                        } else {
+                            lastUpdatedElem.innerHTML = data;
+                        }
+                    }
+                    updateNoteEnCours = 0;
+                    setSaveButtonRed(false);
+                    
+                    // Now that the note is saved, toggle favorite
+                    performFavoriteToggle(noteId);
+                }
+            })
+            .catch(function(error) {
+                showNotificationPopup('Network error while saving: ' + error.message, 'error');
+                editedButNotSaved = 1;
+                updateNoteEnCours = 0;
+                setSaveButtonRed(true);
+            });
+        } else {
+            // Elements don't exist, just proceed with favorite toggle
+            performFavoriteToggle(noteId);
+        }
+    } else {
+        // No unsaved changes or save in progress, directly toggle favorite
+        performFavoriteToggle(noteId);
+    }
+}
+
+// Helper function to perform the actual favorite toggle
+function performFavoriteToggle(noteId) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'api_favorites.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -419,8 +544,14 @@ function toggleFavorite(noteId) {
                         }
                     }
                     
-                    // Refresh to update favorites folder (no notification)
-                    window.location.reload();
+                    // Always ensure flags are reset before reload to prevent browser warning
+                    editedButNotSaved = 0;
+                    updateNoteEnCours = 0;
+                    
+                    // Small delay to ensure flags are properly set before reload
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 50);
                 } else {
                     showNotificationPopup('Error: ' + response.message);
                 }
@@ -537,7 +668,7 @@ function updatenote(){
     // console.log("ent:" + ent);
     var tags = document.getElementById("tags"+noteid).value;
     var folderElem = document.getElementById("folder"+noteid);
-    var folder = folderElem ? folderElem.value : 'Uncategorized';
+    var folder = folderElem ? folderElem.value : getDefaultFolderName();
 
     var params = new URLSearchParams({
         id: noteid,
@@ -571,10 +702,16 @@ function updatenote(){
                 editedButNotSaved = 0;
                 var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
                 if (lastUpdatedElem) lastUpdatedElem.innerHTML = 'Last Saved Today';
+                
+                // Update the title in the left column if it changed
+                updateNoteTitleInLeftColumn();
             } else {
                 editedButNotSaved = 0;
                 var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
                 if (lastUpdatedElem) lastUpdatedElem.innerHTML = data;
+                
+                // Update the title in the left column if it changed
+                updateNoteTitleInLeftColumn();
             }
             updateNoteEnCours = 0;
             setSaveButtonRed(false);
@@ -742,6 +879,93 @@ function displayEditInProgress(){
     var elem = document.getElementById('lastupdated'+noteid);
     if (elem) elem.innerHTML = '<span>Editing in progress...</span>';
     setSaveButtonRed(true);
+}
+
+// Update the title in the left column after successful save
+function updateNoteTitleInLeftColumn(){
+    if(noteid == 'search' || noteid == -1) return;
+    
+    // Get the current title from the input field
+    var titleInput = document.getElementById('inp'+noteid);
+    if (!titleInput) return;
+    
+    var newTitle = titleInput.value.trim();
+    if (newTitle === '') newTitle = 'Untitled note';
+    
+    var elementsToUpdate = [];
+    
+    // Method 1: Try to find using data-note-db-id (for new page loads)
+    var noteLinksById = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + noteid + '"]');
+    if (noteLinksById.length > 0) {
+        for (var i = 0; i < noteLinksById.length; i++) {
+            elementsToUpdate.push(noteLinksById[i]);
+        }
+    }
+    
+    // Method 2: Try selected-note class (and find all notes with same title)
+    var selectedNote = document.querySelector('.links_arbo_left.selected-note');
+    if (selectedNote && elementsToUpdate.length === 0) {
+        var selectedTitle = selectedNote.querySelector('.note-title');
+        if (selectedTitle) {
+            var currentTitle = selectedTitle.textContent.trim();
+            // Find all notes with the same title (favorites + original folder)
+            var allNoteLinks = document.querySelectorAll('.links_arbo_left');
+            for (var i = 0; i < allNoteLinks.length; i++) {
+                var link = allNoteLinks[i];
+                var titleSpan = link.querySelector('.note-title');
+                if (titleSpan && titleSpan.textContent.trim() === currentTitle) {
+                    elementsToUpdate.push(link);
+                }
+            }
+        }
+    }
+    
+    // Method 3: Look for the note that corresponds to currently loaded page
+    if (elementsToUpdate.length === 0) {
+        var urlParams = new URLSearchParams(window.location.search);
+        var currentNoteTitle = urlParams.get('note');
+        if (currentNoteTitle) {
+            var noteLinks = document.querySelectorAll('.links_arbo_left');
+            for (var i = 0; i < noteLinks.length; i++) {
+                var link = noteLinks[i];
+                var titleSpan = link.querySelector('.note-title');
+                if (titleSpan && titleSpan.textContent.trim() === currentNoteTitle.trim()) {
+                    elementsToUpdate.push(link);
+                }
+            }
+        }
+    }
+    
+    // Update all found elements
+    for (var i = 0; i < elementsToUpdate.length; i++) {
+        updateTitleInElement(elementsToUpdate[i], newTitle);
+    }
+}
+
+// Helper function to update title in a note link element
+function updateTitleInElement(linkElement, newTitle) {
+    var titleSpan = linkElement.querySelector('.note-title');
+    if (titleSpan) {
+        // Update the title text
+        titleSpan.textContent = newTitle;
+        
+        // Update the href to reflect the new title
+        var href = linkElement.getAttribute('href');
+        if (href) {
+            try {
+                var url = new URL(href, window.location.origin);
+                url.searchParams.set('note', newTitle);
+                linkElement.setAttribute('href', url.pathname + url.search);
+            } catch(e) {
+                // Fallback for relative URLs
+                var newHref = href.replace(/note=[^&]*/, 'note=' + encodeURIComponent(newTitle));
+                linkElement.setAttribute('href', newHref);
+            }
+        }
+        
+        // Update the data-note-id attribute (which contains the title)
+        linkElement.setAttribute('data-note-id', newTitle);
+    }
 }
 
 // Update the color of the save button
@@ -1027,6 +1251,62 @@ function saveFolderName() {
     });
 }
 
+// Functions for default folder management
+function editDefaultFolderName() {
+    // First get the current default folder name
+    fetch("api_default_folder_settings.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=get_default_folder_name"
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success) {
+            document.getElementById('editDefaultFolderModal').style.display = 'block';
+            document.getElementById('editDefaultFolderName').value = data.default_folder_name;
+            document.getElementById('editDefaultFolderName').focus();
+        } else {
+            showNotificationPopup('Error getting current default folder name', 'error');
+        }
+    })
+    .catch(error => {
+        showNotificationPopup('Error: ' + error, 'error');
+    });
+}
+
+function saveDefaultFolderName() {
+    var newName = document.getElementById('editDefaultFolderName').value.trim();
+    
+    if (!newName) {
+        showNotificationPopup('Please enter a folder name', 'error');
+        return;
+    }
+    
+    var params = new URLSearchParams({
+        action: 'set_default_folder_name',
+        new_name: newName
+    });
+    
+    fetch("api_default_folder_settings.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(response => response.json())
+    .then(function(data) {
+        if (data.success) {
+            closeModal('editDefaultFolderModal');
+            showNotificationPopup('Default folder name updated successfully');
+            location.reload();
+        } else {
+            showNotificationPopup('Error: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showNotificationPopup('Error updating default folder name: ' + error, 'error');
+    });
+}
+
 /**
  * Clean localStorage entries when a folder is renamed
  */
@@ -1099,7 +1379,7 @@ function deleteFolder(folderName) {
             }
             
             // For folders with notes, show confirmation modal
-            var confirmMessage = `Are you sure you want to delete the folder "${folderName}"? \n${noteCount} note${noteCount > 1 ? 's' : ''} will be moved to "Uncategorized".\n\nIf you want to delete all the notes of this folder instead, you can move them to "Uncategorized" folder then empty it.`;
+            var confirmMessage = `Are you sure you want to delete the folder "${folderName}"? \n${noteCount} note${noteCount > 1 ? 's' : ''} will be moved to "${getDefaultFolderName()}".\n\nIf you want to delete all the notes of this folder instead, you can move them to "${getDefaultFolderName()}" folder then empty it.`;
             
             showDeleteFolderModal(folderName, confirmMessage);
         } else {
@@ -1339,7 +1619,7 @@ function refreshFoldersList() {
     if (!noteId) return;
     
     var params = new URLSearchParams({
-        action: 'get_folders'
+        action: 'list'
     });
     
     fetch("folder_operations.php", {
@@ -1422,7 +1702,7 @@ function moveNoteToSelectedFolder(targetFolder = null) {
     }
     
     const params = new URLSearchParams({
-        action: 'move_note',
+        action: 'move_to',
         note_id: noteid,
         folder: folderToMoveTo
     });
@@ -1670,7 +1950,7 @@ function executeFolderAction() {
     const folderToMoveTo = selectedFolderOption || searchTerm;
     
     const params = new URLSearchParams({
-        action: 'move_note',
+        action: 'move_to',
         note_id: noteid,
         folder: folderToMoveTo
     });
@@ -1717,12 +1997,15 @@ function showMoveFolderDialog(noteId) {
     
     noteid = noteId; // Set the current note ID
     
+    // Store noteId in the modal dataset for later use
+    document.getElementById('moveNoteFolderModal').dataset.noteId = noteId;
+    
     // Get current folder of the note
     const currentFolder = document.getElementById('folder' + noteId).value;
     
     // Load folders
     const params = new URLSearchParams({
-        action: 'get_folders'
+        action: 'list'
     });
     
     fetch("folder_operations.php", {
@@ -1905,7 +2188,7 @@ function loadSuggestedFolders(noteId) {
                 let folderIcon = 'fas fa-folder';
                 if (folder === 'Favorites') {
                     folderIcon = 'fas fa-star';
-                } else if (folder === 'Uncategorized') {
+                } else if (folder === getDefaultFolderName()) {
                     folderIcon = 'fas fa-folder-open';
                 }
                 
@@ -1943,7 +2226,7 @@ function showMoveNoteDialog(noteHeading) {
     
     // Load folders
     var params = new URLSearchParams({
-        action: 'get_folders'
+        action: 'list'
     });
     
     fetch("folder_operations.php", {
@@ -1968,13 +2251,13 @@ function showMoveNoteDialog(noteHeading) {
 }
 
 function moveNoteToFolder() {
-    var noteHeading = document.getElementById('moveNoteModal').dataset.noteHeading;
+    var noteId = document.getElementById('moveNoteModal').dataset.noteId;
     var targetFolder = document.getElementById('moveNoteFolder').value;
     
     var params = new URLSearchParams({
-        action: 'move_note',
-        note_heading: noteHeading,
-        target_folder: targetFolder
+        action: 'move_to',
+        note_id: noteId,
+        folder: targetFolder
     });
     
     fetch("folder_operations.php", {
@@ -2717,7 +3000,7 @@ function cleanupNonExistentFoldersFromLocalStorage() {
     fetch("folder_operations.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ action: 'get_folders' })
+        body: new URLSearchParams({ action: 'list' })
     })
     .then(response => response.json())
     .then(function(data) {
@@ -2789,7 +3072,7 @@ function cleanupSearchFiltersOnly() {
     fetch("folder_operations.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ action: 'get_folders' })
+        body: new URLSearchParams({ action: 'list' })
     })
     .then(response => response.json())
     .then(function(data) {

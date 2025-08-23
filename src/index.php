@@ -10,6 +10,7 @@ requireAuth();
 
 ob_start();
 require_once 'config.php';
+require_once 'default_folder_settings.php';
 
 // Mobile detection by user agent (must be done BEFORE any output and never redefined)
 $is_mobile = false;
@@ -21,6 +22,9 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
 include 'functions.php';
 include 'db_connect.php';
 
+// Get the custom default folder name
+$defaultFolderName = getDefaultFolderName();
+
 // Column verification (only on application startup)
 // In SQLite, we use PRAGMA table_info to check columns
 $stmt = $con->query("PRAGMA table_info(entries)");
@@ -30,7 +34,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 if (!in_array('folder', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN folder varchar(255) DEFAULT 'Uncategorized'");
+    $con->query("ALTER TABLE entries ADD COLUMN folder varchar(255) DEFAULT '$defaultFolderName'");
 }
 
 if (!in_array('favorite', $columns)) {
@@ -113,7 +117,7 @@ $folder_filter = $_GET['folder'] ?? '';
             $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if($note_data) {
-                $current_note_folder = $note_data["folder"] ?: 'Uncategorized';
+                $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
                 // Prepare result for right column
                 $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
                 $stmt_right->execute([$note]);
@@ -132,7 +136,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     $stmt_right->execute();
                     $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
                     if($latest_note) {
-                        $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                        $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
                         // Reset statement to be used in display loop
                         $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
                         $stmt_right->execute();
@@ -155,7 +159,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 $stmt_right->execute();
                 $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
                 if($latest_note) {
-                    $default_note_folder = $latest_note["folder"] ?: 'Uncategorized';
+                    $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
                     // Reset statement to be used in display loop
                     $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
                     $stmt_right->execute();
@@ -245,7 +249,7 @@ $folder_filter = $_GET['folder'] ?? '';
             <h3>Change folder</h3>
             <p>Move "<span id="moveNoteTitle"></span>" to:</p>
             <select id="moveNoteFolder">
-                <option value="Uncategorized">Uncategorized</option>
+                <option value="<?php echo htmlspecialchars($defaultFolderName, ENT_QUOTES); ?>"><?php echo htmlspecialchars($defaultFolderName, ENT_QUOTES); ?></option>
             </select>
             <div class="modal-buttons">
                 <button onclick="moveNoteToFolder()">Move</button>
@@ -308,6 +312,20 @@ $folder_filter = $_GET['folder'] ?? '';
             </div>
         </div>
     </div>
+
+    <!-- Modal for editing default folder name -->
+    <div id="editDefaultFolderModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editDefaultFolderModal')">&times;</span>
+            <h3>Rename Default Folder</h3>
+            <p>This is the default folder where new notes are placed when no specific folder is selected.</p>
+            <input type="text" id="editDefaultFolderName" placeholder="Default folder name" maxlength="255">
+            <div class="modal-buttons">
+                <button onclick="saveDefaultFolderName()">Save</button>
+                <button onclick="closeModal('editDefaultFolderModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Modal for deleting folder -->
     <div id="deleteFolderModal" class="modal">
@@ -335,7 +353,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <div id="acceptedTypes" class="accepted-types">Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)</div>
                 </div>
                 <div class="spacer-18"></div>
-                <div id="selectedFileName" class="selected-filename">No file chosen</div>
+                <div id="selectedFileName" class="selected-filename"></div>
                 <div class="upload-button-container">
                     <button onclick="uploadAttachment()">Upload File</button>
                 </div>
@@ -518,7 +536,7 @@ $folder_filter = $_GET['folder'] ?? '';
     // error_log("Search params: " . print_r($search_params, true));
     
     // Secure prepared queries
-    $query_left_secure = "SELECT heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
+    $query_left_secure = "SELECT id, heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
@@ -630,7 +648,7 @@ $folder_filter = $_GET['folder'] ?? '';
         isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
         currentNoteFolder = <?php 
             if ($note != '' && empty($search) && empty($tags_search)) {
-                echo json_encode($current_note_folder ?? 'Uncategorized');
+                echo json_encode($current_note_folder ?? $defaultFolderName);
             } else if ($default_note_folder && empty($search) && empty($tags_search)) {
                 echo json_encode($default_note_folder);
             } else {
@@ -706,7 +724,7 @@ $folder_filter = $_GET['folder'] ?? '';
         $favorites = []; // Store favorite notes
         
         while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
-            $folder = $row1["folder"] ?: 'Uncategorized';
+            $folder = $row1["folder"] ?: $defaultFolderName;
             if (!isset($folders[$folder])) {
                 $folders[$folder] = [];
             }
@@ -739,12 +757,12 @@ $folder_filter = $_GET['folder'] ?? '';
             }
         }
         
-        // Sort folders alphabetically (Favorites first, then Uncategorized, then others)
-        uksort($folders, function($a, $b) {
+        // Sort folders alphabetically (Favorites first, then default folder, then others)
+        uksort($folders, function($a, $b) use ($defaultFolderName) {
             if ($a === 'Favorites') return -1;
             if ($b === 'Favorites') return 1;
-            if ($a === 'Uncategorized') return -1;
-            if ($b === 'Uncategorized') return 1;
+            if (isDefaultFolder($a)) return -1;
+            if (isDefaultFolder($b)) return 1;
             return strcasecmp($a, $b);
         });
         
@@ -799,7 +817,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo "<i class='fas $chevron_icon folder-icon'></i>";
                 
                 
-                echo "<span class='folder-name' ondblclick='editFolderName(\"$folderName\")'>$folderName</span>";
+                echo "<span class='folder-name' ondblclick='" . (isDefaultFolder($folderName) ? 'editDefaultFolderName()' : 'editFolderName(\"' . $folderName . '\")') . "'>$folderName</span>";
                 echo "<span class='folder-note-count'>(" . count($notes) . ")</span>";
                 echo "<span class='folder-actions'>";
                 
@@ -807,9 +825,9 @@ $folder_filter = $_GET['folder'] ?? '';
                 if ($folderName === 'Favorites') {
                     // Search filter icon for Favorites folder
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                } else if ($folderName === 'Uncategorized') {
+                } else if (isDefaultFolder($folderName)) {
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
+                    echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editDefaultFolderName()' title='Rename default folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
                 } else {
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
@@ -835,7 +853,8 @@ $folder_filter = $_GET['folder'] ?? '';
                 $link = 'index.php?' . implode('&', $params);
                 
                 $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
-                echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-folder='$folderName'>";
+                $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+                echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'>";
                 echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
                 echo "</a>";
                 echo "<div id=pxbetweennotes></div>";
@@ -1006,8 +1025,8 @@ $folder_filter = $_GET['folder'] ?? '';
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? 'Uncategorized';
-                    if ($folder_name === 'Uncategorized') $folder_name = 'Non classé';
+                    $folder_name = $row['folder'] ?? $defaultFolderName;
+                    if (isDefaultFolder($folder_name)) $folder_name = 'Non classé';
                     $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
@@ -1018,7 +1037,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     
                     // Safety checks
-                    if ($folder_json === false) $folder_json = '"Uncategorized"';
+                    if ($folder_json === false) $folder_json = '"' . $defaultFolderName . '"';
                     if ($favorite_json === false) $favorite_json = '0';
                     if ($tags_json === false) $tags_json = '""';
                     if ($attachments_count_json === false) $attachments_count_json = '0';
@@ -1105,7 +1124,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info (mobile)
-                    $folder_name = $row['folder'] ?? 'Uncategorized';
+                    $folder_name = $row['folder'] ?? $defaultFolderName;
                     $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
@@ -1116,7 +1135,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     
                     // Safety checks
-                    if ($folder_json === false) $folder_json = '"Uncategorized"';
+                    if ($folder_json === false) $folder_json = '"' . $defaultFolderName . '"';
                     if ($favorite_json === false) $favorite_json = '0';
                     if ($tags_json === false) $tags_json = '""';
                     if ($attachments_count_json === false) $attachments_count_json = '0';
@@ -1143,7 +1162,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo '</div>';
                 
                 // Hidden folder value for the note
-                echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: 'Uncategorized', ENT_QUOTES).'"/>';
+                echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
                 // Title
                 echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
                 // Note content

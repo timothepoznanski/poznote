@@ -5,9 +5,10 @@
 	date_default_timezone_set('UTC');
 	require_once 'config.php';
 	include 'db_connect.php';
+	require_once 'default_folder_settings.php';
 	
 	$now = $_POST['now'];
-	$folder = $_POST['folder'] ?? 'Uncategorized';
+	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes();
 	$created_date = date("Y-m-d H:i:s", (int)$now);
 	
 // Insert the new note
