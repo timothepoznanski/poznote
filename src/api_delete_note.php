@@ -56,7 +56,7 @@ try {
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {
                 if (isset($attachment['filename'])) {
-                    $attachment_file = __DIR__ . '/attachments/' . $attachment['filename'];
+                    $attachment_file = getAttachmentsRelativePath() . $attachment['filename'];
                     if (file_exists($attachment_file)) {
                         if (unlink($attachment_file)) {
                             $deleted_attachments[] = $attachment['filename'];
