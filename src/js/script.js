@@ -134,12 +134,22 @@ function toggleToolbarMenu(noteId) {
 document.addEventListener('DOMContentLoaded', function() {
     var fileInput = document.getElementById('attachmentFile');
     var fileNameDiv = document.getElementById('selectedFileName');
+    var uploadButtonContainer = document.querySelector('.upload-button-container');
+    
     if (fileInput && fileNameDiv) {
         fileInput.addEventListener('change', function() {
             if (fileInput.files && fileInput.files.length > 0) {
                 fileNameDiv.textContent = fileInput.files[0].name;
+                // Show upload button when file is selected
+                if (uploadButtonContainer) {
+                    uploadButtonContainer.classList.add('show');
+                }
             } else {
                 fileNameDiv.textContent = 'No file chosen';
+                // Hide upload button when no file is selected
+                if (uploadButtonContainer) {
+                    uploadButtonContainer.classList.remove('show');
+                }
             }
         });
     }
@@ -176,8 +186,14 @@ function closeModal(modalId) {
         // Also reset the file input display
         const fileInput = document.getElementById('attachmentFile');
         const fileNameDiv = document.getElementById('selectedFileName');
+        const uploadButtonContainer = document.querySelector('.upload-button-container');
+        
         if (fileInput) fileInput.value = '';
         if (fileNameDiv) fileNameDiv.textContent = 'No file chosen';
+        // Hide upload button when modal closes
+        if (uploadButtonContainer) {
+            uploadButtonContainer.classList.remove('show');
+        }
     }
 }
 
@@ -238,6 +254,13 @@ function uploadAttachment() {
         if (data.success) {
             fileInput.value = ''; // Clear input
             document.getElementById('selectedFileName').textContent = 'No file chosen'; // Reset filename display
+            
+            // Hide upload button after successful upload
+            const uploadButtonContainer = document.querySelector('.upload-button-container');
+            if (uploadButtonContainer) {
+                uploadButtonContainer.classList.remove('show');
+            }
+            
             loadAttachments(currentNoteIdForAttachments); // Reload list
             updateAttachmentCountInMenu(currentNoteIdForAttachments); // Update count in menu
             // showNotificationPopup('File uploaded successfully'); // Removed notification

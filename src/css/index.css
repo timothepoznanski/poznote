@@ -276,6 +276,11 @@ a:active { color: #2E8CFA; } */
 
 .upload-button-container {
     text-align: center;
+    display: none; /* Hidden by default, shown when file is selected */
+}
+
+.upload-button-container.show {
+    display: block;
 }
 
 .attachment-help {
