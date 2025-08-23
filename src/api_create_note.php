@@ -5,6 +5,7 @@ requireApiAuth();
 
 header('Content-Type: application/json');
 require_once 'config.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 
 // Check that the request is POST
@@ -17,15 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Get the JSON data sent
 $input = json_decode(file_get_contents('php://input'), true);
 
-$heading = isset($input['heading']) ? trim($input['heading']) : '';
+$originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
 $folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Uncategorized';
 
-if ($heading === '') {
+if ($originalHeading === '') {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'The heading field is required']);
     exit;
 }
+
+// Generate unique title to prevent duplicates
+$heading = generateUniqueTitle($originalHeading);
 
 $stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, updated) VALUES (?, ?, ?, datetime('now'))");
 

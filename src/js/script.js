@@ -475,13 +475,32 @@ function toggleFavorite(noteId) {
             .then(response => response.text())
             .then(function(data) {
                 try {
-                    // Try to parse as JSON first (for error responses)
+                    // Try to parse as JSON first
                     var jsonData = JSON.parse(data);
                     if (jsonData.status === 'error') {
                         showNotificationPopup('Error saving note: ' + jsonData.message, 'error');
                         editedButNotSaved = 1;
                         updateNoteEnCours = 0;
                         setSaveButtonRed(true);
+                        return;
+                    } else if (jsonData.date && jsonData.title) {
+                        // Handle response with date and title (title was changed to ensure uniqueness)
+                        editedButNotSaved = 0;
+                        var lastUpdatedElem = document.getElementById('lastupdated'+noteId);
+                        if (lastUpdatedElem) lastUpdatedElem.innerHTML = jsonData.date;
+                        
+                        // Update the title input field with the unique title
+                        var titleInput = document.getElementById('inp'+noteId);
+                        if (titleInput && jsonData.title !== jsonData.original_title) {
+                            titleInput.value = jsonData.title;
+                            showNotificationPopup('Title was modified to "' + jsonData.title + '" to ensure uniqueness.', 'info');
+                        }
+                        
+                        updateNoteEnCours = 0;
+                        setSaveButtonRed(false);
+                        
+                        // Now that the note is saved, toggle favorite
+                        performFavoriteToggle(noteId);
                         return;
                     }
                 } catch(e) {
@@ -687,13 +706,31 @@ function updatenote(){
     .then(response => response.text())
     .then(function(data) {
         try {
-            // Try to parse as JSON first (for error responses)
+            // Try to parse as JSON first
             var jsonData = JSON.parse(data);
             if (jsonData.status === 'error') {
                 showNotificationPopup('Error saving note: ' + jsonData.message, 'error');
                 editedButNotSaved = 1; // Keep the edited flag since save failed
                 updateNoteEnCours = 0;
                 setSaveButtonRed(true); // Keep save button red to indicate unsaved changes
+                return;
+            } else if (jsonData.date && jsonData.title) {
+                // Handle response with date and title (title was changed to ensure uniqueness)
+                editedButNotSaved = 0;
+                var lastUpdatedElem = document.getElementById('lastupdated'+noteid);
+                if (lastUpdatedElem) lastUpdatedElem.innerHTML = jsonData.date;
+                
+                // Update the title input field with the unique title
+                var titleInput = document.getElementById('inp'+noteid);
+                if (titleInput && jsonData.title !== jsonData.original_title) {
+                    titleInput.value = jsonData.title;
+                    showNotificationPopup('Title was modified to "' + jsonData.title + '" to ensure uniqueness.', 'info');
+                }
+                
+                // Update the title in the left column
+                updateNoteTitleInLeftColumn();
+                updateNoteEnCours = 0;
+                setSaveButtonRed(false);
                 return;
             }
         } catch(e) {

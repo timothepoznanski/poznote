@@ -102,4 +102,60 @@ function isAIEnabled() {
         return true;
     }
 }
+
+/**
+ * Generate a unique note title to prevent duplicates
+ * For "Untitled note", adds date and time
+ * For other titles, adds a suffix number if duplicate exists
+ */
+function generateUniqueTitle($originalTitle, $excludeId = null) {
+    global $con;
+    
+    // Clean the original title
+    $title = trim($originalTitle);
+    if (empty($title)) {
+        $title = 'Untitled note';
+    }
+    
+    // For "Untitled note", always add date and time
+    if ($title === 'Untitled note') {
+        $dateTime = date('Y-m-d H:i:s');
+        $title = 'Untitled note ' . $dateTime;
+    }
+    
+    // Check if title already exists (excluding the current note if updating)
+    $query = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0";
+    $params = [$title];
+    
+    if ($excludeId !== null) {
+        $query .= " AND id != ?";
+        $params[] = $excludeId;
+    }
+    
+    $stmt = $con->prepare($query);
+    $stmt->execute($params);
+    $count = $stmt->fetchColumn();
+    
+    // If no duplicate, return the title as is
+    if ($count == 0) {
+        return $title;
+    }
+    
+    // If duplicate exists, add a number suffix
+    $counter = 1;
+    $baseTitle = $title;
+    
+    do {
+        $title = $baseTitle . ' (' . $counter . ')';
+        
+        $stmt = $con->prepare($query);
+        $params[0] = $title; // Update the title in params
+        $stmt->execute($params);
+        $count = $stmt->fetchColumn();
+        
+        $counter++;
+    } while ($count > 0);
+    
+    return $title;
+}
 ?>

@@ -17,10 +17,13 @@
 	}
 	
 	$id = $_POST['id'];
-	$heading = trim($_POST['heading'] ?? '');
+	$originalHeading = trim($_POST['heading'] ?? '');
 	$entry = $_POST['entry'] ?? ''; // Save the HTML content (including images) in an HTML file.
 	$entrycontent = $_POST['entrycontent'] ?? ''; // Save the text content (without images) in the database.
 	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes();
+	
+	// Generate unique title to prevent duplicates
+	$heading = generateUniqueTitle($originalHeading, $id);
 	
 	$now = $_POST['now'];
 	$seconds = (int)$now;
@@ -68,7 +71,22 @@
 	$stmt = $con->prepare($query);
     
 	if($stmt->execute([$heading, $entrycontent, $updated_date, $tags, $folder, $id])) {
-		die(formatDateTime(strtotime($updated_date))); // If writing the query in base is ok then we exit
+		// Return both date and title (in case it was modified to be unique)
+		$response = [
+			'date' => formatDateTime(strtotime($updated_date)),
+			'title' => $heading,
+			'original_title' => $originalHeading
+		];
+		
+		// If title was changed to make it unique, return JSON
+		if ($heading !== $originalHeading) {
+			header('Content-Type: application/json');
+			echo json_encode($response);
+		} else {
+			// Legacy format - just return the date
+			echo $response['date'];
+		}
+		die();
 	} else {
 		// Return error details as JSON
 		header('Content-Type: application/json');
