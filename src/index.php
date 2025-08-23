@@ -1161,6 +1161,26 @@ $folder_filter = $_GET['folder'] ?? '';
                 .'</span>';
                 echo '</div>';
                 
+                // Display attachments directly in the note if they exist
+                if (!empty($row['attachments'])) {
+                    $attachments_data = json_decode($row['attachments'], true);
+                    if (is_array($attachments_data) && !empty($attachments_data)) {
+                        echo '<div class="note-attachments-row">';
+                        echo '<span class="fas fa-paperclip icon_attachment"></span>';
+                        echo '<span class="note-attachments-list">';
+                        $attachment_links = [];
+                        foreach ($attachments_data as $attachment) {
+                            if (isset($attachment['id']) && isset($attachment['original_filename'])) {
+                                $safe_filename = htmlspecialchars($attachment['original_filename'], ENT_QUOTES);
+                                $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="Download '.$safe_filename.'">'.$safe_filename.'</a>';
+                            }
+                        }
+                        echo implode(' • ', $attachment_links);
+                        echo '</span>';
+                        echo '</div>';
+                    }
+                }
+                
                 // Hidden folder value for the note
                 echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
                 // Title

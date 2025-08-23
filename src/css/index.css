@@ -1313,7 +1313,7 @@ img {
     display: flex;
     align-items: center;
     overflow: hidden;
-    margin-bottom: 15px;
+    /* margin-bottom: 15px; */
     margin-top: 5px;
 }
 
@@ -1346,6 +1346,48 @@ img {
     margin: 8px 5px;
     font-family: 'Inter', sans-serif !important;
     font-size: 15px;
+}
+
+/* ATTACHMENTS ROW */
+
+.note-attachments-row {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+.fa-paperclip.icon_attachment {
+    font-size: 12px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    color: #007DB8;
+}
+
+.note-attachments-list {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-link {
+    color: #007DB8 !important;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+.attachment-link:hover {
+    color: #005a8b !important;
+    text-decoration: underline;
+}
+
+.attachment-link:visited {
+    color: #007DB8 !important;
 }
 
 /* MENU LEFT */

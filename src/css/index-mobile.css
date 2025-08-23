@@ -86,6 +86,11 @@ body {
 
 .note-tags-row {
     margin-top: 0 !important;
+    /* margin-bottom: 12px !important; */
+}
+
+.note-attachments-row {
+    margin-top: 0 !important;
     margin-bottom: 12px !important;
 }
 

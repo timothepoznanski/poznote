@@ -329,12 +329,13 @@ function displayAttachments(attachments) {
     container.innerHTML = html;
 }
 
-function downloadAttachment(attachmentId) {
-    if (!currentNoteIdForAttachments) {
+function downloadAttachment(attachmentId, noteId = null) {
+    const noteIdToUse = noteId || currentNoteIdForAttachments;
+    if (!noteIdToUse) {
         showNotificationPopup('No note selected', 'error');
         return;
     }
-    window.open(`api_attachments.php?action=download&note_id=${currentNoteIdForAttachments}&attachment_id=${attachmentId}`, '_blank');
+    window.open(`api_attachments.php?action=download&note_id=${noteIdToUse}&attachment_id=${attachmentId}`, '_blank');
 }
 
 function deleteAttachment(attachmentId) {
