@@ -101,9 +101,32 @@ if (!$note) {
             const uploadBtn = document.getElementById('uploadBtn');
             
             if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                const fileSize = formatFileSize(fileInput.files[0].size);
-                fileNameDiv.innerHTML = `<i class="fas fa-file"></i> ${fileName} (${fileSize})`;
+                const file = fileInput.files[0];
+                const fileName = file.name;
+                const fileSize = formatFileSize(file.size);
+                
+                // Check if file is an image
+                const isImage = file.type.startsWith('image/');
+                
+                let htmlContent = `<div class="selected-file-info">
+                    <i class="fas fa-${isImage ? 'image' : 'file'}"></i> 
+                    <span>${fileName} (${fileSize})</span>
+                </div>`;
+                
+                if (isImage) {
+                    // Create image preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        htmlContent += `<div class="image-preview">
+                            <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;">
+                        </div>`;
+                        fileNameDiv.innerHTML = htmlContent;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileNameDiv.innerHTML = htmlContent;
+                }
+                
                 fileNameDiv.style.display = 'block';
                 uploadBtn.disabled = false;
             } else {
@@ -218,10 +241,17 @@ if (!$note) {
                 const fileName = attachment.original_filename;
                 const shortName = fileName.length > 40 ? fileName.substring(0, 40) + '...' : fileName;
                 
+                // Check if attachment is an image
+                const isImage = attachment.file_type && attachment.file_type.startsWith('image/');
+                const imageUrl = `api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachment.id}`;
+                
                 html += `
                     <div class="attachment-card">
                         <div class="attachment-icon">
-                            <i class="fas fa-file"></i>
+                            ${isImage ? 
+                                `<img src="${imageUrl}" alt="Preview" class="attachment-thumbnail" onclick="previewImage('${imageUrl}', '${fileName}')">` :
+                                `<i class="fas fa-${getFileIcon(fileName)}"></i>`
+                            }
                         </div>
                         <div class="attachment-details">
                             <div class="attachment-name" title="${fileName}">${shortName}</div>
@@ -243,6 +273,45 @@ if (!$note) {
             });
             
             container.innerHTML = html;
+        }
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            switch (ext) {
+                case 'pdf': return 'file-pdf';
+                case 'doc':
+                case 'docx': return 'file-word';
+                case 'xls':
+                case 'xlsx': return 'file-excel';
+                case 'ppt':
+                case 'pptx': return 'file-powerpoint';
+                case 'txt': return 'file-alt';
+                case 'zip':
+                case 'rar': return 'file-archive';
+                default: return 'file';
+            }
+        }
+
+        function previewImage(imageUrl, fileName) {
+            // Create modal for image preview
+            const modal = document.createElement('div');
+            modal.className = 'image-preview-modal';
+            modal.innerHTML = `
+                <div class="image-preview-content">
+                    <span class="image-preview-close">&times;</span>
+                    <img src="${imageUrl}" alt="${fileName}" class="image-preview-large">
+                    <div class="image-preview-title">${fileName}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal on click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal || e.target.className === 'image-preview-close') {
+                    document.body.removeChild(modal);
+                }
+            });
         }
 
         function downloadAttachment(attachmentId) {
