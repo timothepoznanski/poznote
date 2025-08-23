@@ -59,7 +59,7 @@ if (!$note) {
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
                 
-                <button type="button" onclick="uploadAttachment()" class="btn btn-primary" id="uploadBtn" disabled>
+                <button type="button" onclick="uploadAttachment(event)" class="btn btn-primary" id="uploadBtn" disabled>
                     <i class="fas fa-upload"></i> Upload File
                 </button>
             </div>
@@ -105,11 +105,16 @@ if (!$note) {
                 const fileName = file.name;
                 const fileSize = formatFileSize(file.size);
                 
-                // Check if file is an image
+                // Check if file is an image or PDF
                 const isImage = file.type.startsWith('image/');
+                const isPDF = file.type === 'application/pdf';
+                
+                let iconType = 'file';
+                if (isImage) iconType = 'image';
+                else if (isPDF) iconType = 'file-pdf';
                 
                 let htmlContent = `<div class="selected-file-info">
-                    <i class="fas fa-${isImage ? 'image' : 'file'}"></i> 
+                    <i class="fas fa-${iconType}"></i> 
                     <span>${fileName} (${fileSize})</span>
                 </div>`;
                 
@@ -119,6 +124,17 @@ if (!$note) {
                     reader.onload = function(e) {
                         htmlContent += `<div class="image-preview">
                             <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;">
+                        </div>`;
+                        fileNameDiv.innerHTML = htmlContent;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (isPDF) {
+                    // Create PDF preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        htmlContent += `<div class="pdf-preview">
+                            <embed src="${e.target.result}" type="application/pdf" width="200" height="150" style="border-radius: 4px; margin-top: 10px;">
+                            <p style="font-size: 12px; color: #666; margin-top: 5px;">Aperçu PDF</p>
                         </div>`;
                         fileNameDiv.innerHTML = htmlContent;
                     };
@@ -135,8 +151,17 @@ if (!$note) {
             }
         }
 
-        function uploadAttachment() {
-            if (uploadInProgress) return;
+        function uploadAttachment(event) {
+            if (uploadInProgress) {
+                console.log('Upload already in progress, ignoring click');
+                return;
+            }
+            
+            // Prevent any default form submission or link following
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             
             const fileInput = document.getElementById('attachmentFile');
             const progressDiv = document.getElementById('uploadProgress');
@@ -241,17 +266,30 @@ if (!$note) {
                 const fileName = attachment.original_filename;
                 const shortName = fileName.length > 40 ? fileName.substring(0, 40) + '...' : fileName;
                 
-                // Check if attachment is an image
+                // Check if attachment is an image or PDF
                 const isImage = attachment.file_type && attachment.file_type.startsWith('image/');
-                const imageUrl = `api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachment.id}`;
+                const isPDF = attachment.file_type && attachment.file_type === 'application/pdf';
+                const fileUrl = `api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachment.id}`;
+                
+                let previewContent = '';
+                if (isImage) {
+                    previewContent = `<img src="${fileUrl}" alt="Preview" class="attachment-thumbnail" onclick="previewImage('${fileUrl}', '${fileName}')">`;
+                } else if (isPDF) {
+                    previewContent = `<div class="pdf-thumbnail" onclick="previewPDF('${fileUrl}', '${fileName}')">
+                        <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
+                        <div class="pdf-overlay">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF</span>
+                        </div>
+                    </div>`;
+                } else {
+                    previewContent = `<i class="fas fa-${getFileIcon(fileName)}"></i>`;
+                }
                 
                 html += `
                     <div class="attachment-card">
                         <div class="attachment-icon">
-                            ${isImage ? 
-                                `<img src="${imageUrl}" alt="Preview" class="attachment-thumbnail" onclick="previewImage('${imageUrl}', '${fileName}')">` :
-                                `<i class="fas fa-${getFileIcon(fileName)}"></i>`
-                            }
+                            ${previewContent}
                         </div>
                         <div class="attachment-details">
                             <div class="attachment-name" title="${fileName}">${shortName}</div>
@@ -308,13 +346,40 @@ if (!$note) {
             
             // Close modal on click
             modal.addEventListener('click', function(e) {
-                if (e.target === modal || e.target.className === 'image-preview-close') {
-                    document.body.removeChild(modal);
-                }
-            });
-        }
+            if (e.target === modal || e.target.className === 'image-preview-close') {
+                document.body.removeChild(modal);
+            }
+        });
+    }
 
-        function downloadAttachment(attachmentId) {
+    function previewPDF(pdfUrl, fileName) {
+        const modal = document.createElement('div');
+        modal.className = 'image-preview-modal';
+        modal.innerHTML = `
+            <div class="pdf-preview-content">
+                <div class="pdf-preview-header">
+                    <h3>${fileName}</h3>
+                    <button class="pdf-preview-close">&times;</button>
+                </div>
+                <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
+                <div class="pdf-preview-actions">
+                    <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
+                        <i class="fas fa-external-link-alt"></i> Ouvrir dans un nouvel onglet
+                    </button>
+                    <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Télécharger
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal || e.target.className === 'pdf-preview-close') {
+                document.body.removeChild(modal);
+            }
+        });
+    }        function downloadAttachment(attachmentId) {
             window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}`, '_blank');
         }
 

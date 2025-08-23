@@ -225,6 +225,11 @@ function reinitializeNoteContent() {
         setTimeout(highlightSearchTerms, 100);
     }
     
+    // Re-initialize clickable tags
+    if (typeof reinitializeClickableTagsAfterAjax === 'function') {
+        reinitializeClickableTagsAfterAjax();
+    }
+    
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
     

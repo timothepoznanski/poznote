@@ -1823,6 +1823,7 @@ input[type="radio"] {
 }
 
 .css-title {
+    margin-top: 15px;
     margin-bottom: 20px;
     margin-left:-3px;
     font-size: 24px;
@@ -3523,4 +3524,106 @@ input[type="search"]::-webkit-search-results-decoration {
     .loading-spinner i {
         font-size: 1.5em;
     }
+}
+
+/* Editable tags styling */
+.editable-tags-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    transition: border-color 0.2s ease;
+    overflow: hidden;
+}
+
+.clickable-tag-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f4f8;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.clickable-tag-wrapper:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.clickable-tag {
+    color: #007DB8;
+    padding: 4px 8px 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.clickable-tag:hover {
+    color: #005a8a;
+    text-decoration: none;
+}
+
+.clickable-tag:visited {
+    color: #007DB8;
+}
+
+.clickable-tag:hover:visited {
+    color: #005a8a;
+}
+
+.tag-delete-button {
+    color: #94a3b8;
+    padding: 4px 6px 4px 2px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.tag-delete-button:hover {
+    color: #ef4444;
+}
+
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #37352F;
+    min-width: 60px;
+    max-width: 150px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    resize: none;
+}
+
+.tag-input::placeholder {
+    color: #bababa;
+    font-style: italic;
+}
+
+.tag-input:focus {
+    outline: none;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 4px;
+}
+
+/* Hide original input when showing editable tags */
+.name_tags.showing-editable-tags > input {
+    display: none;
+}
+
+.name_tags.showing-editable-tags {
+    overflow: visible;
+    white-space: normal;
 }

@@ -2,11 +2,17 @@
 require 'auth.php';
 requireApiAuth();
 
-// Prevent any output before JSON response
-ob_start();
+// Get action first to determine response type
+$action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-// Set JSON content type header
-header('Content-Type: application/json');
+// Only set JSON headers and start output buffering if not downloading
+if ($action !== 'download') {
+    // Prevent any output before JSON response
+    ob_start();
+    
+    // Set JSON content type header
+    header('Content-Type: application/json');
+}
 
 // Enable error logging for debugging
 ini_set('display_errors', 0);
@@ -42,11 +48,6 @@ if (!is_writable($attachments_dir)) {
 }
 
 // Handle different actions
-$action = $_POST['action'] ?? $_GET['action'] ?? '';
-
-// Clean any output buffer before responding
-ob_clean();
-
 switch ($action) {
     case 'upload':
         handleUpload();
@@ -61,12 +62,16 @@ switch ($action) {
         handleDownload();
         break;
     default:
-        echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        if ($action !== 'download') {
+            echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        }
         break;
 }
 
-// End output buffering
-ob_end_flush();
+// End output buffering only if not downloading
+if ($action !== 'download' && ob_get_level()) {
+    ob_end_flush();
+}
 
 function handleUpload() {
     global $con, $attachments_dir;
@@ -325,13 +330,25 @@ function handleDownload() {
                 $file_path = $attachments_dir . '/' . $attachment['filename'];
                 
                 if (file_exists($file_path)) {
-                    // Clear any previous output
-                    ob_end_clean();
+                    // Clear any output buffer that might exist
+                    if (ob_get_level()) {
+                        ob_end_clean();
+                    }
                     
-                    // Set headers for file download
+                    // Set headers for file download/viewing
+                    $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
+                    
+                    // For PDFs and images, allow inline viewing
+                    if (strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false) {
+                        header('Content-Type: ' . $file_type);
+                        header('Content-Disposition: inline; filename="' . $attachment['original_filename'] . '"');
+                    } else {
+                        // For other files, force download
+                        header('Content-Type: application/octet-stream');
+                        header('Content-Disposition: attachment; filename="' . $attachment['original_filename'] . '"');
+                    }
+                    
                     header('Content-Description: File Transfer');
-                    header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment; filename="' . $attachment['original_filename'] . '"');
                     header('Expires: 0');
                     header('Cache-Control: must-revalidate');
                     header('Pragma: public');

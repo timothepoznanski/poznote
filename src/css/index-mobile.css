@@ -955,3 +955,27 @@ input[type="search"]::-webkit-search-results-decoration {
     width: 100% !important;
     justify-content: center !important;
 }
+
+/* Mobile editable tags adjustments */
+@media (max-width: 800px) {
+    .editable-tags-container {
+        padding: 3px !important;
+        gap: 4px !important;
+    }
+    
+    .clickable-tag {
+        font-size: 12px !important;
+        padding: 3px 6px 3px 6px !important;
+    }
+    
+    .tag-delete-button {
+        padding: 3px 5px 3px 2px !important;
+        font-size: 12px !important;
+    }
+    
+    .tag-input {
+        font-size: 12px !important;
+        padding: 3px 6px !important;
+        min-width: 60px !important;
+    }
+}
