@@ -202,7 +202,12 @@ Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans un navigateur pour acc
 
 ## Fonctionnalités IA
 
-Poznote inclut des fonctionnalités IA puissantes propulsées par OpenAI pour améliorer votre expérience de prise de notes. Ces fonctionnalités sont optionnelles et nécessitent une clé API OpenAI.
+Poznote inclut des fonctionnalités IA puissantes propulsées par **OpenAI** ou **Mistral AI** pour améliorer votre expérience de prise de notes. Ces fonctionnalités sont optionnelles et nécessitent une clé API du fournisseur choisi.
+
+### Fournisseurs IA supportés
+
+- **🤖 OpenAI** - GPT-4o, GPT-4 Turbo, GPT-3.5 Turbo (Recommandé pour la qualité)
+- **🚀 Mistral AI** - Mistral Large, Medium, Small, Open Mistral (Alternative européenne)
 
 ### Fonctionnalités IA disponibles
 
@@ -212,15 +217,19 @@ Poznote inclut des fonctionnalités IA puissantes propulsées par OpenAI pour am
 
 ### Configuration des fonctionnalités IA
 
-1. **Obtenez une clé API OpenAI**
-   - Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
+1. **Choisissez votre fournisseur IA**
+   - **OpenAI**: Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Mistral AI**: Rendez-vous sur [Mistral Console](https://console.mistral.ai/)
    - Créez un compte ou connectez-vous
    - Générez une nouvelle clé API
 
 2. **Configurez Poznote**
    - Allez dans **Paramètres → Paramètres IA** dans l'interface Poznote
    - Activez les fonctionnalités IA
-   - Entrez votre clé API OpenAI
+   - Sélectionnez votre fournisseur IA préféré
+   - Entrez votre clé API
+   - Choisissez le modèle désiré
+   - Testez la connexion avec le bouton "Test Connection"
    - Sauvegardez la configuration
 
 3. **Utilisez les fonctionnalités IA**
@@ -232,14 +241,15 @@ Poznote inclut des fonctionnalités IA puissantes propulsées par OpenAI pour am
 ### Prérequis
 
 - ✅ Connexion internet active
-- ✅ Clé API OpenAI valide
+- ✅ Clé API valide (OpenAI ou Mistral AI)
 - ✅ Crédits OpenAI suffisants
 
 ### Confidentialité & Données
 
 Lorsque les fonctionnalités IA sont activées :
-- Le contenu des notes est envoyé aux serveurs d'OpenAI pour traitement
-- Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
+- Le contenu des notes est envoyé aux serveurs du fournisseur IA choisi pour traitement
+- **OpenAI**: Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
+- **Mistral AI**: Les données sont traitées selon les [conditions de service de Mistral AI](https://mistral.ai/terms/)
 - Vous pouvez désactiver l'IA à tout moment dans les paramètres
 
 ## Documentation API

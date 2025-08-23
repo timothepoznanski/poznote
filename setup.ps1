@@ -586,6 +586,16 @@ function Install-Poznote {
     # Get instance name first
     $INSTANCE_NAME = Split-Path -Leaf (Get-Location)
     Write-Status "Using instance name: $INSTANCE_NAME"
+    
+    # Validate instance name for Docker compatibility
+    if ($INSTANCE_NAME -notmatch "^[a-z0-9_-]+$") {
+        Write-Warning "Instance name '$INSTANCE_NAME' contains invalid characters."
+        Write-Host "Docker project names must contain only lowercase letters, numbers, underscores, and hyphens." -ForegroundColor $Colors.Yellow
+        Write-Host "Please rename your folder to use only lowercase letters, numbers, _ and - characters." -ForegroundColor $Colors.Yellow
+        Write-Host "Example: rename 'MyPoznote' to 'my-poznote' or 'mypoznote'" -ForegroundColor $Colors.Yellow
+        exit 1
+    }
+    
     Write-Host ""
 
     # Check if .env already exists

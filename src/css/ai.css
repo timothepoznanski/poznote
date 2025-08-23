@@ -8,6 +8,63 @@
     background-color: #f5f5f5;
 }
 
+/* Provider configuration styles */
+.provider-config {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    background: #f9f9f9;
+}
+
+.provider-config.active {
+    background: #fff;
+    border-color: #007DB8;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+}
+
+/* API key input container */
+.api-key-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.api-key-input input {
+    flex: 1;
+    padding-right: 50px; /* Space for the toggle button */
+}
+
+.toggle-visibility {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.toggle-visibility:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
 /* AI Summary page styles */
 .summary-page {
     max-width: 800px;

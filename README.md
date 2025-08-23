@@ -201,25 +201,34 @@ Simply extract the ZIP file and open `index.html` in any web browser to access y
 
 ## AI Features
 
-Poznote includes powerful AI capabilities powered by OpenAI to enhance your note-taking experience. These features are optional and require an OpenAI API key to function.
+Poznote includes powerful AI capabilities powered by **OpenAI** or **Mistral AI** to enhance your note-taking experience. These features are optional and require an API key from your chosen provider.
+
+### Supported AI Providers
+
+- **🤖 OpenAI** - GPT-4o, GPT-4 Turbo, GPT-3.5 Turbo (Recommended for quality)
+- **🚀 Mistral AI** - Mistral Large, Medium, Small, Open Mistral (European alternative)
 
 ### Available AI Features
 
-- **🤖 AI Summarization** - Generate intelligent summaries of your notes to quickly understand key points
-- **🏷️ Auto Tag Generation** - Automatically generate relevant tags based on your note content
-- **🔍 Check Content** - Verify the accuracy, coherence, and logical consistency of your note content
+- **🤖 AI Summary** - Generate intelligent summaries of your notes for quick understanding
+- **🏷️ Auto Tags** - Automatically generate relevant tags based on note content
+- **🔍 Check Faults** - Verify consistency, logic, and grammar in your notes
 
 ### Setup AI Features
 
-1. **Get an OpenAI API Key**
-   - Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+1. **Choose your AI Provider**
+   - **OpenAI**: Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Mistral AI**: Visit [Mistral Console](https://console.mistral.ai/)
    - Create an account or sign in
    - Generate a new API key
 
 2. **Configure Poznote**
    - Go to **Settings → AI Settings** in your Poznote interface
    - Enable AI features by checking the box
-   - Enter your OpenAI API key
+   - Select your preferred AI provider
+   - Enter your API key
+   - Choose your desired model
+   - Test the connection using the "Test Connection" button
    - Save the configuration
 
 3. **Start Using AI Features**
@@ -231,14 +240,14 @@ Poznote includes powerful AI capabilities powered by OpenAI to enhance your note
 ### Requirements
 
 - ✅ Active internet connection
-- ✅ Valid OpenAI API key
-- ✅ Sufficient OpenAI credits in your account
+- ✅ Valid API key (OpenAI or Mistral AI)
 
 ### Privacy & Data
 
 When AI features are enabled:
-- Note content is sent to OpenAI's servers for processing
-- Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
+- Note content is sent to your chosen AI provider's servers for processing
+- **OpenAI**: Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
+- **Mistral AI**: Data is processed according to [Mistral AI's terms of service](https://mistral.ai/terms/)
 - You can disable AI features at any time in settings
 
 ## API Documentation
