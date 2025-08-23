@@ -155,10 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 function showAttachmentDialog(noteId) {
-    currentNoteIdForAttachments = noteId;
-    document.getElementById('attachmentModal').style.display = 'block';
-    hideAttachmentError(); // Clear any previous error messages
-    loadAttachments(noteId);
+    // Redirect to the dedicated attachments management page
+    window.location.href = `manage_attachments.php?note_id=${noteId}`;
 }
 
 // Functions to handle attachment modal error messages

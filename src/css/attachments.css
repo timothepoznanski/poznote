@@ -1,0 +1,406 @@
+/* Attachments Management Page - Poznote */
+
+.settings-container h1 {
+    color: #007DB8;
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-container p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Settings sections */
+.settings-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007DB8;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Upload section styles */
+.attachment-upload-section {
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.file-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.file-input:hover {
+    border-color: #007DB8;
+}
+
+.accepted-types {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.selected-filename {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #e8f4f8;
+    border: 1px solid #007DB8;
+    border-radius: 4px;
+    color: #007DB8;
+    font-size: 14px;
+}
+
+.selected-filename i {
+    margin-right: 6px;
+}
+
+/* Upload progress */
+.upload-progress {
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #007DB8, #005a8a);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 14px;
+    color: #007DB8;
+    font-weight: 500;
+}
+
+/* Attachments display */
+.attachments-display {
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    min-height: 100px;
+}
+
+.loading-attachments {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.loading-attachments i {
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+.no-attachments {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-style: italic;
+}
+
+.no-attachments i {
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.error-message {
+    text-align: center;
+    padding: 20px;
+    color: #dc3545;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+/* Attachment card styles */
+.attachment-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.attachment-card:last-child {
+    border-bottom: none;
+}
+
+.attachment-card:hover {
+    background-color: #f8f9fa;
+}
+
+.attachment-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: #007DB8;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+.attachment-icon i {
+    color: white;
+    font-size: 18px;
+}
+
+.attachment-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-name {
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.attachment-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.attachment-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    margin-left: 15px;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.btn-download {
+    background: #28a745;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Button styles (consistent with other pages) */
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #005a8a;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    background: #ccc !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Alert messages */
+.alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.warning i {
+    margin-right: 8px;
+}
+
+/* Spin animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .settings-container {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .settings-container h1 {
+        font-size: 24px;
+    }
+    
+    .settings-section {
+        padding: 15px;
+    }
+    
+    .attachment-card {
+        padding: 12px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .attachment-icon {
+        align-self: flex-start;
+    }
+    
+    .attachment-details {
+        width: 100%;
+    }
+    
+    .attachment-actions {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+    
+    .attachment-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .attachment-card {
+        padding: 10px;
+    }
+    
+    .attachment-name {
+        font-size: 14px;
+    }
+    
+    .attachment-meta {
+        font-size: 12px;
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+}

@@ -347,6 +347,12 @@ a:active { color: #2E8CFA; } */
     color: #666;
 }
 
+.attachment-info strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .attachment-actions {
     display: flex;
     gap: 5px;
@@ -480,6 +486,12 @@ a:active { color: #2E8CFA; } */
 
 .attachment-info {
     flex: 1;
+}
+
+.attachment-info strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .attachment-actions {
