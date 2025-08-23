@@ -205,7 +205,10 @@ $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] 
             <!-- Test Connection Section (after save) -->
             <div class="test-section">
                 <p><i class="fas fa-info-circle"></i> Save your configuration first, then test the connection to verify it works.</p>
-                <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn">
+                <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn"
+                        data-saved-provider="<?php echo htmlspecialchars($ai_provider); ?>"
+                        data-saved-openai-model="<?php echo htmlspecialchars($openai_model); ?>"
+                        data-saved-mistral-model="<?php echo htmlspecialchars($mistral_model); ?>">
                     <i class="fas fa-plug"></i> <span id="test-btn-text">Test Connection</span>
                 </button>
                 <div id="test-result" style="margin-top: 15px; display: none;"></div>

@@ -37,39 +37,49 @@ function toggleProviderSettings() {
     if (selectedConfig) {
         selectedConfig.style.display = 'block';
     }
-    
-    // Update test button text
-    updateTestButtonText();
 }
 
 /**
- * Update test button text based on selected provider and model
+ * Update test button text based on saved configuration (not current form values)
  */
 function updateTestButtonText() {
-    const providerSelect = document.getElementById('ai_provider');
+    const testBtn = document.getElementById('test-connection-btn');
     const testBtnText = document.getElementById('test-btn-text');
     
-    if (!providerSelect || !testBtnText) return;
+    if (!testBtn || !testBtnText) return;
     
-    const selectedProvider = providerSelect.value;
-    let modelText = '';
+    const savedProvider = testBtn.getAttribute('data-saved-provider');
+    const savedOpenAIModel = testBtn.getAttribute('data-saved-openai-model');
+    const savedMistralModel = testBtn.getAttribute('data-saved-mistral-model');
     
-    if (selectedProvider === 'openai') {
+    if (savedProvider === 'openai') {
+        // Find the display name for the OpenAI model
         const openaiModelSelect = document.getElementById('openai_model');
+        let modelDisplayName = savedOpenAIModel;
+        
         if (openaiModelSelect) {
-            const selectedOption = openaiModelSelect.options[openaiModelSelect.selectedIndex];
-            modelText = selectedOption.text;
+            const option = openaiModelSelect.querySelector(`option[value="${savedOpenAIModel}"]`);
+            if (option) {
+                modelDisplayName = option.textContent;
+            }
         }
-        testBtnText.textContent = `Test OpenAI Connection (${modelText})`;
-    } else if (selectedProvider === 'mistral') {
+        
+        testBtnText.textContent = `Test OpenAI Connection (${modelDisplayName})`;
+    } else if (savedProvider === 'mistral') {
+        // Find the display name for the Mistral model
         const mistralModelSelect = document.getElementById('mistral_model');
+        let modelDisplayName = savedMistralModel;
+        
         if (mistralModelSelect) {
-            const selectedOption = mistralModelSelect.options[mistralModelSelect.selectedIndex];
-            modelText = selectedOption.text;
+            const option = mistralModelSelect.querySelector(`option[value="${savedMistralModel}"]`);
+            if (option) {
+                modelDisplayName = option.textContent;
+            }
         }
-        testBtnText.textContent = `Test Mistral AI Connection (${modelText})`;
+        
+        testBtnText.textContent = `Test Mistral AI Connection (${modelDisplayName})`;
     } else {
-        testBtnText.textContent = 'Test Connection';
+        testBtnText.textContent = 'Test Connection (Save configuration first)';
     }
 }
 
@@ -123,20 +133,50 @@ function toggleApiKeyVisibility() {
     toggleApiKeyVisibility('openai_api_key');
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Update test button text on page load
-    updateTestButtonText();
-    
-    // Add event listeners for model changes
+/**
+ * Update saved configuration data attributes after successful save
+ */
+function updateSavedConfiguration() {
+    const testBtn = document.getElementById('test-connection-btn');
+    const providerSelect = document.getElementById('ai_provider');
     const openaiModelSelect = document.getElementById('openai_model');
     const mistralModelSelect = document.getElementById('mistral_model');
     
-    if (openaiModelSelect) {
-        openaiModelSelect.addEventListener('change', updateTestButtonText);
+    if (testBtn && providerSelect) {
+        // Update data attributes with current form values
+        testBtn.setAttribute('data-saved-provider', providerSelect.value);
+        
+        if (openaiModelSelect) {
+            testBtn.setAttribute('data-saved-openai-model', openaiModelSelect.value);
+        }
+        
+        if (mistralModelSelect) {
+            testBtn.setAttribute('data-saved-mistral-model', mistralModelSelect.value);
+        }
+        
+        // Update button text
+        updateTestButtonText();
     }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Update test button text on page load based on saved configuration
+    updateTestButtonText();
     
-    if (mistralModelSelect) {
-        mistralModelSelect.addEventListener('change', updateTestButtonText);
+    // Listen for form submission to update saved configuration
+    const form = document.getElementById('ai-config-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Small delay to let the form submit, then update the saved config
+            setTimeout(() => {
+                // Check if the page was reloaded (success message visible) or if we're still here
+                const successAlert = document.querySelector('.alert-success');
+                if (successAlert) {
+                    // Form was submitted successfully, update saved configuration
+                    updateSavedConfiguration();
+                }
+            }, 100);
+        });
     }
 });

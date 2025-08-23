@@ -588,7 +588,7 @@ function Install-Poznote {
     Write-Status "Using instance name: $INSTANCE_NAME"
     
     # Validate instance name for Docker compatibility
-    if ($INSTANCE_NAME -notmatch "^[a-z0-9_-]+$") {
+    if ($INSTANCE_NAME -cnotmatch "^[a-z0-9_-]+$") {
         Write-Warning "Instance name '$INSTANCE_NAME' contains invalid characters."
         Write-Host "Docker project names must contain only lowercase letters, numbers, underscores, and hyphens." -ForegroundColor $Colors.Yellow
         Write-Host "Please rename your folder to use only lowercase letters, numbers, _ and - characters." -ForegroundColor $Colors.Yellow
