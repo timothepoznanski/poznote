@@ -1352,8 +1352,7 @@ img {
 
 .note-attachments-row {
     display: flex;
-    align-items: center;
-    overflow: hidden;
+    align-items: flex-start;
     margin-bottom: 15px;
     margin-top: 5px;
 }
@@ -1361,6 +1360,7 @@ img {
 .fa-paperclip.icon_attachment {
     font-size: 12px;
     margin-right: 8px;
+    margin-top: 2px;
     flex-shrink: 0;
     color: #007DB8;
 }
@@ -1368,9 +1368,7 @@ img {
 .note-attachments-list {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.4;
 }
 
 .attachment-link {
@@ -1379,6 +1377,9 @@ img {
     font-size: 14px;
     transition: color 0.2s;
     cursor: pointer;
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    word-break: break-word;
 }
 
 .attachment-link:hover {

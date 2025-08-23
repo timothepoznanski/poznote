@@ -1175,7 +1175,7 @@ $folder_filter = $_GET['folder'] ?? '';
                                 $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="Download '.$safe_filename.'">'.$safe_filename.'</a>';
                             }
                         }
-                        echo implode(' • ', $attachment_links);
+                        echo implode(' ', $attachment_links);
                         echo '</span>';
                         echo '</div>';
                     }
