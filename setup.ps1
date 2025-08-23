@@ -593,6 +593,8 @@ function Install-Poznote {
         Write-Host "Docker project names must contain only lowercase letters, numbers, underscores, and hyphens." -ForegroundColor $Colors.Yellow
         Write-Host "Please rename your folder to use only lowercase letters, numbers, _ and - characters." -ForegroundColor $Colors.Yellow
         Write-Host "Example: rename 'MyPoznote' to 'my-poznote' or 'mypoznote'" -ForegroundColor $Colors.Yellow
+        Write-Host ""
+        Write-Host "If you used the PowerShell command from the README, please use the updated version that validates names before cloning." -ForegroundColor $Colors.Blue
         exit 1
     }
     

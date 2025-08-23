@@ -348,6 +348,18 @@ get_user_config() {
     if [ "$is_update" != "true" ]; then
         INSTANCE_NAME=$(basename "$(pwd)")
         print_status "Using instance name: $INSTANCE_NAME"
+        
+        # Validate instance name for Docker compatibility
+        if ! [[ "$INSTANCE_NAME" =~ ^[a-z0-9_-]+$ ]]; then
+            print_warning "Instance name '$INSTANCE_NAME' contains invalid characters."
+            echo "Docker project names must contain only lowercase letters, numbers, underscores, and hyphens."
+            echo "Please rename your folder to use only lowercase letters, numbers, _ and - characters."
+            echo "Example: rename 'MyPoznote' to 'my-poznote' or 'mypoznote'"
+            echo ""
+            echo "If you used the bash command from the README, please use the updated version that validates names before cloning."
+            exit 1
+        fi
+        
         echo
     fi
     
