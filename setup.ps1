@@ -511,8 +511,7 @@ function Install-Poznote {
     
     if ($isExisting) {
         # Existing installation - show menu
-        Write-Host @"
-"@ -ForegroundColor $Colors.Blue
+        Write-Host "Poznote Installation Manager" -ForegroundColor $Colors.Blue
         
         $existingConfig = Get-ExistingEnvConfig
         
@@ -527,9 +526,9 @@ function Install-Poznote {
         }
         
         Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green
-        Write-Host "  1) Update application (get latest code)" -ForegroundColor $Colors.White
-        Write-Host "  2) Change settings (password/port/name etc.)" -ForegroundColor $Colors.White
-        Write-Host "  3) Cancel" -ForegroundColor $Colors.Gray
+        Write-Host "  1. Update application (get latest code)" -ForegroundColor $Colors.White
+        Write-Host "  2. Change settings (password/port/name etc.)" -ForegroundColor $Colors.White
+        Write-Host "  3. Cancel" -ForegroundColor $Colors.Gray
         
         do {
             $choice = Read-Host "`nPlease select an option (1-3)"
@@ -559,9 +558,7 @@ function Install-Poznote {
                         # Install Git hook for automatic versioning
                         Install-GitHook
                         
-                        Write-Host @"
-Update Complete!
-"@ -ForegroundColor $Colors.Green
+                        Write-Host "Update Complete!" -ForegroundColor $Colors.Green
                         
                         Write-Host "Your Poznote installation has been updated successfully!" -ForegroundColor $Colors.Green
                         Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
@@ -584,9 +581,7 @@ Update Complete!
     }
     
     # Fresh installation
-    Write-Host @"
-Poznote Installation Script
-"@ -ForegroundColor $Colors.Green
+    Write-Host "Poznote Installation Script" -ForegroundColor $Colors.Green
 
     # Get instance name first
     $INSTANCE_NAME = Split-Path -Leaf (Get-Location)
@@ -712,6 +707,11 @@ Poznote Installation Script
 "@ -ForegroundColor $Colors.Green
         
         # Use the variables directly instead of reading from file
+        # Fallback to reading from .env if variables are not set
+        if (-not $POZNOTE_USERNAME -or -not $POZNOTE_PASSWORD -or -not $HTTP_WEB_PORT) {
+            $envVars = Get-ExistingEnvConfig
+        }
+        
         $finalUsername = if ($POZNOTE_USERNAME) { $POZNOTE_USERNAME } else { $envVars['POZNOTE_USERNAME'] }
         $finalPassword = if ($POZNOTE_PASSWORD) { $POZNOTE_PASSWORD } else { $envVars['POZNOTE_PASSWORD'] }
         $finalPort = if ($HTTP_WEB_PORT) { $HTTP_WEB_PORT } else { $envVars['HTTP_WEB_PORT'] }
