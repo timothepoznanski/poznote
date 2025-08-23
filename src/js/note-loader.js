@@ -8,6 +8,34 @@ var currentLoadingNoteId = null;
 var isNoteLoading = false;
 
 /**
+ * Check if we're on mobile
+ */
+function isMobileDevice() {
+    return window.innerWidth <= 800;
+}
+
+/**
+ * Function to go back to note list on mobile
+ * Made available globally for use by mobile home button
+ */
+window.goBackToNoteList = function() {
+    if (isMobileDevice()) {
+        // Remove note-open class to show left column
+        document.body.classList.remove('note-open');
+        
+        // Clear selected note
+        document.querySelectorAll('.links_arbo_left').forEach(link => {
+            link.classList.remove('selected-note');
+        });
+        
+        // Update URL to remove note parameter
+        const url = new URL(window.location);
+        url.searchParams.delete('note');
+        history.pushState({}, '', url.toString());
+    }
+};
+
+/**
  * Initialize note loading system
  */
 function initializeNoteLoader() {
@@ -31,6 +59,16 @@ function initializeNoteLoader() {
     window.addEventListener('popstate', function(event) {
         if (event.state && event.state.noteTitle) {
             loadNoteFromUrl(window.location.href);
+        } else {
+            // If no state (going back to list), handle mobile view
+            if (isMobileDevice()) {
+                document.body.classList.remove('note-open');
+                
+                // Clear selected note
+                document.querySelectorAll('.links_arbo_left').forEach(link => {
+                    link.classList.remove('selected-note');
+                });
+            }
         }
     });
 }
@@ -49,6 +87,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
     // Update UI to show loading state
     showNoteLoadingState();
     updateSelectedNote(clickedLink);
+    
+    // On mobile, add the note-open class to body to show right column
+    if (isMobileDevice()) {
+        document.body.classList.add('note-open');
+    }
     
     // Create XMLHttpRequest
     const xhr = new XMLHttpRequest();
@@ -197,6 +240,20 @@ function reinitializeNoteContent() {
     if (typeof initializeToolbarHandlers === 'function') {
         initializeToolbarHandlers();
     }
+    
+    // On mobile, ensure the right column is properly displayed
+    if (isMobileDevice()) {
+        // Make sure body has note-open class
+        if (!document.body.classList.contains('note-open')) {
+            document.body.classList.add('note-open');
+        }
+        
+        // Ensure right column is visible
+        const rightColumn = document.getElementById('right_col');
+        if (rightColumn) {
+            rightColumn.style.display = 'block';
+        }
+    }
 }
 
 /**
@@ -209,9 +266,45 @@ function isNoteUrl(url) {
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteLoader();
+    
+    // On mobile, if we have a note parameter in URL, ensure note-open class is set
+    if (isMobileDevice()) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const noteParam = urlParams.get('note');
+        
+        if (noteParam) {
+            // We're loading a specific note on mobile, ensure proper display
+            document.body.classList.add('note-open');
+            
+            // Mark the correct note as selected
+            const noteLinks = document.querySelectorAll('.links_arbo_left');
+            noteLinks.forEach(link => {
+                if (link.getAttribute('data-note-id') === noteParam) {
+                    link.classList.add('selected-note');
+                }
+            });
+        }
+    }
 });
 
 // Also initialize if DOM is already loaded
 if (document.readyState !== 'loading') {
     initializeNoteLoader();
+    
+    // Same mobile check for already loaded DOM
+    if (isMobileDevice()) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const noteParam = urlParams.get('note');
+        
+        if (noteParam) {
+            document.body.classList.add('note-open');
+            
+            const noteLinks = document.querySelectorAll('.links_arbo_left');
+            noteLinks.forEach(link => {
+                if (link.getAttribute('data-note-id') === noteParam) {
+                    link.classList.add('selected-note');
+                }
+            });
+        }
+    }
 }

@@ -918,7 +918,13 @@ $folder_filter = $_GET['folder'] ?? '';
                     if (!empty($home_params)) {
                         $home_url .= '?' . implode('&', $home_params);
                     }
-                    echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
+                    
+                    // Use goBackToNoteList function for better mobile experience if no search parameters
+                    if (empty($home_params)) {
+                        echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="goBackToNoteList()"><i class="fas fa-home"></i></button>';
+                    } else {
+                        echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
+                    }
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)
