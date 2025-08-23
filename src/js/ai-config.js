@@ -37,6 +37,40 @@ function toggleProviderSettings() {
     if (selectedConfig) {
         selectedConfig.style.display = 'block';
     }
+    
+    // Update test button text
+    updateTestButtonText();
+}
+
+/**
+ * Update test button text based on selected provider and model
+ */
+function updateTestButtonText() {
+    const providerSelect = document.getElementById('ai_provider');
+    const testBtnText = document.getElementById('test-btn-text');
+    
+    if (!providerSelect || !testBtnText) return;
+    
+    const selectedProvider = providerSelect.value;
+    let modelText = '';
+    
+    if (selectedProvider === 'openai') {
+        const openaiModelSelect = document.getElementById('openai_model');
+        if (openaiModelSelect) {
+            const selectedOption = openaiModelSelect.options[openaiModelSelect.selectedIndex];
+            modelText = selectedOption.text;
+        }
+        testBtnText.textContent = `Test OpenAI Connection (${modelText})`;
+    } else if (selectedProvider === 'mistral') {
+        const mistralModelSelect = document.getElementById('mistral_model');
+        if (mistralModelSelect) {
+            const selectedOption = mistralModelSelect.options[mistralModelSelect.selectedIndex];
+            modelText = selectedOption.text;
+        }
+        testBtnText.textContent = `Test Mistral AI Connection (${modelText})`;
+    } else {
+        testBtnText.textContent = 'Test Connection';
+    }
 }
 
 /**
@@ -45,10 +79,14 @@ function toggleProviderSettings() {
 function testAIConnection() {
     const testBtn = document.getElementById('test-connection-btn');
     const testResult = document.getElementById('test-result');
+    const testBtnText = document.getElementById('test-btn-text');
+    
+    // Store original button text
+    const originalText = testBtnText.textContent;
     
     // Show loading state
     testBtn.disabled = true;
-    testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    testBtnText.textContent = 'Testing...';
     testResult.style.display = 'none';
     
     fetch('api_test_ai_connection.php', {
@@ -76,7 +114,7 @@ function testAIConnection() {
     .finally(() => {
         // Restore button state
         testBtn.disabled = false;
-        testBtn.innerHTML = '<i class="fas fa-plug"></i> Test Connection';
+        testBtnText.textContent = originalText;
     });
 }
 
@@ -84,3 +122,21 @@ function testAIConnection() {
 function toggleApiKeyVisibility() {
     toggleApiKeyVisibility('openai_api_key');
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Update test button text on page load
+    updateTestButtonText();
+    
+    // Add event listeners for model changes
+    const openaiModelSelect = document.getElementById('openai_model');
+    const mistralModelSelect = document.getElementById('mistral_model');
+    
+    if (openaiModelSelect) {
+        openaiModelSelect.addEventListener('change', updateTestButtonText);
+    }
+    
+    if (mistralModelSelect) {
+        mistralModelSelect.addEventListener('change', updateTestButtonText);
+    }
+});

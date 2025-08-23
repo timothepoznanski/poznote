@@ -200,13 +200,16 @@ $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] 
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Configuration
                 </button>
-                
-                <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn" style="margin-left: 10px;">
-                    <i class="fas fa-plug"></i> Test Connection
-                </button>
             </form>
             
-            <div id="test-result" style="margin-top: 15px; display: none;"></div>
+            <!-- Test Connection Section (after save) -->
+            <div class="test-section">
+                <p><i class="fas fa-info-circle"></i> Save your configuration first, then test the connection to verify it works.</p>
+                <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn">
+                    <i class="fas fa-plug"></i> <span id="test-btn-text">Test Connection</span>
+                </button>
+                <div id="test-result" style="margin-top: 15px; display: none;"></div>
+            </div>
         </div>
         
         <!-- AI Features Information -->
