@@ -129,10 +129,10 @@ function generateUniqueTitle($originalTitle, $excludeId = null) {
         $title = 'Untitled note';
     }
     
-    // For "Untitled note", always add date and time
+    // For "Untitled note", always add date and time in YYMMddHHmmss format
     if ($title === 'Untitled note') {
-        $dateTime = date('Y-m-d H:i:s');
-        $title = 'Untitled note ' . $dateTime;
+        $dateTime = date('ymdHis'); // Format: YYMMddHHmmss
+        $title = 'Untitled-note-' . $dateTime;
     }
     
     // Check if title already exists (excluding the current note if updating)
