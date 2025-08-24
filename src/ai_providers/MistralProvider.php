@@ -44,7 +44,8 @@ CRITIQUE : Toute ta réponse doit être écrite dans la même langue principale 
 
 Règles :
 - Génère entre 3 et 8 tags maximum
-- Les tags doivent être des mots simples ou des phrases courtes (2-3 mots max)
+- Les tags DOIVENT être des mots uniques seulement (pas d\'espaces autorisés)
+- Si un concept nécessite plusieurs mots, utilise camelCase ou des underscores (ex: "apprentissageAutomatique" ou "apprentissage_automatique")
 - Les tags doivent être dans la même langue que le contenu de la note
 - Concentre-toi sur les sujets principaux, concepts et thèmes
 - Évite les tags génériques comme "note" ou "texte"
@@ -54,7 +55,7 @@ Règles :
             ],
             [
                 'role' => 'user',
-                'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nGénère des tags pertinents pour cette note. Retourne seulement les tags sous forme de liste séparée par des virgules."
+                'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nGénère des tags pertinents composés d'un seul mot pour cette note. Retourne seulement les tags sous forme de liste séparée par des virgules."
             ]
         ];
         
@@ -68,8 +69,14 @@ Règles :
         $tags_text = trim($result['content']);
         $tags = array_map('trim', explode(',', $tags_text));
         $tags = array_filter($tags, function($tag) {
-            return !empty($tag) && strlen($tag) > 1;
+            // Filter out empty tags and tags with spaces
+            return !empty($tag) && strlen($tag) > 1 && !preg_match('/\s/', $tag);
         });
+        
+        // If any tag contains spaces, replace them with underscores
+        $tags = array_map(function($tag) {
+            return str_replace(' ', '_', $tag);
+        }, $tags);
         
         // Limit to maximum 8 tags
         $tags = array_slice($tags, 0, 8);

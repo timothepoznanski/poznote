@@ -22,6 +22,20 @@ $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
 $folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Uncategorized';
 
+// Validation des tags : supprimer les tags qui contiennent des espaces
+if (!empty($tags)) {
+    $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+    $validTags = [];
+    foreach ($tagsArray as $tag) {
+        if (!empty($tag)) {
+            // Remplacer les espaces par des underscores si nécessaire
+            $tag = str_replace(' ', '_', $tag);
+            $validTags[] = $tag;
+        }
+    }
+    $tags = implode(',', $validTags);
+}
+
 if ($originalHeading === '') {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'The heading field is required']);

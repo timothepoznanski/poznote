@@ -88,6 +88,12 @@ function convertTagsToEditable(noteId) {
             e.stopPropagation();
             return false;
         }
+        // Empêcher la saisie d'espaces
+        if (e.key === ' ') {
+            e.preventDefault();
+            showTagError(tagInput, 'Les espaces ne sont pas autorisés dans les tags');
+            return false;
+        }
     });
     
     tagInput.addEventListener('keydown', function(e) {
@@ -153,6 +159,13 @@ function handleTagInput(e, noteId, container) {
         const tagText = input.value.trim();
         
         if (tagText && tagText !== '') {
+            // Vérifier s'il y a des espaces dans le tag
+            if (tagText.includes(' ')) {
+                // Afficher un message d'erreur temporaire
+                showTagError(input, 'Les tags ne peuvent pas contenir d\'espaces');
+                return false;
+            }
+            
             // Check if tag already exists
             const existingTags = container.querySelectorAll('.clickable-tag');
             const tagExists = Array.from(existingTags).some(tag => 
@@ -190,6 +203,14 @@ function handleTagInputBlur(e, noteId, container) {
     const tagText = input.value.trim();
     
     if (tagText && tagText !== '') {
+        // Vérifier s'il y a des espaces dans le tag
+        if (tagText.includes(' ')) {
+            // Afficher un message d'erreur temporaire et vider l'input
+            showTagError(input, 'Les tags ne peuvent pas contenir d\'espaces');
+            input.value = '';
+            return;
+        }
+        
         // Check if tag already exists
         const existingTags = container.querySelectorAll('.clickable-tag');
         const tagExists = Array.from(existingTags).some(tag => 
@@ -211,6 +232,36 @@ function removeTagElement(tagWrapper, noteId) {
     const container = tagWrapper.closest('.editable-tags-container');
     tagWrapper.remove();
     updateTagsInput(noteId, container);
+}
+
+/**
+ * Show a temporary error message for tag input
+ */
+function showTagError(input, message) {
+    // Remove existing error message
+    const existingError = input.parentNode.querySelector('.tag-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Create error message element
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'tag-error-message';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = 'color: #dc3545; font-size: 12px; margin-top: 2px; position: absolute; z-index: 1000; background: white; padding: 2px 5px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+    
+    // Insert after input
+    input.parentNode.insertBefore(errorDiv, input.nextSibling);
+    
+    // Remove error after 3 seconds
+    setTimeout(() => {
+        if (errorDiv && errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 3000);
+    
+    // Clear the input
+    input.value = '';
 }
 
 /**

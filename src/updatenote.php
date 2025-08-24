@@ -29,6 +29,20 @@
 	$seconds = (int)$now;
 	
     $tags = str_replace(' ', ',', $_POST['tags'] ?? '');	
+    
+    // Validation des tags : supprimer les tags qui contiennent des espaces
+    if (!empty($tags)) {
+        $tagsArray = array_map('trim', explode(',', $tags));
+        $validTags = [];
+        foreach ($tagsArray as $tag) {
+            if (!empty($tag)) {
+                // Remplacer les espaces par des underscores si nécessaire
+                $tag = str_replace(' ', '_', $tag);
+                $validTags[] = $tag;
+            }
+        }
+        $tags = implode(',', $validTags);
+    }
 	
 	$query = "SELECT * FROM entries WHERE id = ?";
 	$stmt = $con->prepare($query);

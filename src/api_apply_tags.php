@@ -41,7 +41,17 @@ try {
     // Convert tags array to comma-separated string
     $tags_string = '';
     if (is_array($tags) && count($tags) > 0) {
-        $tags_string = implode(', ', array_map('trim', $tags));
+        // Validate tags - remove any that contain spaces and replace spaces with underscores if needed
+        $valid_tags = [];
+        foreach ($tags as $tag) {
+            $tag = trim($tag);
+            if (!empty($tag)) {
+                // If tag contains spaces, replace with underscores
+                $tag = str_replace(' ', '_', $tag);
+                $valid_tags[] = $tag;
+            }
+        }
+        $tags_string = implode(', ', $valid_tags);
     }
     
     // Update the tags in the database

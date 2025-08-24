@@ -44,7 +44,8 @@ CRITICAL: Your entire response must be written in the same primary language as t
 
 Rules:
 - Generate between 3 to 8 tags maximum
-- Tags should be single words or short phrases (2-3 words max)
+- Tags MUST be single words only (no spaces allowed)
+- If a concept requires multiple words, use camelCase or underscores (e.g., "machineLearning" or "machine_learning")
 - Tags should be in the same language as the note content
 - Focus on the main topics, concepts, and themes
 - Avoid generic tags like "note" or "text"
@@ -54,7 +55,7 @@ Rules:
             ],
             [
                 'role' => 'user',
-                'content' => "Here is a note titled \"$title\":\n\n$content\n\nGenerate relevant tags for this note. Return only the tags as a comma-separated list."
+                'content' => "Here is a note titled \"$title\":\n\n$content\n\nGenerate relevant single-word tags for this note. Return only the tags as a comma-separated list."
             ]
         ];
         
@@ -68,8 +69,14 @@ Rules:
         $tags_text = trim($result['content']);
         $tags = array_map('trim', explode(',', $tags_text));
         $tags = array_filter($tags, function($tag) {
-            return !empty($tag) && strlen($tag) > 1;
+            // Filter out empty tags and tags with spaces
+            return !empty($tag) && strlen($tag) > 1 && !preg_match('/\s/', $tag);
         });
+        
+        // If any tag contains spaces, replace them with underscores
+        $tags = array_map(function($tag) {
+            return str_replace(' ', '_', $tag);
+        }, $tags);
         
         // Limit to maximum 8 tags
         $tags = array_slice($tags, 0, 8);
