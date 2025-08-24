@@ -2977,18 +2977,100 @@ hr {
     width: 100%;
 }
 
+/* Legacy search-type-buttons - keep for backwards compatibility but hide */
 .search-type-buttons {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 2px;
-    align-items: center;
-    z-index: 4;
-    /* margin-right: 8px; */
+    display: none;
 }
 
+/* New modern search options */
+.search-options-container {
+    margin-top: 8px;
+    padding: 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.search-type-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-pill {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 14px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6c757d;
+    font-size: 0.8em;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    outline: none;
+    position: relative;
+    min-height: 28px;
+    user-select: none;
+    opacity: 0.8;
+}
+
+.search-pill:hover {
+    background: #e9ecef;
+    border-color: #007DB8;
+    color: #007DB8;
+    transform: translateY(-1px);
+    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
+    opacity: 1;
+}
+
+.search-pill:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
+}
+
+.search-pill.active {
+    background: #007DB8;
+    border-color: #007DB8;
+    color: white;
+    box-shadow: 0 1px 4px rgba(0, 125, 184, 0.2);
+    opacity: 1;
+}
+
+.search-pill.active:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 125, 184, 0.3);
+}
+
+.search-pill.active:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.2);
+}
+
+.search-pill i {
+    font-size: 0.75em;
+}
+
+.search-pill span {
+    font-size: 0.8em;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Legacy search-type-btn styles - keep for JS compatibility */
 .search-type-btn {
     background: transparent;
     border: none;

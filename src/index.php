@@ -442,24 +442,32 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="unified-search-container mobile">
                     <div class="searchbar-row searchbar-icon-row">
                         <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Select search options first..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Search..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                             <span class="searchbar-icon"><span class="fas fa-search"></span></span>
                             <?php if (!empty($search) || !empty($tags_search)): ?>
                                 <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>
                             <?php endif; ?>
                         </div>
-                        <div class="search-type-buttons">
-                            <button type="button" class="search-type-btn" id="search-notes-btn-mobile" title="Search in notes" data-type="notes">
+                    </div>
+                    
+                    <!-- Search options pills below the search bar for mobile -->
+                    <div class="search-options-container mobile">
+                        <div class="search-type-pills">
+                            <button type="button" class="search-pill" id="search-notes-btn-mobile" title="Search in note content" data-type="notes">
                                 <i class="fas fa-file-alt"></i>
+                                <span>Notes</span>
                             </button>
-                            <button type="button" class="search-type-btn" id="search-tags-btn-mobile" title="Search in tags" data-type="tags">
+                            <button type="button" class="search-pill" id="search-tags-btn-mobile" title="Search in tags" data-type="tags">
                                 <i class="fas fa-tags"></i>
+                                <span>Tags</span>
                             </button>
-                            <button type="button" class="search-type-btn" id="search-folders-btn-mobile" title="Filter folders" data-type="folders">
+                            <button type="button" class="search-pill" id="search-folders-btn-mobile" title="Filter folders" data-type="folders">
                                 <i class="fas fa-folder"></i>
+                                <span>Folders</span>
                             </button>
                         </div>
                     </div>
+                    
                     <!-- Hidden inputs to maintain compatibility -->
                     <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                     <input type="hidden" id="search-tags-hidden-mobile" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
@@ -489,8 +497,22 @@ $folder_filter = $_GET['folder'] ?? '';
     }
     
     if (!empty($tags_search)) {
-        $where_conditions[] = "tags LIKE ?";
-        $search_params[] = '%' . $tags_search . '%';
+        // Handle multiple tags search - split by comma or space
+        $search_tags = array_filter(array_map('trim', preg_split('/[,\s]+/', $tags_search)));
+        
+        if (count($search_tags) == 1) {
+            // Single tag search
+            $where_conditions[] = "tags LIKE ?";
+            $search_params[] = '%' . $search_tags[0] . '%';
+        } else {
+            // Multiple tags search - all tags must be present
+            $tag_conditions = [];
+            foreach ($search_tags as $tag) {
+                $tag_conditions[] = "tags LIKE ?";
+                $search_params[] = '%' . $tag . '%';
+            }
+            $where_conditions[] = "(" . implode(" AND ", $tag_conditions) . ")";
+        }
     }
     
     // Secure folder filter
@@ -614,24 +636,32 @@ $folder_filter = $_GET['folder'] ?? '';
             <div class="unified-search-container">
                 <div class="searchbar-row searchbar-icon-row">
                     <div class="searchbar-input-wrapper">
-                        <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Select search options first..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                        <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Search..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                         <span class="searchbar-icon"><span class="fas fa-search"></span></span>
                         <?php if (!empty($search) || !empty($tags_search)): ?>
                             <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>
                         <?php endif; ?>
                     </div>
-                    <div class="search-type-buttons">
-                        <button type="button" class="search-type-btn" id="search-notes-btn" title="Search in notes" data-type="notes">
+                </div>
+                
+                <!-- Search options pills below the search bar -->
+                <div class="search-options-container">
+                    <div class="search-type-pills">
+                        <button type="button" class="search-pill" id="search-notes-btn" title="Search in note content" data-type="notes">
                             <i class="fas fa-file-alt"></i>
+                            <span>Notes</span>
                         </button>
-                        <button type="button" class="search-type-btn" id="search-tags-btn" title="Search in tags" data-type="tags">
+                        <button type="button" class="search-pill" id="search-tags-btn" title="Search in tags" data-type="tags">
                             <i class="fas fa-tags"></i>
+                            <span>Tags</span>
                         </button>
-                        <button type="button" class="search-type-btn" id="search-folders-btn" title="Filter folders" data-type="folders">
+                        <button type="button" class="search-pill" id="search-folders-btn" title="Filter folders" data-type="folders">
                             <i class="fas fa-folder"></i>
+                            <span>Folders</span>
                         </button>
                     </div>
                 </div>
+                
                 <!-- Hidden inputs to maintain compatibility -->
                 <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">

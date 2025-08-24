@@ -790,33 +790,118 @@ a.links_arbo_left.selected-note {
 
 /* Mobile searchbar input adjustments */
 .searchbar-input {
-    padding: 8px 70px 8px 40px !important;
+    padding: 8px 15px 8px 40px !important;
     font-size: 16px !important; /* Prevent zoom on iOS */
 }
 
 /* When clear button is present on mobile, add more padding */
 .searchbar-input-wrapper.has-clear-button .searchbar-input {
-    padding-right: 110px !important;
+    padding-right: 50px !important;
 }
 
 /* Mobile clear button positioning */
 .searchbar-clear {
-    right: 85px !important;
+    right: 15px !important;
     height: 32px !important;
     width: 32px !important;
 }
 
+/* Legacy search-type-buttons - hide for new design */
 .search-type-buttons {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 1px;
-    align-items: center;
-    z-index: 4;
+    display: none;
 }
 
+/* New modern search options for mobile */
+.search-options-container.mobile {
+    margin-top: 8px;
+    padding: 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.search-options-container .search-type-pills {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.search-options-container .search-pill {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6c757d;
+    font-size: 0.75em;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    outline: none;
+    position: relative;
+    min-height: 26px;
+    flex: 0 1 auto;
+    user-select: none;
+    opacity: 0.8;
+}
+
+.search-options-container .search-pill:hover {
+    background: #e9ecef;
+    border-color: #007DB8;
+    color: #007DB8;
+    transform: translateY(-1px);
+    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
+    opacity: 1;
+}
+
+.search-options-container .search-pill:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
+}
+
+.search-options-container .search-pill.active {
+    background: #007DB8;
+    border-color: #007DB8;
+    color: white;
+    box-shadow: 0 1px 4px rgba(0, 125, 184, 0.2);
+    opacity: 1;
+}
+
+.search-options-container .search-pill.active:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 125, 184, 0.3);
+}
+
+.search-options-container .search-pill.active:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.2);
+}
+
+.search-options-container .search-pill i {
+    font-size: 0.7em;
+}
+
+.search-options-container .search-pill span {
+    font-size: 0.75em;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Legacy search-type-btn styles - keep for backwards compatibility */
 .search-type-btn {
     background: transparent;
     border: none;
