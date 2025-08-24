@@ -1006,7 +1006,7 @@ a.links_arbo_left.selected-note {
 
 .searchbar-clear {
     position: absolute;
-    right: 95px;
+    right: 15px;
     top: 50%;
     transform: translateY(-50%);
     background: none !important;
