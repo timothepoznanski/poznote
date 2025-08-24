@@ -995,7 +995,8 @@ a.links_arbo_left.selected-note {
     gap: 0;
     position: relative;
     width: 100%;
-    margin-bottom: 8px;
+    max-width: 500px;
+    margin: 0 auto 8px auto;
 }
 
 /* Folder filter clear buttons (hidden by default) */
@@ -1045,8 +1046,10 @@ a.links_arbo_left.selected-note {
 {
     width: 100%;
     margin: 12px 0 15px 0;
-    text-align: left;
+    text-align: center;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
 }
 
 /* CAPTURES */
@@ -2975,6 +2978,10 @@ hr {
 /* UNIFIED SEARCH STYLES */
 .unified-search-container {
     width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Legacy search-type-buttons - keep for backwards compatibility but hide */
@@ -2987,6 +2994,8 @@ hr {
     margin-top: 8px;
     padding: 0;
     animation: fadeIn 0.3s ease-out;
+    display: flex;
+    justify-content: center;
 }
 
 .search-type-pills {
@@ -2994,6 +3003,7 @@ hr {
     gap: 6px;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
 }
 
 .search-pill {
