@@ -1303,6 +1303,76 @@ img {
         justify-content: center;
         gap: 8px;
     }
+    
+    /* Styles spécifiques pour les filtres en mobile - force l'apparence comme desktop */
+    .mobile-search-container .search-pill.active,
+    .mobile .search-pill.active {
+        background: #f8f9fa !important;
+        border-color: #007DB8 !important;
+        color: #007DB8 !important;
+        box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
+        opacity: 1 !important;
+    }
+
+    .mobile-search-container .search-pill.active:hover,
+    .mobile .search-pill.active:hover {
+        background: #e9ecef !important;
+        border-color: #007DB8 !important;
+        color: #007DB8 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
+    }
+
+    .mobile-search-container .search-pill.active:active,
+    .mobile .search-pill.active:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
+    }
+}
+
+/* Styles pour les écrans petits/moyens (ordinateurs portables inclus) */
+@media (max-width: 1024px) {
+    /* Assure-toi que les filtres desktop sont centrés même sur les petits écrans */
+    .contains_forms_search {
+        padding: 0 15px;
+    }
+    
+    .unified-search-container {
+        max-width: 90%;
+    }
+    
+    .search-options-container {
+        margin-top: 10px;
+    }
+    
+    .search-type-pills {
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .search-pill {
+        font-size: 0.75em;
+        padding: 3px 8px;
+        min-height: 26px;
+    }
+}
+
+/* Styles pour les très petits écrans */
+@media (max-width: 480px) {
+    .unified-search-container {
+        max-width: 100%;
+    }
+    
+    .search-pill {
+        font-size: 0.7em;
+        padding: 2px 6px;
+        min-height: 24px;
+    }
+    
+    .search-pill span {
+        font-size: 0.75em;
+    }
 }
 
 /* MENU RIGHT */
@@ -3099,6 +3169,38 @@ hr {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Force correct appearance for active search pills on ALL devices */
+.search-pill.active,
+body .search-pill.active,
+html .search-pill.active {
+    background: #f8f9fa !important;
+    background-color: #f8f9fa !important;
+    border-color: #007DB8 !important;
+    color: #007DB8 !important;
+    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
+    opacity: 1 !important;
+}
+
+.search-pill.active:hover,
+body .search-pill.active:hover,
+html .search-pill.active:hover {
+    background: #e9ecef !important;
+    background-color: #e9ecef !important;
+    border-color: #007DB8 !important;
+    color: #007DB8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
+}
+
+.search-pill.active:active,
+body .search-pill.active:active,
+html .search-pill.active:active {
+    background: #e9ecef !important;
+    background-color: #e9ecef !important;
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
 }
 
 /* Legacy search-type-btn styles - keep for JS compatibility */
