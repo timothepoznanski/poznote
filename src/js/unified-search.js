@@ -530,10 +530,10 @@ function updateSearchPlaceholder(isMobile) {
     const hasTagsActive = tagsBtn.classList.contains('active');
     const hasFoldersActive = foldersBtn.classList.contains('active');
     
-    let placeholder = 'Search in notes...'; // Default placeholder
+    let placeholder = 'Search in contents and titles...'; // Default placeholder
     
     if (hasNotesActive) {
-        placeholder = 'Search in notes...';
+        placeholder = 'Search in contents and titles...';
     } else if (hasTagsActive) {
         placeholder = 'Search in tags...';
     } else if (hasFoldersActive) {
