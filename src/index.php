@@ -457,7 +457,7 @@ $folder_filter = $_GET['folder'] ?? '';
                                 <i class="fas fa-file-alt"></i>
                                 <span>Notes</span>
                             </button>
-                            <button type="button" class="search-pill" id="search-tags-btn-mobile" title="Search in tags" data-type="tags">
+                            <button type="button" class="search-pill" id="search-tags-btn-mobile" title="Search in one or more tags" data-type="tags">
                                 <i class="fas fa-tags"></i>
                                 <span>Tags</span>
                             </button>
@@ -651,7 +651,7 @@ $folder_filter = $_GET['folder'] ?? '';
                             <i class="fas fa-file-alt"></i>
                             <span>Notes</span>
                         </button>
-                        <button type="button" class="search-pill" id="search-tags-btn" title="Search in tags" data-type="tags">
+                        <button type="button" class="search-pill" id="search-tags-btn" title="Search in one or more tags" data-type="tags">
                             <i class="fas fa-tags"></i>
                             <span>Tags</span>
                         </button>

@@ -535,7 +535,7 @@ function updateSearchPlaceholder(isMobile) {
     if (hasNotesActive) {
         placeholder = 'Search in contents and titles...';
     } else if (hasTagsActive) {
-        placeholder = 'Search in tags...';
+        placeholder = 'Search in one or more tags...';
     } else if (hasFoldersActive) {
         placeholder = 'Filter folders...';
     }
