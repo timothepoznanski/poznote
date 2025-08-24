@@ -160,7 +160,7 @@ IMPORTANT: Ignore l\'orthographe/grammaire, concentre-toi sur les FAITS!'
             'Content-Type: application/json',
             'Authorization: Bearer ' . $this->api_key
         ]);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

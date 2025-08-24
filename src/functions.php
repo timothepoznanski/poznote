@@ -14,7 +14,18 @@ function formatDateTime($t) {
  * Now unified: always use 'data/entries' directory in webroot
  */
 function getEntriesPath() {
-    // Always use the data/entries path - Docker volumes handle the mapping
+    // Try parent directory path first (for direct execution and to avoid empty src/data/entries)
+    $parent_path = realpath(dirname(__DIR__) . '/data/entries');
+    
+    if ($parent_path && is_dir($parent_path)) {
+        // Check if this directory actually contains files
+        $files = scandir($parent_path);
+        if (count($files) > 2) { // More than just . and ..
+            return $parent_path;
+        }
+    }
+    
+    // Try relative path (for Docker context)
     $path = realpath('data/entries');
     
     if ($path && is_dir($path)) {
@@ -23,15 +34,16 @@ function getEntriesPath() {
     
     // Fallback: create entries directory in data location
     // This should rarely happen as Docker creates the directories
-    if (!is_dir('data/entries')) {
-        mkdir('data/entries', 0755, true);
+    $data_path = dirname(__DIR__) . '/data/entries';
+    if (!is_dir($data_path)) {
+        mkdir($data_path, 0755, true);
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown('data/entries', 'www-data');
-            chgrp('data/entries', 'www-data');
+            chown($data_path, 'www-data');
+            chgrp($data_path, 'www-data');
         }
     }
-    return realpath('data/entries');
+    return realpath($data_path);
 }
 
 /**

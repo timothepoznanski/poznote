@@ -40,6 +40,6 @@ if (isset($result['error'])) {
 // Return the corrections
 echo json_encode([
     'success' => true,
-    'corrections' => $result['corrections']
+    'error_check' => $result['corrections']
 ]);
 ?>

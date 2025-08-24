@@ -49,7 +49,8 @@ async function checkErrors() {
         
         if (response.ok && data.success) {
             // Show the error check result with preserved line breaks
-            summaryText.innerHTML = data.error_check.replace(/\n/g, '<br>');
+            const errorCheckText = data.error_check || '';
+            summaryText.innerHTML = errorCheckText.replace(/\n/g, '<br>');
             summaryText.style.display = 'block';
             copyBtn.style.display = 'inline-flex';
             regenerateBtn.style.display = 'inline-flex';
