@@ -1417,8 +1417,8 @@ img {
 
 .note-tags-row {
     display: flex;
-    align-items: center;
-    overflow: hidden;
+    align-items: flex-start;
+    overflow: visible;
     /* margin-bottom: 15px; */
     margin-top: 5px;
 }
@@ -1432,9 +1432,7 @@ img {
 .name_tags {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
     color: rgb(55, 53, 47) !important;
 }
 
@@ -3744,7 +3742,7 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Editable tags styling */
 .editable-tags-container {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
     min-height: 24px;
@@ -3752,7 +3750,7 @@ input[type="search"]::-webkit-search-results-decoration {
     border-radius: 4px;
     padding: 4px;
     transition: border-color 0.2s ease;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .clickable-tag-wrapper {
