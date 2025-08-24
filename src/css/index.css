@@ -1282,6 +1282,27 @@ img {
     .update-notification.show {
         right: 10px;
     }
+    
+    /* Mobile search container */
+    .mobile-search-container {
+        padding: 0 15px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .mobile-search-container .unified-search-container {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .mobile-search-container .search-options-container {
+        margin-top: 12px;
+    }
+    
+    .mobile-search-container .search-type-pills {
+        justify-content: center;
+        gap: 8px;
+    }
 }
 
 /* MENU RIGHT */
