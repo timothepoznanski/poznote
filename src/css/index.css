@@ -2330,7 +2330,7 @@ hr {
 }
 
 .noteentry label span[contenteditable="true"]:empty:before {
-    content: "Tapez votre tâche ici";
+    content: "Type your task here";
     color: #999;
     font-style: italic;
 }

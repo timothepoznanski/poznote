@@ -196,7 +196,7 @@ body {
 }
 
 .noteentry label span[contenteditable="true"]:empty:before {
-    content: "Tapez votre tâche ici" !important;
+    content: "Type your task here" !important;
     color: #999 !important;
     font-style: italic !important;
 }
