@@ -50,6 +50,36 @@ function initializeNoteLoader() {
             const noteTitle = noteLink.getAttribute('data-note-id');
             
             if (href && noteTitle) {
+                // If a note has been edited but not saved, ask for confirmation using the
+                // app's styled confirm modal (fallback to native confirm if unavailable).
+                try {
+                    if (typeof editedButNotSaved !== 'undefined' && editedButNotSaved == 1) {
+                        var title = 'Unsaved changes';
+                        var message = 'This note has unsaved changes. Do you want to continue and lose your changes?';
+
+                        // If the app provides the styled confirm modal, use it
+                        if (typeof showConfirmModal === 'function') {
+                            showConfirmModal(title, message, function() {
+                                try { editedButNotSaved = 0; } catch (e) {}
+                                loadNoteViaAjax(href, noteTitle, noteLink);
+                            });
+                            // Do not proceed now; wait for the modal callback
+                            return;
+                        }
+
+                        // Fallback to native confirm
+                        if (!confirm(message)) {
+                            return; // User cancelled navigation
+                        }
+
+                        // User chose to continue: clear the flag so we don't prompt again
+                        try { editedButNotSaved = 0; } catch (e) {}
+                    }
+                } catch (e) {
+                    // If any error occurs while checking edited flag, just proceed
+                }
+
+                // No unsaved changes or user confirmed: load the note
                 loadNoteViaAjax(href, noteTitle, noteLink);
             }
         }

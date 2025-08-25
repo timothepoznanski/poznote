@@ -87,9 +87,9 @@ $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] 
         <h1><i class="fas fa-robot"></i> Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
     
-        <a href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
-        </a>
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Notes
+            </a>
 
         <br><br>
 
@@ -230,4 +230,12 @@ $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] 
 
     <script src="js/ai-config.js"></script>
 </body>
+    <script>
+    (function(){ try {
+        var stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored && stored !== 'Poznote') {
+            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        }
+    } catch(e){} })();
+    </script>
 </html>

@@ -27,9 +27,10 @@ if (!isset($input['note_id']) || !is_numeric($input['note_id'])) {
 }
 
 $note_id = intval($input['note_id']);
+$workspace = isset($input['workspace']) ? trim($input['workspace']) : null;
 
-// Use AIHelper to check errors
-$result = AIHelper::checkErrors($note_id, $con);
+// Use AIHelper to check errors (pass workspace if provided)
+$result = AIHelper::checkErrors($note_id, $con, $workspace ?? null);
 
 if (isset($result['error'])) {
     http_response_code(400);

@@ -7,6 +7,7 @@ include 'db_connect.php';
 
 // Get note ID from URL
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
 
 if (!$note_id) {
     header('Location: index.php');
@@ -14,8 +15,15 @@ if (!$note_id) {
 }
 
 // Get note details
-$stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
-$stmt->execute([$note_id]);
+$query = "SELECT heading FROM entries WHERE id = ?";
+if ($workspace) {
+    $query = "SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+    $stmt = $con->prepare($query);
+    $stmt->execute([$note_id, $workspace, $workspace]);
+} else {
+    $stmt = $con->prepare($query);
+    $stmt->execute([$note_id]);
+}
 $note = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$note) {
@@ -39,7 +47,7 @@ if (!$note) {
         <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
-        <a href="index.php" class="btn btn-secondary">
+    <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
         </a>
 
@@ -87,7 +95,8 @@ if (!$note) {
     </div>
 
     <script>
-        const noteId = <?php echo $note_id; ?>;
+    const noteId = <?php echo $note_id; ?>;
+    const noteWorkspace = <?php echo $workspace ? json_encode($workspace) : 'undefined'; ?>;
         let uploadInProgress = false;
 
         // Load attachments when page loads
@@ -188,6 +197,10 @@ if (!$note) {
             const formData = new FormData();
             formData.append('action', 'upload');
             formData.append('note_id', noteId);
+            // Include workspace if present on the page
+            if (typeof noteWorkspace !== 'undefined' && noteWorkspace) {
+                formData.append('workspace', noteWorkspace);
+            }
             formData.append('file', file);
 
             const xhr = new XMLHttpRequest();
@@ -234,7 +247,7 @@ if (!$note) {
         }
 
         function loadAttachments() {
-            fetch(`api_attachments.php?action=list&note_id=${noteId}`)
+            fetch(`api_attachments.php?action=list&note_id=${noteId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -269,7 +282,7 @@ if (!$note) {
                 // Check if attachment is an image or PDF
                 const isImage = attachment.file_type && attachment.file_type.startsWith('image/');
                 const isPDF = attachment.file_type && attachment.file_type === 'application/pdf';
-                const fileUrl = `api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachment.id}`;
+                const fileUrl = `api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachment.id}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`;
                 
                 let previewContent = '';
                 if (isImage) {
@@ -380,7 +393,7 @@ if (!$note) {
             }
         });
     }        function downloadAttachment(attachmentId) {
-            window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}`, '_blank');
+            window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`, '_blank');
         }
 
         function deleteAttachment(attachmentId) {
@@ -393,7 +406,7 @@ if (!$note) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}`
+                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`
             })
             .then(response => response.json())
             .then(data => {
@@ -419,17 +432,27 @@ if (!$note) {
         }
 
         function showNotification(message, type) {
-            // Simple notification function
+            // Simple notification function with clearer error visuals
             const notification = document.createElement('div');
-            notification.className = `alert alert-${type}`;
+            let cssClass = 'alert';
+            if (type === 'success') cssClass += ' alert-success';
+            else if (type === 'error') cssClass += ' alert-error attention';
+            else cssClass += ` alert-${type}`;
+
+            notification.className = cssClass;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
-            
+
             const container = document.querySelector('.settings-container');
-            container.insertBefore(notification, container.firstChild.nextSibling.nextSibling);
-            
+            // insert right below the main title so it's immediately visible
+            const titleEl = container.querySelector('h1');
+            container.insertBefore(notification, titleEl.nextSibling);
+
+            // Remove after 6s
             setTimeout(() => {
+                // remove attention class to avoid re-animation if re-inserted
+                notification.classList.remove('attention');
                 notification.remove();
-            }, 5000);
+            }, 6000);
         }
     </script>
 </body>

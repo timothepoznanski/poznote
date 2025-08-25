@@ -531,6 +531,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
 }
 
 .alert-success {
@@ -543,6 +545,27 @@
     background: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+}
+
+/* More visible error style (JS uses 'error' as type -> class alert-error) */
+.alert-error {
+    background: linear-gradient(90deg, #fff1f0 0%, #ffe6e6 100%);
+    color: #7a141a;
+    border-left: 6px solid #c82333;
+    box-shadow: 0 6px 18px rgba(200, 36, 51, 0.12);
+    padding: 14px 18px;
+    border-radius: 6px;
+}
+
+/* Small attention animation to draw the eye once */
+.alert-error.attention {
+    animation: pulseAttention 1.2s ease-out 1;
+}
+
+@keyframes pulseAttention {
+    0% { transform: translateY(-4px); opacity: 0.98; }
+    50% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-2px); opacity: 0.99; }
 }
 
 .warning {

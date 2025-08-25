@@ -29,11 +29,17 @@ if (!$input || !isset($input['note_id'])) {
 }
 
 $note_id = $input['note_id'];
+$workspace = isset($input['workspace']) ? trim($input['workspace']) : null;
 
 try {
-    // Get the note metadata
-    $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
-    $stmt->execute([$note_id]);
+    // Get the note metadata (respect workspace if provided)
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+        $stmt->execute([$note_id]);
+    }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {

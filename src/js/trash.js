@@ -78,12 +78,13 @@ function updateSearchResults(count, searchTerm) {
 }
 
 function restoreNote(noteid) {
+    const wsBody = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
     fetch('putback.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'id=' + encodeURIComponent(noteid)
+        body: 'id=' + encodeURIComponent(noteid) + wsBody
     })
     .then(response => response.text())
     .then(data => {
@@ -104,12 +105,13 @@ function restoreNote(noteid) {
 }
 
 function permanentlyDeleteNote(noteid) {
+    const wsBodyDel = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
     fetch('permanentDelete.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'id=' + encodeURIComponent(noteid)
+        body: 'id=' + encodeURIComponent(noteid) + wsBodyDel
     })
     .then(response => response.text())
     .then(data => {
@@ -130,17 +132,20 @@ function permanentlyDeleteNote(noteid) {
 }
 
 function emptyTrash() {
+    const wsEmpty = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? 'workspace=' + encodeURIComponent(pageWorkspace) : '';
     fetch('emptytrash.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         }
+        ,
+        body: wsEmpty
     })
     .then(response => response.text())
     .then(data => {
         if (data === '1') {
             // Success - redirect to trash.php to refresh page
-            window.location.href = 'trash.php';
+            window.location.href = 'trash.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
         } else {
             showInfoModal('Empty Trash Error', 'Error emptying trash: ' + data);
         }
@@ -157,7 +162,7 @@ let currentNoteIdForAction = null;
 function showInfoModal(title, message) {
     document.getElementById('infoModalTitle').textContent = title;
     document.getElementById('infoModalMessage').textContent = message;
-    document.getElementById('infoModal').style.display = 'block';
+    document.getElementById('infoModal').style.display = 'flex';
 }
 
 function closeInfoModal() {
@@ -165,7 +170,7 @@ function closeInfoModal() {
 }
 
 function showEmptyTrashConfirmModal() {
-    document.getElementById('emptyTrashConfirmModal').style.display = 'block';
+    document.getElementById('emptyTrashConfirmModal').style.display = 'flex';
 }
 
 function closeEmptyTrashConfirmModal() {
@@ -179,7 +184,7 @@ function executeEmptyTrash() {
 
 function showRestoreConfirmModal(noteId) {
     currentNoteIdForAction = noteId;
-    document.getElementById('restoreConfirmModal').style.display = 'block';
+    document.getElementById('restoreConfirmModal').style.display = 'flex';
 }
 
 function closeRestoreConfirmModal() {
@@ -196,7 +201,7 @@ function executeRestoreNote() {
 
 function showDeleteConfirmModal(noteId) {
     currentNoteIdForAction = noteId;
-    document.getElementById('deleteConfirmModal').style.display = 'block';
+    document.getElementById('deleteConfirmModal').style.display = 'flex';
 }
 
 function closeDeleteConfirmModal() {

@@ -20,10 +20,21 @@
 	$originalHeading = trim($_POST['heading'] ?? '');
 	$entry = $_POST['entry'] ?? ''; // Save the HTML content (including images) in an HTML file.
 	$entrycontent = $_POST['entrycontent'] ?? ''; // Save the text content (without images) in the database.
-	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes();
+	$workspace = $_POST['workspace'] ?? null; // optional
+	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
 	
-	// Generate unique title to prevent duplicates
-	$heading = generateUniqueTitle($originalHeading, $id);
+	// Enforce uniqueness: if another non-trashed note in the same workspace has the same heading, fail.
+	// Allow the same heading if it belongs to this note (by id).
+	$heading = $originalHeading;
+	$checkQuery = "SELECT id FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+	$checkStmt = $con->prepare($checkQuery);
+	$checkStmt->execute([$heading, $workspace ?? 'Poznote', $workspace ?? 'Poznote']);
+	$conflictId = $checkStmt->fetchColumn();
+	if ($conflictId !== false && $conflictId !== null && $conflictId != $id) {
+		header('Content-Type: application/json');
+		echo json_encode(['status' => 'error', 'message' => 'Another note with the same title exists in this workspace']);
+		die();
+	}
 	
 	$now = $_POST['now'];
 	$seconds = (int)$now;
@@ -44,9 +55,15 @@
         $tags = implode(',', $validTags);
     }
 	
-	$query = "SELECT * FROM entries WHERE id = ?";
-	$stmt = $con->prepare($query);
-	$stmt->execute([$id]);
+	if ($workspace !== null) {
+		$query = "SELECT * FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+		$stmt = $con->prepare($query);
+		$stmt->execute([$id, $workspace, $workspace]);
+	} else {
+		$query = "SELECT * FROM entries WHERE id = ?";
+		$stmt = $con->prepare($query);
+		$stmt->execute([$id]);
+	}
 	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	if (!$row) {
@@ -81,10 +98,18 @@
     
 	$updated_date = date("Y-m-d H:i:s", $seconds);
 	
-	$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ? WHERE id = ?";
-	$stmt = $con->prepare($query);
-    
-	if($stmt->execute([$heading, $entrycontent, $updated_date, $tags, $folder, $id])) {
+	// If workspace provided, include it in update
+	if ($workspace !== null) {
+		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ?, workspace = ? WHERE id = ?";
+		$stmt = $con->prepare($query);
+		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $workspace, $id];
+	} else {
+		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ? WHERE id = ?";
+		$stmt = $con->prepare($query);
+		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $id];
+	}
+	
+	if($stmt->execute($executeParams)) {
 		// Return both date and title (in case it was modified to be unique)
 		$response = [
 			'date' => formatDateTime(strtotime($updated_date)),

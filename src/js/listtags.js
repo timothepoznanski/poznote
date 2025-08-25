@@ -31,7 +31,12 @@ function handleExcludedFoldersOnLoad() {
             // Create and submit a form to refresh the page with folder exclusions
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = 'listtags.php';
+            // If the page provided a workspace variable, include it in the form action
+            if (typeof pageWorkspace !== 'undefined' && pageWorkspace) {
+                form.action = 'listtags.php?workspace=' + encodeURIComponent(pageWorkspace);
+            } else {
+                form.action = 'listtags.php';
+            }
             
             const excludedInput = document.createElement('input');
             excludedInput.type = 'hidden';
@@ -92,12 +97,22 @@ function redirectToTagWithExclusions(tagEncoded) {
         excludedInput.name = 'excluded_folders';
         excludedInput.value = JSON.stringify(excludedFolders);
         form.appendChild(excludedInput);
+
+        // Include workspace if provided on the page
+        if (typeof pageWorkspace !== 'undefined' && pageWorkspace) {
+            const wsInput = document.createElement('input');
+            wsInput.type = 'hidden';
+            wsInput.name = 'workspace';
+            wsInput.value = pageWorkspace;
+            form.appendChild(wsInput);
+        }
         
         document.body.appendChild(form);
         form.submit();
     } else {
         // No exclusions, use simple GET redirect
-        window.location.href = 'index.php?tags_search_from_list=' + tagEncoded;
+    const wsParam = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
+    window.location.href = 'index.php?tags_search_from_list=' + tagEncoded + wsParam;
     }
 }
 

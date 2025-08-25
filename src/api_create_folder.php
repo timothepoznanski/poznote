@@ -51,9 +51,18 @@ foreach ($forbidden_chars as $char) {
 
 try {
     // Check if folder already exists
-    $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-    $stmt->execute([$folder_name]);
-    $count = $stmt->fetchColumn();
+    // Optional workspace
+    $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
+
+    if ($workspace) {
+        $checkStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $checkStmt->execute([$folder_name, $workspace, $workspace]);
+        $count = $checkStmt->fetchColumn();
+    } else {
+        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
+        $stmt->execute([$folder_name]);
+        $count = $stmt->fetchColumn();
+    }
     
     if ($count > 0) {
         http_response_code(409);
@@ -62,13 +71,20 @@ try {
     }
     
     // Create folder in database
-    $stmt = $con->prepare("INSERT INTO folders (name, created) VALUES (?, datetime('now'))");
-    $stmt->execute([$folder_name]);
+    if ($workspace) {
+        $stmt = $con->prepare("INSERT INTO folders (name, workspace, created) VALUES (?, ?, datetime('now'))");
+        $stmt->execute([$folder_name, $workspace]);
+    } else {
+        $stmt = $con->prepare("INSERT INTO folders (name, created) VALUES (?, datetime('now'))");
+        $stmt->execute([$folder_name]);
+    }
     
     $folder_id = $con->lastInsertId();
     
     // Create physical folder
-    $folder_path = __DIR__ . '/entries/' . $folder_name;
+    // Store physical folders under workspace-specific path to avoid collisions
+    $wsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
+    $folder_path = __DIR__ . '/entries/' . $wsSegment . '/' . $folder_name;
     if (!file_exists($folder_path)) {
         if (!mkdir($folder_path, 0755, true)) {
             // Database rollback if folder creation fails

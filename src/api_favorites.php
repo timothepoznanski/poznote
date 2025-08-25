@@ -22,10 +22,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Get current favorite status
-        $query = "SELECT favorite FROM entries WHERE id = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$noteId]);
+        // Get workspace from request (to prevent cross-workspace toggles)
+        $workspace = $_POST['workspace'] ?? null;
+
+        // Get current favorite status limited to workspace if provided
+        if ($workspace) {
+            $query = "SELECT favorite FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$noteId, $workspace, $workspace]);
+        } else {
+            $query = "SELECT favorite FROM entries WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$noteId]);
+        }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$result) {
@@ -38,11 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Toggle favorite status
         $newFavorite = $currentFavorite ? 0 : 1;
         
-        // Update database
-        $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
-        $updateStmt = $con->prepare($updateQuery);
+        // Update database (respect workspace if provided)
+        if ($workspace) {
+            $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $updateStmt = $con->prepare($updateQuery);
+            $success = $updateStmt->execute([$newFavorite, $noteId, $workspace, $workspace]);
+        } else {
+            $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
+            $updateStmt = $con->prepare($updateQuery);
+            $success = $updateStmt->execute([$newFavorite, $noteId]);
+        }
         
-        if ($updateStmt->execute([$newFavorite, $noteId])) {
+        if ($success) {
             echo json_encode([
                 'success' => true, 
                 'is_favorite' => $newFavorite
@@ -51,8 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'message' => 'Error updating database']);
         }
         
-        $stmt->close();
-        $updateStmt->close();
+        // Close statements if available
+        if (isset($stmt) && method_exists($stmt, 'close')) $stmt->close();
+        if (isset($updateStmt) && method_exists($updateStmt, 'close')) $updateStmt->close();
     }
 }
 

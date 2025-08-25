@@ -36,8 +36,15 @@ $permanent = isset($data['permanent']) ? (bool)$data['permanent'] : false;
 
 try {
     // Vérifier que la note existe
-    $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ?");
-    $stmt->execute([$note_id]);
+    $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
+
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ?");
+        $stmt->execute([$note_id]);
+    }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
@@ -68,7 +75,7 @@ try {
         
         // Delete HTML file
         $html_file_path = __DIR__ . '/entries/';
-        if ($note['folder'] && $note['folder'] !== 'Uncategorized') {
+    if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
             $html_file_path .= $note['folder'] . '/';
         }
         $html_file_path .= $note_id . '.html';
@@ -78,10 +85,14 @@ try {
             $html_deleted = unlink($html_file_path);
         }
         
-        // Delete database entry
-        $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
-        // PDO uses execute with array -  $note_id);
-        $success = $stmt->execute();
+        // Delete database entry (respect workspace if provided)
+        if ($workspace) {
+            $stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $success = $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+            $success = $stmt->execute([$note_id]);
+        }
         
         if ($success) {
             http_response_code(200);
@@ -109,8 +120,13 @@ try {
             exit;
         }
         
-        $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
-        $success = $stmt->execute([$note_id]);
+        if ($workspace) {
+            $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $success = $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
+            $success = $stmt->execute([$note_id]);
+        }
         
         if ($success) {
             http_response_code(200);

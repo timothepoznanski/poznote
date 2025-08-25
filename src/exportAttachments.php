@@ -31,11 +31,11 @@ if ($checkResult) {
 if (!$hasAttachments) {
     ?>
     <!DOCTYPE html>
-    <html lang="fr">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title><?php echo APP_NAME_DISPLAYED; ?> - Export des pièces jointes</title>
+    <title>Poznote - Attachments Export</title>
         <link href="css/index.css" rel="stylesheet">
         <link rel="stylesheet" href="css/font-awesome.css">
         <link rel="stylesheet" href="css/ai.css">
@@ -43,8 +43,8 @@ if (!$hasAttachments) {
     <body class="ai-page">
         <div class="summary-page">
             <div class="summary-header">
-                <h1>Export des pièces jointes</h1>
-                <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">Aucune pièce jointe trouvée</p>
+                <h1>Attachments Export</h1>
+                <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">No attachments found</p>
             </div>
             
             <div class="summary-content">
@@ -52,22 +52,22 @@ if (!$hasAttachments) {
                     <div style="font-size: 48px; color: #6c757d; margin-bottom: 20px;">
                         <i class="fas fa-paperclip"></i>
                     </div>
-                    <h2 style="color: #333; margin-bottom: 15px; font-size: 24px;">Aucune pièce jointe trouvée</h2>
+                    <h2 style="color: #333; margin-bottom: 15px; font-size: 24px;">No attachments found</h2>
                     <p style="color: #666; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
-                        Il n'y a actuellement aucune pièce jointe dans vos notes.
+                        There are currently no attachments in your notes.
                     </p>
                     <p style="color: #666; line-height: 1.6; margin-bottom: 0; font-size: 16px;">
-                        Pour ajouter des pièces jointes à vos notes, utilisez le bouton <strong><i class="fas fa-paperclip"></i></strong> dans l'éditeur de notes.
+                        To add attachments to your notes, use the <strong><i class="fas fa-paperclip"></i></strong> button in the note editor.
                     </p>
                 </div>
             </div>
             
             <div class="action-buttons">
                 <a href="index.php" class="btn btn-primary">
-                    <i class="fas fa-arrow-left"></i> Retour aux notes
+                    <i class="fas fa-arrow-left"></i> Back to notes
                 </a>
                 <a href="backup_export.php" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Autres options d'export
+                    <i class="fas fa-download"></i> Other export options
                 </a>
             </div>
         </div>
@@ -149,7 +149,7 @@ if (!empty($metadataInfo)) {
 
 // Create a simple index file
 $indexContent = '<html><head><title>Attachments Index</title></head><body>';
-$indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Attachments Export</h1>';
+$indexContent .= '<h1>Poznote Attachments Export</h1>';
 $indexContent .= '<p>Total attachments: ' . $attachmentCount . '</p>';
 $indexContent .= '<p>Total notes with attachments: ' . count($metadataInfo) . '</p>';
 $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';

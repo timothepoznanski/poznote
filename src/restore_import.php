@@ -176,6 +176,13 @@ function importNotesZip($uploadedFile) {
     }
     
     $zip->close();
+    // If the ZIP contained an index.html that was restored into the entries folder,
+    // remove it to avoid showing a generic index page among notes.
+    $indexFile = rtrim($entriesPath, '/') . '/index.html';
+    if (file_exists($indexFile)) {
+        @unlink($indexFile);
+    }
+
     unlink($tempFile);
     
     return ['success' => true, 'message' => "Imported {$importedCount} HTML files."];
@@ -263,19 +270,26 @@ function importAttachmentsZip($uploadedFile) {
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.4);
+            /* Use flex centering when the element is shown (JS sets inline display:flex) */
+            align-items: center;
+            justify-content: center;
         }
 
         .import-confirm-modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            /* remove large top margin so the flex centering can work properly */
+            margin: 0 auto;
             padding: 20px;
             border: none;
             border-radius: 8px;
             width: 400px;
             max-width: 90%;
+            max-height: 90vh;
+            overflow: auto;
             font-family: 'Inter', sans-serif;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .import-confirm-modal-content h3 {
@@ -337,16 +351,20 @@ function importAttachmentsZip($uploadedFile) {
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
         }
 
         .custom-alert-content {
             background-color: #fefefe;
-            margin: 20% auto;
+            margin: 0 auto;
             padding: 20px;
             border: none;
             border-radius: 8px;
             width: 350px;
             max-width: 90%;
+            max-height: 80vh;
+            overflow: auto;
             font-family: 'Inter', sans-serif;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             text-align: center;
@@ -388,7 +406,7 @@ function importAttachmentsZip($uploadedFile) {
         <h1><i class="fas fa-download"></i> Restore (Import)</h1>
         <p>Import data from backup files.</p>
         
-        <a href="index.php" class="btn btn-secondary">
+        <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
         </a>
         <a href="backup_export.php" class="btn btn-secondary">
@@ -396,14 +414,22 @@ function importAttachmentsZip($uploadedFile) {
         </a>
         <br><br>
         
+        <!-- Global backup/restore warning (important) -->
+        <div class="alert alert-danger" style="margin-top:12px;">
+            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
+            <p style="margin:0; color:#333;">
+                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
+            </p>
+        </div>
+
         <!-- Information Section -->
         <div class="warning">
             <h4>⚠️ Important Notes:</h4>
             <ul>
                 <li><strong>Database restore</strong> will replace note titles, tags, search index and metadata (not note content)</li>
-                <li><strong>Notes import</strong> will add to existing notes (no overwrite)</li>
-                <li><strong>Attachments import</strong> will add to existing attachments (no overwrite)</li>
-                <li>Always backup your current data before restoring</li>
+                <li><strong>Notes import</strong> will overwrite existing notes and add missing ones</li>
+                <li><strong>Attachments import</strong> will overwrite existing attachments and add missing ones</li>
+                <br>Always backup your current data before restoring.
             </ul>
         </div>
         
@@ -570,3 +596,13 @@ function importAttachmentsZip($uploadedFile) {
     <script src="js/restore-import.js"></script>
 </body>
 </html>
+
+<script>
+// Ensure Back to Notes opens the stored workspace if present
+(function(){ try {
+    var stored = localStorage.getItem('poznote_selected_workspace');
+    if (stored && stored !== 'Poznote') {
+        var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+    }
+} catch(e){} })();
+</script>

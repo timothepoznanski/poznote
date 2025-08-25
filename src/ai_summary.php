@@ -7,7 +7,9 @@ include 'db_connect.php';
 include_once 'functions.php';
 
 // Get note ID from URL parameter
+// Preserve optional workspace parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
 
 if (!$note_id) {
     header('Location: index.php');
@@ -16,8 +18,13 @@ if (!$note_id) {
 
 // Get the note metadata
 try {
-    $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
-    $stmt->execute([$note_id]);
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+        $stmt->execute([$note_id]);
+    }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
@@ -82,7 +89,7 @@ $is_generating = false;
                 <i class="fas fa-redo"></i> Regenerate
             </button>
             
-            <a href="index.php" class="btn btn-secondary">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
         </div>
@@ -91,7 +98,16 @@ $is_generating = false;
     <script>
         // Set the note ID as global variable for use by the external JavaScript
         var noteId = <?php echo json_encode($note_id); ?>;
+        var noteWorkspace = <?php echo $workspace ? json_encode($workspace) : 'undefined'; ?>;
     </script>
     <script src="js/ai-summary.js"></script>
+    <script>
+    (function(){ try {
+        var stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored && stored !== 'Poznote') {
+            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        }
+    } catch(e){} })();
+    </script>
 </body>
 </html>

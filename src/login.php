@@ -1,7 +1,30 @@
 <?php
+// Debug display disabled for production
+// (Previously enabled with display_errors / error_reporting for debugging)
 require 'auth.php';
 
 $error = '';
+
+// Load configured login display name if present
+try {
+    require_once 'config.php';
+    // Open a local PDO connection to read the setting without depending on global db_connect which may die()
+    $login_display_name = '';
+    try {
+        $tmpCon = new PDO('sqlite:' . SQLITE_DATABASE);
+        $tmpCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['login_display_name']);
+        $login_display_name = $stmt->fetchColumn();
+        $tmpCon = null;
+    } catch (Exception $e) {
+        // ignore DB errors and leave display name empty
+        $login_display_name = '';
+    }
+    if ($login_display_name === false) $login_display_name = '';
+} catch (Exception $e) {
+    $login_display_name = '';
+}
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
@@ -26,7 +49,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - <?php echo APP_NAME_DISPLAYED; ?></title>
+    <title>Login - Poznote</title>
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -35,9 +58,9 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <img src="favicon.ico" alt="<?php echo APP_NAME_DISPLAYED; ?>" class="logo-favicon">
+                <img src="favicon.ico" alt="Poznote" class="logo-favicon">
             </div>
-            <h1 class="login-title"><?php echo APP_NAME_DISPLAYED; ?></h1>
+            <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
         
         <form method="POST">

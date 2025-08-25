@@ -8,24 +8,37 @@ require_once 'default_folder_settings.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
+// Preserve workspace parameter if provided
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
 
 if (!$note_id) {
-    header('Location: index.php');
+    $loc = 'index.php';
+    if ($workspace) $loc .= '?workspace=' . urlencode($workspace);
+    header('Location: ' . $loc);
     exit;
 }
 
 // Get note details from database
 try {
-    $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments FROM entries WHERE id = ? AND trash = 0");
-    $stmt->execute([$note_id]);
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments FROM entries WHERE id = ? AND trash = 0");
+        $stmt->execute([$note_id]);
+    }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$note) {
-        header('Location: index.php');
+        $loc = 'index.php';
+        if ($workspace) $loc .= '?workspace=' . urlencode($workspace);
+        header('Location: ' . $loc);
         exit;
     }
 } catch (PDOException $e) {
-    header('Location: index.php');
+    $loc = 'index.php';
+    if ($workspace) $loc .= '?workspace=' . urlencode($workspace);
+    header('Location: ' . $loc);
     exit;
 }
 
@@ -44,7 +57,7 @@ function formatDate($dateStr) {
 
 $createdText = formatDate($note['created']);
 $updatedText = formatDate($note['updated']);
-$folderText = $note['folder'] ?: getDefaultFolderForNewNotes();
+$folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
 // Build full path of the note
@@ -210,6 +223,11 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             </div>
 
             <div class="info-row">
+                <div class="info-label">Workspace:</div>
+                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
+            </div>
+
+            <div class="info-row">
                 <div class="info-label">Full Path:</div>
                 <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
             </div>
@@ -243,7 +261,8 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
         </div>
 
         <div class="action-buttons">
-            <a href="index.php" class="btn btn-secondary">Close</a>
+            <?php $close_href = 'index.php' . ($workspace ? '?workspace=' . urlencode($workspace) : ''); ?>
+            <a href="<?php echo $close_href; ?>" class="btn btn-secondary">Close</a>
         </div>
     </div>
 </body>

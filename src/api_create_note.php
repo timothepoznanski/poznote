@@ -20,7 +20,8 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
-$folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Uncategorized';
+$folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Default';
+$workspace = isset($input['workspace']) ? trim($input['workspace']) : 'Poznote';
 
 // Validation des tags : supprimer les tags qui contiennent des espaces
 if (!empty($tags)) {
@@ -42,12 +43,21 @@ if ($originalHeading === '') {
     exit;
 }
 
-// Generate unique title to prevent duplicates
-$heading = generateUniqueTitle($originalHeading);
+// Enforce uniqueness of heading within the workspace: reject if same heading exists (non-trashed)
+$check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+$check->execute([$originalHeading, $workspace, $workspace]);
+if ($check->fetchColumn() > 0) {
+    http_response_code(409);
+    echo json_encode(['success' => false, 'message' => 'A note with the same title already exists in this workspace']);
+    exit;
+}
 
-$stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, updated) VALUES (?, ?, ?, datetime('now'))");
+// Use the original heading (no auto-rename) since duplicates are disallowed
+$heading = $originalHeading;
 
-if ($stmt->execute([$heading, $tags, $folder])) {
+$stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, workspace, updated) VALUES (?, ?, ?, ?, datetime('now'))");
+
+if ($stmt->execute([$heading, $tags, $folder, $workspace])) {
     echo json_encode(['success' => true, 'id' => $con->lastInsertId()]);
 } else {
     http_response_code(500);

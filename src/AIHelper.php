@@ -42,7 +42,7 @@ class AIHelper {
      * @param PDO $database Database connection
      * @return array Result array
      */
-    public static function generateSummary($note_id, $database) {
+    public static function generateSummary($note_id, $database, $workspace = null) {
         // Check AI status
         $status = self::checkAIStatus($database);
         if (!$status['enabled']) {
@@ -50,8 +50,13 @@ class AIHelper {
         }
         
         // Get note
-        $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
-        $stmt->execute([$note_id]);
+        if ($workspace) {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
+            $stmt->execute([$note_id]);
+        }
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$note) {
@@ -106,7 +111,7 @@ class AIHelper {
      * @param PDO $database Database connection
      * @return array Result array
      */
-    public static function generateTags($note_id, $database) {
+    public static function generateTags($note_id, $database, $workspace = null) {
         // Check AI status
         $status = self::checkAIStatus($database);
         if (!$status['enabled']) {
@@ -114,8 +119,13 @@ class AIHelper {
         }
         
         // Get note
-        $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
-        $stmt->execute([$note_id]);
+        if ($workspace) {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
+            $stmt->execute([$note_id]);
+        }
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$note) {
@@ -164,7 +174,7 @@ class AIHelper {
      * @param PDO $database Database connection
      * @return array Result array
      */
-    public static function checkErrors($note_id, $database) {
+    public static function checkErrors($note_id, $database, $workspace = null) {
         // Check AI status
         $status = self::checkAIStatus($database);
         if (!$status['enabled']) {
@@ -172,8 +182,13 @@ class AIHelper {
         }
         
         // Get note
-        $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
-        $stmt->execute([$note_id]);
+        if ($workspace) {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $stmt = $database->prepare("SELECT * FROM entries WHERE id = ?");
+            $stmt->execute([$note_id]);
+        }
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$note) {

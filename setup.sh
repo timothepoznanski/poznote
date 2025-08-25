@@ -49,12 +49,12 @@ EXAMPLES:
     ./setup.sh         Interactive menu for installation, update, or configuration
 
 FEATURES:
-    • Automatic detection of existing installations
-    • Interactive menu with options:
-      - New installation (fresh setup)
-      - Update application (get latest code)
-      - Change configuration (password/port/name etc.)
-    • Configuration preservation during updates
+        • Automatic detection of existing installations
+        • Interactive menu with options:
+            - New installation (fresh setup)
+            - Update application (get latest code)
+            - Change configuration (password/port, etc.)
+        • Configuration preservation during updates
 
 REQUIREMENTS:
     - Docker Engine and Docker Compose
@@ -90,7 +90,7 @@ reconfigure_poznote() {
     echo -e "  • Username: ${POZNOTE_USERNAME}"
     echo -e "  • Password: ${POZNOTE_PASSWORD}"
     echo -e "  • Port: ${HTTP_WEB_PORT}"
-    echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
+    
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -112,8 +112,7 @@ reconfigure_poznote() {
 
     HTTP_WEB_PORT=$(get_port_with_validation "Web Server Port [$HTTP_WEB_PORT]: " "$HTTP_WEB_PORT" "$HTTP_WEB_PORT")
 
-    read -p "Application Name [${APP_NAME_DISPLAYED:-Poznote}]: " NEW_APP_NAME
-    APP_NAME_DISPLAYED=${NEW_APP_NAME:-${APP_NAME_DISPLAYED:-Poznote}}
+    
 
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -125,10 +124,10 @@ reconfigure_poznote() {
     
     echo -e "\n${GREEN}Configuration Update Complete!${NC}"
     echo -e "${GREEN}Your Poznote configuration has been updated!${NC}\n"
-    echo -e "${BLUE}Access your instance at: ${YELLOW}http://your-server:$HTTP_WEB_PORT${NC}"
+                
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
-    echo -e "${BLUE}Application Name Displayed: ${YELLOW}${APP_NAME_DISPLAYED:-Poznote}${NC}"
+    
     echo
 }
 
@@ -218,7 +217,7 @@ get_template_values() {
         TEMPLATE_USERNAME=$(grep "^POZNOTE_USERNAME=" .env.template | cut -d'=' -f2)
         TEMPLATE_PASSWORD=$(grep "^POZNOTE_PASSWORD=" .env.template | cut -d'=' -f2)
         TEMPLATE_PORT=$(grep "^HTTP_WEB_PORT=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
-        TEMPLATE_APP_NAME=$(grep "^APP_NAME_DISPLAYED=" .env.template | cut -d'=' -f2 | tr -d ' \t\r\n')
+    # TEMPLATE_APP_NAME removed - not used by this script
     fi
 }
 
@@ -419,14 +418,7 @@ get_user_config() {
         HTTP_WEB_PORT=$(get_port_with_validation "HTTP Port (default: ${TEMPLATE_PORT:-8040}): " "${TEMPLATE_PORT:-8040}")
     fi
     
-    # Get application name
-    if [ "$is_update" = "true" ] && [ -n "$APP_NAME_DISPLAYED" ]; then
-        read -p "Application Name (current: $APP_NAME_DISPLAYED): " NEW_APP_NAME
-        APP_NAME_DISPLAYED=${NEW_APP_NAME:-$APP_NAME_DISPLAYED}
-    else
-        # Use default value for new installations
-        APP_NAME_DISPLAYED="Poznote"
-    fi
+    
     
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
@@ -449,7 +441,7 @@ create_env_file() {
     sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
     sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
     sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
-    sed -i "s/^APP_NAME_DISPLAYED=.*/APP_NAME_DISPLAYED=$APP_NAME_DISPLAYED/" .env
+    # Deprecated .env variables are not used by this script
     
     print_success ".env file created from template"
 }
@@ -595,12 +587,12 @@ main() {
             echo -e "  • Username: ${POZNOTE_USERNAME}"
             echo -e "  • Password: ${POZNOTE_PASSWORD}"
             echo -e "  • Port: ${HTTP_WEB_PORT}"
-            echo -e "  • Application Name Displayed: ${APP_NAME_DISPLAYED:-Poznote}"
+                
         fi
         
         echo -e "\n${GREEN}What would you like to do?${NC}\n"
         echo -e "  1) Update application (get latest code)"
-        echo -e "  2) Change settings (password/port/name etc.)"
+    echo -e "  2) Change settings (password/port, etc.)"
         echo -e "  3) Cancel"
         
         while true; do
