@@ -8,11 +8,23 @@
     color: #bababa;
 }
 
-/* Font families */
-.font-calibri {
-    font-family: 'Calibri', sans-serif;
+/* MODAL base: place modal content at the top and center it horizontally */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    /* When opened by JS, the script sets display:flex so the modal uses flex layout */
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px 16px 16px;
+    box-sizing: border-box;
+    overflow: auto;
 }
-
 /* Hidden elements */
 .hidden {
     display: none;
@@ -63,145 +75,128 @@
     min-height: 1.5em;
 }
 
-/* Welcome message */
-.welcome-message-full {
-    height: 100%;
-    width: 100%;
-    display: flex;
+/* (welcome page styles removed) */
+
+/* Workspace list alignment: use a fixed 4-column grid so action buttons align consistently */
+.workspace-list ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.workspace-list ul li {
+    display: grid;
+    /* Use 3 action columns now that the Select column was removed: name | rename | move | delete */
+    /* Fix name column width so action buttons have consistent space */
+    grid-template-columns: 220px repeat(3, 140px);
+    align-items: center;
+    gap: 18px; /* uniform spacing between action columns */
+    margin: 14px 0;
+    min-height: 56px;
+    justify-items: center; /* center items in their grid cells */
+}
+.workspace-name-item {
+    grid-column: 1;
+    /* padding-left: 8px; */
+    font-size: 1rem;
+}
+.ws-col { display: flex; align-items: center; }
+.ws-col-name { justify-content: flex-start; padding-left: 8px; justify-self: start; }
+.ws-col-select { justify-content: center; }
+.ws-col-action { justify-content: center; gap: 12px; }
+.ws-col-move { justify-content: center; }
+.ws-col-delete { justify-content: center; }
+.workspace-list .action-btn {
+    min-width: 140px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    min-height: 600px;
-    padding: 2rem;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    margin: 0; /* ensure uniform spacing controlled by gap on the container */
 }
-
-.welcome-content {
-    text-align: center;
-    max-width: 900px;
-    width: 100%;
-    padding: 2rem 0;
-}
-
-.welcome-icon {
-    font-size: 4rem;
-    color: #007DB8;
-    margin-bottom: 1.5rem;
-}
-
-.poznote-logo {
-    position: relative;
+.workspace-list .action-btn:active { transform: translateY(1px); }
+.workspace-action-placeholder {
+    width: 120px;
+    height: 40px; /* match button height */
     display: inline-block;
 }
 
-.poznote-favicon {
-    width: 4rem;
-    height: 4rem;
-    object-fit: contain;
+/* Disabled / grayed buttons */
+.btn[disabled], .btn.disabled {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    opacity: 0.95;
 }
 
-.poznote-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: white;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-    letter-spacing: 1px;
+/* Ensure delete column has consistent spacing */
+.ws-col-delete { justify-content: center; }
+
+/* Lock icon for default workspace */
+.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
+
+/* Highlight Select button for Poznote to make it stand out */
+.poznote-selected {
+    background: #0b75a8 !important;
+    color: #fff !important;
+    box-shadow: 0 3px 6px rgba(11,117,168,0.18);
 }
 
-.welcome-title {
-    font-size: 2.5rem;
-    font-weight: 600;
-    color: #37352F;
-    margin-bottom: 1rem;
-    line-height: 1.2;
+/* Responsive: stack controls on small screens */
+@media (max-width: 600px) {
+    .workspace-list ul li {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 8px;
+        padding: 10px 6px;
+        border-bottom: 1px solid #eee;
+    }
+    .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ws-col-name { padding-left: 0; font-size: 1rem; }
+    .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
+    .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
+    .workspace-action-placeholder { width: 100px; }
 }
-
-.welcome-description {
-    font-size: 1.2rem;
-    color: #7f8c8d;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-}
-
-.welcome-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 3rem;
-}
-
-.welcome-btn {
-    padding: 1rem 2rem;
+.delete-form { margin: 0; }
+.delete-form .btn { margin: 0; }
+.workspace-list ul li > .ws-col .action-btn { margin: 0; }
+.workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
+.workspace-list .btn-danger:hover { background: #c43b3b; }
+/* .btn-rename visibility controlled earlier */
+.workspace-list .btn-rename {
+    display: inline-flex;
+    background: #f0ad4e; /* orange */
+    color: #111;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    min-width: 200px;
-    justify-content: center;
 }
-
-.welcome-btn-primary {
-    background: #007DB8;
-    color: white;
-}
-
-.welcome-btn-primary:hover {
-    background: #005c8a;
-    transform: translateY(-1px);
-}
-
-.welcome-btn-secondary {
-    background: #f8f9fa;
-    color: #2c3e50;
-    border: 1px solid #e9ecef;
-}
-
-.welcome-btn-secondary:hover {
+.workspace-list .badge {
+    display: inline-block;
     background: #e9ecef;
-    transform: translateY(-1px);
+    color: #333;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
 }
 
-/* Responsive design for welcome page */
-@media (max-width: 768px) {
-    .welcome-message-full {
-        padding: 1rem;
-        min-height: 500px;
-    }
-    
-    .welcome-content {
-        padding: 1rem 0;
-    }
-    
-    .welcome-title {
-        font-size: 2rem;
-    }
-    
-    .welcome-description {
-        font-size: 1rem;
-    }
-    
-    .welcome-actions {
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-    
-    .welcome-btn {
-        width: 100%;
-        max-width: 300px;
-    }
+.rename-default-form input[type="text"] {
+    width: 220px;
+    margin-right: 8px;
 }
+.rename-default-form .btn-primary {
+    padding: 6px 12px;
+    vertical-align: middle;
+}
+
+/* Modal base styles are defined below (responsive, centered) */
+
+.modal .form-group label { display:block; margin-bottom:6px; font-weight:600; }
+
+
+/* (welcome responsive styles removed) */
 
 @font-face {
     font-family: 'Inter';
@@ -567,47 +562,17 @@ body {
 
 .left-header {
     text-align: center;
-    padding: 0px 0px 13px 0px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
+    /* padding: 0px 0px 13px 0px; */
+    margin-bottom: 16px; /* space between workspace name and icons */
+    /* border-bottom: 1px solid #e9ecef; */
 }
 
-.left-header-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.2s ease;
-    padding: 4px 8px;
-    border-radius: 6px;
-}
 
-.left-header-logo:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-    transform: translateY(-1px);
-    text-decoration: none;
-    color: inherit;
-}
-
-.left-header-logo:visited,
-.left-header-logo:link,
-.left-header-logo:active {
-    text-decoration: none;
-    color: inherit;
-}
-
-.left-header-favicon {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-}
 
 .left-header-text {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: 2rem; /* make the workspace name larger */
     color: #007DB8;
     letter-spacing: 0.5px;
 }
@@ -2494,6 +2459,9 @@ hr {
     background-color: rgba(0, 125, 184, 0.2);
 }
 
+/* Hide edit button for default folder to prevent renaming */
+.default-folder .folder-edit-btn { display: none !important; }
+
 .folder-delete-btn:hover {
     background-color: rgba(220, 53, 69, 0.2);
     color: #dc3545;
@@ -2571,18 +2539,27 @@ hr {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.4);
+    /* Modal uses flex layout when opened via JS (display: flex set dynamically) */
+    align-items: flex-start; /* place modal content at the top when visible */
+    justify-content: center;
+    padding: 20px 16px 16px 16px; /* smaller top padding to move modals upward */
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
     padding: 20px;
     border: none;
     border-radius: 8px;
-    width: 300px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 480px;
+    margin: 0 auto; /* horizontal center; vertical spacing comes from .modal padding */
     font-family: 'Inter', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    /* prevent inner elements from causing horizontal overflow */
+    overflow-x: hidden;
 }
 
 .modal-content h3 {
@@ -2617,6 +2594,8 @@ hr {
     margin-top: auto;
     padding-top: 15px;
     border-top: 1px solid #e0e0e0;
+    /* allow buttons to wrap instead of forcing a horizontal scroll */
+    flex-wrap: wrap;
 }
 
 .modal-buttons button {
@@ -2627,6 +2606,19 @@ hr {
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     transition: background-color 0.2s;
+    /* allow buttons to shrink on narrow viewports */
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* Ensure buttons and form controls inside modals never exceed the modal width */
+.modal-content .btn,
+.modal-content button,
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    max-width: 100% !important;
+    box-sizing: border-box;
 }
 
 .modal-buttons button:first-child {
@@ -3756,18 +3748,19 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Styles responsive pour les modals sur mobile */
 @media (max-width: 768px) {
     .modal-content {
-        margin: 10% auto;
-        width: calc(100% - 40px);
-        max-width: none;
-        margin-left: 20px;
-        margin-right: 20px;
+    margin: 0 auto;
+    width: calc(100% - 40px);
+    max-width: 480px;
+    margin-left: 20px;
+    margin-right: 20px;
     }
     
     .modal-content.ai-summary-simple {
-        margin: 15% auto;
+        margin: 0 auto;
         width: calc(100% - 30px);
         margin-left: 15px;
         margin-right: 15px;
+        max-width: 480px;
     }
     
     /* Menu AI mobile avec positionnement adapté */

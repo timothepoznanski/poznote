@@ -135,11 +135,11 @@ Server: my-server.com
     └── Data: ./poznote-work/data/
 ```
 
-For deployments on different servers, you only need to run the setup script and use menu option 2 to update the displayed application name parameter - no need for different instance names or ports.
+For deployments on different servers, you only need to run the setup script to update configuration (no need for different instance names or ports).
 
 ## Change Settings
 
-To change your username, password, port, or application name:
+To change your username, password, or port:
 
 **Linux:**
 ```bash
@@ -318,7 +318,7 @@ curl -X POST http://localhost:8040/api_create_note.php \
 - `heading` (string) - The note title
 **Optional parameters:**
 - `tags` (string) - Comma-separated tags
-- `folder_name` (string) - Folder name (defaults to "Uncategorized")
+- `folder_name` (string) - Folder name (defaults to "Default")
 
 #### Create Folder
 ```bash
@@ -370,7 +370,7 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -d '{"folder_name": "Work Projects"}'
 ```
 
-**Note:** The `Uncategorized` folder cannot be deleted. When a folder is deleted, all its notes are moved to `Uncategorized`.
+**Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
 
 ## Manual Operations
 

@@ -32,14 +32,15 @@ async function generateSummary() {
     generateBtn.style.display = 'none';
     
     try {
+        const payload = { note_id: noteId };
+        if (typeof noteWorkspace !== 'undefined' && noteWorkspace) payload.workspace = noteWorkspace;
+
         const response = await fetch('api_ai_summary.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                note_id: noteId
-            })
+            body: JSON.stringify(payload)
         });
         
         const data = await response.json();

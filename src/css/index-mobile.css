@@ -40,6 +40,37 @@ html, body {
     overflow: hidden;
 }
 
+/* Ensure modals are centered and fit within mobile viewport */
+#moveNotesModal, #renameModal, #deleteModal, .modal {
+    display: none;
+}
+
+.modal {
+    /* place modal at the top center on mobile */
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 24px 12px 12px 12px !important;
+}
+
+.modal-content {
+    width: 100% !important;
+    max-width: 420px !important;
+    margin: 0 !important; /* vertical spacing provided by .modal padding */
+    box-sizing: border-box !important;
+}
+
+/* Make modal action buttons full-width on narrow screens to avoid overflow */
+@media (max-width: 420px) {
+    .modal-content .modal-buttons,
+    .modal-content .modal-buttons button {
+        width: 100% !important;
+    }
+    .modal-content .modal-buttons button {
+        display: block !important;
+        margin-bottom: 10px !important;
+    }
+}
+
 /* Exception for tags page */
 body.tags-page {
     overflow: auto !important;
@@ -652,9 +683,10 @@ a.links_arbo_left.selected-note {
 .attachment-modal .modal-content {
     width: 90% !important;
     max-width: 400px !important;
-    margin: 10% auto !important;
+    margin: 6% auto 0 auto !important;
     max-height: 80vh !important;
     overflow-y: auto !important;
+    box-sizing: border-box !important;
 }
 
 .attachment-upload {

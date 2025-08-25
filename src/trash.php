@@ -8,6 +8,7 @@ require_once 'config.php';
 include 'db_connect.php';
 
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
+$pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -15,7 +16,7 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-<title>Trash - <?php echo APP_NAME_DISPLAYED; ?></title>
+<title>Trash - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link rel="stylesheet" href="css/font-awesome.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
@@ -26,10 +27,10 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 	<div class="trash-container">
 		<h2 class="trash-header">Trash</h2>
 		
-		<?php if (!empty($search)): ?>
+	<?php if (!empty($search)): ?>
 			<div class="trash-search-notice">
 				Results for "<?php echo htmlspecialchars($search); ?>"
-				<span class="trash-clear-search" onclick="window.location='trash.php'">
+		<span class="trash-clear-search" onclick="window.location='trash.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>'">
 					<i class="fas fa-times"></i>
 				</span>
 			</div>
@@ -48,7 +49,7 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 		</form>
 		
 		<div class="trash-buttons-container">
-			<div class="trash-button trash-back-button" onclick="window.location = 'index.php';" title="Back to notes">
+			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
 				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
 			</div>
 			<div class="trash-button trash-empty-button" id="emptyTrashBtn" title="Empty trash">
@@ -58,15 +59,27 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 		
 		<div class="trash-content">
 		<?php
-		$search_condition = $search ? " AND (heading LIKE ? OR entry LIKE ?)" : '';
-		$sql = "SELECT * FROM entries WHERE trash = 1$search_condition ORDER BY updated DESC LIMIT 50";
+	$search_condition = $search ? " AND (heading LIKE ? OR entry LIKE ?)" : '';
+	$workspace_condition = $pageWorkspace ? " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))" : '';
+	$sql = "SELECT * FROM entries WHERE trash = 1$search_condition$workspace_condition ORDER BY updated DESC LIMIT 50";
 		
 		if ($search) {
-			$stmt = $con->prepare($sql);
-			$searchParam = "%$search%";
-			$stmt->execute([$searchParam, $searchParam]);
+			if ($pageWorkspace) {
+				$stmt = $con->prepare($sql);
+				$searchParam = "%$search%";
+				$stmt->execute([$searchParam, $searchParam, $pageWorkspace, $pageWorkspace]);
+			} else {
+				$stmt = $con->prepare($sql);
+				$searchParam = "%$search%";
+				$stmt->execute([$searchParam, $searchParam]);
+			}
 		} else {
-			$stmt = $con->query($sql);
+			if ($pageWorkspace) {
+				$stmt = $con->prepare($sql);
+				$stmt->execute([$pageWorkspace, $pageWorkspace]);
+			} else {
+				$stmt = $con->query($sql);
+			}
 		}
 		
 		if ($stmt) {
@@ -146,5 +159,8 @@ $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 	
 	<script src="js/script.js"></script>
 	<script src="js/trash.js"></script>
+	<script>
+		var pageWorkspace = <?php echo $pageWorkspace ? json_encode($pageWorkspace) : 'undefined'; ?>;
+	</script>
 </body>
 </html>

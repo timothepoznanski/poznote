@@ -9,8 +9,15 @@
 	$id = $_POST['id'];
 	
 	// Get note data before deletion to access attachments
-	$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
-	$stmt->execute([$id]);
+	$workspace = $_POST['workspace'] ?? null;
+
+	if ($workspace) {
+		$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+		$stmt->execute([$id, $workspace, $workspace]);
+	} else {
+		$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
+		$stmt->execute([$id]);
+	}
 	$result = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	if ($result) {
@@ -33,7 +40,12 @@
 	$filename = getEntriesRelativePath() . $id . ".html";
 	if (file_exists($filename)) unlink($filename);
 	
-	// Delete database entry
-	$stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
-	echo $stmt->execute([$id]) ? 1 : 'Database error occurred';
+	// Delete database entry (respect workspace if provided)
+	if ($workspace) {
+		$stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+		echo $stmt->execute([$id, $workspace, $workspace]) ? 1 : 'Database error occurred';
+	} else {
+		$stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+		echo $stmt->execute([$id]) ? 1 : 'Database error occurred';
+	}
 ?>

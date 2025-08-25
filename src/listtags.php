@@ -9,6 +9,9 @@ include 'db_connect.php';
 $where_conditions = ["trash = 0"];
 $search_params = [];
 
+// Respect optional workspace parameter to scope tags
+$workspace = $_GET['workspace'] ?? $_POST['workspace'] ?? null;
+
 // Get excluded folders from POST (if coming from a form submission)
 $excluded_folders = [];
 if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
@@ -46,7 +49,18 @@ if (!empty($excluded_folders)) {
 $where_clause = implode(" AND ", $where_conditions);
 
 // Execute query with proper parameters
-$stmt = $con->prepare("SELECT tags FROM entries WHERE $where_clause");
+$select_query = "SELECT tags FROM entries WHERE $where_clause";
+
+// If workspace is provided, add workspace condition to where clause and params
+if ($workspace !== null) {
+	// Append workspace condition to where clause and parameters
+	// We add it now because $where_clause was already built without workspace
+	$select_query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+	$search_params[] = $workspace;
+	$search_params[] = $workspace;
+}
+
+$stmt = $con->prepare($select_query);
 $stmt->execute($search_params);
 
 $tags_list = [];
@@ -72,7 +86,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tags - <?php echo APP_NAME_DISPLAYED; ?></title>
+<title>Tags - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link rel="stylesheet" href="css/font-awesome.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
@@ -124,5 +138,9 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	</div>
 	
 	<script src="js/listtags.js"></script>
+	<script>
+		// Expose current workspace to the tags page JS so redirects include it
+		var pageWorkspace = <?php echo $workspace !== null ? json_encode($workspace) : 'undefined'; ?>;
+	</script>
 </body>
 </html>

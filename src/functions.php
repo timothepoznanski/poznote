@@ -120,7 +120,7 @@ function isAIEnabled() {
  * For "Untitled note", adds date and time
  * For other titles, adds a suffix number if duplicate exists
  */
-function generateUniqueTitle($originalTitle, $excludeId = null) {
+function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = null) {
     global $con;
     
     // Clean the original title
@@ -138,6 +138,13 @@ function generateUniqueTitle($originalTitle, $excludeId = null) {
     // Check if title already exists (excluding the current note if updating)
     $query = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0";
     $params = [$title];
+
+    // If workspace specified, restrict uniqueness to that workspace
+    if ($workspace !== null) {
+        $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $params[] = $workspace;
+        $params[] = $workspace;
+    }
     
     if ($excludeId !== null) {
         $query .= " AND id != ?";
@@ -160,9 +167,9 @@ function generateUniqueTitle($originalTitle, $excludeId = null) {
     do {
         $title = $baseTitle . ' (' . $counter . ')';
         
-        $stmt = $con->prepare($query);
-        $params[0] = $title; // Update the title in params
-        $stmt->execute($params);
+    $stmt = $con->prepare($query);
+    $params[0] = $title; // Update the title in params
+    $stmt->execute($params);
         $count = $stmt->fetchColumn();
         
         $counter++;

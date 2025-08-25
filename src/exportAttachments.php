@@ -35,7 +35,7 @@ if (!$hasAttachments) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title><?php echo APP_NAME_DISPLAYED; ?> - Export des pièces jointes</title>
+    <title>Poznote - Export des pièces jointes</title>
         <link href="css/index.css" rel="stylesheet">
         <link rel="stylesheet" href="css/font-awesome.css">
         <link rel="stylesheet" href="css/ai.css">
@@ -149,7 +149,7 @@ if (!empty($metadataInfo)) {
 
 // Create a simple index file
 $indexContent = '<html><head><title>Attachments Index</title></head><body>';
-$indexContent .= '<h1>' . APP_NAME_DISPLAYED . ' Attachments Export</h1>';
+$indexContent .= '<h1>Poznote Attachments Export</h1>';
 $indexContent .= '<p>Total attachments: ' . $attachmentCount . '</p>';
 $indexContent .= '<p>Total notes with attachments: ' . count($metadataInfo) . '</p>';
 $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';

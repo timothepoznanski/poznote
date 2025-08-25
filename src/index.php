@@ -22,8 +22,35 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
 include 'functions.php';
 include 'db_connect.php';
 
+// Ensure $workspaces and $labels are defined to avoid PHP notices
+// which can inject HTML into scripts and cause JS parsing errors
+if (!isset($workspaces) || !is_array($workspaces)) {
+    $workspaces = [];
+    try {
+        // Try to read workspaces from the DB if the table exists
+        $stmt_ws = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+        while ($r = $stmt_ws->fetch(PDO::FETCH_ASSOC)) {
+            $workspaces[] = $r['name'];
+        }
+    } catch (Exception $e) {
+        // ignore - leave as empty array
+        $workspaces = [];
+    }
+}
+
+if (!isset($labels) || !is_array($labels)) {
+    // Labels table is optional in some installs; default to empty labels map
+    $labels = [];
+}
+
+// Workspace filter (only show notes from this workspace) - initialize early to avoid undefined variable warnings
+// Determine workspace filter (client may pass workspace param). Default workspace is 'Poznote'.
+$workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+
+$displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
+
 // Get the custom default folder name
-$defaultFolderName = getDefaultFolderName();
+$defaultFolderName = getDefaultFolderName($workspace_filter);
 
 // Column verification (only on application startup)
 // In SQLite, we use PRAGMA table_info to check columns
@@ -43,6 +70,11 @@ if (!in_array('favorite', $columns)) {
 
 if (!in_array('attachments', $columns)) {
     $con->query("ALTER TABLE entries ADD COLUMN attachments TEXT DEFAULT NULL");
+}
+
+// Add workspace column if missing (default to 'Poznote')
+if (!in_array('workspace', $columns)) {
+    $con->query("ALTER TABLE entries ADD COLUMN workspace TEXT DEFAULT 'Poznote'");
 }
 
 $search = $_POST['search'] ?? $_GET['search'] ?? '';
@@ -106,67 +138,69 @@ if (!empty($_POST['unified_search'])) {
 $note = $_GET['note'] ?? '';
 $folder_filter = $_GET['folder'] ?? '';
 
+// Workspace filter already initialized above
+
         // Determine default note folder before JavaScript
         $default_note_folder = null; // Track folder of default note
         $res_right = null; // Initialize $res_right to avoid undefined variable error
         
         if($note!='') // If the note is not empty, it means we have just clicked on a note.
         {          
-            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
-            $stmt->execute([$note]);
+            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt->execute([$note, $workspace_filter, $workspace_filter]);
             $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if($note_data) {
                 $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
-                // Prepare result for right column
-                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ?");
-                $stmt_right->execute([$note]);
+                // Prepare result for right column (ensure it's in the workspace)
+                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt_right->execute([$note, $workspace_filter, $workspace_filter]);
                 $res_right = $stmt_right;
             } else {
                 // If the requested note doesn't exist, display the last updated note
                 $note = ''; // Reset note to trigger showing latest note
-                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0");
-                $check_stmt->execute();
+                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $check_stmt->execute([$workspace_filter, $workspace_filter]);
                 $note_count_row = $check_stmt->fetch(PDO::FETCH_ASSOC);
                 $note_count = $note_count_row['note_count'];
                 
                 if ($note_count > 0) {
-                    // Show the most recently updated note
-                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
-                    $stmt_right->execute();
+                    // Show the most recently updated note in the selected workspace
+                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
+                    $stmt_right->execute([$workspace_filter, $workspace_filter]);
                     $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
                     if($latest_note) {
                         $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
-                        // Reset statement to be used in display loop
-                        $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
-                        $stmt_right->execute();
+                        // Reset statement to be used in display loop (workspace filtered)
+                        $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
+                        $stmt_right->execute([$workspace_filter, $workspace_filter]);
                         $res_right = $stmt_right;
                     }
                 } else {
-                    // No notes available, show welcome screen
+                    // No notes available
                     $res_right = null;
                 }
             }
         } else {
             // No specific note requested, check if we have notes to show the latest one
-            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0");
-            $check_stmt->execute();
+            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $check_stmt->execute([$workspace_filter, $workspace_filter]);
             $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
             
             if ($note_count > 0) {
-                // Show the most recently updated note
-                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
-                $stmt_right->execute();
+                // Show the most recently updated note in the selected workspace
+                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
+                $stmt_right->execute([$workspace_filter, $workspace_filter]);
                 $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
                 if($latest_note) {
                     $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
-                    // Reset statement to be used in display loop
-                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 ORDER BY updated DESC LIMIT 1");
-                    $stmt_right->execute();
+                    // Reset statement to be used in display loop (workspace filtered)
+                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
+                    $stmt_right->execute([$workspace_filter, $workspace_filter]);
                     $res_right = $stmt_right;
                 }
             } else {
-                // No notes available, show welcome screen
+                // No notes available
                 $res_right = null;
             }
         }
@@ -178,16 +212,58 @@ $folder_filter = $_GET['folder'] ?? '';
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo APP_NAME_DISPLAYED; ?></title>
+    <title>Poznote</title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
     <script src="js/toolbar.js"></script>
+    <style>
+    /* Minimal workspace link styling (displayed next to header logo) */
+    .left-header .workspace-link {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 1.5rem;
+        color: #007DB8;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    </style>
 </head>
 
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
 
     <div class="main-container">
+    <script>
+    (function(){
+        try {
+            var params = new URLSearchParams(window.location.search);
+            if (!params.has('workspace')) {
+                var stored = null;
+                try { stored = localStorage.getItem('poznote_selected_workspace'); } catch(e) {}
+                if (stored) {
+                    var workspaceDisplayMap = <?php
+                        $display_map = [];
+                        foreach ($workspaces as $w) {
+                            if (isset($labels[$w]) && $labels[$w] !== '') {
+                                $display_map[$w] = $labels[$w];
+                            } else {
+                                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
+                            }
+                        }
+                        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+                    ?>;
+                    var left = document.querySelector('.left-header-text');
+                    if (left) {
+                        if (workspaceDisplayMap[stored]) left.textContent = workspaceDisplayMap[stored];
+                        else left.textContent = stored;
+                    }
+                }
+            }
+        } catch(e) {}
+    })();
+    </script>
+
+    <!-- workspace selector removed (now shown under left header) -->
 
 
     <!-- Notification popup -->
@@ -313,19 +389,7 @@ $folder_filter = $_GET['folder'] ?? '';
         </div>
     </div>
 
-    <!-- Modal for editing default folder name -->
-    <div id="editDefaultFolderModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('editDefaultFolderModal')">&times;</span>
-            <h3>Rename Default Folder</h3>
-            <p>This is the default folder where new notes are placed when no specific folder is selected.</p>
-            <input type="text" id="editDefaultFolderName" placeholder="Default folder name" maxlength="255">
-            <div class="modal-buttons">
-                <button onclick="saveDefaultFolderName()">Save</button>
-                <button onclick="closeModal('editDefaultFolderModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <!-- Default folder rename modal removed: renaming default folder is disabled -->
     
     <!-- Modal for deleting folder -->
     <div id="deleteFolderModal" class="modal">
@@ -373,16 +437,20 @@ $folder_filter = $_GET['folder'] ?? '';
 
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
-        <div class="left-header">
-            <a href="https://timpoz.com" target="_blank" class="left-header-logo">
-                <img src="favicon.ico" alt="<?php echo APP_NAME_DISPLAYED; ?>" class="left-header-favicon">
-                <span class="left-header-text"><?php echo APP_NAME_DISPLAYED; ?></span>
-            </a>
+    <div class="left-header">
+        <a href="manage_workspaces.php" class="left-header-text workspace-link" title="Manage workspaces"><?php echo $displayWorkspace; ?></a>
+        <div id="workspaceMenu" class="settings-menu" style="display:none; position:absolute; z-index:9999;">
+            <div class="settings-menu-item" onclick="window.location='manage_workspaces.php';">
+                <i class="fas fa-cog"></i>
+                <span>Manage workspaces</span>
+            </div>
+            <div id="workspaceMenuItems"></div>
         </div>
+    </div>
         <div class="containbuttons">
             <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
             <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
-            <div class="list_tags" onclick="window.location = 'listtags.php';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+            <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
             <div class="settings-dropdown">
                 <div class="settingsbutton" onclick="toggleSettingsMenu(event);" title="Settings">
                     <span><span class="fas fa-cog"></span></span>
@@ -431,7 +499,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     </div>
                 </div>
             </div>
-            <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
+            <div class="trashnotebutton" onclick="window.location = 'trash.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
         </div>
         <?php endif; ?>
 
@@ -471,6 +539,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <!-- Hidden inputs to maintain compatibility -->
                     <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                     <input type="hidden" id="search-tags-hidden-mobile" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
+                    <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
                     <input type="hidden" id="search-in-notes-mobile" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes'])) || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
                     <input type="hidden" id="search-in-tags-mobile" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags'])) || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
                     <input type="hidden" id="search-in-folders-mobile" name="search_in_folders" value="">
@@ -524,6 +593,14 @@ $folder_filter = $_GET['folder'] ?? '';
             $search_params[] = $folder_filter;
         }
     }
+
+    // Apply workspace filter
+    if (!empty($workspace_filter)) {
+        $where_conditions[] = "(workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        // We push workspace twice to match the two placeholders
+        $search_params[] = $workspace_filter;
+        $search_params[] = $workspace_filter;
+    }
     
     // Exclude folders from search if specified
     if (!empty($excluded_folders)) {
@@ -566,15 +643,12 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <a href="https://timpoz.com" target="_blank" class="left-header-logo">
-            <img src="favicon.ico" alt="<?php echo APP_NAME_DISPLAYED; ?>" class="left-header-favicon">
-            <span class="left-header-text"><?php echo APP_NAME_DISPLAYED; ?></span>
-        </a>
+        <a href="manage_workspaces.php" class="left-header-text workspace-link" title="Manage workspaces"><?php echo $displayWorkspace; ?></a>
     </div>
     <div class="containbuttons">
         <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
         <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
-        <div class="list_tags" onclick="window.location = 'listtags.php';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+    <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
         <div class="settings-dropdown">
             <div class="settingsbutton" onclick="toggleSettingsMenu(event);" title="Settings">
                 <span><span class="fas fa-cog"></span></span>
@@ -623,7 +697,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 </div>
             </div>
         </div>
-        <div class="trashnotebutton" onclick="window.location = 'trash.php';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
+    <div class="trashnotebutton" onclick="window.location = 'trash.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
         <?php
         // Red cross removed
         ?>
@@ -665,6 +739,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <!-- Hidden inputs to maintain compatibility -->
                 <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
+                <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
                 <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes'])) || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
                 <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags'])) || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
                 <input type="hidden" id="search-in-folders" name="search_in_folders" value="">
@@ -685,6 +760,8 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo 'null';
             }
         ?>;
+    // selected workspace for client-side actions
+    selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
     </script>
                     
     <?php
@@ -779,8 +856,13 @@ $folder_filter = $_GET['folder'] ?? '';
             $folders = ['Favorites' => $favorites] + $folders;
         }
         
-        // Add empty folders from folders table
-        $empty_folders_query = $con->query("SELECT name FROM folders ORDER BY name");
+        // Add empty folders from folders table (workspace-scoped)
+        $folders_sql = "SELECT name FROM folders";
+        if (!empty($workspace_filter)) {
+            $folders_sql .= " WHERE (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
+        }
+        $folders_sql .= " ORDER BY name";
+        $empty_folders_query = $con->query($folders_sql);
         while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
             if (!isset($folders[$folder_row['name']])) {
                 $folders[$folder_row['name']] = [];
@@ -788,11 +870,11 @@ $folder_filter = $_GET['folder'] ?? '';
         }
         
         // Sort folders alphabetically (Favorites first, then default folder, then others)
-        uksort($folders, function($a, $b) use ($defaultFolderName) {
+        uksort($folders, function($a, $b) use ($defaultFolderName, $workspace_filter) {
             if ($a === 'Favorites') return -1;
             if ($b === 'Favorites') return 1;
-            if (isDefaultFolder($a)) return -1;
-            if (isDefaultFolder($b)) return 1;
+            if (isDefaultFolder($a, $workspace_filter)) return -1;
+            if (isDefaultFolder($b, $workspace_filter)) return 1;
             return strcasecmp($a, $b);
         });
         
@@ -806,6 +888,7 @@ $folder_filter = $_GET['folder'] ?? '';
             // Show folder header only if not filtering by folder
             if (empty($folder_filter)) {
                 $folderClass = 'folder-header';
+                if (isDefaultFolder($folderName, $workspace_filter)) $folderClass .= ' default-folder';
                 $folderId = 'folder-' . md5($folderName);
                 
                 // Determine if this folder should be open
@@ -813,6 +896,9 @@ $folder_filter = $_GET['folder'] ?? '';
                 
                 // Check if we have very few notes (likely just created demo notes)
                 $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
+                if (isset($workspace_filter)) {
+                    $total_notes_query .= " AND (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
+                }
                 $total_notes_result = $con->query($total_notes_query);
                 $total_notes = $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
                 
@@ -828,8 +914,8 @@ $folder_filter = $_GET['folder'] ?? '';
                         $should_be_open = true;
                     } else if ($folderName === 'Favoris') {
                         // Open Favoris folder if the current note is favorite
-                        $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ?");
-                        $stmt_check_favorite->execute([$note]);
+                        $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                        $stmt_check_favorite->execute([$note, $workspace_filter, $workspace_filter]);
                         $favorite_data = $stmt_check_favorite->fetch(PDO::FETCH_ASSOC);
                         $should_be_open = $favorite_data && $favorite_data['favorite'] == 1;
                     }
@@ -846,8 +932,10 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
                 echo "<i class='fas $chevron_icon folder-icon'></i>";
                 
-                
-                echo "<span class='folder-name' ondblclick='" . (isDefaultFolder($folderName) ? 'editDefaultFolderName()' : 'editFolderName(\"' . $folderName . '\")') . "'>$folderName</span>";
+                // Workspace-aware default folder handling in UI
+                // Disable double-click rename for default folder
+                $ondbl = isDefaultFolder($folderName, $workspace_filter) ? '' : 'editFolderName("' . $folderName . '")';
+                echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
                 echo "<span class='folder-note-count'>(" . count($notes) . ")</span>";
                 echo "<span class='folder-actions'>";
                 
@@ -855,9 +943,9 @@ $folder_filter = $_GET['folder'] ?? '';
                 if ($folderName === 'Favorites') {
                     // Search filter icon for Favorites folder
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                } else if (isDefaultFolder($folderName)) {
+                } else if (isDefaultFolder($folderName, $workspace_filter)) {
+                    // For the default folder: allow search and empty, but do not allow renaming
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editDefaultFolderName()' title='Rename default folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
                 } else {
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
@@ -877,6 +965,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 if (!empty($search)) $params[] = 'search=' . urlencode($search);
                 if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
                 if (!empty($folder_filter)) $params[] = 'folder=' . urlencode($folder_filter);
+                if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
                 if ($preserve_notes) $params[] = 'preserve_notes=1';
                 if ($preserve_tags) $params[] = 'preserve_tags=1';
                 $params[] = 'note=' . urlencode($row1["heading"]);
@@ -913,7 +1002,7 @@ $folder_filter = $_GET['folder'] ?? '';
             
             // Right-side list based on the query created earlier //		
             
-            // Check if we should display a note or welcome message
+            // Check if we should display a note or nothing
             if ($res_right && $res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
@@ -1064,7 +1153,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     
                     // Prepare additional data for note info
                     $folder_name = $row['folder'] ?? $defaultFolderName;
-                    if (isDefaultFolder($folder_name)) $folder_name = 'Non classé';
+                    if (isDefaultFolder($folder_name, $workspace_filter)) $folder_name = 'Non classé';
                     $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
@@ -1236,41 +1325,9 @@ $folder_filter = $_GET['folder'] ?? '';
             $is_search_active = !empty($search) || !empty($tags_search);
             
             if ($is_search_active) {
-                // Display "No notes found" message for search results
-                echo '<div class="welcome-message welcome-message-full">';
-                echo '    <div class="welcome-content">';
-                echo '        <div class="welcome-icon">';
-                echo '            <i class="fas fa-search" style="font-size: 4rem; color: #007DB8; margin-bottom: 1.5rem;"></i>';
-                echo '        </div>';
-                echo '        <h2 class="welcome-title">No notes found</h2>';
-                echo '        <p class="welcome-description">Your search didn\'t return any results. Try different keywords or check your spelling.</p>';
-                echo '        <div class="welcome-actions">';
-                echo '            <button class="welcome-btn welcome-btn-secondary" onclick="clearUnifiedSearch()">';
-                echo '                <i class="fas fa-times"></i>';
-                echo '                Clear search';
-                echo '            </button>';
-                echo '        </div>';
-                echo '    </div>';
-                echo '</div>';
+                // intentionally left blank: no search results
             } else {
-                // Display welcome message when no note is available (first time use)
-                echo '<div class="welcome-message welcome-message-full">';
-                echo '    <div class="welcome-content">';
-                echo '        <div class="welcome-icon">';
-                echo '            <div class="poznote-logo">';
-                echo '                <img src="favicon.ico" alt="Poznote" class="poznote-favicon">';
-                echo '            </div>';
-                echo '        </div>';
-                echo '        <h2 class="welcome-title">' . APP_NAME_DISPLAYED . '</h2>';
-                echo '        <p class="welcome-description">Create your first note to get started</p>';
-                echo '        <div class="welcome-actions">';
-                echo '            <button class="welcome-btn welcome-btn-primary" onclick="createFirstNote()">';
-                echo '                <i class="fas fa-plus"></i>';
-                echo '                Create your first note';
-                echo '            </button>';
-                echo '        </div>';
-                echo '    </div>';
-                echo '</div>';
+                // intentionally left blank: no notes to display
             }
         }
         ?>        
@@ -1317,7 +1374,6 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/unified-search.js"></script>
 <script src="js/note-loader.js"></script>
 <script src="js/clickable-tags.js"></script>
-<script src="js/welcome.js"></script>
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>

@@ -6,7 +6,9 @@ require_once 'config.php';
 include 'db_connect.php';
 
 // Get note ID from URL
+// Preserve workspace if provided
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
 
 if (!$note_id) {
     header('Location: index.php');
@@ -14,8 +16,13 @@ if (!$note_id) {
 }
 
 // Get note details
-$stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
-$stmt->execute([$note_id]);
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+        $stmt->execute([$note_id]);
+    }
 $note = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$note) {
@@ -39,7 +46,7 @@ if (!$note) {
         <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
-        <a href="index.php" class="btn btn-secondary">
+    <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
         </a>
 
@@ -101,7 +108,7 @@ if (!$note) {
         });
 
         function showFileName() {
-            const fileInput = document.getElementById('attachmentFile');
+        const fileInput = document.getElementById('attachmentFile');
             const fileNameDiv = document.getElementById('selectedFileName');
             const uploadBtn = document.getElementById('uploadBtn');
             
@@ -145,6 +152,9 @@ if (!$note) {
             const formData = new FormData();
             formData.append('action', 'upload');
             formData.append('note_id', noteId);
+            <?php if ($workspace): ?>
+            formData.append('workspace', '<?php echo addslashes($workspace); ?>');
+            <?php endif; ?>
             formData.append('file', file);
 
             const xhr = new XMLHttpRequest();
@@ -191,7 +201,7 @@ if (!$note) {
         }
 
         function loadAttachments() {
-            fetch(`api_attachments.php?action=list&note_id=${noteId}`)
+            fetch(`api_attachments.php?action=list&note_id=${noteId}${<?php echo $workspace ? "'&workspace=' + encodeURIComponent('" . addslashes($workspace) . "')" : "''"; ?>}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -251,7 +261,7 @@ if (!$note) {
         }
 
         function downloadAttachment(attachmentId) {
-            window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}`, '_blank');
+            window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}${<?php echo $workspace ? "'&workspace=' + encodeURIComponent('" . addslashes($workspace) . "')" : "''"; ?>}`, '_blank');
         }
 
         function deleteAttachment(attachmentId) {
@@ -264,7 +274,7 @@ if (!$note) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}`
+                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${<?php echo $workspace ? "'&workspace=' + encodeURIComponent('" . addslashes($workspace) . "')" : "''"; ?>}`
             })
             .then(response => response.json())
             .then(data => {

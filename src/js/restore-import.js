@@ -30,7 +30,7 @@ function showImportConfirmation() {
         showCustomAlert('No SQL File Selected', 'Please select a SQL file before proceeding with the database import.');
         return;
     }
-    document.getElementById('importConfirmModal').style.display = 'block';
+    document.getElementById('importConfirmModal').style.display = 'flex';
 }
 
 function hideImportConfirmation() {
@@ -57,7 +57,7 @@ function showNotesImportConfirmation() {
         showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing HTML notes before proceeding with the import.');
         return;
     }
-    document.getElementById('notesImportConfirmModal').style.display = 'block';
+    document.getElementById('notesImportConfirmModal').style.display = 'flex';
 }
 
 function hideNotesImportConfirmation() {
@@ -81,7 +81,7 @@ function showAttachmentsImportConfirmation() {
         showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing attachments before proceeding with the import.');
         return;
     }
-    document.getElementById('attachmentsImportConfirmModal').style.display = 'block';
+    document.getElementById('attachmentsImportConfirmModal').style.display = 'flex';
 }
 
 function hideAttachmentsImportConfirmation() {
@@ -102,7 +102,7 @@ function proceedWithAttachmentsImport() {
 function showCustomAlert(title = 'No File Selected', message = 'Please select a file before proceeding with the import.') {
     document.getElementById('alertTitle').textContent = title;
     document.getElementById('alertMessage').textContent = message;
-    document.getElementById('customAlert').style.display = 'block';
+    document.getElementById('customAlert').style.display = 'flex';
 }
 
 function hideCustomAlert() {

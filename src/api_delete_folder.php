@@ -33,31 +33,47 @@ if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
     exit;
 }
 
+// Optional workspace
+$workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 $folder_name = trim($data['folder_name']);
 
 // Verify that folder is not protected
-if ($folder_name === 'Uncategorized') {
+if ($folder_name === 'Uncategorized' || $folder_name === 'Default') {
     http_response_code(400);
-    echo json_encode(['error' => 'Cannot delete the Uncategorized folder']);
+    echo json_encode(['error' => 'Cannot delete the default folder']);
     exit;
 }
 
 try {
-    // Check if folder exists
-    $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-    $stmt->execute([$folder_name]);
-    $folder_exists_in_table = $stmt->fetchColumn() > 0;
+    // Check if folder exists (workspace-scoped)
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $folder_exists_in_table = $stmt->fetchColumn() > 0;
+    } else {
+        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
+        $stmt->execute([$folder_name]);
+        $folder_exists_in_table = $stmt->fetchColumn() > 0;
+    }
     
-    // Check if folder contains notes
-    $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0");
-    $stmt->execute([$folder_name]);
-    $stmt->execute();
-    $notes_count = $stmt->fetchColumn();
-    
-    // Check if folder contains notes dans la corbeille
-    $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1");
-    $stmt->execute([$folder_name]);
-    $trash_notes_count = $stmt->fetchColumn();
+    // Check if folder contains notes (workspace-scoped)
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $notes_count = $stmt->fetchColumn();
+
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $trash_notes_count = $stmt->fetchColumn();
+    } else {
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 0");
+        $stmt->execute([$folder_name]);
+        $notes_count = $stmt->fetchColumn();
+
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND trash = 1");
+        $stmt->execute([$folder_name]);
+        $trash_notes_count = $stmt->fetchColumn();
+    }
     
     $total_notes = $notes_count + $trash_notes_count;
     
@@ -72,20 +88,27 @@ try {
     $con->beginTransaction();
     
     try {
-        // Move all notes from this folder to Uncategorized
+    // Move all notes from this folder to the default folder
         if ($total_notes > 0) {
-            $stmt = $con->prepare("UPDATE entries SET folder = 'Uncategorized', updated = datetime('now') WHERE folder = ?");
+            // Move notes to new default name
+            $stmt = $con->prepare("UPDATE entries SET folder = 'Default', updated = datetime('now') WHERE folder = ?");
             $stmt->execute([$folder_name]);
         }
         
-        // Delete folder from folders table
+        // Delete folder from folders table (workspace-scoped)
         if ($folder_exists_in_table) {
-            $stmt = $con->prepare("DELETE FROM folders WHERE name = ?");
-            $stmt->execute([$folder_name]);
+            if ($workspace) {
+                $stmt = $con->prepare("DELETE FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folder_name, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("DELETE FROM folders WHERE name = ?");
+                $stmt->execute([$folder_name]);
+            }
         }
         
         // Delete physical folder
-        $folder_path = __DIR__ . '/entries/' . $folder_name;
+    $wsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
+    $folder_path = __DIR__ . '/entries/' . $wsSegment . '/' . $folder_name;
         $folder_deleted = false;
         
         if (is_dir($folder_path)) {

@@ -26,6 +26,7 @@ if (empty($note)) {
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $tags_search = isset($_GET['tags_search']) ? trim($_GET['tags_search']) : '';
 $folder_filter = isset($_GET['folder']) ? trim($_GET['folder']) : '';
+$workspace_filter = isset($_GET['workspace']) ? trim($_GET['workspace']) : '';
 $preserve_notes = !empty($_GET['preserve_notes']);
 $preserve_tags = !empty($_GET['preserve_tags']);
 
@@ -57,6 +58,11 @@ try {
             $search_params[] = $folder_filter;
         }
     }
+    // Workspace filter
+    if (!empty($workspace_filter)) {
+        $where_conditions[] = "workspace = ?";
+        $search_params[] = $workspace_filter;
+    }
     
     $where_clause = implode(" AND ", $where_conditions);
     $query = "SELECT * FROM entries WHERE $where_clause LIMIT 1";
@@ -86,7 +92,7 @@ try {
             'title' => $title,
             'content' => $entryfinal,
             'tags' => $row['tags'] ?? '',
-            'folder' => $row['folder'] ?? 'Uncategorized',
+            'folder' => $row['folder'] ?? 'Default',
             'favorite' => $row['favorite'] ?? 0,
             'created' => $row['created'] ?? '',
             'updated' => $row['updated'] ?? '',
@@ -112,6 +118,7 @@ if (!$is_ajax) {
     if (!empty($search)) $redirect_url .= '&search=' . urlencode($search);
     if (!empty($tags_search)) $redirect_url .= '&tags_search=' . urlencode($tags_search);
     if (!empty($folder_filter)) $redirect_url .= '&folder=' . urlencode($folder_filter);
+    if (!empty($workspace_filter)) $redirect_url .= '&workspace=' . urlencode($workspace_filter);
     if ($preserve_notes) $redirect_url .= '&preserve_notes=1';
     if ($preserve_tags) $redirect_url .= '&preserve_tags=1';
     

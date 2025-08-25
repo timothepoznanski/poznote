@@ -12,6 +12,7 @@ include 'db_connect.php';
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? '';
+$workspace = $_POST['workspace'] ?? null;
 
 switch($action) {
     case 'create':
@@ -23,29 +24,40 @@ switch($action) {
             exit;
         }
         
-        $defaultFolderName = getDefaultFolderName();
+    $defaultFolderName = getDefaultFolderName($workspace);
         
         if ($folderName === $defaultFolderName) {
             echo json_encode(['success' => false, 'error' => 'Cannot create folder with the same name as the default folder']);
-            exit;
+                if ($workspace !== null) {
+                    $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                    $check1->execute([$folderName, $workspace, $workspace]);
+                } else {
+                    $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
+                    $check1->execute([$folderName]);
+                }
+        } else {
+            $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
+            $check1->execute([$folderName]);
         }
-        
-        // Check if folder already exists in entries or folders table
-        $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
-        $check1->execute([$folderName]);
         $result1 = $check1->fetch(PDO::FETCH_ASSOC);
         
-        $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
-        $check2->execute([$folderName]);
+        if ($workspace !== null) {
+            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $check2->execute([$folderName, $workspace, $workspace]);
+        } else {
+            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
+            $check2->execute([$folderName]);
+        }
         $result2 = $check2->fetch(PDO::FETCH_ASSOC);
         
         if ($result1['count'] > 0 || $result2['count'] > 0) {
             echo json_encode(['success' => false, 'error' => 'Folder already exists']);
         } else {
-            // Create folder
-            $query = "INSERT INTO folders (name) VALUES (?)";
+            // Create folder (store workspace)
+            $query = "INSERT INTO folders (name, workspace) VALUES (?, ?)";
             $stmt = $con->prepare($query);
-            if ($stmt->execute([$folderName])) {
+            $wsValue = $workspace ?? 'Poznote';
+            if ($stmt->execute([$folderName, $wsValue])) {
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -67,16 +79,9 @@ switch($action) {
         
         $defaultFolderName = getDefaultFolderName();
         
-        // Allow renaming the default folder
-        if (isDefaultFolder($oldName)) {
-            // This is renaming the default folder
-            if (setDefaultFolderName($newName)) {
-                // Update all references
-                updateDefaultFolderReferences($oldName, $newName);
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'error' => 'Failed to update default folder name']);
-            }
+        // Do not allow renaming the default folder
+        if (isDefaultFolder($oldName, $workspace)) {
+            echo json_encode(['success' => false, 'error' => 'Renaming the default folder is not allowed']);
             exit;
         }
         
@@ -85,15 +90,39 @@ switch($action) {
             echo json_encode(['success' => false, 'error' => 'Cannot rename to default folder name']);
             exit;
         }
+
+        // Ensure target name does not already exist in the same workspace (but allow same name in other workspaces)
+        if ($workspace !== null) {
+            $check = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $check->execute([$newName, $workspace, $workspace]);
+        } else {
+            $check = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
+            $check->execute([$newName]);
+        }
+        $exists = $check->fetch(PDO::FETCH_ASSOC);
+        if ($exists && $exists['count'] > 0) {
+            echo json_encode(['success' => false, 'error' => 'Folder already exists in this workspace']);
+            exit;
+        }
         
-        // Update entries and folders table
-        $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
-        $query2 = "UPDATE folders SET name = ? WHERE name = ?";
+        // Update entries and folders table (workspace-scoped)
+            if ($workspace !== null) {
+                $query1 = "UPDATE entries SET folder = ? WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query2 = "UPDATE folders SET name = ? WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $stmt1 = $con->prepare($query1);
+                $stmt2 = $con->prepare($query2);
+                $exec1 = $stmt1->execute([$newName, $oldName, $workspace, $workspace]);
+                $exec2 = $stmt2->execute([$newName, $oldName, $workspace, $workspace]);
+            } else {
+                $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
+                $query2 = "UPDATE folders SET name = ? WHERE name = ?";
+                $stmt1 = $con->prepare($query1);
+                $stmt2 = $con->prepare($query2);
+                $exec1 = $stmt1->execute([$newName, $oldName]);
+                $exec2 = $stmt2->execute([$newName, $oldName]);
+            }
         
-        $stmt1 = $con->prepare($query1);
-        $stmt2 = $con->prepare($query2);
-        
-        if ($stmt1->execute([$newName, $oldName]) && $stmt2->execute([$newName, $oldName])) {
+        if ($exec1 && $exec2) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -104,22 +133,31 @@ switch($action) {
         require_once 'default_folder_settings.php';
         
         $folderName = $_POST['folder_name'] ?? '';
-        if (empty($folderName) || isDefaultFolder($folderName)) {
+    if (empty($folderName) || isDefaultFolder($folderName, $workspace)) {
             echo json_encode(['success' => false, 'error' => 'Cannot delete the default folder']);
             exit;
         }
         
-        $defaultFolderName = getDefaultFolderForNewNotes();
+    $defaultFolderName = getDefaultFolderForNewNotes($workspace);
         
         // Move all notes from this folder to default folder
-        $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
-        // Delete folder from folders table
-        $query2 = "DELETE FROM folders WHERE name = ?";
+        if ($workspace !== null) {
+            $query1 = "UPDATE entries SET folder = ? WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt1 = $con->prepare($query1);
+            $exec1 = $stmt1->execute([$defaultFolderName, $folderName, $workspace, $workspace]);
+            $query2 = "DELETE FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt2 = $con->prepare($query2);
+            $exec2 = $stmt2->execute([$folderName, $workspace, $workspace]);
+        } else {
+            $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
+            $query2 = "DELETE FROM folders WHERE name = ?";
+            $stmt1 = $con->prepare($query1);
+            $stmt2 = $con->prepare($query2);
+            $exec1 = $stmt1->execute([$defaultFolderName, $folderName]);
+            $exec2 = $stmt2->execute([$folderName]);
+        }
         
-        $stmt1 = $con->prepare($query1);
-        $stmt2 = $con->prepare($query2);
-        
-        if ($stmt1->execute([$defaultFolderName, $folderName]) && $stmt2->execute([$folderName])) {
+        if ($exec1 && $exec2) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -130,16 +168,23 @@ switch($action) {
         require_once 'default_folder_settings.php';
         
         $noteId = $_POST['note_id'] ?? '';
-        $targetFolder = $_POST['folder'] ?? $_POST['target_folder'] ?? getDefaultFolderForNewNotes();
+    $targetFolder = $_POST['folder'] ?? $_POST['target_folder'] ?? getDefaultFolderForNewNotes($workspace);
         
         if (empty($noteId)) {
             echo json_encode(['success' => false, 'error' => 'Note ID is required']);
             exit;
         }
         
-        $query = "UPDATE entries SET folder = ? WHERE id = ?";
-        $stmt = $con->prepare($query);
-        if ($stmt->execute([$targetFolder, $noteId])) {
+        if ($workspace) {
+            $query = "UPDATE entries SET folder = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt = $con->prepare($query);
+            $success = $stmt->execute([$targetFolder, $noteId, $workspace, $workspace]);
+        } else {
+            $query = "UPDATE entries SET folder = ? WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $success = $stmt->execute([$targetFolder, $noteId]);
+        }
+        if ($success) {
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Database error']);
@@ -150,24 +195,30 @@ switch($action) {
         require_once 'default_folder_settings.php';
         
         $query1 = "SELECT DISTINCT folder as name FROM entries WHERE folder IS NOT NULL AND folder != ''";
+        if ($workspace !== null) {
+            $query1 .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+        }
         $query2 = "SELECT name FROM folders";
+        if ($workspace !== null) {
+            $query2 .= " WHERE (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+        }
         
         $result1 = $con->query($query1);
         $result2 = $con->query($query2);
         
-        $defaultFolderName = getDefaultFolderName();
+    $defaultFolderName = getDefaultFolderName($workspace);
         $folders = [$defaultFolderName];
         
         // Add folders from entries
         while($row = $result1->fetch(PDO::FETCH_ASSOC)) {
-            if (!isDefaultFolder($row['name']) && !in_array($row['name'], $folders)) {
+            if (!isDefaultFolder($row['name'], $workspace) && !in_array($row['name'], $folders)) {
                 $folders[] = $row['name'];
             }
         }
         
         // Add folders from folders table
         while($row = $result2->fetch(PDO::FETCH_ASSOC)) {
-            if (!isDefaultFolder($row['name']) && !in_array($row['name'], $folders)) {
+            if (!isDefaultFolder($row['name'], $workspace) && !in_array($row['name'], $folders)) {
                 $folders[] = $row['name'];
             }
         }
@@ -186,27 +237,35 @@ switch($action) {
         require_once 'default_folder_settings.php';
         
         // Get the most recently used folders and always include the default folder
-        $recentQuery = "SELECT folder, MAX(updated) as last_used FROM entries WHERE folder IS NOT NULL AND folder != '' AND trash = 0 GROUP BY folder ORDER BY last_used DESC LIMIT 3";
+        $recentQuery = "SELECT folder, MAX(updated) as last_used FROM entries WHERE folder IS NOT NULL AND folder != '' AND trash = 0";
+        if ($workspace !== null) {
+            $recentQuery .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+        }
+        $recentQuery .= " GROUP BY folder ORDER BY last_used DESC LIMIT 3";
         $recentResult = $con->query($recentQuery);
         
-        $defaultFolderName = getDefaultFolderName();
+    $defaultFolderName = getDefaultFolderName($workspace);
         $suggestedFolders = [$defaultFolderName]; // Always include default folder first
         
         // Add recent folders
         while($row = $recentResult->fetch(PDO::FETCH_ASSOC)) {
-            if (!isDefaultFolder($row['folder']) && !in_array($row['folder'], $suggestedFolders)) {
+            if (!isDefaultFolder($row['folder'], $workspace) && !in_array($row['folder'], $suggestedFolders)) {
                 $suggestedFolders[] = $row['folder'];
             }
         }
         
         // If we don't have enough, add some popular folders
         if (count($suggestedFolders) < 4) {
-            $popularQuery = "SELECT folder, COUNT(*) as count FROM entries WHERE folder IS NOT NULL AND folder != '' AND trash = 0 GROUP BY folder ORDER BY count DESC LIMIT 3";
+            $popularQuery = "SELECT folder, COUNT(*) as count FROM entries WHERE folder IS NOT NULL AND folder != '' AND trash = 0";
+            if ($workspace !== null) {
+                $popularQuery .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            }
+            $popularQuery .= " GROUP BY folder ORDER BY count DESC LIMIT 3";
             $popularResult = $con->query($popularQuery);
             
             while($row = $popularResult->fetch(PDO::FETCH_ASSOC)) {
                 if (!in_array($row['folder'], $suggestedFolders) && count($suggestedFolders) < 4) {
-                    if (!isDefaultFolder($row['folder'])) {
+                    if (!isDefaultFolder($row['folder'], $workspace)) {
                         $suggestedFolders[] = $row['folder'];
                     }
                 }
@@ -220,7 +279,11 @@ switch($action) {
         require_once 'default_folder_settings.php';
         
         // Get note counts for each folder
-        $query = "SELECT folder, COUNT(*) as count FROM entries WHERE trash = 0 GROUP BY folder";
+        $query = "SELECT folder, COUNT(*) as count FROM entries WHERE trash = 0";
+        if ($workspace !== null) {
+            $query .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+        }
+        $query .= " GROUP BY folder";
         $result = $con->query($query);
         
         $defaultFolderName = getDefaultFolderName();
@@ -232,6 +295,9 @@ switch($action) {
         
         // Get favorite count
         $favoriteQuery = "SELECT COUNT(*) as count FROM entries WHERE trash = 0 AND favorite = 1";
+        if ($workspace !== null) {
+            $favoriteQuery .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+        }
         $favoriteResult = $con->query($favoriteQuery);
         if ($favoriteResult) {
             $favoriteData = $favoriteResult->fetch(PDO::FETCH_ASSOC);
@@ -249,11 +315,18 @@ switch($action) {
             exit;
         }
         
-        // Move all notes from this folder to trash
-        $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0";
-        $stmt = $con->prepare($query);
+        // Move all notes from this folder to trash (workspace-scoped)
+        if ($workspace !== null) {
+            $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt = $con->prepare($query);
+            $successExec = $stmt->execute([$folderName, $workspace, $workspace]);
+        } else {
+            $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0";
+            $stmt = $con->prepare($query);
+            $successExec = $stmt->execute([$folderName]);
+        }
         
-        if ($stmt->execute([$folderName])) {
+        if ($successExec) {
             $affected_rows = $stmt->rowCount();
             echo json_encode(['success' => true, 'message' => "Moved $affected_rows notes to trash"]);
         } else {
@@ -269,9 +342,15 @@ switch($action) {
             exit;
         }
         
-        $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$folderName]);
+        if ($workspace !== null) {
+            $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$folderName, $workspace, $workspace]);
+        } else {
+            $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$folderName]);
+        }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         echo json_encode(['success' => true, 'count' => (int)$result['count']]);

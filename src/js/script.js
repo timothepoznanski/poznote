@@ -7,8 +7,9 @@ var editedButNotSaved = 0;  // Flag indicating that the note has been edited set
 var lastudpdate;
 var noteid=-1;
 var updateNoteEnCours = 0;
-var selectedFolder = 'Uncategorized'; // Track currently selected folder (will be updated dynamically)
-var defaultFolderName = 'Uncategorized'; // Will be updated on page load
+var selectedFolder = 'Default'; // Track currently selected folder (will be updated dynamically)
+var defaultFolderName = 'Default'; // Will be updated on page load
+var selectedWorkspace = 'Poznote'; // Track currently selected workspace
 
 // Function to get the current default folder name
 function getDefaultFolderName() {
@@ -18,17 +19,77 @@ function getDefaultFolderName() {
 // Function to update default folder name
 function updateDefaultFolderName(newName) {
     defaultFolderName = newName;
-    if (selectedFolder === 'Uncategorized') {
+    // Treat legacy and current default names as interchangeable
+    if (selectedFolder === 'Uncategorized' || selectedFolder === 'Default') {
         selectedFolder = newName;
     }
 }
 
 // Initialize default folder name on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize workspace selector from DOM if present
+    var wsSelector = document.getElementById('workspaceSelector');
+    // Prefer localStorage if available
+    try {
+        var stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored) selectedWorkspace = stored;
+    } catch(e) {}
+
+    // If a workspace is stored but no longer exists (e.g. was deleted/merged),
+    // reset it to the default 'Poznote' so the UI doesn't keep showing a removed workspace.
+    try {
+        if (typeof stored !== 'undefined' && stored) {
+            var existsInSelect = false;
+            if (wsSelector) {
+                for (var i = 0; i < wsSelector.options.length; i++) {
+                    if (wsSelector.options[i].value === stored) { existsInSelect = true; break; }
+                }
+                // If selector exists but stored value not present, reset to Poznote
+                if (!existsInSelect) {
+                    selectedWorkspace = 'Poznote';
+                    try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
+                    try { wsSelector.value = 'Poznote'; } catch(e) {}
+                    try {
+                        var leftHeader = document.querySelector('.left-header-text');
+                        if (leftHeader) leftHeader.textContent = 'Poznote';
+                    } catch(e) {}
+                } else {
+                    // selector exists and stored value is present
+                    selectedWorkspace = stored;
+                }
+            } else {
+                // No selector on this page: trust stored workspace and update left header
+                selectedWorkspace = stored;
+                try {
+                    var leftHeader = document.querySelector('.left-header-text');
+                    if (leftHeader) leftHeader.textContent = stored;
+                } catch(e) {}
+            }
+        }
+    } catch(e) {}
+
+    if (wsSelector) {
+        wsSelector.value = selectedWorkspace;
+        wsSelector.addEventListener('change', function() {
+            selectedWorkspace = wsSelector.value;
+            try { localStorage.setItem('poznote_selected_workspace', selectedWorkspace); } catch(e) {}
+        });
+    }
+
+    // When workspace changes, reload page with workspace param to filter server-rendered list
+    if (wsSelector) {
+        wsSelector.addEventListener('change', function() {
+            var val = wsSelector.value;
+            // preserve current search/folder params if present
+            var url = new URL(window.location.href);
+            url.searchParams.set('workspace', val);
+            window.location.href = url.toString();
+        });
+    }
     fetch("api_default_folder_settings.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=get_default_folder_name"
+        body: "action=get_default_folder_name&workspace=" + encodeURIComponent(selectedWorkspace || 'Poznote')
     })
     .then(response => response.json())
     .then(function(data) {
@@ -39,6 +100,80 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
         console.log('Using default folder name due to error:', error);
     });
+    // Workspace menu: attach to all .left-header-text elements and create the menu dynamically
+    (function(){
+        var leftHeaders = document.querySelectorAll('.left-header-text');
+        if (!leftHeaders || leftHeaders.length === 0) return;
+
+        // Create menu element once and append to body
+        var workspaceMenu = document.getElementById('workspaceMenu');
+        if (!workspaceMenu) {
+            workspaceMenu = document.createElement('div');
+            workspaceMenu.id = 'workspaceMenu';
+            workspaceMenu.className = 'settings-menu';
+            workspaceMenu.style.position = 'absolute';
+            workspaceMenu.style.display = 'none';
+            workspaceMenu.innerHTML = '<div class="settings-menu-item" onclick="window.location=\'manage_workspaces.php\';"><i class="fas fa-cog"></i><span>Manage workspaces</span></div><div id="workspaceMenuItems"></div>';
+            document.body.appendChild(workspaceMenu);
+        }
+
+        function openMenuFor(target) {
+            // Position menu under the clicked element
+            var rect = target.getBoundingClientRect();
+            workspaceMenu.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+            // try to align left edge with target
+            workspaceMenu.style.left = (rect.left + window.scrollX) + 'px';
+            // override CSS translate and ensure menu is above other elements
+            workspaceMenu.style.transform = 'none';
+            workspaceMenu.style.zIndex = '99999';
+            workspaceMenu.style.minWidth = workspaceMenu.style.minWidth || '180px';
+            workspaceMenu.style.display = 'block';
+
+            // Populate items
+            var container = document.getElementById('workspaceMenuItems');
+            if (container) container.innerHTML = '';
+                fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: 'action=list' })
+                .then(r => r.json()).then(function(res){
+                    if (!container) return;
+                    container.innerHTML = '';
+                    if (res && res.success && Array.isArray(res.workspaces)) {
+                        // determine current workspace (prefer JS variable, fallback to clicked element text)
+                        var current = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : (target.textContent || '').trim();
+                        res.workspaces.forEach(function(w){
+                            if (w.name === current) return; // skip current workspace
+                            var div = document.createElement('div');
+                            div.className = 'settings-menu-item';
+                            var icon = document.createElement('i'); icon.className = 'fas fa-layer-group'; div.appendChild(icon);
+                            var span = document.createElement('span'); span.textContent = w.name; div.appendChild(span);
+                            div.onclick = function(){
+                                try { localStorage.setItem('poznote_selected_workspace', w.name); } catch(e) {}
+                                window.location = 'index.php?workspace=' + encodeURIComponent(w.name);
+                            };
+                            container.appendChild(div);
+                        });
+                    }
+                }).catch(function(){ /* ignore errors */ });
+
+            // Close when clicking outside
+            setTimeout(function(){
+                document.addEventListener('click', function closeMenu(event){
+                    if (!workspaceMenu.contains(event.target) && !target.contains(event.target)) {
+                        workspaceMenu.style.display = 'none';
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 100);
+        }
+
+        leftHeaders.forEach(function(elem){
+            elem.addEventListener('click', function(e){
+                e.preventDefault();
+                // toggle
+                if (workspaceMenu.style.display === 'block') { workspaceMenu.style.display = 'none'; return; }
+                openMenuFor(elem);
+            });
+        });
+    })();
 });
 var currentNoteFolder = null; // Track current folder of note being moved
 var currentNoteIdForAttachments = null; // Track current note for attachments
@@ -76,6 +211,83 @@ function toggleNoteMenu(noteId) {
     }
 }
 
+function showNewWorkspacePrompt() {
+    var name = prompt('Enter new workspace name:');
+    if (!name) return;
+    // validate allowed characters (letters, digits, -, _)
+    if (!/^[A-Za-z0-9_-]+$/.test(name)) {
+        // If the manage_workspaces page provides a top alert, use it; otherwise fallback to the popup
+        if (typeof showTopAlert === 'function') {
+            showTopAlert('Invalid workspace name: use letters, numbers, dash or underscore only (no spaces)', 'error');
+            try { scrollToTopAlert(); } catch(e) {}
+        } else {
+            showNotificationPopup('Invalid workspace name: use letters, numbers, dash or underscore only (no spaces)', 'error');
+        }
+        return;
+    }
+    var params = new URLSearchParams({ action: 'create', name: name });
+    fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
+    .then(r => r.json()).then(function(res){
+        if (res.success) {
+            // Add option to selector if missing and select it
+            var sel = document.getElementById('workspaceSelector');
+            if (sel) {
+                var exists = false;
+                for (var i=0;i<sel.options.length;i++) { if (sel.options[i].value === name) { exists = true; break; } }
+                if (!exists) {
+                    var opt = document.createElement('option');
+                    opt.value = name;
+                    opt.text = name;
+                    sel.appendChild(opt);
+                }
+                sel.value = name;
+                selectedWorkspace = name;
+                try { localStorage.setItem('poznote_selected_workspace', name); } catch(e) {}
+                // Refresh left column via AJAX
+                refreshLeftColumnForWorkspace(name);
+                showNotificationPopup('Workspace created and selected', 'success');
+            } else {
+                // fallback: reload
+                var url = new URL(window.location.href);
+                url.searchParams.set('workspace', name);
+                window.location.href = url.toString();
+            }
+        } else {
+            showNotificationPopup('Error creating workspace: ' + (res.message || 'unknown'), 'error');
+        }
+    }).catch(function(err){ showNotificationPopup('Network error', 'error'); });
+}
+
+function deleteCurrentWorkspace() {
+    var sel = document.getElementById('workspaceSelector');
+    if (!sel) return;
+    var name = sel.value;
+    if (!name || name === 'Poznote') { showNotificationPopup('Cannot delete default workspace', 'error'); return; }
+    if (!confirm('Delete workspace "' + name + '"? Notes will be moved to the default workspace.')) return;
+    var params = new URLSearchParams({ action: 'delete', name: name });
+    fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
+    .then(r => r.json()).then(function(res){
+        if (res.success) {
+            var sel = document.getElementById('workspaceSelector');
+            if (sel) {
+                // remove option
+                for (var i=0;i<sel.options.length;i++) {
+                    if (sel.options[i].value === name) { sel.remove(i); break; }
+                }
+                sel.value = 'Poznote';
+                selectedWorkspace = 'Poznote';
+                try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
+                refreshLeftColumnForWorkspace('Poznote');
+                showNotificationPopup('Workspace deleted; default selected', 'success');
+            } else {
+                window.location.href = 'index.php?workspace=Poznote';
+            }
+        } else {
+            showNotificationPopup('Error deleting workspace: ' + (res.message || 'unknown'), 'error');
+        }
+    }).catch(function(err){ showNotificationPopup('Network error', 'error'); });
+}
+
 // Function to show note information with complete details
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
     if (!noteId) {
@@ -85,8 +297,9 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
     }
     
     try {
-        // Redirect to the note info page
-        const url = 'note_info.php?note_id=' + encodeURIComponent(noteId);
+        // Redirect to the note info page and preserve workspace
+        var wsParam = selectedWorkspace ? ('&workspace=' + encodeURIComponent(selectedWorkspace)) : '';
+        const url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
         window.location.href = url;
     } catch (error) {
         console.error('Error in showNoteInfo:', error);
@@ -155,8 +368,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 function showAttachmentDialog(noteId) {
-    // Redirect to the dedicated attachments management page
-    window.location.href = `manage_attachments.php?note_id=${noteId}`;
+    // Redirect to the dedicated attachments management page and include current workspace if set
+    var ws = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : null;
+    var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
+    window.location.href = `manage_attachments.php?note_id=${noteId}${wsParam}`;
 }
 
 // Functions to handle attachment modal error messages
@@ -485,6 +700,7 @@ function toggleFavorite(noteId) {
                 entry: ent,
                 tags: tagsElement.value,
                 folder: folderElement.value,
+                workspace: selectedWorkspace || 'Poznote',
                 entrycontent: entcontent,
                 now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
             });
@@ -602,7 +818,7 @@ function performFavoriteToggle(noteId) {
         }
     };
     
-    xhr.send('action=toggle_favorite&note_id=' + encodeURIComponent(noteId));
+    xhr.send('action=toggle_favorite&note_id=' + encodeURIComponent(noteId) + '&workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote'));
 }
 
 function updateidsearch(el)
@@ -727,6 +943,7 @@ function updatenote(){
         folder: folder,
         heading: headi,
         entry: ent,
+    workspace: selectedWorkspace || 'Poznote',
         entrycontent: entcontent,
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
@@ -806,6 +1023,8 @@ function newnote(){
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60,
         folder: selectedFolder
     });
+    // include workspace
+    params.append('workspace', selectedWorkspace || 'Poznote');
     fetch("insertnew.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -817,7 +1036,8 @@ function newnote(){
             var res = typeof data === 'string' ? JSON.parse(data) : data;
             if(res.status === 1) {
                 window.scrollTo(0, 0);
-                window.location.href = "index.php?note=" + encodeURIComponent(res.heading);
+                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                window.location.href = "index.php?workspace=" + ws + "&note=" + encodeURIComponent(res.heading);
             } else {
                 showNotificationPopup(res.error || data, 'error');
             }
@@ -839,7 +1059,8 @@ function deleteNote(iid){
         var trimmed = (data || '').trim();
         // Fast path: legacy success response '1'
         if (trimmed === '1') {
-            window.location.href = "index.php";
+            var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+            window.location.href = wsRedirect;
             return;
         }
         // Try to parse JSON (could be error or a structured success in future)
@@ -847,7 +1068,8 @@ function deleteNote(iid){
             var jsonData = JSON.parse(trimmed);
             // Case where backend still returns bare 1 (parsed as number) – already handled above, but safety:
             if (jsonData === 1) {
-                window.location.href = "index.php";
+                var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+                window.location.href = wsRedirect;
                 return;
             }
             if (jsonData && jsonData.status === 'error') {
@@ -856,11 +1078,13 @@ function deleteNote(iid){
             }
             // Allow for future success shape {status: 'ok'} or similar
             if (jsonData && (jsonData.status === 'ok' || jsonData.status === 'success')) {
-                window.location.href = "index.php";
+                var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+                window.location.href = wsRedirect;
                 return;
             }
-            // Fallback: not recognized structure -> redirect if optimistic
-            window.location.href = "index.php";
+            // Fallback: not recognized structure -> redirect to current workspace if optimistic
+            var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+            window.location.href = wsRedirect;
         } catch(e) {
             // Not JSON and not '1' -> show error
             showNotificationPopup('Error deleting note: ' + trimmed, 'error');
@@ -1374,6 +1598,36 @@ function showNotificationPopup(message, type = 'success') {
     popup.addEventListener('click', hideNotification);
 }
 
+// Refresh left column by fetching index.php and replacing #left_col content
+function refreshLeftColumnForWorkspace(workspaceName) {
+    var url = new URL(window.location.href);
+    url.searchParams.set('workspace', workspaceName);
+    fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(response => response.text())
+    .then(function(html){
+        try {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newLeft = doc.getElementById('left_col');
+            if (newLeft) {
+                var currentLeft = document.getElementById('left_col');
+                if (currentLeft) {
+                    currentLeft.innerHTML = newLeft.innerHTML;
+                    // Update browser URL without reload
+                    history.replaceState({}, '', url.toString());
+                    // reinitialize any needed behaviors (note click listeners are global)
+                    // update selectedWorkspace var
+                    selectedWorkspace = workspaceName;
+                    try { localStorage.setItem('poznote_selected_workspace', workspaceName); } catch(e) {}
+                }
+            }
+        } catch (e) {
+            console.error('Error refreshing left column', e);
+        }
+    })
+    .catch(function(err){ console.error('Error fetching left column', err); });
+}
+
 // Function to show contact popup
 function showContactPopup() {
     var contactModal = `
@@ -1424,7 +1678,7 @@ function closeContactModal() {
 
 // Folder management functions
 function newFolder() {
-    document.getElementById('newFolderModal').style.display = 'block';
+    document.getElementById('newFolderModal').style.display = 'flex';
     document.getElementById('newFolderName').focus();
 }
 
@@ -1439,10 +1693,13 @@ function createFolder() {
         action: 'create',
         folder_name: folderName
     });
+    // append workspace if selected
+    var selectedWorkspace = localStorage.getItem('poznote_selected_workspace') || null;
+    if (selectedWorkspace) params.append('workspace', selectedWorkspace);
     
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
@@ -1491,8 +1748,14 @@ function selectFolder(folderName, element) {
     selectedFolder = folderName;
 }
 
+// Helper to get current selected workspace (fallback to localStorage)
+function getSelectedWorkspace() {
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) return selectedWorkspace;
+    return localStorage.getItem('poznote_selected_workspace') || null;
+}
+
 function editFolderName(oldName) {
-    document.getElementById('editFolderModal').style.display = 'block';
+    document.getElementById('editFolderModal').style.display = 'flex';
     document.getElementById('editFolderName').value = oldName;
     document.getElementById('editFolderName').dataset.oldName = oldName;
     document.getElementById('editFolderName').focus();
@@ -1517,10 +1780,12 @@ function saveFolderName() {
         old_name: oldName,
         new_name: newName
     });
-    
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
+
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
@@ -1541,60 +1806,7 @@ function saveFolderName() {
 }
 
 // Functions for default folder management
-function editDefaultFolderName() {
-    // First get the current default folder name
-    fetch("api_default_folder_settings.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=get_default_folder_name"
-    })
-    .then(response => response.json())
-    .then(function(data) {
-        if (data.success) {
-            document.getElementById('editDefaultFolderModal').style.display = 'block';
-            document.getElementById('editDefaultFolderName').value = data.default_folder_name;
-            document.getElementById('editDefaultFolderName').focus();
-        } else {
-            showNotificationPopup('Error getting current default folder name', 'error');
-        }
-    })
-    .catch(error => {
-        showNotificationPopup('Error: ' + error, 'error');
-    });
-}
-
-function saveDefaultFolderName() {
-    var newName = document.getElementById('editDefaultFolderName').value.trim();
-    
-    if (!newName) {
-        showNotificationPopup('Please enter a folder name', 'error');
-        return;
-    }
-    
-    var params = new URLSearchParams({
-        action: 'set_default_folder_name',
-        new_name: newName
-    });
-    
-    fetch("api_default_folder_settings.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
-    })
-    .then(response => response.json())
-    .then(function(data) {
-        if (data.success) {
-            closeModal('editDefaultFolderModal');
-            showNotificationPopup('Default folder name updated successfully');
-            location.reload();
-        } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
-        }
-    })
-    .catch(error => {
-        showNotificationPopup('Error updating default folder name: ' + error, 'error');
-    });
-}
+// default folder rename functions removed: renaming default folder is disabled
 
 /**
  * Clean localStorage entries when a folder is renamed
@@ -1628,10 +1840,12 @@ function deleteFolder(folderName) {
         action: 'count_notes_in_folder',
         folder_name: folderName
     });
-    
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
+
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
@@ -1646,10 +1860,12 @@ function deleteFolder(folderName) {
                     action: 'delete',
                     folder_name: folderName
                 });
+                var ws = getSelectedWorkspace();
+                if (ws) deleteParams.append('workspace', ws);
                 
                 fetch("folder_operations.php", {
                     method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
                     body: deleteParams.toString()
                 })
                 .then(response => response.json())
@@ -1685,7 +1901,7 @@ let currentFolderToDelete = null;
 function showDeleteFolderModal(folderName, message) {
     currentFolderToDelete = folderName;
     document.getElementById('deleteFolderMessage').textContent = message;
-    document.getElementById('deleteFolderModal').style.display = 'block';
+    document.getElementById('deleteFolderModal').style.display = 'flex';
 }
 
 function executeDeleteFolder() {
@@ -1694,10 +1910,12 @@ function executeDeleteFolder() {
             action: 'delete',
             folder_name: currentFolderToDelete
         });
+        var ws = getSelectedWorkspace();
+        if (ws) deleteParams.append('workspace', ws);
         
         fetch("folder_operations.php", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
             body: deleteParams.toString()
         })
         .then(response => response.json())
@@ -1766,10 +1984,12 @@ function executeEmptyFolder(folderName) {
         action: 'empty_folder',
         folder_name: folderName
     });
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
     
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
@@ -1870,12 +2090,15 @@ function filterMoveFolders() {
 
 function createAndSelectNewFolder(folderName) {
     // Create the new folder via API
+    var ws = getSelectedWorkspace();
+    var bodyStr = 'folder_name=' + encodeURIComponent(folderName);
+    if (ws) bodyStr += '&workspace=' + encodeURIComponent(ws);
     fetch('api_create_folder.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'folder_name=' + encodeURIComponent(folderName)
+        body: bodyStr
     })
     .then(response => response.json())
     .then(data => {
@@ -1910,10 +2133,11 @@ function refreshFoldersList() {
     var params = new URLSearchParams({
         action: 'list'
     });
-    
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
@@ -1995,23 +2219,27 @@ function moveNoteToSelectedFolder(targetFolder = null) {
         note_id: noteid,
         folder: folderToMoveTo
     });
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
     
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
     .then(function(data) {
-        if (data.success) {
-            closeModal('moveNoteFolderModal');
+        if (data && data.success) {
+            try { closeModal('moveNoteFolderModal'); } catch(e) {}
+            try { closeModal('moveNoteModal'); } catch(e) {}
             location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            const err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error: ' + err, 'error');
         }
     })
     .catch(error => {
-        showNotificationPopup('Error moving note: ' + error);
+        showNotificationPopup('Error moving note: ' + error, 'error');
     });
 }
 
@@ -2246,23 +2474,24 @@ function executeFolderAction() {
     
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
     .then(function(data) {
-        if (data.success) {
+        if (data && data.success) {
             // Add to recent folders
             addToRecentFolders(folderToMoveTo);
-            
-            closeModal('moveNoteFolderModal');
+            try { closeModal('moveNoteFolderModal'); } catch(e) {}
+            try { closeModal('moveNoteModal'); } catch(e) {}
             location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            const err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error: ' + err, 'error');
         }
     })
     .catch(error => {
-        showNotificationPopup('Error moving note: ' + error);
+        showNotificationPopup('Error moving note: ' + error, 'error');
     });
 }
 
@@ -2326,7 +2555,7 @@ function showMoveFolderDialog(noteId) {
             hideMoveFolderError();
             
             // Show the modal and focus on input
-            document.getElementById('moveNoteFolderModal').style.display = 'block';
+            document.getElementById('moveNoteFolderModal').style.display = 'flex';
             setTimeout(() => {
                 input.focus();
             }, 100);
@@ -2450,10 +2679,13 @@ function loadSuggestedFolders(noteId) {
     const currentFolder = document.getElementById('folder' + noteId).value;
     
     // Load suggested folders
+    var params = new URLSearchParams({ action: 'get_suggested_folders' });
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
     fetch("folder_operations.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=get_suggested_folders"
+        body: params.toString()
     })
     .then(response => response.json())
     .then(function(data) {
@@ -2517,7 +2749,8 @@ function showMoveNoteDialog(noteHeading) {
     var params = new URLSearchParams({
         action: 'list'
     });
-    
+    var ws = getSelectedWorkspace();
+    if (ws) params.append('workspace', ws);
     fetch("folder_operations.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -2534,7 +2767,7 @@ function showMoveNoteDialog(noteHeading) {
                 option.textContent = folder;
                 select.appendChild(option);
             });
-            document.getElementById('moveNoteModal').style.display = 'block';
+            document.getElementById('moveNoteModal').style.display = 'flex';
         }
     });
 }
@@ -2551,20 +2784,22 @@ function moveNoteToFolder() {
     
     fetch("folder_operations.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
     .then(response => response.json())
     .then(function(data) {
-        if (data.success) {
-            closeModal('moveNoteModal');
+        if (data && data.success) {
+            try { closeModal('moveNoteModal'); } catch(e) {}
+            try { closeModal('moveNoteFolderModal'); } catch(e) {}
             location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            const err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error: ' + err, 'error');
         }
     })
     .catch(error => {
-        showNotificationPopup('Error moving note: ' + error);
+        showNotificationPopup('Error moving note: ' + error, 'error');
     });
 }
 
@@ -3034,7 +3269,7 @@ function checkForUpdates() {
 // Function to show update instructions
 function showUpdateInstructions() {
     // Show the update modal instead of notification popup
-    document.getElementById('updateModal').style.display = 'block';
+    document.getElementById('updateModal').style.display = 'flex';
 }
 
 // Function to close update modal
@@ -3060,7 +3295,7 @@ function showUpdateCheckModal() {
     statusElement.style.color = '#555';
     buttonsElement.style.display = 'none';
     
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 // Function to show update check result
@@ -3110,7 +3345,7 @@ function showConfirmModal(title, message, callback) {
     messageElement.textContent = message;
     confirmedActionCallback = callback;
     
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 function closeConfirmModal() {

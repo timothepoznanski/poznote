@@ -77,6 +77,7 @@ function handleUpload() {
     global $con, $attachments_dir;
     
     $note_id = $_POST['note_id'] ?? '';
+    $workspace = $_POST['workspace'] ?? null;
     
     if (empty($note_id)) {
         error_log("Upload failed: Note ID is required");
@@ -175,10 +176,16 @@ function handleUpload() {
         // Set file permissions
         chmod($file_path, 0644);
         
-        // Get current attachments
-        $query = "SELECT attachments FROM entries WHERE id = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id]);
+        // Get current attachments (restrict by workspace if provided)
+        if ($workspace) {
+            $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$note_id, $workspace, $workspace]);
+        } else {
+            $query = "SELECT attachments FROM entries WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $stmt->execute([$note_id]);
+        }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($result) {
@@ -197,11 +204,18 @@ function handleUpload() {
             $current_attachments[] = $new_attachment;
             
             // Update database
-            $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
-            $update_stmt = $con->prepare($update_query);
             $attachments_json = json_encode($current_attachments);
+            if ($workspace) {
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $update_stmt = $con->prepare($update_query);
+                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace, $workspace]);
+            } else {
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
+                $update_stmt = $con->prepare($update_query);
+                $success = $update_stmt->execute([$attachments_json, $note_id]);
+            }
             
-            if ($update_stmt->execute([$attachments_json, $note_id])) {
+            if ($success) {
                 error_log("File uploaded successfully: $original_name");
                 echo json_encode(['success' => true, 'message' => 'File uploaded successfully']);
             } else {
@@ -230,15 +244,22 @@ function handleList() {
     global $con;
     
     $note_id = $_GET['note_id'] ?? '';
+    $workspace = $_GET['workspace'] ?? null;
     
     if (empty($note_id)) {
         echo json_encode(['success' => false, 'message' => 'Note ID is required']);
         return;
     }
     
-    $query = "SELECT attachments FROM entries WHERE id = ?";
-    $stmt = $con->prepare($query);
-    $stmt->execute([$note_id]);
+    if ($workspace) {
+        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $query = "SELECT attachments FROM entries WHERE id = ?";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id]);
+    }
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($result) {
@@ -254,6 +275,7 @@ function handleDelete() {
     
     $note_id = $_POST['note_id'] ?? '';
     $attachment_id = $_POST['attachment_id'] ?? '';
+    $workspace = $_POST['workspace'] ?? null;
     
     if (empty($note_id) || empty($attachment_id)) {
         echo json_encode(['success' => false, 'message' => 'Note ID and Attachment ID are required']);
@@ -261,9 +283,15 @@ function handleDelete() {
     }
     
     // Get current attachments
-    $query = "SELECT attachments FROM entries WHERE id = ?";
-    $stmt = $con->prepare($query);
-    $stmt->execute([$note_id]);
+    if ($workspace) {
+        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $query = "SELECT attachments FROM entries WHERE id = ?";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id]);
+    }
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($result) {
@@ -288,11 +316,18 @@ function handleDelete() {
             }
             
             // Update database
-            $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
-            $update_stmt = $con->prepare($update_query);
             $attachments_json = json_encode($updated_attachments);
+            if ($workspace) {
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $update_stmt = $con->prepare($update_query);
+                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace, $workspace]);
+            } else {
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
+                $update_stmt = $con->prepare($update_query);
+                $success = $update_stmt->execute([$attachments_json, $note_id]);
+            }
             
-            if ($update_stmt->execute([$attachments_json, $note_id])) {
+            if ($success) {
                 echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Database update failed']);
@@ -310,6 +345,7 @@ function handleDownload() {
     
     $note_id = $_GET['note_id'] ?? '';
     $attachment_id = $_GET['attachment_id'] ?? '';
+    $workspace = $_GET['workspace'] ?? null;
     
     if (empty($note_id) || empty($attachment_id)) {
         http_response_code(400);
@@ -317,9 +353,15 @@ function handleDownload() {
     }
     
     // Get attachment info
-    $query = "SELECT attachments FROM entries WHERE id = ?";
-    $stmt = $con->prepare($query);
-    $stmt->execute([$note_id]);
+    if ($workspace) {
+        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $query = "SELECT attachments FROM entries WHERE id = ?";
+        $stmt = $con->prepare($query);
+        $stmt->execute([$note_id]);
+    }
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($result) {

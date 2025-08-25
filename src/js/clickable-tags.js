@@ -324,6 +324,7 @@ function saveTagsDirectly(noteId, tagsValue) {
         heading: titleInput.value,
         entry: contentDiv.innerHTML,
         entrycontent: contentDiv.textContent || '',
+    workspace: (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : 'Poznote'),
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
     

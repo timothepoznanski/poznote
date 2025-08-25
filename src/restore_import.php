@@ -267,7 +267,7 @@ function importAttachmentsZip($uploadedFile) {
 
         .import-confirm-modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 6% auto 0 auto;
             padding: 20px;
             border: none;
             border-radius: 8px;
@@ -276,6 +276,7 @@ function importAttachmentsZip($uploadedFile) {
             font-family: 'Inter', sans-serif;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .import-confirm-modal-content h3 {

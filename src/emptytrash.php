@@ -7,9 +7,19 @@
 	require_once 'config.php';
 	include 'db_connect.php';
     
-    // Delete all files and attachments from trash entries
-    $res = $con->query('SELECT id, attachments FROM entries WHERE trash = 1');
-    while($row = $res->fetch(PDO::FETCH_ASSOC)) {
+    // Respect optional workspace parameter: only operate on that workspace if provided
+    $workspace = $_POST['workspace'] ?? null;
+
+    // Delete all files and attachments from trash entries (scoped by workspace when provided)
+    if ($workspace) {
+        $res_stmt = $con->prepare('SELECT id, attachments FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = \'Poznote\'))');
+        $res_stmt->execute([$workspace, $workspace]);
+        $rows = $res_stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        $res = $con->query('SELECT id, attachments FROM entries WHERE trash = 1');
+        $rows = $res ? $res->fetchAll(PDO::FETCH_ASSOC) : [];
+    }
+    foreach($rows as $row) {
         // Delete HTML file
         $file_path = getEntriesRelativePath() . $row["id"] . ".html";
         if(file_exists($file_path)) unlink($file_path);
@@ -28,7 +38,13 @@
         }
     }
     
-    // Delete all trash entries from database
-    $stmt = $con->prepare("DELETE FROM entries WHERE trash = 1");
-	echo $stmt->execute() ? 1 : $stmt->errorInfo()[2];
+    // Delete all trash entries from database (scoped by workspace when provided)
+    if ($workspace) {
+        $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $ok = $del_stmt->execute([$workspace, $workspace]);
+        echo $ok ? 1 : $del_stmt->errorInfo()[2];
+    } else {
+        $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1");
+        echo $del_stmt->execute() ? 1 : $del_stmt->errorInfo()[2];
+    }
 ?>

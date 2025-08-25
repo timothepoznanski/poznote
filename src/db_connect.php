@@ -13,7 +13,7 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
     
-    // Create table if not exists
+    // Create table if not exists (add workspace column)
     $con->exec('CREATE TABLE IF NOT EXISTS entries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         trash INTEGER DEFAULT 0,
@@ -22,17 +22,32 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated DATETIME,
         tags TEXT,
-        folder TEXT DEFAULT "Uncategorized",
+        folder TEXT DEFAULT "Default",
+    workspace TEXT DEFAULT "Poznote",
         favorite INTEGER DEFAULT 0,
         attachments TEXT
     )');
 
-    // Create folders table for empty folders
+    // Create folders table for empty folders (scoped by workspace)
+    // Note: uniqueness is per (name, workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+    workspace TEXT DEFAULT "Poznote",
+        created DATETIME DEFAULT CURRENT_TIMESTAMP
+    )');
+    // Ensure unique per workspace
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace ON folders(name, workspace)');
+
+    // Create workspaces table
+    $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )');
+
+    // Ensure default workspace exists
+    $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
 
     // Create settings table for configuration
     $con->exec('CREATE TABLE IF NOT EXISTS settings (
