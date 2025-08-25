@@ -76,6 +76,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // If the page was opened without a workspace URL param but the user has a stored
+    // selected workspace, refresh the left column so server-rendered notes are
+    // filtered for that workspace. This fixes the case where after login the UI
+    // shows the stored workspace name but the notes are still from the default.
+    try {
+        var urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('workspace') && selectedWorkspace && selectedWorkspace !== 'Poznote') {
+            // Only refresh when left column exists (avoid on pages without notes)
+            if (document.getElementById('left_col')) {
+                refreshLeftColumnForWorkspace(selectedWorkspace);
+            }
+        }
+    } catch(e) {}
+
     // When workspace changes, reload page with workspace param to filter server-rendered list
     if (wsSelector) {
         wsSelector.addEventListener('change', function() {
@@ -100,48 +114,65 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(error => {
         console.log('Using default folder name due to error:', error);
     });
-    // Workspace menu: attach to all .left-header-text elements and create the menu dynamically
-    (function(){
-        var leftHeaders = document.querySelectorAll('.left-header-text');
-        if (!leftHeaders || leftHeaders.length === 0) return;
-
-        // Create menu element once and append to body
-        var workspaceMenu = document.getElementById('workspaceMenu');
-        if (!workspaceMenu) {
-            workspaceMenu = document.createElement('div');
-            workspaceMenu.id = 'workspaceMenu';
-            workspaceMenu.className = 'settings-menu';
-            workspaceMenu.style.position = 'absolute';
-            workspaceMenu.style.display = 'none';
-            // No direct link to manage_workspaces here (removed per request)
-            workspaceMenu.innerHTML = '<div id="workspaceMenuItems"></div>';
-            document.body.appendChild(workspaceMenu);
-        }
-
-        function openMenuFor(target) {
+    // Workspace menu initializer: use event delegation to avoid re-initialization issues
+    function initWorkspaceMenu() {
+        // Remove existing delegated listener if any
+        document.removeEventListener('click', window.workspaceMenuHandler);
+        
+        // Create delegated event handler
+        window.workspaceMenuHandler = function(e) {
+            var target = e.target;
+            
+            // Check if clicked element is a workspace header
+            if (target.classList.contains('left-header-text')) {
+                e.preventDefault();
+                
+                // Create menu element once and append to body if not exists
+                var workspaceMenu = document.getElementById('workspaceMenu');
+                if (!workspaceMenu) {
+                    workspaceMenu = document.createElement('div');
+                    workspaceMenu.id = 'workspaceMenu';
+                    workspaceMenu.className = 'settings-menu';
+                    workspaceMenu.style.position = 'absolute';
+                    workspaceMenu.style.display = 'none';
+                    workspaceMenu.innerHTML = '<div id="workspaceMenuItems"></div>';
+                    document.body.appendChild(workspaceMenu);
+                }
+                
+                // Toggle menu
+                if (workspaceMenu.style.display === 'block') { 
+                    workspaceMenu.style.display = 'none'; 
+                    return; 
+                }
+                
+                openMenuFor(target, workspaceMenu);
+            }
+        };
+        
+        // Attach delegated listener to document
+        document.addEventListener('click', window.workspaceMenuHandler);
+        
+        function openMenuFor(target, workspaceMenu) {
             // Position menu under the clicked element
             var rect = target.getBoundingClientRect();
             workspaceMenu.style.top = (rect.bottom + window.scrollY + 6) + 'px';
-            // try to align left edge with target
             workspaceMenu.style.left = (rect.left + window.scrollX) + 'px';
-            // override CSS translate and ensure menu is above other elements
             workspaceMenu.style.transform = 'none';
             workspaceMenu.style.zIndex = '99999';
-            workspaceMenu.style.minWidth = workspaceMenu.style.minWidth || '180px';
+            workspaceMenu.style.minWidth = '180px';
             workspaceMenu.style.display = 'block';
 
             // Populate items
             var container = document.getElementById('workspaceMenuItems');
             if (container) container.innerHTML = '';
-                fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: 'action=list' })
+            fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: 'action=list' })
                 .then(r => r.json()).then(function(res){
                     if (!container) return;
                     container.innerHTML = '';
                     if (res && res.success && Array.isArray(res.workspaces)) {
-                        // determine current workspace (prefer JS variable, fallback to clicked element text)
                         var current = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : (target.textContent || '').trim();
                         res.workspaces.forEach(function(w){
-                            if (w.name === current) return; // skip current workspace
+                            if (w.name === current) return;
                             var div = document.createElement('div');
                             div.className = 'settings-menu-item';
                             var icon = document.createElement('i'); icon.className = 'fas fa-layer-group'; div.appendChild(icon);
@@ -152,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             };
                             container.appendChild(div);
                         });
-                        // Add a separator and the Manage workspaces static entry
                         var sep = document.createElement('div'); sep.className = 'settings-menu-separator'; container.appendChild(sep);
                         var manageDiv = document.createElement('div');
                         manageDiv.className = 'settings-menu-item';
@@ -161,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         manageDiv.onclick = function(){ window.location = 'manage_workspaces.php'; };
                         container.appendChild(manageDiv);
                     }
-                }).catch(function(){ /* ignore errors */ });
+                }).catch(function(){});
 
             // Close when clicking outside
             setTimeout(function(){
@@ -173,16 +203,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }, 100);
         }
+    }
 
-        leftHeaders.forEach(function(elem){
-            elem.addEventListener('click', function(e){
-                e.preventDefault();
-                // toggle
-                if (workspaceMenu.style.display === 'block') { workspaceMenu.style.display = 'none'; return; }
-                openMenuFor(elem);
-            });
-        });
-    })();
+    // Initialize the workspace menu on load
+    try { initWorkspaceMenu(); } catch(e) {}
 
 });
 
@@ -1620,13 +1644,24 @@ function refreshLeftColumnForWorkspace(workspaceName) {
             var parser = new DOMParser();
             var doc = parser.parseFromString(html, 'text/html');
             var newLeft = doc.getElementById('left_col');
+            var newRight = doc.getElementById('right_col');
             if (newLeft) {
                 var currentLeft = document.getElementById('left_col');
                 if (currentLeft) {
                     currentLeft.innerHTML = newLeft.innerHTML;
+                    // If the server returned a right column for this workspace, update it too
+                    try {
+                        if (newRight) {
+                            var currentRight = document.getElementById('right_col');
+                            if (currentRight) {
+                                currentRight.innerHTML = newRight.innerHTML;
+                                // Re-initialize right column behaviors if available
+                                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+                            }
+                        }
+                    } catch(e) { console.error('Error updating right column', e); }
                     // Update browser URL without reload
                     history.replaceState({}, '', url.toString());
-                    // reinitialize any needed behaviors (note click listeners are global)
                     // update selectedWorkspace var
                     selectedWorkspace = workspaceName;
                     try { localStorage.setItem('poznote_selected_workspace', workspaceName); } catch(e) {}
