@@ -1467,7 +1467,7 @@ img {
     font-size: 12px;
     margin-right: 8px;
     flex-shrink: 0;
-    color: #007DB8;
+    color: rgb(55, 53, 47);
     align-self: center;
     line-height: 1;
 }
