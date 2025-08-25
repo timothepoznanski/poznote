@@ -76,6 +76,37 @@ if ($_POST) {
                 $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
                 $delEntries->execute([$name]);
 
+                // Additional cleanup: remove orphan HTML files from data/entries
+                // Some HTML export files can remain on disk if the DB row was missing or inconsistent.
+                // Scan the entries directory and remove any <id>.html files that are no longer present in the entries table.
+                try {
+                    $entriesDir = getEntriesPath();
+                    if ($entriesDir && is_dir($entriesDir)) {
+                        $files = scandir($entriesDir);
+                        $checkStmt = $con->prepare('SELECT COUNT(*) FROM entries WHERE id = ?');
+                        foreach ($files as $f) {
+                            if (!is_string($f)) continue;
+                            if (substr($f, -5) !== '.html') continue;
+                            if ($f === 'index.html') continue; // keep generic index
+                            $base = basename($f, '.html');
+                            // Only consider numeric IDs (legacy behavior uses numeric ids for exported files)
+                            if (!preg_match('/^\d+$/', $base)) continue;
+                            // If no DB row exists for this id, delete the file
+                            try {
+                                $checkStmt->execute([$base]);
+                                $count = (int)$checkStmt->fetchColumn();
+                                if ($count === 0) {
+                                    @unlink(rtrim($entriesDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $f);
+                                }
+                            } catch (Exception $e) {
+                                // ignore DB check errors and continue
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    // Non-fatal: don't block workspace deletion if cleanup fails
+                }
+
                 // Remove folders scoped to this workspace
                 try {
                     $delFolders = $con->prepare('DELETE FROM folders WHERE workspace = ?');
@@ -491,6 +522,18 @@ try {
                             } catch (e) {
                                 // non-fatal UI update error
                             }
+                            // Persist the selected workspace so returning to notes shows destination
+                            try { localStorage.setItem('poznote_selected_workspace', json.target); } catch(e) {}
+                            // Update any Back to Notes links on this page to include the workspace param
+                            try {
+                                var backLinks = document.querySelectorAll('a.btn.btn-secondary');
+                                for (var i = 0; i < backLinks.length; i++) {
+                                    var href = backLinks[i].getAttribute('href') || '';
+                                    if (href.indexOf('index.php') !== -1) {
+                                        backLinks[i].setAttribute('href', 'index.php?workspace=' + encodeURIComponent(json.target));
+                                    }
+                                }
+                            } catch(e) {}
                             // Close the modal on success
                             try { closeMoveModal(); } catch(e) {}
                         } else {

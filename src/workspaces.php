@@ -39,7 +39,7 @@ $workspaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <button onclick="createWorkspace()">Create</button>
         </div>
         <div style="margin-top:20px;">
-            <a href="index.php">Back to notes</a>
+            <a id="backToNotesLink" href="index.php">Back to notes</a>
         </div>
     </div>
 
@@ -64,6 +64,18 @@ $workspaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
         fetch('api_workspaces.php', {method:'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: params.toString()})
     .then(r=>r.json()).then(function(res){ if(res.success) window.location.href = 'index.php?workspace=' + encodeURIComponent(newName); else alert(res.message || 'Error'); });
     }
+    </script>
+    <script>
+    // Ensure Back to notes link opens the workspace stored in localStorage if present
+    (function(){
+        try {
+            var stored = localStorage.getItem('poznote_selected_workspace');
+            if (stored && stored !== 'Poznote') {
+                var a = document.getElementById('backToNotesLink');
+                if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+            }
+        } catch(e) {}
+    })();
     </script>
 </body>
 </html>

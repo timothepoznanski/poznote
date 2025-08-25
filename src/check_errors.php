@@ -88,7 +88,7 @@ $is_generating = false;
                 <i class="fas fa-redo"></i> Re-check
             </button>
             
-            <a href="index.php" class="btn btn-secondary">
+            <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Notes
             </a>
         </div>
@@ -99,5 +99,13 @@ $is_generating = false;
         var noteId = <?php echo json_encode($note_id); ?>;
     </script>
     <script src="js/check-errors.js"></script>
+    <script>
+    (function(){ try {
+        var stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored && stored !== 'Poznote') {
+            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        }
+    } catch(e){} })();
+    </script>
 </body>
 </html>

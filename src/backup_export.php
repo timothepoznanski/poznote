@@ -68,7 +68,7 @@ function createBackup() {
         <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
         <p>Export your data for backup or migration purposes.</p>
         
-        <a href="index.php" class="btn btn-secondary">
+        <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
         </a>
         <a href="restore_import.php" class="btn btn-secondary">
@@ -77,6 +77,14 @@ function createBackup() {
 
         <br><br>
         
+        <!-- Global backup/restore warning (important) -->
+        <div class="alert alert-danger" style="margin-top:12px;">
+            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
+            <p style="margin:0; color:#333;">
+                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
+            </p>
+        </div>
+
         <!-- Information Section -->
         <div class="warning">
             <h4>For a complete backup, export all three components:</h4>
@@ -135,5 +143,13 @@ function createBackup() {
     </div>
     
     <script src="js/backup-export.js"></script>
+    <script>
+    (function(){ try {
+        var stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored && stored !== 'Poznote') {
+            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        }
+    } catch(e){} })();
+    </script>
 </body>
 </html>
