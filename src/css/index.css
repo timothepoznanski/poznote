@@ -1417,7 +1417,7 @@ img {
 
 .note-tags-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     overflow: visible;
     /* margin-bottom: 15px; */
     margin-top: 5px;
@@ -1427,6 +1427,8 @@ img {
     font-size: 12px;
     margin-right: 8px;
     flex-shrink: 0;
+    align-self: center;
+    line-height: 1; /* avoid extra vertical spacing */
 } 
 
 .name_tags {
@@ -1456,7 +1458,7 @@ img {
 
 .note-attachments-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 15px;
     margin-top: 15px;
 }
@@ -1464,9 +1466,10 @@ img {
 .fa-paperclip.icon_attachment {
     font-size: 12px;
     margin-right: 8px;
-    margin-top: 2px;
     flex-shrink: 0;
     color: #007DB8;
+    align-self: center;
+    line-height: 1;
 }
 
 .note-attachments-list {
@@ -1482,7 +1485,7 @@ img {
     transition: color 0.2s;
     cursor: pointer;
     display: inline-block;
-    margin: 2px 4px 2px 0;
+    margin: 2px 4px 2px 8px; /* left margin to match tag spacing */
     word-break: break-word;
 }
 
