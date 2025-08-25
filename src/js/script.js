@@ -979,11 +979,38 @@ function insertHTMLAtSelection(html) {
         range.insertNode(frag);
         // place caret after inserted content
         if (lastNode) {
-            range = range.cloneRange();
-            range.setStartAfter(lastNode);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            try {
+                // If the inserted node is an image, create a new empty block after it and place the caret inside
+                if (lastNode.nodeType === 1 && lastNode.tagName && lastNode.tagName.toUpperCase() === 'IMG') {
+                    var parent = lastNode.parentNode;
+                    var newLine = document.createElement('div');
+                    // Add an empty text node so caret can be placed reliably
+                    var emptyText = document.createTextNode('');
+                    newLine.appendChild(emptyText);
+                    if (parent) {
+                        if (lastNode.nextSibling) parent.insertBefore(newLine, lastNode.nextSibling);
+                        else parent.appendChild(newLine);
+                        range = range.cloneRange();
+                        range.setStart(emptyText, 0);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                } else {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            } catch (e) {
+                // fallback to original behavior
+                range = range.cloneRange();
+                range.setStartAfter(lastNode);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         }
         return true;
     } catch (e) {
@@ -1016,13 +1043,29 @@ function handleImageFilesAndInsert(files, dropTarget) {
                     }
                 }
                 if (!inserted) {
-                    // Fallback: append at the end of the dropTarget
+                    // Fallback: append at the end of the dropTarget and place caret on a new line after the image
                     try {
                         if (dropTarget) {
                             var img = document.createElement('img');
                             img.src = dataUrl;
                             img.alt = 'image';
                             dropTarget.appendChild(img);
+                            // Create a new empty block after the image so the caret can be placed
+                            var newLine = document.createElement('div');
+                            var emptyText = document.createTextNode('');
+                            newLine.appendChild(emptyText);
+                            dropTarget.appendChild(newLine);
+                            // Place caret inside the new empty block
+                            try {
+                                var sel2 = window.getSelection();
+                                var range2 = document.createRange();
+                                range2.setStart(emptyText, 0);
+                                range2.collapse(true);
+                                sel2.removeAllRanges();
+                                sel2.addRange(range2);
+                            } catch (e2) {
+                                // ignore caret placement errors
+                            }
                         }
                     } catch (e) {
                         console.error('Fallback append image failed', e);
