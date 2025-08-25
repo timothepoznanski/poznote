@@ -514,13 +514,9 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-code-branch"></i>
                         <span>GitHub Repository</span>
                     </div>
-                    <div class="settings-menu-item" onclick="showContactPopup();">
-                        <i class="fas fa-envelope"></i>
-                        <span>Contact</span>
-                    </div>
-                    <div class="settings-menu-item" onclick="koFiAction();">
-                        <i class="fas fa-coffee"></i>
-                        <span>Support me</span>
+                    <div class="settings-menu-item" onclick="window.open('https://timpoz.com/', '_blank');">
+                        <i class="fas fa-globe"></i>
+                        <span>Tim's projects</span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'logout.php';">
                         <i class="fas fa-sign-out-alt"></i>
@@ -717,13 +713,9 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-code-branch"></i>
                     <span>GitHub Repository</span>
                 </div>
-                <div class="settings-menu-item" onclick="showContactPopup();">
-                    <i class="fas fa-envelope"></i>
-                    <span>Contact</span>
-                </div>
-                <div class="settings-menu-item" onclick="koFiAction();">
-                    <i class="fas fa-coffee"></i>
-                    <span>Support me</span>
+                <div class="settings-menu-item" onclick="window.open('https://timpoz.com/', '_blank');">
+                    <i class="fas fa-globe"></i>
+                    <span>Tim's projects</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'logout.php';">
                     <i class="fas fa-sign-out-alt"></i>

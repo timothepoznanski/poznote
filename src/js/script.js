@@ -3047,17 +3047,6 @@ function showLoginDisplayNamePrompt() {
     });
 }
 
-function koFiAction() {
-    // Open Ko-fi page in a new tab
-    window.open('https://ko-fi.com/Q5Q61IECOW', '_blank');
-    
-    // Close settings menu (both mobile and desktop)
-    const settingsMenu = document.getElementById('settingsMenu');
-    const settingsMenuMobile = document.getElementById('settingsMenuMobile');
-    if (settingsMenu) settingsMenu.style.display = 'none';
-    if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
-}
-
 // Function to download a file
 function downloadFile(url, filename) {
     // Ensure the filename has .html extension

@@ -43,6 +43,7 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - [Installation](#installation)
 - [Accéder à votre instance](#accéder-à-votre-instance)
 - [Instances multiples](#instances-multiples)
+- [Espaces de travail](#espaces-de-travail)
 - [Modifier les paramètres](#modifier-les-paramètres)
 - [Réinitialiser le mot de passe](#réinitialiser-le-mot-de-passe)
 - [Mettre à jour l'application](#mettre-à-jour-lapplication)
@@ -137,6 +138,70 @@ Serveur : mon-serveur.com
 ```
 
 Pour des déploiements sur des serveurs différents, il suffit juste de lancer le script de configuration et d'utiliser l'option de menu 2 pour mettre à jour le paramètre nom de l'application affiché - pas besoin de noms d'instance ou de ports différents.
+
+## Espaces de travail
+
+Les espaces de travail permettent d'organiser vos notes en environnements séparés et isolés au sein d'une même instance Poznote. Pensez aux espaces de travail comme différents "contextes" ou "projets" où vous pouvez regrouper des notes liées.
+
+### Fonctionnalités principales
+
+- **🔀 Espaces multiples** - Créez un nombre illimité d'espaces de travail pour organiser différents projets, contextes ou domaines de votre vie
+- **🔒 Notes isolées** - Les notes d'un espace de travail sont complètement séparées des notes des autres espaces
+- **⚡ Basculement rapide** - Changez facilement d'espace de travail via le sélecteur dans l'interface
+- **🏷️ Tags indépendants** - Chaque espace de travail maintient son propre ensemble de tags et d'organisation
+- **📁 Dossiers séparés** - La structure des dossiers est indépendante par espace de travail
+
+### Espace de travail par défaut
+
+Chaque instance Poznote commence avec un espace de travail par défaut appelé **"Poznote"**. Cet espace :
+- Ne peut pas être supprimé
+- Contient toutes les notes créées avant l'activation de la fonctionnalité d'espaces de travail
+- Sert d'espace de secours pour les notes héritées
+
+### Gestion des espaces de travail
+
+**Accéder à la gestion des espaces de travail :**
+- Allez dans **Paramètres → Gérer les espaces de travail** dans votre interface Poznote
+
+**Créer un nouvel espace de travail :**
+1. Saisissez un nom d'espace de travail (seules les lettres, chiffres, tirets bas et traits d'union sont autorisés)
+2. Cliquez sur "Créer"
+3. Basculez vers votre nouvel espace pour commencer à créer des notes
+
+**Basculer entre les espaces de travail :**
+- Utilisez le sélecteur d'espace de travail en haut de l'interface
+- Cliquez sur le nom de l'espace de travail actuel pour voir tous les espaces disponibles
+- Sélectionnez n'importe quel espace pour y basculer immédiatement
+
+**Renommer un espace de travail :**
+- Dans l'interface de gestion des espaces de travail, cliquez sur "Renommer" à côté d'un espace
+- Saisissez le nouveau nom et confirmez
+- Toutes les notes seront automatiquement déplacées vers l'espace renommé
+
+**Déplacer des notes entre espaces de travail :**
+- Utilisez le bouton "Déplacer les notes" dans la gestion des espaces de travail
+- Sélectionnez l'espace de destination
+- Toutes les notes de l'espace source seront transférées
+
+**Supprimer un espace de travail :**
+- Cliquez sur "Supprimer" à côté d'un espace (sauf l'espace par défaut "Poznote")
+- Toutes les notes et pièces jointes de cet espace seront définitivement supprimées
+- ⚠️ **Attention :** Cette action ne peut pas être annulée
+
+### Cas d'usage
+
+- **📝 Personnel vs Travail** - Séparez les notes personnelles du contenu professionnel
+- **🎓 Projets différents** - Organisez les notes par projet, cours ou client
+- **👥 Accès partagé** - Créez des espaces de travail pour différents membres d'équipe ou cas d'usage
+- **🗂️ Organisation d'archives** - Séparez les notes actives du contenu archivé
+
+### Notes techniques
+
+- Les espaces de travail sont stockés dans la base de données SQLite
+- Chaque note est associée à exactement un espace de travail
+- Changer d'espace de travail n'affiche que les notes de l'espace sélectionné
+- La fonctionnalité de recherche est spécifique à l'espace de travail
+- Les opérations de sauvegarde/export incluent tous les espaces de travail
 
 ## Modifier les paramètres
 

@@ -42,6 +42,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Multiple Instances](#multiple-instances)
+- [Workspaces](#workspaces)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
@@ -136,6 +137,70 @@ Server: my-server.com
 ```
 
 For deployments on different servers, you only need to run the setup script to update configuration (no need for different instance names or ports).
+
+## Workspaces
+
+Workspaces allow you to organize your notes into separate, isolated environments within a single Poznote instance. Think of workspaces as different "contexts" or "projects" where you can keep related notes together.
+
+### Key Features
+
+- **🔀 Multiple Workspaces** - Create unlimited workspaces to organize different projects, contexts, or areas of your life
+- **🔒 Isolated Notes** - Notes in one workspace are completely separate from notes in another workspace
+- **⚡ Quick Switching** - Easily switch between workspaces using the workspace selector in the interface
+- **🏷️ Independent Tags** - Each workspace maintains its own set of tags and organization
+- **📁 Separate Folders** - Folder structures are independent per workspace
+
+### Default Workspace
+
+Every Poznote instance starts with a default workspace called **"Poznote"**. This workspace:
+- Cannot be deleted
+- Contains any notes created before workspace functionality was enabled
+- Serves as the fallback workspace for legacy notes
+
+### Managing Workspaces
+
+**Access Workspace Management:**
+- Go to **Settings → Manage Workspaces** in your Poznote interface
+
+**Create a New Workspace:**
+1. Enter a workspace name (only letters, numbers, underscores, and hyphens allowed)
+2. Click "Create"
+3. Switch to your new workspace to start creating notes
+
+**Switch Between Workspaces:**
+- Use the workspace selector at the top of the interface
+- Click on the current workspace name to see all available workspaces
+- Select any workspace to switch to it immediately
+
+**Rename a Workspace:**
+- In the workspace management interface, click "Rename" next to any workspace
+- Enter the new name and confirm
+- All notes will automatically be moved to the renamed workspace
+
+**Move Notes Between Workspaces:**
+- Use the "Move notes" button in workspace management
+- Select the target workspace
+- All notes from the source workspace will be transferred
+
+**Delete a Workspace:**
+- Click "Delete" next to any workspace (except the default "Poznote" workspace)
+- All notes and attachments in that workspace will be permanently removed
+- ⚠️ **Warning:** This action cannot be undone
+
+### Use Cases
+
+- **📝 Personal vs Work** - Keep personal notes separate from work-related content
+- **🎓 Different Projects** - Organize notes by project, course, or client
+- **👥 Shared Access** - Create workspaces for different team members or use cases
+- **🗂️ Archive Organization** - Separate active notes from archived content
+
+### Technical Notes
+
+- Workspaces are stored in the SQLite database
+- Each note is associated with exactly one workspace
+- Switching workspaces only shows notes from the selected workspace
+- Search functionality is workspace-specific
+- Backup/export operations include all workspaces
 
 ## Change Settings
 
