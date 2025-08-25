@@ -2361,17 +2361,27 @@ hr {
 .noteentry .checkline {
     display: flex;
     align-items: center;
-    margin: 6px 0;
+    /* margin: 6px 0; */
 }
 .noteentry .checkline input[type="checkbox"] {
     width: 16px;
     height: 16px;
     margin-right: 8px;
+    vertical-align: middle;
+    margin-top: 0;
 }
 .noteentry .checkline-text {
     display: inline-block;
     min-width: 20px;
     outline: none;
+    line-height: 16px; /* match checkbox height */
+    vertical-align: middle;
+    /* padding-top: 2px; */
+}
+.noteentry .checkline label {
+    /* display: flex; */
+    align-items: center;
+    /* gap: 8px; */
 }
 
 /* FOLDER STYLES */
