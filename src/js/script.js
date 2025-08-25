@@ -113,7 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
             workspaceMenu.className = 'settings-menu';
             workspaceMenu.style.position = 'absolute';
             workspaceMenu.style.display = 'none';
-            workspaceMenu.innerHTML = '<div class="settings-menu-item" onclick="window.location=\'manage_workspaces.php\';"><i class="fas fa-cog"></i><span>Manage workspaces</span></div><div id="workspaceMenuItems"></div>';
+            // No direct link to manage_workspaces here (removed per request)
+            workspaceMenu.innerHTML = '<div id="workspaceMenuItems"></div>';
             document.body.appendChild(workspaceMenu);
         }
 
@@ -151,6 +152,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             };
                             container.appendChild(div);
                         });
+                        // Add a separator and the Manage workspaces static entry
+                        var sep = document.createElement('div'); sep.className = 'settings-menu-separator'; container.appendChild(sep);
+                        var manageDiv = document.createElement('div');
+                        manageDiv.className = 'settings-menu-item';
+                        var manageIcon = document.createElement('i'); manageIcon.className = 'fas fa-cog'; manageDiv.appendChild(manageIcon);
+                        var manageSpan = document.createElement('span'); manageSpan.textContent = 'Manage workspaces'; manageDiv.appendChild(manageSpan);
+                        manageDiv.onclick = function(){ window.location = 'manage_workspaces.php'; };
+                        container.appendChild(manageDiv);
                     }
                 }).catch(function(){ /* ignore errors */ });
 
@@ -174,7 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     })();
+
 });
+
 var currentNoteFolder = null; // Track current folder of note being moved
 var currentNoteIdForAttachments = null; // Track current note for attachments
 
@@ -2960,6 +2971,82 @@ function unfoldAllFolders() {
     if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
 }
 
+// Prompt to edit the login display name and persist via API
+function showLoginDisplayNamePrompt() {
+    var modal = document.getElementById('loginDisplayModal');
+    var input = document.getElementById('loginDisplayInput');
+    var saveBtn = document.getElementById('saveLoginDisplayBtn');
+    if (!modal || !input || !saveBtn) {
+        console.warn('login display modal elements missing', {modal: !!modal, input: !!input, saveBtn: !!saveBtn});
+        // Fallback to prompt if modal isn't present
+        var val = prompt('Login display name (blank to clear):');
+        if (val === null) return;
+        var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: val });
+        fetch('api_settings.php', { method: 'POST', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: params.toString() })
+            .then(r=>r.json()).then(function(resp){ if (resp && resp.success) alert('Saved'); else alert('Error saving setting'); }).catch(function(){ alert('Network error'); });
+        return;
+    }
+
+    // Helper to handle server responses and show modal
+    function doSet(value) {
+        var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: value });
+        return fetch('api_settings.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: params.toString() })
+            .then(async function(r){
+                if (!r.ok) {
+                    const txt = await r.text();
+                    console.error('api_settings SET error', r.status, txt);
+                    try { showNotificationPopup('Server error', 'error'); } catch(e){ alert('Server error: ' + txt); }
+                    return null;
+                }
+                try { return await r.json(); } catch(e) { const txt = await r.text(); console.error('api_settings SET parse error', txt); return null; }
+            });
+    }
+
+    // Load current value and show modal
+    fetch('api_settings.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type':'application/x-www-form-urlencoded' }, body: 'action=get&key=login_display_name' })
+    .then(async function(r){
+        if (!r.ok) {
+            const txt = await r.text();
+            console.error('api_settings GET error', r.status, txt);
+            try { showNotificationPopup('Server error', 'error'); } catch(e){ alert('Server error: ' + txt); }
+            return null;
+        }
+        try { return await r.json(); } catch(e) { const txt = await r.text(); console.error('api_settings GET parse error', txt); return null; }
+    }).then(function(res){
+        if (!res) return;
+        input.value = (res && res.success) ? (res.value || '') : '';
+        modal.style.display = 'flex';
+        // attach handler
+        saveBtn.onclick = function(){
+            var val = input.value.trim();
+            if (!val) {
+                try { showNotificationPopup('Display name is required', 'error'); } catch(e){ alert('Display name is required'); }
+                return;
+            }
+            doSet(val).then(function(resp){
+                if (!resp) return;
+                if (resp && resp.success) {
+                    try { showNotificationPopup('Display name saved', 'success'); } catch(e){ alert('Display name saved'); }
+                    modal.style.display = 'none';
+                } else {
+                    try { showNotificationPopup('Error saving setting', 'error'); } catch(e){ alert('Error saving setting'); }
+                }
+            }).catch(function(){ try { showNotificationPopup('Network error', 'error'); } catch(e){ alert('Network error'); } });
+        };
+    }).catch(function(){
+        input.value = '';
+        modal.style.display = 'flex';
+        saveBtn.onclick = function(){
+            var val = input.value.trim();
+            if (!val) {
+                try { showNotificationPopup('Display name is required', 'error'); } catch(e){ alert('Display name is required'); }
+                return;
+            }
+            doSet(val).then(function(resp){ if (!resp) return; if (resp && resp.success) { try { showNotificationPopup('Display name saved', 'success'); } catch(e){ alert('Display name saved'); } modal.style.display = 'none'; } else { try { showNotificationPopup('Error saving setting', 'error'); } catch(e){ alert('Error saving setting'); } } }).catch(function(){ try { showNotificationPopup('Network error', 'error'); } catch(e){ alert('Network error'); } });
+        };
+    });
+}
+
 function koFiAction() {
     // Open Ko-fi page in a new tab
     window.open('https://ko-fi.com/Q5Q61IECOW', '_blank');
@@ -3351,6 +3438,11 @@ function showConfirmModal(title, message, callback) {
 function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
     confirmedActionCallback = null;
+}
+
+function closeLoginDisplayModal() {
+    var m = document.getElementById('loginDisplayModal');
+    if (m) m.style.display = 'none';
 }
 
 function executeConfirmedAction() {

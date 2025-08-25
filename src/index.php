@@ -234,6 +234,20 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <div class="main-container">
     <script>
+    // Ensure the prompt function exists in case external JS hasn't loaded yet
+    if (typeof window.showLoginDisplayNamePrompt !== 'function') {
+        window.showLoginDisplayNamePrompt = function(){
+            var val = prompt('Login display name (blank to clear):');
+            if (val === null) return;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api_settings.php');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function(){ try { var resp = JSON.parse(xhr.responseText); if (resp && resp.success) alert('Saved'); else alert('Error'); } catch(e){ alert('Error'); } };
+            xhr.send('action=set&key=login_display_name&value=' + encodeURIComponent(val));
+        };
+    }
+    </script>
+    <script>
     (function(){
         try {
             var params = new URLSearchParams(window.location.search);
@@ -289,6 +303,20 @@ $folder_filter = $_GET['folder'] ?? '';
             <p id="updateCheckStatus">Please wait while we check for updates...</p>
             <div class="modal-buttons" id="updateCheckButtons" style="display: none;">
                 <button type="button" class="btn-cancel" onclick="closeUpdateCheckModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Display Name Modal -->
+    <div id="loginDisplayModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginDisplayModal()">&times;</span>
+            <h3>Login display name</h3>
+            <p>Set the name shown on the login screen.</p>
+            <input type="text" id="loginDisplayInput" placeholder="Display name" maxlength="255" />
+            <div class="modal-buttons">
+                <button type="button" id="saveLoginDisplayBtn">Save</button>
+                <button type="button" onclick="closeLoginDisplayModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -438,12 +466,8 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <a href="manage_workspaces.php" class="left-header-text workspace-link" title="Manage workspaces"><?php echo $displayWorkspace; ?></a>
+        <span class="left-header-text workspace-link" title="Workspace"><?php echo $displayWorkspace; ?></span>
         <div id="workspaceMenu" class="settings-menu" style="display:none; position:absolute; z-index:9999;">
-            <div class="settings-menu-item" onclick="window.location='manage_workspaces.php';">
-                <i class="fas fa-cog"></i>
-                <span>Manage workspaces</span>
-            </div>
             <div id="workspaceMenuItems"></div>
         </div>
     </div>
@@ -460,6 +484,7 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-minus-square"></i>
                         <span>Fold All Folders</span>
                     </div>
+                    <!-- Manage workspaces moved to the left-header menu -->
                     <div class="settings-menu-item" onclick="unfoldAllFolders();">
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
@@ -467,6 +492,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                         <i class="fas fa-robot"></i>
                         <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
+                    </div>
+                    <div class="settings-menu-item" onclick="showLoginDisplayNamePrompt();">
+                        <i class="fas fa-user"></i>
+                        <span>Login display name</span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                         <i class="fas fa-upload"></i>
@@ -643,7 +672,7 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <a href="manage_workspaces.php" class="left-header-text workspace-link" title="Manage workspaces"><?php echo $displayWorkspace; ?></a>
+        <span class="left-header-text workspace-link" title="Workspace"><?php echo $displayWorkspace; ?></span>
     </div>
     <div class="containbuttons">
         <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
@@ -658,6 +687,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-minus-square"></i>
                     <span>Fold All Folders</span>
                 </div>
+                <!-- Manage workspaces moved to the left-header menu -->
                 <div class="settings-menu-item" onclick="unfoldAllFolders();">
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>
@@ -665,6 +695,10 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                     <i class="fas fa-robot"></i>
                     <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
+                </div>
+                <div class="settings-menu-item" onclick="showLoginDisplayNamePrompt();">
+                    <i class="fas fa-user"></i>
+                    <span>Login display name</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                     <i class="fas fa-upload"></i>

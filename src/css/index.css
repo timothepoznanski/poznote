@@ -25,6 +25,13 @@
     box-sizing: border-box;
     overflow: auto;
 }
+/* Ensure modal overlays sit above other UI components (force higher stacking) */
+.modal {
+    z-index: 9999 !important;
+}
+.modal .modal-content {
+    z-index: 10000 !important;
+}
 /* Hidden elements */
 .hidden {
     display: none;

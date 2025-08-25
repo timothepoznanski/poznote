@@ -1,7 +1,30 @@
 <?php
+// Debug display disabled for production
+// (Previously enabled with display_errors / error_reporting for debugging)
 require 'auth.php';
 
 $error = '';
+
+// Load configured login display name if present
+try {
+    require_once 'config.php';
+    // Open a local PDO connection to read the setting without depending on global db_connect which may die()
+    $login_display_name = '';
+    try {
+        $tmpCon = new PDO('sqlite:' . SQLITE_DATABASE);
+        $tmpCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['login_display_name']);
+        $login_display_name = $stmt->fetchColumn();
+        $tmpCon = null;
+    } catch (Exception $e) {
+        // ignore DB errors and leave display name empty
+        $login_display_name = '';
+    }
+    if ($login_display_name === false) $login_display_name = '';
+} catch (Exception $e) {
+    $login_display_name = '';
+}
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
@@ -37,7 +60,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             <div class="logo">
                 <img src="favicon.ico" alt="Poznote" class="logo-favicon">
             </div>
-            <h1 class="login-title">Poznote</h1>
+            <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
         
         <form method="POST">

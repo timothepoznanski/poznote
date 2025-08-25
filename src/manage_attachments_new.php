@@ -300,17 +300,24 @@ if (!$note) {
         }
 
         function showNotification(message, type) {
-            // Simple notification function
+            // Simple notification function with clearer error visuals
             const notification = document.createElement('div');
-            notification.className = `alert alert-${type}`;
+            let cssClass = 'alert';
+            if (type === 'success') cssClass += ' alert-success';
+            else if (type === 'error') cssClass += ' alert-error attention';
+            else cssClass += ` alert-${type}`;
+
+            notification.className = cssClass;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
-            
+
             const container = document.querySelector('.settings-container');
-            container.insertBefore(notification, container.firstChild.nextSibling.nextSibling);
-            
+            const titleEl = container.querySelector('h1');
+            container.insertBefore(notification, titleEl.nextSibling);
+
             setTimeout(() => {
+                notification.classList.remove('attention');
                 notification.remove();
-            }, 5000);
+            }, 6000);
         }
     </script>
 </body>
