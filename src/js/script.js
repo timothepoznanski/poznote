@@ -962,6 +962,171 @@ function displayEditInProgress(){
     setSaveButtonRed(true);
 }
 
+// Utility: insert given HTML at current selection/caret
+function insertHTMLAtSelection(html) {
+    try {
+        var sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return false;
+        var range = sel.getRangeAt(0);
+        range.deleteContents();
+        var el = document.createElement('div');
+        el.innerHTML = html;
+        var frag = document.createDocumentFragment();
+        var node, lastNode;
+        while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+        }
+        range.insertNode(frag);
+        // place caret after inserted content
+        if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+        return true;
+    } catch (e) {
+        console.error('insertHTMLAtSelection error', e);
+        return false;
+    }
+}
+
+// Handle image files (FileList or array-like) and insert them as data URLs into the focused noteentry
+function handleImageFilesAndInsert(files, dropTarget) {
+    if (!files || files.length === 0) return;
+    for (var i = 0; i < files.length; i++) {
+        (function(file) {
+            if (!file.type || !file.type.startsWith('image/')) return;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var dataUrl = ev.target.result;
+                // Create a simple img tag; keep default styling minimal
+                var imgHtml = '<img src="' + dataUrl + '" alt="image" />';
+                // If dropTarget is provided and selection is not inside it, append at the end
+                var sel = window.getSelection();
+                var inserted = false;
+                if (sel && sel.rangeCount) {
+                    // Ensure the selection is inside the noteentry where we want to insert
+                    var range = sel.getRangeAt(0);
+                    var container = range.startContainer;
+                    if (container && container.nodeType === 3) container = container.parentNode;
+                    if (container && dropTarget && dropTarget.contains(container)) {
+                        inserted = insertHTMLAtSelection(imgHtml);
+                    }
+                }
+                if (!inserted) {
+                    // Fallback: append at the end of the dropTarget
+                    try {
+                        if (dropTarget) {
+                            var img = document.createElement('img');
+                            img.src = dataUrl;
+                            img.alt = 'image';
+                            dropTarget.appendChild(img);
+                        }
+                    } catch (e) {
+                        console.error('Fallback append image failed', e);
+                    }
+                }
+                // Notify the app that the note changed
+                try {
+                    if (dropTarget) dropTarget.dispatchEvent(new Event('input', {bubbles:true}));
+                    update();
+                } catch (e) {}
+            };
+            reader.readAsDataURL(file);
+        })(files[i]);
+    }
+}
+
+// Paste: if an image is in clipboard, insert it as base64 image into the noteentry
+document.body.addEventListener('paste', function(e) {
+    try {
+        var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
+        if (!note) return; // only when pasting inside a note
+        var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
+        if (!items) return;
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+                e.preventDefault();
+                var file = item.getAsFile();
+                handleImageFilesAndInsert([file], note);
+            }
+        }
+    } catch (err) {
+        console.error('paste image handler error', err);
+    }
+});
+
+// Drag & drop: allow dropping images into a noteentry and embed them as base64
+// Use elementFromPoint to reliably find the note under the cursor and
+// prevent default behavior so the browser allows dropping files.
+document.body.addEventListener('dragenter', function(e) {
+    try {
+        var el = document.elementFromPoint(e.clientX, e.clientY);
+        var potential = el && el.closest ? el.closest('.noteentry') : null;
+        if (potential) {
+            e.preventDefault();
+        }
+    } catch (err) {}
+});
+
+document.body.addEventListener('dragover', function(e) {
+    try {
+        var el = document.elementFromPoint(e.clientX, e.clientY);
+        var potential = el && el.closest ? el.closest('.noteentry') : null;
+        if (potential) {
+            // Allow drop
+            e.preventDefault();
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+        }
+    } catch (err) {}
+});
+
+document.body.addEventListener('drop', function(e) {
+    try {
+        var el = document.elementFromPoint(e.clientX, e.clientY);
+        var note = el && el.closest ? el.closest('.noteentry') : null;
+        // As fallback try the event target's closest
+        if (!note && e.target && e.target.closest) note = e.target.closest('.noteentry');
+        if (!note) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var dt = e.dataTransfer;
+        if (!dt) return;
+
+        // Prefer items when available (gives access to type/kind)
+        if (dt.items && dt.items.length > 0) {
+            var files = [];
+            for (var i = 0; i < dt.items.length; i++) {
+                try {
+                    var item = dt.items[i];
+                    if (item.kind === 'file') {
+                        var file = item.getAsFile();
+                        if (file && file.type && file.type.startsWith('image/')) files.push(file);
+                    }
+                } catch (inner) {
+                    // ignore
+                }
+            }
+            if (files.length > 0) {
+                handleImageFilesAndInsert(files, note);
+                return;
+            }
+        }
+
+        // Fallback to files
+        if (dt.files && dt.files.length > 0) {
+            handleImageFilesAndInsert(dt.files, note);
+        }
+    } catch (err) {
+        console.error('drop handler error', err);
+    }
+});
+
 // Update the title in the left column after successful save
 function updateNoteTitleInLeftColumn(){
     if(noteid == 'search' || noteid == -1) return;
