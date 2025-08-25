@@ -219,6 +219,244 @@ function insertSeparator() {
   }
 }
 
+/**
+ * Insert a checklist (list of checkboxes) at the current cursor position inside the noteentry.
+ * Creates a <ul class="checklist"> with one <li><label><input type="checkbox"> Item</label></li>
+ */
+function insertChecklist() {
+  // Insert a single simple line with a checkbox and an editable span at the caret
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  const noteentry = container.closest && container.closest('.noteentry');
+  if (!noteentry) return;
+
+  const line = document.createElement('div');
+  line.className = 'checkline';
+  const label = document.createElement('label');
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  const span = document.createElement('span');
+  span.setAttribute('contenteditable', 'true');
+  span.className = 'checkline-text';
+  // small spacer text node
+  const spacer = document.createTextNode('\u00A0');
+  label.appendChild(checkbox);
+  label.appendChild(spacer);
+  label.appendChild(span);
+  line.appendChild(label);
+
+  // Insert node at current range
+  try {
+    if (!range.collapsed) range.deleteContents();
+    range.insertNode(line);
+  } catch (err) {
+    // fallback: append at the end of note
+    noteentry.appendChild(line);
+  }
+
+  // Attach listeners to mark note modified
+  if (!checkbox._checkboxListenerAttached) {
+    checkbox.addEventListener('change', function() { if (typeof update === 'function') update(); });
+    checkbox._checkboxListenerAttached = true;
+  }
+  span.addEventListener('input', function() { if (typeof update === 'function') update(); });
+
+  // Move caret into span
+  setTimeout(function() {
+    const r = document.createRange();
+    r.selectNodeContents(span);
+    r.collapse(true);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    span.focus();
+  }, 20);
+}
+
+// Expose to global scope for inline onclick handlers
+window.insertChecklist = insertChecklist;
+
+// Handle Enter inside simplified checkline (single-line checkbox + span)
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  if (e.shiftKey) return; // allow newline with Shift+Enter
+
+  // Try to locate the editable span from selection
+  let selNode = (window.getSelection && window.getSelection().anchorNode) || null;
+  if (!selNode) return;
+  const nodeElement = selNode.nodeType === 3 ? selNode.parentElement : selNode;
+  if (!nodeElement || !nodeElement.closest) return;
+
+  const span = nodeElement.closest('.checkline-text');
+  if (!span) return;
+  const line = span.closest('.checkline');
+  if (!line) return;
+
+  e.preventDefault();
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+
+  // Build new simple line
+  const newLine = document.createElement('div');
+  newLine.className = 'checkline';
+  const newLabel = document.createElement('label');
+  const newCheckbox = document.createElement('input');
+  newCheckbox.type = 'checkbox';
+  const spacer = document.createTextNode('\u00A0');
+  const newSpan = document.createElement('span');
+  newSpan.setAttribute('contenteditable', 'true');
+  newSpan.className = 'checkline-text';
+  newLabel.appendChild(newCheckbox);
+  newLabel.appendChild(spacer);
+  newLabel.appendChild(newSpan);
+  newLine.appendChild(newLabel);
+
+  // If caret is not at end, move trailing content into new span
+  try {
+    const caretAtEnd = (range.endContainer.nodeType === 3 && range.endOffset === range.endContainer.length && span.contains(range.endContainer)) || (range.endContainer === span && range.endOffset === span.childNodes.length);
+    if (!caretAtEnd) {
+      const tailRange = document.createRange();
+      tailRange.setStart(range.endContainer, range.endOffset);
+      tailRange.setEndAfter(span);
+      const frag = tailRange.extractContents();
+      newSpan.appendChild(frag);
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  // Insert new line after current
+  if (line.nextSibling) line.parentNode.insertBefore(newLine, line.nextSibling);
+  else line.parentNode.appendChild(newLine);
+
+  // Attach listeners
+  if (!newCheckbox._checkboxListenerAttached) {
+    newCheckbox.addEventListener('change', function() { if (typeof update === 'function') update(); });
+    newCheckbox._checkboxListenerAttached = true;
+  }
+  newSpan.addEventListener('input', function() { if (typeof update === 'function') update(); });
+
+  // Focus new span
+  setTimeout(function() {
+    const r = document.createRange();
+    r.selectNodeContents(newSpan);
+    r.collapse(true);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+    newSpan.focus();
+    if (typeof update === 'function') update();
+  }, 20);
+});
+
+// Delegated keydown handler: when Enter is pressed inside a checklist item span,
+// create a new checklist li after the current one and move focus there.
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+
+  // We want Shift+Enter to insert a newline inside the item
+  if (e.shiftKey) return;
+
+  // Find the editable span that is inside a checklist.
+  // Prefer a selection-based lookup because keydown event target can be the container.
+  let span = null;
+  try {
+    const selNode = (window.getSelection && window.getSelection().anchorNode) || null;
+    if (selNode) {
+      // If it's a text node, use its parentElement
+      const nodeElement = selNode.nodeType === 3 ? selNode.parentElement : selNode;
+      if (nodeElement && nodeElement.closest) span = nodeElement.closest('span[contenteditable]');
+    }
+  } catch (err) {
+    span = null;
+  }
+  // Fallback to event target lookup
+  if (!span && e.target && e.target.closest) span = e.target.closest('span[contenteditable]');
+  if (!span) return;
+  const itemLi = span.closest && span.closest('li');
+  const ul = span.closest && span.closest('ul.checklist');
+  if (!itemLi || !ul) return;
+
+  e.preventDefault();
+
+  // Get current selection/range
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  // Prepare new li structure
+  const newLi = document.createElement('li');
+  const newLabel = document.createElement('label');
+  const newCheckbox = document.createElement('input');
+  newCheckbox.type = 'checkbox';
+  const spacer = document.createTextNode(' \u00A0');
+  const newSpan = document.createElement('span');
+  newSpan.setAttribute('contenteditable', 'true');
+
+  newLabel.appendChild(newCheckbox);
+  newLabel.appendChild(spacer);
+  newLabel.appendChild(newSpan);
+  newLi.appendChild(newLabel);
+
+  // Helper: check if caret is at the end of the span
+  function isCaretAtEndOf(node, range) {
+    // If caret is in a text node inside span
+    if (range.endContainer.nodeType === 3) {
+      return range.endOffset === range.endContainer.length && node === range.endContainer.parentElement.closest('span[contenteditable]') || node.contains(range.endContainer) && range.endOffset === range.endContainer.length;
+    }
+    // If caret is the span element itself
+    if (range.endContainer === node) {
+      return range.endOffset === node.childNodes.length;
+    }
+    // Fallback: if span contains endContainer and offset equals length of that container
+    if (node.contains(range.endContainer)) {
+      if (range.endContainer.nodeType === 1) return range.endOffset === range.endContainer.childNodes.length;
+    }
+    return false;
+  }
+
+  const caretAtEnd = isCaretAtEndOf(span, range);
+
+  if (!caretAtEnd) {
+    // If caret not at end, attempt to move trailing content into new span
+    try {
+      const tailRange = document.createRange();
+      tailRange.setStart(range.endContainer, range.endOffset);
+      tailRange.setEndAfter(span);
+      const fragment = tailRange.extractContents();
+      newSpan.appendChild(fragment);
+    } catch (err) {
+      // ignore and leave newSpan empty
+    }
+  }
+
+  // Insert new li after current li
+  if (itemLi.nextSibling) ul.insertBefore(newLi, itemLi.nextSibling);
+  else ul.appendChild(newLi);
+
+  // Attach change listener to the new checkbox
+  if (!newCheckbox._checkboxListenerAttached) {
+    newCheckbox.addEventListener('change', function() { if (typeof update === 'function') update(); });
+    newCheckbox._checkboxListenerAttached = true;
+  }
+
+  // Move caret to the new span
+  setTimeout(function() {
+    const newRange = document.createRange();
+    newRange.selectNodeContents(newSpan);
+    newRange.collapse(true);
+    const newSel = window.getSelection();
+    newSel.removeAllRanges();
+    newSel.addRange(newRange);
+    newSpan.focus();
+    if (typeof update === 'function') update();
+  }, 20);
+});
+
 function toggleEmojiPicker() {
   const existingPicker = document.querySelector('.emoji-picker');
   

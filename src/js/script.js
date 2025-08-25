@@ -685,7 +685,17 @@ function updatenote(){
     
     // Clean search highlights from the content before saving
     // Use the non-destructive cleaning function that works on a clone
-    var ent = entryElem ? cleanSearchHighlightsFromElement(entryElem) : "";
+    var ent = "";
+    if (entryElem) {
+        // Work on a clone so we can set checked attributes on inputs
+        const cloned = entryElem.cloneNode(true);
+        // Replace any checkbox state by setting 'checked' attribute for checked boxes
+        cloned.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+            if (cb.checked) cb.setAttribute('checked', 'checked');
+            else cb.removeAttribute('checked');
+        });
+        ent = cleanSearchHighlightsFromElement(cloned);
+    }
     
     // console.log("RESULT :" + ent);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
@@ -880,6 +890,18 @@ function deleteNote(iid){
       } else {
         update();
       }
+            // Also attach change listeners to any checkbox inside the note to mark edited
+            if (e.target) {
+                const entry = e.target.closest && e.target.closest('.noteentry');
+                if (entry) {
+                    entry.querySelectorAll('input[type=checkbox]').forEach(cb => {
+                        if (!cb._checkboxListenerAttached) {
+                            cb.addEventListener('change', function() { update(); });
+                            cb._checkboxListenerAttached = true;
+                        }
+                    });
+                }
+            }
     } else if (e.target.tagName === 'INPUT') {
       // Only trigger update() for note inputs
       if (

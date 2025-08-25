@@ -2335,6 +2335,45 @@ hr {
     font-style: italic;
 }
 
+/* Checklist styles */
+.noteentry .checklist {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+.noteentry .checklist li {
+    /* padding: 6px 0; */
+    display: flex;
+    align-items: center;
+}
+.noteentry .checklist input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+.noteentry .checklist label {
+    display: flex;
+    align-items: center;
+    /* gap: 8px; */
+}
+
+/* Simple single-line checkbox inserted by simplified insertChecklist */
+.noteentry .checkline {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+}
+.noteentry .checkline input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+.noteentry .checkline-text {
+    display: inline-block;
+    min-width: 20px;
+    outline: none;
+}
+
 /* FOLDER STYLES */
 
 .folder-header {
