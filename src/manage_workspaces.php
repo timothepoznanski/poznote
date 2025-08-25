@@ -24,21 +24,7 @@ if ($_POST) {
         $isAjax = true;
     }
     try {
-        // Handle saving of generic settings (login display name)
-        if (isset($_POST['action']) && $_POST['action'] === 'save_setting' && isset($_POST['setting_key'])) {
-            $key = trim($_POST['setting_key']);
-            $value = trim($_POST['setting_value'] ?? '');
-            if ($key === '') throw new Exception('Invalid setting');
-            $up = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-            $up->execute([$key, $value]);
-            $message = 'Setting saved';
-            // If AJAX client expects JSON, return structured response
-            if (!empty($isAjax)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'message' => $message, 'key' => $key, 'value' => $value]);
-                exit;
-            }
-        }
+    // ...existing POST handlers for create/delete/rename/move_notes...
         if (isset($_POST['action']) && $_POST['action'] === 'create') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') throw new Exception('Workspace name cannot be empty');
@@ -300,16 +286,7 @@ try {
 
 // No display labels table: use workspace names for display
 
-// Load login display name setting (used on login page)
-$login_display_name = '';
-try {
-    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
-    $stmt->execute(['login_display_name']);
-    $login_display_name = $stmt->fetchColumn();
-    if ($login_display_name === false) $login_display_name = '';
-} catch (Exception $e) {
-    $login_display_name = '';
-}
+// login_display_name setting removed: login page uses default title
 
 ?>
 <!DOCTYPE html>
@@ -448,18 +425,7 @@ try {
             </div>
         </div>
 
-        <div class="settings-section">
-            <h3><i class="fas fa-user"></i> Login display name</h3>
-            <p>Customize the name shown on the login screen.</p>
-            <form id="login-display-form" method="POST">
-                <input type="hidden" name="action" value="save_setting">
-                <input type="hidden" name="setting_key" value="login_display_name">
-                <div class="form-group">
-                    <input id="login-display-value" name="setting_value" type="text" placeholder="Displayed name on login" value="<?php echo htmlspecialchars($login_display_name); ?>" />
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
-            </form>
-        </div>
+    <!-- Login display name feature removed -->
 
     <div id="ajaxAlert" style="display:none; margin-top:12px;"></div>
     <div style="padding-bottom: 50px;"></div>

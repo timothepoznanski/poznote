@@ -3026,7 +3026,7 @@ function showLoginDisplayNamePrompt() {
             doSet(val).then(function(resp){
                 if (!resp) return;
                 if (resp && resp.success) {
-                    try { showNotificationPopup('Display name saved', 'success'); } catch(e){ alert('Display name saved'); }
+                    try { showNotificationPopup('Display login name saved', 'success'); } catch(e){ alert('Display login name saved'); }
                     modal.style.display = 'none';
                 } else {
                     try { showNotificationPopup('Error saving setting', 'error'); } catch(e){ alert('Error saving setting'); }
@@ -3042,7 +3042,7 @@ function showLoginDisplayNamePrompt() {
                 try { showNotificationPopup('Display name is required', 'error'); } catch(e){ alert('Display name is required'); }
                 return;
             }
-            doSet(val).then(function(resp){ if (!resp) return; if (resp && resp.success) { try { showNotificationPopup('Display name saved', 'success'); } catch(e){ alert('Display name saved'); } modal.style.display = 'none'; } else { try { showNotificationPopup('Error saving setting', 'error'); } catch(e){ alert('Error saving setting'); } } }).catch(function(){ try { showNotificationPopup('Network error', 'error'); } catch(e){ alert('Network error'); } });
+            doSet(val).then(function(resp){ if (!resp) return; if (resp && resp.success) { try { showNotificationPopup('Display login name saved', 'success'); } catch(e){ alert('Display login name saved'); } modal.style.display = 'none'; } else { try { showNotificationPopup('Error saving setting', 'error'); } catch(e){ alert('Error saving setting'); } } }).catch(function(){ try { showNotificationPopup('Network error', 'error'); } catch(e){ alert('Network error'); } });
         };
     });
 }
