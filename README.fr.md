@@ -28,6 +28,7 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - 📱 Design responsive pour tous les appareils
 - 🖥️ Support multi-instance
 - 🔒 Auto-hébergement avec authentification sécurisée
+- 🗂️ Workspaces
 - 💾 Outils de sauvegarde et d'export intégrés
 - 🗑️ Corbeille avec restauration
 - 🌐 API REST pour l'automatisation

@@ -26,8 +26,8 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🤖 AI-powered features
 - 📱 Responsive design for all devices
 - 🖥️ Multi-instance support
-- � Workspaces for organizing notes in separate environments
-- �🔒 Self-hosted with secure authentication
+- 🗂️ Workspaces
+- 🏠 Self-hosted with secure authentication
 - 💾 Built-in backup and export tools
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
