@@ -120,14 +120,11 @@ Workspaces allow you to organize your notes into separate environments within a 
 - **⚡ Easy switching** - Use the workspace selector to switch between environments instantly
 - **🏷️ Independent organization** - Tags and folders are unique to each workspace
 
-### How to Switch Workspaces
+### Common Use Cases
 
-To switch between workspaces:
-1. **Click on the workspace name** displayed at the top of the interface (next to the Poznote logo)
-2. **Select your target workspace** from the dropdown menu that appears
-3. The interface will automatically reload and display notes from the selected workspace
-
-💡 **Tip:** The current workspace name is always visible at the top of the page, making it easy to know which environment you're working in.
+- **📝 Personal vs Work** - Separate professional and personal notes
+- **🎓 Projects** - Organize by client, course, or research topic
+- **🗂️ Archive** - Keep active and archived notes separate
 
 ### Managing Workspaces
 
@@ -140,11 +137,14 @@ To switch between workspaces:
 
 ⚠️ **Note:** The default "Poznote" workspace cannot be deleted and contains any pre-existing notes.
 
-### Common Use Cases
+### How to Switch Workspaces
 
-- **📝 Personal vs Work** - Separate professional and personal notes
-- **🎓 Projects** - Organize by client, course, or research topic
-- **🗂️ Archive** - Keep active and archived notes separate
+To switch between workspaces:
+1. **Click on the workspace name** displayed at the top of the interface
+2. **Select your target workspace** from the dropdown menu that appears
+3. The interface will automatically reload and display notes from the selected workspace
+
+💡 **Tip:** The current workspace name is always visible at the top of the page, making it easy to know which environment you're working in.
 
 ## Multiple Instances
 
