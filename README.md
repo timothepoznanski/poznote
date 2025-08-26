@@ -60,33 +60,51 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 - **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux)
 - **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
 
-### Prerequisites (Docker installation)
+### Prerequisites
 
 **🐳 What is Docker?**
 Docker is a platform that packages and runs applications in isolated containers. Poznote uses Docker to simplify installation and ensure the application works consistently across all systems.
 
-**Windows:**
-1. Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-2. Follow the installation wizard (restart required)
-3. Launch Docker Desktop from Start menu
-4. Wait for Docker to start (Docker icon in system tray)
+#### Windows Prerequisites
 
-**Linux:**
-1. Install Docker Engine based on your distribution:
+1. **PowerShell 7** (**REQUIRED**):
+   - ⚠️ **Installation does NOT work with PowerShell 5** (Windows default version)
+   - Download and install [PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
+   - After installation, launch **PowerShell 7** (not Windows PowerShell)
+   - To check version: `$PSVersionTable.PSVersion` (must show 7.x.x)
+   
+2. **Docker Desktop**:
+   - Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+   - Follow the installation wizard (restart required)
+   - Launch Docker Desktop from Start menu
+   - Wait for Docker to start (Docker icon in system tray)
+
+#### Linux Prerequisites
+
+1. **Docker Engine**: Install Docker based on your distribution:
    - **Ubuntu/Debian:** `curl -fsSL https://get.docker.com | sh`
    - **CentOS/RHEL:** Follow the [official guide](https://docs.docker.com/engine/install/centos/)
    - **Arch Linux:** `sudo pacman -S docker docker-compose`
-2. Start Docker: `sudo systemctl start docker && sudo systemctl enable docker`
-3. Add your user to docker group:
+
+2. **Docker Configuration**:
    ```bash
+   # Start Docker
+   sudo systemctl start docker && sudo systemctl enable docker
+   
+   # Add your user to docker group
    sudo usermod -aG docker $USER
+   
+   # Restart session (or reboot)
+   newgrp docker
+   
+   # Test installation
+   docker --version && docker compose version
    ```
-4. Restart your session
-5. Test installation: `docker --version && docker compose version`
 
 ### Quick Start (Poznote installation)
 
-**Windows (PowerShell):**
+**Windows (PowerShell 7):**
+⚠️ **Important**: Use PowerShell 7, not Windows PowerShell 5
 ```powershell
 function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "
 Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) { Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; if (Test-Path $instanceName) { Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1

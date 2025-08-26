@@ -31,12 +31,12 @@ EXAMPLES:
     .\setup.ps1  Interactive menu for installation, update, or configuration
 
 FEATURES:
-    • Automatic detection of existing installations
-    • Interactive menu with options:
+    - Automatic detection of existing installations
+    - Interactive menu with options:
       - New installation (fresh setup)
       - Update application (get latest code)
       - Change settings (password/port/name etc.)
-    • Configuration preservation during updates
+    - Configuration preservation during updates
 
 REQUIREMENTS:
     - Docker Desktop for Windows
@@ -72,10 +72,17 @@ function Test-DockerRunning {
         Write-Status "Checking if Docker Desktop is running..."
         $dockerInfo = & docker info 2>&1
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "Docker Desktop is not running."
-            Write-Host "Please start Docker Desktop and wait for it to be ready, then run this script again." -ForegroundColor $Colors.Yellow
-            Write-Host "Docker info error: $dockerInfo" -ForegroundColor $Colors.Red
-            return $false
+            # Some Docker Desktop setups surface a non-fatal warning like:
+            # "WARNING: DOCKER_INSECURE_NO_IPTABLES_RAW is set"
+            # Treat that specific message as a warning and continue, otherwise fail.
+            if ($dockerInfo -match 'DOCKER_INSECURE_NO_IPTABLES_RAW') {
+                Write-Warning "Docker returned a known warning: DOCKER_INSECURE_NO_IPTABLES_RAW. Continuing, but please ensure Docker Desktop is running correctly."
+            } else {
+                Write-Error "Docker Desktop is not running."
+                Write-Host "Please start Docker Desktop and wait for it to be ready, then run this script again." -ForegroundColor $Colors.Yellow
+                Write-Host "Docker info error: $dockerInfo" -ForegroundColor $Colors.Red
+                return $false
+            }
         }
         
         # Verify Docker functionality
@@ -92,8 +99,31 @@ function Test-DockerRunning {
         return $true
     }
     catch {
+        $errMsg = $_.Exception.Message
+        # Treat the known DOCKER_INSECURE_NO_IPTABLES_RAW warning as non-fatal and continue
+        if ($errMsg -and $errMsg -match 'DOCKER_INSECURE_NO_IPTABLES_RAW') {
+            Write-Warning "Docker info produced a known warning: DOCKER_INSECURE_NO_IPTABLES_RAW. Continuing, but please ensure Docker Desktop is running correctly."
+            # Try to verify docker using 'docker ps' as fallback
+            try {
+                $testOutput = & docker ps 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Error "Docker daemon is not responding properly." 
+                    Write-Host "Please make sure Docker Desktop is fully started and try again." -ForegroundColor $Colors.Yellow
+                    Write-Host "Docker ps error: $testOutput" -ForegroundColor $Colors.Red
+                    return $false
+                }
+                Write-Success "Docker Desktop is running and functional"
+                return $true
+            }
+            catch {
+                Write-Error "Failed to verify Docker daemon after warning: $($_.Exception.Message)"
+                Write-Host "Please make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
+                return $false
+            }
+        }
+
         Write-Error "Failed to check Docker Desktop status."
-        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
+        Write-Host "Error details: $errMsg" -ForegroundColor $Colors.Red
         Write-Host "Please make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
         return $false
     }
@@ -205,9 +235,9 @@ function Test-PasswordSecurity {
     if ($hasError) {
         Write-Host ""
         Write-Host "Password requirements:" -ForegroundColor Blue
-        Write-Host "  • Minimum 8 characters" -ForegroundColor White
-        Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
-        Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host "  - Minimum 8 characters" -ForegroundColor White
+        Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
         Write-Host ""
         return $false
     }
@@ -390,11 +420,11 @@ function Reconfigure-Poznote {
     $existingConfig = Get-ExistingEnvConfig
     
     Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
-    Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
+    Write-Host "  - URL: " -NoNewline -ForegroundColor $Colors.White
     Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-    Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-    Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  • Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    Write-Host "  - Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+    Write-Host "  - Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  - Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
     
 
     Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
@@ -404,9 +434,9 @@ function Reconfigure-Poznote {
     
     Write-Host ""
     Write-Status "Password requirements:"
-    Write-Host "  • Minimum 8 characters" -ForegroundColor White
-    Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
-    Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+    Write-Host "  - Minimum 8 characters" -ForegroundColor White
+    Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
+    Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
     Write-Host ""
     
     $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $existingConfig['POZNOTE_PASSWORD'] $true
@@ -463,7 +493,7 @@ function Reconfigure-Poznote {
 
 # Function to install Git pre-commit hook for automatic versioning
 function Install-GitHook {
-    Write-Status "📋 Installing Git pre-commit hook for automatic versioning..."
+    Write-Status "Installing Git pre-commit hook for automatic versioning..."
     
     try {
         # Create the hook content
@@ -491,10 +521,10 @@ echo "Auto-updated version to: $NEW_VERSION"
         # Create the hook file
         $hookContent | Out-File -FilePath ".git/hooks/pre-commit" -Encoding ASCII -NoNewline
         
-        Write-Success "✅ Git pre-commit hook installed successfully!"
+        Write-Success "Git pre-commit hook installed successfully."
     }
     catch {
-        Write-Warning "⚠️ Could not install Git hook: $($_.Exception.Message)"
+        Write-Warning "Could not install Git hook: $($_.Exception.Message)"
     }
 }
 
@@ -515,11 +545,11 @@ function Install-Poznote {
         
         if ($existingConfig.Count -gt 0) {
             Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
-            Write-Host "  • URL: " -NoNewline -ForegroundColor $Colors.White
+            Write-Host "  - URL: " -NoNewline -ForegroundColor $Colors.White
             Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-            Write-Host "  • Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-            Write-Host "  • Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  • Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+            Write-Host "  - Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+            Write-Host "  - Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+            Write-Host "  - Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
             
         }
         
@@ -640,9 +670,9 @@ function Install-Poznote {
         
         Write-Host ""
         Write-Status "Password requirements:"
-        Write-Host "  • Minimum 8 characters" -ForegroundColor White
-        Write-Host "  • Mix of letters and numbers recommended" -ForegroundColor White
-        Write-Host "  • Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host "  - Minimum 8 characters" -ForegroundColor White
+        Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
         Write-Host ""
         
         $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $templateConfig["POZNOTE_PASSWORD"] $false
@@ -673,39 +703,95 @@ function Install-Poznote {
     try {
         Write-Status "Attempting to start with 'docker compose'..."
         if ($INSTANCE_NAME) {
-            $output = docker compose -p $INSTANCE_NAME up -d --build 2>&1
+            $cmdInfo = "docker compose -p $INSTANCE_NAME up -d --build"
+            $output = & docker compose -p $INSTANCE_NAME up -d --build 2>&1
         } else {
-            $output = docker compose up -d --build 2>&1
+            $cmdInfo = "docker compose up -d --build"
+            $output = & docker compose up -d --build 2>&1
         }
         if ($LASTEXITCODE -eq 0) {
             $dockerComposeCmd = "docker compose"
             $success = $true
         } else {
-            Write-Warning "docker compose failed, trying legacy docker-compose..."
+            Write-Warning "Command attempted: $cmdInfo"
+            Write-Warning "docker compose returned a non-zero exit code. Showing output:"
+            Write-Host $output -ForegroundColor $Colors.Red
+            Write-Status "Will try legacy 'docker-compose' as a fallback. If that also fails, run 'docker compose up --build' manually to see full logs."
         }
     }
     catch {
-        Write-Warning "docker compose command failed, trying legacy docker-compose..."
+        $err = $_.Exception.Message
+        Write-Warning "Command attempted: docker compose (via plugin)."
+        Write-Warning "docker compose command failed: $err"
+        Write-Status "Will try legacy 'docker-compose' as a fallback. If that also fails, run 'docker compose up --build' manually to see full logs."
     }
     
     if (-not $success) {
         try {
-            Write-Status "Attempting to start with 'docker-compose'..."
+            Write-Status "Attempting to start with 'docker-compose' (legacy)..."
             if ($INSTANCE_NAME) {
-                $output = docker-compose -p $INSTANCE_NAME up -d --build 2>&1
+                $cmdInfoLegacy = "docker-compose -p $INSTANCE_NAME up -d --build"
+                $output = & docker-compose -p $INSTANCE_NAME up -d --build 2>&1
             } else {
-                $output = docker-compose up -d --build 2>&1
+                $cmdInfoLegacy = "docker-compose up -d --build"
+                $output = & docker-compose up -d --build 2>&1
             }
             if ($LASTEXITCODE -eq 0) {
                 $dockerComposeCmd = "docker-compose"
                 $success = $true
+            } else {
+                Write-Warning "Command attempted: $cmdInfoLegacy"
+                Write-Error "docker-compose returned a non-zero exit code. Showing output:"
+                Write-Host $output -ForegroundColor $Colors.Red
+                Write-Host "To inspect the error in detail, run one of these commands manually in this folder:" -ForegroundColor $Colors.Yellow
+                Write-Host "  docker compose -p $INSTANCE_NAME up --build" -ForegroundColor $Colors.White
+                Write-Host "  docker-compose -p $INSTANCE_NAME up --build" -ForegroundColor $Colors.White
             }
         }
         catch {
+            $err = $_.Exception.Message
+            Write-Warning "Command attempted: docker-compose (legacy)."
+            Write-Error "docker-compose command failed: $err"
             $success = $false
         }
     }
     
+    # If both compose attempts failed (non-zero exit), try a defensive check:
+    # sometimes compose returns warnings/non-zero codes while still starting containers.
+    if (-not $success) {
+        try {
+            Write-Status "Checking if containers are actually running despite non-zero exit codes..."
+            if ($INSTANCE_NAME) {
+                $psOutput = & docker compose -p $INSTANCE_NAME ps -q 2>$null
+                if ($LASTEXITCODE -eq 0 -and $psOutput) {
+                    Write-Warning "Compose returned non-zero, but containers are running. Treating as success."
+                    $success = $true
+                    $dockerComposeCmd = "docker compose"
+                    $output = $psOutput
+                } else {
+                    $psLegacy = & docker-compose -p $INSTANCE_NAME ps -q 2>$null
+                    if ($LASTEXITCODE -eq 0 -and $psLegacy) {
+                        Write-Warning "Legacy docker-compose returned non-zero, but containers are running. Treating as success."
+                        $success = $true
+                        $dockerComposeCmd = "docker-compose"
+                        $output = $psLegacy
+                    }
+                }
+            } else {
+                # No instance name: try a generic docker ps check for poznote containers
+                $psGeneric = & docker ps --filter "name=poznote" -q 2>$null
+                if ($LASTEXITCODE -eq 0 -and $psGeneric) {
+                    Write-Warning "Containers matching 'poznote' are running. Treating as success."
+                    $success = $true
+                    $output = $psGeneric
+                }
+            }
+        }
+        catch {
+            # ignore and fall through to original error handling
+        }
+    }
+
     if ($success) {
         Write-Success "Poznote has been started successfully!`n"
         
@@ -740,10 +826,10 @@ function Install-Poznote {
         Write-Host "$output" -ForegroundColor $Colors.Red
         Write-Host ""
         Write-Host "Common solutions:" -ForegroundColor $Colors.Yellow
-        Write-Host "  • Make sure Docker Desktop is running and ready"
-        Write-Host "  • Try running 'docker info' to verify Docker is accessible"
-        Write-Host "  • Restart Docker Desktop if needed"
-        Write-Host "  • Check that no other services are using the ports (8040, 3306)"
+        Write-Host "  - Make sure Docker Desktop is running and ready"
+        Write-Host "  - Try running 'docker info' to verify Docker is accessible"
+        Write-Host "  - Restart Docker Desktop if needed"
+        Write-Host "  - Check that no other services are using the ports (8040, 3306)"
         exit 1
     }
 }
