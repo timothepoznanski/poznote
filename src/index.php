@@ -487,13 +487,10 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <a class="left-header-text workspace-name-link" href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
             <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
-            <span class="workspace-name-text"><?php echo $displayWorkspace; ?></span>
+            <?php echo $displayWorkspace; ?>
         </a>
-        <div id="workspaceMenu" class="settings-menu" style="display:none; position:absolute; z-index:9999;">
-            <div id="workspaceMenuItems"></div>
-        </div>
     </div>
         <div class="containbuttons">
             <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
@@ -689,9 +686,9 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <a class="left-header-text workspace-name-link" href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
             <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
-            <span class="workspace-name-text"><?php echo $displayWorkspace; ?></span>
+            <?php echo $displayWorkspace; ?>
         </a>
     </div>
     <div class="containbuttons">
