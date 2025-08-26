@@ -2714,7 +2714,7 @@ hr {
     opacity: 1;
 }
 
-.folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn {
+.folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn, .folder-move-files-btn {
     font-size: 12px;
     color: #007DB8;
     margin-left: 8px;
@@ -2770,6 +2770,11 @@ hr {
 .folder-empty-btn:hover {
     background-color: rgba(255, 193, 7, 0.2);
     color: #ffc107;
+}
+
+.folder-move-files-btn:hover {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #007DB8;
 }
 
 .folder-content {
@@ -4184,4 +4189,66 @@ input[type="search"]::-webkit-search-results-decoration {
 .name_tags.showing-editable-tags {
     overflow: visible;
     white-space: normal;
+}
+
+/* Move folder files modal styles */
+#moveFolderFilesModal .modal-content {
+    max-width: 500px;
+}
+
+#moveFolderFilesModal h3 {
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007DB8;
+    padding-bottom: 8px;
+}
+
+#moveFolderFilesModal p {
+    margin-bottom: 15px;
+    color: #666;
+}
+
+#moveFolderFilesModal #sourceFolderName {
+    font-weight: bold;
+    color: #007DB8;
+}
+
+#moveFolderFilesModal #targetFolderSelect {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    background: white;
+}
+
+#moveFolderFilesModal #targetFolderSelect:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
+}
+
+.modal-info-message {
+    background: rgba(0, 125, 184, 0.1);
+    border: 1px solid rgba(0, 125, 184, 0.3);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 15px 0;
+    color: #005a84;
+}
+
+.modal-info-message i {
+    margin-right: 8px;
+    color: #007DB8;
+}
+
+#moveFolderFilesModal .btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#moveFolderFilesModal .btn-primary:disabled:hover {
+    background-color: #ccc;
 }

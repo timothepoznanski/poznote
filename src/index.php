@@ -460,6 +460,27 @@ $folder_filter = $_GET['folder'] ?? '';
         </div>
     </div>
     
+    <!-- Modal for moving all files from one folder to another -->
+    <div id="moveFolderFilesModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('moveFolderFilesModal')">&times;</span>
+            <h3>Move All Files</h3>
+            <p>Move all files from "<span id="sourceFolderName"></span>" to:</p>
+            <select id="targetFolderSelect">
+                <option value="">Select target folder...</option>
+            </select>
+            <div id="folderFilesCount" class="modal-info-message">
+                <i class="fas fa-info-circle"></i>
+                <span id="filesCountText"></span>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')">Cancel</button>
+            </div>
+            <div id="moveFilesErrorMessage" class="modal-error-message" style="display: none;"></div>
+        </div>
+    </div>
+    
     <!-- LEFT COLUMN -->	
     <div id="left_col">
 
@@ -980,9 +1001,11 @@ $folder_filter = $_GET['folder'] ?? '';
                 } else if (isDefaultFolder($folderName, $workspace_filter)) {
                     // For the default folder: allow search and empty, but do not allow renaming
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
+                    echo "<i class='fas fa-arrows-alt folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
                 } else {
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
+                    echo "<i class='fas fa-arrows-alt folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
                     echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
                     echo "<i class='fas fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
                 }

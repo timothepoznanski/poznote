@@ -2050,6 +2050,133 @@ function cleanupDeletedFolderFromLocalStorage(folderName) {
     });
 }
 
+// Function to show move folder files dialog
+function showMoveFolderFilesDialog(sourceFolderName) {
+    document.getElementById('sourceFolderName').textContent = sourceFolderName;
+    
+    // Get count of files in source folder
+    fetch('api_list_notes.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'folder=' + encodeURIComponent(sourceFolderName) + '&workspace=' + encodeURIComponent(selectedWorkspace)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const filesCount = data.notes.length;
+            const filesText = filesCount === 1 ? '1 file will be moved' : `${filesCount} files will be moved`;
+            document.getElementById('filesCountText').textContent = filesText;
+            
+            // If folder is empty, show message and disable move button
+            if (filesCount === 0) {
+                document.getElementById('filesCountText').textContent = 'This folder is empty';
+                document.querySelector('#moveFolderFilesModal .btn-primary').disabled = true;
+            } else {
+                document.querySelector('#moveFolderFilesModal .btn-primary').disabled = false;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error getting folder files count:', error);
+        document.getElementById('filesCountText').textContent = 'Unable to count files';
+    });
+    
+    // Populate target folder dropdown
+    populateTargetFolderDropdown(sourceFolderName);
+    
+    // Show modal
+    document.getElementById('moveFolderFilesModal').style.display = 'block';
+}
+
+// Function to populate target folder dropdown
+function populateTargetFolderDropdown(excludeFolderName) {
+    const select = document.getElementById('targetFolderSelect');
+    select.innerHTML = '<option value="">Select target folder...</option>';
+    
+    // Get all folders
+    fetch('api_list_notes.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.folders) {
+            data.folders.forEach(folder => {
+                // Don't include the source folder or Favorites in target options
+                if (folder !== excludeFolderName && folder !== 'Favorites') {
+                    const option = document.createElement('option');
+                    option.value = folder;
+                    option.textContent = folder;
+                    select.appendChild(option);
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error loading folders:', error);
+        showNotificationPopup('Error loading folders: ' + error, 'error');
+    });
+}
+
+// Function to execute moving all files
+function executeMoveAllFiles() {
+    const sourceFolderName = document.getElementById('sourceFolderName').textContent;
+    const targetFolderName = document.getElementById('targetFolderSelect').value;
+    
+    if (!targetFolderName) {
+        showNotificationPopup('Please select a target folder', 'error');
+        return;
+    }
+    
+    if (sourceFolderName === targetFolderName) {
+        showNotificationPopup('Source and target folders cannot be the same', 'error');
+        return;
+    }
+    
+    // Disable the move button during operation
+    const moveButton = document.querySelector('#moveFolderFilesModal .btn-primary');
+    const originalText = moveButton.textContent;
+    moveButton.disabled = true;
+    moveButton.textContent = 'Moving...';
+    
+    // Move all files
+    fetch('api_move_folder_files.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'source_folder=' + encodeURIComponent(sourceFolderName) + 
+              '&target_folder=' + encodeURIComponent(targetFolderName) + 
+              '&workspace=' + encodeURIComponent(selectedWorkspace)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotificationPopup(`Successfully moved ${data.moved_count} files from "${sourceFolderName}" to "${targetFolderName}"`);
+            closeModal('moveFolderFilesModal');
+            // Refresh the page to reflect changes
+            location.reload();
+        } else {
+            showNotificationPopup('Error moving files: ' + data.error, 'error');
+            // Re-enable button on error
+            moveButton.disabled = false;
+            moveButton.textContent = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error moving files:', error);
+        showNotificationPopup('Error moving files: ' + error, 'error');
+        // Re-enable button on error
+        moveButton.disabled = false;
+        moveButton.textContent = originalText;
+    });
+}
+
 function emptyFolder(folderName) {
     showConfirmModal(
         'Empty Folder',
