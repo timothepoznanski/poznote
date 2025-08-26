@@ -229,7 +229,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         <div class="workspace-menu-divider"></div>
         <div class="workspace-menu-item" onclick="window.location.href='manage_workspaces.php';">
             <i class="fas fa-cog"></i>
-            <span>Manage workspaces</span>
+            <span>Workspaces</span>
         </div>
     `;
     
