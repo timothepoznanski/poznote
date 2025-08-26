@@ -115,9 +115,178 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Using default folder name due to error:', error);
     });
     
-    // Workspace menu functionality disabled - workspace name now links directly to timpoz.com
+    // Initialize workspace menu functionality
+    initializeWorkspaceMenu();
+    
+    // Handle browser back/forward buttons for workspace changes
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.workspace) {
+            const workspaceName = event.state.workspace;
+            updateWorkspaceNameInHeaders(workspaceName);
+            selectedWorkspace = workspaceName;
+            refreshLeftColumnForWorkspace(workspaceName);
+        }
+    });
 
 });
+
+// Function to initialize workspace menu
+function initializeWorkspaceMenu() {
+    // Close workspace menu when clicking outside
+    document.addEventListener('click', function(e) {
+        const workspaceMenus = document.querySelectorAll('.workspace-menu');
+        workspaceMenus.forEach(menu => {
+            if (!menu.parentElement.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    });
+}
+
+// Function to toggle workspace menu
+function toggleWorkspaceMenu(event) {
+    event.stopPropagation();
+    
+    // Determine if we're on mobile or desktop
+    const isMobile = window.innerWidth <= 768;
+    const menuId = isMobile ? 'workspaceMenuMobile' : 'workspaceMenu';
+    const menu = document.getElementById(menuId);
+    
+    if (!menu) return;
+    
+    // Close the other menu if it exists
+    const otherMenuId = isMobile ? 'workspaceMenu' : 'workspaceMenuMobile';
+    const otherMenu = document.getElementById(otherMenuId);
+    if (otherMenu) {
+        otherMenu.style.display = 'none';
+    }
+    
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        loadAndShowWorkspaceMenu(menu);
+    } else {
+        menu.style.display = 'none';
+    }
+}
+
+// Function to load and show workspace menu
+function loadAndShowWorkspaceMenu(menu) {
+    // Show loading state
+    menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-spinner fa-spin"></i>Loading workspaces...</div>';
+    menu.style.display = 'block';
+    
+    // Load workspaces from API
+    fetch('api_workspaces.php?action=list')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayWorkspaceMenu(menu, data.workspaces);
+            } else {
+                menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-exclamation-triangle"></i>Error loading workspaces</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading workspaces:', error);
+            menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-exclamation-triangle"></i>Error loading workspaces</div>';
+        });
+}
+
+// Function to display workspace menu
+function displayWorkspaceMenu(menu, workspaces) {
+    const currentWorkspace = selectedWorkspace || 'Poznote';
+    let menuHtml = '';
+    
+    // Add current workspace first if not in list (shouldn't happen, but safety)
+    const workspaceExists = workspaces.find(w => w.name === currentWorkspace);
+    
+    // Add default workspace if not in list
+    if (!workspaceExists && currentWorkspace === 'Poznote') {
+        workspaces.unshift({ name: 'Poznote', created: null });
+    }
+    
+    // Sort workspaces: Poznote first, then alphabetically
+    workspaces.sort((a, b) => {
+        if (a.name === 'Poznote') return -1;
+        if (b.name === 'Poznote') return 1;
+        return a.name.localeCompare(b.name);
+    });
+    
+    // Add workspace items
+    workspaces.forEach(workspace => {
+        const isCurrent = workspace.name === currentWorkspace;
+        const currentClass = isCurrent ? ' current-workspace' : '';
+        const icon = isCurrent ? 'fas fa-check' : 'fas fa-layer-group';
+        
+        menuHtml += `
+            <div class="workspace-menu-item${currentClass}" onclick="switchToWorkspace('${workspace.name}')">
+                <i class="${icon}"></i>
+                <span>${workspace.name}</span>
+            </div>
+        `;
+    });
+    
+    // Add separator and management option
+    menuHtml += `
+        <div class="workspace-menu-divider"></div>
+        <div class="workspace-menu-item" onclick="window.location.href='manage_workspaces.php';">
+            <i class="fas fa-cog"></i>
+            <span>Manage workspaces</span>
+        </div>
+    `;
+    
+    menu.innerHTML = menuHtml;
+}
+
+// Function to switch to a workspace
+function switchToWorkspace(workspaceName) {
+    if (workspaceName === selectedWorkspace) {
+        // Already on this workspace, just close menus
+        const menu1 = document.getElementById('workspaceMenu');
+        const menu2 = document.getElementById('workspaceMenuMobile');
+        if (menu1) menu1.style.display = 'none';
+        if (menu2) menu2.style.display = 'none';
+        return;
+    }
+    
+    // Close menus
+    const menu1 = document.getElementById('workspaceMenu');
+    const menu2 = document.getElementById('workspaceMenuMobile');
+    if (menu1) menu1.style.display = 'none';
+    if (menu2) menu2.style.display = 'none';
+    
+    // Update the workspace name in headers immediately
+    updateWorkspaceNameInHeaders(workspaceName);
+    
+    // Update the selected workspace variable
+    selectedWorkspace = workspaceName;
+    
+    // Save to localStorage
+    try { 
+        localStorage.setItem('poznote_selected_workspace', workspaceName); 
+    } catch(e) {}
+    
+    // Build URL with current search parameters but don't navigate
+    const url = new URL(window.location.href);
+    url.searchParams.set('workspace', workspaceName);
+    
+    // Update browser history without reloading
+    history.pushState({workspace: workspaceName}, '', url.toString());
+    
+    // Refresh the left column content for the new workspace
+    refreshLeftColumnForWorkspace(workspaceName);
+}
+
+// Function to update workspace name in headers
+function updateWorkspaceNameInHeaders(workspaceName) {
+    const desktopElement = document.getElementById('workspaceNameDesktop');
+    const mobileElement = document.getElementById('workspaceNameMobile');
+    
+    if (desktopElement) {
+        desktopElement.textContent = workspaceName;
+    }
+    if (mobileElement) {
+        mobileElement.textContent = workspaceName;
+    }
+}
 
 var currentNoteFolder = null; // Track current folder of note being moved
 var currentNoteIdForAttachments = null; // Track current note for attachments
