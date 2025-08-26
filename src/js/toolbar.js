@@ -666,11 +666,20 @@ document.addEventListener('keydown', function(e) {
     const spanText = (checklineSpan.textContent || '').replace(/\u00A0/g, '').trim();
     if (spanText === '') {
       e.preventDefault();
-      // Insert a normal empty line (no checkbox) after current line
+      // Replace the empty checkline with a normal empty line (no checkbox)
       const normalLine = document.createElement('div');
       normalLine.innerHTML = '<br>';
-      if (checklineDiv.nextSibling) checklineDiv.parentNode.insertBefore(normalLine, checklineDiv.nextSibling);
-      else checklineDiv.parentNode.appendChild(normalLine);
+      const parent = checklineDiv.parentNode;
+      if (parent) {
+        try {
+          parent.replaceChild(normalLine, checklineDiv);
+        } catch (err) {
+          // Fallback to insert/remove if replaceChild fails
+          if (checklineDiv.nextSibling) parent.insertBefore(normalLine, checklineDiv.nextSibling);
+          else parent.appendChild(normalLine);
+          try { parent.removeChild(checklineDiv); } catch (e) {}
+        }
+      }
       // Move caret into the normal line
       setTimeout(function() {
         const r = document.createRange();
@@ -747,6 +756,39 @@ document.addEventListener('keydown', function(e) {
 
   // Handle checklist (ul/li structure)
   if (checklistSpan && itemLi && ul) {
+    // If the checklist span is empty, remove the current li and insert a normal line after the list
+    const checklistText = (checklistSpan.textContent || '').replace(/\u00A0/g, '').trim();
+    if (checklistText === '') {
+      e.preventDefault();
+      const normalLine = document.createElement('div');
+      normalLine.innerHTML = '<br>';
+      const listParent = ul.parentNode;
+      if (listParent) {
+        if (ul.nextSibling) listParent.insertBefore(normalLine, ul.nextSibling);
+        else listParent.appendChild(normalLine);
+      }
+      // Remove the empty li
+      try { itemLi.parentNode.removeChild(itemLi); } catch (err) {}
+      // If the ul has no more li children, remove the ul entirely
+      try {
+        if (!ul.querySelector || !ul.querySelector('li')) {
+          ul.parentNode.removeChild(ul);
+        }
+      } catch (err) {}
+      // Focus the normal line
+      setTimeout(function() {
+        const r = document.createRange();
+        r.selectNodeContents(normalLine);
+        r.collapse(true);
+        const s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(r);
+        normalLine.focus && normalLine.focus();
+        if (typeof update === 'function') update();
+      }, 20);
+      return;
+    }
+
     e.preventDefault();
 
     // Get current selection/range
