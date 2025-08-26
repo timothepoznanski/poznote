@@ -17,6 +17,14 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
         margin: 0 auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    /* Prevent any links or buttons from overflowing */
+    .settings-container a,
+    .settings-container button {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     /* Workspace list mobile optimizations */
@@ -66,8 +74,14 @@
     /* Back button mobile styling */
     .btn-secondary {
         width: 100% !important;
+        max-width: 100% !important;
         margin-bottom: 20px !important;
         padding: 12px !important;
         font-size: 16px !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-wrap: break-word !important;
     }
 }
