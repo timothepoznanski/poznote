@@ -60,8 +60,6 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 - **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux)
 - **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
 
-### Prerequisites
-
 **🐳 What is Docker?**
 Docker is a platform that packages and runs applications in isolated containers. Poznote uses Docker to simplify installation and ensure the application works consistently across all systems.
 
