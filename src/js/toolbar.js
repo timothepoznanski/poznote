@@ -24,7 +24,7 @@ function addLinkToNote() {
           </div>
           <div class="link-modal-field">
             <label for="linkUrl">URL :</label>
-            <input type="url" id="linkUrl" placeholder="https://example.com" autofocus>
+            <input type="url" id="linkUrl" placeholder="https://example.com">
           </div>
         </div>
         <div class="link-modal-footer">
@@ -62,27 +62,42 @@ function addLinkToNote() {
     }
   });
   
-  // Focus URL input
-  document.getElementById('linkUrl').focus();
-  
-  // Handle Enter key
-  document.getElementById('linkUrl').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      createLinkFromModal();
+  // Focus URL input (only if it's not already focused)
+  const linkUrlEl = document.getElementById('linkUrl');
+  const linkTextEl = document.getElementById('linkText');
+  try {
+    if (linkUrlEl && document.activeElement !== linkUrlEl) {
+      // Slight delay to ensure the modal is attached and visible before focusing
+      setTimeout(() => {
+        linkUrlEl.focus();
+      }, 10);
     }
-    if (e.key === 'Escape') {
-      closeLinkModal();
-    }
-  });
-  
-  document.getElementById('linkText').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      createLinkFromModal();
-    }
-    if (e.key === 'Escape') {
-      closeLinkModal();
-    }
-  });
+  } catch (e) {
+    // ignore focus errors
+  }
+
+  // Handle Enter/Escape keys on inputs
+  if (linkUrlEl) {
+    linkUrlEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        createLinkFromModal();
+      }
+      if (e.key === 'Escape') {
+        closeLinkModal();
+      }
+    });
+  }
+
+  if (linkTextEl) {
+    linkTextEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        createLinkFromModal();
+      }
+      if (e.key === 'Escape') {
+        closeLinkModal();
+      }
+    });
+  }
 }
 
 // Function to close the link modal
