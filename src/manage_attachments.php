@@ -397,30 +397,32 @@ if (!$note) {
         }
 
         function deleteAttachment(attachmentId) {
-            if (!confirm('Are you sure you want to delete this attachment?')) {
-                return;
-            }
-
-            fetch('api_attachments.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+            showConfirmDialog(
+                'Êtes-vous sûr de vouloir supprimer cette pièce jointe ?',
+                function() {
+                    fetch('api_attachments.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Attachment deleted successfully', 'success');
+                            loadAttachments(); // Reload the list
+                        } else {
+                            showNotification('Failed to delete attachment: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error deleting attachment', 'error');
+                    });
                 },
-                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Attachment deleted successfully', 'success');
-                    loadAttachments(); // Reload the list
-                } else {
-                    showNotification('Failed to delete attachment: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error deleting attachment', 'error');
-            });
+                null // onCancel callback
+            );
         }
 
         function formatFileSize(bytes) {
@@ -429,6 +431,79 @@ if (!$note) {
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Custom confirmation modal for mobile-friendly UI
+        function showConfirmDialog(message, onConfirm, onCancel) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-overlay';
+            overlay.style.display = 'block';
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal';
+            modal.style.display = 'block';
+            
+            // Create content
+            const content = document.createElement('div');
+            content.className = 'confirm-content';
+            
+            const messageEl = document.createElement('div');
+            messageEl.className = 'confirm-message';
+            messageEl.textContent = message;
+            
+            const buttonsEl = document.createElement('div');
+            buttonsEl.className = 'confirm-buttons';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'confirm-btn confirm-btn-cancel';
+            cancelBtn.textContent = 'Annuler';
+            
+            const okBtn = document.createElement('button');
+            okBtn.className = 'confirm-btn confirm-btn-confirm';
+            okBtn.textContent = 'Supprimer';
+            
+            buttonsEl.appendChild(cancelBtn);
+            buttonsEl.appendChild(okBtn);
+            content.appendChild(messageEl);
+            content.appendChild(buttonsEl);
+            modal.appendChild(content);
+            
+            // Add to page
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+            
+            function closeModal() {
+                overlay.style.display = 'none';
+                modal.style.display = 'none';
+                document.body.removeChild(overlay);
+                document.body.removeChild(modal);
+            }
+            
+            function handleCancel() {
+                closeModal();
+                if (onCancel) onCancel();
+            }
+            
+            function handleConfirm() {
+                closeModal();
+                if (onConfirm) onConfirm();
+            }
+            
+            function handleOverlayClick(e) {
+                if (e.target === overlay) {
+                    handleCancel();
+                }
+            }
+            
+            // Add event listeners
+            cancelBtn.addEventListener('click', handleCancel);
+            okBtn.addEventListener('click', handleConfirm);
+            overlay.addEventListener('click', handleOverlayClick);
+            
+            // Focus cancel button by default
+            setTimeout(() => cancelBtn.focus(), 100);
         }
 
         function showNotification(message, type) {
