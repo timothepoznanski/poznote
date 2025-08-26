@@ -484,14 +484,14 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-minus-square"></i>
                         <span>Fold All Folders</span>
                     </div>
-                    <!-- Manage workspaces moved to the left-header menu -->
-                    <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Workspaces</span>
-                    </div>
                     <div class="settings-menu-item" onclick="unfoldAllFolders();">
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
+                    </div>
+                    <!-- Manage workspaces moved after unfold all folders -->
+                    <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Workspaces</span>
                     </div>
                     <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                         <i class="fas fa-robot"></i>
@@ -687,14 +687,14 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-minus-square"></i>
                     <span>Fold All Folders</span>
                 </div>
-                <!-- Manage workspaces moved to the left-header menu -->
-                <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Workspaces</span>
-                </div>
                 <div class="settings-menu-item" onclick="unfoldAllFolders();">
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>
+                </div>
+                <!-- Manage workspaces moved after unfold all folders -->
+                <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Workspaces</span>
                 </div>
                 <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                     <i class="fas fa-robot"></i>
