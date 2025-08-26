@@ -487,21 +487,22 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <div class="workspace-dropdown">
-            <div class="left-header-text workspace-mobile-btn" style="text-decoration: none; color: #007DB8; cursor: pointer;" onclick="toggleWorkspaceMenu(event)" title="Switch workspace">
-                <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
-                <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
-                <i class="fas fa-chevron-down" style="margin-left: 4px; font-size: 10px;"></i>
-            </div>
-            <div class="workspace-menu" id="workspaceMenuMobile">
-                <!-- Menu items will be loaded dynamically -->
-            </div>
-        </div>
+        <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
+            <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
+        </a>
     </div>
         <div class="containbuttons">
             <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
             <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
             <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+            <div class="workspace-dropdown">
+                <div class="workspace-icon-btn small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)" style="cursor: pointer;">
+                    <i class="fas fa-layer-group workspace-toggle-icon" aria-hidden="true"></i>
+                </div>
+                <div class="workspace-menu" id="workspaceMenuMobile">
+                    <!-- Menu items will be loaded dynamically -->
+                </div>
+            </div>
             <div class="settings-dropdown">
                 <div class="settingsbutton" onclick="toggleSettingsMenu(event);" title="Settings">
                     <span><span class="fas fa-cog"></span></span>
@@ -693,7 +694,6 @@ $folder_filter = $_GET['folder'] ?? '';
     <?php if (!$is_mobile): ?>
     <div class="left-header">
         <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
-            <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
             <span id="workspaceNameDesktop"><?php echo $displayWorkspace; ?></span>
         </a>
     </div>
