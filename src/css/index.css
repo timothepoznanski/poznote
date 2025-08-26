@@ -1811,8 +1811,26 @@ img {
 
 .containbuttons{
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     /* padding-top: 8px; */
     /* padding-bottom: 8px; */
+}
+
+/* Ensure all icons within containbuttons are properly centered */
+.containbuttons > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.containbuttons span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .newbutton[style], .list_tags[style] {
@@ -1833,13 +1851,22 @@ img {
 }
 
 .newbutton, .newfolderbutton, .list_tags, .settingsbutton {
-    display: inline-block;
-    width:30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    height:20px;
-    margin: 5px;
+    margin: 4px;
     color: #007DB8;
-    font-size: 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.newbutton:hover, .newfolderbutton:hover, .list_tags:hover, .settingsbutton:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a;
 }
 
 /* Settings dropdown styles */
@@ -1849,13 +1876,17 @@ img {
 }
 
 .settingsbutton {
-    display: inline-block;
-    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    height: 20px;
-    margin: 5px;
+    margin: 4px;
     color: #007DB8;
-    font-size: 17px;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .settings-menu {
@@ -1999,13 +2030,22 @@ img {
 }
 
 .trashnotebutton {
-    display: inline-block;
-    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    height: 20px;
-    margin: 5px;
+    margin: 4px;
     color: #007DB8;
-    font-size: 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.trashnotebutton:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a;
 }
 
 .logoutbutton {
