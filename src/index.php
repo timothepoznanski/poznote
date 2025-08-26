@@ -1101,8 +1101,6 @@ $folder_filter = $_GET['folder'] ?? '';
                 // Note action buttons (desktop only)
                     if (!$is_mobile) {
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    // Checklist button placed immediately to the right of emoji as requested
-                    echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="Insert checklist" onclick="insertChecklist()"><i class="fas fa-check-square"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                     // AI actions dropdown menu (only if AI is enabled)
@@ -1225,8 +1223,6 @@ $folder_filter = $_GET['folder'] ?? '';
                     // Note action buttons 
                     // AI actions dropdown menu for mobile (only if AI is enabled)
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    // Checklist button placed immediately to the right of emoji on mobile
-                    echo '<button type="button" class="toolbar-btn btn-checklist" title="Insert checklist" onclick="insertChecklist()"><i class="fas fa-check-square"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
                     if (isAIEnabled()) {

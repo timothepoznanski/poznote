@@ -196,7 +196,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save, .btn-ai, .btn-emoji, .btn-checklist {
+.btn-separator, .btn-save, .btn-ai, .btn-emoji {
     display: flex !important;
 }
 
@@ -226,7 +226,6 @@ body {
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-emoji,
-.show-format-buttons .btn-checklist,
 .show-format-buttons .btn-save,
 .show-format-buttons .btn-ai,
 .show-format-buttons .btn-favorite, 
@@ -475,56 +474,6 @@ a.links_arbo_left.selected-note {
     transform: translate(-50%, -50%) rotate(-45deg) !important;
     pointer-events: none !important;
     z-index: 1 !important;
-}
-
-/* Checklist alignment: ensure checkbox and text are vertically centered on mobile */
-.noteentry .checkline,
-.noteentry .checkline label {
-    /* display: inline-flex !important; */
-    align-items: center !important;
-    /* gap: 8px !important; */
-}
-.noteentry .checkline input[type="checkbox"] {
-    width: 18px !important;
-    height: 18px !important;
-    margin: 0 !important;
-    vertical-align: middle !important;
-    flex: 0 0 18px !important;
-}
-.noteentry .checkline-text {
-    display: inline-block !important;
-    line-height: 18px !important;
-    vertical-align: middle !important;
-    padding-top: 0 !important;
-    margin: 0 !important;
-    margin-left: 8px !important; /* Add space between checkbox and text */
-    min-height: 18px !important; /* Ensure minimum touch target */
-    padding: 2px 4px !important; /* Add padding for better touch target */
-    border-radius: 3px !important;
-    transition: background-color 0.2s ease !important;
-}
-
-/* Improve visual feedback for checkline text on mobile */
-.noteentry .checkline-text:hover,
-.noteentry .checkline-text:focus {
-    background-color: rgba(0, 123, 255, 0.1) !important;
-    outline: 1px solid rgba(0, 123, 255, 0.3) !important;
-}
-
-/* Make the checkline label non-selectable to avoid conflicts */
-.noteentry .checkline label {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    pointer-events: auto !important;
-}
-
-/* Make the checkline text selectable and improve touch target */
-.noteentry .checkline-text {
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    pointer-events: auto !important;
-    cursor: text !important;
-    min-width: 30px !important; /* Ensure minimum touch target width */
 }
 
 .folder-content {

@@ -942,11 +942,6 @@ function updatenote(){
     if (entryElem) {
         // Work on a clone so we can set checked attributes on inputs
         const cloned = entryElem.cloneNode(true);
-        // Replace any checkbox state by setting 'checked' attribute for checked boxes
-        cloned.querySelectorAll('input[type=checkbox]').forEach(function(cb){
-            if (cb.checked) cb.setAttribute('checked', 'checked');
-            else cb.removeAttribute('checked');
-        });
         ent = cleanSearchHighlightsFromElement(cloned);
     }
     
@@ -1151,18 +1146,6 @@ function deleteNote(iid){
       } else {
         update();
       }
-            // Also attach change listeners to any checkbox inside the note to mark edited
-            if (e.target) {
-                const entry = e.target.closest && e.target.closest('.noteentry');
-                if (entry) {
-                    entry.querySelectorAll('input[type=checkbox]').forEach(cb => {
-                        if (!cb._checkboxListenerAttached) {
-                            cb.addEventListener('change', function() { update(); });
-                            cb._checkboxListenerAttached = true;
-                        }
-                    });
-                }
-            }
     } else if (e.target.tagName === 'INPUT') {
       // Only trigger update() for note inputs
       if (
@@ -4115,22 +4098,3 @@ function confirmDeleteAttachment(callback) {
         null
     );
 }
-
-// Fix for checkbox text editing issue
-// Prevent checkbox from being toggled when clicking on the text span in a checkline
-document.addEventListener('DOMContentLoaded', function() {
-    // Add click event listener to handle checkline text clicks
-    document.addEventListener('click', function(e) {
-        // Check if the clicked element is a contenteditable span within a checkline
-        if (e.target.tagName === 'SPAN' && 
-            e.target.hasAttribute('contenteditable') && 
-            e.target.classList.contains('checkline-text')) {
-            
-            // Prevent the click from propagating to the label (which would toggle the checkbox)
-            e.stopPropagation();
-            
-            // Focus the span for text editing
-            e.target.focus();
-        }
-    }, true); // Use capture phase to handle this before other handlers
-});
