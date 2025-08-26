@@ -298,29 +298,36 @@ function deleteCurrentWorkspace() {
     if (!sel) return;
     var name = sel.value;
     if (!name || name === 'Poznote') { showNotificationPopup('Cannot delete default workspace', 'error'); return; }
-    if (!confirm('Delete workspace "' + name + '"? Notes will be moved to the default workspace.')) return;
-    var params = new URLSearchParams({ action: 'delete', name: name });
-    fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
-    .then(r => r.json()).then(function(res){
-        if (res.success) {
-            var sel = document.getElementById('workspaceSelector');
-            if (sel) {
-                // remove option
-                for (var i=0;i<sel.options.length;i++) {
-                    if (sel.options[i].value === name) { sel.remove(i); break; }
+    
+    showConfirmDialog(
+        'Delete workspace "' + name + '"? Notes will be moved to the default workspace.',
+        function() {
+            var params = new URLSearchParams({ action: 'delete', name: name });
+            fetch('api_workspaces.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
+            .then(r => r.json()).then(function(res){
+                if (res.success) {
+                    var sel = document.getElementById('workspaceSelector');
+                    if (sel) {
+                        // remove option
+                        for (var i=0;i<sel.options.length;i++) {
+                            if (sel.options[i].value === name) { sel.remove(i); break; }
+                        }
+                        sel.value = 'Poznote';
+                        selectedWorkspace = 'Poznote';
+                        try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
+                        refreshLeftColumnForWorkspace('Poznote');
+                        showNotificationPopup('Workspace deleted; default selected', 'success');
+                    } else {
+                        window.location.href = 'index.php?workspace=Poznote';
+                    }
+                } else {
+                    showNotificationPopup('Error deleting workspace: ' + (res.message || 'unknown'), 'error');
                 }
-                sel.value = 'Poznote';
-                selectedWorkspace = 'Poznote';
-                try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
-                refreshLeftColumnForWorkspace('Poznote');
-                showNotificationPopup('Workspace deleted; default selected', 'success');
-            } else {
-                window.location.href = 'index.php?workspace=Poznote';
-            }
-        } else {
-            showNotificationPopup('Error deleting workspace: ' + (res.message || 'unknown'), 'error');
-        }
-    }).catch(function(err){ showNotificationPopup('Network error', 'error'); });
+            })
+            .catch(function(err){ showNotificationPopup('Network error', 'error'); });
+        },
+        null // onCancel callback
+    );
 }
 
 // Function to show note information with complete details
@@ -4015,54 +4022,36 @@ window.createTestContent = function() {
     }
 };
 
-// Custom confirmation modal for mobile-friendly UI
+// Custom confirmation modal using application's modal style
 function showConfirmDialog(message, onConfirm, onCancel) {
-    // Create overlay if it doesn't exist
-    let overlay = document.getElementById('confirmOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'confirmOverlay';
-        overlay.className = 'confirm-overlay';
-        document.body.appendChild(overlay);
+    // Remove existing confirmation modal if any
+    const existingModal = document.getElementById('confirmationModal');
+    if (existingModal) {
+        existingModal.remove();
     }
 
-    // Create modal if it doesn't exist
-    let modal = document.getElementById('confirmModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'confirmModal';
-        modal.className = 'confirm-modal';
-        modal.innerHTML = `
-            <div class="confirm-content">
-                <div class="confirm-message"></div>
-                <div class="confirm-buttons">
-                    <button id="confirmCancel" class="confirm-btn confirm-btn-cancel">Annuler</button>
-                    <button id="confirmOk" class="confirm-btn confirm-btn-confirm">Supprimer</button>
+    // Create modal HTML using the same structure as other modals
+    const modalHTML = `
+        <div id="confirmationModal" class="modal" style="display: flex;">
+            <div class="modal-content" style="max-width: 400px;">
+                <h3>Confirm Action</h3>
+                <p id="confirmationMessage">${message}</p>
+                <div class="modal-buttons">
+                    <button type="button" id="confirmBtn" class="btn-primary">Delete</button>
+                    <button type="button" id="cancelBtn">Cancel</button>
                 </div>
             </div>
-        `;
-        document.body.appendChild(modal);
-    }
+        </div>
+    `;
 
-    // Set message
-    const messageElement = modal.querySelector('.confirm-message');
-    messageElement.textContent = message;
-
-    // Show modal
-    overlay.style.display = 'block';
-    modal.style.display = 'block';
-
-    // Handle buttons
-    const cancelBtn = modal.querySelector('#confirmCancel');
-    const okBtn = modal.querySelector('#confirmOk');
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    const modal = document.getElementById('confirmationModal');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
 
     function closeModal() {
-        overlay.style.display = 'none';
-        modal.style.display = 'none';
-        // Remove event listeners
-        cancelBtn.removeEventListener('click', handleCancel);
-        okBtn.removeEventListener('click', handleConfirm);
-        overlay.removeEventListener('click', handleOverlayClick);
+        modal.remove();
     }
 
     function handleCancel() {
@@ -4076,15 +4065,15 @@ function showConfirmDialog(message, onConfirm, onCancel) {
     }
 
     function handleOverlayClick(e) {
-        if (e.target === overlay) {
+        if (e.target === modal) {
             handleCancel();
         }
     }
 
     // Add event listeners
     cancelBtn.addEventListener('click', handleCancel);
-    okBtn.addEventListener('click', handleConfirm);
-    overlay.addEventListener('click', handleOverlayClick);
+    confirmBtn.addEventListener('click', handleConfirm);
+    modal.addEventListener('click', handleOverlayClick);
 
     // Focus on cancel button for accessibility
     setTimeout(() => cancelBtn.focus(), 100);
@@ -4093,7 +4082,7 @@ function showConfirmDialog(message, onConfirm, onCancel) {
 // Helper function to replace confirm() calls for attachment deletion
 function confirmDeleteAttachment(callback) {
     showConfirmDialog(
-        'Êtes-vous sûr de vouloir supprimer cette pièce jointe ?',
+        'Are you sure you want to delete this attachment?',
         callback,
         null
     );

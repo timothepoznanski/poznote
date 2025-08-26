@@ -52,10 +52,20 @@ $workspaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .then(r=>r.json()).then(function(res){ if(res.success) window.location.href = 'index.php?workspace=' + encodeURIComponent(name); else alert(res.message || 'Error'); });
     }
     function deleteWorkspace(name){
-        if(!confirm('Delete ' + name + '? Notes will move to default.')) return;
-        var params = new URLSearchParams({action:'delete', name: name});
-        fetch('api_workspaces.php', {method:'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: params.toString()})
-    .then(r=>r.json()).then(function(res){ if(res.success) window.location.href = 'index.php?workspace=Poznote'; else alert(res.message || 'Error'); });
+        showConfirmDialog(
+            'Delete ' + name + '? Notes will be moved to the default workspace.',
+            function() {
+                var params = new URLSearchParams({action:'delete', name: name});
+                fetch('api_workspaces.php', {method:'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: params.toString()})
+                .then(r=>r.json()).then(function(res){ 
+                    if(res.success) 
+                        window.location.href = 'index.php?workspace=Poznote'; 
+                    else 
+                        alert(res.message || 'Error'); 
+                });
+            },
+            null
+        );
     }
     function renameWorkspace(oldName){
         var newName = prompt('Rename workspace "' + oldName + '" to:');
@@ -63,6 +73,63 @@ $workspaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
         var params = new URLSearchParams({action:'rename', old_name: oldName, new_name: newName});
         fetch('api_workspaces.php', {method:'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: params.toString()})
     .then(r=>r.json()).then(function(res){ if(res.success) window.location.href = 'index.php?workspace=' + encodeURIComponent(newName); else alert(res.message || 'Error'); });
+    }
+    
+    // Custom confirmation modal using application's modal style
+    function showConfirmDialog(message, onConfirm, onCancel) {
+        // Remove existing confirmation modal if any
+        const existingModal = document.getElementById('confirmationModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Create modal HTML using the same structure as other modals
+        const modalHTML = `
+            <div id="confirmationModal" class="modal" style="display: flex;">
+                <div class="modal-content" style="max-width: 400px;">
+                    <h3>Confirm Action</h3>
+                    <p id="confirmationMessage">${message}</p>
+                    <div class="modal-buttons">
+                        <button type="button" id="confirmBtn" class="btn-primary">Delete</button>
+                        <button type="button" id="cancelBtn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const modal = document.getElementById('confirmationModal');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        function closeModal() {
+            modal.remove();
+        }
+
+        function handleCancel() {
+            closeModal();
+            if (onCancel) onCancel();
+        }
+
+        function handleConfirm() {
+            closeModal();
+            if (onConfirm) onConfirm();
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === modal) {
+                handleCancel();
+            }
+        }
+
+        // Add event listeners
+        cancelBtn.addEventListener('click', handleCancel);
+        confirmBtn.addEventListener('click', handleConfirm);
+        modal.addEventListener('click', handleOverlayClick);
+
+        // Focus on cancel button for accessibility
+        setTimeout(() => cancelBtn.focus(), 100);
     }
     </script>
     <script>

@@ -67,13 +67,17 @@ function initializeNoteLoader() {
                             return;
                         }
 
-                        // Fallback to native confirm
-                        if (!confirm(message)) {
-                            return; // User cancelled navigation
-                        }
-
-                        // User chose to continue: clear the flag so we don't prompt again
-                        try { editedButNotSaved = 0; } catch (e) {}
+                        // Use custom confirm dialog instead of native confirm
+                        showConfirmDialog(message, function() {
+                            // User chose to continue: clear the flag so we don't prompt again
+                            try { editedButNotSaved = 0; } catch (e) {}
+                            // Continue with the navigation
+                            loadnote(id, pos, e ? e.shiftKey : false, searchTerm);
+                        }, function() {
+                            // User cancelled - do nothing
+                            return;
+                        });
+                        return; // Exit here to wait for user choice
                     }
                 } catch (e) {
                     // If any error occurs while checking edited flag, just proceed
