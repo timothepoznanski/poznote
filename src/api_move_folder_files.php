@@ -2,16 +2,21 @@
 require_once 'db_connect.php';
 require_once 'auth.php';
 
+// Start output buffering to prevent any accidental output
+ob_start();
+
 header('Content-Type: application/json');
 
 // Check authentication
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    ob_clean();
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_clean();
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
     exit;
@@ -22,17 +27,20 @@ $target_folder = $_POST['target_folder'] ?? '';
 $workspace = $_POST['workspace'] ?? 'Poznote';
 
 if (empty($source_folder) || empty($target_folder)) {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'Source and target folders are required']);
     exit;
 }
 
 if ($source_folder === $target_folder) {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'Source and target folders cannot be the same']);
     exit;
 }
 
 // Prevent moving files from Favorites folder
 if ($source_folder === 'Favorites') {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'Cannot move files from Favorites folder']);
     exit;
 }
@@ -58,6 +66,7 @@ try {
     
     if (empty($notes)) {
         $con->rollBack();
+        ob_clean();
         echo json_encode(['success' => false, 'error' => 'No files found in source folder']);
         exit;
     }
@@ -76,6 +85,8 @@ try {
     // Commit transaction
     $con->commit();
     
+    // Clean output buffer and send JSON response
+    ob_clean();
     echo json_encode([
         'success' => true, 
         'moved_count' => $moved_count,
@@ -86,6 +97,10 @@ try {
     // Rollback transaction on error
     $con->rollBack();
     error_log("Error moving folder files: " . $e->getMessage());
-    echo json_encode(['success' => false, 'error' => 'Database error occurred']);
+    ob_clean();
+    echo json_encode(['success' => false, 'error' => 'Database error occurred: ' . $e->getMessage()]);
 }
+
+// End output buffering
+ob_end_flush();
 ?>

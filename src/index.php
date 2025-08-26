@@ -1001,11 +1001,11 @@ $folder_filter = $_GET['folder'] ?? '';
                 } else if (isDefaultFolder($folderName, $workspace_filter)) {
                     // For the default folder: allow search and empty, but do not allow renaming
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-arrows-alt folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
+                    echo "<i class='fas fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
                     echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
                 } else {
                     echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-arrows-alt folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
+                    echo "<i class='fas fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
                     echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
                     echo "<i class='fas fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
                 }

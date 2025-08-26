@@ -2154,7 +2154,21 @@ function executeMoveAllFiles() {
               '&target_folder=' + encodeURIComponent(targetFolderName) + 
               '&workspace=' + encodeURIComponent(selectedWorkspace)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // Check if response is actually JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            return response.text().then(text => {
+                throw new Error(`Expected JSON but received: ${text.substring(0, 200)}`);
+            });
+        }
+        
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             showNotificationPopup(`Successfully moved ${data.moved_count} files from "${sourceFolderName}" to "${targetFolderName}"`);
@@ -2170,7 +2184,7 @@ function executeMoveAllFiles() {
     })
     .catch(error => {
         console.error('Error moving files:', error);
-        showNotificationPopup('Error moving files: ' + error, 'error');
+        showNotificationPopup('Error moving files: ' + error.message, 'error');
         // Re-enable button on error
         moveButton.disabled = false;
         moveButton.textContent = originalText;
