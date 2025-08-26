@@ -121,24 +121,24 @@ Chaque instance aura :
 - Des ports différents
 - Des configurations isolées
 
-### Exemple : Instances personnelle et professionnelle sur le même serveur
+### Exemple : Instances Tom et Alice sur le même serveur
 
 ```
 Serveur : mon-serveur.com
-├── Poznote Personnel
+├── Poznote-Tom
 │   ├── Port : 8040
 │   ├── URL : http://mon-serveur.com:8040
-│   ├── Conteneur : poznote-personnel-webserver-1
-│   └── Données : ./poznote-personnel/data/
+│   ├── Conteneur : poznote-tom-webserver-1
+│   └── Données : ./poznote-tom/data/
 │
-└── Poznote Travail
+└── Poznote-Alice
     ├── Port : 8041
     ├── URL : http://mon-serveur.com:8041
-    ├── Conteneur : poznote-travail-webserver-1
-    └── Données : ./poznote-travail/data/
+    ├── Conteneur : poznote-alice-webserver-1
+    └── Données : ./poznote-alice/data/
 ```
 
-Pour des déploiements sur des serveurs différents, il suffit juste de lancer le script de configuration et d'utiliser l'option de menu 2 pour mettre à jour le paramètre nom de l'application affiché - pas besoin de noms d'instance ou de ports différents.
+Pour des déploiements sur des serveurs différents, il suffit de lancer le script de configuration pour mettre à jour la configuration (pas besoin de noms d'instance ou de ports différents).
 
 ## Espaces de travail
 
