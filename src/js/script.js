@@ -266,6 +266,10 @@ function switchToWorkspace(workspaceName) {
     
     // Build URL with current search parameters but don't navigate
     const url = new URL(window.location.href);
+    // Ensure we don't keep a selected note when switching workspace (mobile should stay on left column)
+    url.searchParams.delete('note');
+    url.searchParams.delete('preserve_notes');
+    url.searchParams.delete('preserve_tags');
     url.searchParams.set('workspace', workspaceName);
     
     // Update browser history without reloading
@@ -1749,6 +1753,10 @@ function showNotificationPopup(message, type = 'success') {
 // Refresh left column by fetching index.php and replacing #left_col content
 function refreshLeftColumnForWorkspace(workspaceName) {
     var url = new URL(window.location.href);
+    // Remove note parameter to ensure we get the list view, not a specific note
+    url.searchParams.delete('note');
+    url.searchParams.delete('preserve_notes');
+    url.searchParams.delete('preserve_tags');
     url.searchParams.set('workspace', workspaceName);
     fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
     .then(response => response.text())
@@ -1762,14 +1770,28 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                 var currentLeft = document.getElementById('left_col');
                 if (currentLeft) {
                     currentLeft.innerHTML = newLeft.innerHTML;
+                    // After swapping DOM, ensure header/workspace displays and menu behavior are up-to-date
+                    try {
+                        // Update the visible workspace names in the newly inserted headers
+                        if (typeof updateWorkspaceNameInHeaders === 'function') updateWorkspaceNameInHeaders(workspaceName);
+                        // Re-run any initialization required for the workspace menu to rebind global handlers
+                        if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu();
+                    } catch(e) { console.error('Error reinitializing workspace UI', e); }
                     // If the server returned a right column for this workspace, update it too
                     try {
                         if (newRight) {
                             var currentRight = document.getElementById('right_col');
                             if (currentRight) {
-                                currentRight.innerHTML = newRight.innerHTML;
-                                // Re-initialize right column behaviors if available
-                                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+                                // On mobile, if switching workspace shows a note, clear it to stay on left column
+                                const isMobile = window.innerWidth <= 768;
+                                if (isMobile && newRight.innerHTML.trim() !== '') {
+                                    // Clear right column on mobile to keep focus on left column (note list)
+                                    currentRight.innerHTML = '';
+                                } else {
+                                    currentRight.innerHTML = newRight.innerHTML;
+                                    // Re-initialize right column behaviors if available
+                                    try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+                                }
                             }
                         }
                     } catch(e) { console.error('Error updating right column', e); }
