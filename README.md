@@ -317,23 +317,6 @@ http://YOUR_SERVER:HTTP_WEB_PORT/
 - `409` - Conflict (duplicate)
 - `500` - Server Error
 
-**Success Response:**
-```json
-{
-  "success": true,
-  "message": "Operation completed",
-  "data": { /* response data */ }
-}
-```
-
-**Error Response:**
-```json
-{
-  "error": "Error description",
-  "details": "Additional details (optional)"
-}
-```
-
 ### Endpoints
 
 #### List Notes
@@ -343,8 +326,10 @@ curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=M
 
 You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST data (`workspace=NAME`). If omitted, the API will return notes from all workspaces.
 
-**Optional parameters:**
-- `workspace` (string) - Filter notes by workspace name
+**Parameters:**
+- `workspace` (string) - *Optional* - Filter notes by workspace name
+
+---
 
 #### Create Note
 ```bash
@@ -358,12 +343,14 @@ curl -X POST http://localhost:8040/api_create_note.php \
     "workspace": "MyWorkspace"
   }'
 ```
-**Required parameters:**
-- `heading` (string) - The note title
-**Optional parameters:**
-- `tags` (string) - Comma-separated tags
-- `folder_name` (string) - Folder name (defaults to "Default")
-- `workspace` (string) - Workspace name (defaults to "Poznote")
+
+**Parameters:**
+- `heading` (string) - **Required** - The note title
+- `tags` (string) - *Optional* - Comma-separated tags
+- `folder_name` (string) - *Optional* - Folder name (defaults to "Default")
+- `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
+
+---
 
 #### Create Folder
 ```bash
@@ -372,10 +359,12 @@ curl -X POST http://localhost:8040/api_create_folder.php \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
 ```
-**Required parameters:**
-- `folder_name` (string) - The folder name
-**Optional parameters:**
-- `workspace` (string) - Optional workspace name to scope the folder (defaults to `Poznote`)
+
+**Parameters:**
+- `folder_name` (string) - **Required** - The folder name
+- `workspace` (string) - *Optional* - Workspace name to scope the folder (defaults to "Poznote")
+
+---
 
 #### Move Note
 ```bash
@@ -384,15 +373,17 @@ curl -X POST http://localhost:8040/api_move_note.php \
   -H "Content-Type: application/json" \
   -d '{
     "note_id": "123",
-  "folder_name": "Work Projects",
-  "workspace": "MyWorkspace"  # optional: destination workspace name
+    "folder_name": "Work Projects",
+    "workspace": "MyWorkspace"
   }'
 ```
-**Required parameters:**
-- `note_id` (string) - The ID of the note to move
-- `folder_name` (string) - The target folder name
-Optional parameters:
-- `workspace` (string) - If provided, moves the note into the specified workspace (and will handle title conflicts there)
+
+**Parameters:**
+- `note_id` (string) - **Required** - The ID of the note to move
+- `folder_name` (string) - **Required** - The target folder name
+- `workspace` (string) - *Optional* - If provided, moves the note into the specified workspace (handles title conflicts)
+
+---
 
 #### Delete Note
 ```bash
@@ -413,6 +404,13 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
   }'
 ```
 
+**Parameters:**
+- `note_id` (string) - **Required** - The ID of the note to delete
+- `permanent` (boolean) - *Optional* - If true, permanently delete; otherwise move to trash
+- `workspace` (string) - *Optional* - Workspace to scope the operation
+
+---
+
 #### Delete Folder
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
@@ -420,6 +418,10 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -H "Content-Type: application/json" \
   -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
 ```
+
+**Parameters:**
+- `folder_name` (string) - **Required** - The folder name to delete
+- `workspace` (string) - *Optional* - Workspace to scope the operation (defaults to "Poznote")
 
 **Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
 

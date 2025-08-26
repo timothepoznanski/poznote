@@ -319,23 +319,6 @@ http://VOTRE_SERVEUR:PORT_HTTP_WEB/
 - `409` - Conflit (doublon)
 - `500` - Erreur serveur
 
-**Réponse succès :**
-```json
-{
-	"success": true,
-	"message": "Opération terminée",
-	"data": { /* données de réponse */ }
-}
-```
-
-**Réponse erreur :**
-```json
-{
-	"error": "Description de l'erreur",
-	"details": "Détails supplémentaires (optionnel)"
-}
-```
-
 ### Endpoints
 
 #### Lister les notes
