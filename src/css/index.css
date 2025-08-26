@@ -435,6 +435,77 @@ a:active { color: #2E8CFA; } */
     color: #007DB8;
 }
 
+/* Font size popup (used by toolbar.js -> changeFontSize) */
+.font-size-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(20,20,20,0.12);
+    padding: 8px;
+    z-index: 1002;
+    min-width: 180px;
+    max-width: 320px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.font-size-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.font-size-popup .font-size-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+.font-size-popup .font-size-item:hover {
+    background-color: #f6fbff;
+}
+.font-size-popup .size-label {
+    font-size: 0.95rem;
+    color: #333;
+}
+.font-size-popup .size-preview {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 28px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    color: #222;
+    background: #fafafa;
+}
+/* Map preview classes to approximate sizes (match JS size map) */
+.font-size-popup .size-1 { font-size: 0.75rem; }
+.font-size-popup .size-2 { font-size: 0.875rem; }
+.font-size-popup .size-3 { font-size: 1rem; }
+.font-size-popup .size-4 { font-size: 1.125rem; }
+.font-size-popup .size-5 { font-size: 1.5rem; }
+.font-size-popup .size-6 { font-size: 2rem; }
+.font-size-popup .size-7 { font-size: 3rem; line-height: 1; padding: 2px 6px; }
+
+/* Ensure popup does not overflow toolbar area on small screens */
+@media (max-width: 720px) {
+    .font-size-popup {
+        right: 0;
+        left: 8px;
+        min-width: 150px;
+    }
+}
+
 .toolbar-menu-btn i {
     width: 20px;
     margin-right: 8px;

@@ -334,10 +334,25 @@ function changeFontSize() {
   
   popup.innerHTML = popupHTML;
   
-  // Position the popup relative to the button
-  fontSizeButton.parentElement.style.position = 'relative';
-  fontSizeButton.parentElement.appendChild(popup);
-  
+  // Append popup to body and compute coordinates so it doesn't get clipped
+  document.body.appendChild(popup);
+  popup.style.position = 'absolute';
+  popup.style.minWidth = '180px';
+
+  // Position near the button but keep inside viewport
+  const btnRect = fontSizeButton.getBoundingClientRect();
+  const popupRectEstimate = { width: 220, height: (fontSizes.length * 44) };
+  let left = btnRect.right - popupRectEstimate.width;
+  if (left < 8) left = 8;
+  let top = btnRect.bottom + 8;
+  // If popup would overflow bottom, place it above the button
+  if (top + popupRectEstimate.height > window.innerHeight - 8) {
+    top = btnRect.top - popupRectEstimate.height - 8;
+    if (top < 8) top = 8;
+  }
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+
   // Show popup with animation
   setTimeout(() => {
     popup.classList.add('show');
