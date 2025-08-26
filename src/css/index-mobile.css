@@ -78,6 +78,42 @@ body.tags-page {
     min-height: 100vh !important;
 }
 
+/* Exception for workspaces page - aggressive override */
+body.workspaces-page,
+html.workspaces-page {
+    overflow: auto !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* More specific rule to target workspaces page by content */
+body {
+    &:has(.settings-container) {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: static !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* Alternative approach - target by URL or JavaScript class addition */
+.mobile-scroll-enabled {
+    overflow: auto !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
 html {
 overflow-x: hidden;
 }
@@ -265,7 +301,7 @@ pre, code {
     padding-top: 5px;
     padding-right: 5%;
     padding-bottom: 5px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 body.note-open #left_col {
@@ -459,6 +495,34 @@ a.links_arbo_left.selected-note {
     vertical-align: middle !important;
     padding-top: 0 !important;
     margin: 0 !important;
+    margin-left: 8px !important; /* Add space between checkbox and text */
+    min-height: 18px !important; /* Ensure minimum touch target */
+    padding: 2px 4px !important; /* Add padding for better touch target */
+    border-radius: 3px !important;
+    transition: background-color 0.2s ease !important;
+}
+
+/* Improve visual feedback for checkline text on mobile */
+.noteentry .checkline-text:hover,
+.noteentry .checkline-text:focus {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    outline: 1px solid rgba(0, 123, 255, 0.3) !important;
+}
+
+/* Make the checkline label non-selectable to avoid conflicts */
+.noteentry .checkline label {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    pointer-events: auto !important;
+}
+
+/* Make the checkline text selectable and improve touch target */
+.noteentry .checkline-text {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    pointer-events: auto !important;
+    cursor: text !important;
+    min-width: 30px !important; /* Ensure minimum touch target width */
 }
 
 .folder-content {
@@ -1116,5 +1180,129 @@ input[type="search"]::-webkit-search-results-decoration {
         font-size: 12px !important;
         padding: 3px 6px !important;
         min-width: 60px !important;
+    }
+}
+
+/* WORKSPACES PAGE MOBILE STYLES */
+@media (max-width: 800px) {
+    .settings-container {
+        padding: 20px 15px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+    
+    .workspace-list {
+        margin-bottom: 30px !important;
+    }
+    
+    /* Ensure workspace buttons stack properly on mobile */
+    .workspace-list ul li {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 15px 0 !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+    }
+    
+    .workspace-list .ws-col {
+        width: 100% !important;
+    }
+    
+    .workspace-list .ws-col-name {
+        margin-bottom: 8px !important;
+    }
+    
+    /* Make workspace buttons full width on mobile */
+    .workspace-list .btn {
+        width: 100% !important;
+        min-width: unset !important;
+        margin-bottom: 5px !important;
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Create button row container for mobile */
+    .workspace-list .ws-col-action,
+    .workspace-list .ws-col-select,
+    .workspace-list .ws-col-move,
+    .workspace-list .ws-col-delete {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    /* Workspace creation form on mobile */
+    #create-workspace-form {
+        margin-bottom: 30px !important;
+    }
+    
+    #create-workspace-form .form-group {
+        margin-bottom: 15px !important;
+    }
+    
+    #create-workspace-form input {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
+    }
+    
+    #create-workspace-form button {
+        width: 100% !important;
+        padding: 14px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Modal adjustments for mobile */
+    #moveNotesModal .modal-content {
+        width: 90% !important;
+        max-width: 400px !important;
+        margin: 20px auto !important;
+    }
+    
+    #moveNotesModal select {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
+    }
+    
+    #moveNotesModal .btn {
+        width: 100% !important;
+        margin-bottom: 10px !important;
+        padding: 12px !important;
+    }
+    
+    /* Alert styling for mobile */
+    #topAlert, #ajaxAlert {
+        margin: 15px 0 !important;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Back to notes button mobile styling */
+    .btn-secondary {
+        width: 100% !important;
+        margin-bottom: 20px !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Headings mobile adjustment */
+    h1 {
+        font-size: 24px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    h3 {
+        font-size: 18px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Settings section spacing */
+    .settings-section {
+        margin-bottom: 30px !important;
     }
 }

@@ -1,9 +1,204 @@
 function addLinkToNote() {
-  const url = prompt('Enter the link URL:', 'https://');
-  if (url && url.trim() !== '' && url !== 'https://') {
-    document.execCommand('createLink', false, url);
+  // Check if there's a text selection and save it
+  const selection = window.getSelection();
+  const selectedText = selection.toString().trim();
+  let savedRange = null;
+  
+  // Save the current selection range
+  if (selection.rangeCount > 0) {
+    savedRange = selection.getRangeAt(0).cloneRange();
+  }
+  
+  // Create the modal HTML
+  const modalHTML = `
+    <div id="linkModal" class="link-modal-overlay">
+      <div class="link-modal-content">
+        <div class="link-modal-header">
+          <h3>Créer un lien</h3>
+          <button class="link-modal-close" onclick="closeLinkModal()">&times;</button>
+        </div>
+        <div class="link-modal-body">
+          <div class="link-modal-field">
+            <label for="linkText">Texte du lien :</label>
+            <input type="text" id="linkText" value="${selectedText}" placeholder="Entrez le texte du lien">
+          </div>
+          <div class="link-modal-field">
+            <label for="linkUrl">URL :</label>
+            <input type="url" id="linkUrl" placeholder="https://example.com" autofocus>
+          </div>
+        </div>
+        <div class="link-modal-footer">
+          <button class="link-modal-btn link-modal-btn-cancel" onclick="closeLinkModal()">Annuler</button>
+          <button class="link-modal-btn link-modal-btn-primary" onclick="createLinkFromModal()">Créer le lien</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Remove any existing modal
+  const existingModal = document.getElementById('linkModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  // Add modal to body
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  // Store the saved range for later use
+  window.savedLinkRange = savedRange;
+  window.originalSelectedText = selectedText;
+  
+  // Show modal with animation
+  const modal = document.getElementById('linkModal');
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      closeLinkModal();
+    }
+  });
+  
+  // Focus URL input
+  document.getElementById('linkUrl').focus();
+  
+  // Handle Enter key
+  document.getElementById('linkUrl').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      createLinkFromModal();
+    }
+    if (e.key === 'Escape') {
+      closeLinkModal();
+    }
+  });
+  
+  document.getElementById('linkText').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      createLinkFromModal();
+    }
+    if (e.key === 'Escape') {
+      closeLinkModal();
+    }
+  });
+}
+
+// Function to close the link modal
+function closeLinkModal() {
+  const modal = document.getElementById('linkModal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.remove();
+    }, 200);
+  }
+  
+  // Clean up global variables
+  window.savedLinkRange = null;
+  window.originalSelectedText = null;
+}
+
+// Function to create the link from the modal
+function createLinkFromModal() {
+  const linkText = document.getElementById('linkText').value.trim();
+  const linkUrl = document.getElementById('linkUrl').value.trim();
+  
+  if (!linkUrl || linkUrl === 'https://') {
+    // Focus URL field if empty
+    document.getElementById('linkUrl').focus();
+    document.getElementById('linkUrl').style.borderColor = '#dc3545';
+    setTimeout(() => {
+      document.getElementById('linkUrl').style.borderColor = '';
+    }, 2000);
+    return;
+  }
+  
+  // Get the saved range and original text
+  const savedRange = window.savedLinkRange;
+  const originalSelectedText = window.originalSelectedText;
+  
+  if (savedRange) {
+    // Restore the selection
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(savedRange);
+    
+    // Create link element
+    const link = document.createElement('a');
+    link.href = linkUrl;
+    link.textContent = linkText || originalSelectedText || linkUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    
+    try {
+      // If there was selected text, replace it
+      if (originalSelectedText) {
+        savedRange.deleteContents();
+      }
+      
+      // Insert the link
+      savedRange.insertNode(link);
+      
+      // Position cursor after the link
+      savedRange.setStartAfter(link);
+      savedRange.setEndAfter(link);
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
+      
+    } catch (e) {
+      console.error('Error creating link:', e);
+      // Fallback: try using execCommand if modern approach fails
+      if (originalSelectedText) {
+        document.execCommand('createLink', false, linkUrl);
+        // Try to set the link text
+        const links = document.querySelectorAll('a[href="' + linkUrl + '"]');
+        const lastLink = links[links.length - 1];
+        if (lastLink && linkText && linkText !== originalSelectedText) {
+          lastLink.textContent = linkText;
+        }
+      }
+    }
+  } else {
+    // No saved range - try to insert at current cursor position
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      
+      const link = document.createElement('a');
+      link.href = linkUrl;
+      link.textContent = linkText || linkUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      
+      range.insertNode(link);
+      
+      // Position cursor after the link
+      range.setStartAfter(link);
+      range.setEndAfter(link);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+  
+  // Clean up
+  window.savedLinkRange = null;
+  window.originalSelectedText = null;
+  
+  // Close modal
+  closeLinkModal();
+  
+  // Trigger update if available
+  const noteentry = document.querySelector('.noteentry');
+  if (noteentry && typeof update === 'function') {
+    update();
   }
 }
+
+// Make functions globally available
+window.closeLinkModal = closeLinkModal;
+window.createLinkFromModal = createLinkFromModal;
 
 function toggleRedColor() {
   document.execCommand('styleWithCSS', false, true);
@@ -69,9 +264,144 @@ function toggleYellowHighlight() {
   }
 }
 
+// Helper function to convert font size value to CSS size
+function getFontSizeFromValue(value) {
+  const sizeMap = {
+    '1': '0.75rem',   // Très petit
+    '2': '0.875rem',  // Petit  
+    '3': '1rem',      // Normal
+    '4': '1.125rem',  // Grand
+    '5': '1.5rem',    // Très grand
+    '6': '2rem',      // Énorme
+    '7': '3rem'       // Géant
+  };
+  return sizeMap[value] || '1rem';
+}
+
 function changeFontSize() {
-  const size = prompt('Font size (1-7):', '3');
-  if (size) document.execCommand('fontSize', false, size);
+  // Close any existing font size popup
+  const existingPopup = document.querySelector('.font-size-popup');
+  if (existingPopup) {
+    existingPopup.remove();
+    return;
+  }
+
+  // Save the current selection before opening popup
+  const selection = window.getSelection();
+  let savedRange = null;
+  
+  if (selection.rangeCount > 0) {
+    savedRange = selection.getRangeAt(0).cloneRange();
+  }
+  
+  // Check if we have selected text
+  const hasSelection = savedRange && !savedRange.collapsed;
+  
+  if (!hasSelection) {
+    console.log('Veuillez sélectionner du texte avant de changer la taille de police');
+    return;
+  }
+
+  // Find the font size button to position the popup
+  const fontSizeButton = document.querySelector('.btn-text-height');
+  if (!fontSizeButton) return;
+
+  // Create the popup
+  const popup = document.createElement('div');
+  popup.className = 'font-size-popup';
+  
+  // Font size options with labels
+  const fontSizes = [
+    { value: '1', label: 'Très petit', preview: 'Aa' },
+    { value: '2', label: 'Petit', preview: 'Aa' },
+    { value: '3', label: 'Normal', preview: 'Aa' },
+    { value: '4', label: 'Grand', preview: 'Aa' },
+    { value: '5', label: 'Très grand', preview: 'Aa' },
+    { value: '6', label: 'Énorme', preview: 'Aa' },
+    { value: '7', label: 'Géant', preview: 'Aa' }
+  ];
+
+  // Build popup content
+  let popupHTML = '';
+  fontSizes.forEach(size => {
+    popupHTML += `
+      <div class="font-size-item" data-size="${size.value}">
+        <span class="size-label">${size.label}</span>
+        <span class="size-preview size-${size.value}">${size.preview}</span>
+      </div>
+    `;
+  });
+  
+  popup.innerHTML = popupHTML;
+  
+  // Position the popup relative to the button
+  fontSizeButton.parentElement.style.position = 'relative';
+  fontSizeButton.parentElement.appendChild(popup);
+  
+  // Show popup with animation
+  setTimeout(() => {
+    popup.classList.add('show');
+  }, 10);
+
+  // Add click handlers for font size items
+  popup.querySelectorAll('.font-size-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const size = item.getAttribute('data-size');
+      
+      // Ensure editor has focus
+      const editor = document.querySelector('[contenteditable="true"]');
+      if (editor) {
+        editor.focus();
+        
+        // Restore the saved selection
+        if (savedRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(savedRange);
+          
+          console.log('Restoring selection and applying font size', size);
+          // Apply font size to the restored selection
+          document.execCommand('fontSize', false, size);
+        }
+      }
+      
+      // Close popup
+      popup.classList.remove('show');
+      setTimeout(() => {
+        popup.remove();
+      }, 200);
+    });
+  });
+
+  // Close popup when clicking outside
+  const closePopup = (e) => {
+    if (!popup.contains(e.target) && !fontSizeButton.contains(e.target)) {
+      popup.classList.remove('show');
+      setTimeout(() => {
+        popup.remove();
+      }, 200);
+      document.removeEventListener('click', closePopup);
+    }
+  };
+  
+  // Add delay to prevent immediate closure
+  setTimeout(() => {
+    document.addEventListener('click', closePopup);
+  }, 100);
+
+  // Close on escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      popup.classList.remove('show');
+      setTimeout(() => {
+        popup.remove();
+      }, 200);
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  
+  document.addEventListener('keydown', handleEscape);
 }
 
 function toggleCodeBlock() {

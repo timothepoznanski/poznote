@@ -293,12 +293,29 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
+    <script src="js/workspaces-emergency-inline.js"></script>
+    <script src="js/workspaces-mobile-fix.js"></script>
+    <style id="workspaces-mobile-emergency-fix">
+        @media (max-width: 800px) {
+            body, html {
+                overflow: auto !important;
+                overflow-y: scroll !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                position: static !important;
+                -webkit-overflow-scrolling: touch !important;
+                max-height: none !important;
+            }
+        }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/workspaces-emergency-fix.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -983,12 +1000,29 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
+    <script src="js/workspaces-emergency-inline.js"></script>
+    <script src="js/workspaces-mobile-fix.js"></script>
+    <style id="workspaces-mobile-emergency-fix">
+        @media (max-width: 800px) {
+            body, html {
+                overflow: auto !important;
+                overflow-y: scroll !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                position: static !important;
+                -webkit-overflow-scrolling: touch !important;
+                max-height: none !important;
+            }
+        }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/font-awesome.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/workspaces-emergency-fix.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }

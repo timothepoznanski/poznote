@@ -218,13 +218,13 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             </div>
 
             <div class="info-row">
-                <div class="info-label">Folder:</div>
-                <div class="info-value"><?php echo htmlspecialchars($folderText); ?></div>
+                <div class="info-label">Workspace:</div>
+                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Workspace:</div>
-                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
+                <div class="info-label">Folder:</div>
+                <div class="info-value"><?php echo htmlspecialchars($folderText); ?></div>
             </div>
 
             <div class="info-row">

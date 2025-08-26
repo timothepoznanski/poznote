@@ -26,7 +26,8 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🤖 AI-powered features
 - 📱 Responsive design for all devices
 - 🖥️ Multi-instance support
-- 🔒 Self-hosted with secure authentication
+- � Workspaces for organizing notes in separate environments
+- �🔒 Self-hosted with secure authentication
 - 💾 Built-in backup and export tools
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
@@ -41,8 +42,8 @@ A powerful note-taking application that puts you in complete control of your dat
 
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
-- [Multiple Instances](#multiple-instances)
 - [Workspaces](#workspaces)
+- [Multiple Instances](#multiple-instances)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
@@ -88,13 +89,13 @@ Docker is a platform that packages and runs applications in isolated containers.
 **Windows (PowerShell):**
 ```powershell
 function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "
-Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) { Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; if (Test-Path $instanceName) { Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
+Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) { Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; if (Test-Path $instanceName) { Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
 ```
 
 **Linux (Bash):**
 ```bash
 check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Docker container '${name}-webserver-1' already exists!"; return 1; fi; return 0; }; while true; do read -p "
-Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then break; else if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."; elif [ -d "$instanceName" ]; then echo "⚠️  Folder '$instanceName' already exists!"; fi; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
+Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then break; else if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."; elif [ -d "$instanceName" ]; then echo "⚠️  Folder '$instanceName' already exists!"; fi; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
 ```
 
 ## Access Your Instance
@@ -109,6 +110,33 @@ where YOUR_SERVER depends on your environment:
 
 The setup script will display the exact URL and credentials.
 
+## Workspaces
+
+Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
+
+### What are Workspaces?
+
+- **🔀 Separate environments** - Each workspace contains its own notes, tags, and folders
+- **⚡ Easy switching** - Use the workspace selector to switch between environments instantly
+- **🏷️ Independent organization** - Tags and folders are unique to each workspace
+
+### Managing Workspaces
+
+**Access:** Go to **Settings → Manage Workspaces**
+
+**Basic Operations:**
+- **Create:** Enter a name and click "Create"
+- **Switch:** Use the workspace selector at the top of the interface
+- **Rename/Move/Delete:** Use the buttons in workspace management
+
+⚠️ **Note:** The default "Poznote" workspace cannot be deleted and contains any pre-existing notes.
+
+### Common Use Cases
+
+- **📝 Personal vs Work** - Separate professional and personal notes
+- **🎓 Projects** - Organize by client, course, or research topic
+- **🗂️ Archive** - Keep active and archived notes separate
+
 ## Multiple Instances
 
 You can run multiple isolated Poznote instances on the same server. Simply run the setup script multiple times with different instance names and ports.
@@ -119,88 +147,24 @@ Each instance will have:
 - Different ports
 - Isolated configurations
 
-### Example: Personal and Work instances on the same server
+### Example: Tom and Alice instances on the same server
 
 ```
 Server: my-server.com
-├── Poznote Personal
+├── Poznote Tom
 │   ├── Port: 8040
 │   ├── URL: http://my-server.com:8040
-│   ├── Container: poznote-personal-webserver-1
-│   └── Data: ./poznote-personal/data/
+│   ├── Container: poznote-tom-webserver-1
+│   └── Data: ./poznote-tom/data/
 │
-└── Poznote Work
+└── Poznote Alice
     ├── Port: 8041
     ├── URL: http://my-server.com:8041
-    ├── Container: poznote-work-webserver-1
-    └── Data: ./poznote-work/data/
+    ├── Container: poznote-alice-webserver-1
+    └── Data: ./poznote-alice/data/
 ```
 
 For deployments on different servers, you only need to run the setup script to update configuration (no need for different instance names or ports).
-
-## Workspaces
-
-Workspaces allow you to organize your notes into separate, isolated environments within a single Poznote instance. Think of workspaces as different "contexts" or "projects" where you can keep related notes together.
-
-### Key Features
-
-- **🔀 Multiple Workspaces** - Create unlimited workspaces to organize different projects, contexts, or areas of your life
-- **🔒 Isolated Notes** - Notes in one workspace are completely separate from notes in another workspace
-- **⚡ Quick Switching** - Easily switch between workspaces using the workspace selector in the interface
-- **🏷️ Independent Tags** - Each workspace maintains its own set of tags and organization
-- **📁 Separate Folders** - Folder structures are independent per workspace
-
-### Default Workspace
-
-Every Poznote instance starts with a default workspace called **"Poznote"**. This workspace:
-- Cannot be deleted
-- Contains any notes created before workspace functionality was enabled
-- Serves as the fallback workspace for legacy notes
-
-### Managing Workspaces
-
-**Access Workspace Management:**
-- Go to **Settings → Manage Workspaces** in your Poznote interface
-
-**Create a New Workspace:**
-1. Enter a workspace name (only letters, numbers, underscores, and hyphens allowed)
-2. Click "Create"
-3. Switch to your new workspace to start creating notes
-
-**Switch Between Workspaces:**
-- Use the workspace selector at the top of the interface
-- Click on the current workspace name to see all available workspaces
-- Select any workspace to switch to it immediately
-
-**Rename a Workspace:**
-- In the workspace management interface, click "Rename" next to any workspace
-- Enter the new name and confirm
-- All notes will automatically be moved to the renamed workspace
-
-**Move Notes Between Workspaces:**
-- Use the "Move notes" button in workspace management
-- Select the target workspace
-- All notes from the source workspace will be transferred
-
-**Delete a Workspace:**
-- Click "Delete" next to any workspace (except the default "Poznote" workspace)
-- All notes and attachments in that workspace will be permanently removed
-- ⚠️ **Warning:** This action cannot be undone
-
-### Use Cases
-
-- **📝 Personal vs Work** - Keep personal notes separate from work-related content
-- **🎓 Different Projects** - Organize notes by project, course, or client
-- **👥 Shared Access** - Create workspaces for different team members or use cases
-- **🗂️ Archive Organization** - Separate active notes from archived content
-
-### Technical Notes
-
-- Workspaces are stored in the SQLite database
-- Each note is associated with exactly one workspace
-- Switching workspaces only shows notes from the selected workspace
-- Search functionality is workspace-specific
-- Backup/export operations include all workspaces
 
 ## Change Settings
 

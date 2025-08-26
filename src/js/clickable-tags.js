@@ -88,12 +88,7 @@ function convertTagsToEditable(noteId) {
             e.stopPropagation();
             return false;
         }
-        // Empêcher la saisie d'espaces
-        if (e.key === ' ') {
-            e.preventDefault();
-            showTagError(tagInput, 'Les espaces ne sont pas autorisés dans les tags');
-            return false;
-        }
+        // La touche espace sera gérée dans keydown pour créer un tag
     });
     
     tagInput.addEventListener('keydown', function(e) {
@@ -156,32 +151,34 @@ function handleTagInput(e, noteId, container) {
         e.stopPropagation(); // Empêche la propagation de l'événement
         
         const input = e.target;
-        const tagText = input.value.trim();
+        let tagText = input.value.trim();
         
         if (tagText && tagText !== '') {
-            // Vérifier s'il y a des espaces dans le tag
-            if (tagText.includes(' ')) {
-                // Afficher un message d'erreur temporaire
-                showTagError(input, 'Les tags ne peuvent pas contenir d\'espaces');
-                return false;
-            }
+            // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
+            const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
             
-            // Check if tag already exists
-            const existingTags = container.querySelectorAll('.clickable-tag');
-            const tagExists = Array.from(existingTags).some(tag => 
-                tag.textContent.toLowerCase() === tagText.toLowerCase()
-            );
+            tags.forEach(singleTag => {
+                const trimmedTag = singleTag.trim();
+                if (trimmedTag) {
+                    // Check if tag already exists
+                    const existingTags = container.querySelectorAll('.clickable-tag');
+                    const tagExists = Array.from(existingTags).some(tag => 
+                        tag.textContent.toLowerCase() === trimmedTag.toLowerCase()
+                    );
+                    
+                    if (!tagExists) {
+                        addTagElement(container, trimmedTag, noteId);
+                    }
+                }
+            });
             
-            if (!tagExists) {
-                addTagElement(container, tagText, noteId);
-                input.value = '';
-                updateTagsInput(noteId, container);
-                
-                // Garde le focus sur l'input pour continuer à taper
-                setTimeout(() => {
-                    input.focus();
-                }, 10);
-            }
+            input.value = '';
+            updateTagsInput(noteId, container);
+            
+            // Garde le focus sur l'input pour continuer à taper
+            setTimeout(() => {
+                input.focus();
+            }, 10);
         }
         
         return false; // Empêche complètement la propagation
@@ -200,28 +197,29 @@ function handleTagInput(e, noteId, container) {
  */
 function handleTagInputBlur(e, noteId, container) {
     const input = e.target;
-    const tagText = input.value.trim();
+    let tagText = input.value.trim();
     
     if (tagText && tagText !== '') {
-        // Vérifier s'il y a des espaces dans le tag
-        if (tagText.includes(' ')) {
-            // Afficher un message d'erreur temporaire et vider l'input
-            showTagError(input, 'Les tags ne peuvent pas contenir d\'espaces');
-            input.value = '';
-            return;
-        }
+        // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
+        const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
         
-        // Check if tag already exists
-        const existingTags = container.querySelectorAll('.clickable-tag');
-        const tagExists = Array.from(existingTags).some(tag => 
-            tag.textContent.toLowerCase() === tagText.toLowerCase()
-        );
+        tags.forEach(singleTag => {
+            const trimmedTag = singleTag.trim();
+            if (trimmedTag) {
+                // Check if tag already exists
+                const existingTags = container.querySelectorAll('.clickable-tag');
+                const tagExists = Array.from(existingTags).some(tag => 
+                    tag.textContent.toLowerCase() === trimmedTag.toLowerCase()
+                );
+                
+                if (!tagExists) {
+                    addTagElement(container, trimmedTag, noteId);
+                }
+            }
+        });
         
-        if (!tagExists) {
-            addTagElement(container, tagText, noteId);
-            input.value = '';
-            updateTagsInput(noteId, container);
-        }
+        input.value = '';
+        updateTagsInput(noteId, container);
     }
 }
 

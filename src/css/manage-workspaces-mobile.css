@@ -1,0 +1,68 @@
+/* Mobile CSS fix for workspaces page scrolling */
+@media (max-width: 800px) {
+    /* Override the default mobile overflow: hidden for workspaces page */
+    body, html {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: static !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure proper spacing and layout for workspaces page */
+    .settings-container {
+        padding: 20px 15px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Workspace list mobile optimizations */
+    .workspace-list {
+        margin-bottom: 30px !important;
+    }
+    
+    .workspace-list ul li {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 15px 0 !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+    }
+    
+    .workspace-list .ws-col {
+        width: 100% !important;
+    }
+    
+    .workspace-list .btn {
+        width: 100% !important;
+        min-width: unset !important;
+        margin-bottom: 8px !important;
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Form styling for mobile */
+    #create-workspace-form input {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
+    }
+    
+    #create-workspace-form button {
+        width: 100% !important;
+        padding: 14px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Back button mobile styling */
+    .btn-secondary {
+        width: 100% !important;
+        margin-bottom: 20px !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+    }
+}

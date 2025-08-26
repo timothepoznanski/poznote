@@ -220,7 +220,7 @@
 }
 
 html, body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     color: rgb(55, 53, 47);
 }
 
@@ -1077,6 +1077,140 @@ img {
     box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
 }
 
+/* CUSTOM CONFIRMATION MODAL */
+.confirm-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.confirm-modal {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    max-width: 400px;
+    width: 90%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: confirmModalAppear 0.2s ease-out;
+}
+
+@keyframes confirmModalAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.confirm-content {
+    padding: 0;
+}
+
+.confirm-message {
+    padding: 24px 24px 20px 24px;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #333;
+    text-align: center;
+}
+
+.confirm-buttons {
+    display: flex;
+    border-top: 1px solid #e0e0e0;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    background: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    outline: none;
+}
+
+.confirm-btn:first-child {
+    border-right: 1px solid #e0e0e0;
+}
+
+.confirm-btn-cancel {
+    color: #666;
+}
+
+.confirm-btn-cancel:hover {
+    background-color: #f5f5f5;
+}
+
+.confirm-btn-cancel:focus {
+    background-color: #f0f0f0;
+}
+
+.confirm-btn-confirm {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.confirm-btn-confirm:hover {
+    background-color: #fff5f5;
+}
+
+.confirm-btn-confirm:focus {
+    background-color: #ffebee;
+}
+
+/* Mobile specific styles for confirmation modal */
+@media (max-width: 768px) {
+    .confirm-modal {
+        max-width: 320px;
+        width: 85%;
+        border-radius: 16px;
+    }
+    
+    .confirm-message {
+        padding: 20px 20px 16px 20px;
+        font-size: 15px;
+    }
+    
+    .confirm-buttons {
+        flex-direction: column;
+    }
+    
+    .confirm-btn {
+        padding: 18px 20px;
+        font-size: 17px;
+    }
+    
+    .confirm-btn:first-child {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .confirm-btn-cancel {
+        order: 2;
+    }
+    
+    .confirm-btn-confirm {
+        order: 1;
+    }
+}
+
 /* UPDATE NOTIFICATION STYLES */
 
 /* Update notification badge */
@@ -1741,7 +1875,7 @@ textarea:focus{
     overflow-wrap: break-word;
     outline: none;
     resize: none;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-size: 15px;
 }
 
@@ -1759,7 +1893,7 @@ textarea:focus{
 .noteentry s,
 .noteentry a,
 .noteentry span:not(.code-block span) {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
 }
 
 .noteentry:focus{
@@ -1777,7 +1911,7 @@ pre.code-block,
     background-color: #f8f8f8 !important;
     /* border: 1px solid #e1e1e1; */
     border-radius: 4px;
-    padding: 30px 30px;
+    padding: 20px 20px;
     margin: 8px 0;
     color: #333;
     white-space: pre-wrap;
@@ -1790,7 +1924,7 @@ pre.code-block,
 /* S'assurer que les blocs de code ont les bonnes marges même sans wrapper */
 .code-block, pre.code-block, .noteentry pre {
     margin: 0 !important;
-    padding: 40px 15px 40px 60px;
+    padding: 30px 30px !important;
     /* border-radius: 6px; */
     background: #F8FAFC !important;
     border: 1px solid #e9ecef;
@@ -1798,6 +1932,11 @@ pre.code-block,
     position: relative;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* Règle spécifique supplémentaire pour s'assurer que le padding est appliqué */
+.noteentry pre, pre.code-block, .code-block {
+    padding: 30px !important;
 }
 
 

@@ -592,28 +592,30 @@ function deleteAttachment(attachmentId) {
         return;
     }
     
-    const formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('note_id', currentNoteIdForAttachments);
-    formData.append('attachment_id', attachmentId);
-    
-    fetch('api_attachments.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            loadAttachments(currentNoteIdForAttachments); // Reload list
-            updateAttachmentCountInMenu(currentNoteIdForAttachments); // Update count in menu
-            // showNotificationPopup('Attachment deleted successfully'); // Removed notification
-        } else {
-            showNotificationPopup('Delete failed: ' + data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotificationPopup('Delete failed', 'error');
+    confirmDeleteAttachment(function() {
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('note_id', currentNoteIdForAttachments);
+        formData.append('attachment_id', attachmentId);
+        
+        fetch('api_attachments.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadAttachments(currentNoteIdForAttachments); // Reload list
+                updateAttachmentCountInMenu(currentNoteIdForAttachments); // Update count in menu
+                // showNotificationPopup('Attachment deleted successfully'); // Removed notification
+            } else {
+                showNotificationPopup('Delete failed: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotificationPopup('Delete failed', 'error');
+        });
     });
 }
 
@@ -1185,6 +1187,49 @@ function deleteNote(iid){
       }
     }
   });
+});
+
+// Add keydown event handler for classic tags inputs to handle space key for tag separation
+document.body.addEventListener('keydown', function(e) {
+    // Check if this is a classic tags input field (not clickable tags)
+    if (e.target.tagName === 'INPUT' && 
+        e.target.id && 
+        e.target.id.startsWith('tags') &&
+        !e.target.classList.contains('tag-input')) {
+        
+        if (e.key === ' ') {
+            // For classic tags input, let's implement space-to-tag functionality
+            const input = e.target;
+            const currentValue = input.value;
+            const cursorPos = input.selectionStart;
+            
+            // Get the text before cursor and find the current tag being typed
+            const textBeforeCursor = currentValue.substring(0, cursorPos);
+            const lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
+            const currentTag = textBeforeCursor.substring(lastSpaceIndex + 1).trim();
+            
+            if (currentTag && currentTag.length > 0) {
+                // We have a tag to create, add space and continue
+                // This simulates the desktop behavior where space separates tags
+                e.preventDefault();
+                
+                // Add a space if there isn't already one
+                const charAfterCursor = currentValue.charAt(cursorPos);
+                if (charAfterCursor !== ' ' && charAfterCursor !== '') {
+                    input.value = currentValue.substring(0, cursorPos) + '  ' + currentValue.substring(cursorPos);
+                    input.selectionStart = input.selectionEnd = cursorPos + 2;
+                } else {
+                    input.value = currentValue.substring(0, cursorPos) + ' ' + currentValue.substring(cursorPos);
+                    input.selectionStart = input.selectionEnd = cursorPos + 1;
+                }
+                
+                // Trigger update to save changes
+                if (typeof update === 'function') {
+                    update();
+                }
+            }
+        }
+    }
 });
 
 // Reset noteid when the search bar receives focus
@@ -3986,3 +4031,106 @@ window.createTestContent = function() {
         noteContents[0].innerHTML = 'This is a test note with some test words to highlight. Test again and again.';
     }
 };
+
+// Custom confirmation modal for mobile-friendly UI
+function showConfirmDialog(message, onConfirm, onCancel) {
+    // Create overlay if it doesn't exist
+    let overlay = document.getElementById('confirmOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'confirmOverlay';
+        overlay.className = 'confirm-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('confirmModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'confirmModal';
+        modal.className = 'confirm-modal';
+        modal.innerHTML = `
+            <div class="confirm-content">
+                <div class="confirm-message"></div>
+                <div class="confirm-buttons">
+                    <button id="confirmCancel" class="confirm-btn confirm-btn-cancel">Annuler</button>
+                    <button id="confirmOk" class="confirm-btn confirm-btn-confirm">Supprimer</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // Set message
+    const messageElement = modal.querySelector('.confirm-message');
+    messageElement.textContent = message;
+
+    // Show modal
+    overlay.style.display = 'block';
+    modal.style.display = 'block';
+
+    // Handle buttons
+    const cancelBtn = modal.querySelector('#confirmCancel');
+    const okBtn = modal.querySelector('#confirmOk');
+
+    function closeModal() {
+        overlay.style.display = 'none';
+        modal.style.display = 'none';
+        // Remove event listeners
+        cancelBtn.removeEventListener('click', handleCancel);
+        okBtn.removeEventListener('click', handleConfirm);
+        overlay.removeEventListener('click', handleOverlayClick);
+    }
+
+    function handleCancel() {
+        closeModal();
+        if (onCancel) onCancel();
+    }
+
+    function handleConfirm() {
+        closeModal();
+        if (onConfirm) onConfirm();
+    }
+
+    function handleOverlayClick(e) {
+        if (e.target === overlay) {
+            handleCancel();
+        }
+    }
+
+    // Add event listeners
+    cancelBtn.addEventListener('click', handleCancel);
+    okBtn.addEventListener('click', handleConfirm);
+    overlay.addEventListener('click', handleOverlayClick);
+
+    // Focus on cancel button for accessibility
+    setTimeout(() => cancelBtn.focus(), 100);
+}
+
+// Helper function to replace confirm() calls for attachment deletion
+function confirmDeleteAttachment(callback) {
+    showConfirmDialog(
+        'Êtes-vous sûr de vouloir supprimer cette pièce jointe ?',
+        callback,
+        null
+    );
+}
+
+// Fix for checkbox text editing issue
+// Prevent checkbox from being toggled when clicking on the text span in a checkline
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click event listener to handle checkline text clicks
+    document.addEventListener('click', function(e) {
+        // Check if the clicked element is a contenteditable span within a checkline
+        if (e.target.tagName === 'SPAN' && 
+            e.target.hasAttribute('contenteditable') && 
+            e.target.classList.contains('checkline-text')) {
+            
+            // Prevent the click from propagating to the label (which would toggle the checkbox)
+            e.stopPropagation();
+            
+            // Focus the span for text editing
+            e.target.focus();
+        }
+    }, true); // Use capture phase to handle this before other handlers
+});
