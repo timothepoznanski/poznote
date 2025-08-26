@@ -67,52 +67,19 @@ Docker is a platform that packages and runs applications in isolated containers.
 
 ## 🪟 Windows Prerequisites
 
-### 1. PowerShell 7 (**REQUIRED**)
-- ⚠️ **Installation does NOT work with PowerShell 5** (Windows default version)
-- 📥 Download and install [PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
-- 🚀 After installation, launch **PowerShell 7** (not Windows PowerShell)
-- ✅ To check version: `$PSVersionTable.PSVersion` (must show 7.x.x)
-
-### 2. Docker Desktop
-- 📥 Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-- 📋 Follow the installation wizard (restart required)
-- 🚀 Launch Docker Desktop from Start menu
-- ⏳ Wait for Docker to start (Docker icon in system tray)
+1. **PowerShell 7**: [Download PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
+2. **Docker Desktop**: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ---
 
 ## 🐧 Linux Prerequisites
 
-### 1. Docker Engine
-Install Docker based on your distribution:
-
-**Ubuntu/Debian:**
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-**CentOS/RHEL:**
-Follow the [official guide](https://docs.docker.com/engine/install/centos/)
-
-**Arch Linux:**
-```bash
-sudo pacman -S docker docker-compose
-```
-
-### 2. Docker Configuration
-```bash
-# Start Docker
-sudo systemctl start docker && sudo systemctl enable docker
-
-# Add your user to docker group
-sudo usermod -aG docker $USER
-
-# Restart session (or reboot)
-newgrp docker
-
-# Test installation
-docker --version && docker compose version
-```
+1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
+2. **Add user to Docker group**:
+   ```bash
+   sudo usermod -aG docker $USER
+   ```
+   ⚠️ **Restart your session** after this command
 
 ---
 
