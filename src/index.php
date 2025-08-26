@@ -487,7 +487,10 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text workspace-link" title="Workspace"><?php echo $displayWorkspace; ?></span>
+        <a class="left-header-text workspace-name-link" href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
+            <span class="workspace-name-text"><?php echo $displayWorkspace; ?></span>
+        </a>
         <div id="workspaceMenu" class="settings-menu" style="display:none; position:absolute; z-index:9999;">
             <div id="workspaceMenuItems"></div>
         </div>
@@ -509,11 +512,7 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
                     </div>
-                    <!-- Manage workspaces moved after unfold all folders -->
-                    <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
-                        <i class="fas fa-layer-group"></i>
-                        <span>Workspaces</span>
-                    </div>
+                    <!-- Manage workspaces moved to the left header workspace control -->
                     <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                         <i class="fas fa-robot"></i>
                         <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
@@ -539,10 +538,7 @@ $folder_filter = $_GET['folder'] ?? '';
                         <i class="fas fa-code-branch"></i>
                         <span>GitHub Repository</span>
                     </div>
-                    <div class="settings-menu-item" onclick="window.open('https://timpoz.com/', '_blank');">
-                        <i class="fas fa-globe"></i>
-                        <span>Tim's projects</span>
-                    </div>
+                    <!-- Tim's projects removed from settings per request -->
                     <div class="settings-menu-item" onclick="window.location = 'logout.php';">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
@@ -693,12 +689,19 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text workspace-link" title="Workspace"><?php echo $displayWorkspace; ?></span>
+        <a class="left-header-text workspace-name-link" href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-layer-group workspace-icon" aria-hidden="true"></i>
+            <span class="workspace-name-text"><?php echo $displayWorkspace; ?></span>
+        </a>
     </div>
     <div class="containbuttons">
         <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
         <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
     <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+        <!-- Small workspace icon (desktop) placed left of Settings; uses same class so existing delegated click opens the workspace menu -->
+        <div class="workspace-icon-btn left-header-text small-workspace-btn" title="Workspace" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-layer-group workspace-toggle-icon" aria-hidden="true"></i>
+        </div>
         <div class="settings-dropdown">
             <div class="settingsbutton" onclick="toggleSettingsMenu(event);" title="Settings">
                 <span><span class="fas fa-cog"></span></span>
@@ -712,11 +715,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>
                 </div>
-                <!-- Manage workspaces moved after unfold all folders -->
-                <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Workspaces</span>
-                </div>
+                <!-- Manage workspaces moved to the left header workspace control -->
                 <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                     <i class="fas fa-robot"></i>
                     <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
@@ -742,10 +741,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-code-branch"></i>
                     <span>GitHub Repository</span>
                 </div>
-                <div class="settings-menu-item" onclick="window.open('https://timpoz.com/', '_blank');">
-                    <i class="fas fa-globe"></i>
-                    <span>Tim's projects</span>
-                </div>
+                <!-- Tim's projects removed from settings per request -->
                 <div class="settings-menu-item" onclick="window.location = 'logout.php';">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>

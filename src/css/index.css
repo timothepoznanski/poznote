@@ -715,7 +715,7 @@ body {
 .left-header-text {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 2rem; /* make the workspace name larger */
+    font-size: 1.5rem; /* workspace name size */
     color: #007DB8;
     letter-spacing: 0.5px;
 }
@@ -4252,3 +4252,27 @@ input[type="search"]::-webkit-search-results-decoration {
 #moveFolderFilesModal .btn-primary:disabled:hover {
     background-color: #ccc;
 }
+
+/* Small workspace button near settings */
+
+/* Make the small workspace button use the same styling as other header icon buttons */
+.small-workspace-btn {
+    display: inline-block;
+    width: 30px;
+    cursor: pointer;
+    height: 20px;
+    margin: 5px;
+    color: #007DB8;
+    font-size: 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.workspace-toggle-icon, .workspace-icon {
+    display: inline-block;
+    font-size: 15px; /* match other header icons */
+    color: #007DB8;
+}
+
+.left-header .workspace-icon { margin-right: 6px; vertical-align: middle; }
+

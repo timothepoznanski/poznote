@@ -121,12 +121,26 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create delegated event handler
         window.workspaceMenuHandler = function(e) {
-            var target = e.target;
+            // Normalize target: if user clicked a text node, use its parent element so closest() works
+            var rawTarget = e.target;
+            var target = (rawTarget && rawTarget.nodeType === 3 && rawTarget.parentElement) ? rawTarget.parentElement : rawTarget;
+
+            // Exclude workspace name link from any interception
+            var workspaceNameLink = (target && target.classList && target.classList.contains('workspace-name-link')) ? target : (target && target.closest ? target.closest('.workspace-name-link') : null);
+            var workspaceNameText = (target && target.classList && target.classList.contains('workspace-name-text')) ? target : (target && target.closest ? target.closest('.workspace-name-text') : null);
             
-            // Check if clicked element is a workspace header
-            if (target.classList.contains('left-header-text')) {
+            if (workspaceNameLink || workspaceNameText) {
+                // Allow default behavior for workspace name links
+                return;
+            }
+
+            // Only trigger workspace menu for the small workspace button
+            var smallWorkspaceBtn = (target && target.classList && target.classList.contains('small-workspace-btn')) ? target : (target && target.closest ? target.closest('.small-workspace-btn') : null);
+
+            if (smallWorkspaceBtn) {
+                // Intercept clicks intended to open the workspace menu
                 e.preventDefault();
-                
+
                 // Create menu element once and append to body if not exists
                 var workspaceMenu = document.getElementById('workspaceMenu');
                 if (!workspaceMenu) {
@@ -4228,3 +4242,16 @@ function confirmDeleteAttachment(callback) {
         null
     );
 }
+
+// Force workspace name link to work properly
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure workspace name text links work
+    var workspaceLinks = document.querySelectorAll('.workspace-name-text');
+    workspaceLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            // Allow default behavior and force navigation
+            e.stopPropagation();
+            return true;
+        });
+    });
+});
