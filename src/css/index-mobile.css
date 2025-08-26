@@ -196,7 +196,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save, .btn-ai {
+.btn-separator, .btn-save, .btn-ai, .btn-emoji, .btn-checklist {
     display: flex !important;
 }
 
@@ -226,7 +226,9 @@ body {
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-emoji,
+.show-format-buttons .btn-checklist,
 .show-format-buttons .btn-save,
+.show-format-buttons .btn-ai,
 .show-format-buttons .btn-favorite, 
 .show-format-buttons .btn-folder, 
 .show-format-buttons .btn-attachment, 

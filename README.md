@@ -338,29 +338,32 @@ http://YOUR_SERVER:HTTP_WEB_PORT/
 
 #### List Notes
 ```bash
-curl -u 'username:password' http://localhost:8040/api_list_notes.php
+curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=MyWorkspace
 ```
+
+You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST data (`workspace=NAME`). If omitted, the API will return notes from all workspaces.
+
+**Optional parameters:**
+- `workspace` (string) - Filter notes by workspace name
 
 #### Create Note
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
-curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=MyWorkspace
-You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST data (`workspace=NAME`). If omitted, the default workspace is `Poznote` and APIs will return notes from all workspaces when appropriate (or use the default workspace semantics described below).
-
   -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
     "tags": "personal,important",
-    "folder_name": "Projects"
+    "folder_name": "Projects",
+    "workspace": "MyWorkspace"
   }'
 ```
-  "folder_name": "Projects",
-  "workspace": "MyWorkspace"
+**Required parameters:**
 - `heading` (string) - The note title
 **Optional parameters:**
 - `tags` (string) - Comma-separated tags
 - `folder_name` (string) - Folder name (defaults to "Default")
+- `workspace` (string) - Workspace name (defaults to "Poznote")
 
 #### Create Folder
 ```bash

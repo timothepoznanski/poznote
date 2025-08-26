@@ -340,8 +340,13 @@ http://VOTRE_SERVEUR:PORT_HTTP_WEB/
 
 #### Lister les notes
 ```bash
-curl -u 'utilisateur:motdepasse' http://localhost:8040/api_list_notes.php
+curl -u 'utilisateur:motdepasse' http://localhost:8040/api_list_notes.php?workspace=MonEspaceDeTravail
 ```
+
+Vous pouvez passer l'espace de travail comme paramètre de requête (`?workspace=NOM`) ou comme données POST (`workspace=NOM`). Si omis, l'API retournera les notes de tous les espaces de travail.
+
+**Paramètres optionnels :**
+- `workspace` (string) - Filtrer les notes par nom d'espace de travail
 
 #### Créer une note
 ```bash
@@ -351,24 +356,28 @@ curl -X POST http://localhost:8040/api_create_note.php \
 	-d '{
 		"heading": "Ma nouvelle note",
 		"tags": "perso,important",
-		"folder_name": "Projets"
+		"folder_name": "Projets",
+		"workspace": "MonEspaceDeTravail"
 	}'
 ```
 **Paramètres obligatoires :**
 - `heading` (string) - Titre de la note
 **Paramètres optionnels :**
 - `tags` (string) - Tags séparés par des virgules
-- `folder_name` (string) - Nom du dossier (par défaut "Non classé")
+- `folder_name` (string) - Nom du dossier (par défaut "Default")
+- `workspace` (string) - Nom de l'espace de travail (par défaut "Poznote")
 
 #### Créer un dossier
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
 	-u 'utilisateur:motdepasse' \
 	-H "Content-Type: application/json" \
-	-d '{"folder_name": "Projets Travail"}'
+	-d '{"folder_name": "Projets Travail", "workspace": "MonEspaceDeTravail"}'
 ```
 **Paramètre obligatoire :**
 - `folder_name` (string) - Nom du dossier
+**Paramètre optionnel :**
+- `workspace` (string) - Nom de l'espace de travail pour scoper le dossier (par défaut "Poznote")
 
 #### Déplacer une note
 ```bash
@@ -377,12 +386,15 @@ curl -X POST http://localhost:8040/api_move_note.php \
 	-H "Content-Type: application/json" \
 	-d '{
 		"note_id": "123",
-		"folder_name": "Projets Travail"
+		"folder_name": "Projets Travail",
+		"workspace": "MonEspaceDeTravail"
 	}'
 ```
 **Paramètres obligatoires :**
 - `note_id` (string) - ID de la note à déplacer
 - `folder_name` (string) - Dossier cible
+**Paramètre optionnel :**
+- `workspace` (string) - Si fourni, déplace la note vers l'espace de travail spécifié (gère les conflits de titre)
 
 #### Supprimer une note
 ```bash
@@ -390,7 +402,7 @@ curl -X POST http://localhost:8040/api_move_note.php \
 curl -X DELETE http://localhost:8040/api_delete_note.php \
 	-u 'utilisateur:motdepasse' \
 	-H "Content-Type: application/json" \
-	-d '{"note_id": "123"}'
+	-d '{"note_id": "123", "workspace": "MonEspaceDeTravail"}'
 
 # Suppression définitive
 curl -X DELETE http://localhost:8040/api_delete_note.php \
@@ -398,17 +410,27 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 	-H "Content-Type: application/json" \
 	-d '{
 		"note_id": "123",
-		"permanent": true
+		"permanent": true,
+		"workspace": "MonEspaceDeTravail"
 	}'
 ```
+**Paramètre obligatoire :**
+- `note_id` (string) - ID de la note à supprimer
+**Paramètres optionnels :**
+- `permanent` (boolean) - Suppression définitive si true, sinon déplace vers la corbeille
+- `workspace` (string) - Espace de travail pour scoper l'opération
 
 #### Supprimer un dossier
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
 	-u 'utilisateur:motdepasse' \
 	-H "Content-Type: application/json" \
-	-d '{"folder_name": "Projets Travail"}'
+	-d '{"folder_name": "Projets Travail", "workspace": "MonEspaceDeTravail"}'
 ```
+**Paramètre obligatoire :**
+- `folder_name` (string) - Nom du dossier à supprimer
+**Paramètre optionnel :**
+- `workspace` (string) - Espace de travail pour scoper l'opération (par défaut "Poznote")
 
 **Note :** Le dossier `Non classé` ne peut pas être supprimé. Quand un dossier est supprimé, toutes ses notes sont déplacées dans `Non classé`.
 
