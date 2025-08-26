@@ -36,6 +36,13 @@ try {
             echo json_encode(['success' => false, 'message' => 'Invalid workspace']);
             exit;
         }
+        // Ensure workspace exists before trying to delete
+        $check = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+        $check->execute([$name]);
+        if ((int)$check->fetchColumn() === 0) {
+            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            exit;
+        }
         // Move notes from this workspace to default before deleting
         $stmt = $con->prepare("UPDATE entries SET workspace = 'Poznote' WHERE workspace = ?");
         $stmt->execute([$name]);
@@ -49,6 +56,25 @@ try {
         }
 
         $stmt = $con->prepare("DELETE FROM workspaces WHERE name = ?");
+        // Audit log: record delete attempts
+        try {
+            $logDir = __DIR__ . '/../data';
+            if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+            $logFile = $logDir . '/workspace_actions.log';
+            // Determine actor for log: prefer session auth, else basic auth username if present
+            $who = 'unknown';
+            if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['authenticated'])) {
+                $who = 'session_user';
+            } elseif (!empty($_SERVER['PHP_AUTH_USER'])) {
+                $who = $_SERVER['PHP_AUTH_USER'];
+            }
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
+            $entry = date('c') . "\tapi_workspaces.php\tDELETE\t$name\tby:$who\tfrom:$ip\n";
+            @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+        } catch (Exception $e) {
+            // ignore logging errors
+        }
+
         if ($stmt->execute([$name])) {
             echo json_encode(['success' => true]);
         } else {
@@ -64,6 +90,20 @@ try {
         }
         if (!preg_match('/^[A-Za-z0-9_-]+$/', $new)) {
             echo json_encode(['success' => false, 'message' => 'Invalid new name: use letters, numbers, dash or underscore only']);
+            exit;
+        }
+        // Ensure the source workspace exists
+        $checkOld = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+        $checkOld->execute([$old]);
+        if ((int)$checkOld->fetchColumn() === 0) {
+            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            exit;
+        }
+        // Ensure the target name does not already exist
+        $checkNew = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+        $checkNew->execute([$new]);
+        if ((int)$checkNew->fetchColumn() > 0) {
+            echo json_encode(['success' => false, 'message' => 'Target workspace name already exists']);
             exit;
         }
         // Update entries workspace and workspaces table

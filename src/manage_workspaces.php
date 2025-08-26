@@ -38,6 +38,13 @@ if ($_POST) {
             if ($name === '') throw new Exception('Workspace name required');
             if ($name === 'Poznote') throw new Exception('Cannot delete the default workspace');
 
+            // Ensure workspace exists before deletion
+            $check = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+            $check->execute([$name]);
+            if ((int)$check->fetchColumn() === 0) {
+                throw new Exception('Workspace not found');
+            }
+
                 // Delete all entries for this workspace (including trashed notes)
                 $selectEntries = $con->prepare('SELECT id, attachments FROM entries WHERE workspace = ?');
                 $selectEntries->execute([$name]);
@@ -128,7 +135,26 @@ if ($_POST) {
                 $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
                 $stmt->execute([$name]);
 
+                // Audit log for manual deletion from manage_workspaces
+                try {
+                    $logDir = __DIR__ . '/../data';
+                    if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+                    $logFile = $logDir . '/workspace_actions.log';
+                    $who = (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['authenticated'])) ? 'session_user' : ($_SERVER['PHP_AUTH_USER'] ?? 'unknown');
+                    $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
+                    $entry = date('c') . "\tmanage_workspaces.php\tDELETE\t$name\tby:$who\tfrom:$ip\n";
+                    @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+                } catch (Exception $e) {
+                    // ignore logging errors
+                }
+
                 $message = 'Workspace deleted and all associated notes, folders and attachments removed';
+                // If this was an AJAX delete, return JSON response immediately
+                if (!empty($isAjax)) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => $message]);
+                    exit;
+                }
                 // If this was a non-AJAX delete, instruct client to clear selected workspace (so UI doesn't keep showing deleted workspace)
                 $clearSelectedWorkspace = true;
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {

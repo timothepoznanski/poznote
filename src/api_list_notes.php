@@ -15,6 +15,18 @@ $folder = $_GET['folder'] ?? $_POST['folder'] ?? null;
 $get_folders = $_GET['get_folders'] ?? $_POST['get_folders'] ?? null;
 
 try {
+    // If a workspace parameter is provided, ensure it exists in the workspaces table.
+    if ($workspace) {
+        $chk = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+        $chk->execute([$workspace]);
+        if ((int)$chk->fetchColumn() === 0) {
+            // Special-case: map 'Poznote' if requested even when absent in table (db_connect ensures default exists),
+            // otherwise return an explicit error for unknown workspace.
+            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            exit;
+        }
+    }
+
     if ($get_folders) {
         // Return list of folders
         $folders = [];
