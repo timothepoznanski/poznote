@@ -66,14 +66,14 @@ Docker est une plateforme qui permet d'empaqueter et d'exécuter des application
 
 ---
 
-## 🪟 Prérequis Windows
+### 🪟 Prérequis Windows
 
 1. **PowerShell 7** : [Télécharger PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
 2. **Docker Desktop** : [Télécharger Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ---
 
-## 🐧 Prérequis Linux
+### 🐧 Prérequis Linux
 
 1. **Docker Engine** : Installez Docker selon votre distribution ([guide officiel](https://docs.docker.com/engine/install/))
 2. **Ajouter l'utilisateur au groupe Docker** :
