@@ -4312,13 +4312,12 @@ input[type="search"]::-webkit-search-results-decoration {
     font-size: 16px;
     border-radius: 4px;
     transition: background-color 0.2s, color 0.2s;
-    padding: 8px;
     user-select: none;
 }
 
 .small-workspace-btn:hover {
     background-color: rgba(0, 125, 184, 0.1);
-    color: #005a8a !important;
+    color: #005a8a;
 }
 
 .workspace-toggle-icon, .workspace-icon {

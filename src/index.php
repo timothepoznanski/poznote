@@ -696,7 +696,7 @@ $folder_filter = $_GET['folder'] ?? '';
         <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
     <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
         <!-- Small workspace icon (desktop) placed left of Settings; uses same class so existing delegated click opens the workspace menu -->
-        <div class="workspace-icon-btn left-header-text small-workspace-btn" title="Workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="window.location.href='manage_workspaces.php';" style="cursor: pointer;">
+        <div class="workspace-icon-btn small-workspace-btn" title="Workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="window.location.href='manage_workspaces.php';" style="cursor: pointer;">
             <i class="fas fa-layer-group workspace-toggle-icon" aria-hidden="true"></i>
         </div>
         <div class="settings-dropdown">
