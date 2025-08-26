@@ -1,20 +1,14 @@
 <?php
 require_once 'config.php';
-require_once 'db_connect.php';
 require_once 'auth.php';
+requireApiAuth();
+
+require_once 'db_connect.php';
 
 // Start output buffering to prevent any accidental output
 ob_start();
 
 header('Content-Type: application/json');
-
-// Check authentication
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    ob_clean();
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ob_clean();
