@@ -506,6 +506,71 @@ a:active { color: #2E8CFA; } */
     }
 }
 
+/* Link modal styles (used by addLinkToNote / createLinkFromModal) */
+.link-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    z-index: 10050;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.link-modal-content {
+    background: #ffffff;
+    border-radius: 10px;
+    width: min(640px, 96%);
+    max-width: 640px;
+    box-shadow: 0 12px 30px rgba(15,15,15,0.18);
+    padding: 14px 16px;
+    box-sizing: border-box;
+}
+.link-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.link-modal-header h3 { margin: 0; font-size: 1.05rem; color: #222; }
+.link-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.link-modal-close:hover { background: #f4f6f8; color: #333; }
+.link-modal-body { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.link-modal-field { display: flex; flex-direction: column; gap: 6px; }
+.link-modal-field label { font-weight: 600; font-size: 0.95rem; color: #333; }
+.link-modal-field input[type="text"],
+.link-modal-field input[type="url"] {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.98rem;
+    box-sizing: border-box;
+}
+.link-modal-field input:focus { outline: none; border-color: #007DB8; box-shadow: 0 0 0 3px rgba(0,125,184,0.08); }
+.link-modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+.link-modal-btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.95rem; }
+.link-modal-btn-cancel { background: #f1f3f5; color: #333; }
+.link-modal-btn-cancel:hover { background: #e9ecef; }
+.link-modal-btn-primary { background: #007DB8; color: #fff; }
+.link-modal-btn-primary:hover { background: #006494; }
+
+@media (max-width: 520px) {
+    .link-modal-content { padding: 12px; }
+    .link-modal-header h3 { font-size: 1rem; }
+    .link-modal-footer { flex-direction: column-reverse; gap: 10px; }
+    .link-modal-btn { width: 100%; }
+}
+
 .toolbar-menu-btn i {
     width: 20px;
     margin-right: 8px;

@@ -148,7 +148,7 @@ function createLinkFromModal() {
       selection.addRange(savedRange);
       
     } catch (e) {
-      console.error('Error creating link:', e);
+      // Link insertion fallback: silently attempt execCommand approach
       // Fallback: try using execCommand if modern approach fails
       if (originalSelectedText) {
         document.execCommand('createLink', false, linkUrl);
@@ -298,7 +298,7 @@ function changeFontSize() {
   const hasSelection = savedRange && !savedRange.collapsed;
   
   if (!hasSelection) {
-    console.log('Veuillez sélectionner du texte avant de changer la taille de police');
+    // No selection - silently return
     return;
   }
 
@@ -374,8 +374,6 @@ function changeFontSize() {
           const selection = window.getSelection();
           selection.removeAllRanges();
           selection.addRange(savedRange);
-          
-          console.log('Restoring selection and applying font size', size);
           // Apply font size to the restored selection
           document.execCommand('fontSize', false, size);
         }
