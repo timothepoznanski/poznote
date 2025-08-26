@@ -74,6 +74,7 @@ Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à dép
 
 1. **Docker Engine** : Installez Docker selon votre distribution ([guide officiel](https://docs.docker.com/engine/install/))
 2. **Ajouter l'utilisateur au groupe Docker** :
+ 
    ```bash
    sudo usermod -aG docker $USER
    ```
