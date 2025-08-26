@@ -335,6 +335,9 @@ curl -u 'username:password' http://localhost:8040/api_list_notes.php
 #### Create Note
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
+curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=MyWorkspace
+You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST data (`workspace=NAME`). If omitted, the default workspace is `Poznote` and APIs will return notes from all workspaces when appropriate (or use the default workspace semantics described below).
+
   -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -343,7 +346,8 @@ curl -X POST http://localhost:8040/api_create_note.php \
     "folder_name": "Projects"
   }'
 ```
-**Required parameters:**
+  "folder_name": "Projects",
+  "workspace": "MyWorkspace"
 - `heading` (string) - The note title
 **Optional parameters:**
 - `tags` (string) - Comma-separated tags
@@ -354,10 +358,12 @@ curl -X POST http://localhost:8040/api_create_note.php \
 curl -X POST http://localhost:8040/api_create_folder.php \
   -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"folder_name": "Work Projects"}'
+  -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
 ```
 **Required parameters:**
 - `folder_name` (string) - The folder name
+**Optional parameters:**
+- `workspace` (string) - Optional workspace name to scope the folder (defaults to `Poznote`)
 
 #### Move Note
 ```bash
@@ -366,12 +372,15 @@ curl -X POST http://localhost:8040/api_move_note.php \
   -H "Content-Type: application/json" \
   -d '{
     "note_id": "123",
-    "folder_name": "Work Projects"
+  "folder_name": "Work Projects",
+  "workspace": "MyWorkspace"  # optional: destination workspace name
   }'
 ```
 **Required parameters:**
 - `note_id` (string) - The ID of the note to move
 - `folder_name` (string) - The target folder name
+Optional parameters:
+- `workspace` (string) - If provided, moves the note into the specified workspace (and will handle title conflicts there)
 
 #### Delete Note
 ```bash
@@ -379,7 +388,7 @@ curl -X POST http://localhost:8040/api_move_note.php \
 curl -X DELETE http://localhost:8040/api_delete_note.php \
   -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"note_id": "123"}'
+  -d '{"note_id": "123", "workspace": "MyWorkspace"}'
 
 # Permanent delete
 curl -X DELETE http://localhost:8040/api_delete_note.php \
@@ -387,7 +396,8 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
   -H "Content-Type: application/json" \
   -d '{
     "note_id": "123",
-    "permanent": true
+    "permanent": true,
+    "workspace": "MyWorkspace"
   }'
 ```
 
@@ -396,7 +406,7 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
   -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"folder_name": "Work Projects"}'
+  -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
 ```
 
 **Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
