@@ -485,6 +485,10 @@ $folder_filter = $_GET['folder'] ?? '';
                         <span>Fold All Folders</span>
                     </div>
                     <!-- Manage workspaces moved to the left-header menu -->
+                    <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Workspaces</span>
+                    </div>
                     <div class="settings-menu-item" onclick="unfoldAllFolders();">
                         <i class="fas fa-plus-square"></i>
                         <span>Unfold All Folders</span>
@@ -684,6 +688,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     <span>Fold All Folders</span>
                 </div>
                 <!-- Manage workspaces moved to the left-header menu -->
+                <div class="settings-menu-item" onclick="window.location = 'manage_workspaces.php';">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Workspaces</span>
+                </div>
                 <div class="settings-menu-item" onclick="unfoldAllFolders();">
                     <i class="fas fa-plus-square"></i>
                     <span>Unfold All Folders</span>

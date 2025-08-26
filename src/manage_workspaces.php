@@ -293,8 +293,7 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
-    <script src="js/workspaces-emergency-inline.js"></script>
-    <script src="js/workspaces-mobile-fix.js"></script>
+    <!-- Emergency JS files removed: not present in repository -->
     <style id="workspaces-mobile-emergency-fix">
         @media (max-width: 800px) {
             body, html {
@@ -315,7 +314,8 @@ try {
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
-    <link rel="stylesheet" href="css/workspaces-emergency-fix.css" media="(max-width: 800px)">
+    <!-- Use existing mobile stylesheet for manage workspaces -->
+    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -1000,8 +1000,7 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
-    <script src="js/workspaces-emergency-inline.js"></script>
-    <script src="js/workspaces-mobile-fix.js"></script>
+    <!-- Emergency JS files removed: not present in repository -->
     <style id="workspaces-mobile-emergency-fix">
         @media (max-width: 800px) {
             body, html {
@@ -1022,7 +1021,8 @@ try {
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
-    <link rel="stylesheet" href="css/workspaces-emergency-fix.css" media="(max-width: 800px)">
+    <!-- Use existing mobile stylesheet for manage workspaces -->
+    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }

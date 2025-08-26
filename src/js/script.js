@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var manageDiv = document.createElement('div');
                         manageDiv.className = 'settings-menu-item';
                         var manageIcon = document.createElement('i'); manageIcon.className = 'fas fa-cog'; manageDiv.appendChild(manageIcon);
-                        var manageSpan = document.createElement('span'); manageSpan.textContent = 'Manage workspaces'; manageDiv.appendChild(manageSpan);
+                        var manageSpan = document.createElement('span'); manageSpan.textContent = 'Workspaces'; manageDiv.appendChild(manageSpan);
                         manageDiv.onclick = function(){ window.location = 'manage_workspaces.php'; };
                         container.appendChild(manageDiv);
                     }
