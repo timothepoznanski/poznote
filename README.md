@@ -160,13 +160,13 @@ Each instance will have:
 
 ```
 Server: my-server.com
-├── Poznote Tom
+├── Poznote-Tom
 │   ├── Port: 8040
 │   ├── URL: http://my-server.com:8040
 │   ├── Container: poznote-tom-webserver-1
 │   └── Data: ./poznote-tom/data/
 │
-└── Poznote Alice
+└── Poznote-Alice
     ├── Port: 8041
     ├── URL: http://my-server.com:8041
     ├── Container: poznote-alice-webserver-1
