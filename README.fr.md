@@ -66,41 +66,56 @@ Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à dép
 **🐳 Qu'est-ce que Docker ?**
 Docker est une plateforme qui permet d'empaqueter et d'exécuter des applications dans des conteneurs isolés. Poznote utilise Docker pour simplifier l'installation et garantir que l'application fonctionne de la même manière sur tous les systèmes.
 
-#### Prérequis Windows
+---
 
-1. **PowerShell 7** (**OBLIGATOIRE**) :
-   - ⚠️ **L'installation ne fonctionne PAS avec PowerShell 5** (version par défaut de Windows)
-   - Téléchargez et installez [PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
-   - Après installation, lancez **PowerShell 7** (pas Windows PowerShell)
-   - Pour vérifier la version : `$PSVersionTable.PSVersion` (doit afficher 7.x.x)
-   
-2. **Docker Desktop** :
-   - Téléchargez et installez [Docker Desktop pour Windows](https://www.docker.com/products/docker-desktop/)
-   - Suivez l'assistant d'installation (redémarrage requis)
-   - Lancez Docker Desktop depuis le menu Démarrer
-   - Attendez que Docker soit démarré (icône Docker dans la barre des tâches)
+## 🪟 Prérequis Windows
 
-#### Prérequis Linux
+### 1. PowerShell 7 (**OBLIGATOIRE**)
+- ⚠️ **L'installation ne fonctionne PAS avec PowerShell 5** (version par défaut de Windows)
+- 📥 Téléchargez et installez [PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
+- 🚀 Après installation, lancez **PowerShell 7** (pas Windows PowerShell)
+- ✅ Pour vérifier la version : `$PSVersionTable.PSVersion` (doit afficher 7.x.x)
 
-1. **Docker Engine** : Installez Docker selon votre distribution :
-   - **Ubuntu/Debian :** `curl -fsSL https://get.docker.com | sh`
-   - **CentOS/RHEL :** Suivez le [guide officiel](https://docs.docker.com/engine/install/centos/)
-   - **Arch Linux :** `sudo pacman -S docker docker-compose`
+### 2. Docker Desktop
+- 📥 Téléchargez et installez [Docker Desktop pour Windows](https://www.docker.com/products/docker-desktop/)
+- 📋 Suivez l'assistant d'installation (redémarrage requis)
+- 🚀 Lancez Docker Desktop depuis le menu Démarrer
+- ⏳ Attendez que Docker soit démarré (icône Docker dans la barre des tâches)
 
-2. **Configuration Docker** :
-   ```bash
-   # Démarrer Docker
-   sudo systemctl start docker && sudo systemctl enable docker
-   
-   # Ajouter votre utilisateur au groupe docker
-   sudo usermod -aG docker $USER
-   
-   # Redémarrer la session (ou redémarrer)
-   newgrp docker
-   
-   # Tester l'installation
-   docker --version && docker compose version
-   ```
+---
+
+## 🐧 Prérequis Linux
+
+### 1. Docker Engine
+Installez Docker selon votre distribution :
+
+**Ubuntu/Debian :**
+```bash
+curl -fsSL https://get.docker.com | sh
+```
+
+**CentOS/RHEL :**
+Suivez le [guide officiel](https://docs.docker.com/engine/install/centos/)
+
+**Arch Linux :**
+```bash
+sudo pacman -S docker docker-compose
+```
+
+### 2. Configuration Docker
+```bash
+# Démarrer Docker
+sudo systemctl start docker && sudo systemctl enable docker
+
+# Ajouter votre utilisateur au groupe docker
+sudo usermod -aG docker $USER
+
+# Redémarrer la session (ou redémarrer)
+newgrp docker
+
+# Tester l'installation
+docker --version && docker compose version
+```
 
 ### Démarrage rapide (installation Poznote)
 
