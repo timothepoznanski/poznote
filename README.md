@@ -118,11 +118,11 @@ docker --version && docker compose version
 
 ---
 
-# 🚀 Quick Start (Poznote installation)
+## 🚀 Quick Start (Poznote installation)
 
 **Once Docker is installed, copy and paste the command for your system:**
 
-## 🪟 Windows Installation
+### 🪟 Windows Installation
 
 ⚠️ **Important**: Use **PowerShell 7**, not Windows PowerShell 5
 
@@ -132,7 +132,7 @@ function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}"
 Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) { Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; if (Test-Path $instanceName) { Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
 ```
 
-## 🐧 Linux Installation
+### 🐧 Linux Installation
 
 📋 **Copy and paste this command in your terminal:**
 ```bash
