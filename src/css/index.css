@@ -704,6 +704,9 @@ body {
 /* LEFT HEADER */
 
 .left-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     /* padding: 0px 0px 13px 0px; */
     margin-bottom: 16px; /* space between workspace name and icons */
@@ -1393,7 +1396,6 @@ img {
     .confirm-btn:active {
         transform: scale(0.98);
     }
-}
     
     .confirm-btn {
         padding: 18px 20px;
@@ -1872,7 +1874,9 @@ img {
 /* Settings dropdown styles */
 .settings-dropdown {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .settingsbutton {
@@ -4309,10 +4313,45 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .workspace-toggle-icon, .workspace-icon {
-    display: inline-block;
-    font-size: 15px; /* match other header icons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* match other header icons */
     color: #007DB8;
 }
 
-.left-header .workspace-icon { margin-right: 6px; vertical-align: middle; }
+.left-header .workspace-icon { 
+    margin-right: 6px; 
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Mobile workspace button styling */
+.workspace-mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+    padding: 8px;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.workspace-mobile-btn:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a !important;
+}
+
+/* Desktop workspace button styling */
+.small-workspace-btn {
+    transition: background-color 0.2s, color 0.2s;
+    padding: 8px;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.small-workspace-btn:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #005a8a !important;
+}
 
