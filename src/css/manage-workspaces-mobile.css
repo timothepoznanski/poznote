@@ -44,6 +44,11 @@
         font-size: 14px !important;
     }
     
+    /* Ensure delete form takes full width */
+    .workspace-list .delete-form {
+        width: 100% !important;
+    }
+    
     /* Form styling for mobile */
     #create-workspace-form input {
         width: 100% !important;
