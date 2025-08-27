@@ -142,6 +142,12 @@ body {
     overflow: hidden !important;
 }
 
+/* When in color mode, hide original toolbar buttons and show the inline color toolbar */
+.note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
+.note-edit-toolbar.color-mode .color-toolbar { display: flex !important; gap: 8px; align-items: center; padding: 6px 8px; }
+.note-edit-toolbar .toolbar-color-item { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); box-shadow: none; cursor: pointer; }
+.note-edit-toolbar .toolbar-color-item:focus { outline: 2px solid #95c2ff; outline-offset: 2px; }
+
 /* Reduce space between toolbar and tags on mobile */
 .note-header {
     margin-bottom: 8px !important;
@@ -221,6 +227,53 @@ body {
 .show-format-buttons .btn-inline-code,
 .show-format-buttons .btn-eraser {
     display: flex !important;
+}
+
+/* Color palette popup */
+.color-palette-popup {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    background: transparent; /* keep background transparent so it blends with toolbar */
+    padding: 6px 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+.color-palette-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.color-palette-popup .color-grid {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.98);
+    border-radius: 10px;
+}
+.color-item {
+    width: 28px;
+    height: 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.color-item:focus {
+    outline: 2px solid #007DB8;
+}
+
+/* Visual thin baseline under the palette like the attachment */
+/* baseline removed - simplified palette */
+
+/* caret removed - popup has no arrow */
+.color-palette-popup.in-innernote::after,
+.color-palette-popup.in-innernote::before {
+    display: none;
 }
 
 /* Hide ALL action buttons when text is selected */

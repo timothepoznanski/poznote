@@ -1,252 +1,229 @@
-function addLinkToNote() {
-  // Check if there's a text selection and save it
-  const selection = window.getSelection();
-  const selectedText = selection.toString().trim();
-  let savedRange = null;
-  
-  // Save the current selection range
-  if (selection.rangeCount > 0) {
-    savedRange = selection.getRangeAt(0).cloneRange();
-  }
-  
-  // Create the modal HTML
-  const modalHTML = `
-    <div id="linkModal" class="link-modal-overlay">
-      <div class="link-modal-content">
-        <div class="link-modal-header">
-          <h3>Créer un lien</h3>
-          <button class="link-modal-close" onclick="closeLinkModal()">&times;</button>
-        </div>
-        <div class="link-modal-body">
-          <div class="link-modal-field">
-            <label for="linkText">Texte du lien :</label>
-            <input type="text" id="linkText" value="${selectedText}" placeholder="Entrez le texte du lien">
-          </div>
-          <div class="link-modal-field">
-            <label for="linkUrl">URL :</label>
-            <input type="url" id="linkUrl" placeholder="https://example.com">
-          </div>
-        </div>
-        <div class="link-modal-footer">
-          <button class="link-modal-btn link-modal-btn-cancel" onclick="closeLinkModal()">Annuler</button>
-          <button class="link-modal-btn link-modal-btn-primary" onclick="createLinkFromModal()">Créer le lien</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  // Remove any existing modal
-  const existingModal = document.getElementById('linkModal');
-  if (existingModal) {
-    existingModal.remove();
-  }
-  
-  // Add modal to body
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-  
-  // Store the saved range for later use
-  window.savedLinkRange = savedRange;
-  window.originalSelectedText = selectedText;
-  
-  // Show modal with animation
-  const modal = document.getElementById('linkModal');
-  modal.style.display = 'flex';
-  setTimeout(() => {
-    modal.classList.add('show');
-  }, 10);
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      closeLinkModal();
+// Clean, popup-only color picker for the toolbar palette button.
+// Exposes window.toggleRedColor() which is called from the toolbar button.
+
+(function () {
+  'use strict';
+
+  const COLORS = [
+    { name: 'Black', value: 'rgb(55,53,47)' },
+    { name: 'Red', value: 'red' },
+    { name: 'Orange', value: 'orange' },
+    { name: 'Yellow', value: 'yellow' },
+    { name: 'Green', value: 'green' },
+    { name: 'Blue', value: 'blue' },
+    { name: 'Purple', value: 'purple' },
+    { name: 'None', value: 'none' }
+  ];
+
+  // Save/restore selection helpers
+  function saveSelection() {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      window.savedColorRange = sel.getRangeAt(0).cloneRange();
+    } else {
+      window.savedColorRange = null;
     }
-  });
-  
-  // Focus URL input (only if it's not already focused)
-  const linkUrlEl = document.getElementById('linkUrl');
-  const linkTextEl = document.getElementById('linkText');
-  try {
-    if (linkUrlEl && document.activeElement !== linkUrlEl) {
-      // Slight delay to ensure the modal is attached and visible before focusing
-      setTimeout(() => {
-        linkUrlEl.focus();
-      }, 10);
+  }
+
+  function restoreSelection() {
+    const r = window.savedColorRange;
+    if (r) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      return true;
     }
-  } catch (e) {
-    // ignore focus errors
+    return false;
   }
 
-  // Handle Enter/Escape keys on inputs
-  if (linkUrlEl) {
-    linkUrlEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        createLinkFromModal();
-      }
-      if (e.key === 'Escape') {
-        closeLinkModal();
-      }
-    });
-  }
-
-  if (linkTextEl) {
-    linkTextEl.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        createLinkFromModal();
-      }
-      if (e.key === 'Escape') {
-        closeLinkModal();
-      }
-    });
-  }
-}
-
-// Function to close the link modal
-function closeLinkModal() {
-  const modal = document.getElementById('linkModal');
-  if (modal) {
-    modal.classList.remove('show');
-    setTimeout(() => {
-      modal.remove();
-    }, 200);
-  }
-  
-  // Clean up global variables
-  window.savedLinkRange = null;
-  window.originalSelectedText = null;
-}
-
-// Function to create the link from the modal
-function createLinkFromModal() {
-  const linkText = document.getElementById('linkText').value.trim();
-  const linkUrl = document.getElementById('linkUrl').value.trim();
-  
-  if (!linkUrl || linkUrl === 'https://') {
-    // Focus URL field if empty
-    document.getElementById('linkUrl').focus();
-    document.getElementById('linkUrl').style.borderColor = '#dc3545';
-    setTimeout(() => {
-      document.getElementById('linkUrl').style.borderColor = '';
-    }, 2000);
-    return;
-  }
-  
-  // Get the saved range and original text
-  const savedRange = window.savedLinkRange;
-  const originalSelectedText = window.originalSelectedText;
-  
-  if (savedRange) {
-    // Restore the selection
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(savedRange);
-    
-    // Create link element
-    const link = document.createElement('a');
-    link.href = linkUrl;
-    link.textContent = linkText || originalSelectedText || linkUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    
+  // Remove inline color styles in the selected range (best-effort)
+  function removeInlineColorInRange(range) {
     try {
-      // If there was selected text, replace it
-      if (originalSelectedText) {
-        savedRange.deleteContents();
+      const root = range.commonAncestorContainer.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+      const toClean = [];
+      while (walker.nextNode()) {
+        const el = walker.currentNode;
+        if (range.intersectsNode(el) && el.style && el.style.color) toClean.push(el);
       }
-      
-      // Insert the link
-      savedRange.insertNode(link);
-      
-      // Position cursor after the link
-      savedRange.setStartAfter(link);
-      savedRange.setEndAfter(link);
-      selection.removeAllRanges();
-      selection.addRange(savedRange);
-      
+      toClean.forEach(el => {
+        el.style.color = '';
+        if (el.getAttribute('style') === '') el.removeAttribute('style');
+      });
     } catch (e) {
-      // Link insertion fallback: silently attempt execCommand approach
-      // Fallback: try using execCommand if modern approach fails
-      if (originalSelectedText) {
-        document.execCommand('createLink', false, linkUrl);
-        // Try to set the link text
-        const links = document.querySelectorAll('a[href="' + linkUrl + '"]');
-        const lastLink = links[links.length - 1];
-        if (lastLink && linkText && linkText !== originalSelectedText) {
-          lastLink.textContent = linkText;
+      // swallow
+    }
+  }
+
+  // Apply color (or remove it) to the saved selection
+  function applyColorToSelection(color) {
+    // restore selection first
+    restoreSelection();
+
+    try {
+      // Prefer CSS styling for foreColor
+      document.execCommand('styleWithCSS', false, true);
+    } catch (e) {
+      // ignore
+    }
+
+    if (color === 'none') {
+      // Try to set to inherit and then remove inline styles where possible
+      try {
+        document.execCommand('foreColor', false, 'inherit');
+      } catch (e) {
+        // ignore
+      }
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        removeInlineColorInRange(sel.getRangeAt(0));
+      }
+    } else {
+      try {
+        document.execCommand('foreColor', false, color);
+      } catch (e) {
+        // fallback: wrap selection in span with inline style
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          const span = document.createElement('span');
+          span.style.color = color;
+          try {
+            range.surroundContents(span);
+          } catch (err) {
+            // If surroundContents fails (partial selections), use insertNode
+            const docFrag = range.cloneContents();
+            span.appendChild(docFrag);
+            range.deleteContents();
+            range.insertNode(span);
+          }
         }
       }
     }
-  } else {
-    // No saved range - try to insert at current cursor position
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      
-      const link = document.createElement('a');
-      link.href = linkUrl;
-      link.textContent = linkText || linkUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      
-      range.insertNode(link);
-      
-      // Position cursor after the link
-      range.setStartAfter(link);
-      range.setEndAfter(link);
-      selection.removeAllRanges();
-      selection.addRange(range);
+
+    // trigger optional update callback if present
+    const noteentry = document.querySelector('.noteentry');
+    if (noteentry && typeof window.update === 'function') {
+      window.update();
     }
   }
-  
-  // Clean up
-  window.savedLinkRange = null;
-  window.originalSelectedText = null;
-  
-  // Close modal
-  closeLinkModal();
-  
-  // Trigger update if available
-  const noteentry = document.querySelector('.noteentry');
-  if (noteentry && typeof update === 'function') {
-    update();
+
+  // Remove any existing popup
+  function removeExistingPopup() {
+    const prev = document.querySelector('.color-palette-popup');
+    if (prev) prev.remove();
+    window.savedColorRange = null;
   }
-}
 
-// Make functions globally available
-window.closeLinkModal = closeLinkModal;
-window.createLinkFromModal = createLinkFromModal;
+  // Build popup DOM
+  function buildPopup() {
+    const popup = document.createElement('div');
+    popup.className = 'color-palette-popup';
+    const grid = document.createElement('div');
+    grid.className = 'color-grid';
 
-function toggleRedColor() {
-  document.execCommand('styleWithCSS', false, true);
-  const sel = window.getSelection();
-  if (sel.rangeCount > 0) {
-    const range = sel.getRangeAt(0);
-    let allRed = true, hasText = false;
-    const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT, {
-      acceptNode: function(node) {
-        if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
+    COLORS.forEach(c => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'color-item';
+      item.setAttribute('data-color', c.value);
+      item.setAttribute('title', c.name);
+      // Visual: a small swatch and label (screen readers)
+      const sw = document.createElement('span');
+      sw.className = 'color-swatch';
+      sw.style.background = c.value === 'none' ? 'transparent' : c.value;
+      if (c.value === 'none') {
+        // Visual: neutral empty swatch with border (no cross)
+        sw.style.border = '1px solid #ccc';
+        sw.style.background = 'transparent';
+        sw.style.display = 'inline-block';
       }
+      sw.setAttribute('aria-hidden', 'true');
+      item.appendChild(sw);
+      item.appendChild(document.createTextNode(' '));
+      grid.appendChild(item);
     });
-    let node = treeWalker.currentNode;
-    while(node) {
-      if (node.nodeType === 3 && node.nodeValue.trim() !== '') {
-        hasText = true;
-        let parent = node.parentNode;
-        let color = '';
-        if (parent && parent.style && parent.style.color) color = parent.style.color.replace(/\s/g, '').toLowerCase();
-        if (color !== '#ff2222' && color !== 'rgb(255,34,34)') allRed = false;
+
+    popup.appendChild(grid);
+    return popup;
+  }
+
+  // Main entry: show popup centered under the palette button
+  function toggleRedColor() {
+    try {
+      removeExistingPopup();
+      saveSelection();
+
+      const btn = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('btn-color')
+        ? document.activeElement
+        : document.querySelector('.btn-color');
+
+      const popup = buildPopup();
+      document.body.appendChild(popup);
+
+      // Positioning: center under button
+      const btnRect = btn ? btn.getBoundingClientRect() : { left: 10, right: 40, bottom: 40, width: 30 };
+      const popupRect = popup.getBoundingClientRect();
+      const left = btnRect.left + (btnRect.width / 2) - (popupRect.width / 2) + window.scrollX;
+      const top = btnRect.bottom + 8 + window.scrollY;
+      popup.style.position = 'absolute';
+      popup.style.left = Math.max(8, left) + 'px';
+      popup.style.top = top + 'px';
+
+      // caret alignment variable for CSS if used
+      const caretX = (btnRect.left + (btnRect.width / 2)) - (left);
+      popup.style.setProperty('--caret-x', Math.max(8, caretX) + 'px');
+
+      // show class for CSS transitions
+      setTimeout(() => popup.classList.add('show'), 10);
+
+      // Click handler
+      popup.addEventListener('click', function (e) {
+        const btnItem = e.target.closest('.color-item');
+        if (!btnItem) return;
+        const color = btnItem.getAttribute('data-color');
+        applyColorToSelection(color);
+        popup.classList.remove('show');
+        setTimeout(() => popup.remove(), 160);
+        window.savedColorRange = null;
+      });
+
+      // Close on outside click
+      function outsideHandler(e) {
+        if (!popup.contains(e.target) && !(e.target.closest && e.target.closest('.btn-color'))) {
+          popup.classList.remove('show');
+          setTimeout(() => popup.remove(), 160);
+          document.removeEventListener('click', outsideHandler);
+          document.removeEventListener('keydown', keyHandler);
+          window.savedColorRange = null;
+        }
       }
-      node = treeWalker.nextNode();
-    }
-    if (hasText && allRed) {
-      document.execCommand('foreColor', false, 'black');
-    } else {
-      document.execCommand('foreColor', false, '#ff2222');
+
+      function keyHandler(e) {
+        if (e.key === 'Escape') {
+          popup.classList.remove('show');
+          setTimeout(() => popup.remove(), 160);
+          document.removeEventListener('click', outsideHandler);
+          document.removeEventListener('keydown', keyHandler);
+          window.savedColorRange = null;
+        }
+      }
+
+      setTimeout(() => document.addEventListener('click', outsideHandler), 20);
+      document.addEventListener('keydown', keyHandler);
+
+    } catch (err) {
+      console.error('toggleRedColor error', err);
     }
   }
-  document.execCommand('styleWithCSS', false, false);
-}
 
+  // Export
+  window.toggleRedColor = toggleRedColor;
+  // Also expose applyColorToSelection in case other scripts call it
+  window.applyColorToSelection = applyColorToSelection;
+
+})();
 function toggleYellowHighlight() {
   const sel = window.getSelection();
   if (sel.rangeCount > 0) {
@@ -765,6 +742,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+    // Minimal link helpers (lightweight, prompt-based fallback)
+    function addLinkToNote() {
+      try {
+        const sel = window.getSelection();
+        const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+        const url = window.prompt('Enter URL', 'https://');
+        if (!url) return;
+        if (hasSelection) {
+          // Try to create link around selection
+          try {
+            document.execCommand('createLink', false, url);
+          } catch (e) {
+            const range = sel.getRangeAt(0);
+            const a = document.createElement('a');
+            a.href = url;
+            a.textContent = sel.toString();
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            range.deleteContents();
+            range.insertNode(a);
+          }
+        } else {
+          // No selection: ask for link text and insert at caret or end of editor
+          const text = window.prompt('Link text (optional)', url) || url;
+          const a = document.createElement('a');
+          a.href = url;
+          a.textContent = text;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+          if (range) {
+            range.insertNode(a);
+            // move caret after inserted link
+            range.setStartAfter(a);
+            range.setEndAfter(a);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          } else {
+            const noteentry = document.querySelector('.noteentry');
+            if (noteentry) noteentry.appendChild(a);
+          }
+        }
+
+        const noteentry = document.querySelector('.noteentry');
+        if (noteentry && typeof window.update === 'function') window.update();
+      } catch (err) {
+        console.error('addLinkToNote error', err);
+      }
+    }
+
+    function createLinkFromModal() {
+      // Backwards-compatible stub: fallback to addLinkToNote behaviour
+      return addLinkToNote();
+    }
+
+    function closeLinkModal() {
+      // No modal in this minimal implementation
+      return;
+    }
 
 // Ensure all toolbar functions are available in global scope
 window.addLinkToNote = addLinkToNote;

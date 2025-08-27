@@ -213,10 +213,13 @@ $folder_filter = $_GET['folder'] ?? '';
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <link type="text/css" rel="stylesheet" href="css/index.css"/>
-    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
+    <?php $__poznote_css_mtime = @filemtime(__DIR__ . '/css/index.css') ?: time(); ?>
+    <?php $__poznote_css_mobile_mtime = @filemtime(__DIR__ . '/css/index-mobile.css') ?: time(); ?>
+    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $__poznote_css_mtime; ?>"/>
+    <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $__poznote_css_mobile_mtime; ?>" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
-    <script src="js/toolbar.js"></script>
+    <?php $__poznote_toolbar_js_mtime = @filemtime(__DIR__ . '/js/toolbar.js') ?: time(); ?>
+    <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
     <style>
     /* Minimal workspace link styling (displayed next to header logo) */
     .left-header .workspace-link {

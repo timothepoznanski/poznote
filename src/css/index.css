@@ -398,6 +398,62 @@ a:active { color: #2E8CFA; } */
     position: relative;
 }
 
+/* Color palette popup (desktop) - same appearance as mobile palette */
+.color-palette-popup {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    background: transparent;
+    padding: 6px 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+.color-palette-popup {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    padding: 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform-origin: top center;
+    transition: opacity 140ms ease, transform 140ms ease;
+}
+.color-palette-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.color-palette-popup .color-grid {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.color-item {
+    border: none;
+    background: transparent;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.color-item:focus { outline: 2px solid #4d90fe; }
+.color-swatch {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+.color-palette-popup.show { opacity: 1; transform: translateY(0); }
+.color-palette-popup .color-grid {
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+    padding: 8px 12px; background: rgba(255,255,255,0.98); border-radius: 10px;
+}
+.color-item { width: 28px; height: 16px; border-radius: 4px; border: none; cursor: pointer; padding: 0; display:inline-block; box-sizing: border-box; }
+.color-item:focus { outline: 2px solid #007DB8; }
+/* baseline removed - simplified palette */
+
+/* caret removed - popup has no arrow */
+
 .mobile-toolbar {
     display: none !important;
 }
@@ -781,6 +837,12 @@ body {
     position: relative;
     order: 2;
 }
+
+/* Color-mode: replace toolbar icons with inline color selectors */
+.note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
+.note-edit-toolbar.color-mode .color-toolbar { display: flex; gap: 8px; align-items: center; padding: 6px 8px; }
+.note-edit-toolbar .toolbar-color-item { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); box-shadow: none; cursor: pointer; }
+.note-edit-toolbar .toolbar-color-item:focus { outline: 2px solid #95c2ff; outline-offset: 2px; }
 
 .note-edit-toolbar::-webkit-scrollbar {
     display: none;
