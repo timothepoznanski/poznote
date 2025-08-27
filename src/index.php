@@ -519,7 +519,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <!-- Manage workspaces moved to the left header workspace control -->
                     <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                         <i class="fas fa-robot"></i>
-                        <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
+                        <span>AI<?php echo isAIEnabled() ? '<span class="ai-status enabled">(enabled)</span>' : '<span class="ai-status disabled">(disabled)</span>'; ?></span>
                     </div>
                     <div class="settings-menu-item" onclick="showLoginDisplayNamePrompt();">
                         <i class="fas fa-user"></i>
@@ -726,7 +726,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <!-- Manage workspaces moved to the left header workspace control -->
                 <div class="settings-menu-item" onclick="window.location = 'ai.php';">
                     <i class="fas fa-robot"></i>
-                    <span>AI settings <?php echo isAIEnabled() ? '<small style="color: #28a745;">(enabled)</small>' : '<small style="color: #dc3545;">(disabled)</small>'; ?></span>
+                    <span>AI<?php echo isAIEnabled() ? '<span class="ai-status enabled">(enabled)</span>' : '<span class="ai-status disabled">(disabled)</span>'; ?></span>
                 </div>
                 <div class="settings-menu-item" onclick="showLoginDisplayNamePrompt();">
                     <i class="fas fa-user"></i>

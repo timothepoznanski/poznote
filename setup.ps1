@@ -694,6 +694,22 @@ function Install-Poznote {
         Write-Success ".env file created from template successfully!"
     }
 
+    # Create necessary directories for fresh installation
+    Write-Status "Creating data directories..."
+    if (-not (Test-Path "data")) {
+        New-Item -ItemType Directory -Path "data" -Force | Out-Null
+    }
+    if (-not (Test-Path "data\entries")) {
+        New-Item -ItemType Directory -Path "data\entries" -Force | Out-Null
+    }
+    if (-not (Test-Path "data\database")) {
+        New-Item -ItemType Directory -Path "data\database" -Force | Out-Null
+    }
+    if (-not (Test-Path "data\attachments")) {
+        New-Item -ItemType Directory -Path "data\attachments" -Force | Out-Null
+    }
+    Write-Success "Data directories created"
+
     # Start Docker container
     Write-Status "Starting Poznote with Docker Compose..."
     

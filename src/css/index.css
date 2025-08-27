@@ -1937,6 +1937,20 @@ img {
     color: #007DB8;
 }
 
+.settings-menu-item .ai-status {
+    margin-left: 8px;
+    /* font-size: 0.85em; */
+    vertical-align: baseline;
+}
+
+.settings-menu-item .ai-status.enabled {
+    color: #28a745;
+}
+
+.settings-menu-item .ai-status.disabled {
+    color: #dc3545;
+}
+
 .settings-menu-item.deployment-info {
     /* border-top: 1px solid rgba(0,0,0,0.1); */
     margin-top: 5px;

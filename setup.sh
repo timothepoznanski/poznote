@@ -639,6 +639,14 @@ main() {
         
         get_user_config "false"
         create_env_file
+        
+        # Create necessary directories for fresh installation
+        print_status "Creating data directories..."
+        mkdir -p data/entries
+        mkdir -p data/database  
+        mkdir -p data/attachments
+        print_success "Data directories created"
+        
         manage_container "update"
         install_git_hook
         show_info "false"
