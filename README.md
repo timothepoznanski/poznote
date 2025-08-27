@@ -513,24 +513,24 @@ For advanced users who prefer direct configuration:
 **Install Poznote Linux (Bash):**
 
 ```bash
-`INSTANCE_NAME="VOTRE-NOM-DINSTANCE"`
-`git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
-`cd $INSTANCE_NAME`
-`vim Dockerfile`  # If necessary (for example to add proxies)
-`cp .env.template .env`
-`vim .env`
-`mkdir -p data/entries`
-`mkdir -p data/database`
-`mkdir -p data/attachments`
-`docker compose up -d --build`
+INSTANCE_NAME="VOTRE-NOM-DINSTANCE"
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+cd $INSTANCE_NAME
+vim Dockerfile  # If necessary (for example to add proxies)
+cp .env.template .env
+vim .env
+mkdir -p data/entries
+mkdir -p data/database
+mkdir -p data/attachments
+docker compose up -d --build
 ```
 
 **Change settings:**
 
 ```bash
-`docker compose down`
-`vim .env`
-`docker compose up -d`
+docker compose down
+vim .env
+docker compose up -d
 ```
 
 **Update Poznote to the latest version:** 
@@ -555,7 +555,7 @@ Replace `./data/` directory and restart container
 **Password Reset:**
 
 ```bash
-`docker compose down`
-`vim .env`  # `POZNOTE_PASSWORD=new_password`
-`docker compose up -d`
+docker compose down
+vim .env  # `POZNOTE_PASSWORD=new_password`
+docker compose up -d
 ```
