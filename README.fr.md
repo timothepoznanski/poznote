@@ -26,9 +26,9 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - 🤖 Fonctionnalités IA
 - 📱 Design responsive pour tous les appareils
 - 🖥️ Support multi-instance
-- �️ Espaces de travail
+- 🗂️ Espaces de travail
 - 🏠 Auto-hébergement avec authentification sécurisée
--  Outils de sauvegarde et d'export intégrés
+- 💾 Outils de sauvegarde et d'export intégrés
 - 🗑️ Corbeille avec restauration
 - 🌐 API REST pour l'automatisation
 
@@ -95,15 +95,15 @@ do {
     $instanceName = Read-Host "Choisissez un nom d'instance (poznote-tom, poznote-alice, mes-notes, etc.) [poznote]"
     if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
     if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
-        Write-Host "⚠️  Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces." -ForegroundColor Yellow
+        Write-Host "Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces." -ForegroundColor Yellow
         continue
     }
     if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "⚠️  Le conteneur Docker '${instanceName}-webserver-1' existe déjà !" -ForegroundColor Yellow
+        Write-Host "Le conteneur Docker '${instanceName}-webserver-1' existe déjà !" -ForegroundColor Yellow
         continue
     }
     if (Test-Path $instanceName) {
-        Write-Host "⚠️  Le dossier '$instanceName' existe déjà !" -ForegroundColor Yellow
+        Write-Host "Le dossier '$instanceName' existe déjà !" -ForegroundColor Yellow
         continue
     }
     break
@@ -138,7 +138,7 @@ cd $INSTANCE_NAME
 check_conflicts() {
     local name="$1"
     if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
-        echo "⚠️  Le conteneur Docker '${name}-webserver-1' existe déjà !"
+        echo "Le conteneur Docker '${name}-webserver-1' existe déjà !"
         return 1
     fi
     return 0
@@ -152,9 +152,9 @@ while true; do
         break
     else
         if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
-            echo "⚠️  Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces."
+            echo "Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces."
         elif [ -d "$instanceName" ]; then
-            echo "⚠️  Le dossier '$instanceName' existe déjà !"
+            echo "Le dossier '$instanceName' existe déjà !"
         fi
     fi
 done
