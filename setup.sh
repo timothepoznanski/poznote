@@ -143,12 +143,11 @@ check_docker() {
     # Check if Docker daemon is running and accessible
     if ! docker info &> /dev/null; then
         print_error "Cannot access Docker daemon. This could mean:"
-        echo "  1. Docker service is not running - try: systemctl start docker"
+        echo "  1. Docker service is not running"
         echo "  2. Docker daemon is not responding"
+        echo "  3. You may need to start Docker using your system's service manager"
         echo
-        print_status "To start Docker service:"
-        echo "  systemctl start docker"
-        echo "  systemctl enable docker"
+        print_status "Please ensure Docker is running and accessible, then try again."
         exit 1
     fi
     
