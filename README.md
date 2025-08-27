@@ -72,6 +72,7 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 ### 🐧 Linux Prerequisites
 
 1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
+2. **Docker Compose**: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
 
 ---
 

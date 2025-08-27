@@ -120,6 +120,7 @@ Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à dép
 ### 🐧 Prérequis Linux
 
 1. **Docker Engine** : Installez Docker selon votre distribution ([guide officiel](https://docs.docker.com/engine/install/))
+2. **Docker Compose** : Installez Docker Compose ([guide officiel](https://docs.docker.com/compose/install/))
 
 ---
 
