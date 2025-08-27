@@ -111,6 +111,10 @@ reconfigure_poznote() {
         print_warning "You are using the default password! Please change it for production use."
     fi
 
+    if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
+        print_warning "You are using the default password! Please change it for production use."
+    fi
+
     # Update .env file
     create_env_file
     manage_container "restart"
@@ -122,6 +126,11 @@ reconfigure_poznote() {
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
     
     echo
+    
+    # Export variables for use in other functions
+    export POZNOTE_USERNAME
+    export POZNOTE_PASSWORD  
+    export HTTP_WEB_PORT
 }
 
 # Check Docker installation
@@ -389,6 +398,11 @@ get_user_config() {
     if [ "$POZNOTE_PASSWORD" = "admin123" ]; then
         print_warning "You are using the default password! Please change it for production use."
     fi
+    
+    # Export variables for use in other functions
+    export POZNOTE_USERNAME
+    export POZNOTE_PASSWORD  
+    export HTTP_WEB_PORT
 }
 
 # Create or update .env file
@@ -466,9 +480,9 @@ show_info() {
     fi
     echo
     print_status "Access Information:\n"
-    echo "  URL: http://your-server:$HTTP_WEB_PORT"
-    echo "  Username: $POZNOTE_USERNAME"
-    echo "  Password: $POZNOTE_PASSWORD"
+    echo "  URL: http://your-server:${HTTP_WEB_PORT}"
+    echo "  Username: ${POZNOTE_USERNAME}"
+    echo "  Password: ${POZNOTE_PASSWORD}"
     echo
     
     if [ "$is_update" != "true" ]; then
