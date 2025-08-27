@@ -16,4 +16,4 @@ services:
     volumes:
       - "./src:/var/www/html"
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chmod -R 775 /var/www/html/data && apache2-foreground"
+    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
