@@ -215,23 +215,31 @@ function showTagSuggestions(inputEl, container, workspace) {
         dd.style.left = inputEl.offsetLeft + 'px';
         dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
         dd.firstChild && dd.firstChild.classList.add('highlight');
-        // keyboard navigation
-        let highlighted = -1;
-        inputEl.addEventListener('keydown', function navHandler(ev) {
-            const items = dd.querySelectorAll('.tag-suggestion-item');
-            if (!items || items.length === 0) return;
-            if (ev.key === 'ArrowDown') {
-                ev.preventDefault(); highlighted = Math.min(highlighted + 1, items.length - 1);
-                items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
-            } else if (ev.key === 'ArrowUp') {
-                ev.preventDefault(); highlighted = Math.max(highlighted - 1, 0);
-                items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
-            } else if (ev.key === 'Enter' && highlighted >= 0) {
-                ev.preventDefault(); items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
-            } else if (ev.key === 'Escape') {
-                dd.style.display = 'none';
-            }
-        });
+        
+        // Only add navigation handler once per input element
+        if (!inputEl.hasNavigationHandler) {
+            let highlighted = -1;
+            inputEl.addEventListener('keydown', function navHandler(ev) {
+                const items = dd.querySelectorAll('.tag-suggestion-item');
+                if (!items || items.length === 0) return;
+                if (ev.key === 'ArrowDown') {
+                    ev.preventDefault(); 
+                    highlighted = Math.min(highlighted + 1, items.length - 1);
+                    items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+                } else if (ev.key === 'ArrowUp') {
+                    ev.preventDefault(); 
+                    highlighted = Math.max(highlighted - 1, 0);
+                    items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+                } else if (ev.key === 'Enter' && highlighted >= 0) {
+                    ev.preventDefault(); 
+                    ev.stopPropagation();
+                    items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
+                } else if (ev.key === 'Escape') {
+                    dd.style.display = 'none';
+                }
+            });
+            inputEl.hasNavigationHandler = true;
+        }
     });
 }
 
@@ -291,6 +299,14 @@ function handleTagInput(e, noteId, container) {
         let tagText = input.value.trim();
         
         if (tagText && tagText !== '') {
+            // Check if there's a visible suggestions dropdown
+            const suggestionsDropdown = container.querySelector('.tag-suggestions');
+            if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
+                // If suggestions are visible, don't process the input text
+                // The suggestion selection should be handled by the navigation handler
+                return false;
+            }
+            
             // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
             const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
             
@@ -337,6 +353,14 @@ function handleTagInputBlur(e, noteId, container) {
     let tagText = input.value.trim();
     
     if (tagText && tagText !== '') {
+        // Check if there's a visible suggestions dropdown
+        const suggestionsDropdown = container.querySelector('.tag-suggestions');
+        if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
+            // If suggestions are visible, don't process the input text on blur
+            // This prevents adding the typed text when user clicks away from suggestions
+            return;
+        }
+        
         // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
         const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
         
