@@ -4359,7 +4359,8 @@ input[type="search"]::-webkit-search-results-decoration {
 .workspace-menu {
     position: absolute;
     top: 100%;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -4414,9 +4415,12 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Mobile workspace dropdown adjustments */
 @media (max-width: 768px) {
     .workspace-menu {
-        right: 0;
-        left: auto;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
         min-width: 180px;
+        margin-top: 4px;
     }
 }
 
