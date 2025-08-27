@@ -460,20 +460,20 @@ show_info() {
     
     echo
     if [ "$is_update" = "true" ]; then
-        print_success "🎉 Poznote has been successfully updated!"
+        print_success "Poznote has been successfully updated!"
     else
-        print_success "🎉 Poznote has been successfully installed!"
+        print_success "Poznote has been successfully installed!"
     fi
     echo
-    print_status "📋 Access Information:\n"
-    echo "  🌐 URL: http://your-server:$HTTP_WEB_PORT"
-    echo "  🔑 Username: $POZNOTE_USERNAME"
-    echo "  🔑 Password: $POZNOTE_PASSWORD"
+    print_status "Access Information:\n"
+    echo "  URL: http://your-server:$HTTP_WEB_PORT"
+    echo "  Username: $POZNOTE_USERNAME"
+    echo "  Password: $POZNOTE_PASSWORD"
     echo
     
     if [ "$is_update" != "true" ]; then
         echo
-        print_status "⚙️  To update Poznote or change settings, run setup script again"
+        print_status "To update Poznote or change settings, run setup script again"
         echo
     fi
 }
@@ -497,7 +497,7 @@ check_updates_only() {
 
 # Function to install Git pre-commit hook for automatic versioning
 install_git_hook() {
-    print_status "📋 Installing Git pre-commit hook for automatic versioning..."
+    print_status "Installing Git pre-commit hook for automatic versioning..."
     
     # Create the hook file
     cat > .git/hooks/pre-commit << 'EOF'
@@ -524,7 +524,7 @@ EOF
     # Make it executable
     chmod +x .git/hooks/pre-commit
     
-    print_success "✅ Git pre-commit hook installed successfully!"
+    print_success "Git pre-commit hook installed successfully!"
 }
 
 # Main function
@@ -567,14 +567,14 @@ main() {
                     echo
                     print_status "Starting application update..."
                     
-                    print_status "📥 Pulling latest changes from repository..."
+                    print_status "Pulling latest changes from repository..."
                     echo
                     if git pull origin main; then
                         echo
-                        print_success "✅ Successfully pulled latest changes"
+                        print_success "Successfully pulled latest changes"
                     else
                         echo
-                        print_warning "⚠️  Git pull failed or no changes, continuing with local files"
+                        print_warning "Git pull failed or no changes, continuing with local files"
                     fi
                     
                     print_status "Preserving existing configuration..."
@@ -606,7 +606,7 @@ main() {
         done
     else
         # Fresh installation
-        print_status "🆕 Proceeding with fresh installation."
+        print_status "Proceeding with fresh installation."
         
         get_user_config "false"
         create_env_file
