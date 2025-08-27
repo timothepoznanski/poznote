@@ -532,7 +532,12 @@ For advanced users who prefer direct configuration:
 **Update Poznote to the latest version:** 
 
 ```bash
-git pull origin main && docker compose down && docker compose up -d --build
+docker compose down
+git stash push -m "Keep local modifications"
+git pull
+git stash pop
+docker compose --build # --no-cache
+docker compose up -d --force-recreate
 ```
 
 **Backup:** 
