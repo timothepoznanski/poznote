@@ -95,15 +95,15 @@ do {
     $instanceName = Read-Host "Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"
     if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
     if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
-        Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
+        Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
         continue
     }
     if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
+        Write-Host "Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
         continue
     }
     if (Test-Path $instanceName) {
-        Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow
+        Write-Host "Folder '$instanceName' already exists!" -ForegroundColor Yellow
         continue
     }
     break
@@ -138,7 +138,7 @@ cd $INSTANCE_NAME
 check_conflicts() {
     local name="$1"
     if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
-        echo "⚠️  Docker container '${name}-webserver-1' already exists!"
+        echo "Docker container '${name}-webserver-1' already exists!"
         return 1
     fi
     return 0
@@ -152,9 +152,9 @@ while true; do
         break
     else
         if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
-            echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
+            echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
         elif [ -d "$instanceName" ]; then
-            echo "⚠️  Folder '$instanceName' already exists!"
+            echo "Folder '$instanceName' already exists!"
         fi
     fi
 done
