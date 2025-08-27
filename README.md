@@ -127,15 +127,15 @@ git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
 
 # Navigate to the cloned directory
 cd "$INSTANCE_NAME"
-
-# Make the setup script executable
-chmod +x setup.sh
 ```
 
 #### Step 3: Run the setup script
 ```bash
 # Run the interactive setup script
 ./setup.sh
+
+# Or alternatively, you can use:
+# bash setup.sh
 ```
 
 ---
