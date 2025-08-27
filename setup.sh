@@ -58,18 +58,11 @@ FEATURES:
 
 REQUIREMENTS:
     - Docker Engine and Docker Compose
-    - User must be in the 'docker' group
     - Bash shell
 
-SETUP DOCKER PERMISSIONS:
-    If you get permission errors, add your user to the docker group:
-    
-    sudo /usr/sbin/usermod -aG docker $USER
-    newgrp docker
-    
-    Then run this script again.
-    
-    Then run this script again.
+SETUP INFO:
+    This script will automatically set up your Poznote installation.
+    Make sure Docker is running before executing this script.
 EOF
 }
 
@@ -132,32 +125,6 @@ reconfigure_poznote() {
 }
 
 # Check Docker installation
-# Check if user is in docker group
-check_docker_permissions() {
-    # Root user doesn't need to be in docker group
-    if [ "$USER" = "root" ]; then
-        print_success "Running as root - Docker permissions OK"
-        return 0
-    fi
-    
-    if ! groups "$USER" | grep -q docker; then
-        echo
-        print_error "Your user '$USER' is not in the 'docker' group."
-        echo
-        print_status "Run this command as root to add your user to the docker group:"
-        echo
-        echo "  /usr/sbin/usermod -aG docker $USER"
-        echo
-        print_status "Then, go back to your user session and run these commands:"
-        echo
-        echo "  newgrp docker && exit"
-        echo "  ./setup.sh"
-        echo
-        exit 1
-    fi
-    
-    print_success "User '$USER' is in the docker group"
-}
 
 # Check Docker installation and accessibility
 check_docker() {
@@ -571,10 +538,7 @@ main() {
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
     
-    # Check Docker permissions first
-    check_docker_permissions
-    
-    # Then check Docker installation and accessibility
+    # Check Docker installation and accessibility
     check_docker
     
     if check_existing_installation; then
@@ -615,6 +579,14 @@ main() {
                     fi
                     
                     print_status "Preserving existing configuration..."
+                    
+                    # Ensure data directories exist
+                    print_status "Creating/verifying data directories..."
+                    mkdir -p data/entries
+                    mkdir -p data/database  
+                    mkdir -p data/attachments
+                    print_success "Data directories created/verified"
+                    
                     manage_container "update"
                     install_git_hook
                     show_info "true"
