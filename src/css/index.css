@@ -1078,7 +1078,8 @@ a.links_arbo_left.selected-note {
     width: 100%;
     min-width: 0;
     font-family: 'Inter', sans-serif !important;
-    color: #868484b9 
+    color: #d32f2f;
+    caret-color: #b0b0b0;
 }
 
 /* When clear button is present, add more padding to avoid overlap */

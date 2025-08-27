@@ -914,6 +914,13 @@ a.links_arbo_left.selected-note {
 .searchbar-input {
     padding: 8px 15px 8px 40px !important;
     font-size: 16px !important; /* Prevent zoom on iOS */
+    color: #d32f2f !important;
+    caret-color: #000000 !important;
+}
+
+.searchbar-input::placeholder {
+    color: #b0b0b0 !important;
+    opacity: 1;
 }
 
 /* When clear button is present on mobile, add more padding */
