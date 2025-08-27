@@ -90,9 +90,34 @@ Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]";
 
 #### Step 1: Choose your instance name
 ```bash
-# Choose an instance name (use only lowercase letters, numbers, underscores, and hyphens)
-# Examples: poznote, my-notes, poznote-work, poznote-personal
-INSTANCE_NAME="poznote"  # Change this to your preferred name
+# Run this interactive script to choose your instance name
+# It will validate the name and check for Docker conflicts
+
+check_conflicts() {
+    local name="$1"
+    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
+        echo "⚠️  Docker container '${name}-webserver-1' already exists!"
+        return 1
+    fi
+    return 0
+}
+
+while true; do
+    read -p "Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]: " instanceName
+    instanceName=${instanceName:-poznote}
+    if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then
+        INSTANCE_NAME="$instanceName"
+        break
+    else
+        if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
+            echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
+        elif [ -d "$instanceName" ]; then
+            echo "⚠️  Folder '$instanceName' already exists!"
+        fi
+    fi
+done
+
+echo "Using instance name: $INSTANCE_NAME"
 ```
 
 #### Step 2: Clone the repository and navigate to the directory

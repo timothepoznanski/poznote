@@ -4,9 +4,34 @@
 
 #### Étape 1 : Choisissez votre nom d'instance
 ```bash
-# Choisissez un nom d'instance (utilisez uniquement des lettres minuscules, chiffres, tirets et underscores)
-# Exemples : poznote, mes-notes, poznote-travail, poznote-personnel
-INSTANCE_NAME="poznote"  # Changez ceci selon votre préférence
+# Exécutez ce script interactif pour choisir votre nom d'instance
+# Il validera le nom et vérifiera les conflits Docker
+
+check_conflicts() {
+    local name="$1"
+    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
+        echo "⚠️  Docker container '${name}-webserver-1' already exists!"
+        return 1
+    fi
+    return 0
+}
+
+while true; do
+    read -p "Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]: " instanceName
+    instanceName=${instanceName:-poznote}
+    if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then
+        INSTANCE_NAME="$instanceName"
+        break
+    else
+        if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
+            echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
+        elif [ -d "$instanceName" ]; then
+            echo "⚠️  Folder '$instanceName' already exists!"
+        fi
+    fi
+done
+
+echo "Using instance name: $INSTANCE_NAME"
 ```
 
 #### Étape 2 : Clonez le dépôt et naviguez vers le répertoire
