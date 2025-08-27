@@ -46,9 +46,6 @@ cd "$INSTANCE_NAME"
 #### Étape 3 : Exécutez le script de configuration
 ```bash
 # Lancez le script de configuration interactif
-./setup.sh
-
-# Ou alternativement, vous pouvez utiliser :
 # bash setup.sh
 ```und:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">

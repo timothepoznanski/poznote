@@ -132,9 +132,6 @@ cd "$INSTANCE_NAME"
 #### Step 3: Run the setup script
 ```bash
 # Run the interactive setup script
-./setup.sh
-
-# Or alternatively, you can use:
 # bash setup.sh
 ```
 
