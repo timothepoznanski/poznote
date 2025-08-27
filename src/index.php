@@ -490,9 +490,9 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
             <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
-        </a>
+        </span>
     </div>
         <div class="containbuttons">
             <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
@@ -696,9 +696,9 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <a href="https://timpoz.com/" target="_blank" rel="noopener noreferrer" class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
             <span id="workspaceNameDesktop"><?php echo $displayWorkspace; ?></span>
-        </a>
+        </span>
     </div>
     <div class="containbuttons">
         <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
@@ -751,6 +751,10 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <i class="fas fa-code-branch"></i>
                     <span>GitHub Repository</span>
+                </div>
+                <div class="settings-menu-item" onclick="window.open('https://poznote.com', '_blank');">
+                    <i class="fas fa-globe"></i>
+                    <span>Website</span>
                 </div>
                 <!-- Tim's projects removed from settings per request -->
                 <div class="settings-menu-item" onclick="window.location = 'logout.php';">
