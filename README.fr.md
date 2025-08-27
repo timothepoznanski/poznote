@@ -512,22 +512,26 @@ Pour les utilisateurs avancés qui préfèrent la configuration directe :
 
 **Installer Poznote Linux (Bash) :**
 
-1. Créer le nom du dossier d'instance : `INSTANCE_NAME="VOTRE-NOM-DINSTANCE"`
-2. Cloner : `git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
-3. Naviguer vers le dossier cloné : `cd $INSTANCE_NAME`
-4. Si nécessaire, editer le Dockerfile (par exemple pour ajouter les proxy)
-5. Créer .env à partir du modèle : `cp .env.template .env`
-6. Modifier le fichier `.env`
-7. Créer le dossier entries : `mkdir -p data/entries`
-8. Créer le dossier database : `mkdir -p data/database`
-9. Créer le dossier attachments : `mkdir -p data/attachments`
-10. Déployer Poznote : `docker compose up -d --build`
+```bash
+`INSTANCE_NAME="VOTRE-NOM-DINSTANCE"`
+`git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
+`cd $INSTANCE_NAME`
+`vim Dockerfile` # Si nécessaire (par exemple pour ajouter les proxies)
+`cp .env.template .env`
+`vim .env`
+`mkdir -p data/entries`
+`mkdir -p data/database`
+`mkdir -p data/attachments`
+`docker compose up -d --build`
+```
 
 **Modifier les paramètres :**
 
-1. Arrêtez Poznote : `docker compose down`
-2. Modifiez le fichier `.env`
-3. Redémarrez Poznote : `docker compose up -d`
+```bash
+`docker compose down`
+`vim .env`
+`docker compose up -d`
+```
 
 **Mettre à jour Poznote vers la dernière version :**
 
@@ -550,6 +554,8 @@ Remplacez le répertoire `./data/` et redémarrez le conteneur
 
 **Réinitialisation du mot de passe :**
 
-1. Arrêtez Poznote : `docker compose down`
-2. Modifiez le fichier `.env` : `POZNOTE_PASSWORD=nouveau_mot_de_passe`
-3. Redémarrez Poznote : `docker compose up -d`
+```bash
+`docker compose down`
+`vim .env`  # `POZNOTE_PASSWORD=nouveau_mot_de_passe`
+`docker compose up -d`
+```

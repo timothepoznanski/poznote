@@ -512,22 +512,26 @@ For advanced users who prefer direct configuration:
 
 **Install Poznote Linux (Bash):**
 
-1. Create folder instance name: `INSTANCE_NAME="YOUR-INSTANCE-NAME"`
-2. Clone: `git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
-3. Navigate to cloned folder: `cd $INSTANCE_NAME"`
-4. If necessary, edit the Dockerfile (for example to add proxies)
-5. Create .env from template: `cp .env.template .env`
-6. Edit `.env` file
-7. Create folder entries: `mkdir -p data/entries` 
-8. Create folder database: `mkdir -p data/database` 
-9. Create folder attachments: `mkdir -p data/attachments` 
-10. Deploy Poznote: `docker compose up -d --build`
+```bash
+`INSTANCE_NAME="VOTRE-NOM-DINSTANCE"`
+`git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
+`cd $INSTANCE_NAME`
+`vim Dockerfile`  # If necessary (for example to add proxies)
+`cp .env.template .env`
+`vim .env`
+`mkdir -p data/entries`
+`mkdir -p data/database`
+`mkdir -p data/attachments`
+`docker compose up -d --build`
+```
 
 **Change settings:**
 
-1. Stop Poznote: `docker compose down`
-2. Edit `.env` file
-3. Restart Poznote: `docker compose up -d`
+```bash
+`docker compose down`
+`vim .env`
+`docker compose up -d`
+```
 
 **Update Poznote to the latest version:** 
 
@@ -550,6 +554,8 @@ Replace `./data/` directory and restart container
 
 **Password Reset:**
 
-1. Stop Poznote: `docker compose down`
-2. Edit `.env` file: `POZNOTE_PASSWORD=new_password`  
-3. Restart Poznote: `docker compose up -d`
+```bash
+`docker compose down`
+`vim .env`  # `POZNOTE_PASSWORD=new_password`
+`docker compose up -d`
+```
