@@ -29,6 +29,3 @@ EXPOSE 80
 
 # Set working directory
 WORKDIR /var/www/html
-
-# Start Apache in foreground
-CMD ["apache2-foreground"]
