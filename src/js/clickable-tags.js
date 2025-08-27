@@ -94,6 +94,22 @@ function convertTagsToEditable(noteId) {
     tagInput.addEventListener('keydown', function(e) {
         handleTagInput(e, noteId, editableContainer);
     });
+    // Show suggestions while typing
+    tagInput.addEventListener('input', function(e) {
+        try {
+            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace);
+        } catch (err) { /* ignore */ }
+    });
+    // Hide suggestions on focus out (but allow click into suggestion via mousedown handler)
+    tagInput.addEventListener('focus', function() {
+        try { showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace); } catch(e){}
+    });
+    tagInput.addEventListener('blur', function() {
+        setTimeout(() => {
+            const dd = editableContainer.querySelector('.tag-suggestions');
+            if (dd) dd.style.display = 'none';
+        }, 150);
+    });
     
     tagInput.addEventListener('blur', function(e) {
         handleTagInputBlur(e, noteId, editableContainer);
@@ -106,6 +122,127 @@ function convertTagsToEditable(noteId) {
     nameTagsContainer.classList.add('showing-editable-tags');
     notesWithClickableTags.add(noteId);
 }
+
+// --- Autocompletion support for tag input ---
+// Cache for tags per workspace
+const _tagCache = { tags: null, fetchedForWorkspace: null };
+
+/**
+ * Fetch tags from server (cached per workspace)
+ */
+function fetchAllTags(workspace) {
+    return new Promise((resolve, reject) => {
+        if (_tagCache.tags !== null && _tagCache.fetchedForWorkspace === workspace) {
+            resolve(_tagCache.tags);
+            return;
+        }
+
+        const url = 'api_list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+        fetch(url, { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.tags)) {
+                    _tagCache.tags = data.tags;
+                    _tagCache.fetchedForWorkspace = workspace;
+                    resolve(data.tags);
+                } else {
+                    resolve([]);
+                }
+            })
+            .catch(err => { console.error('Failed to load tags for autocomplete', err); resolve([]); });
+    });
+}
+
+/**
+ * Create or reuse a suggestions dropdown for a given container
+ */
+function getOrCreateSuggestions(container) {
+    let dd = container.querySelector('.tag-suggestions');
+    if (!dd) {
+        dd = document.createElement('div');
+        dd.className = 'tag-suggestions';
+        dd.style.position = 'absolute';
+        dd.style.zIndex = '10000';
+        dd.style.background = '#fff';
+        dd.style.border = '1px solid #ddd';
+        dd.style.borderRadius = '4px';
+        dd.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
+        dd.style.maxHeight = '200px';
+        dd.style.overflow = 'auto';
+        dd.style.display = 'none';
+        dd.style.minWidth = '150px';
+        dd.style.fontSize = '0.95em';
+        container.appendChild(dd);
+    }
+    return dd;
+}
+
+/**
+ * Show suggestions filtered by prefix
+ */
+function showTagSuggestions(inputEl, container, workspace) {
+    const dd = getOrCreateSuggestions(container);
+    const value = inputEl.value.trim().toLowerCase();
+    if (!value) { dd.style.display = 'none'; return; }
+
+    fetchAllTags(workspace).then(allTags => {
+        // Exclude tags already present
+        const existing = Array.from(container.querySelectorAll('.clickable-tag')).map(t => t.textContent.toLowerCase());
+        const matches = allTags.filter(t => t.toLowerCase().includes(value) && !existing.includes(t.toLowerCase()));
+
+        dd.innerHTML = '';
+        if (matches.length === 0) { dd.style.display = 'none'; return; }
+
+        matches.slice(0, 50).forEach((tag, idx) => {
+            const item = document.createElement('div');
+            item.className = 'tag-suggestion-item';
+            item.textContent = tag;
+            item.style.padding = '6px 8px';
+            item.style.cursor = 'pointer';
+            item.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                addTagElement(container, tag, extractNoteIdFromContainer(container));
+                inputEl.value = '';
+                updateTagsInput(extractNoteIdFromContainer(container), container);
+                dd.style.display = 'none';
+                setTimeout(() => inputEl.focus(), 10);
+            });
+            dd.appendChild(item);
+        });
+
+        // Position the dropdown under the input
+        dd.style.display = 'block';
+        dd.style.left = inputEl.offsetLeft + 'px';
+        dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
+        dd.firstChild && dd.firstChild.classList.add('highlight');
+        // keyboard navigation
+        let highlighted = -1;
+        inputEl.addEventListener('keydown', function navHandler(ev) {
+            const items = dd.querySelectorAll('.tag-suggestion-item');
+            if (!items || items.length === 0) return;
+            if (ev.key === 'ArrowDown') {
+                ev.preventDefault(); highlighted = Math.min(highlighted + 1, items.length - 1);
+                items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+            } else if (ev.key === 'ArrowUp') {
+                ev.preventDefault(); highlighted = Math.max(highlighted - 1, 0);
+                items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+            } else if (ev.key === 'Enter' && highlighted >= 0) {
+                ev.preventDefault(); items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
+            } else if (ev.key === 'Escape') {
+                dd.style.display = 'none';
+            }
+        });
+    });
+}
+
+// Close suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    document.querySelectorAll('.tag-suggestions').forEach(dd => {
+        if (!dd.contains(e.target)) dd.style.display = 'none';
+    });
+});
+
+// End autocompletion support
 
 /**
  * Add a tag element to the container
