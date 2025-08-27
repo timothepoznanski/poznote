@@ -46,7 +46,7 @@ cd "$INSTANCE_NAME"
 #### Étape 3 : Exécutez le script de configuration
 ```bash
 # Lancez le script de configuration interactif
-# bash setup.sh
+bash setup.sh
 ```und:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.md" style="text-decoration:none; display:flex; align-items:center;">
