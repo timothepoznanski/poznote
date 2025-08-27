@@ -562,7 +562,8 @@ function Install-Poznote {
             $choice = Read-Host "`nPlease select an option (1-3)"
             switch ($choice) {
                 "1" {
-                    Write-Status "\nStarting application update..."
+                    Write-Host ""
+                    Write-Status "Starting application update..."
                     Write-Status "Pulling latest changes from repository..."
                     try {
                         Write-Host ""
