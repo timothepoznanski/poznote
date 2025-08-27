@@ -1,56 +1,8 @@
 
-
-<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; b### 🐧 Installation Linux (Bash)
-
-#### Étape 1 : Choisissez votre nom d'instance
-```bash
-# Exécutez ce script interactif pour choisir votre nom d'instance
-# Il validera le nom et vérifiera les conflits Docker
-
-check_conflicts() {
-    local name="$1"
-    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
-        echo "⚠️  Docker container '${name}-webserver-1' already exists!"
-        return 1
-    fi
-    return 0
-}
-
-while true; do
-    read -p "Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]: " instanceName
-    instanceName=${instanceName:-poznote}
-    if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then
-        INSTANCE_NAME="$instanceName"
-        break
-    else
-        if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
-            echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
-        elif [ -d "$instanceName" ]; then
-            echo "⚠️  Folder '$instanceName' already exists!"
-        fi
-    fi
-done
-
-echo "Using instance name: $INSTANCE_NAME"
-```
-
-#### Étape 2 : Clonez le dépôt et naviguez vers le répertoire
-```bash
-# Clonez le dépôt avec votre nom d'instance choisi
-git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
-
-# Naviguez vers le répertoire cloné
-cd "$INSTANCE_NAME"
-```
-
-#### Étape 3 : Exécutez le script de configuration
-```bash
-# Lancez le script de configuration interactif
-bash setup.sh
-```und:#f0f8ff; margin-bottom:20px;">
+<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.md" style="text-decoration:none; display:flex; align-items:center;">
-  <span>Click here to read this documentation in English</span>
+  <span>Cliquez ici pour lire cette documentation en anglais</span>
   <img src="https://flagcdn.com/24x18/gb.png" alt="GB flag" style="margin-left:10px;">
 </a>
 </h3>
@@ -74,9 +26,9 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - 🤖 Fonctionnalités IA
 - 📱 Design responsive pour tous les appareils
 - 🖥️ Support multi-instance
-- 🔒 Auto-hébergement avec authentification sécurisée
-- 🗂️ Workspaces
-- 💾 Outils de sauvegarde et d'export intégrés
+- �️ Espaces de travail
+- 🏠 Auto-hébergement avec authentification sécurisée
+-  Outils de sauvegarde et d'export intégrés
 - 🗑️ Corbeille avec restauration
 - 🌐 API REST pour l'automatisation
 
@@ -90,8 +42,8 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 
 - [Installation](#installation)
 - [Accéder à votre instance](#accéder-à-votre-instance)
-- [Instances multiples](#instances-multiples)
 - [Espaces de travail](#espaces-de-travail)
+- [Instances multiples](#instances-multiples)
 - [Modifier les paramètres](#modifier-les-paramètres)
 - [Réinitialiser le mot de passe](#réinitialiser-le-mot-de-passe)
 - [Mettre à jour l'application](#mettre-à-jour-lapplication)
@@ -140,25 +92,25 @@ function Test-DockerConflict($name) {
 }
 
 do {
-    $instanceName = Read-Host "Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]"
+    $instanceName = Read-Host "Choisissez un nom d'instance (poznote-tom, poznote-alice, mes-notes, etc.) [poznote]"
     if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
     if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
-        Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
+        Write-Host "⚠️  Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces." -ForegroundColor Yellow
         continue
     }
     if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
+        Write-Host "⚠️  Le conteneur Docker '${instanceName}-webserver-1' existe déjà !" -ForegroundColor Yellow
         continue
     }
     if (Test-Path $instanceName) {
-        Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow
+        Write-Host "⚠️  Le dossier '$instanceName' existe déjà !" -ForegroundColor Yellow
         continue
     }
     break
 } while ($true)
 
 $INSTANCE_NAME = $instanceName
-Write-Host "Using instance name: $INSTANCE_NAME"
+Write-Host "Utilisation du nom d'instance : $INSTANCE_NAME"
 ```
 
 #### Étape 2 : Clonez le dépôt et naviguez vers le répertoire
@@ -178,9 +130,51 @@ cd $INSTANCE_NAME
 
 ### 🐧 Installation Linux (Bash)
 
+#### Étape 1 : Choisissez votre nom d'instance
 ```bash
-check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Docker container '${name}-webserver-1' already exists!"; return 1; fi; return 0; }; while true; do read -p "
-Choose an instance name (poznote-work, poznote_app, mynotes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then break; else if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."; elif [ -d "$instanceName" ]; then echo "⚠️  Folder '$instanceName' already exists!"; fi; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
+# Exécutez ce script interactif pour choisir votre nom d'instance
+# Il validera le nom et vérifiera les conflits Docker
+
+check_conflicts() {
+    local name="$1"
+    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
+        echo "⚠️  Le conteneur Docker '${name}-webserver-1' existe déjà !"
+        return 1
+    fi
+    return 0
+}
+
+while true; do
+    read -p "Choisissez un nom d'instance (poznote-tom, poznote-alice, mes-notes, etc.) [poznote] : " instanceName
+    instanceName=${instanceName:-poznote}
+    if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then
+        INSTANCE_NAME="$instanceName"
+        break
+    else
+        if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
+            echo "⚠️  Le nom doit contenir uniquement des lettres minuscules, des chiffres, des underscores et des tirets, sans espaces."
+        elif [ -d "$instanceName" ]; then
+            echo "⚠️  Le dossier '$instanceName' existe déjà !"
+        fi
+    fi
+done
+
+echo "Utilisation du nom d'instance : $INSTANCE_NAME"
+```
+
+#### Étape 2 : Clonez le dépôt et naviguez vers le répertoire
+```bash
+# Clonez le dépôt avec votre nom d'instance choisi
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+
+# Naviguez vers le répertoire cloné
+cd "$INSTANCE_NAME"
+```
+
+#### Étape 3 : Exécutez le script de configuration
+```bash
+# Lancez le script de configuration interactif
+bash setup.sh
 ```
 
 ---
@@ -195,40 +189,11 @@ où VOTRE_SERVEUR dépend de votre environnement :
 - L'adresse IP de votre serveur
 - Votre nom de domaine
 
-Le script d'installation affichera l'URL exacte et les identifiants.
-
-## Instances multiples
-
-Vous pouvez lancer plusieurs instances Poznote isolées sur le même serveur. Il suffit de lancer le script de configuration plusieurs fois avec des noms d'instance et des ports différents.
-
-Chaque instance aura :
-- Des conteneurs Docker séparés
-- Un stockage de données indépendant
-- Des ports différents
-- Des configurations isolées
-
-### Exemple : Instances Tom et Alice sur le même serveur
-
-```
-Serveur : mon-serveur.com
-├── Poznote-Tom
-│   ├── Port : 8040
-│   ├── URL : http://mon-serveur.com:8040
-│   ├── Conteneur : poznote-tom-webserver-1
-│   └── Données : ./poznote-tom/data/
-│
-└── Poznote-Alice
-    ├── Port : 8041
-    ├── URL : http://mon-serveur.com:8041
-    ├── Conteneur : poznote-alice-webserver-1
-    └── Données : ./poznote-alice/data/
-```
-
-Pour des déploiements sur des serveurs différents, il suffit de lancer le script de configuration pour mettre à jour la configuration (pas besoin de noms d'instance ou de ports différents).
+Le script de configuration affichera l'URL exacte et les identifiants.
 
 ## Espaces de travail
 
-Les espaces de travail permettent d'organiser vos notes en environnements séparés et isolés au sein d'une même instance Poznote. Pensez aux espaces de travail comme différents "contextes" ou "projets" où vous pouvez regrouper des notes liées.
+Les espaces de travail permettent d'organiser vos notes en environnements séparés au sein d'une même instance Poznote - comme avoir différents carnets pour le travail, la vie personnelle ou les projets.
 
 ### Qu'est-ce que les espaces de travail ?
 
@@ -262,9 +227,38 @@ Pour basculer entre les espaces de travail :
 
 💡 **Astuce :** Le nom de l'espace de travail actuel est toujours visible en haut de la page, ce qui facilite la reconnaissance de l'environnement dans lequel vous travaillez.
 
+## Instances multiples
+
+Vous pouvez lancer plusieurs instances Poznote isolées sur le même serveur. Il suffit de lancer le script de configuration plusieurs fois avec des noms d'instance et des ports différents.
+
+Chaque instance aura :
+- Des conteneurs Docker séparés
+- Un stockage de données indépendant
+- Des ports différents
+- Des configurations isolées
+
+### Exemple : Instances Tom et Alice sur le même serveur
+
+```
+Serveur : mon-serveur.com
+├── Poznote-Tom
+│   ├── Port : 8040
+│   ├── URL : http://mon-serveur.com:8040
+│   ├── Conteneur : poznote-tom-webserver-1
+│   └── Données : ./poznote-tom/data/
+│
+└── Poznote-Alice
+    ├── Port : 8041
+    ├── URL : http://mon-serveur.com:8041
+    ├── Conteneur : poznote-alice-webserver-1
+    └── Données : ./poznote-alice/data/
+```
+
+Pour des déploiements sur des serveurs différents, il suffit de lancer le script de configuration pour mettre à jour la configuration (pas besoin de noms d'instance ou de ports différents).
+
 ## Modifier les paramètres
 
-Pour changer votre nom d'utilisateur, mot de passe, port ou nom d'application :
+Pour changer votre nom d'utilisateur, mot de passe ou port :
 
 **Linux :**
 ```bash
@@ -290,7 +284,7 @@ Pour mettre à jour Poznote vers la dernière version, lancez le script de confi
 
 ## Sauvegarde et restauration
 
-Poznote inclut une fonctionnalité de sauvegarde accessible via Paramètres → "Exporter/Importer la base de données".
+Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Paramètres → "Exporter/Importer la base de données".
 
 ### Options de sauvegarde
 
@@ -307,11 +301,11 @@ Poznote inclut une fonctionnalité de sauvegarde accessible via Paramètres → 
 
 ### Sauvegarde automatique de la base
 
-🔒 **Sécurité :** À chaque import/restauration via l'interface web, Poznote crée automatiquement une sauvegarde de la base avant de procéder.
+🔒 **Fonctionnalité de sécurité :** À chaque import/restauration via l'interface web, Poznote crée automatiquement une sauvegarde de la base avant de procéder.
 
-- **Emplacement :** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
+- **Emplacement :** `data/database/poznote.db.backup.AAAA-MM-JJ_HH-MM-SS`
 - **Format :** Fichiers de sauvegarde horodatés (ex : `poznote.db.backup.2025-08-15_14-36-19`)
-- **But :** Permet de revenir en arrière si besoin
+- **But :** Permet de récupérer si l'import échoue ou si les données doivent être restaurées
 
 ## Vue hors-ligne
 
@@ -335,56 +329,55 @@ Poznote inclut des fonctionnalités IA puissantes propulsées par **OpenAI** ou 
 
 ### Fonctionnalités IA disponibles
 
-- **🤖 Résumé IA** - Génère des résumés intelligents de vos notes pour comprendre rapidement les points clés
-- **🏷️ Génération automatique de tags** - Génère automatiquement des tags pertinents selon le contenu de la note
-- **🔍 Vérification du contenu** - Vérifie la cohérence, la logique et la grammaire de vos notes
+- **🤖 Résumé IA** - Génère des résumés intelligents de vos notes pour une compréhension rapide
+- **🏷️ Tags automatiques** - Génère automatiquement des tags pertinents basés sur le contenu de la note
+- **🔍 Vérifier les erreurs** - Vérifie la cohérence, la logique et la grammaire dans vos notes
 
 ### Configuration des fonctionnalités IA
 
 1. **Choisissez votre fournisseur IA**
-   - **OpenAI**: Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
-   - **Mistral AI**: Rendez-vous sur [Mistral Console](https://console.mistral.ai/)
+   - **OpenAI** : Rendez-vous sur [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Mistral AI** : Rendez-vous sur [Mistral Console](https://console.mistral.ai/)
    - Créez un compte ou connectez-vous
    - Générez une nouvelle clé API
 
 2. **Configurez Poznote**
    - Allez dans **Paramètres → Paramètres IA** dans l'interface Poznote
-   - Activez les fonctionnalités IA
+   - Activez les fonctionnalités IA en cochant la case
    - Sélectionnez votre fournisseur IA préféré
    - Entrez votre clé API
    - Choisissez le modèle désiré
-   - Testez la connexion avec le bouton "Test Connection"
+   - Testez la connexion avec le bouton "Tester la connexion"
    - Sauvegardez la configuration
 
-3. **Utilisez les fonctionnalités IA**
+3. **Commencez à utiliser les fonctionnalités IA**
    - Ouvrez une note et cherchez les boutons IA dans la barre d'outils
-   - Utilisez **Résumé IA** pour générer un résumé
-   - Utilisez **Tags auto** pour suggérer des tags
-   - Utilisez **Correction** pour corriger grammaire et style
+   - Utilisez **Résumé IA** pour générer des résumés de notes
+   - Utilisez **Tags automatiques** pour suggérer des tags pertinents
+   - Utilisez **Corriger les erreurs** pour corriger la grammaire et le style
 
 ### Prérequis
 
 - ✅ Connexion internet active
 - ✅ Clé API valide (OpenAI ou Mistral AI)
-- ✅ Crédits OpenAI suffisants
 
 ### Confidentialité & Données
 
-Lorsque les fonctionnalités IA sont activées :
+Quand les fonctionnalités IA sont activées :
 - Le contenu des notes est envoyé aux serveurs du fournisseur IA choisi pour traitement
-- **OpenAI**: Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
-- **Mistral AI**: Les données sont traitées selon les [conditions de service de Mistral AI](https://mistral.ai/terms/)
-- Vous pouvez désactiver l'IA à tout moment dans les paramètres
+- **OpenAI** : Les données sont traitées selon la [politique de confidentialité d'OpenAI](https://openai.com/privacy/)
+- **Mistral AI** : Les données sont traitées selon les [conditions de service de Mistral AI](https://mistral.ai/terms/)
+- Vous pouvez désactiver les fonctionnalités IA à tout moment dans les paramètres
 
 ## Documentation API
 
-Poznote propose une API REST pour accéder aux notes et dossiers de façon programmatique.
+Poznote fournit une API REST pour un accès programmatique aux notes et dossiers.
 
 ### Authentification
 
 Toutes les requêtes API nécessitent une authentification HTTP Basic :
 ```bash
-curl -u 'utilisateur:motdepasse' http://localhost:8040/NOM_ENDPOINT_API.php
+curl -u 'nomutilisateur:motdepasse' http://localhost:8040/POINT_TERMINAISON_API.php
 ```
 
 ### URL de base
@@ -396,7 +389,7 @@ http://VOTRE_SERVEUR:PORT_HTTP_WEB/
 
 ### Format de réponse
 
-**Codes HTTP :**
+**Codes de statut HTTP :**
 - `200` - Succès (mises à jour, suppressions)
 - `201` - Créé
 - `400` - Requête invalide
@@ -405,35 +398,35 @@ http://VOTRE_SERVEUR:PORT_HTTP_WEB/
 - `409` - Conflit (doublon)
 - `500` - Erreur serveur
 
-### Endpoints
+### Points de terminaison
 
 #### Lister les notes
 ```bash
-curl -u 'utilisateur:motdepasse' http://localhost:8040/api_list_notes.php?workspace=MonEspaceDeTravail
+curl -u 'nomutilisateur:motdepasse' http://localhost:8040/api_list_notes.php?workspace=MonEspaceDeTravail
 ```
 
 Vous pouvez passer l'espace de travail comme paramètre de requête (`?workspace=NOM`) ou comme données POST (`workspace=NOM`). Si omis, l'API retournera les notes de tous les espaces de travail.
 
-**Paramètres optionnels :**
-- `workspace` (string) - Filtrer les notes par nom d'espace de travail
+**Paramètres :**
+- `workspace` (string) - *Optionnel* - Filtrer les notes par nom d'espace de travail
 
 ---
 
 #### Créer une note
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{
-		"heading": "Ma nouvelle note",
-		"tags": "perso,important",
-		"folder_name": "Projets",
-		"workspace": "MonEspaceDeTravail"
-	}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "heading": "Ma nouvelle note",
+    "tags": "personnel,important",
+    "folder_name": "Projets",
+    "workspace": "MonEspaceDeTravail"
+  }'
 ```
 
 **Paramètres :**
-- `heading` (string) - **Obligatoire** - Titre de la note
+- `heading` (string) - **Obligatoire** - Le titre de la note
 - `tags` (string) - *Optionnel* - Tags séparés par des virgules
 - `folder_name` (string) - *Optionnel* - Nom du dossier (par défaut "Default")
 - `workspace` (string) - *Optionnel* - Nom de l'espace de travail (par défaut "Poznote")
@@ -443,13 +436,13 @@ curl -X POST http://localhost:8040/api_create_note.php \
 #### Créer un dossier
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{"folder_name": "Projets Travail", "workspace": "MonEspaceDeTravail"}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{"folder_name": "Projets de travail", "workspace": "MonEspaceDeTravail"}'
 ```
 
 **Paramètres :**
-- `folder_name` (string) - **Obligatoire** - Nom du dossier
+- `folder_name` (string) - **Obligatoire** - Le nom du dossier
 - `workspace` (string) - *Optionnel* - Nom de l'espace de travail pour scoper le dossier (par défaut "Poznote")
 
 ---
@@ -457,44 +450,44 @@ curl -X POST http://localhost:8040/api_create_folder.php \
 #### Déplacer une note
 ```bash
 curl -X POST http://localhost:8040/api_move_note.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{
-		"note_id": "123",
-		"folder_name": "Projets Travail",
-		"workspace": "MonEspaceDeTravail"
-	}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "note_id": "123",
+    "folder_name": "Projets de travail",
+    "workspace": "MonEspaceDeTravail"
+  }'
 ```
 
 **Paramètres :**
-- `note_id` (string) - **Obligatoire** - ID de la note à déplacer
-- `folder_name` (string) - **Obligatoire** - Dossier cible
+- `note_id` (string) - **Obligatoire** - L'ID de la note à déplacer
+- `folder_name` (string) - **Obligatoire** - Le nom du dossier cible
 - `workspace` (string) - *Optionnel* - Si fourni, déplace la note vers l'espace de travail spécifié (gère les conflits de titre)
 
 ---
 
 #### Supprimer une note
 ```bash
-# Suppression douce (corbeille)
+# Suppression douce (vers la corbeille)
 curl -X DELETE http://localhost:8040/api_delete_note.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{"note_id": "123", "workspace": "MonEspaceDeTravail"}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": "123", "workspace": "MonEspaceDeTravail"}'
 
 # Suppression définitive
 curl -X DELETE http://localhost:8040/api_delete_note.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{
-		"note_id": "123",
-		"permanent": true,
-		"workspace": "MonEspaceDeTravail"
-	}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "note_id": "123",
+    "permanent": true,
+    "workspace": "MonEspaceDeTravail"
+  }'
 ```
 
 **Paramètres :**
-- `note_id` (string) - **Obligatoire** - ID de la note à supprimer
-- `permanent` (boolean) - *Optionnel* - Suppression définitive si true, sinon déplace vers la corbeille
+- `note_id` (string) - **Obligatoire** - L'ID de la note à supprimer
+- `permanent` (boolean) - *Optionnel* - Si true, suppression définitive ; sinon déplacement vers la corbeille
 - `workspace` (string) - *Optionnel* - Espace de travail pour scoper l'opération
 
 ---
@@ -502,16 +495,16 @@ curl -X DELETE http://localhost:8040/api_delete_note.php \
 #### Supprimer un dossier
 ```bash
 curl -X DELETE http://localhost:8040/api_delete_folder.php \
-	-u 'utilisateur:motdepasse' \
-	-H "Content-Type: application/json" \
-	-d '{"folder_name": "Projets Travail", "workspace": "MonEspaceDeTravail"}'
+  -u 'nomutilisateur:motdepasse' \
+  -H "Content-Type: application/json" \
+  -d '{"folder_name": "Projets de travail", "workspace": "MonEspaceDeTravail"}'
 ```
 
 **Paramètres :**
-- `folder_name` (string) - **Obligatoire** - Nom du dossier à supprimer
+- `folder_name` (string) - **Obligatoire** - Le nom du dossier à supprimer
 - `workspace` (string) - *Optionnel* - Espace de travail pour scoper l'opération (par défaut "Poznote")
 
-**Note :** Le dossier `Default` ne peut pas être supprimé. Quand un dossier est supprimé, toutes ses notes sont déplacées dans `Default`.
+**Note :** Le dossier par défaut ("Default", historiquement "Uncategorized") ne peut pas être supprimé. Quand un dossier est supprimé, toutes ses notes sont déplacées vers le dossier par défaut.
 
 ## Opérations manuelles
 
@@ -523,7 +516,7 @@ Pour les utilisateurs avancés qui préfèrent la configuration directe :
 2. Modifiez le fichier `.env`
 3. Redémarrez Poznote : `docker compose up -d`
 
-**Mettre à jour Poznote :**
+**Mettre à jour Poznote vers la dernière version :**
 
 ```bash
 git pull origin main && docker compose down && docker compose up -d --build
@@ -531,14 +524,14 @@ git pull origin main && docker compose down && docker compose up -d --build
 
 **Sauvegarde :**
 
-Copiez le dossier `./data/` (contient les notes, pièces jointes, base)
+Copiez le répertoire `./data/` (contient les entrées, pièces jointes, base de données)
 
 **Restauration :**
 
-Remplacez le dossier `./data/` et redémarrez le conteneur
+Remplacez le répertoire `./data/` et redémarrez le conteneur
 
 **Réinitialisation du mot de passe :**
 
 1. Arrêtez Poznote : `docker compose down`
-2. Modifiez `.env` : `POZNOTE_PASSWORD=nouveau_mot_de_passe`
+2. Modifiez le fichier `.env` : `POZNOTE_PASSWORD=nouveau_mot_de_passe`
 3. Redémarrez Poznote : `docker compose up -d`
