@@ -510,6 +510,19 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 
 For advanced users who prefer direct configuration:
 
+**Install Poznote Linux (Bash):**
+
+1. Create folder instance name: `INSTANCE_NAME="YOUR-INSTANCE-NAME"`
+2. Clone: `git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"`
+3. Navigate to cloned folder: `cd $INSTANCE_NAME"`
+4. If necessary, edit the Dockerfile (for example to add proxies)
+5. Create .env from template: `cp .env.template .env`
+6. Edit `.env` file
+7. Create folder entries: `mkdir -p data/entries` 
+8. Create folder database: `mkdir -p data/database` 
+9. Create folder attachments: `mkdir -p data/attachments` 
+10. Deploy Poznote: `docker compose up -d --build`
+
 **Change settings:**
 
 1. Stop Poznote: `docker compose down`
