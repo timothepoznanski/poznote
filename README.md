@@ -72,12 +72,6 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 ### 🐧 Linux Prerequisites
 
 1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
-2. **Add user to Docker group**:
-
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-   ⚠️ **Restart your session** after this command
 
 ---
 
@@ -94,9 +88,29 @@ Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]";
 
 ### 🐧 Linux Installation (Bash)
 
+#### Step 1: Choose your instance name
 ```bash
-check_conflicts() { local name="$1"; if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then echo "⚠️  Docker container '${name}-webserver-1' already exists!"; return 1; fi; return 0; }; while true; do read -p "
-Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]: " instanceName; instanceName=${instanceName:-poznote}; if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then break; else if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then echo "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."; elif [ -d "$instanceName" ]; then echo "⚠️  Folder '$instanceName' already exists!"; fi; fi; done; git clone https://github.com/timothepoznanski/poznote.git "$instanceName"; cd "$instanceName"; chmod +x setup.sh; ./setup.sh
+# Choose an instance name (use only lowercase letters, numbers, underscores, and hyphens)
+# Examples: poznote, my-notes, poznote-work, poznote-personal
+INSTANCE_NAME="poznote"  # Change this to your preferred name
+```
+
+#### Step 2: Clone the repository and navigate to the directory
+```bash
+# Clone the repository with your chosen instance name
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+
+# Navigate to the cloned directory
+cd "$INSTANCE_NAME"
+
+# Make the setup script executable
+chmod +x setup.sh
+```
+
+#### Step 3: Run the setup script
+```bash
+# Run the interactive setup script
+./setup.sh
 ```
 
 ---

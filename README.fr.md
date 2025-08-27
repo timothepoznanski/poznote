@@ -1,6 +1,31 @@
 
 
-<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
+<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; b### 🐧 Installation Linux (Bash)
+
+#### Étape 1 : Choisissez votre nom d'instance
+```bash
+# Choisissez un nom d'instance (utilisez uniquement des lettres minuscules, chiffres, tirets et underscores)
+# Exemples : poznote, mes-notes, poznote-travail, poznote-personnel
+INSTANCE_NAME="poznote"  # Changez ceci selon votre préférence
+```
+
+#### Étape 2 : Clonez le dépôt et naviguez vers le répertoire
+```bash
+# Clonez le dépôt avec votre nom d'instance choisi
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+
+# Naviguez vers le répertoire cloné
+cd "$INSTANCE_NAME"
+
+# Rendez le script de configuration exécutable
+chmod +x setup.sh
+```
+
+#### Étape 3 : Exécutez le script de configuration
+```bash
+# Lancez le script de configuration interactif
+./setup.sh
+```und:#f0f8ff; margin-bottom:20px;">
 <h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
 <a href="README.md" style="text-decoration:none; display:flex; align-items:center;">
   <span>Click here to read this documentation in English</span>
@@ -73,12 +98,6 @@ Poznote fonctionne dans un conteneur Docker, ce qui le rend très facile à dép
 ### 🐧 Prérequis Linux
 
 1. **Docker Engine** : Installez Docker selon votre distribution ([guide officiel](https://docs.docker.com/engine/install/))
-2. **Ajouter l'utilisateur au groupe Docker** :
- 
-   ```bash
-   sudo usermod -aG docker $USER
-   ```
-   ⚠️ **Redémarrez votre session** après cette commande
 
 ---
 
