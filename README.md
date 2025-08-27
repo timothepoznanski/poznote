@@ -82,9 +82,50 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 ### 🪟 Windows Installation (Powershell 7)
 
+#### Step 1: Choose your instance name
 ```powershell
-function Test-DockerConflict($name) { return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0 }; do { $instanceName = Read-Host "
-Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"; if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }; if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) { Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow; continue }; if (-not (Test-DockerConflict $instanceName)) { Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow; continue }; if (Test-Path $instanceName) { Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow; continue }; break } while ($true); git clone https://github.com/timothepoznanski/poznote.git $instanceName; cd $instanceName; .\setup.ps1
+# Run this interactive script to choose your instance name
+# It will validate the name and check for Docker conflicts
+
+function Test-DockerConflict($name) {
+    return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0
+}
+
+do {
+    $instanceName = Read-Host "Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"
+    if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
+    if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
+        Write-Host "⚠️  Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
+        continue
+    }
+    if (-not (Test-DockerConflict $instanceName)) {
+        Write-Host "⚠️  Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
+        continue
+    }
+    if (Test-Path $instanceName) {
+        Write-Host "⚠️  Folder '$instanceName' already exists!" -ForegroundColor Yellow
+        continue
+    }
+    break
+} while ($true)
+
+$INSTANCE_NAME = $instanceName
+Write-Host "Using instance name: $INSTANCE_NAME"
+```
+
+#### Step 2: Clone the repository and navigate to the directory
+```powershell
+# Clone the repository with your chosen instance name
+git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
+
+# Navigate to the cloned directory
+cd $INSTANCE_NAME
+```
+
+#### Step 3: Run the setup script
+```powershell
+# Run the interactive setup script
+.\setup.ps1
 ```
 
 ### 🐧 Linux Installation (Bash)
