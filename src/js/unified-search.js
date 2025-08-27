@@ -430,8 +430,69 @@ function handleUnifiedSearchSubmit(e, isMobile) {
     
     // Add excluded folders to form data - this handles normal form submissions
     addExcludedFoldersToForm(e.target, isMobile);
-    
-    // Let the form submit normally (don't prevent default)
+
+    // Intercept the normal submit and perform AJAX request to update columns
+    try {
+        e.preventDefault();
+
+        const form = e.target;
+        // Serialize form data
+        const formParams = new URLSearchParams(new FormData(form)).toString();
+
+        fetch(form.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formParams
+        })
+        .then(resp => resp.text())
+        .then(html => {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newLeft = doc.getElementById('left_col');
+                const newRight = doc.getElementById('right_col');
+
+                if (newLeft) {
+                    const currentLeft = document.getElementById('left_col');
+                    if (currentLeft) currentLeft.innerHTML = newLeft.innerHTML;
+                }
+
+                if (newRight) {
+                    const currentRight = document.getElementById('right_col');
+                    if (currentRight) currentRight.innerHTML = newRight.innerHTML;
+                }
+
+                // Update browser URL to reflect search parameters for bookmarking/navigation
+                try {
+                    const baseUrl = window.location.pathname;
+                    const newUrl = baseUrl + '?' + formParams;
+                    history.pushState({}, '', newUrl);
+                } catch (err) { /* ignore history errors */ }
+
+                // Reinitialize dynamic behaviors on the updated DOM
+                try { if (typeof reinitializeClickableTagsAfterAjax === 'function') reinitializeClickableTagsAfterAjax(); } catch(e) {}
+                try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
+                try { if (typeof initializeSearchButtons === 'function') initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
+                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+            } catch (err) {
+                console.error('Error parsing search response', err);
+                // Fallback: reload the page
+                form.submit();
+            }
+        })
+        .catch(err => {
+            console.error('AJAX search failed', err);
+            // Fallback to normal submit
+            form.submit();
+        });
+    } catch (err) {
+        // On unexpected error, allow default submit
+        console.error('Search submit interception error', err);
+    }
 }
 
 function addExcludedFoldersToForm(form, isMobile) {
