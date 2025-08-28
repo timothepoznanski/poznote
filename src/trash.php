@@ -59,28 +59,46 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 		
 		<div class="trash-content">
 		<?php
-	$search_condition = $search ? " AND (heading LIKE ? OR entry LIKE ?)" : '';
-	$workspace_condition = $pageWorkspace ? " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))" : '';
-	$sql = "SELECT * FROM entries WHERE trash = 1$search_condition$workspace_condition ORDER BY updated DESC LIMIT 50";
-		
-		if ($search) {
-			if ($pageWorkspace) {
-				$stmt = $con->prepare($sql);
-				$searchParam = "%$search%";
-				$stmt->execute([$searchParam, $searchParam, $pageWorkspace, $pageWorkspace]);
-			} else {
-				$stmt = $con->prepare($sql);
-				$searchParam = "%$search%";
-				$stmt->execute([$searchParam, $searchParam]);
-			}
+	// Build search condition supporting multiple terms (AND)
+	$search_params = [];
+	$search_condition = '';
+	if ($search) {
+		$terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
+		if (count($terms) <= 1) {
+			$search_condition = " AND (heading LIKE ? OR entry LIKE ?)";
+			$search_params[] = "%{$search}%";
+			$search_params[] = "%{$search}%";
 		} else {
-			if ($pageWorkspace) {
-				$stmt = $con->prepare($sql);
-				$stmt->execute([$pageWorkspace, $pageWorkspace]);
-			} else {
-				$stmt = $con->query($sql);
+			$parts = [];
+			foreach ($terms as $t) {
+				$parts[] = "(heading LIKE ? OR entry LIKE ?)";
+				$search_params[] = "%{$t}%";
+				$search_params[] = "%{$t}%";
 			}
+			$search_condition = " AND (" . implode(" AND ", $parts) . ")";
 		}
+	}
+	$workspace_condition = $pageWorkspace ? " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))" : '';
+	$sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY updated DESC LIMIT 50";
+
+	// Execute with appropriate parameters order (search params first, then workspace if any)
+	if (!empty($search_params)) {
+		if ($pageWorkspace) {
+			$stmt = $con->prepare($sql);
+			$execute_params = array_merge($search_params, [$pageWorkspace, $pageWorkspace]);
+			$stmt->execute($execute_params);
+		} else {
+			$stmt = $con->prepare($sql);
+			$stmt->execute($search_params);
+		}
+	} else {
+		if ($pageWorkspace) {
+			$stmt = $con->prepare($sql);
+			$stmt->execute([$pageWorkspace, $pageWorkspace]);
+		} else {
+			$stmt = $con->query($sql);
+		}
+	}
 		
 		if ($stmt) {
 			while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

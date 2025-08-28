@@ -616,9 +616,24 @@ $folder_filter = $_GET['folder'] ?? '';
     
     // Simple secure search (basic version)
     if (!empty($search)) {
-        $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
-        $search_params[] = '%' . $search . '%';
-        $search_params[] = '%' . $search . '%';
+        // Split search string into individual terms (whitespace separated)
+        $search_terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
+
+        if (count($search_terms) <= 1) {
+            // Single term: preserve previous behavior
+            $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+            $search_params[] = '%' . $search . '%';
+            $search_params[] = '%' . $search . '%';
+        } else {
+            // Multiple terms: require ALL terms to appear (AND)
+            $term_conditions = [];
+            foreach ($search_terms as $t) {
+                $term_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+                $search_params[] = '%' . $t . '%';
+                $search_params[] = '%' . $t . '%';
+            }
+            $where_conditions[] = "(" . implode(" AND ", $term_conditions) . ")";
+        }
     }
     
     if (!empty($tags_search)) {

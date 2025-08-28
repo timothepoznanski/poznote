@@ -40,9 +40,22 @@ try {
     
     // Add search conditions if they exist
     if (!empty($search)) {
-        $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
-        $search_params[] = '%' . $search . '%';
-        $search_params[] = '%' . $search . '%';
+        // Split search into terms and require all terms (AND)
+        $search_terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
+
+        if (count($search_terms) <= 1) {
+            $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+            $search_params[] = '%' . $search . '%';
+            $search_params[] = '%' . $search . '%';
+        } else {
+            $term_conditions = [];
+            foreach ($search_terms as $t) {
+                $term_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+                $search_params[] = '%' . $t . '%';
+                $search_params[] = '%' . $t . '%';
+            }
+            $where_conditions[] = "(" . implode(" AND ", $term_conditions) . ")";
+        }
     }
     
     if (!empty($tags_search)) {
