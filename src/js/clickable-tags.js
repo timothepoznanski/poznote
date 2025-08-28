@@ -210,6 +210,7 @@ function showTagSuggestions(inputEl, container, workspace) {
                     if (typeof window !== 'undefined') {
                         window.noteid = targetNoteId;
                         window.editedButNotSaved = 1;
+                        try { console.debug('clickable-tags: set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
                     }
                     // Immediately save tags via AJAX to avoid relying on global save button/state
                     try {
@@ -259,6 +260,7 @@ function showTagSuggestions(inputEl, container, workspace) {
                         if (typeof window !== 'undefined') {
                             window.noteid = targetNoteId;
                             window.editedButNotSaved = 1;
+                            try { console.debug('clickable-tags (keyboard): set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
                         }
                         try {
                             const tagsInput = document.getElementById('tags' + targetNoteId);
