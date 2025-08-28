@@ -673,32 +673,67 @@ function saveTagsDirectly(noteId, tagsValue) {
             // If not JSON, treat as normal response
             if (typeof editedButNotSaved !== 'undefined') {
                 window.editedButNotSaved = 0;
+                console.log('saveTagsDirectly: set editedButNotSaved = 0');
             }
             var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
             if (lastUpdatedElem) {
                 if (data == '1') {
                     lastUpdatedElem.innerHTML = 'Last Saved Today';
+                    console.log('saveTagsDirectly: updated lastUpdatedElem to: Last Saved Today');
                 } else {
                     lastUpdatedElem.innerHTML = data;
+                    console.log('saveTagsDirectly: updated lastUpdatedElem to:', data);
                 }
             }
             
             // Update the title in the left column
             if (typeof updateNoteTitleInLeftColumn === 'function') {
+                console.log('saveTagsDirectly: calling updateNoteTitleInLeftColumn');
                 updateNoteTitleInLeftColumn();
+            } else {
+                console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
             }
             if (typeof setSaveButtonRed === 'function') {
+                console.log('saveTagsDirectly: calling setSaveButtonRed(false)');
                 setSaveButtonRed(false);
+            } else {
+                console.warn('saveTagsDirectly: setSaveButtonRed function not found');
             }
         }
         
         // Clear the flags after successful save
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 0;
+            console.log('saveTagsDirectly: set editedButNotSaved = 0');
         }
         if (typeof updateNoteEnCours !== 'undefined') {
             window.updateNoteEnCours = 0;
+            console.log('saveTagsDirectly: set updateNoteEnCours = 0');
         }
+        
+        // Update UI elements
+        var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
+        if (lastUpdatedElem) {
+            lastUpdatedElem.innerHTML = data;
+            console.log('saveTagsDirectly: updated lastUpdatedElem to:', data);
+        }
+        
+        // Update title in left column
+        if (typeof updateNoteTitleInLeftColumn === 'function') {
+            console.log('saveTagsDirectly: calling updateNoteTitleInLeftColumn');
+            updateNoteTitleInLeftColumn();
+        } else {
+            console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
+        }
+        
+        // Update save button
+        if (typeof setSaveButtonRed === 'function') {
+            console.log('saveTagsDirectly: calling setSaveButtonRed(false)');
+            setSaveButtonRed(false);
+        } else {
+            console.warn('saveTagsDirectly: setSaveButtonRed function not found');
+        }
+        
         console.log('saveTagsDirectly: save completed successfully');
     })
     .catch(function(error) {
