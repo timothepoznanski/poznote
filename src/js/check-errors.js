@@ -63,7 +63,6 @@ async function checkErrors() {
         }
         
     } catch (error) {
-        console.error('Error checking for errors:', error);
         
         // Hide loading
         loadingState.style.display = 'none';
@@ -101,7 +100,6 @@ async function copyToClipboard() {
         }, 2000);
         
     } catch (err) {
-        console.error('Failed to copy text: ', err);
         
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
@@ -122,7 +120,7 @@ async function copyToClipboard() {
             }, 2000);
             
         } catch (fallbackErr) {
-            console.error('Fallback copy failed: ', fallbackErr);
+            
         }
         
         document.body.removeChild(textArea);

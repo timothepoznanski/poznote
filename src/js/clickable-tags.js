@@ -149,7 +149,7 @@ function fetchAllTags(workspace) {
                     resolve([]);
                 }
             })
-            .catch(err => { console.error('Failed to load tags for autocomplete', err); resolve([]); });
+            .catch(err => { resolve([]); });
     });
 }
 
@@ -467,7 +467,6 @@ function saveTagsDirectly(noteId, tagsValue) {
     const folderInput = document.getElementById('folder' + noteId);
     
     if (!titleInput || !contentDiv) {
-        console.error('Could not find note elements for saving tags');
         return;
     }
     
@@ -494,7 +493,6 @@ function saveTagsDirectly(noteId, tagsValue) {
     })
     .then(response => response.text())
     .then(function(data) {
-        console.log('Tags saved successfully');
         // Clear the flags after successful save
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 0;
@@ -504,7 +502,6 @@ function saveTagsDirectly(noteId, tagsValue) {
         }
     })
     .catch(function(error) {
-        console.error('Error saving tags:', error);
         // Keep edited flag on error, clear saving flag
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 1;

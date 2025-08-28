@@ -16,7 +16,6 @@ $workspace = isset($_GET['workspace']) ? trim($_GET['workspac                   
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     showNotification('Failed to delete attachment', 'error');
                 });
                 },
@@ -226,7 +225,6 @@ if (!$note) {
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     document.getElementById('attachmentsList').innerHTML = 
                         '<div class="error-message">Error loading attachments</div>';
                 });
@@ -299,7 +297,6 @@ if (!$note) {
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         showNotification('Error deleting attachment', 'error');
                     });
                 },

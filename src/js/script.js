@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
     .catch(error => {
-        console.log('Using default folder name due to error:', error);
+        
     });
     
     // Initialize workspace menu functionality
@@ -185,7 +185,6 @@ function loadAndShowWorkspaceMenu(menu) {
             }
         })
         .catch(error => {
-            console.error('Error loading workspaces:', error);
             menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-exclamation-triangle"></i>Error loading workspaces</div>';
         });
 }
@@ -418,7 +417,6 @@ function deleteCurrentWorkspace() {
 // Function to show note information with complete details
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
     if (!noteId) {
-        console.error('No noteId provided');
         alert('Error: No note ID provided');
         return;
     }
@@ -429,7 +427,6 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
         const url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
         window.location.href = url;
     } catch (error) {
-        console.error('Error in showNoteInfo:', error);
         alert('Error displaying note information: ' + error.message);
     }
 }
@@ -587,7 +584,6 @@ function uploadAttachment() {
         try {
             data = JSON.parse(text);
         } catch (e) {
-            console.error('Invalid JSON response:', text);
             throw new Error('Server returned invalid response');
         }
         
@@ -609,7 +605,6 @@ function uploadAttachment() {
         }
     })
     .catch(error => {
-        console.error('Upload error:', error);
         showAttachmentError('Upload failed: ' + error.message);
     })
     .finally(() => {
@@ -626,11 +621,11 @@ function loadAttachments(noteId) {
         if (data.success) {
             displayAttachments(data.attachments);
         } else {
-            console.error('Failed to load attachments:', data.message);
+            
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        
     });
 }
 
@@ -705,7 +700,6 @@ function deleteAttachment(attachmentId) {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             showNotificationPopup('Delete failed', 'error');
         });
     });
@@ -773,7 +767,7 @@ function updateAttachmentCountInMenu(noteId) {
         }
     })
     .catch(error => {
-        console.error('Error updating attachment count:', error);
+        
     });
 }
 
@@ -1393,7 +1387,6 @@ function insertHTMLAtSelection(html) {
         }
         return true;
     } catch (e) {
-        console.error('insertHTMLAtSelection error', e);
         return false;
     }
 }
@@ -1447,7 +1440,7 @@ function handleImageFilesAndInsert(files, dropTarget) {
                             }
                         }
                     } catch (e) {
-                        console.error('Fallback append image failed', e);
+                        
                     }
                 }
                 // Notify the app that the note changed
@@ -1477,7 +1470,7 @@ document.body.addEventListener('paste', function(e) {
             }
         }
     } catch (err) {
-        console.error('paste image handler error', err);
+        
     }
 });
 
@@ -1545,7 +1538,7 @@ document.body.addEventListener('drop', function(e) {
             handleImageFilesAndInsert(dt.files, note);
         }
     } catch (err) {
-        console.error('drop handler error', err);
+        
     }
 });
 
@@ -1779,17 +1772,17 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                         // Save button states
                         if (typeof window.saveCurrentSearchState === 'function') {
                             savedSearchState = window.saveCurrentSearchState();
-                            console.log('Saved search state before DOM replacement:', savedSearchState);
+                            
                         }
                         
                         // Save current search term
                         const searchInput = document.getElementById('unified-search');
                         if (searchInput && searchInput.value) {
                             savedSearchTerm = searchInput.value;
-                            console.log('Saved search term before DOM replacement:', savedSearchTerm);
+                            
                         }
                     } catch(e) { 
-                        console.error('Error saving search state before DOM replacement:', e); 
+                        
                     }
                     
                     currentLeft.innerHTML = newLeft.innerHTML;
@@ -1803,7 +1796,7 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                         if (typeof updateWorkspaceNameInHeaders === 'function') updateWorkspaceNameInHeaders(workspaceName);
                         // Re-run any initialization required for the workspace menu to rebind global handlers
                         if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu();
-                    } catch(e) { console.error('Error reinitializing workspace UI', e); }
+                    } catch(e) {  }
                     // If the server returned a right column for this workspace, update it too
                     try {
                         if (newRight) {
@@ -1821,7 +1814,7 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                                 }
                             }
                         }
-                    } catch(e) { console.error('Error updating right column', e); }
+                    } catch(e) {  }
                     // Update browser URL without reload
                     history.replaceState({}, '', url.toString());
                     // update selectedWorkspace var
@@ -1830,7 +1823,6 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                     
                     // CRITICAL: Reinitialize search functionality after DOM replacement
                     setTimeout(() => {
-                        console.log('Reinitializing search after DOM replacement for workspace:', workspaceName);
                         if (typeof window.reinitializeSearchAfterWorkspaceChange === 'function') {
                             window.reinitializeSearchAfterWorkspaceChange();
                         }
@@ -1838,10 +1830,10 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                 }
             }
         } catch (e) {
-            console.error('Error refreshing left column', e);
+            
         }
     })
-    .catch(function(err){ console.error('Error fetching left column', err); });
+    .catch(function(err){  });
 }
 
 // Function to show contact popup
@@ -1920,7 +1912,6 @@ function createFolder() {
     })
     .then(response => response.json())
     .then(function(data) {
-        console.log('Create folder response:', data);
         if (data.success) {
             closeModal('newFolderModal');
             document.getElementById('newFolderName').value = ''; // Clear input
@@ -1931,7 +1922,6 @@ function createFolder() {
         }
     })
     .catch(error => {
-        console.error('Error creating folder:', error);
         showNotificationPopup('Error creating folder: ' + error, 'error');
     });
 }
@@ -2037,7 +2027,7 @@ function cleanupRenamedFolderInLocalStorage(oldName, newName) {
     if (searchState !== null) {
         localStorage.setItem(newSearchKey, searchState);
         localStorage.removeItem(oldSearchKey);
-        console.log(`Updated folder search filter: ${oldName} -> ${newName}`);
+        
     }
     
     // Update recent folders
@@ -2047,7 +2037,6 @@ function cleanupRenamedFolderInLocalStorage(oldName, newName) {
     );
     localStorage.setItem('poznote_recent_folders', JSON.stringify(updatedRecentFolders));
     
-    console.log(`Updated localStorage for renamed folder: ${oldName} -> ${newName}`);
 }
 
 function deleteFolder(folderName) {
@@ -2214,7 +2203,6 @@ function showMoveFolderFilesDialog(sourceFolderName) {
         }
     })
     .catch(error => {
-        console.error('Error getting folder files count:', error);
         document.getElementById('filesCountText').textContent = 'Unable to count files';
     });
     
@@ -2253,7 +2241,6 @@ function populateTargetFolderDropdown(excludeFolderName) {
         }
     })
     .catch(error => {
-        console.error('Error loading folders:', error);
         showNotificationPopup('Error loading folders: ' + error, 'error');
     });
 }
@@ -2318,7 +2305,6 @@ function executeMoveAllFiles() {
         }
     })
     .catch(error => {
-        console.error('Error moving files:', error);
         showNotificationPopup('Error moving files: ' + error.message, 'error');
         // Re-enable button on error
         moveButton.disabled = false;
@@ -2476,7 +2462,6 @@ function createAndSelectNewFolder(folderName) {
         }
     })
     .catch(error => {
-        console.error('Error creating folder:', error);
         showNotificationPopup('Error creating folder: ' + error, 'error');
     });
 }
@@ -2504,7 +2489,7 @@ function refreshFoldersList() {
         }
     })
     .catch(error => {
-        console.error('Error refreshing folders list:', error);
+        
     });
 }
 

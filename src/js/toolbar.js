@@ -214,7 +214,7 @@
       document.addEventListener('keydown', keyHandler);
 
     } catch (err) {
-      console.error('toggleRedColor error', err);
+      
     }
   }
 
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const noteentry = document.querySelector('.noteentry');
         if (noteentry && typeof window.update === 'function') window.update();
       } catch (err) {
-        console.error('addLinkToNote error', err);
+        
       }
     }
 

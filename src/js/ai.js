@@ -9,7 +9,6 @@ let currentSummaryNoteId = null;
  */
 async function generateAISummary(noteId) {
     if (!noteId) {
-        console.error('Note ID is required');
         return;
     }
     
@@ -22,7 +21,6 @@ async function generateAISummary(noteId) {
  */
 async function checkErrors(noteId) {
     if (!noteId) {
-        console.error('Note ID is required');
         return;
     }
     
@@ -172,7 +170,6 @@ async function copyToClipboard() {
             }, 2000);
         }
     } catch (err) {
-        console.error('Failed to copy text: ', err);
         
         // Fallback for older browsers
         const textArea = document.createElement('textarea');

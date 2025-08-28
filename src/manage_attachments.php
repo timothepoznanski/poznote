@@ -162,7 +162,6 @@ if (!$note) {
 
         function uploadAttachment(event) {
             if (uploadInProgress) {
-                console.log('Upload already in progress, ignoring click');
                 return;
             }
             
@@ -258,7 +257,6 @@ if (!$note) {
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     document.getElementById('attachmentsList').innerHTML = 
                         '<div class="error-message">Error loading attachments</div>';
                 });
@@ -417,7 +415,6 @@ if (!$note) {
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         showNotification('Error deleting attachment', 'error');
                     });
                 },
