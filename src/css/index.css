@@ -37,6 +37,19 @@
     display: none;
 }
 
+/* Utility: force hidden (used by JS to toggle visibility without inline styles) */
+.hidden {
+    display: none !important;
+}
+
+/* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
+.folder-header {
+    display: block;
+}
+.folder-content {
+    display: block;
+}
+
 /* Specific hidden elements */
 .folders-selection-list,
 .create-folder-section,

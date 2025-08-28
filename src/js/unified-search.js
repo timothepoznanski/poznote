@@ -24,7 +24,8 @@ function clearUnifiedSearch() {
     if (preserveFolders) {
         const folderHeaders = document.querySelectorAll('.folder-header');
         folderHeaders.forEach(folderHeader => {
-            folderHeader.style.display = 'block';
+            // Use CSS class to show/hide folders instead of inline styles
+            folderHeader.classList.remove('hidden');
             
             // Restore folder content visibility based on their previous state
             const folderToggle = folderHeader.querySelector('[data-folder-id]');
@@ -35,9 +36,9 @@ function clearUnifiedSearch() {
                     // Use localStorage state if available, or show by default
                     const state = localStorage.getItem('folder_' + folderId);
                     if (state === 'closed') {
-                        folderContent.style.display = 'none';
+                        folderContent.classList.add('hidden');
                     } else {
-                        folderContent.style.display = 'block';
+                        folderContent.classList.remove('hidden');
                     }
                 }
             }
@@ -101,6 +102,101 @@ function clearUnifiedSearch() {
     }
     
     window.location.href = url;
+}
+
+// Helper utilities to reduce duplication
+function getSuffix(isMobile) {
+    return isMobile ? '-mobile' : '';
+}
+
+function getButtonsAndFields(isMobile) {
+    const s = getSuffix(isMobile);
+    return {
+        notesBtn: document.getElementById('search-notes-btn' + s),
+        tagsBtn: document.getElementById('search-tags-btn' + s),
+        foldersBtn: document.getElementById('search-folders-btn' + s),
+        searchInput: document.getElementById('unified-search' + s),
+        notesHidden: document.getElementById('search-in-notes' + s) || document.getElementById('search-notes-hidden' + s),
+        tagsHidden: document.getElementById('search-in-tags' + s) || document.getElementById('search-tags-hidden' + s),
+        foldersHidden: document.getElementById('search-in-folders' + s) || document.getElementById('search-in-folders' + s)
+    };
+}
+
+function setActiveStyle(btn) {
+    if (!btn) return;
+    btn.classList.add('active');
+}
+
+function setInactiveStyle(btn) {
+    if (!btn) return;
+    btn.classList.remove('active');
+}
+
+function ajaxSubmitForm(form, formParams, searchState) {
+    // Encapsulate duplicated AJAX fetch + DOM swap + reinit + state restore
+    try {
+        fetch(form.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formParams
+        })
+        .then(resp => resp.text())
+        .then(html => {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newLeft = doc.getElementById('left_col');
+                const newRight = doc.getElementById('right_col');
+
+                if (newLeft) {
+                    const currentLeft = document.getElementById('left_col');
+                    if (currentLeft) currentLeft.innerHTML = newLeft.innerHTML;
+                }
+
+                if (newRight) {
+                    const currentRight = document.getElementById('right_col');
+                    if (currentRight) currentRight.innerHTML = newRight.innerHTML;
+                }
+
+                try {
+                    const baseUrl = window.location.pathname;
+                    const newUrl = baseUrl + '?' + formParams;
+                    history.pushState({}, '', newUrl);
+                } catch (err) { /* ignore history errors */ }
+
+                // Reinitialize dynamic behaviors on the updated DOM
+                try { if (typeof reinitializeClickableTagsAfterAjax === 'function') reinitializeClickableTagsAfterAjax(); } catch(e) {}
+                try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
+                try { initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
+                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+
+                // Restore search button state if provided
+                try { if (searchState) restoreSearchState(searchState); setTimeout(() => ensureAtLeastOneButtonActive(), 150); } catch(e) {}
+
+                // Ensure highlighting runs after AJAX content replacement so search terms
+                // are highlighted on the first AJAX search result update.
+                try {
+                    if (typeof highlightSearchTerms === 'function') {
+                        // Small delay to allow DOM reinitialization to complete
+                        setTimeout(highlightSearchTerms, 150);
+                    }
+                } catch(e) {}
+            } catch (err) {
+                // Fallback: reload the page
+                form.submit();
+            }
+        })
+        .catch(err => {
+            // Fallback to normal submit
+            form.submit();
+        });
+    } catch (err) {
+        form.submit();
+    }
 }
 
 // Function to go back to home while preserving search state (fallback for JavaScript calls)
@@ -312,92 +408,32 @@ function initializeSearchButtonsWithState(isMobile, forcedState) {
     
     // Apply the final button states and synchronize hidden fields
     if (finalNotesActive) {
-        notesBtn.classList.add('active');
-        tagsBtn.classList.remove('active');
-        foldersBtn.classList.remove('active');
-        
-        // Apply active styling to notes button with correct colors
-        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
-        notesBtn.style.setProperty('color', '#007DB8', 'important');
-        notesBtn.style.setProperty('border-color', '#007DB8', 'important');
-        notesBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-        notesBtn.style.setProperty('opacity', '1', 'important');
-        // Reset other buttons to inactive styling
-        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
-        tagsBtn.style.setProperty('color', '#6c757d', 'important');
-        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        tagsBtn.style.removeProperty('box-shadow');
-        tagsBtn.style.removeProperty('opacity');
-        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
-        foldersBtn.style.setProperty('color', '#6c757d', 'important');
-        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        foldersBtn.style.removeProperty('box-shadow');
-        foldersBtn.style.removeProperty('opacity');
-        
-        // Synchronize hidden fields
+        setActiveStyle(notesBtn);
+        setInactiveStyle(tagsBtn);
+        setInactiveStyle(foldersBtn);
         if (notesHidden) notesHidden.value = '1';
         if (tagsHidden) tagsHidden.value = '';
         if (foldersHidden) foldersHidden.value = '';
     } else if (finalTagsActive) {
-        tagsBtn.classList.add('active');
-        notesBtn.classList.remove('active');
-        foldersBtn.classList.remove('active');
-        
-        // Apply active styling to tags button with correct colors
-        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
-        tagsBtn.style.setProperty('color', '#007DB8', 'important');
-        tagsBtn.style.setProperty('border-color', '#007DB8', 'important');
-        tagsBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-        tagsBtn.style.setProperty('opacity', '1', 'important');
-        // Reset other buttons to inactive styling
-        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
-        notesBtn.style.setProperty('color', '#6c757d', 'important');
-        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        notesBtn.style.removeProperty('box-shadow');
-        notesBtn.style.removeProperty('opacity');
-        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
-        foldersBtn.style.setProperty('color', '#6c757d', 'important');
-        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        foldersBtn.style.removeProperty('box-shadow');
-        foldersBtn.style.removeProperty('opacity');
-        
-        // Synchronize hidden fields
+        setActiveStyle(tagsBtn);
+        setInactiveStyle(notesBtn);
+        setInactiveStyle(foldersBtn);
         if (notesHidden) notesHidden.value = '';
         if (tagsHidden) tagsHidden.value = '1';
         if (foldersHidden) foldersHidden.value = '';
     } else if (finalFoldersActive) {
-        foldersBtn.classList.add('active');
-        notesBtn.classList.remove('active');
-        tagsBtn.classList.remove('active');
-        
-        // Apply active styling to folders button with correct colors
-        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
-        foldersBtn.style.setProperty('color', '#007DB8', 'important');
-        foldersBtn.style.setProperty('border-color', '#007DB8', 'important');
-        foldersBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-        foldersBtn.style.setProperty('opacity', '1', 'important');
-        // Reset other buttons to inactive styling
-        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
-        notesBtn.style.setProperty('color', '#6c757d', 'important');
-        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        notesBtn.style.removeProperty('box-shadow');
-        notesBtn.style.removeProperty('opacity');
-        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
-        tagsBtn.style.setProperty('color', '#6c757d', 'important');
-        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        tagsBtn.style.removeProperty('box-shadow');
-        tagsBtn.style.removeProperty('opacity');
-        
-        // Synchronize hidden fields
+        setActiveStyle(foldersBtn);
+        setInactiveStyle(notesBtn);
+        setInactiveStyle(tagsBtn);
         if (notesHidden) notesHidden.value = '';
         if (tagsHidden) tagsHidden.value = '';
         if (foldersHidden) foldersHidden.value = '1';
     }
     
     // Remove any existing event listeners first to avoid duplicates
-    notesBtn.removeEventListener('click', notesBtn._clickHandler);
-    tagsBtn.removeEventListener('click', tagsBtn._clickHandler);
-    foldersBtn.removeEventListener('click', foldersBtn._clickHandler);
+    try { notesBtn.removeEventListener('click', notesBtn._clickHandler); } catch(e) {}
+    try { tagsBtn.removeEventListener('click', tagsBtn._clickHandler); } catch(e) {}
+    try { foldersBtn.removeEventListener('click', foldersBtn._clickHandler); } catch(e) {}
     
     // Create new handlers and store references for cleanup
     notesBtn._clickHandler = function() {
@@ -446,41 +482,12 @@ function toggleSearchType(type, isMobile) {
     }
     
     // Deactivate all buttons first - reset to default search-pill style
-    if (notesBtn) {
-        notesBtn.classList.remove('active');
-        // Reset to default .search-pill styles
-        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
-        notesBtn.style.setProperty('color', '#6c757d', 'important');
-        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        notesBtn.style.removeProperty('box-shadow');
-        notesBtn.style.removeProperty('opacity');
-    }
-    if (tagsBtn) {
-        tagsBtn.classList.remove('active');
-        // Reset to default .search-pill styles
-        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
-        tagsBtn.style.setProperty('color', '#6c757d', 'important');
-        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        tagsBtn.style.removeProperty('box-shadow');
-        tagsBtn.style.removeProperty('opacity');
-    }
-    if (foldersBtn) {
-        foldersBtn.classList.remove('active');
-        // Reset to default .search-pill styles
-        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
-        foldersBtn.style.setProperty('color', '#6c757d', 'important');
-        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
-        foldersBtn.style.removeProperty('box-shadow');
-        foldersBtn.style.removeProperty('opacity');
-    }
+    setInactiveStyle(notesBtn);
+    setInactiveStyle(tagsBtn);
+    setInactiveStyle(foldersBtn);
     
-    // Activate the clicked button with .search-pill.active styles
-    btn.classList.add('active');
-    btn.style.setProperty('background', '#f8f9fa', 'important');
-    btn.style.setProperty('color', '#007DB8', 'important');
-    btn.style.setProperty('border-color', '#007DB8', 'important');
-    btn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-    btn.style.setProperty('opacity', '1', 'important');
+    // Activate the clicked button via CSS class
+    setActiveStyle(btn);
     
     // Remove error styling
     hideSearchValidationError(isMobile);
@@ -508,7 +515,7 @@ function toggleSearchType(type, isMobile) {
     if (searchInput && searchInput.value.trim() !== '') {
         // Update hidden inputs with current search value before submitting
         updateHiddenInputs(isMobile);
-        
+
         // Instead of triggering form submission, directly submit with excluded folders
         submitSearchWithExcludedFolders(isMobile);
     } else {
@@ -525,88 +532,22 @@ function submitSearchWithExcludedFolders(isMobile) {
     const form = document.getElementById(formId);
     
     if (!form) return;
-    
+
     // Add excluded folders to form before submission
     addExcludedFoldersToForm(form, isMobile);
-    
-    // Use AJAX instead of form.submit() to avoid full page reload
-    try {
-        // Build form parameters manually to ensure all fields are included
-        const formData = new FormData(form);
-        const params = new URLSearchParams();
-        
-        // Explicitly add all form fields
-        for (const [key, value] of formData.entries()) {
-            params.append(key, value);
-        }
-        
-        const formParams = params.toString();
-        
-        // Save current search button state before AJAX
-        const searchState = saveCurrentSearchState(isMobile);
-        
-        fetch(form.action || window.location.pathname, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formParams
-        })
-        .then(resp => resp.text())
-        .then(html => {
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
 
-                const newLeft = doc.getElementById('left_col');
-                const newRight = doc.getElementById('right_col');
-
-                if (newLeft) {
-                    const currentLeft = document.getElementById('left_col');
-                    if (currentLeft) currentLeft.innerHTML = newLeft.innerHTML;
-                }
-
-                if (newRight) {
-                    const currentRight = document.getElementById('right_col');
-                    if (currentRight) currentRight.innerHTML = newRight.innerHTML;
-                }
-
-                // Update browser URL to reflect search parameters for bookmarking/navigation
-                try {
-                    const baseUrl = window.location.pathname;
-                    const newUrl = baseUrl + '?' + formParams;
-                    history.pushState({}, '', newUrl);
-                } catch (err) { /* ignore history errors */ }
-
-                // Reinitialize dynamic behaviors on the updated DOM
-                try { if (typeof reinitializeClickableTagsAfterAjax === 'function') reinitializeClickableTagsAfterAjax(); } catch(e) {}
-                try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
-                try { if (typeof initializeSearchButtons === 'function') initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
-                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
-                
-                // Reinitialize search buttons after DOM update (this also reattaches button listeners)
-                try { initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) { }
-                
-                // Restore search button state after reinitialization in submitSearchWithExcludedFolders
-                try { 
-                    restoreSearchState(searchState); 
-                    // Ensure at least one button is active after restoration
-                    setTimeout(() => ensureAtLeastOneButtonActive(), 150);
-                } catch(e) { }
-            } catch (err) {
-                // Fallback: reload the page
-                form.submit();
-            }
-        })
-        .catch(err => {
-            // Fallback to normal submit
-            form.submit();
-        });
-    } catch (err) {
-        // On unexpected error, allow normal submit
-        form.submit();
+    // Build form parameters manually to ensure all fields are included
+    const formData = new FormData(form);
+    const params = new URLSearchParams();
+    for (const [key, value] of formData.entries()) {
+        params.append(key, value);
     }
+    const formParams = params.toString();
+
+    // Save current search button state before AJAX
+    const searchState = saveCurrentSearchState(isMobile);
+
+    ajaxSubmitForm(form, formParams, searchState);
 }
 
 function handleUnifiedSearchSubmit(e, isMobile) {
@@ -699,56 +640,8 @@ function handleUnifiedSearchSubmit(e, isMobile) {
             },
             body: formParams
         })
-        .then(resp => resp.text())
-        .then(html => {
-            try {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                const newLeft = doc.getElementById('left_col');
-                const newRight = doc.getElementById('right_col');
-
-                if (newLeft) {
-                    const currentLeft = document.getElementById('left_col');
-                    if (currentLeft) currentLeft.innerHTML = newLeft.innerHTML;
-                }
-
-                if (newRight) {
-                    const currentRight = document.getElementById('right_col');
-                    if (currentRight) currentRight.innerHTML = newRight.innerHTML;
-                }
-
-                // Update browser URL to reflect search parameters for bookmarking/navigation
-                try {
-                    const baseUrl = window.location.pathname;
-                    const newUrl = baseUrl + '?' + formParams;
-                    history.pushState({}, '', newUrl);
-                } catch (err) { /* ignore history errors */ }
-
-                // Reinitialize dynamic behaviors on the updated DOM
-                try { if (typeof reinitializeClickableTagsAfterAjax === 'function') reinitializeClickableTagsAfterAjax(); } catch(e) {}
-                try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
-                try { if (typeof initializeSearchButtons === 'function') initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
-                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
-                
-                // Reinitialize search buttons after DOM update (this also reattaches button listeners)
-                try { initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) { }
-                
-                // Restore search button state after reinitialization in handleUnifiedSearchSubmit
-                try { 
-                    restoreSearchState(searchState); 
-                    // Ensure at least one button is active after restoration
-                    setTimeout(() => ensureAtLeastOneButtonActive(), 150);
-                } catch(e) { }
-            } catch (err) {
-                // Fallback: reload the page
-                form.submit();
-            }
-        })
-        .catch(err => {
-            // Fallback to normal submit
-            form.submit();
-        });
+    // Delegate to ajax helper
+    ajaxSubmitForm(form, formParams, searchState);
     } catch (err) {
         // On unexpected error, allow default submit
     }
@@ -864,7 +757,6 @@ function updateSearchPlaceholder(isMobile) {
     
     // Always enable search input since there's always a selection
     searchInput.disabled = false;
-    searchInput.style.opacity = '1';
 }
 
 function updateHiddenInputs(isMobile) {
@@ -931,10 +823,10 @@ function filterFolders(filterValue, isMobile) {
         
         if (matches || !filterValue) {
             // Show folder
-            folderHeader.style.display = 'block';
+            folderHeader.classList.remove('hidden');
         } else {
             // Hide folder and its content
-            folderHeader.style.display = 'none';
+            folderHeader.classList.add('hidden');
             
             // Also hide folder content using the data-folder-id approach
             const folderToggle = folderHeader.querySelector('[data-folder-id]');
@@ -942,7 +834,7 @@ function filterFolders(filterValue, isMobile) {
                 const folderId = folderToggle.getAttribute('data-folder-id');
                 const folderContent = document.getElementById(folderId);
                 if (folderContent) {
-                    folderContent.style.display = 'none';
+                    folderContent.classList.add('hidden');
                 }
             }
         }
@@ -1156,33 +1048,10 @@ function ensureAtLeastOneButtonActive() {
                          foldersBtn.classList.contains('active');
         
         if (!hasActive) {
-            notesBtn.classList.add('active');
-            
-            // Apply correct active styling to notes button
-            notesBtn.style.setProperty('background', '#f8f9fa', 'important');
-            notesBtn.style.setProperty('color', '#007DB8', 'important');
-            notesBtn.style.setProperty('border-color', '#007DB8', 'important');
-            notesBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-            notesBtn.style.setProperty('opacity', '1', 'important');
-            
-            // Reset other buttons to inactive styling
-            tagsBtn.classList.remove('active');
-            tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
-            tagsBtn.style.setProperty('color', '#6c757d', 'important');
-            tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
-            tagsBtn.style.removeProperty('box-shadow');
-            tagsBtn.style.removeProperty('opacity');
-            
-            foldersBtn.classList.remove('active');
-            foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
-            foldersBtn.style.setProperty('color', '#6c757d', 'important');
-            foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
-            foldersBtn.style.removeProperty('box-shadow');
-            foldersBtn.style.removeProperty('opacity');
-            
+            setActiveStyle(notesBtn);
+            setInactiveStyle(tagsBtn);
+            setInactiveStyle(foldersBtn);
             updateSearchPlaceholder(false);
-            
-            // Synchronize hidden fields
             if (notesHidden) notesHidden.value = '1';
             if (tagsHidden) tagsHidden.value = '';
             if (foldersHidden) foldersHidden.value = '';
@@ -1203,33 +1072,10 @@ function ensureAtLeastOneButtonActive() {
                                foldersBtnMobile.classList.contains('active');
         
         if (!hasMobileActive) {
-            notesBtnMobile.classList.add('active');
-            
-            // Apply correct active styling to notes button
-            notesBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
-            notesBtnMobile.style.setProperty('color', '#007DB8', 'important');
-            notesBtnMobile.style.setProperty('border-color', '#007DB8', 'important');
-            notesBtnMobile.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
-            notesBtnMobile.style.setProperty('opacity', '1', 'important');
-            
-            // Reset other buttons to inactive styling
-            tagsBtnMobile.classList.remove('active');
-            tagsBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
-            tagsBtnMobile.style.setProperty('color', '#6c757d', 'important');
-            tagsBtnMobile.style.setProperty('border-color', '#dee2e6', 'important');
-            tagsBtnMobile.style.removeProperty('box-shadow');
-            tagsBtnMobile.style.removeProperty('opacity');
-            
-            foldersBtnMobile.classList.remove('active');
-            foldersBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
-            foldersBtnMobile.style.setProperty('color', '#6c757d', 'important');
-            foldersBtnMobile.style.setProperty('border-color', '#dee2e6', 'important');
-            foldersBtnMobile.style.removeProperty('box-shadow');
-            foldersBtnMobile.style.removeProperty('opacity');
-            
+            setActiveStyle(notesBtnMobile);
+            setInactiveStyle(tagsBtnMobile);
+            setInactiveStyle(foldersBtnMobile);
             updateSearchPlaceholder(true);
-            
-            // Synchronize hidden fields
             if (notesHiddenMobile) notesHiddenMobile.value = '1';
             if (tagsHiddenMobile) tagsHiddenMobile.value = '';
             if (foldersHiddenMobile) foldersHiddenMobile.value = '';
