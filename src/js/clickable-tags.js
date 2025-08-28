@@ -204,6 +204,13 @@ function showTagSuggestions(inputEl, container, workspace) {
                 addTagElement(container, tag, extractNoteIdFromContainer(container));
                 inputEl.value = '';
                 updateTagsInput(extractNoteIdFromContainer(container), container);
+                // Trigger immediate save when user picks a suggestion so the note is persisted
+                try {
+                    if (typeof saveFocusedNoteJS === 'function') {
+                        // small timeout to ensure DOM updates settled
+                        setTimeout(() => { saveFocusedNoteJS(); }, 50);
+                    }
+                } catch (err) { /* ignore */ }
                 dd.style.display = 'none';
                 setTimeout(() => inputEl.focus(), 10);
             });
@@ -233,7 +240,13 @@ function showTagSuggestions(inputEl, container, workspace) {
                 } else if (ev.key === 'Enter' && highlighted >= 0) {
                     ev.preventDefault(); 
                     ev.stopPropagation();
+                    // Dispatch mousedown to reuse the same handler which also triggers save
                     items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
+                    try {
+                        if (typeof saveFocusedNoteJS === 'function') {
+                            setTimeout(() => { saveFocusedNoteJS(); }, 50);
+                        }
+                    } catch (err) { /* ignore */ }
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
                 }
