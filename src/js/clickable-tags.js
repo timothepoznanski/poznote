@@ -513,13 +513,32 @@ function saveTagsDirectly(noteId, tagsValue) {
         window.updateNoteEnCours = 1;
     }
     
+    // Clean search highlights from content before saving (same as updatenote)
+    let cleanContent = contentDiv.innerHTML;
+    if (typeof cleanSearchHighlightsFromElement === 'function') {
+        cleanContent = cleanSearchHighlightsFromElement(contentDiv);
+    }
+    
+    // Get text content for entrycontent (also clean highlights)
+    let textContent = contentDiv.textContent || '';
+    if (typeof cleanSearchHighlightsFromElement === 'function') {
+        const clonedForText = contentDiv.cloneNode(true);
+        const highlights = clonedForText.querySelectorAll('.search-highlight');
+        highlights.forEach(highlight => {
+            const parent = highlight.parentNode;
+            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+            parent.normalize();
+        });
+        textContent = clonedForText.textContent || '';
+    }
+    
     const params = new URLSearchParams({
         id: noteId,
         tags: tagsValue,
         folder: folderInput ? folderInput.value : '',
         heading: titleInput.value,
-        entry: contentDiv.innerHTML,
-        entrycontent: contentDiv.textContent || '',
+        entry: cleanContent,
+        entrycontent: textContent,
     workspace: (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : 'Poznote'),
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
@@ -531,6 +550,67 @@ function saveTagsDirectly(noteId, tagsValue) {
     })
     .then(response => response.text())
     .then(function(data) {
+        try {
+            // Try to parse as JSON first
+            var jsonData = JSON.parse(data);
+            if (jsonData.status === 'error') {
+                // Keep edited flag on error
+                if (typeof editedButNotSaved !== 'undefined') {
+                    window.editedButNotSaved = 1;
+                }
+                if (typeof updateNoteEnCours !== 'undefined') {
+                    window.updateNoteEnCours = 0;
+                }
+                if (typeof setSaveButtonRed === 'function') {
+                    setSaveButtonRed(true);
+                }
+                return;
+            } else if (jsonData.date && jsonData.title) {
+                // Handle response with date and title
+                if (typeof editedButNotSaved !== 'undefined') {
+                    window.editedButNotSaved = 0;
+                }
+                var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
+                if (lastUpdatedElem) lastUpdatedElem.innerHTML = jsonData.date;
+                
+                // Update the title input field with the unique title
+                var titleInput = document.getElementById('inp' + noteId);
+                if (titleInput && jsonData.title !== jsonData.original_title) {
+                    titleInput.value = jsonData.title;
+                }
+                
+                // Update the title in the left column
+                if (typeof updateNoteTitleInLeftColumn === 'function') {
+                    updateNoteTitleInLeftColumn();
+                }
+                if (typeof setSaveButtonRed === 'function') {
+                    setSaveButtonRed(false);
+                }
+                return;
+            }
+        } catch(e) {
+            // If not JSON, treat as normal response
+            if (typeof editedButNotSaved !== 'undefined') {
+                window.editedButNotSaved = 0;
+            }
+            var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
+            if (lastUpdatedElem) {
+                if (data == '1') {
+                    lastUpdatedElem.innerHTML = 'Last Saved Today';
+                } else {
+                    lastUpdatedElem.innerHTML = data;
+                }
+            }
+            
+            // Update the title in the left column
+            if (typeof updateNoteTitleInLeftColumn === 'function') {
+                updateNoteTitleInLeftColumn();
+            }
+            if (typeof setSaveButtonRed === 'function') {
+                setSaveButtonRed(false);
+            }
+        }
+        
         // Clear the flags after successful save
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 0;
@@ -547,13 +627,17 @@ function saveTagsDirectly(noteId, tagsValue) {
         if (typeof updateNoteEnCours !== 'undefined') {
             window.updateNoteEnCours = 0;
         }
+        if (typeof setSaveButtonRed === 'function') {
+            setSaveButtonRed(true);
+        }
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup('Network error while saving: ' + error.message, 'error');
+        }
     });
 }
 
-/**
- * Redirect to notes with specific tag
- */
-function redirectToTag(tag) {
+// Make saveTagsDirectly globally available
+window.saveTagsDirectly = saveTagsDirectly;
     // Get excluded folders from localStorage like in listtags.js
     const excludedFolders = getExcludedFoldersFromLocalStorage();
     
