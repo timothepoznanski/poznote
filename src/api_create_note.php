@@ -22,6 +22,8 @@ $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
 $folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Default';
 $workspace = isset($input['workspace']) ? trim($input['workspace']) : 'Poznote';
+$entry = isset($input['entry']) ? $input['entry'] : ''; // HTML content for the file
+$entrycontent = isset($input['entrycontent']) ? $input['entrycontent'] : ''; // Text content for database
 
 // Validation des tags : supprimer les tags qui contiennent des espaces
 if (!empty($tags)) {
@@ -55,10 +57,30 @@ if ($check->fetchColumn() > 0) {
 // Use the original heading (no auto-rename) since duplicates are disallowed
 $heading = $originalHeading;
 
-$stmt = $con->prepare("INSERT INTO entries (heading, tags, folder, workspace, updated) VALUES (?, ?, ?, ?, datetime('now'))");
+$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, created, updated) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
 
-if ($stmt->execute([$heading, $tags, $folder, $workspace])) {
-    echo json_encode(['success' => true, 'id' => $con->lastInsertId()]);
+if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace])) {
+    $id = $con->lastInsertId();
+    
+    // Create the HTML file for the note content
+    $filename = getEntriesRelativePath() . $id . ".html";
+    
+    // Ensure the entries directory exists
+    $entriesDir = dirname($filename);
+    if (!is_dir($entriesDir)) {
+        mkdir($entriesDir, 0755, true);
+    }
+    
+    // Write HTML content to file
+    if (!empty($entry)) {
+        $write_result = file_put_contents($filename, $entry);
+        if ($write_result === false) {
+            // Log error but don't fail the creation since DB entry was successful
+            error_log("Failed to write HTML file for note ID $id: $filename");
+        }
+    }
+    
+    echo json_encode(['success' => true, 'id' => $id]);
 } else {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error while creating the note']);

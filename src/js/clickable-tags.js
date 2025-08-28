@@ -220,12 +220,9 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                     try {
                         const tagsInput = document.getElementById('tags' + targetNoteId);
                         const tagsValue = tagsInput ? tagsInput.value : '';
-                        console.log('Tag selection: targetNoteId=', targetNoteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                         if (targetNoteId && typeof saveTagsDirectly === 'function') {
-                            console.log('Calling saveTagsDirectly for note', targetNoteId);
                             saveTagsDirectly(targetNoteId, tagsValue);
                         } else if (targetNoteId && typeof updatenote === 'function') {
-                            console.log('Calling updatenote for note', targetNoteId);
                             setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
                         } else {
                             console.warn('No save function available for tag selection');
@@ -278,12 +275,9 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                         try {
                             const tagsInput = document.getElementById('tags' + targetNoteId);
                             const tagsValue = tagsInput ? tagsInput.value : '';
-                            console.log('Keyboard tag selection: targetNoteId=', targetNoteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                             if (targetNoteId && typeof saveTagsDirectly === 'function') {
-                                console.log('Calling saveTagsDirectly for note', targetNoteId, 'from keyboard');
                                 saveTagsDirectly(targetNoteId, tagsValue);
                             } else if (targetNoteId && typeof updatenote === 'function') {
-                                console.log('Calling updatenote for note', targetNoteId, 'from keyboard');
                                 setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
                             } else {
                                 console.warn('No save function available for keyboard tag selection');
@@ -389,12 +383,9 @@ function handleTagInput(e, noteId, container) {
                 try {
                     const tagsInput = document.getElementById('tags' + noteId);
                     const tagsValue = tagsInput ? tagsInput.value : '';
-                    console.log('Manual tag addition: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                     if (noteId && typeof saveTagsDirectly === 'function') {
-                        console.log('Calling saveTagsDirectly for manual tag addition');
                         saveTagsDirectly(noteId, tagsValue);
                     } else if (noteId && typeof updatenote === 'function') {
-                        console.log('Calling updatenote for manual tag addition');
                         updatenote();
                     }
                 } catch (error) {
@@ -461,12 +452,9 @@ function handleTagInputBlur(e, noteId, container) {
             try {
                 const tagsInput = document.getElementById('tags' + noteId);
                 const tagsValue = tagsInput ? tagsInput.value : '';
-                console.log('Blur tag addition: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                 if (noteId && typeof saveTagsDirectly === 'function') {
-                    console.log('Calling saveTagsDirectly for blur tag addition');
                     saveTagsDirectly(noteId, tagsValue);
                 } else if (noteId && typeof updatenote === 'function') {
-                    console.log('Calling updatenote for blur tag addition');
                     updatenote();
                 }
             } catch (error) {
@@ -489,12 +477,9 @@ function removeTagElement(tagWrapper, noteId) {
         try {
             const tagsInput = document.getElementById('tags' + noteId);
             const tagsValue = tagsInput ? tagsInput.value : '';
-            console.log('Tag removal: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
             if (noteId && typeof saveTagsDirectly === 'function') {
-                console.log('Calling saveTagsDirectly for tag removal');
                 saveTagsDirectly(noteId, tagsValue);
             } else if (noteId && typeof updatenote === 'function') {
-                console.log('Calling updatenote for tag removal');
                 updatenote();
             }
         } catch (error) {
@@ -575,17 +560,13 @@ function updateTagsInput(noteId, container) {
  * Fallback function to save tags directly via AJAX
  */
 function saveTagsDirectly(noteId, tagsValue) {
-    console.log('saveTagsDirectly called with noteId=', noteId, 'tagsValue=', tagsValue);
     
     // Get note title and content for the update
     const titleInput = document.getElementById('inp' + noteId);
     const contentDiv = document.getElementById('entry' + noteId);
     const folderInput = document.getElementById('folder' + noteId);
     
-    console.log('saveTagsDirectly: DOM elements found - titleInput:', !!titleInput, 'contentDiv:', !!contentDiv, 'folderInput:', !!folderInput);
-    
     if (!titleInput || !contentDiv) {
-        console.error('saveTagsDirectly: missing required elements for noteId', noteId);
         return;
     }
     
@@ -624,24 +605,16 @@ function saveTagsDirectly(noteId, tagsValue) {
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
     
-    console.log('saveTagsDirectly: sending request to updatenote.php with params:', Object.fromEntries(params));
-    
     fetch("updatenote.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
     })
-    .then(response => {
-        console.log('saveTagsDirectly: fetch response received, status:', response.status);
-        return response.text();
-    })
+    .then(response => response.text())
     .then(function(data) {
-        console.log('saveTagsDirectly: response data received:', data);
-        
         try {
             // Try to parse as JSON first
             var jsonData = JSON.parse(data);
-            console.log('saveTagsDirectly: parsed JSON response:', jsonData);
             
             if (jsonData.status === 'error') {
                 console.error('saveTagsDirectly: server returned error:', jsonData.message);
@@ -661,7 +634,6 @@ function saveTagsDirectly(noteId, tagsValue) {
                 }
                 return;
             } else if (jsonData.date && jsonData.title) {
-                console.log('saveTagsDirectly: successful save with title change');
                 // Handle response with date and title
                 if (typeof editedButNotSaved !== 'undefined') {
                     window.editedButNotSaved = 0;
@@ -685,32 +657,26 @@ function saveTagsDirectly(noteId, tagsValue) {
                 return;
             }
         } catch(e) {
-            console.log('saveTagsDirectly: response is not JSON, treating as normal response');
             // If not JSON, treat as normal response
             if (typeof editedButNotSaved !== 'undefined') {
                 window.editedButNotSaved = 0;
-                console.log('saveTagsDirectly: set editedButNotSaved = 0');
             }
             var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
             if (lastUpdatedElem) {
                 if (data == '1') {
                     lastUpdatedElem.innerHTML = 'Last Saved Today';
-                    console.log('saveTagsDirectly: updated lastUpdatedElem to: Last Saved Today');
                 } else {
                     lastUpdatedElem.innerHTML = data;
-                    console.log('saveTagsDirectly: updated lastUpdatedElem to:', data);
                 }
             }
             
             // Update the title in the left column
             if (typeof updateNoteTitleInLeftColumn === 'function') {
-                console.log('saveTagsDirectly: calling updateNoteTitleInLeftColumn');
                 updateNoteTitleInLeftColumn();
             } else {
                 console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
             }
             if (typeof setSaveButtonRed === 'function') {
-                console.log('saveTagsDirectly: calling setSaveButtonRed(false)');
                 setSaveButtonRed(false);
             } else {
                 console.warn('saveTagsDirectly: setSaveButtonRed function not found');
@@ -720,23 +686,19 @@ function saveTagsDirectly(noteId, tagsValue) {
         // Clear the flags after successful save
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 0;
-            console.log('saveTagsDirectly: set editedButNotSaved = 0');
         }
         if (typeof updateNoteEnCours !== 'undefined') {
             window.updateNoteEnCours = 0;
-            console.log('saveTagsDirectly: set updateNoteEnCours = 0');
         }
         
         // Update UI elements
         var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
         if (lastUpdatedElem) {
             lastUpdatedElem.innerHTML = data;
-            console.log('saveTagsDirectly: updated lastUpdatedElem to:', data);
         }
         
         // Update title in left column
         if (typeof updateNoteTitleInLeftColumn === 'function') {
-            console.log('saveTagsDirectly: calling updateNoteTitleInLeftColumn');
             updateNoteTitleInLeftColumn();
         } else {
             console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
@@ -744,13 +706,11 @@ function saveTagsDirectly(noteId, tagsValue) {
         
         // Update save button
         if (typeof setSaveButtonRed === 'function') {
-            console.log('saveTagsDirectly: calling setSaveButtonRed(false)');
             setSaveButtonRed(false);
         } else {
             console.warn('saveTagsDirectly: setSaveButtonRed function not found');
         }
         
-        console.log('saveTagsDirectly: save completed successfully');
     })
     .catch(function(error) {
         console.error('saveTagsDirectly: network error:', error);
