@@ -638,43 +638,10 @@ function saveTagsDirectly(noteId, tagsValue) {
 
 // Make saveTagsDirectly globally available
 window.saveTagsDirectly = saveTagsDirectly;
-    // Get excluded folders from localStorage like in listtags.js
-    const excludedFolders = getExcludedFoldersFromLocalStorage();
-    
-    if (excludedFolders.length > 0) {
-        // Create a form to post the tag search with excluded folders
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'index.php';
-        
-        // Add tag search parameter
-        const tagInput = document.createElement('input');
-        tagInput.type = 'hidden';
-        tagInput.name = 'tags_search';
-        tagInput.value = tag;
-        form.appendChild(tagInput);
-        
-        // Add search type parameters
-        const searchInTagsInput = document.createElement('input');
-        searchInTagsInput.type = 'hidden';
-        searchInTagsInput.name = 'search_in_tags';
-        searchInTagsInput.value = '1';
-        form.appendChild(searchInTagsInput);
-        
-        // Add excluded folders
-        const excludedInput = document.createElement('input');
-        excludedInput.type = 'hidden';
-        excludedInput.name = 'excluded_folders';
-        excludedInput.value = JSON.stringify(excludedFolders);
-        form.appendChild(excludedInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    } else {
-        // No exclusions, use simple GET redirect
-        window.location.href = 'index.php?tags_search_from_list=' + encodeURIComponent(tag);
-    }
-}
+
+// Make functions available globally for use by other scripts
+window.initializeClickableTags = initializeClickableTags;
+window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
 
 /**
  * Get excluded folders from localStorage (copied from listtags.js)
