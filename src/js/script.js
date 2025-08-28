@@ -1018,9 +1018,23 @@ function cleanSearchHighlightsFromElement(element) {
 }
 
 function updatenote(){
+    // Start save
     updateNoteEnCours = 1;
-    var headi = document.getElementById("inp"+noteid).value;
-    var entryElem = document.getElementById("entry"+noteid);
+
+    // Find title and content elements safely
+    var titleInput = document.getElementById("inp" + noteid);
+    var headi = titleInput ? titleInput.value : '';
+    var entryElem = document.getElementById("entry" + noteid);
+
+    // If required elements are missing, abort and clear the saving flag
+    if (!titleInput || !entryElem) {
+        console.error('updatenote: missing title or entry element for noteid=', noteid);
+        // Clear saving flag so UI doesn't stay stuck
+        if (typeof updateNoteEnCours !== 'undefined') window.updateNoteEnCours = 0;
+        // Keep edited flag so user can retry
+        if (typeof editedButNotSaved !== 'undefined') window.editedButNotSaved = 1;
+        return;
+    }
     
     // Clean search highlights from the content before saving
     // Use the non-destructive cleaning function that works on a clone
@@ -1051,9 +1065,10 @@ function updatenote(){
     
     // console.log("entcontent:" + entcontent);
     // console.log("ent:" + ent);
-    var tags = document.getElementById("tags"+noteid).value;
-    var folderElem = document.getElementById("folder"+noteid);
-    var folder = folderElem ? folderElem.value : getDefaultFolderName();
+    var tagsElem = document.getElementById("tags" + noteid);
+    var tags = tagsElem ? tagsElem.value : '';
+    var folderElem = document.getElementById("folder" + noteid);
+    var folder = folderElem ? folderElem.value : (typeof getDefaultFolderName === 'function' ? getDefaultFolderName() : '');
 
     var params = new URLSearchParams({
         id: noteid,
@@ -1702,6 +1717,16 @@ function saveFocusedNoteJS(){
     if(updateNoteEnCours==0 && editedButNotSaved==1)
     {
         displaySavingInProgress();
+        // Verify required elements exist before attempting update
+        var titleInput = document.getElementById('inp' + noteid);
+        var entryElem = document.getElementById('entry' + noteid);
+        if (!titleInput || !entryElem) {
+            showNotificationPopup('Save failed: missing note elements. Click inside the note area and try again.', 'error');
+            // Reset saving flag
+            if (typeof updateNoteEnCours !== 'undefined') updateNoteEnCours = 0;
+            return;
+        }
+
         updatenote();
     }
     else{
