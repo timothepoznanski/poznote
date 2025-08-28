@@ -777,10 +777,6 @@ function saveTagsDirectly(noteId, tagsValue) {
 // Make saveTagsDirectly globally available immediately after definition
 window.saveTagsDirectly = saveTagsDirectly;
 
-// Make functions available globally for use by other scripts
-window.initializeClickableTags = initializeClickableTags;
-window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
-
 /**
  * Get excluded folders from localStorage (copied from listtags.js)
  */
@@ -834,6 +830,15 @@ if (document.readyState !== 'loading') {
     initializeClickableTags();
 }
 
+/**
+ * Redirect to notes with specific tag
+ */
+function redirectToTag(tag) {
+    // Redirect to index with tag search parameter
+    window.location.href = 'index.php?tags_search_from_list=' + encodeURIComponent(tag);
+}
+
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;
 window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
+window.redirectToTag = redirectToTag;
