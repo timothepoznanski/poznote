@@ -203,13 +203,24 @@ function showTagSuggestions(inputEl, container, workspace) {
                 e.preventDefault();
                 addTagElement(container, tag, extractNoteIdFromContainer(container));
                 inputEl.value = '';
-                updateTagsInput(extractNoteIdFromContainer(container), container);
-                // Trigger immediate save when user picks a suggestion so the note is persisted
+                const targetNoteId = extractNoteIdFromContainer(container);
+                updateTagsInput(targetNoteId, container);
+                // Ensure edit flags and noteid are set, then trigger save
                 try {
-                    if (typeof saveFocusedNoteJS === 'function') {
-                        // small timeout to ensure DOM updates settled
-                        setTimeout(() => { saveFocusedNoteJS(); }, 50);
+                    if (typeof window !== 'undefined') {
+                        window.noteid = targetNoteId;
+                        window.editedButNotSaved = 1;
                     }
+                    // Immediately save tags via AJAX to avoid relying on global save button/state
+                    try {
+                        const tagsInput = document.getElementById('tags' + targetNoteId);
+                        const tagsValue = tagsInput ? tagsInput.value : '';
+                        if (typeof saveTagsDirectly === 'function') {
+                            saveTagsDirectly(targetNoteId, tagsValue);
+                        } else if (typeof updatenote === 'function') {
+                            setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
+                        }
+                    } catch (inner) { /* ignore */ }
                 } catch (err) { /* ignore */ }
                 dd.style.display = 'none';
                 setTimeout(() => inputEl.focus(), 10);
@@ -242,10 +253,22 @@ function showTagSuggestions(inputEl, container, workspace) {
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
                     items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
+                    // Also ensure flags are set and trigger save for keyboard selection
                     try {
-                        if (typeof saveFocusedNoteJS === 'function') {
-                            setTimeout(() => { saveFocusedNoteJS(); }, 50);
+                        const targetNoteId = extractNoteIdFromContainer(container);
+                        if (typeof window !== 'undefined') {
+                            window.noteid = targetNoteId;
+                            window.editedButNotSaved = 1;
                         }
+                        try {
+                            const tagsInput = document.getElementById('tags' + targetNoteId);
+                            const tagsValue = tagsInput ? tagsInput.value : '';
+                            if (typeof saveTagsDirectly === 'function') {
+                                saveTagsDirectly(targetNoteId, tagsValue);
+                            } else if (typeof updatenote === 'function') {
+                                setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
+                            }
+                        } catch (inner) { /* ignore */ }
                     } catch (err) { /* ignore */ }
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
