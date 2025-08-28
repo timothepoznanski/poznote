@@ -277,6 +277,9 @@ function switchToWorkspace(workspaceName) {
     
     // Refresh the left column content for the new workspace
     refreshLeftColumnForWorkspace(workspaceName);
+    
+    // Note: Search reinitialization is handled by refreshLeftColumnForWorkspace() 
+    // after DOM replacement is complete
 }
 
 // Function to update workspace name in headers
@@ -1769,7 +1772,31 @@ function refreshLeftColumnForWorkspace(workspaceName) {
             if (newLeft) {
                 var currentLeft = document.getElementById('left_col');
                 if (currentLeft) {
+                    // CRITICAL: Save current search state AND search term before DOM replacement
+                    let savedSearchState = null;
+                    let savedSearchTerm = '';
+                    try {
+                        // Save button states
+                        if (typeof window.saveCurrentSearchState === 'function') {
+                            savedSearchState = window.saveCurrentSearchState();
+                            console.log('Saved search state before DOM replacement:', savedSearchState);
+                        }
+                        
+                        // Save current search term
+                        const searchInput = document.getElementById('unified-search');
+                        if (searchInput && searchInput.value) {
+                            savedSearchTerm = searchInput.value;
+                            console.log('Saved search term before DOM replacement:', savedSearchTerm);
+                        }
+                    } catch(e) { 
+                        console.error('Error saving search state before DOM replacement:', e); 
+                    }
+                    
                     currentLeft.innerHTML = newLeft.innerHTML;
+                    
+                    // Store the saved state globally for restoration
+                    window.pendingSearchStateRestore = savedSearchState;
+                    window.pendingSearchTermRestore = savedSearchTerm;
                     // After swapping DOM, ensure header/workspace displays and menu behavior are up-to-date
                     try {
                         // Update the visible workspace names in the newly inserted headers
@@ -1800,6 +1827,14 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                     // update selectedWorkspace var
                     selectedWorkspace = workspaceName;
                     try { localStorage.setItem('poznote_selected_workspace', workspaceName); } catch(e) {}
+                    
+                    // CRITICAL: Reinitialize search functionality after DOM replacement
+                    setTimeout(() => {
+                        console.log('Reinitializing search after DOM replacement for workspace:', workspaceName);
+                        if (typeof window.reinitializeSearchAfterWorkspaceChange === 'function') {
+                            window.reinitializeSearchAfterWorkspaceChange();
+                        }
+                    }, 150); // Slightly longer delay since DOM was completely replaced
                 }
             }
         } catch (e) {

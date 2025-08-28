@@ -73,6 +73,12 @@ function clearUnifiedSearch() {
     let url = 'index.php';
     const params = new URLSearchParams();
     
+    // CRITICAL: Preserve current workspace
+    const currentWorkspace = new URLSearchParams(window.location.search).get('workspace') || selectedWorkspace || 'Poznote';
+    if (currentWorkspace && currentWorkspace !== 'Poznote') {
+        params.set('workspace', currentWorkspace);
+    }
+    
     // Preserve current folder filter if it exists
     const currentFolder = new URLSearchParams(window.location.search).get('folder');
     if (currentFolder) {
@@ -152,11 +158,77 @@ function goHomeWithSearch() {
     }
 }
 
+// Global references to event handlers for cleanup
+let desktopSubmitHandler = null;
+let mobileSubmitHandler = null;
+
+// Function to attach search form event listeners (can be called multiple times)
+function attachSearchFormListeners() {
+    console.log('Attaching search form listeners');
+    
+    // Desktop form - remove existing listener if it exists, then add new one
+    const unifiedForm = document.getElementById('unified-search-form');
+    if (unifiedForm) {
+        // Remove existing listener if it exists
+        if (desktopSubmitHandler) {
+            unifiedForm.removeEventListener('submit', desktopSubmitHandler);
+        }
+        
+        // Create new handler and store reference
+        desktopSubmitHandler = function(e) {
+            console.log('Desktop form submit event triggered');
+            handleUnifiedSearchSubmit(e, false);
+        };
+        
+        console.log('Adding submit listener to desktop form');
+        unifiedForm.addEventListener('submit', desktopSubmitHandler);
+    } else {
+        console.log('Desktop unified-search-form not found');
+    }
+    
+    // Mobile form - same approach
+    const unifiedFormMobile = document.getElementById('unified-search-form-mobile');
+    if (unifiedFormMobile) {
+        // Remove existing listener if it exists
+        if (mobileSubmitHandler) {
+            unifiedFormMobile.removeEventListener('submit', mobileSubmitHandler);
+        }
+        
+        // Create new handler and store reference
+        mobileSubmitHandler = function(e) {
+            console.log('Mobile form submit event triggered');
+            handleUnifiedSearchSubmit(e, true);
+        };
+        
+        console.log('Adding submit listener to mobile form');
+        unifiedFormMobile.addEventListener('submit', mobileSubmitHandler);
+    } else {
+        console.log('Mobile unified-search-form-mobile not found');
+    }
+}
+
 // Handle unified search form submission
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize search state for both desktop and mobile
+    console.log('DOM loaded, initializing search functionality');
+    
+    // Attach form event listeners FIRST
+    attachSearchFormListeners();
+    
+    // Then initialize search state for both desktop and mobile
     initializeSearchButtons(false); // Desktop
     initializeSearchButtons(true);  // Mobile
+    
+    // Ensure at least one button is active after initialization
+    setTimeout(() => {
+        ensureAtLeastOneButtonActive();
+        console.log('Initial setup complete');
+        
+        // Double-check after a longer delay in case something else interferes
+        setTimeout(() => {
+            console.log('Final check - ensuring button state...');
+            ensureAtLeastOneButtonActive();
+        }, 200);
+    }, 50);
     
     // Handle browser back button to preserve search state
     window.addEventListener('popstate', function(event) {
@@ -174,42 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Desktop form
-    const unifiedForm = document.getElementById('unified-search-form');
-    if (unifiedForm) {
-        unifiedForm.addEventListener('submit', function(e) {
-            handleUnifiedSearchSubmit(e, false);
-        });
-    }
-    
-    // Mobile form
-    const unifiedFormMobile = document.getElementById('unified-search-form-mobile');
-    if (unifiedFormMobile) {
-        unifiedFormMobile.addEventListener('submit', function(e) {
-            handleUnifiedSearchSubmit(e, true);
-        });
-    }
-    
-    // Add input event listeners for real-time folder filtering
-    const desktopSearchInput = document.getElementById('unified-search');
-    const mobileSearchInput = document.getElementById('unified-search-mobile');
-    
-    if (desktopSearchInput) {
-        desktopSearchInput.addEventListener('input', function() {
-            const foldersBtn = document.getElementById('search-folders-btn');
-            if (foldersBtn && foldersBtn.classList.contains('active')) {
-                filterFolders(this.value, false);
-            }
-            // Clear highlights immediately when search input is emptied in notes mode
-            const notesBtn = document.getElementById('search-notes-btn');
-            if (notesBtn && notesBtn.classList.contains('active') && this.value.trim() === '') {
-                if (typeof clearSearchHighlights === 'function') {
-                    clearSearchHighlights();
-                }
-            }
-        });
-    }
-    
     // Highlight search terms when page loads if we're in search mode
     setTimeout(function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -219,25 +255,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }, 500);
-    
-    if (mobileSearchInput) {
-        mobileSearchInput.addEventListener('input', function() {
-            const foldersBtn = document.getElementById('search-folders-btn-mobile');
-            if (foldersBtn && foldersBtn.classList.contains('active')) {
-                filterFolders(this.value, true);
-            }
-            // Clear highlights immediately when search input is emptied in notes mode
-            const notesBtn = document.getElementById('search-notes-btn-mobile');
-            if (notesBtn && notesBtn.classList.contains('active') && this.value.trim() === '') {
-                if (typeof clearSearchHighlights === 'function') {
-                    clearSearchHighlights();
-                }
-            }
-        });
-    }
 });
 
 function initializeSearchButtons(isMobile) {
+    initializeSearchButtonsWithState(isMobile, null);
+}
+
+function initializeSearchButtonsWithState(isMobile, forcedState) {
+    console.log('initializeSearchButtons called with isMobile:', isMobile);
+    
     const suffix = isMobile ? '-mobile' : '';
     const notesBtn = document.getElementById('search-notes-btn' + suffix);
     const tagsBtn = document.getElementById('search-tags-btn' + suffix);
@@ -247,55 +273,222 @@ function initializeSearchButtons(isMobile) {
     const tagsHidden = document.getElementById('search-in-tags' + suffix);
     const foldersHidden = document.getElementById('search-in-folders' + suffix);
     
-    if (!notesBtn || !tagsBtn || !foldersBtn || !searchInput) return;
+    console.log('Elements found:', {
+        notesBtn: !!notesBtn,
+        tagsBtn: !!tagsBtn,
+        foldersBtn: !!foldersBtn,
+        searchInput: !!searchInput,
+        notesHidden: !!notesHidden,
+        tagsHidden: !!tagsHidden,
+        foldersHidden: !!foldersHidden
+    });
+    
+    if (!notesBtn || !tagsBtn || !foldersBtn || !searchInput) {
+        console.log('Missing required elements for', isMobile ? 'mobile' : 'desktop');
+        return;
+    }
     
     // Check if there are existing search preferences from hidden inputs
     const hasNotesPreference = notesHidden && notesHidden.value === '1';
     const hasTagsPreference = tagsHidden && tagsHidden.value === '1';
     const hasFoldersPreference = foldersHidden && foldersHidden.value === '1';
     
-    // Respect existing search type preferences
-    if (hasNotesPreference) {
+    // Check current visual button state to preserve user's current selection
+    const currentNotesActive = notesBtn && notesBtn.classList.contains('active');
+    const currentTagsActive = tagsBtn && tagsBtn.classList.contains('active');
+    const currentFoldersActive = foldersBtn && foldersBtn.classList.contains('active');
+    
+    console.log('Search preferences:', {
+        hasNotesPreference,
+        hasTagsPreference,
+        hasFoldersPreference,
+        currentNotesActive,
+        currentTagsActive,
+        currentFoldersActive,
+        notesHiddenValue: notesHidden?.value,
+        tagsHiddenValue: tagsHidden?.value,
+        foldersHiddenValue: foldersHidden?.value
+    });
+    
+    // Safety check: ensure only one preference is active at a time
+    // If we're reinitializing, prefer current visual state over hidden field conflicts
+    let finalNotesActive = false;
+    let finalTagsActive = false;
+    let finalFoldersActive = false;
+    
+    // If there are multiple hidden field conflicts, use current visual state
+    const hasMultiplePreferences = [hasNotesPreference, hasTagsPreference, hasFoldersPreference].filter(Boolean).length > 1;
+    const hasCurrentVisualState = currentNotesActive || currentTagsActive || currentFoldersActive;
+    
+    // If we have a forced state from DOM replacement, use it with highest priority
+    if (forcedState) {
+        console.log('Using forced search state from DOM replacement:', forcedState);
+        finalNotesActive = (isMobile ? forcedState.mobile?.notes : forcedState.desktop?.notes) || false;
+        finalTagsActive = (isMobile ? forcedState.mobile?.tags : forcedState.desktop?.tags) || false;
+        finalFoldersActive = (isMobile ? forcedState.mobile?.folders : forcedState.desktop?.folders) || false;
+    } else if (hasMultiplePreferences && hasCurrentVisualState) {
+        console.log('Multiple hidden field conflicts detected, preserving current visual state');
+        finalNotesActive = currentNotesActive;
+        finalTagsActive = currentTagsActive;
+        finalFoldersActive = currentFoldersActive;
+    } else {
+        // Normal priority logic: notes > tags > folders
+        if (hasNotesPreference) {
+            finalNotesActive = true;
+        } else if (hasTagsPreference) {
+            finalTagsActive = true;
+        } else if (hasFoldersPreference) {
+            finalFoldersActive = true;
+        } else {
+            // Default: activate notes
+            finalNotesActive = true;
+        }
+    }
+    
+    console.log('Final button states:', {
+        finalNotesActive,
+        finalTagsActive,
+        finalFoldersActive
+    });
+    
+    // Apply the final button states and synchronize hidden fields
+    if (finalNotesActive) {
+        console.log('Activating notes button');
         notesBtn.classList.add('active');
         tagsBtn.classList.remove('active');
         foldersBtn.classList.remove('active');
-    } else if (hasTagsPreference) {
+        
+        // Apply active styling to notes button with correct colors
+        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
+        notesBtn.style.setProperty('color', '#007DB8', 'important');
+        notesBtn.style.setProperty('border-color', '#007DB8', 'important');
+        notesBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+        notesBtn.style.setProperty('opacity', '1', 'important');
+        // Reset other buttons to inactive styling
+        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
+        tagsBtn.style.setProperty('color', '#6c757d', 'important');
+        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        tagsBtn.style.removeProperty('box-shadow');
+        tagsBtn.style.removeProperty('opacity');
+        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
+        foldersBtn.style.setProperty('color', '#6c757d', 'important');
+        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        foldersBtn.style.removeProperty('box-shadow');
+        foldersBtn.style.removeProperty('opacity');
+        
+        console.log('Notes button classes after activation:', notesBtn.className);
+        console.log('Notes button computed style:', window.getComputedStyle(notesBtn).backgroundColor);
+        
+        // Synchronize hidden fields
+        if (notesHidden) notesHidden.value = '1';
+        if (tagsHidden) tagsHidden.value = '';
+        if (foldersHidden) foldersHidden.value = '';
+    } else if (finalTagsActive) {
+        console.log('Activating tags button');
         tagsBtn.classList.add('active');
         notesBtn.classList.remove('active');
         foldersBtn.classList.remove('active');
-    } else if (hasFoldersPreference) {
+        
+        // Apply active styling to tags button with correct colors
+        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
+        tagsBtn.style.setProperty('color', '#007DB8', 'important');
+        tagsBtn.style.setProperty('border-color', '#007DB8', 'important');
+        tagsBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+        tagsBtn.style.setProperty('opacity', '1', 'important');
+        // Reset other buttons to inactive styling
+        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
+        notesBtn.style.setProperty('color', '#6c757d', 'important');
+        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        notesBtn.style.removeProperty('box-shadow');
+        notesBtn.style.removeProperty('opacity');
+        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
+        foldersBtn.style.setProperty('color', '#6c757d', 'important');
+        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        foldersBtn.style.removeProperty('box-shadow');
+        foldersBtn.style.removeProperty('opacity');
+        
+        // Synchronize hidden fields
+        if (notesHidden) notesHidden.value = '';
+        if (tagsHidden) tagsHidden.value = '1';
+        if (foldersHidden) foldersHidden.value = '';
+    } else if (finalFoldersActive) {
+        console.log('Activating folders button');
         foldersBtn.classList.add('active');
         notesBtn.classList.remove('active');
         tagsBtn.classList.remove('active');
-    } else {
-        // Default state: activate notes search
-        notesBtn.classList.add('active');
-        tagsBtn.classList.remove('active');
-        foldersBtn.classList.remove('active');
+        
+        // Apply active styling to folders button with correct colors
+        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
+        foldersBtn.style.setProperty('color', '#007DB8', 'important');
+        foldersBtn.style.setProperty('border-color', '#007DB8', 'important');
+        foldersBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+        foldersBtn.style.setProperty('opacity', '1', 'important');
+        // Reset other buttons to inactive styling
+        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
+        notesBtn.style.setProperty('color', '#6c757d', 'important');
+        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        notesBtn.style.removeProperty('box-shadow');
+        notesBtn.style.removeProperty('opacity');
+        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
+        tagsBtn.style.setProperty('color', '#6c757d', 'important');
+        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        tagsBtn.style.removeProperty('box-shadow');
+        tagsBtn.style.removeProperty('opacity');
+        
+        // Synchronize hidden fields
+        if (notesHidden) notesHidden.value = '';
+        if (tagsHidden) tagsHidden.value = '';
+        if (foldersHidden) foldersHidden.value = '1';
     }
     
-    // Add click handlers
-    notesBtn.addEventListener('click', function() {
+    console.log('After synchronization - hidden field values:', {
+        notesHiddenValue: notesHidden?.value,
+        tagsHiddenValue: tagsHidden?.value,
+        foldersHiddenValue: foldersHidden?.value
+    });
+    
+    // Remove any existing event listeners first to avoid duplicates
+    notesBtn.removeEventListener('click', notesBtn._clickHandler);
+    tagsBtn.removeEventListener('click', tagsBtn._clickHandler);
+    foldersBtn.removeEventListener('click', foldersBtn._clickHandler);
+    
+    // Create new handlers and store references for cleanup
+    notesBtn._clickHandler = function() {
+        console.log('Notes button clicked');
         toggleSearchType('notes', isMobile);
-    });
+    };
     
-    tagsBtn.addEventListener('click', function() {
+    tagsBtn._clickHandler = function() {
+        console.log('Tags button clicked');
         toggleSearchType('tags', isMobile);
-    });
+    };
     
-    foldersBtn.addEventListener('click', function() {
+    foldersBtn._clickHandler = function() {
+        console.log('Folders button clicked');
         toggleSearchType('folders', isMobile);
-    });
+    };
+    
+    // Add click handlers
+    notesBtn.addEventListener('click', notesBtn._clickHandler);
+    tagsBtn.addEventListener('click', tagsBtn._clickHandler);
+    foldersBtn.addEventListener('click', foldersBtn._clickHandler);
     
     // Update placeholder and input state
     updateSearchPlaceholder(isMobile);
 }
 
 function toggleSearchType(type, isMobile) {
+    console.log('toggleSearchType called with:', type, 'isMobile:', isMobile);
+    
     const suffix = isMobile ? '-mobile' : '';
     const btn = document.getElementById('search-' + type + '-btn' + suffix);
     
-    if (!btn) return;
+    if (!btn) {
+        console.log('Button not found:', 'search-' + type + '-btn' + suffix);
+        return;
+    }
+    
+    console.log('Button found, current active state:', btn.classList.contains('active'));
     
     // Get all three buttons
     const notesBtn = document.getElementById('search-notes-btn' + suffix);
@@ -312,13 +505,44 @@ function toggleSearchType(type, isMobile) {
         clearSearchHighlights();
     }
     
-    // Deactivate all buttons first
-    if (notesBtn) notesBtn.classList.remove('active');
-    if (tagsBtn) tagsBtn.classList.remove('active');
-    if (foldersBtn) foldersBtn.classList.remove('active');
+    // Deactivate all buttons first - reset to default search-pill style
+    if (notesBtn) {
+        notesBtn.classList.remove('active');
+        // Reset to default .search-pill styles
+        notesBtn.style.setProperty('background', '#f8f9fa', 'important');
+        notesBtn.style.setProperty('color', '#6c757d', 'important');
+        notesBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        notesBtn.style.removeProperty('box-shadow');
+        notesBtn.style.removeProperty('opacity');
+    }
+    if (tagsBtn) {
+        tagsBtn.classList.remove('active');
+        // Reset to default .search-pill styles
+        tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
+        tagsBtn.style.setProperty('color', '#6c757d', 'important');
+        tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        tagsBtn.style.removeProperty('box-shadow');
+        tagsBtn.style.removeProperty('opacity');
+    }
+    if (foldersBtn) {
+        foldersBtn.classList.remove('active');
+        // Reset to default .search-pill styles
+        foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
+        foldersBtn.style.setProperty('color', '#6c757d', 'important');
+        foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
+        foldersBtn.style.removeProperty('box-shadow');
+        foldersBtn.style.removeProperty('opacity');
+    }
     
-    // Activate the clicked button
+    // Activate the clicked button with .search-pill.active styles
     btn.classList.add('active');
+    btn.style.setProperty('background', '#f8f9fa', 'important');
+    btn.style.setProperty('color', '#007DB8', 'important');
+    btn.style.setProperty('border-color', '#007DB8', 'important');
+    btn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+    btn.style.setProperty('opacity', '1', 'important');
+    
+    console.log('Activated button:', type, 'classes:', btn.className, 'final color:', window.getComputedStyle(btn).color, 'border-color:', window.getComputedStyle(btn).borderColor);
     
     // Remove error styling
     hideSearchValidationError(isMobile);
@@ -347,6 +571,8 @@ function toggleSearchType(type, isMobile) {
         // Update hidden inputs with current search value before submitting
         updateHiddenInputs(isMobile);
         
+        console.log('toggleSearchType: triggering search for type:', type, 'isMobile:', isMobile);
+        
         // Instead of triggering form submission, directly submit with excluded folders
         submitSearchWithExcludedFolders(isMobile);
     } else {
@@ -367,18 +593,113 @@ function submitSearchWithExcludedFolders(isMobile) {
     // Add excluded folders to form before submission
     addExcludedFoldersToForm(form, isMobile);
     
-    // Submit the form normally (this will bypass our event handler to avoid recursion)
-    form.submit();
+    // Use AJAX instead of form.submit() to avoid full page reload
+    try {
+        // Build form parameters manually to ensure all fields are included
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+        
+        // Explicitly add all form fields
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+        }
+        
+        const formParams = params.toString();
+        
+        // Debug logging
+        console.log('Form submission data:', formParams);
+        console.log('Form workspace field:', form.querySelector('[name="workspace"]')?.value);
+        console.log('All form fields:', Array.from(formData.entries()));
+        
+        // Save current search button state before AJAX
+        const searchState = saveCurrentSearchState(isMobile);
+        console.log('Saved search state in submitSearchWithExcludedFolders:', searchState);
+        
+        fetch(form.action || window.location.pathname, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formParams
+        })
+        .then(resp => resp.text())
+        .then(html => {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newLeft = doc.getElementById('left_col');
+                const newRight = doc.getElementById('right_col');
+
+                if (newLeft) {
+                    const currentLeft = document.getElementById('left_col');
+                    if (currentLeft) currentLeft.innerHTML = newLeft.innerHTML;
+                }
+
+                if (newRight) {
+                    const currentRight = document.getElementById('right_col');
+                    if (currentRight) currentRight.innerHTML = newRight.innerHTML;
+                }
+
+                // Update browser URL to reflect search parameters for bookmarking/navigation
+                try {
+                    const baseUrl = window.location.pathname;
+                    const newUrl = baseUrl + '?' + formParams;
+                    history.pushState({}, '', newUrl);
+                } catch (err) { /* ignore history errors */ }
+
+                // Reinitialize dynamic behaviors on the updated DOM
+                try { if (typeof reinitializeClickableTagsAfterAjax === 'function') reinitializeClickableTagsAfterAjax(); } catch(e) {}
+                try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
+                try { if (typeof initializeSearchButtons === 'function') initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
+                try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+                
+                // Reinitialize search buttons after DOM update (this also reattaches button listeners)
+                try { initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) { console.error('Error reinitializing search buttons after AJAX:', e); }
+                
+                // Restore search button state after reinitialization in submitSearchWithExcludedFolders
+                try { 
+                    restoreSearchState(searchState); 
+                    // Ensure at least one button is active after restoration
+                    setTimeout(() => ensureAtLeastOneButtonActive(), 150);
+                } catch(e) { console.error('Error restoring search state in submitSearchWithExcludedFolders:', e); }
+            } catch (err) {
+                console.error('Error parsing search response', err);
+                // Fallback: reload the page
+                form.submit();
+            }
+        })
+        .catch(err => {
+            console.error('AJAX search failed', err);
+            // Fallback to normal submit
+            form.submit();
+        });
+    } catch (err) {
+        // On unexpected error, allow normal submit
+        console.error('Search submit error', err);
+        form.submit();
+    }
 }
 
 function handleUnifiedSearchSubmit(e, isMobile) {
+    console.log('handleUnifiedSearchSubmit called with isMobile:', isMobile, 'event:', e);
+    
     const suffix = isMobile ? '-mobile' : '';
     const notesBtn = document.getElementById('search-notes-btn' + suffix);
     const tagsBtn = document.getElementById('search-tags-btn' + suffix);
     const foldersBtn = document.getElementById('search-folders-btn' + suffix);
     const searchInput = document.getElementById('unified-search' + suffix);
     
-    if (!notesBtn || !tagsBtn || !foldersBtn || !searchInput) return;
+    if (!notesBtn || !tagsBtn || !foldersBtn || !searchInput) {
+        console.log('Missing required elements:', {
+            notesBtn: !!notesBtn,
+            tagsBtn: !!tagsBtn,
+            foldersBtn: !!foldersBtn,
+            searchInput: !!searchInput
+        });
+        return;
+    }
     
     const searchValue = searchInput.value.trim();
     
@@ -436,8 +757,22 @@ function handleUnifiedSearchSubmit(e, isMobile) {
         e.preventDefault();
 
         const form = e.target;
-        // Serialize form data
-        const formParams = new URLSearchParams(new FormData(form)).toString();
+        // Build form parameters manually to ensure all fields are included
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+        
+        // Explicitly add all form fields
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+        }
+        
+        const formParams = params.toString();
+        
+        console.log('handleUnifiedSearchSubmit - Form data:', formParams);
+        
+        // Save current search button state before AJAX in handleUnifiedSearchSubmit
+        const searchState = saveCurrentSearchState(isMobile);
+        console.log('Saved search state for handleUnifiedSearchSubmit:', searchState);
 
         fetch(form.action || window.location.pathname, {
             method: 'POST',
@@ -478,6 +813,16 @@ function handleUnifiedSearchSubmit(e, isMobile) {
                 try { if (typeof initializeWorkspaceMenu === 'function') initializeWorkspaceMenu(); } catch(e) {}
                 try { if (typeof initializeSearchButtons === 'function') initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) {}
                 try { if (typeof reinitializeNoteContent === 'function') reinitializeNoteContent(); } catch(e) {}
+                
+                // Reinitialize search buttons after DOM update (this also reattaches button listeners)
+                try { initializeSearchButtons(false); initializeSearchButtons(true); } catch(e) { console.error('Error reinitializing search buttons after AJAX in handleUnifiedSearchSubmit:', e); }
+                
+                // Restore search button state after reinitialization in handleUnifiedSearchSubmit
+                try { 
+                    restoreSearchState(searchState); 
+                    // Ensure at least one button is active after restoration
+                    setTimeout(() => ensureAtLeastOneButtonActive(), 150);
+                } catch(e) { console.error("Error restoring search state in handleUnifiedSearchSubmit:", e); }
             } catch (err) {
                 console.error('Error parsing search response', err);
                 // Fallback: reload the page
@@ -688,4 +1033,320 @@ function filterFolders(filterValue, isMobile) {
             }
         }
     });
+}
+
+// Functions to save and restore search button state across AJAX calls
+function saveCurrentSearchState(isMobile) {
+    const state = {
+        desktop: {
+            notes: false,
+            tags: false,
+            folders: false
+        },
+        mobile: {
+            notes: false,
+            tags: false,
+            folders: false
+        }
+    };
+    
+    // Save desktop state
+    const notesBtn = document.getElementById('search-notes-btn');
+    const tagsBtn = document.getElementById('search-tags-btn');
+    const foldersBtn = document.getElementById('search-folders-btn');
+    
+    if (notesBtn) state.desktop.notes = notesBtn.classList.contains('active');
+    if (tagsBtn) state.desktop.tags = tagsBtn.classList.contains('active');
+    if (foldersBtn) state.desktop.folders = foldersBtn.classList.contains('active');
+    
+    // Save mobile state
+    const notesBtnMobile = document.getElementById('search-notes-btn-mobile');
+    const tagsBtnMobile = document.getElementById('search-tags-btn-mobile');
+    const foldersBtnMobile = document.getElementById('search-folders-btn-mobile');
+    
+    if (notesBtnMobile) state.mobile.notes = notesBtnMobile.classList.contains('active');
+    if (tagsBtnMobile) state.mobile.tags = tagsBtnMobile.classList.contains('active');
+    if (foldersBtnMobile) state.mobile.folders = foldersBtnMobile.classList.contains('active');
+    
+    return state;
+}
+
+function restoreSearchState(state) {
+    if (!state) return;
+    
+    console.log('Restoring search state:', state);
+    
+    // Use a small delay to ensure DOM elements are ready
+    setTimeout(() => {
+        console.log('Applying restored search state after timeout');
+        
+        // Restore desktop state
+        const notesBtn = document.getElementById('search-notes-btn');
+        const tagsBtn = document.getElementById('search-tags-btn');
+        const foldersBtn = document.getElementById('search-folders-btn');
+        
+        console.log('Desktop buttons found:', {
+            notes: !!notesBtn,
+            tags: !!tagsBtn,
+            folders: !!foldersBtn
+        });
+        
+        if (notesBtn) {
+            if (state.desktop.notes) {
+                notesBtn.classList.add('active');
+                console.log('Restored notes button to active');
+            } else {
+                notesBtn.classList.remove('active');
+                console.log('Restored notes button to inactive');
+            }
+        }
+        
+        if (tagsBtn) {
+            if (state.desktop.tags) {
+                tagsBtn.classList.add('active');
+                console.log('Restored tags button to active');
+            } else {
+                tagsBtn.classList.remove('active');
+                console.log('Restored tags button to inactive');
+            }
+        }
+        
+        if (foldersBtn) {
+            if (state.desktop.folders) {
+                foldersBtn.classList.add('active');
+                console.log('Restored folders button to active');
+            } else {
+                foldersBtn.classList.remove('active');
+                console.log('Restored folders button to inactive');
+            }
+        }
+        
+        // Restore mobile state
+        const notesBtnMobile = document.getElementById('search-notes-btn-mobile');
+        const tagsBtnMobile = document.getElementById('search-tags-btn-mobile');
+        const foldersBtnMobile = document.getElementById('search-folders-btn-mobile');
+        
+        if (notesBtnMobile) {
+            if (state.mobile.notes) {
+                notesBtnMobile.classList.add('active');
+            } else {
+                notesBtnMobile.classList.remove('active');
+            }
+        }
+        
+        if (tagsBtnMobile) {
+            if (state.mobile.tags) {
+                tagsBtnMobile.classList.add('active');
+            } else {
+                tagsBtnMobile.classList.remove('active');
+            }
+        }
+        
+        if (foldersBtnMobile) {
+            if (state.mobile.folders) {
+                foldersBtnMobile.classList.add('active');
+            } else {
+                foldersBtnMobile.classList.remove('active');
+            }
+        }
+        
+        // Update placeholders and hidden inputs to match restored state
+        updateSearchPlaceholder(false); // Desktop
+        updateSearchPlaceholder(true);  // Mobile
+        
+        // Safety check: ensure at least one button is active
+        ensureAtLeastOneButtonActive();
+    }, 100); // 100ms delay to ensure DOM is ready
+}
+
+// Global function to save current search state (callable from other scripts)
+window.saveCurrentSearchState = function() {
+    const notesBtn = document.getElementById('search-notes-btn');
+    const tagsBtn = document.getElementById('search-tags-btn');
+    const foldersBtn = document.getElementById('search-folders-btn');
+    
+    return {
+        desktop: {
+            notes: notesBtn ? notesBtn.classList.contains('active') : false,
+            tags: tagsBtn ? tagsBtn.classList.contains('active') : false,
+            folders: foldersBtn ? foldersBtn.classList.contains('active') : false
+        },
+        mobile: {
+            notes: false,
+            tags: false, 
+            folders: false
+        }
+    };
+};
+
+// Global function to reinitialize search after workspace changes (can be called from other scripts)
+window.reinitializeSearchAfterWorkspaceChange = function() {
+    console.log('Reinitializing search after workspace change');
+    
+    // Get the current workspace to add specific handling for Poznote
+    const currentWorkspace = selectedWorkspace || 'Poznote';
+    console.log('Current workspace during search reinitialization:', currentWorkspace);
+    
+    // Check if we have a pending search state to restore from DOM replacement
+    const pendingState = window.pendingSearchStateRestore;
+    const pendingSearchTerm = window.pendingSearchTermRestore;
+    if (pendingState) {
+        console.log('Found pending search state to restore:', pendingState);
+        // Clear it so it's not used again
+        window.pendingSearchStateRestore = null;
+    }
+    if (pendingSearchTerm) {
+        console.log('Found pending search term to restore:', pendingSearchTerm);
+        // Clear it so it's not used again  
+        window.pendingSearchTermRestore = null;
+    }
+    
+    // Do NOT clear existing search terms during workspace reinitialization
+    // The search should persist even when workspace changes or when no results are found
+    console.log('Preserving any existing search state during reinitialization');
+    
+    // CRITICAL: Reattach search form event listeners after DOM replacement
+    attachSearchFormListeners();
+    
+    // Initialize search state for both desktop and mobile with pending state if available
+    if (pendingState) {
+        initializeSearchButtonsWithState(false, pendingState); // Desktop
+        initializeSearchButtonsWithState(true, pendingState);  // Mobile
+    } else {
+        initializeSearchButtons(false); // Desktop
+        initializeSearchButtons(true);  // Mobile
+    }
+    
+    // Ensure at least one button is active after initialization
+    setTimeout(() => {
+        ensureAtLeastOneButtonActive();
+        
+        // If we have a search term to restore, restore it AND resubmit the search
+        if (pendingSearchTerm) {
+            const searchInput = document.getElementById('unified-search');
+            const searchInputMobile = document.getElementById('unified-search-mobile');
+            if (searchInput) {
+                searchInput.value = pendingSearchTerm;
+                console.log('Restored search term to desktop input:', pendingSearchTerm);
+                
+                // Automatically resubmit the search to get proper state (with clear button, etc.)
+                setTimeout(() => {
+                    console.log('Auto-resubmitting search to restore proper search state');
+                    const form = document.getElementById('unified-search-form');
+                    if (form) {
+                        // Create a synthetic submit event
+                        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
+                        form.dispatchEvent(submitEvent);
+                    }
+                }, 100);
+            }
+            if (searchInputMobile) {
+                searchInputMobile.value = pendingSearchTerm;
+                console.log('Restored search term to mobile input:', pendingSearchTerm);
+            }
+        }
+        
+        console.log('Search reinitialization complete for workspace:', currentWorkspace);
+    }, 50);
+};
+
+// Safety function to ensure at least one search button is always active
+function ensureAtLeastOneButtonActive() {
+    // Check desktop buttons
+    const notesBtn = document.getElementById('search-notes-btn');
+    const tagsBtn = document.getElementById('search-tags-btn');
+    const foldersBtn = document.getElementById('search-folders-btn');
+    const notesHidden = document.getElementById('search-in-notes');
+    const tagsHidden = document.getElementById('search-in-tags');
+    const foldersHidden = document.getElementById('search-in-folders');
+    
+    if (notesBtn && tagsBtn && foldersBtn) {
+        const hasActive = notesBtn.classList.contains('active') || 
+                         tagsBtn.classList.contains('active') || 
+                         foldersBtn.classList.contains('active');
+        
+        if (!hasActive) {
+            console.log('No desktop button active, activating notes button');
+            notesBtn.classList.add('active');
+            
+            // Apply correct active styling to notes button
+            notesBtn.style.setProperty('background', '#f8f9fa', 'important');
+            notesBtn.style.setProperty('color', '#007DB8', 'important');
+            notesBtn.style.setProperty('border-color', '#007DB8', 'important');
+            notesBtn.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+            notesBtn.style.setProperty('opacity', '1', 'important');
+            
+            // Reset other buttons to inactive styling
+            tagsBtn.classList.remove('active');
+            tagsBtn.style.setProperty('background', '#f8f9fa', 'important');
+            tagsBtn.style.setProperty('color', '#6c757d', 'important');
+            tagsBtn.style.setProperty('border-color', '#dee2e6', 'important');
+            tagsBtn.style.removeProperty('box-shadow');
+            tagsBtn.style.removeProperty('opacity');
+            
+            foldersBtn.classList.remove('active');
+            foldersBtn.style.setProperty('background', '#f8f9fa', 'important');
+            foldersBtn.style.setProperty('color', '#6c757d', 'important');
+            foldersBtn.style.setProperty('border-color', '#dee2e6', 'important');
+            foldersBtn.style.removeProperty('box-shadow');
+            foldersBtn.style.removeProperty('opacity');
+            
+            updateSearchPlaceholder(false);
+            
+            // Synchronize hidden fields
+            if (notesHidden) notesHidden.value = '1';
+            if (tagsHidden) tagsHidden.value = '';
+            if (foldersHidden) foldersHidden.value = '';
+            console.log('Synchronized hidden fields after activating notes button');
+        }
+    }
+    
+    // Check mobile buttons
+    const notesBtnMobile = document.getElementById('search-notes-btn-mobile');
+    const tagsBtnMobile = document.getElementById('search-tags-btn-mobile');
+    const foldersBtnMobile = document.getElementById('search-folders-btn-mobile');
+    const notesHiddenMobile = document.getElementById('search-in-notes-mobile');
+    const tagsHiddenMobile = document.getElementById('search-in-tags-mobile');
+    const foldersHiddenMobile = document.getElementById('search-in-folders-mobile');
+    
+    if (notesBtnMobile && tagsBtnMobile && foldersBtnMobile) {
+        const hasMobileActive = notesBtnMobile.classList.contains('active') || 
+                               tagsBtnMobile.classList.contains('active') || 
+                               foldersBtnMobile.classList.contains('active');
+        
+        if (!hasMobileActive) {
+            console.log('No mobile button active, activating notes button');
+            notesBtnMobile.classList.add('active');
+            
+            // Apply correct active styling to notes button
+            notesBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
+            notesBtnMobile.style.setProperty('color', '#007DB8', 'important');
+            notesBtnMobile.style.setProperty('border-color', '#007DB8', 'important');
+            notesBtnMobile.style.setProperty('box-shadow', '0 1px 3px rgba(0, 125, 184, 0.1)', 'important');
+            notesBtnMobile.style.setProperty('opacity', '1', 'important');
+            
+            // Reset other buttons to inactive styling
+            tagsBtnMobile.classList.remove('active');
+            tagsBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
+            tagsBtnMobile.style.setProperty('color', '#6c757d', 'important');
+            tagsBtnMobile.style.setProperty('border-color', '#dee2e6', 'important');
+            tagsBtnMobile.style.removeProperty('box-shadow');
+            tagsBtnMobile.style.removeProperty('opacity');
+            
+            foldersBtnMobile.classList.remove('active');
+            foldersBtnMobile.style.setProperty('background', '#f8f9fa', 'important');
+            foldersBtnMobile.style.setProperty('color', '#6c757d', 'important');
+            foldersBtnMobile.style.setProperty('border-color', '#dee2e6', 'important');
+            foldersBtnMobile.style.removeProperty('box-shadow');
+            foldersBtnMobile.style.removeProperty('opacity');
+            
+            updateSearchPlaceholder(true);
+            
+            // Synchronize hidden fields
+            if (notesHiddenMobile) notesHiddenMobile.value = '1';
+            if (tagsHiddenMobile) tagsHiddenMobile.value = '';
+            if (foldersHiddenMobile) foldersHiddenMobile.value = '';
+            console.log('Synchronized mobile hidden fields after activating notes button');
+        }
+    }
 }

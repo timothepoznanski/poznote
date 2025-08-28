@@ -47,6 +47,9 @@ if (!isset($labels) || !is_array($labels)) {
 // Determine workspace filter (client may pass workspace param). Default workspace is 'Poznote'.
 $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 
+// Debug log for workspace
+error_log("DEBUG: Received workspace = '$workspace_filter', GET=" . ($_GET['workspace'] ?? 'null') . ", POST=" . ($_POST['workspace'] ?? 'null'));
+
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
 // Get the custom default folder name
