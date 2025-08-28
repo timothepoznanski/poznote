@@ -564,12 +564,16 @@ function updateTagsInput(noteId, container) {
  */
 function saveTagsDirectly(noteId, tagsValue) {
     console.log('saveTagsDirectly called with noteId=', noteId, 'tagsValue=', tagsValue);
+    
     // Get note title and content for the update
     const titleInput = document.getElementById('inp' + noteId);
     const contentDiv = document.getElementById('entry' + noteId);
     const folderInput = document.getElementById('folder' + noteId);
     
+    console.log('saveTagsDirectly: DOM elements found - titleInput:', !!titleInput, 'contentDiv:', !!contentDiv, 'folderInput:', !!folderInput);
+    
     if (!titleInput || !contentDiv) {
+        console.error('saveTagsDirectly: missing required elements for noteId', noteId);
         return;
     }
     
@@ -608,17 +612,27 @@ function saveTagsDirectly(noteId, tagsValue) {
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
     
+    console.log('saveTagsDirectly: sending request to updatenote.php with params:', Object.fromEntries(params));
+    
     fetch("updatenote.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
     })
-    .then(response => response.text())
+    .then(response => {
+        console.log('saveTagsDirectly: fetch response received, status:', response.status);
+        return response.text();
+    })
     .then(function(data) {
+        console.log('saveTagsDirectly: response data received:', data);
+        
         try {
             // Try to parse as JSON first
             var jsonData = JSON.parse(data);
+            console.log('saveTagsDirectly: parsed JSON response:', jsonData);
+            
             if (jsonData.status === 'error') {
+                console.error('saveTagsDirectly: server returned error:', jsonData.message);
                 // Keep edited flag on error
                 if (typeof editedButNotSaved !== 'undefined') {
                     window.editedButNotSaved = 1;
@@ -631,6 +645,7 @@ function saveTagsDirectly(noteId, tagsValue) {
                 }
                 return;
             } else if (jsonData.date && jsonData.title) {
+                console.log('saveTagsDirectly: successful save with title change');
                 // Handle response with date and title
                 if (typeof editedButNotSaved !== 'undefined') {
                     window.editedButNotSaved = 0;
@@ -654,6 +669,7 @@ function saveTagsDirectly(noteId, tagsValue) {
                 return;
             }
         } catch(e) {
+            console.log('saveTagsDirectly: response is not JSON, treating as normal response');
             // If not JSON, treat as normal response
             if (typeof editedButNotSaved !== 'undefined') {
                 window.editedButNotSaved = 0;
@@ -683,8 +699,10 @@ function saveTagsDirectly(noteId, tagsValue) {
         if (typeof updateNoteEnCours !== 'undefined') {
             window.updateNoteEnCours = 0;
         }
+        console.log('saveTagsDirectly: save completed successfully');
     })
     .catch(function(error) {
+        console.error('saveTagsDirectly: network error:', error);
         // Keep edited flag on error, clear saving flag
         if (typeof editedButNotSaved !== 'undefined') {
             window.editedButNotSaved = 1;
