@@ -211,6 +211,10 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                         window.noteid = targetNoteId;
                         window.editedButNotSaved = 1;
                         try { console.debug('clickable-tags: set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
+                        // Show modification indicator immediately
+                        if (typeof displayModificationsDone === 'function') {
+                            displayModificationsDone();
+                        }
                     }
                     // Immediately save tags via AJAX to avoid relying on global save button/state
                     try {
@@ -266,6 +270,10 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                             window.noteid = targetNoteId;
                             window.editedButNotSaved = 1;
                             try { console.debug('clickable-tags (keyboard): set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
+                            // Show modification indicator immediately
+                            if (typeof displayModificationsDone === 'function') {
+                                displayModificationsDone();
+                            }
                         }
                         try {
                             const tagsInput = document.getElementById('tags' + targetNoteId);
@@ -552,6 +560,10 @@ function updateTagsInput(noteId, container) {
         if (typeof lastudpdate !== 'undefined') {
             window.lastudpdate = new Date().getTime();
         }
+        // Show modification indicator
+        if (typeof displayModificationsDone === 'function') {
+            displayModificationsDone();
+        }
     }
     
     // Trigger the input change event to notify any other listeners
@@ -642,6 +654,10 @@ function saveTagsDirectly(noteId, tagsValue) {
                 }
                 if (typeof setSaveButtonRed === 'function') {
                     setSaveButtonRed(true);
+                }
+                // Show modification indicator for error state
+                if (typeof displayModificationsDone === 'function') {
+                    displayModificationsDone();
                 }
                 return;
             } else if (jsonData.date && jsonData.title) {
@@ -750,6 +766,10 @@ function saveTagsDirectly(noteId, tagsValue) {
         }
         if (typeof showNotificationPopup === 'function') {
             showNotificationPopup('Network error while saving: ' + error.message, 'error');
+        }
+        // Show modification indicator for error state
+        if (typeof displayModificationsDone === 'function') {
+            displayModificationsDone();
         }
     });
 }
