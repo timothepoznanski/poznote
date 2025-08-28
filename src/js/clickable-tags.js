@@ -97,12 +97,12 @@ function convertTagsToEditable(noteId) {
     // Show suggestions while typing
     tagInput.addEventListener('input', function(e) {
         try {
-            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace);
+            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId);
         } catch (err) { /* ignore */ }
     });
     // Hide suggestions on focus out (but allow click into suggestion via mousedown handler)
     tagInput.addEventListener('focus', function() {
-        try { showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace); } catch(e){}
+        try { showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId); } catch(e){}
     });
     tagInput.addEventListener('blur', function() {
         setTimeout(() => {
@@ -180,7 +180,7 @@ function getOrCreateSuggestions(container) {
 /**
  * Show suggestions filtered by prefix
  */
-function showTagSuggestions(inputEl, container, workspace) {
+function showTagSuggestions(inputEl, container, workspace, noteId) {
     const dd = getOrCreateSuggestions(container);
     const value = inputEl.value.trim().toLowerCase();
     if (!value) { dd.style.display = 'none'; return; }
@@ -201,9 +201,9 @@ function showTagSuggestions(inputEl, container, workspace) {
             item.style.cursor = 'pointer';
             item.addEventListener('mousedown', function(e) {
                 e.preventDefault();
-                addTagElement(container, tag, extractNoteIdFromContainer(container));
+                addTagElement(container, tag, noteId);
                 inputEl.value = '';
-                const targetNoteId = extractNoteIdFromContainer(container);
+                const targetNoteId = noteId;
                 updateTagsInput(targetNoteId, container);
                 // Ensure edit flags and noteid are set, then trigger save
                 try {
@@ -216,12 +216,17 @@ function showTagSuggestions(inputEl, container, workspace) {
                     try {
                         const tagsInput = document.getElementById('tags' + targetNoteId);
                         const tagsValue = tagsInput ? tagsInput.value : '';
+                        console.log('Tag selection: targetNoteId=', targetNoteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                         if (targetNoteId && typeof saveTagsDirectly === 'function') {
+                            console.log('Calling saveTagsDirectly for note', targetNoteId);
                             saveTagsDirectly(targetNoteId, tagsValue);
                         } else if (targetNoteId && typeof updatenote === 'function') {
+                            console.log('Calling updatenote for note', targetNoteId);
                             setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
+                        } else {
+                            console.warn('No save function available for tag selection');
                         }
-                    } catch (inner) { /* ignore */ }
+                    } catch (inner) { console.error('Error in tag selection save:', inner); }
                 } catch (err) { /* ignore */ }
                 dd.style.display = 'none';
                 setTimeout(() => inputEl.focus(), 10);
@@ -256,7 +261,7 @@ function showTagSuggestions(inputEl, container, workspace) {
                     items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
                                         // Also ensure flags are set and trigger save for keyboard selection
                     try {
-                        const targetNoteId = extractNoteIdFromContainer(container);
+                        const targetNoteId = noteId;
                         if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
                             window.editedButNotSaved = 1;
@@ -265,12 +270,17 @@ function showTagSuggestions(inputEl, container, workspace) {
                         try {
                             const tagsInput = document.getElementById('tags' + targetNoteId);
                             const tagsValue = tagsInput ? tagsInput.value : '';
+                            console.log('Keyboard tag selection: targetNoteId=', targetNoteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
                             if (targetNoteId && typeof saveTagsDirectly === 'function') {
+                                console.log('Calling saveTagsDirectly for note', targetNoteId, 'from keyboard');
                                 saveTagsDirectly(targetNoteId, tagsValue);
                             } else if (targetNoteId && typeof updatenote === 'function') {
+                                console.log('Calling updatenote for note', targetNoteId, 'from keyboard');
                                 setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
+                            } else {
+                                console.warn('No save function available for keyboard tag selection');
                             }
-                        } catch (inner) { /* ignore */ }
+                        } catch (inner) { console.error('Error in keyboard tag selection save:', inner); }
                     } catch (err) { /* ignore */ }
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
@@ -366,6 +376,24 @@ function handleTagInput(e, noteId, container) {
             input.value = '';
             updateTagsInput(noteId, container);
             
+            // Trigger save after adding tags manually
+            setTimeout(() => {
+                try {
+                    const tagsInput = document.getElementById('tags' + noteId);
+                    const tagsValue = tagsInput ? tagsInput.value : '';
+                    console.log('Manual tag addition: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
+                    if (noteId && typeof saveTagsDirectly === 'function') {
+                        console.log('Calling saveTagsDirectly for manual tag addition');
+                        saveTagsDirectly(noteId, tagsValue);
+                    } else if (noteId && typeof updatenote === 'function') {
+                        console.log('Calling updatenote for manual tag addition');
+                        updatenote();
+                    }
+                } catch (error) {
+                    console.error('Error saving after manual tag addition:', error);
+                }
+            }, 100);
+            
             // Garde le focus sur l'input pour continuer à taper
             setTimeout(() => {
                 input.focus();
@@ -419,6 +447,24 @@ function handleTagInputBlur(e, noteId, container) {
         
         input.value = '';
         updateTagsInput(noteId, container);
+        
+        // Trigger save after adding tags on blur
+        setTimeout(() => {
+            try {
+                const tagsInput = document.getElementById('tags' + noteId);
+                const tagsValue = tagsInput ? tagsInput.value : '';
+                console.log('Blur tag addition: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
+                if (noteId && typeof saveTagsDirectly === 'function') {
+                    console.log('Calling saveTagsDirectly for blur tag addition');
+                    saveTagsDirectly(noteId, tagsValue);
+                } else if (noteId && typeof updatenote === 'function') {
+                    console.log('Calling updatenote for blur tag addition');
+                    updatenote();
+                }
+            } catch (error) {
+                console.error('Error saving after blur tag addition:', error);
+            }
+        }, 100);
     }
 }
 
@@ -429,6 +475,24 @@ function removeTagElement(tagWrapper, noteId) {
     const container = tagWrapper.closest('.editable-tags-container');
     tagWrapper.remove();
     updateTagsInput(noteId, container);
+    
+    // Trigger save after removing tag
+    setTimeout(() => {
+        try {
+            const tagsInput = document.getElementById('tags' + noteId);
+            const tagsValue = tagsInput ? tagsInput.value : '';
+            console.log('Tag removal: noteId=', noteId, 'tagsValue=', tagsValue, 'saveTagsDirectly available=', typeof saveTagsDirectly === 'function');
+            if (noteId && typeof saveTagsDirectly === 'function') {
+                console.log('Calling saveTagsDirectly for tag removal');
+                saveTagsDirectly(noteId, tagsValue);
+            } else if (noteId && typeof updatenote === 'function') {
+                console.log('Calling updatenote for tag removal');
+                updatenote();
+            }
+        } catch (error) {
+            console.error('Error saving after tag removal:', error);
+        }
+    }, 100);
 }
 
 /**
@@ -499,6 +563,7 @@ function updateTagsInput(noteId, container) {
  * Fallback function to save tags directly via AJAX
  */
 function saveTagsDirectly(noteId, tagsValue) {
+    console.log('saveTagsDirectly called with noteId=', noteId, 'tagsValue=', tagsValue);
     // Get note title and content for the update
     const titleInput = document.getElementById('inp' + noteId);
     const contentDiv = document.getElementById('entry' + noteId);
@@ -636,7 +701,7 @@ function saveTagsDirectly(noteId, tagsValue) {
     });
 }
 
-// Make saveTagsDirectly globally available
+// Make saveTagsDirectly globally available immediately after definition
 window.saveTagsDirectly = saveTagsDirectly;
 
 // Make functions available globally for use by other scripts
