@@ -8,20 +8,7 @@ include 'db_connect.php';
 // Get note ID from URL
 // Preserve workspace if provided
 $note_id = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
-$workspace = isset($_GET['workspace']) ? trim($_GET['workspac                    if (data.success) {
-                        showNotification('Attachment deleted successfully', 'success');
-                        loadAttachments(); // Reload the list
-                    } else {
-                        showNotification('Failed to delete attachment: ' + data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('Failed to delete attachment', 'error');
-                });
-                },
-                null // onCancel callback
-            );
-        }
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : null;
 
 if (!$note_id) {
     header('Location: index.php');
