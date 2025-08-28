@@ -4203,6 +4203,16 @@ function initializeSearchHighlighting() {
     const searchForms = document.querySelectorAll('#unified-search-form, #unified-search-form-mobile');
     searchForms.forEach(form => {
         form.addEventListener('submit', () => {
+            // If this submit was caused by our AJAX path, skip immediate highlighting
+            // because unified-search will schedule it after DOM replacement.
+            try {
+                if (form.dataset && form.dataset.ajaxSubmitting === '1') {
+                    // Clear the flag and skip the immediate highlight
+                    delete form.dataset.ajaxSubmitting;
+                    return;
+                }
+            } catch(e) {}
+
             // Highlight after a short delay to allow page reload/update
             setTimeout(highlightSearchTerms, 100);
         });

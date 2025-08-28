@@ -547,6 +547,10 @@ function submitSearchWithExcludedFolders(isMobile) {
     // Save current search button state before AJAX
     const searchState = saveCurrentSearchState(isMobile);
 
+    // Mark the form as performing an AJAX submit so other listeners
+    // (like the general highlighting submit listener) can skip
+    // immediate highlighting to avoid a duplicate highlight cycle.
+    try { form.dataset.ajaxSubmitting = '1'; } catch(e) {}
     ajaxSubmitForm(form, formParams, searchState);
 }
 
@@ -632,15 +636,7 @@ function handleUnifiedSearchSubmit(e, isMobile) {
         // Save current search button state before AJAX in handleUnifiedSearchSubmit
         const searchState = saveCurrentSearchState(isMobile);
 
-        fetch(form.action || window.location.pathname, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formParams
-        })
-    // Delegate to ajax helper
+    // Delegate to ajax helper (single AJAX path)
     ajaxSubmitForm(form, formParams, searchState);
     } catch (err) {
         // On unexpected error, allow default submit
