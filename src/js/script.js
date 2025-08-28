@@ -1021,9 +1021,16 @@ function updatenote(){
     // Start save
     updateNoteEnCours = 1;
 
+    // Check if noteid is valid
+    if (!noteid || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
+        console.error('updatenote: invalid noteid', noteid);
+        updateNoteEnCours = 0;
+        return;
+    }
+
     // Find title and content elements safely
     var titleInput = document.getElementById("inp" + noteid);
-    var headi = titleInput ? titleInput.value : '';
+    var headi = (titleInput && titleInput.tagName === 'INPUT') ? titleInput.value : '';
     var entryElem = document.getElementById("entry" + noteid);
 
     // If required elements are missing, abort and clear the saving flag
@@ -1324,7 +1331,7 @@ document.body.addEventListener('focusin', function(e) {
 });
 
 function update(){
-    if(noteid=='search' || noteid==-1) return;
+    if(noteid=='search' || noteid==-1 || noteid === null || noteid === undefined) return;
     editedButNotSaved = 1;  // We set the flag to indicate that the note has been modified.
     var curdate = new Date();
     var curtime = curdate.getTime();
@@ -1559,7 +1566,7 @@ document.body.addEventListener('drop', function(e) {
 
 // Update the title in the left column after successful save
 function updateNoteTitleInLeftColumn(){
-    if(noteid == 'search' || noteid == -1) return;
+    if(noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
     
     // Get the current title from the input field
     var titleInput = document.getElementById('inp'+noteid);
@@ -1709,7 +1716,7 @@ function checkedit(){
 function saveFocusedNoteJS(){
     //console.log("noteid = " + noteid);
     //if(noteid==-1) return ;
-    if(noteid == -1){
+    if(noteid == -1 || noteid === null || noteid === undefined || noteid == ''){
         showNotificationPopup("Click anywhere in the note to be saved, then try again.");
         return ;
     }
@@ -2566,7 +2573,7 @@ function createAndMoveToNewFolder() {
 
 function moveNoteToSelectedFolder(targetFolder = null) {
     // Check if a valid note is selected
-    if (!noteid || noteid == -1 || noteid == '' || noteid == null) {
+    if (!noteid || noteid == -1 || noteid == '' || noteid == null || noteid === undefined) {
         showNotificationPopup('Please select a note first before moving it to a folder.');
         return;
     }
@@ -2821,7 +2828,7 @@ function updateHighlight(options) {
 
 function executeFolderAction() {
     // Check if a valid note is selected
-    if (!noteid || noteid == -1 || noteid == '' || noteid == null) {
+    if (!noteid || noteid == -1 || noteid == '' || noteid == null || noteid === undefined) {
         showNotificationPopup('Please select a note first before moving it to a folder.');
         return;
     }
@@ -2877,7 +2884,7 @@ function hideMoveFolderError() {
 
 function showMoveFolderDialog(noteId) {
     // Check if a valid note is selected
-    if (!noteId || noteId == -1 || noteId == '' || noteId == null) {
+    if (!noteId || noteId == -1 || noteId == '' || noteId == null || noteId === undefined) {
         showNotificationPopup('Please select a note first before moving it to a folder.');
         return;
     }

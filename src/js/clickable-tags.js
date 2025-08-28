@@ -207,7 +207,7 @@ function showTagSuggestions(inputEl, container, workspace) {
                 updateTagsInput(targetNoteId, container);
                 // Ensure edit flags and noteid are set, then trigger save
                 try {
-                    if (typeof window !== 'undefined') {
+                    if (typeof window !== 'undefined' && targetNoteId) {
                         window.noteid = targetNoteId;
                         window.editedButNotSaved = 1;
                         try { console.debug('clickable-tags: set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
@@ -216,9 +216,9 @@ function showTagSuggestions(inputEl, container, workspace) {
                     try {
                         const tagsInput = document.getElementById('tags' + targetNoteId);
                         const tagsValue = tagsInput ? tagsInput.value : '';
-                        if (typeof saveTagsDirectly === 'function') {
+                        if (targetNoteId && typeof saveTagsDirectly === 'function') {
                             saveTagsDirectly(targetNoteId, tagsValue);
-                        } else if (typeof updatenote === 'function') {
+                        } else if (targetNoteId && typeof updatenote === 'function') {
                             setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
                         }
                     } catch (inner) { /* ignore */ }
@@ -254,10 +254,10 @@ function showTagSuggestions(inputEl, container, workspace) {
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
                     items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
-                    // Also ensure flags are set and trigger save for keyboard selection
+                                        // Also ensure flags are set and trigger save for keyboard selection
                     try {
                         const targetNoteId = extractNoteIdFromContainer(container);
-                        if (typeof window !== 'undefined') {
+                        if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
                             window.editedButNotSaved = 1;
                             try { console.debug('clickable-tags (keyboard): set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
@@ -265,9 +265,9 @@ function showTagSuggestions(inputEl, container, workspace) {
                         try {
                             const tagsInput = document.getElementById('tags' + targetNoteId);
                             const tagsValue = tagsInput ? tagsInput.value : '';
-                            if (typeof saveTagsDirectly === 'function') {
+                            if (targetNoteId && typeof saveTagsDirectly === 'function') {
                                 saveTagsDirectly(targetNoteId, tagsValue);
-                            } else if (typeof updatenote === 'function') {
+                            } else if (targetNoteId && typeof updatenote === 'function') {
                                 setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
                             }
                         } catch (inner) { /* ignore */ }
