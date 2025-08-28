@@ -1725,10 +1725,8 @@ function saveFocusedNoteJS(){
     {
         displaySavingInProgress();
     // Verify required elements exist before attempting update
-    console.debug('saveFocusedNoteJS: noteid=', noteid);
     var titleInput = document.getElementById('inp' + noteid);
     var entryElem = document.getElementById('entry' + noteid);
-    console.debug('saveFocusedNoteJS: titleInput=', !!titleInput, 'entryElem=', !!entryElem);
         if (!titleInput || !entryElem) {
             showNotificationPopup('Save failed: missing note elements. Click inside the note area and try again.', 'error');
             // Reset saving flag

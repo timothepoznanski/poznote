@@ -419,6 +419,8 @@ curl -X POST http://localhost:8040/api_create_note.php \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
+    "entry": "<p>This is the <strong>HTML content</strong> of the note</p>",
+    "entrycontent": "This is the plain text content of the note",
     "tags": "personal,important",
     "folder_name": "Projects",
     "workspace": "MyWorkspace"
@@ -427,6 +429,8 @@ curl -X POST http://localhost:8040/api_create_note.php \
 
 **Parameters:**
 - `heading` (string) - **Required** - The note title
+- `entry` (string) - *Optional* - HTML content that will be saved to the note's HTML file
+- `entrycontent` (string) - *Optional* - Plain text content that will be saved to the database
 - `tags` (string) - *Optional* - Comma-separated tags
 - `folder_name` (string) - *Optional* - Folder name (defaults to "Default")
 - `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
