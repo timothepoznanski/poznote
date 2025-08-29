@@ -502,7 +502,7 @@ $folder_filter = $_GET['folder'] ?? '';
         <div class="containbuttons">
             <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
             <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
-            <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+            <div class="list_tags" onclick="window.location = 'list_tags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
             <div class="workspace-dropdown">
                 <div class="small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)">
                     <span><span class="fas fa-layer-group" aria-hidden="true"></span></span>
@@ -723,7 +723,7 @@ $folder_filter = $_GET['folder'] ?? '';
     <div class="containbuttons">
         <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
         <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
-    <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
+    <div class="list_tags" onclick="window.location = 'list_tags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
         <!-- Small workspace icon (desktop) with dropdown menu -->
         <div class="workspace-dropdown">
             <div class="small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)">

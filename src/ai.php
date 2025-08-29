@@ -4,7 +4,7 @@ requireAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
-require_once 'AIProviderFactory.php';
+require_once 'ai_provider_factory.php';
 
 $message = '';
 $error = '';

@@ -79,7 +79,7 @@ function updateSearchResults(count, searchTerm) {
 
 function restoreNote(noteid) {
     const wsBody = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('putback.php', {
+    fetch('put_back.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -106,7 +106,7 @@ function restoreNote(noteid) {
 
 function permanentlyDeleteNote(noteid) {
     const wsBodyDel = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('permanentDelete.php', {
+    fetch('permanent_delete.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -133,7 +133,7 @@ function permanentlyDeleteNote(noteid) {
 
 function emptyTrash() {
     const wsEmpty = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? 'workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('emptytrash.php', {
+    fetch('empty_trash.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

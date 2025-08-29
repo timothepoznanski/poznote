@@ -605,7 +605,7 @@ function saveTagsDirectly(noteId, tagsValue) {
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
     
-    fetch("updatenote.php", {
+    fetch("update_note.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()

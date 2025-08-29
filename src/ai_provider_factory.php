@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/OpenAIProvider.php';
-require_once __DIR__ . '/MistralProvider.php';
+require_once __DIR__ . '/open_ai_provider.php';
+require_once __DIR__ . '/mistral_provider.php';
 
 /**
  * Factory class to create AI provider instances

@@ -9,7 +9,7 @@ requireAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
-require_once 'AIHelper.php';
+require_once 'ai_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

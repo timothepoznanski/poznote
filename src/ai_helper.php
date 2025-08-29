@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/AIProviderFactory.php';
+require_once __DIR__ . '/ai_provider_factory.php';
 
 /**
  * AI Helper class to simplify AI operations

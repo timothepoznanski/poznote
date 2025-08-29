@@ -1,6 +1,6 @@
 // Download function (popup)
 function startDownload() {
-    window.location = 'exportEntries.php';
+    window.location = 'export_entries.php';
 }
 
 var editedButNotSaved = 0;  // Flag indicating that the note has been edited set to 1
@@ -828,7 +828,7 @@ function toggleFavorite(noteId) {
                 now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
             });
             
-            fetch("updatenote.php", {
+            fetch("update_note.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: params.toString()
@@ -1087,7 +1087,7 @@ function updatenote(){
         entrycontent: entcontent,
         now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
     });
-    fetch("updatenote.php", {
+    fetch("update_note.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
@@ -1165,7 +1165,7 @@ function newnote(){
     });
     // include workspace
     params.append('workspace', selectedWorkspace || 'Poznote');
-    fetch("insertnew.php", {
+    fetch("insert_new.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
@@ -1189,7 +1189,7 @@ function newnote(){
 
 function deleteNote(iid){
     var params = new URLSearchParams({ id: iid });
-    fetch("deletenote.php", {
+    fetch("delete_note.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()

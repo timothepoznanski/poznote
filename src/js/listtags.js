@@ -33,9 +33,9 @@ function handleExcludedFoldersOnLoad() {
             form.method = 'POST';
             // If the page provided a workspace variable, include it in the form action
             if (typeof pageWorkspace !== 'undefined' && pageWorkspace) {
-                form.action = 'listtags.php?workspace=' + encodeURIComponent(pageWorkspace);
+                form.action = 'list_tags.php?workspace=' + encodeURIComponent(pageWorkspace);
             } else {
-                form.action = 'listtags.php';
+                form.action = 'list_tags.php';
             }
             
             const excludedInput = document.createElement('input');
