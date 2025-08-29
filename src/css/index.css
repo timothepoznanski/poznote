@@ -4480,20 +4480,6 @@ input[type="search"]::-webkit-search-results-decoration {
     color: #005a8a;
 }
 
-.workspace-toggle-icon, .workspace-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px; /* match other header icons */
-    color: #007DB8;
-}
-
-.left-header .workspace-icon { 
-    margin-right: 6px; 
-    display: inline-flex;
-    align-items: center;
-}
-
 /* Mobile workspace button styling */
 .workspace-mobile-btn {
     display: flex;

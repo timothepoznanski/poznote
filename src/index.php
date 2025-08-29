@@ -502,8 +502,8 @@ $folder_filter = $_GET['folder'] ?? '';
             <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
             <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
             <div class="workspace-dropdown">
-                <div class="workspace-icon-btn small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)" style="cursor: pointer;">
-                    <i class="fas fa-layer-group workspace-toggle-icon" aria-hidden="true"></i>
+                <div class="small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)">
+                    <span><span class="fas fa-layer-group" aria-hidden="true"></span></span>
                 </div>
                 <div class="workspace-menu" id="workspaceMenuMobile">
                     <!-- Menu items will be loaded dynamically -->
@@ -724,8 +724,8 @@ $folder_filter = $_GET['folder'] ?? '';
     <div class="list_tags" onclick="window.location = 'listtags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
         <!-- Small workspace icon (desktop) with dropdown menu -->
         <div class="workspace-dropdown">
-            <div class="workspace-icon-btn small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)" style="cursor: pointer;">
-                <i class="fas fa-layer-group workspace-toggle-icon" aria-hidden="true"></i>
+            <div class="small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)">
+                <span><span class="fas fa-layer-group" aria-hidden="true"></span></span>
             </div>
             <div class="workspace-menu" id="workspaceMenu">
                 <!-- Menu items will be loaded dynamically -->
