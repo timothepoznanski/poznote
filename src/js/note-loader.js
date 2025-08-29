@@ -249,6 +249,184 @@ function updateBrowserUrl(url, noteTitle) {
 }
 
 /**
+ * Re-initialize image click handlers for note content
+ */
+function reinitializeImageClickHandlers() {
+    // Find all images in the document
+    const allImages = document.querySelectorAll('img');
+    
+    allImages.forEach((img, index) => {
+        // Remove existing event listeners to avoid duplicates
+        img.removeEventListener('click', handleImageClick);
+        // Add new event listener
+        img.addEventListener('click', handleImageClick);
+    });
+}
+
+/**
+ * Handle image click to show popup with options
+ */
+function handleImageClick(event) {
+    const img = event.target;
+    
+    // Check if image has a valid src
+    if (!img.src || img.src.trim() === '') {
+        return;
+    }
+    
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const src = img.src;
+    
+    // Remove any existing image menu
+    const existingMenu = document.querySelector('.image-menu');
+    if (existingMenu) {
+        document.body.removeChild(existingMenu);
+    }
+    
+    // Create simple dropdown menu
+    const menu = document.createElement('div');
+    menu.className = 'image-menu';
+    menu.innerHTML = `
+        <div class="image-menu-item" data-action="view-large">
+            <i class="fas fa-expand"></i>
+            View Large
+        </div>
+        <div class="image-menu-item" data-action="download">
+            <i class="fas fa-download"></i>
+            Download
+        </div>
+    `;
+    
+    // Position the menu at click coordinates
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+    
+    menu.style.position = 'fixed';
+    menu.style.left = clickX + 'px';
+    menu.style.top = clickY + 'px';
+    menu.style.transform = 'translate(-50%, -120%)'; // Center horizontally, position above cursor with more space
+    menu.style.zIndex = '10000';
+    
+    document.body.appendChild(menu);
+    
+    // Adjust position if menu goes off-screen
+    const menuRect = menu.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // If menu goes off the right edge, move it left
+    if (menuRect.right > viewportWidth) {
+        menu.style.left = (clickX - (menuRect.width / 2)) + 'px';
+        menu.style.transform = 'translate(0, -120%)';
+    }
+    
+    // If menu goes off the left edge, move it right
+    if (menuRect.left < 0) {
+        menu.style.left = clickX + 'px';
+        menu.style.transform = 'translate(-50%, -120%)';
+    }
+    
+    // If menu goes off the top edge, move it below the cursor
+    if (menuRect.top < 0) {
+        menu.style.top = clickY + 'px';
+        menu.style.transform = 'translate(-50%, 20%)';
+    }
+    
+    // Handle menu item clicks
+    menu.addEventListener('click', function(e) {
+        const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
+        
+        if (action === 'view-large') {
+            viewImageLarge(src);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'download') {
+            downloadImage(src);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        }
+        
+        // Prevent event bubbling to avoid triggering the global click handler
+        e.stopPropagation();
+    });
+    
+    // Close menu when clicking elsewhere
+    setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+            if (!menu.contains(e.target) && e.target !== img) {
+                if (document.body.contains(menu)) {
+                    document.body.removeChild(menu);
+                }
+                document.removeEventListener('click', closeMenu);
+            }
+        });
+    }, 10);
+}
+
+/**
+ * View image in large modal
+ */
+function viewImageLarge(imageSrc) {
+    // Create large image modal
+    const modal = document.createElement('div');
+    modal.className = 'image-preview-modal';
+    modal.innerHTML = `
+        <div class="image-preview-content">
+            <span class="image-preview-close">&times;</span>
+            <img src="${imageSrc}" alt="Large view" class="image-preview-large">
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close modal on click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal || e.target.className === 'image-preview-close') {
+            document.body.removeChild(modal);
+        }
+    });
+}
+
+/**
+ * Download image
+ */
+function downloadImage(imageSrc) {
+    // Determine filename based on image source
+    let filename = 'image.png'; // Default
+    if (imageSrc.includes('data:image/')) {
+        // For base64 images, try to determine the format
+        const mimeType = imageSrc.split(';')[0].split(':')[1];
+        if (mimeType === 'image/jpeg') filename = 'image.jpg';
+        else if (mimeType === 'image/png') filename = 'image.png';
+        else if (mimeType === 'image/gif') filename = 'image.gif';
+        else if (mimeType === 'image/webp') filename = 'image.webp';
+    } else {
+        // For regular URLs, extract filename from URL
+        try {
+            const url = new URL(imageSrc);
+            const pathname = url.pathname;
+            filename = pathname.substring(pathname.lastIndexOf('/') + 1) || 'image.png';
+        } catch (e) {
+            filename = 'image.png';
+        }
+    }
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = imageSrc;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+/**
  * Re-initialize note content after AJAX load
  */
 function reinitializeNoteContent() {
@@ -263,6 +441,9 @@ function reinitializeNoteContent() {
     if (typeof reinitializeClickableTagsAfterAjax === 'function') {
         reinitializeClickableTagsAfterAjax();
     }
+    
+    // Re-initialize image click handlers
+    reinitializeImageClickHandlers();
     
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
@@ -326,6 +507,15 @@ function isNoteUrl(url) {
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteLoader();
+    reinitializeImageClickHandlers(); // Initialize image handlers on page load
+    
+    // Add global image click listener as fallback - using event delegation
+    document.addEventListener('click', function(event) {
+        // Check if the clicked element is an image
+        if (event.target.tagName === 'IMG') {
+            handleImageClick(event);
+        }
+    }, true); // Use capture phase to ensure we get the event first
     
     // On mobile, if we have a note parameter in URL, ensure note-open class is set
     if (isMobileDevice()) {
@@ -350,6 +540,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Also initialize if DOM is already loaded
 if (document.readyState !== 'loading') {
     initializeNoteLoader();
+    reinitializeImageClickHandlers(); // Initialize image handlers if DOM already loaded
     
     // Same mobile check for already loaded DOM
     if (isMobileDevice()) {

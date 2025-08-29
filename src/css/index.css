@@ -1292,6 +1292,76 @@ img {
     box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
 }
 
+/* Image menu styles (similar to settings menu) */
+
+
+
+
+
+
+
+
+
+
+
+/* Image menu styles (similar to settings menu) */
+.image-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 160px;
+    padding: 8px 0;
+    display: block;
+}
+
+.image-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.image-menu-item:last-child {
+    border-bottom: none;
+}
+
+.image-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.image-menu-item i {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+    color: #007DB8;
+}
+
+/* Mobile responsiveness for image modals */
+@media (max-width: 768px) {
+    
+    
+    
+    
+    .image-preview-content {
+        max-width: 98%;
+        max-height: 98%;
+    }
+    
+    .image-preview-close {
+        top: -40px;
+        font-size: 32px;
+    }
+}
+
 /* CUSTOM CONFIRMATION MODAL */
 .confirm-overlay {
     display: none;
