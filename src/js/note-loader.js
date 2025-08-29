@@ -280,17 +280,38 @@ function reinitializeNoteContent() {
         initializeToolbarHandlers();
     }
     
-    // On mobile, ensure the right column is properly displayed
+    // On mobile, ensure the right column is properly displayed only when a specific note is selected
     if (isMobileDevice()) {
-        // Make sure body has note-open class
-        if (!document.body.classList.contains('note-open')) {
-            document.body.classList.add('note-open');
-        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const noteParam = urlParams.get('note');
+        const searchParam = urlParams.get('search');
+        const tagsSearchParam = urlParams.get('tags_search');
+        const unifiedSearchParam = urlParams.get('unified_search');
+        const isInSearchMode = searchParam || tagsSearchParam || unifiedSearchParam;
         
-        // Ensure right column is visible
-        const rightColumn = document.getElementById('right_col');
-        if (rightColumn) {
-            rightColumn.style.display = 'block';
+        // Only add note-open class if we have a specific note selected AND we're not in search mode
+        if (noteParam && !isInSearchMode) {
+            // Make sure body has note-open class
+            if (!document.body.classList.contains('note-open')) {
+                document.body.classList.add('note-open');
+            }
+            
+            // Ensure right column is visible
+            const rightColumn = document.getElementById('right_col');
+            if (rightColumn) {
+                rightColumn.style.display = 'block';
+            }
+        } else {
+            // If no specific note is selected or we're in search mode, ensure left column is visible
+            if (document.body.classList.contains('note-open')) {
+                document.body.classList.remove('note-open');
+            }
+            
+            // Ensure left column is visible
+            const leftColumn = document.getElementById('left_col');
+            if (leftColumn) {
+                leftColumn.style.display = 'block';
+            }
         }
     }
 }
