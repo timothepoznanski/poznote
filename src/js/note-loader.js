@@ -373,24 +373,32 @@ function handleImageClick(event) {
  * View image in large modal
  */
 function viewImageLarge(imageSrc) {
-    // Create large image modal
-    const modal = document.createElement('div');
-    modal.className = 'image-preview-modal';
-    modal.innerHTML = `
-        <div class="image-preview-content">
-            <span class="image-preview-close">&times;</span>
-            <img src="${imageSrc}" alt="Large view" class="image-preview-large">
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Close modal on click
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal || e.target.className === 'image-preview-close') {
-            document.body.removeChild(modal);
+    if (imageSrc.startsWith('data:image/')) {
+        // Handle base64 data URLs by creating a blob
+        const mimeType = imageSrc.split(';')[0].split(':')[1];
+        const base64Data = imageSrc.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
-    });
+
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Open the blob URL in new tab
+        window.open(blobUrl, '_blank');
+
+        // Clean up the blob URL after a short delay
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 1000);
+    } else {
+        // For regular URLs, open directly
+        window.open(imageSrc, '_blank');
+    }
 }
 
 /**
