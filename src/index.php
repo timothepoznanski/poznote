@@ -223,6 +223,8 @@ $folder_filter = $_GET['folder'] ?? '';
     <link rel="stylesheet" href="css/font-awesome.css" />
     <?php $__poznote_toolbar_js_mtime = @filemtime(__DIR__ . '/js/toolbar.js') ?: time(); ?>
     <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
+    <?php $__poznote_note_loader_js_mtime = @filemtime(__DIR__ . '/js/note-loader.js') ?: time(); ?>
+    <script src="js/note-loader.js?v=<?php echo $__poznote_note_loader_js_mtime; ?>"></script>
     <style>
     /* Minimal workspace link styling (displayed next to header logo) */
     .left-header .workspace-link {
@@ -1059,6 +1061,8 @@ $folder_filter = $_GET['folder'] ?? '';
                 
                 $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
                 $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+                
+                // No onclick handler - touch events will be handled via JavaScript
                 echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'>";
                 echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
                 echo "</a>";
@@ -1458,7 +1462,6 @@ $folder_filter = $_GET['folder'] ?? '';
 <script src="js/script.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
-<script src="js/note-loader.js"></script>
 <script src="js/clickable-tags.js"></script>
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>

@@ -378,6 +378,8 @@ body.note-open #right_col {
     cursor: pointer !important;
     border-radius: 8px !important;
     transition: background-color 0.2s !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    touch-action: manipulation !important;
 }
 
 .folder-header.selected-folder {
@@ -421,6 +423,9 @@ a.links_arbo_left {
     -moz-user-select: none !important;
     -ms-user-select: none !important;
     user-select: none !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    touch-action: manipulation !important;
 }
 
 /* Remove hover effects on mobile */
@@ -455,6 +460,9 @@ a.links_arbo_left:focus,
 a.links_arbo_left.selected-note {
     background-color: transparent !important;
     background: transparent !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    touch-action: manipulation !important;
 }
 
 .folder-content {

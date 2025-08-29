@@ -11,8 +11,187 @@ var isNoteLoading = false;
  * Check if we're on mobile
  */
 function isMobileDevice() {
-    return window.innerWidth <= 800;
+    // Check both window width and user agent for better mobile detection
+    const isMobileWidth = window.innerWidth <= 800;
+    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+    
+    return isMobileWidth || isMobileUserAgent;
 }
+
+/**
+ * Initialize touch event handlers for mobile note links
+ */
+function initializeMobileTouchHandlers() {
+    if (!isMobileDevice()) {
+        // For desktop, add click handlers
+        const noteLinks = document.querySelectorAll('.links_arbo_left a');
+        noteLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const url = this.getAttribute('href');
+                const noteTitle = this.querySelector('.note-title')?.textContent?.trim() || this.textContent.trim();
+                loadNoteDirectly(url, noteTitle);
+                return false;
+            });
+        });
+        return;
+    }
+    
+    // Find all note links
+    const noteLinks = document.querySelectorAll('.links_arbo_left a');
+    
+    noteLinks.forEach(link => {
+        // Remove existing event listeners to avoid duplicates
+        link.removeEventListener('touchstart', handleMobileTouchStart);
+        link.removeEventListener('touchend', handleMobileTouchEnd);
+        
+        // Add touch event listeners with passive option for touchstart
+        link.addEventListener('touchstart', handleMobileTouchStart, { passive: true });
+        link.addEventListener('touchend', handleMobileTouchEnd, { passive: false });
+    });
+}
+
+/**
+ * Handle mobile touch start
+ */
+function handleMobileTouchStart(event) {
+    // Store touch start time and position on the element
+    this.touchStartTime = Date.now();
+    this.touchStartX = event.touches[0].clientX;
+    this.touchStartY = event.touches[0].clientY;
+    this.touchHandled = false; // Reset flag
+}
+
+/**
+ * Handle mobile touch end
+ */
+function handleMobileTouchEnd(event) {
+    const link = this;
+    const url = link.getAttribute('href');
+    const noteTitle = link.querySelector('.note-title')?.textContent?.trim() || link.textContent.trim();
+    
+    // Prevent default to avoid navigation
+    event.preventDefault();
+    
+    // Validate touch
+    const touch = event.changedTouches[0];
+    const touchDuration = Date.now() - (this.touchStartTime || 0);
+    const deltaX = Math.abs(touch.clientX - (this.touchStartX || 0));
+    const deltaY = Math.abs(touch.clientY - (this.touchStartY || 0));
+    const hasMoved = deltaX > 10 || deltaY > 10;
+    
+    // Validate tap: reasonable duration, no significant movement
+    if (touchDuration > 50 && touchDuration < 1000 && !hasMoved && !this.touchHandled) {
+        console.log('Valid mobile tap detected, loading note:', noteTitle);
+        this.touchHandled = true; // Mark as handled
+        loadNoteDirectly(url, noteTitle);
+    } else {
+        console.log('Invalid mobile tap - Duration:', touchDuration, 'ms, Movement:', deltaX, deltaY);
+    }
+    
+    return false;
+}
+
+/**
+ * Direct note loading function called from onclick
+ */
+window.loadNoteDirectly = function(url, noteTitle) {
+    console.log('Direct loadNoteDirectly called for:', noteTitle, 'URL:', url);
+    
+    // Prevent multiple simultaneous loads
+    if (window.isLoadingNote) {
+        console.log('Note already loading, ignoring request');
+        return false;
+    }
+    window.isLoadingNote = true;
+    
+    // Show loading state immediately
+    showNoteLoadingState();
+    
+    // On mobile, add note-open class
+    if (isMobileDevice()) {
+        console.log('Mobile device detected, adding note-open class');
+        document.body.classList.add('note-open');
+    }
+    
+    // Create XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            window.isLoadingNote = false;
+            console.log('AJAX request completed with status:', xhr.status);
+            
+            if (xhr.status === 200) {
+                try {
+                    console.log('Parsing response...');
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                    const rightColumn = doc.getElementById('right_col');
+                    
+                    if (rightColumn) {
+                        console.log('Found right column, updating content');
+                        const currentRightColumn = document.getElementById('right_col');
+                        if (currentRightColumn) {
+                            currentRightColumn.innerHTML = rightColumn.innerHTML;
+                            reinitializeNoteContent();
+                            updateBrowserUrl(url, noteTitle);
+                            hideNoteLoadingState();
+                            console.log('Note loaded successfully');
+                        } else {
+                            throw new Error('Could not find current right column');
+                        }
+                    } else {
+                        throw new Error('Could not find note content in response');
+                    }
+                } catch (error) {
+                    console.error('Error loading note:', error);
+                    showNotificationPopup('Error loading note: ' + error.message);
+                    hideNoteLoadingState();
+                    if (isMobileDevice()) {
+                        document.body.classList.remove('note-open');
+                    }
+                }
+            } else {
+                console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
+                showNotificationPopup('Failed to load note (status: ' + xhr.status + ')');
+                hideNoteLoadingState();
+                if (isMobileDevice()) {
+                    document.body.classList.remove('note-open');
+                }
+            }
+        }
+    };
+    
+    xhr.onerror = function() {
+        window.isLoadingNote = false;
+        console.error('Network error during note loading');
+        showNotificationPopup('Network error - please check your connection');
+        hideNoteLoadingState();
+        if (isMobileDevice()) {
+            document.body.classList.remove('note-open');
+        }
+    };
+    
+    xhr.ontimeout = function() {
+        window.isLoadingNote = false;
+        console.error('Request timeout during note loading');
+        showNotificationPopup('Request timeout - please try again');
+        hideNoteLoadingState();
+        if (isMobileDevice()) {
+            document.body.classList.remove('note-open');
+        }
+    };
+    
+    // Set timeout
+    xhr.timeout = 10000; // 10 seconds
+    
+    console.log('Sending AJAX request...');
+    xhr.send();
+    return false;
+};
 
 /**
  * Function to go back to note list on mobile
@@ -39,55 +218,10 @@ window.goBackToNoteList = function() {
  * Initialize note loading system
  */
 function initializeNoteLoader() {
-    // Intercept clicks on note links
-    document.addEventListener('click', function(event) {
-        const noteLink = event.target.closest('.links_arbo_left');
-        
-        if (noteLink && noteLink.tagName === 'A') {
-            event.preventDefault();
-            
-            const href = noteLink.getAttribute('href');
-            const noteTitle = noteLink.getAttribute('data-note-id');
-            
-            if (href && noteTitle) {
-                // If a note has been edited but not saved, ask for confirmation using the
-                // app's styled confirm modal (fallback to native confirm if unavailable).
-                try {
-                    if (typeof editedButNotSaved !== 'undefined' && editedButNotSaved == 1) {
-                        var title = 'Unsaved changes';
-                        var message = 'This note has unsaved changes. Do you want to continue and lose your changes?';
-
-                        // If the app provides the styled confirm modal, use it
-                        if (typeof showConfirmModal === 'function') {
-                            showConfirmModal(title, message, function() {
-                                try { editedButNotSaved = 0; } catch (e) {}
-                                loadNoteViaAjax(href, noteTitle, noteLink);
-                            });
-                            // Do not proceed now; wait for the modal callback
-                            return;
-                        }
-
-                        // Use custom confirm dialog instead of native confirm
-                        showConfirmDialog(message, function() {
-                            // User chose to continue: clear the flag so we don't prompt again
-                            try { editedButNotSaved = 0; } catch (e) {}
-                            // Continue with the navigation
-                            loadnote(id, pos, e ? e.shiftKey : false, searchTerm);
-                        }, function() {
-                            // User cancelled - do nothing
-                            return;
-                        });
-                        return; // Exit here to wait for user choice
-                    }
-                } catch (e) {
-                    // If any error occurs while checking edited flag, just proceed
-                }
-
-                // No unsaved changes or user confirmed: load the note
-                loadNoteViaAjax(href, noteTitle, noteLink);
-            }
-        }
-    });
+    // Simple initialization - events are now handled directly in HTML onclick
+    
+    // Keep the existing functions available for compatibility
+    window.loadNoteViaAjax = loadNoteViaAjax;
     
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
@@ -97,7 +231,6 @@ function initializeNoteLoader() {
             // If no state (going back to list), handle mobile view
             if (isMobileDevice()) {
                 document.body.classList.remove('note-open');
-                
                 // Clear selected note
                 document.querySelectorAll('.links_arbo_left').forEach(link => {
                     link.classList.remove('selected-note');
@@ -105,12 +238,7 @@ function initializeNoteLoader() {
             }
         }
     });
-}
-
-/**
- * Load note content via AJAX
- */
-function loadNoteViaAjax(url, noteTitle, clickedLink) {
+}function loadNoteViaAjax(url, noteTitle, clickedLink) {
     if (isNoteLoading) {
         return; // Prevent multiple simultaneous requests
     }
@@ -122,7 +250,7 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
     showNoteLoadingState();
     updateSelectedNote(clickedLink);
     
-    // On mobile, add the note-open class to body to show right column
+    // On mobile, add the note-open class to show the loading state
     if (isMobileDevice()) {
         document.body.classList.add('note-open');
     }
@@ -165,11 +293,21 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                     console.error('Error loading note:', error);
                     showNotificationPopup('Error loading note: ' + error.message);
                     hideNoteLoadingState();
+                    
+                    // On error, remove note-open class to go back to note list
+                    if (isMobileDevice()) {
+                        document.body.classList.remove('note-open');
+                    }
                 }
             } else {
                 console.error('Failed to load note:', xhr.status, xhr.statusText);
                 showNotificationPopup('Failed to load note. Please try again.');
                 hideNoteLoadingState();
+                
+                // On error, remove note-open class to go back to note list
+                if (isMobileDevice()) {
+                    document.body.classList.remove('note-open');
+                }
             }
         }
     };
@@ -179,6 +317,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
         console.error('Network error while loading note');
         showNotificationPopup('Network error. Please check your connection.');
         hideNoteLoadingState();
+        
+        // On error, remove note-open class to go back to note list
+        if (isMobileDevice()) {
+            document.body.classList.remove('note-open');
+        }
     };
     
     xhr.send();
@@ -516,6 +659,22 @@ function isNoteUrl(url) {
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteLoader();
     reinitializeImageClickHandlers(); // Initialize image handlers on page load
+    initializeMobileTouchHandlers(); // Initialize mobile touch handlers
+    
+    // Add touch move detection for mobile
+    if (isMobileDevice()) {
+        document.addEventListener('touchmove', function(event) {
+            if (window.touchStartX !== undefined && window.touchStartY !== undefined) {
+                const touch = event.touches[0];
+                const deltaX = Math.abs(touch.clientX - window.touchStartX);
+                const deltaY = Math.abs(touch.clientY - window.touchStartY);
+                
+                if (deltaX > 10 || deltaY > 10) {
+                    window.hasTouchMoved = true;
+                }
+            }
+        }, { passive: true });
+    }
     
     // Add global image click listener as fallback - using event delegation
     document.addEventListener('click', function(event) {
@@ -549,6 +708,22 @@ document.addEventListener('DOMContentLoaded', function() {
 if (document.readyState !== 'loading') {
     initializeNoteLoader();
     reinitializeImageClickHandlers(); // Initialize image handlers if DOM already loaded
+    initializeMobileTouchHandlers(); // Initialize mobile touch handlers if DOM already loaded
+    
+    // Add touch move detection for mobile if DOM already loaded
+    if (isMobileDevice()) {
+        document.addEventListener('touchmove', function(event) {
+            if (window.touchStartX !== undefined && window.touchStartY !== undefined) {
+                const touch = event.touches[0];
+                const deltaX = Math.abs(touch.clientX - window.touchStartX);
+                const deltaY = Math.abs(touch.clientY - window.touchStartY);
+                
+                if (deltaX > 10 || deltaY > 10) {
+                    window.hasTouchMoved = true;
+                }
+            }
+        }, { passive: true });
+    }
     
     // Same mobile check for already loaded DOM
     if (isMobileDevice()) {
