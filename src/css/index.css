@@ -4570,3 +4570,22 @@ input[type="search"]::-webkit-search-results-decoration {
     }
 }
 
+/* Desktop home button visibility control */
+.desktop-home-btn {
+    display: none !important;
+}
+
+/* Show home button on desktop when left column is hidden (small screens) */
+@media (max-width: 1024px) {
+    .desktop-home-btn {
+        display: flex !important;
+    }
+}
+
+/* Hide home button on very small screens where mobile layout takes over */
+@media (max-width: 768px) {
+    .desktop-home-btn {
+        display: none !important;
+    }
+}
+

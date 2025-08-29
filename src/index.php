@@ -1105,31 +1105,35 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo '<div class="note-header">';
                 // Formatting buttons (hidden by default on mobile, visible during selection)
                 echo '<div class="note-edit-toolbar">';
-                if ($is_mobile) {
-                    // Build home URL with search preservation
-                    $home_url = 'index.php';
-                    $home_params = [];
-                    if (!empty($search)) {
-                        $home_params[] = 'search=' . urlencode($search);
-                        $home_params[] = 'preserve_notes=1';
-                    }
-                    if (!empty($tags_search)) {
-                        $home_params[] = 'tags_search=' . urlencode($tags_search);
-                        $home_params[] = 'preserve_tags=1';
-                    }
-                    if (!empty($folder_filter)) {
-                        $home_params[] = 'folder=' . urlencode($folder_filter);
-                    }
-                    if (!empty($home_params)) {
-                        $home_url .= '?' . implode('&', $home_params);
-                    }
-                    
-                    // Use goBackToNoteList function for better mobile experience if no search parameters
-                    if (empty($home_params)) {
-                        echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="goBackToNoteList()"><i class="fas fa-home"></i></button>';
-                    } else {
-                        echo '<button type="button" class="toolbar-btn btn-home" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
-                    }
+                // Build home URL with search preservation
+                $home_url = 'index.php';
+                $home_params = [];
+                if (!empty($search)) {
+                    $home_params[] = 'search=' . urlencode($search);
+                    $home_params[] = 'preserve_notes=1';
+                }
+                if (!empty($tags_search)) {
+                    $home_params[] = 'tags_search=' . urlencode($tags_search);
+                    $home_params[] = 'preserve_tags=1';
+                }
+                if (!empty($folder_filter)) {
+                    $home_params[] = 'folder=' . urlencode($folder_filter);
+                }
+                if (!empty($home_params)) {
+                    $home_url .= '?' . implode('&', $home_params);
+                }
+                
+                // Home button - visible on mobile and desktop when left column is hidden
+                $home_button_class = 'toolbar-btn btn-home';
+                if (!$is_mobile) {
+                    $home_button_class .= ' desktop-home-btn';
+                }
+                
+                // Use goBackToNoteList function for better mobile experience if no search parameters
+                if (empty($home_params)) {
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fas fa-home"></i></button>';
+                } else {
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)
