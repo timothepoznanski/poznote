@@ -15,8 +15,7 @@ require_once 'default_folder_settings.php';
 // Mobile detection by user agent (must be done BEFORE any output and never redefined)
 $is_mobile = false;
 if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', $user_agent) ? true : false;
+    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
 }
 
 include 'functions.php';
@@ -46,9 +45,6 @@ if (!isset($labels) || !is_array($labels)) {
 // Workspace filter (only show notes from this workspace) - initialize early to avoid undefined variable warnings
 // Determine workspace filter (client may pass workspace param). Default workspace is 'Poznote'.
 $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
-
-// Debug log for workspace
-error_log("DEBUG: Received workspace = '$workspace_filter', GET=" . ($_GET['workspace'] ?? 'null') . ", POST=" . ($_POST['workspace'] ?? 'null'));
 
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
@@ -90,16 +86,6 @@ if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
     if (!is_array($excluded_folders)) {
         $excluded_folders = [];
     }
-    // Debug: uncomment to see what folders are being excluded
-    // if (!empty($excluded_folders)) {
-    //     error_log("Excluded folders: " . print_r($excluded_folders, true));
-    // }
-    // if (!empty($_POST)) {
-    //     error_log("POST search: " . $search . ", tags_search: " . $tags_search);
-    //     error_log("POST unified_search: " . ($_POST['unified_search'] ?? 'empty'));
-    //     error_log("POST search_in_notes: " . ($_POST['search_in_notes'] ?? 'empty'));
-    //     error_log("POST search_in_tags: " . ($_POST['search_in_tags'] ?? 'empty'));
-    // }
 }
 
 // Handle search type preservation when clearing search
@@ -116,9 +102,6 @@ if (!empty($_POST['unified_search'])) {
     $search_in_tags = isset($_POST['search_in_tags']) && $_POST['search_in_tags'] !== '';
     
     $using_unified_search = true;
-    
-    // Debug output (remove in production)
-    // Debugging removed - search working correctly
     
     // Only proceed if at least one option is selected
     if ($search_in_notes || $search_in_tags) {
@@ -668,10 +651,6 @@ $folder_filter = $_GET['folder'] ?? '';
     }
     
     $where_clause = implode(" AND ", $where_conditions);
-    
-    // Debug: uncomment to see the final query and parameters
-    // error_log("Where clause: " . $where_clause);
-    // error_log("Search params: " . print_r($search_params, true));
     
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
