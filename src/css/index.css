@@ -25,12 +25,6 @@
     display: block;
 }
 
-/* Specific hidden elements */
-.folders-selection-list,
-.create-folder-section {
-    display: none;
-}
-
 /* File upload styling */
 .file-input-label {
     display: block;
@@ -111,11 +105,6 @@
     margin: 0; /* ensure uniform spacing controlled by gap on the container */
 }
 .workspace-list .action-btn:active { transform: translateY(1px); }
-.workspace-action-placeholder {
-    width: 120px;
-    height: 40px; /* match button height */
-    display: inline-block;
-}
 
 /* Disabled / grayed buttons */
 .btn[disabled], .btn.disabled {
@@ -133,13 +122,6 @@
 /* Lock icon for default workspace */
 .locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
 
-/* Highlight Select button for Poznote to make it stand out */
-.poznote-selected {
-    background: #0b75a8 !important;
-    color: #fff !important;
-    box-shadow: 0 3px 6px rgba(11,117,168,0.18);
-}
-
 /* Responsive: stack controls on small screens */
 @media (max-width: 600px) {
     .workspace-list ul li {
@@ -153,7 +135,6 @@
     .ws-col-name { padding-left: 0; font-size: 1rem; }
     .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
     .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
-    .workspace-action-placeholder { width: 100px; }
 }
 .delete-form { margin: 0; }
 .delete-form .btn { margin: 0; }
@@ -167,24 +148,6 @@
     color: #111;
     border: none;
 }
-.workspace-list .badge {
-    display: inline-block;
-    background: #e9ecef;
-    color: #333;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-}
-
-.rename-default-form input[type="text"] {
-    width: 220px;
-    margin-right: 8px;
-}
-.rename-default-form .btn-primary {
-    padding: 6px 12px;
-    vertical-align: middle;
-}
-
 /* (welcome responsive styles removed) */
 
 @font-face {
@@ -235,12 +198,6 @@ a:active { color: #2E8CFA; } */
 /* TOOLBAR VERTICAL MENU */
 
 .note-edit-toolbar {
-    position: relative;
-}
-
-.desktop-toolbar {
-    display: flex !important;
-    width: 100%;
     position: relative;
 }
 
@@ -299,10 +256,6 @@ a:active { color: #2E8CFA; } */
 /* baseline removed - simplified palette */
 
 /* caret removed - popup has no arrow */
-
-.mobile-toolbar {
-    display: none !important;
-}
 
 .toolbar-vertical-menu {
     position: absolute;
@@ -569,9 +522,6 @@ body {
 
 /* Color-mode: replace toolbar icons with inline color selectors */
 .note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
-.note-edit-toolbar.color-mode .color-toolbar { display: flex; gap: 8px; align-items: center; padding: 6px 8px; }
-.note-edit-toolbar .toolbar-color-item { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); box-shadow: none; cursor: pointer; }
-.note-edit-toolbar .toolbar-color-item:focus { outline: 2px solid #95c2ff; outline-offset: 2px; }
 
 .note-edit-toolbar::-webkit-scrollbar {
     display: none;
@@ -675,11 +625,6 @@ body {
     }
 
 /* Toolbar dropdown menu styles */
-.toolbar-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
 .dropdown-menu {
     position: absolute;
     top: 100%;
@@ -811,11 +756,6 @@ a.links_arbo_left.selected-note {
     caret-color: #b0b0b0;
 }
 
-/* When clear button is present, add more padding to avoid overlap */
-.searchbar-input-wrapper.has-clear-button .searchbar-input {
-    padding-right: 120px;
-}
-
 .searchbar-input:disabled {
     background-color: #f5f5f5;
     color: #999;
@@ -851,28 +791,6 @@ a.links_arbo_left.selected-note {
     font-size: 0.8em;
 }
 
-.searchbar-clear-outer {
-    position: relative;
-    background: none !important;
-    border: none;
-    color: #bbb;
-    font-size: 1.0em;
-    cursor: pointer;
-    border-radius: 50%;
-    height: 32px;
-    width: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    z-index: 3;
-}
-
-.searchbar-clear-outer:hover {
-    color: #e74c3c;
-    background: #f5eaea;
-}
-
 .searchbar-desktop {
     margin-top: 12px;
     margin-bottom: 15px;
@@ -880,16 +798,6 @@ a.links_arbo_left.selected-note {
     background: none;
     border-radius: 0;
     box-shadow: none;
-}
-
-/* Folder filter container styling */
-.folder-filter-container {
-    margin-top: 8px;
-    margin-bottom: 0px;
-}
-
-.folder-filter-container .searchbar-row {
-    margin-bottom: 0;
 }
 
 .searchbar-row {
@@ -994,20 +902,6 @@ img {
     min-width: 200px;
 }
 
-#notificationPopup.notification-success {
-    color: #007DB8;
-    background-color: #fff;
-    border-color: #007DB8;
-    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
-}
-
-#notificationPopup.notification-error {
-    color: #dc3545;
-    background-color: #fff;
-    border-color: #dc3545;
-    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
-}
-
 /* Image menu styles (similar to settings menu) */
 
 
@@ -1078,230 +972,7 @@ img {
     }
 }
 
-/* CUSTOM CONFIRMATION MODAL */
-.confirm-overlay {
-    display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    animation: overlayFadeIn 0.2s ease-out;
-}
-
-@keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.confirm-modal {
-    display: none;
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1002;
-    max-width: 420px;
-    width: 92%;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-    animation: confirmModalAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes confirmModalAppear {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1) translateY(0);
-    }
-}
-
-.confirm-content {
-    padding: 0;
-    position: relative;
-}
-
-.confirm-message {
-    padding: 32px 28px 24px 28px;
-    font-size: 17px;
-    line-height: 1.5;
-    color: #2c2c2c;
-    text-align: center;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-}
-
-.confirm-buttons {
-    display: flex;
-    border-top: 1px solid #f0f0f0;
-    background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
-}
-
-.confirm-btn {
-    flex: 1;
-    padding: 18px 24px;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-    position: relative;
-    letter-spacing: -0.01em;
-}
-
-.confirm-btn:first-child {
-    border-right: 1px solid #e8e8e8;
-}
-
-.confirm-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: transparent;
-    transition: background 0.15s ease;
-}
-
-.confirm-btn-cancel {
-    color: #666;
-}
-
-.confirm-btn-cancel:hover::before {
-    background: rgba(0, 0, 0, 0.04);
-}
-
-.confirm-btn-cancel:active::before {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-.confirm-btn-cancel:focus::before {
-    background: rgba(0, 0, 0, 0.06);
-}
-
-.confirm-btn-confirm {
-    color: #dc3545;
-    font-weight: 700;
-}
-
-.confirm-btn-confirm:hover::before {
-    background: rgba(220, 53, 69, 0.08);
-}
-
-.confirm-btn-confirm:active::before {
-    background: rgba(220, 53, 69, 0.15);
-}
-
-.confirm-btn-confirm:focus::before {
-    background: rgba(220, 53, 69, 0.12);
-}
-
-/* Hover animations for buttons */
-.confirm-btn:hover {
-    transform: translateY(-0.5px);
-}
-
-.confirm-btn:active {
-    transform: translateY(0);
-}
-
-/* Mobile specific styles for confirmation modal */
-@media (max-width: 768px) {
-    .confirm-modal {
-        max-width: 340px;
-        width: 88%;
-        border-radius: 20px;
-    }
-    
-    .confirm-message {
-        padding: 28px 24px 20px 24px;
-        font-size: 16px;
-        line-height: 1.4;
-    }
-    
-    .confirm-buttons {
-        flex-direction: column;
-        background: #f8f8f8;
-    }
-    
-    .confirm-btn {
-        padding: 20px 24px;
-        font-size: 17px;
-        border-radius: 0;
-    }
-    
-    .confirm-btn:first-child {
-        border-right: none;
-        border-bottom: 1px solid #e8e8e8;
-        border-radius: 0 0 0 0;
-    }
-    
-    .confirm-btn:last-child {
-        border-radius: 0 0 20px 20px;
-    }
-    
-    .confirm-btn:hover {
-        transform: none;
-    }
-    
-    .confirm-btn:active {
-        transform: scale(0.98);
-    }
-    
-    .confirm-btn {
-        padding: 18px 20px;
-        font-size: 17px;
-    }
-    
-    .confirm-btn:first-child {
-        border-right: none;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .confirm-btn-cancel {
-        order: 2;
-    }
-    
-    .confirm-btn-confirm {
-        order: 1;
-    }
-}
-
 /* UPDATE NOTIFICATION STYLES */
-
-/* Update notification badge */
-.update-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #4caf50;
-    color: white;
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
-    font-size: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse-update 2s infinite;
-}
-
-@keyframes pulse-update {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 1; }
-}
 
 .settings-menu-item {
     position: relative;
@@ -1811,31 +1482,6 @@ img {
 
 .settings-menu-item .ai-status.disabled {
     color: #dc3545;
-}
-
-.settings-menu-item.deployment-info {
-    /* border-top: 1px solid rgba(0,0,0,0.1); */
-    margin-top: 5px;
-    padding-top: 8px;
-    cursor: default;
-    /* opacity: 0.7; */
-}
-
-.settings-menu-item.deployment-info:hover {
-    background-color: transparent;
-    color: #333;
-}
-
-.settings-menu-item.deployment-info i {
-    color: #007DB8;
-}
-
-.settings-menu-item.deployment-info span {
-    font-size: 1em;
-}
-
-.settings-menu-item.deployment-info small {
-    display: block;
 }
 
 /* AI dropdown styles */
