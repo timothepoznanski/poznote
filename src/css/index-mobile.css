@@ -104,16 +104,6 @@ body {
 }
 
 /* Alternative approach - target by URL or JavaScript class addition */
-.mobile-scroll-enabled {
-    overflow: auto !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    position: static !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
 html {
 overflow-x: hidden;
 }
@@ -144,9 +134,6 @@ body {
 
 /* When in color mode, hide original toolbar buttons and show the inline color toolbar */
 .note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
-.note-edit-toolbar.color-mode .color-toolbar { display: flex !important; gap: 8px; align-items: center; padding: 6px 8px; }
-.note-edit-toolbar .toolbar-color-item { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); box-shadow: none; cursor: pointer; }
-.note-edit-toolbar .toolbar-color-item:focus { outline: 2px solid #95c2ff; outline-offset: 2px; }
 
 /* Reduce space between toolbar and tags on mobile */
 .note-header {
@@ -271,10 +258,6 @@ body {
 /* baseline removed - simplified palette */
 
 /* caret removed - popup has no arrow */
-.color-palette-popup.in-innernote::after,
-.color-palette-popup.in-innernote::before {
-    display: none;
-}
 
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
@@ -574,10 +557,6 @@ a.links_arbo_left.selected-note {
 .folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
     font-size: 14px !important;
     padding: 8px !important;
-}
-
-.move-note-btn {
-    display: none !important; /* Hide move note button on mobile */
 }
 
 /* MODAL MOBILE ADJUSTMENTS */
