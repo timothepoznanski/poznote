@@ -227,53 +227,28 @@ $folder_filter = $_GET['folder'] ?? '';
     <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
     <?php $__poznote_note_loader_js_mtime = @filemtime(__DIR__ . '/js/note-loader.js') ?: time(); ?>
     <script src="js/note-loader.js?v=<?php echo $__poznote_note_loader_js_mtime; ?>"></script>
+    <?php $__poznote_login_prompt_js_mtime = @filemtime(__DIR__ . '/js/index-login-prompt.js') ?: time(); ?>
+    <script src="js/index-login-prompt.js?v=<?php echo $__poznote_login_prompt_js_mtime; ?>"></script>
+    <?php $__poznote_workspace_display_js_mtime = @filemtime(__DIR__ . '/js/index-workspace-display.js') ?: time(); ?>
+    <script src="js/index-workspace-display.js?v=<?php echo $__poznote_workspace_display_js_mtime; ?>"></script>
 </head>
 
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
 
     <div class="main-container">
     <script>
-    // Ensure the prompt function exists in case external JS hasn't loaded yet
-    if (typeof window.showLoginDisplayNamePrompt !== 'function') {
-        window.showLoginDisplayNamePrompt = function(){
-            var val = prompt('Login display name (blank to clear):');
-            if (val === null) return;
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api_settings.php');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function(){ try { var resp = JSON.parse(xhr.responseText); if (resp && resp.success) alert('Saved'); else alert('Error'); } catch(e){ alert('Error'); } };
-            xhr.send('action=set&key=login_display_name&value=' + encodeURIComponent(val));
-        };
-    }
-    </script>
-    <script>
-    (function(){
-        try {
-            var params = new URLSearchParams(window.location.search);
-            if (!params.has('workspace')) {
-                var stored = null;
-                try { stored = localStorage.getItem('poznote_selected_workspace'); } catch(e) {}
-                if (stored) {
-                    var workspaceDisplayMap = <?php
-                        $display_map = [];
-                        foreach ($workspaces as $w) {
-                            if (isset($labels[$w]) && $labels[$w] !== '') {
-                                $display_map[$w] = $labels[$w];
-                            } else {
-                                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
-                            }
-                        }
-                        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-                    ?>;
-                    var left = document.querySelector('.left-header-text');
-                    if (left) {
-                        if (workspaceDisplayMap[stored]) left.textContent = workspaceDisplayMap[stored];
-                        else left.textContent = stored;
-                    }
-                }
+    // Set workspace display map for JavaScript
+    window.workspaceDisplayMap = <?php
+        $display_map = [];
+        foreach ($workspaces as $w) {
+            if (isset($labels[$w]) && $labels[$w] !== '') {
+                $display_map[$w] = $labels[$w];
+            } else {
+                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
             }
-        } catch(e) {}
-    })();
+        }
+        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+    ?>;
     </script>
 
     <!-- workspace selector removed (now shown under left header) -->
@@ -826,19 +801,18 @@ $folder_filter = $_GET['folder'] ?? '';
     <?php endif; ?>
         
     <script>
-        // Configuration variables for the main page
-        isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
-        currentNoteFolder = <?php 
-            if ($note != '' && empty($search) && empty($tags_search)) {
-                echo json_encode($current_note_folder ?? $defaultFolderName);
-            } else if ($default_note_folder && empty($search) && empty($tags_search)) {
-                echo json_encode($default_note_folder);
-            } else {
-                echo 'null';
-            }
-        ?>;
-    // selected workspace for client-side actions
-    selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+    // Set configuration variables for the main page
+    window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
+    window.currentNoteFolder = <?php 
+        if ($note != '' && empty($search) && empty($tags_search)) {
+            echo json_encode($current_note_folder ?? $defaultFolderName);
+        } else if ($default_note_folder && empty($search) && empty($tags_search)) {
+            echo json_encode($default_note_folder);
+        } else {
+            echo 'null';
+        }
+    ?>;
+    window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
     </script>
                     
     <?php
