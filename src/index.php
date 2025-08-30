@@ -51,31 +51,6 @@ $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
 
-// Column verification (only on application startup)
-// In SQLite, we use PRAGMA table_info to check columns
-$stmt = $con->query("PRAGMA table_info(entries)");
-$columns = [];
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $columns[] = $row['name'];
-}
-
-if (!in_array('folder', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN folder varchar(255) DEFAULT '$defaultFolderName'");
-}
-
-if (!in_array('favorite', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN favorite INTEGER DEFAULT 0");
-}
-
-if (!in_array('attachments', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN attachments TEXT DEFAULT NULL");
-}
-
-// Add workspace column if missing (default to 'Poznote')
-if (!in_array('workspace', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN workspace TEXT DEFAULT 'Poznote'");
-}
-
 $search = $_POST['search'] ?? $_GET['search'] ?? '';
 $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
 
