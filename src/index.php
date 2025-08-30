@@ -175,8 +175,10 @@ $folder_filter = $_GET['folder'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <?php $__poznote_css_mtime = @filemtime(__DIR__ . '/css/index.css') ?: time(); ?>
+    <?php $__poznote_modal_css_mtime = @filemtime(__DIR__ . '/css/modal.css') ?: time(); ?>
     <?php $__poznote_css_mobile_mtime = @filemtime(__DIR__ . '/css/index-mobile.css') ?: time(); ?>
     <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $__poznote_css_mtime; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal.css?v=<?php echo $__poznote_modal_css_mtime; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $__poznote_css_mobile_mtime; ?>" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
     <?php $__poznote_index_inline_css_mtime = @filemtime(__DIR__ . '/css/index-inline.css') ?: time(); ?>
