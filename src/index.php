@@ -221,21 +221,12 @@ $folder_filter = $_GET['folder'] ?? '';
     <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $__poznote_css_mtime; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $__poznote_css_mobile_mtime; ?>" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
+    <?php $__poznote_index_inline_css_mtime = @filemtime(__DIR__ . '/css/index-inline.css') ?: time(); ?>
+    <link rel="stylesheet" href="css/index-inline.css?v=<?php echo $__poznote_index_inline_css_mtime; ?>" />
     <?php $__poznote_toolbar_js_mtime = @filemtime(__DIR__ . '/js/toolbar.js') ?: time(); ?>
     <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
     <?php $__poznote_note_loader_js_mtime = @filemtime(__DIR__ . '/js/note-loader.js') ?: time(); ?>
     <script src="js/note-loader.js?v=<?php echo $__poznote_note_loader_js_mtime; ?>"></script>
-    <style>
-    /* Minimal workspace link styling (displayed next to header logo) */
-    .left-header .workspace-link {
-        display: inline-block;
-        margin-left: 8px;
-        font-size: 1.5rem;
-        color: #007DB8;
-        text-decoration: none;
-        font-weight: 600;
-    }
-    </style>
 </head>
 
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
@@ -309,14 +300,14 @@ $folder_filter = $_GET['folder'] ?? '';
         <div class="modal-content">
             <h3>Checking for Updates...</h3>
             <p id="updateCheckStatus">Please wait while we check for updates...</p>
-            <div class="modal-buttons" id="updateCheckButtons" style="display: none;">
+            <div class="modal-buttons" id="updateCheckButtons">
                 <button type="button" class="btn-cancel" onclick="closeUpdateCheckModal()">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Login Display Name Modal -->
-    <div id="loginDisplayModal" class="modal" style="display:none;">
+    <div id="loginDisplayModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeLoginDisplayModal()">&times;</span>
             <h3>Login display name</h3>
@@ -406,7 +397,7 @@ $folder_filter = $_GET['folder'] ?? '';
             </div>
             
             <!-- Error message display -->
-            <div id="moveFolderErrorMessage" class="modal-error-message" style="display: none;">
+            <div id="moveFolderErrorMessage" class="modal-error-message">
                 Please enter a folder name
             </div>
         </div>
@@ -457,7 +448,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="upload-button-container">
                     <button onclick="uploadAttachment()">Upload File</button>
                 </div>
-                <div id="attachmentErrorMessage" class="modal-error-message" style="display: none;"></div>
+                <div id="attachmentErrorMessage" class="modal-error-message"></div>
             </div>
             <div id="attachmentsList" class="attachments-list">
                 <!-- Attachments will be loaded here -->
@@ -485,7 +476,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
                 <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')">Cancel</button>
             </div>
-            <div id="moveFilesErrorMessage" class="modal-error-message" style="display: none;"></div>
+            <div id="moveFilesErrorMessage" class="modal-error-message"></div>
         </div>
     </div>
     
@@ -495,7 +486,7 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text">
             <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
         </span>
     </div>
@@ -544,7 +535,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
                         <i id="update-icon-mobile" class="fas fa-sync-alt"></i>
                         <span>Check for Updates</span>
-                        <small id="update-status-mobile" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
+                        <small id="update-status-mobile"></small>
                     </div>
                     <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                         <i class="fas fa-code-branch"></i>
@@ -716,7 +707,7 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text">
             <span id="workspaceNameDesktop"><?php echo $displayWorkspace; ?></span>
         </span>
     </div>
@@ -766,7 +757,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
                     <i id="update-icon-desktop" class="fas fa-sync-alt"></i>
                     <span>Check for Updates</span>
-                    <small id="update-status" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
+                    <small id="update-status"></small>
                 </div>
                 <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <i class="fas fa-code-branch"></i>
@@ -1434,10 +1425,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-robot rotating"></i>
                     <p>Generating summary...</p>
                 </div>
-                <div id="aiSummaryContent" style="display: none;">
+                <div id="aiSummaryContent">
                     <div id="summaryText" class="summary-text-simple"></div>
                 </div>
-                <div id="aiSummaryError" style="display: none;">
+                <div id="aiSummaryError">
                     <div class="error-content">
                         <i class="fas fa-exclamation-triangle"></i>
                         <p id="errorMessage"></p>
