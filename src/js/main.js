@@ -9,19 +9,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeWorkspaceMenu();
     initializeBrowserHistory();
     
-    // Initialiser tous les événements
+    // Initialize all events
     initializeEventListeners();
     
-    // Initialiser la gestion de sélection de texte pour le formatage
+    // Initialize text selection handling for formatting
     initTextSelectionHandlers();
     
-    // Initialiser les états des filtres de dossiers avec un petit délai pour être sûr que le DOM est prêt
+    // Initialize folder filter states with a small delay to ensure the DOM is ready
     setTimeout(function() {
         initializeFolderSearchFilters();
     }, 100);
 });
 
-// Fonctions globales disponibles pour l'HTML (compatibilité)
+// Global functions available for HTML (compatibility)
 window.newnote = createNewNote;
 window.updatenote = saveNoteToServer;
 window.saveFocusedNoteJS = saveNote;
@@ -85,7 +85,7 @@ window.closeUpdateModal = closeUpdateModal;
 window.closeUpdateCheckModal = closeUpdateCheckModal;
 window.goToUpdateInstructions = goToUpdateInstructions;
 
-// Fonctions pour les événements des éléments (compatibilité)
+// Functions for element events for elements (compatibility)
 window.updateidsearch = updateidsearch;
 window.updateidhead = updateidhead;
 window.updateidtags = updateidtags;

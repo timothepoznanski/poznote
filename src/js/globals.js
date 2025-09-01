@@ -9,12 +9,12 @@ var selectedWorkspace = 'Poznote';
 var currentNoteFolder = null;
 var currentNoteIdForAttachments = null;
 
-// Variables pour le déplacement de notes vers des dossiers
+// Variables for moving notes to folders
 var allFolders = [];
 var selectedFolderOption = null;
 var highlightedIndex = -1;
 
-// Fonctions utilitaires pour les variables globales
+// Utility functions for global variables
 function getDefaultFolderName() {
     return defaultFolderName;
 }

@@ -1,6 +1,6 @@
 /**
- * SearchState - Gestion d'état centralisée pour la recherche unifiée
- * Sépare la logique d'état de la manipulation DOM
+ * SearchState - Centralized state management for unified search
+ * Separates state logic from DOM manipulation
  */
 class SearchState {
     constructor() {
@@ -24,7 +24,7 @@ class SearchState {
     }
 
     /**
-     * Définit la valeur de recherche
+     * Sets search value
      */
     setSearchValue(value) {
         const trimmedValue = value.trim();
@@ -35,7 +35,7 @@ class SearchState {
     }
 
     /**
-     * Marque l'état de recherche en cours
+     * Marks search state in progress
      */
     setSearching(isSearching) {
         if (this.isSearching !== isSearching) {
@@ -75,7 +75,7 @@ class SearchState {
     }
 
     /**
-     * Sauvegarde l'état actuel
+     * Save current state
      */
     saveState() {
         this.lastSearchState = {
@@ -86,7 +86,7 @@ class SearchState {
     }
 
     /**
-     * Restaure l'état sauvegardé
+     * Restore saved state
      */
     restoreState() {
         if (this.lastSearchState) {
@@ -113,10 +113,10 @@ class SearchState {
     }
 
     /**
-     * Sauvegarde les dossiers exclus
+     * Save excluded folders
      */
     saveExcludedFolders() {
-        // Nettoie les anciennes entrées
+        // Clean up old entries
         for (let i = localStorage.length - 1; i >= 0; i--) {
             const key = localStorage.key(i);
             if (key && key.startsWith('folder_search_')) {
@@ -124,14 +124,14 @@ class SearchState {
             }
         }
         
-        // Sauvegarde les nouvelles
+        // Save new ones
         this.excludedFolders.forEach(folder => {
             localStorage.setItem(`folder_search_${folder}`, 'excluded');
         });
     }
 
     /**
-     * Réinitialise l'état
+     * Reset state
      */
     reset() {
         this.currentType = 'notes';
@@ -141,7 +141,7 @@ class SearchState {
     }
 
     /**
-     * Ajoute un observateur pour les changements d'état
+     * Adds observer for state changes of state
      */
     addObserver(callback) {
         this.observers.add(callback);
@@ -162,13 +162,13 @@ class SearchState {
             try {
                 callback(event, data);
             } catch (error) {
-                console.error('Erreur dans l\'observateur de SearchState:', error);
+                console.error('Error in SearchState observer:', error);
             }
         });
     }
 
     /**
-     * Sérialise l'état pour les URL/formulaires
+     * Serializes state for URL/formulaires
      */
     serialize() {
         return {
@@ -179,7 +179,7 @@ class SearchState {
     }
 
     /**
-     * Désérialise l'état depuis les paramètres URL
+     * Deserializes state from URL parameters URL
      */
     deserialize(params) {
         if (params.preserve_notes === '1') {
@@ -196,7 +196,7 @@ class SearchState {
 }
 
 /**
- * SearchConfig - Configuration centralisée
+ * SearchConfig - Centralized configuration
  */
 class SearchConfig {
     static get SEARCH_TYPES() {
@@ -244,13 +244,13 @@ class SearchConfig {
  */
 class DOMUtils {
     /**
-     * Récupère les éléments DOM pour un mode donné
+     * Gets DOM elements for given mode given
      */
     static getSearchElements(isMobile) {
         const suffix = isMobile ? '-mobile' : '';
         const cache = isMobile ? DOMUtils._mobileCache : DOMUtils._desktopCache;
         
-        // Cache simple pour éviter les recherches répétées
+        // Simple cache to avoid repeated searches
         if (!cache.elements) {
             cache.elements = {
                 form: document.getElementById(`unified-search-form${suffix}`),
@@ -277,7 +277,7 @@ class DOMUtils {
     }
 
     /**
-     * Invalide le cache DOM (à appeler après AJAX)
+     * Invalidate DOM cache (call after AJAX)
      */
     static invalidateCache() {
         DOMUtils._desktopCache = {};
@@ -298,7 +298,7 @@ class DOMUtils {
     }
 
     /**
-     * Crée un élément d'erreur de validation
+     * Create validation error element
      */
     static createValidationError(message) {
         const errorDiv = document.createElement('div');
@@ -308,7 +308,7 @@ class DOMUtils {
     }
 
     /**
-     * Supprime les erreurs de validation existantes
+     * Remove existing validation errors
      */
     static removeValidationErrors(container) {
         if (!container) return;
@@ -318,7 +318,7 @@ class DOMUtils {
     }
 
     /**
-     * Vérifie si un élément a une classe CSS
+     * Checks if element has CSS class CSS
      */
     static hasClass(element, className) {
         return element && element.classList.contains(className);
@@ -362,7 +362,7 @@ class ValidationUtils {
     }
 
     /**
-     * Valide l'état complet de recherche
+     * Validates complete search state
      */
     static validateSearchState(elements, searchValue) {
         const typeValidation = this.validateSearchType(elements);

@@ -1,4 +1,4 @@
-// Fonctions utilitaires et diverses
+// Utility and miscellaneous functions
 
 function startDownload() {
     window.location = 'export_entries.php';
@@ -20,7 +20,7 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
 }
 
 function toggleFavorite(noteId) {
-    // Vérifier s'il y a des modifications non sauvegardées et les sauvegarder d'abord
+    // Check if there are unsaved modifications and save them first
     if (editedButNotSaved === 1 && updateNoteEnCours === 0 && noteid && noteid == noteId) {
         var entryElement = document.getElementById('inp' + noteId);
         var tagsElement = document.getElementById('tags' + noteId);
@@ -70,7 +70,7 @@ function toggleFavorite(noteId) {
                     editedButNotSaved = 0;
                     var lastUpdatedElem = document.getElementById('lastupdated' + noteid);
                     if (lastUpdatedElem) {
-                        lastUpdatedElem.innerHTML = data == '1' ? 'Sauvegardé aujourd\'hui' : data;
+                        lastUpdatedElem.innerHTML = data == '1' ? 'Saved today' : data;
                     }
                     updateNoteEnCours = 0;
                     setSaveButtonRed(false);
@@ -130,7 +130,7 @@ function performFavoriteToggle(noteId) {
     xhr.send('action=toggle_favorite&note_id=' + encodeURIComponent(noteId) + '&workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote'));
 }
 
-// Gestion des dossiers
+// Folder management
 var currentFolderToDelete = null;
 
 function newFolder() {
@@ -162,7 +162,7 @@ function newFolder() {
         });
     });
 }function deleteFolder(folderName) {
-    // D'abord, vérifier combien de notes sont dans ce dossier
+    // First, check how many notes sont dans ce dossier
     var params = new URLSearchParams({
         action: 'count_notes_in_folder',
         folder_name: folderName
@@ -180,13 +180,13 @@ function newFolder() {
         if (data.success) {
             var noteCount = data.count || 0;
             
-            // Si le dossier est vide, supprimer sans confirmation
+            // If the folder is empty, delete without confirmation
             if (noteCount === 0) {
                 executeDeleteFolderOperation(folderName);
                 return;
             }
             
-            // Pour les dossiers avec des notes, afficher une confirmation
+            // For folders with notes, show a confirmation
             var confirmMessage = 'Are you sure you want to delete the folder "' + folderName + '"?\n' + noteCount + ' note' + (noteCount > 1 ? 's' : '') + ' will be moved to "' + getDefaultFolderName() + '".\n\nIf you want to delete all notes in this folder, you can move them to "' + getDefaultFolderName() + '" then empty this folder.';
             
             showDeleteFolderModal(folderName, confirmMessage);
@@ -251,7 +251,7 @@ function executeDeleteFolderOperation(folderName) {
 function selectFolder(folderName, element) {
     selectedFolder = folderName;
     
-    // Mettre à jour l'interface
+    // Update interface
     var folderLinks = document.querySelectorAll('.folder-link');
     for (var i = 0; i < folderLinks.length; i++) {
         folderLinks[i].classList.remove('selected');
@@ -275,12 +275,12 @@ function toggleFolder(folderId) {
     }
 }
 
-// Gestion des workspaces (création/suppression)
+// Workspace management (creation/deletion)
 function showNewWorkspacePrompt() {
     var name = prompt('Nom du nouveau workspace:');
     if (!name) return;
     
-    // Valider les caractères autorisés
+    // Validate allowed characters
     if (!/^[A-Za-z0-9_-]+$/.test(name)) {
         showNotificationPopup('Invalid workspace name: use only letters, numbers, hyphens or underscores (no spaces)', 'error');
         return;
@@ -320,7 +320,7 @@ function showNewWorkspacePrompt() {
                 refreshLeftColumnForWorkspace(name);
                 showNotificationPopup('Workspace created and selected', 'success');
             } else {
-                // Fallback: recharger la page
+                // Fallback: reload the page
                 var url = new URL(window.location.href);
                 url.searchParams.set('workspace', name);
                 window.location.href = url.toString();
@@ -360,7 +360,7 @@ function deleteCurrentWorkspace() {
                     localStorage.setItem('poznote_selected_workspace', 'Poznote'); 
                 } catch(e) {}
                 
-                // Supprimer l'option du sélecteur
+                // Remove option from selector
                 for (var i = 0; i < sel.options.length; i++) {
                     if (sel.options[i].value === name) {
                         sel.removeChild(sel.options[i]);
@@ -382,9 +382,9 @@ function deleteCurrentWorkspace() {
     }
 }
 
-// Fonctions de compatibilité (legacy)
+// Compatibility functions (legacy)
 function toggleToolbarMenu(noteId) {
-    // Utiliser la nouvelle fonction
+    // Use the new function
     toggleNoteMenu(noteId);
 }
 
@@ -894,7 +894,7 @@ function executeEmptyFolder(folderName) {
     });
 }
 
-// Fonctions de déplacement de notes individuelles vers des dossiers
+// Functions for moving individual notes individuelles vers des dossiers
 
 function showMoveFolderDialog(noteId) {
     // Check if a valid note is selected

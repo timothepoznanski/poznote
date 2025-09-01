@@ -1,4 +1,4 @@
-// Interface utilisateur (menus, modales, notifications)
+// User interface (menus, modals, notifications)
 
 function showNotificationPopup(message, type) {
     type = type || 'success';
@@ -7,28 +7,28 @@ function showNotificationPopup(message, type) {
     var overlay = document.getElementById('notificationOverlay');
     
     if (!popup || !overlay) {
-        // Fallback si les éléments n'existent pas
+        // Fallback if elements don't exist
         alert(message);
         return;
     }
     
     popup.innerText = message;
     
-    // Supprimer les classes existantes
+    // Remove existing classes
     popup.classList.remove('notification-success', 'notification-error');
     
-    // Ajouter la classe appropriée
+    // Add appropriate class
     if (type === 'error') {
         popup.classList.add('notification-error');
     } else {
         popup.classList.add('notification-success');
     }
     
-    // Afficher
+    // Show
     overlay.style.display = 'block';
     popup.style.display = 'block';
 
-    // Fonction pour masquer
+    // Function to hide
     function hideNotification() {
         overlay.style.display = 'none';
         popup.style.display = 'none';
@@ -36,11 +36,11 @@ function showNotificationPopup(message, type) {
         popup.removeEventListener('click', hideNotification);
     }
 
-    // Permettre la fermeture en cliquant
+    // Allow closing by clicking
     overlay.addEventListener('click', hideNotification);
     popup.addEventListener('click', hideNotification);
     
-    // Fermeture automatique après 3 secondes pour les succès
+    // Auto close after 3 seconds for success
     if (type === 'success') {
         setTimeout(hideNotification, 3000);
     }
@@ -52,7 +52,7 @@ function toggleNoteMenu(noteId) {
     
     if (!menu || !button) return;
     
-    // Fermer tous les autres menus
+    // Close all other menus
     var allMenus = document.querySelectorAll('.dropdown-menu');
     for (var i = 0; i < allMenus.length; i++) {
         var otherMenu = allMenus[i];
@@ -61,12 +61,12 @@ function toggleNoteMenu(noteId) {
         }
     }
     
-    // Basculer le menu actuel
+    // Toggle the current menu
     if (menu.style.display === 'none' || menu.style.display === '') {
         menu.style.display = 'block';
         button.classList.add('active');
         
-        // Fermer le menu en cliquant ailleurs
+        // Close menu when clicking elsewhere
         setTimeout(function() {
             document.addEventListener('click', function closeMenu(e) {
                 if (!menu.contains(e.target) && !button.contains(e.target)) {
@@ -88,7 +88,7 @@ function closeModal(modalId) {
         modal.style.display = 'none';
     }
     
-    // Actions spéciales pour certaines modales
+    // Special actions for certain modals
     if (modalId === 'attachmentModal') {
         hideAttachmentError();
         resetAttachmentForm();
@@ -110,7 +110,7 @@ function resetAttachmentForm() {
 function displaySavingInProgress() {
     var elem = document.getElementById('lastupdated' + noteid);
     if (elem) {
-        elem.innerHTML = '<span style="color:#FF0000;">Sauvegarde en cours...</span>';
+        elem.innerHTML = '<span style="color:#FF0000;">Saving in progress...</span>';
     }
     setSaveButtonRed(true);
 }
@@ -124,14 +124,14 @@ function displayEditInProgress() {
 }
 
 function setSaveButtonRed(isRed) {
-    // Chercher le bouton de sauvegarde
+    // Search the save button
     var saveBtn = document.querySelector('.toolbar-btn > .fa-save');
     if (saveBtn) {
         saveBtn = saveBtn.parentElement;
     }
     
     if (!saveBtn) {
-        // Fallback: chercher parmi tous les boutons
+        // Fallback: search among all buttons
         var btns = document.querySelectorAll('.toolbar-btn');
         for (var i = 0; i < btns.length; i++) {
             var btn = btns[i];
@@ -168,7 +168,7 @@ function closeContactModal() {
 }
 
 function initializeWorkspaceMenu() {
-    // Fermer le menu workspace en cliquant ailleurs
+    // Close workspace menu when clicking elsewhere
     document.addEventListener('click', function(e) {
         var workspaceMenus = document.querySelectorAll('.workspace-menu');
         for (var i = 0; i < workspaceMenus.length; i++) {
@@ -180,7 +180,7 @@ function initializeWorkspaceMenu() {
     });
 }
 
-// Gestion de l'historique du navigateur pour les workspaces
+// Browser history management for workspaces
 function initializeBrowserHistory() {
     window.addEventListener('popstate', function(event) {
         if (event.state && event.state.workspace) {
@@ -192,7 +192,7 @@ function initializeBrowserHistory() {
     });
 }
 
-// Gestion du menu des paramètres
+// Settings menu management
 function toggleSettingsMenu(event) {
     event.stopPropagation();
     
@@ -211,7 +211,7 @@ function toggleSettingsMenu(event) {
     if (menu.style.display === 'none' || menu.style.display === '') {
         menu.style.display = 'block';
         
-        // Fermer le menu en cliquant ailleurs
+        // Close menu when clicking elsewhere
         setTimeout(function() {
             document.addEventListener('click', function closeSettingsMenu(e) {
                 if (!menu.contains(e.target)) {
@@ -225,7 +225,7 @@ function toggleSettingsMenu(event) {
     }
 }
 
-// Replier tous les dossiers
+// Fold all folders
 function foldAllFolders() {
     var folderContents = document.querySelectorAll('.folder-content');
     var folderIcons = document.querySelectorAll('.folder-icon');
@@ -244,11 +244,11 @@ function foldAllFolders() {
         icon.classList.add('fa-chevron-right');
     }
     
-    // Fermer le menu des paramètres
+    // Close settings menu
     closeSettingsMenus();
 }
 
-// Déplier tous les dossiers
+// Unfold all folders
 function unfoldAllFolders() {
     var folderContents = document.querySelectorAll('.folder-content');
     var folderIcons = document.querySelectorAll('.folder-icon');
@@ -267,11 +267,11 @@ function unfoldAllFolders() {
         icon.classList.add('fa-chevron-down');
     }
     
-    // Fermer le menu des paramètres
+    // Close settings menu
     closeSettingsMenus();
 }
 
-// Fermer les menus de paramètres
+// Close settings menus
 function closeSettingsMenus() {
     var settingsMenu = document.getElementById('settingsMenu');
     var settingsMenuMobile = document.getElementById('settingsMenuMobile');
@@ -286,8 +286,8 @@ function showLoginDisplayNamePrompt() {
     var saveBtn = document.getElementById('saveLoginDisplayBtn');
     
     if (!modal || !input || !saveBtn) {
-        console.warn('Éléments de modal de login manquants', {modal: !!modal, input: !!input, saveBtn: !!saveBtn});
-        // Fallback vers un prompt si la modal n'est pas présente
+        console.warn('Missing login modal elements', {modal: !!modal, input: !!input, saveBtn: !!saveBtn});
+        // Fallback to prompt if modal is not present
         var val = prompt('Nom d\'affichage de connexion (vide pour effacer):');
         if (val === null) return;
         
@@ -311,7 +311,7 @@ function showLoginDisplayNamePrompt() {
         return;
     }
 
-    // Fonction helper pour gérer les réponses du serveur
+    // Helper function to handle server responses
     function doSet(value) {
         var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: value });
         return fetch('api_settings.php', { 
@@ -355,7 +355,7 @@ function showLoginDisplayNamePrompt() {
         input.value = (res && res.success) ? (res.value || '') : '';
         modal.style.display = 'flex';
         
-        // Attacher le gestionnaire
+        // Attach the handler
         saveBtn.onclick = function() {
             var val = input.value.trim();
             if (!val) {
@@ -404,7 +404,7 @@ function showLoginDisplayNamePrompt() {
     });
 }
 
-// Fermer la modal de nom d'affichage de connexion
+// Close the login display name modal
 function closeLoginDisplayModal() {
     var modal = document.getElementById('loginDisplayModal');
     if (modal) {
@@ -412,7 +412,7 @@ function closeLoginDisplayModal() {
     }
 }
 
-// Fonctions de modal de confirmation
+// Confirmation modal functions
 var confirmedActionCallback = null;
 
 function showConfirmModal(title, message, callback) {
@@ -439,11 +439,11 @@ function executeConfirmedAction() {
     closeConfirmModal();
 }
 
-// Fonctions pour les modales d'input stylées (remplace window.prompt)
+// Functions for styled input modals (replaces window.prompt)
 var inputModalCallback = null;
 
 function showInputModal(title, placeholder, defaultValue, callback) {
-    // Créer la modale si elle n'existe pas
+    // Create the modal if it does not exist
     var modal = document.getElementById('inputModal');
     if (!modal) {
         createInputModal();
@@ -484,7 +484,7 @@ function createInputModal() {
     
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
-    // Ajouter l'event listener pour Enter
+    // Add event listener for Enter key
     var input = document.getElementById('inputModalInput');
     input.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {

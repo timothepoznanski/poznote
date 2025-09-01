@@ -1,4 +1,4 @@
-// Gestion des fichiers attachés et du drag & drop d'images
+// Attached file and image drag management
 
 function showAttachmentDialog(noteId) {
     var ws = selectedWorkspace || 'Poznote';
@@ -44,10 +44,10 @@ function uploadAttachment() {
     
     hideAttachmentError();
     
-    // Afficher le progrès
+    // Show progress
     var uploadButton = document.querySelector('.attachment-upload button');
     var originalText = uploadButton.textContent;
-    uploadButton.textContent = 'Téléchargement...';
+    uploadButton.textContent = 'Uploading...';
     uploadButton.disabled = true;
     
     var formData = new FormData();
@@ -70,7 +70,7 @@ function uploadAttachment() {
         try {
             data = JSON.parse(text);
         } catch (e) {
-            throw new Error('Réponse invalide du serveur');
+            throw new Error('Invalid server response');
         }
         
         if (data.success) {
@@ -106,7 +106,7 @@ function loadAttachments(noteId) {
         }
     })
     .catch(function(error) {
-        console.log('Erreur lors du chargement des pièces jointes:', error);
+        console.log('Error loading attachments:', error);
     });
 }
 
@@ -130,7 +130,7 @@ function displayAttachments(attachments) {
         html += '<small>' + fileSize + ' - ' + uploadDate + '</small>';
         html += '</div>';
         html += '<div class="attachment-actions">';
-        html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="Télécharger">';
+        html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="Download">';
         html += '<i class="fas fa-download"></i>';
         html += '</button>';
         html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Supprimer" class="delete-btn">';
@@ -191,7 +191,7 @@ function updateAttachmentCountInMenu(noteId) {
             var count = data.attachments.length;
             var hasAttachments = count > 0;
             
-            // Mettre à jour le menu déroulant
+            // Update dropdown menu
             var menu = document.getElementById('note-menu-' + noteId);
             if (menu) {
                 var attachmentItems = menu.querySelectorAll('.dropdown-item');
@@ -207,7 +207,7 @@ function updateAttachmentCountInMenu(noteId) {
                 }
             }
             
-            // Mettre à jour le bouton settings
+            // Update settings button
             var settingsBtn = document.getElementById('settings-btn-' + noteId);
             if (settingsBtn) {
                 if (hasAttachments) {
@@ -217,7 +217,7 @@ function updateAttachmentCountInMenu(noteId) {
                 }
             }
             
-            // Mettre à jour les boutons d'attachement (mobile)
+            // Updates attachment buttons (mobile)
             var attachmentBtns = document.querySelectorAll('.btn-attachment[onclick*="' + noteId + '"]');
             for (var i = 0; i < attachmentBtns.length; i++) {
                 var btn = attachmentBtns[i];
@@ -242,7 +242,7 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Gestion du drag & drop d'images
+// Image drag & drop management
 function handleImageFilesAndInsert(files, dropTarget) {
     if (!files || files.length === 0) return;
     
@@ -301,11 +301,11 @@ function insertHTMLAtSelection(html) {
         
         range.insertNode(frag);
         
-        // Placer le curseur après le contenu inséré
+        // Place cursor after inserted content
         if (lastNode) {
             try {
                 if (lastNode.nodeType === 1 && lastNode.tagName && lastNode.tagName.toUpperCase() === 'IMG') {
-                    // Pour les images, créer un nouveau paragraphe après
+                    // For images, create new paragraph after
                     var newP = document.createElement('div');
                     newP.innerHTML = '<br>';
                     lastNode.parentNode.insertBefore(newP, lastNode.nextSibling);

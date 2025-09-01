@@ -259,13 +259,13 @@ function toggleYellowHighlight() {
 // Helper function to convert font size value to CSS size
 function getFontSizeFromValue(value) {
   const sizeMap = {
-    '1': '0.75rem',   // Très petit
-    '2': '0.875rem',  // Petit  
+    '1': '0.75rem',   // Very small
+    '2': '0.875rem',  // Small  
     '3': '1rem',      // Normal
-    '4': '1.125rem',  // Grand
-    '5': '1.5rem',    // Très grand
-    '6': '2rem',      // Énorme
-    '7': '3rem'       // Géant
+    '4': '1.125rem',  // Large
+    '5': '1.5rem',    // Very large
+    '6': '2rem',      // Huge
+    '7': '3rem'       // Giant
   };
   return sizeMap[value] || '1rem';
 }
@@ -304,13 +304,13 @@ function changeFontSize() {
   
   // Font size options with labels
   const fontSizes = [
-    { value: '1', label: 'Très petit', preview: 'Aa' },
-    { value: '2', label: 'Petit', preview: 'Aa' },
+    { value: '1', label: 'Very small', preview: 'Aa' },
+    { value: '2', label: 'Small', preview: 'Aa' },
     { value: '3', label: 'Normal', preview: 'Aa' },
-    { value: '4', label: 'Grand', preview: 'Aa' },
-    { value: '5', label: 'Très grand', preview: 'Aa' },
-    { value: '6', label: 'Énorme', preview: 'Aa' },
-    { value: '7', label: 'Géant', preview: 'Aa' }
+    { value: '4', label: 'Large', preview: 'Aa' },
+    { value: '5', label: 'Very large', preview: 'Aa' },
+    { value: '6', label: 'Huge', preview: 'Aa' },
+    { value: '7', label: 'Giant', preview: 'Aa' }
   ];
 
   // Build popup content

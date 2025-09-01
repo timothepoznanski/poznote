@@ -1,15 +1,15 @@
-// Gestion des workspaces
+// Workspace management
 
 function initializeWorkspaces() {
     var wsSelector = document.getElementById('workspaceSelector');
     
-    // Charger le workspace depuis localStorage
+    // Load workspace from localStorage
     try {
         var stored = localStorage.getItem('poznote_selected_workspace');
         if (stored) selectedWorkspace = stored;
     } catch(e) {}
 
-    // Valider que le workspace existe dans le sélecteur
+    // Validate that workspace exists in selector
     if (wsSelector) {
         var existsInSelect = false;
         for (var i = 0; i < wsSelector.options.length; i++) {
@@ -30,7 +30,7 @@ function initializeWorkspaces() {
         wsSelector.addEventListener('change', onWorkspaceChange);
     }
 
-    // Charger les paramètres du dossier par défaut
+    // Load default folder settings
     loadDefaultFolderSettings();
 }
 
@@ -45,7 +45,7 @@ function onWorkspaceChange() {
         localStorage.setItem('poznote_selected_workspace', val); 
     } catch(e) {}
     
-    // Recharger la page avec le nouveau workspace
+    // Reload the page with the new workspace
     var url = new URL(window.location.href);
     url.searchParams.set('workspace', val);
     window.location.href = url.toString();
@@ -64,7 +64,7 @@ function loadDefaultFolderSettings() {
         }
     })
     .catch(function(error) {
-        console.log('Erreur lors du chargement des paramètres du dossier:', error);
+        console.log('Error loading folder settings:', error);
     });
 }
 
@@ -77,7 +77,7 @@ function toggleWorkspaceMenu(event) {
     
     if (!menu) return;
     
-    // Fermer l'autre menu s'il existe
+    // Close the other menu if it exists
     var otherMenuId = isMobile ? 'workspaceMenu' : 'workspaceMenuMobile';
     var otherMenu = document.getElementById(otherMenuId);
     if (otherMenu) {
@@ -113,7 +113,7 @@ function displayWorkspaceMenu(menu, workspaces) {
     var currentWorkspace = selectedWorkspace || 'Poznote';
     var menuHtml = '';
     
-    // Ajouter le workspace par défaut s'il n'est pas dans la liste
+    // Add default workspace if it's not in the list
     var workspaceExists = false;
     for (var i = 0; i < workspaces.length; i++) {
         if (workspaces[i].name === currentWorkspace) {
@@ -126,14 +126,14 @@ function displayWorkspaceMenu(menu, workspaces) {
         workspaces.unshift({ name: 'Poznote', created: null });
     }
     
-    // Trier les workspaces: Poznote en premier, puis alphabétiquement
+    // Sort workspaces: Poznote first, then alphabetically
     workspaces.sort(function(a, b) {
         if (a.name === 'Poznote') return -1;
         if (b.name === 'Poznote') return 1;
         return a.name.localeCompare(b.name);
     });
     
-    // Créer les éléments du menu
+    // Create menu elements
     for (var i = 0; i < workspaces.length; i++) {
         var workspace = workspaces[i];
         var isCurrent = workspace.name === currentWorkspace;
@@ -146,7 +146,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         menuHtml += '</div>';
     }
     
-    // Ajouter le lien de gestion
+    // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'manage_workspaces.php\';">';
     menuHtml += '<i class="fas fa-cog"></i>';
@@ -219,6 +219,6 @@ function refreshLeftColumnForWorkspace(workspaceName) {
         }
     })
     .catch(function(err) {
-        console.log('Erreur lors du rafraîchissement:', err);
+        console.log('Error during refresh:', err);
     });
 }

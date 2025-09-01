@@ -1,5 +1,5 @@
-// Fonctions de surlignage de recherche
-// Gestion du surlignage des termes de recherche dans le contenu des notes
+// Search highlighting functions
+// Manages highlighting of search terms in note content
 
 /**
  * Highlight search terms in all note content areas
@@ -112,7 +112,7 @@ function clearSearchHighlights() {
         parent.normalize();
     }
     
-    // Restaurer l'état des filtres de dossiers après avoir effacé la recherche
+    // Restore folder filter state after clearing search
     setTimeout(function() {
         if (typeof initializeFolderSearchFilters === 'function') {
             initializeFolderSearchFilters();

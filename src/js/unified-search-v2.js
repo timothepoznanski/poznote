@@ -1,19 +1,12 @@
 /**
- * Unified Search - Version Ultra-Optimisée
- * 
- * Utilise les patterns modernes :
- * - Séparation des responsabilités
- * - Gestion d'état centralisée  
- * - Pattern Observer
- * - Utilitaires réutilisables
- * - Cache DOM intelligent
+ * Unified Search - Ultra-Optimized Version
  */
 
-// Import des utilitaires (si utilisation de modules ES6)
+// Import utilities (if using ES6 modules)
 // import { SearchState, SearchConfig, DOMUtils, ValidationUtils } from './search-utils.js';
 
 /**
- * Gestionnaire principal de recherche unifié
+ * Main unified search manager
  */
 class UnifiedSearchManager {
     constructor() {
@@ -21,17 +14,17 @@ class UnifiedSearchManager {
         this.eventHandlers = new Map();
         this.isInitialized = false;
         
-        // Binding des méthodes pour les event listeners
+        // Binding methods for event listeners
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.handleStateChange = this.handleStateChange.bind(this);
         
-        // Observer des changements d'état
+        // Observer state changes
         this.state.addObserver(this.handleStateChange);
     }
 
     /**
-     * Initialisation principale
+     * Main initialization
      */
     initialize() {
         if (this.isInitialized) return;
@@ -44,7 +37,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Initialise l'état depuis les paramètres URL
+     * Initializes state from URL parameters URL
      */
     initializeFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -52,7 +45,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Configure les écouteurs d'événements
+     * Configures event listeners
      */
     setupEventListeners() {
         [false, true].forEach(isMobile => {
@@ -62,7 +55,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Configure l'écouteur de formulaire
+     * Configures form listener
      */
     setupFormListener(isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
@@ -76,7 +69,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Configure les écouteurs de boutons
+     * Configures button listeners
      */
     setupButtonListeners(isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
@@ -94,7 +87,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Gestion des soumissions de formulaire
+     * Handle form submissions
      */
     handleFormSubmit(e, isMobile) {
         e.preventDefault();
@@ -102,7 +95,7 @@ class UnifiedSearchManager {
         const elements = DOMUtils.getSearchElements(isMobile);
         const searchValue = elements.searchInput?.value || '';
         
-        // Met à jour l'état
+        // Update state
         this.state.setSearchValue(searchValue);
         
         // Validation
@@ -113,29 +106,29 @@ class UnifiedSearchManager {
             return;
         }
 
-        // Exécute la recherche selon le type
+        // Execute search based on type
         this.executeSearch(validation.activeType, searchValue, isMobile);
     }
 
     /**
-     * Gestion des clics sur les boutons
+     * Handle button clicks
      */
     handleButtonClick(searchType, isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
         const currentActive = DOMUtils.hasClass(elements.buttons[searchType], SearchConfig.CSS_CLASSES.active);
         
-        // Si déjà actif, ne rien faire
+        // If already active, do nothing
         if (currentActive) return;
         
-        // Met à jour l'état
+        // Update state
         this.state.setSearchType(searchType);
         
-        // Logique spéciale pour le changement de type
+        // Special logic for type change
         if (searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
         
-        // Focus et recherche automatique si nécessaire
+        // Focus and auto-search if necessary
         const searchValue = elements.searchInput?.value?.trim() || '';
         if (searchValue) {
             this.executeSearch(searchType, searchValue, isMobile);
@@ -145,7 +138,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Exécute la recherche selon le type
+     * Executes search according to type
      */
     executeSearch(searchType, searchValue, isMobile) {
         this.state.setSearching(true);
@@ -167,7 +160,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Effectue une recherche AJAX
+     * Performs an AJAX search
      */
     async performAjaxSearch(searchType, searchValue, isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
@@ -177,13 +170,13 @@ class UnifiedSearchManager {
         }
 
         try {
-            // Prépare les données du formulaire
+            // Prepare form data
             const formData = this.prepareFormData(elements.form, searchType, searchValue);
             
-            // Sauvegarde l'état avant la requête
+            // Save state before request
             this.state.saveState();
             
-            // Effectue la requête
+            // Execute request
             const response = await fetch(elements.form.action || window.location.pathname, {
                 method: 'POST',
                 headers: {
@@ -210,22 +203,22 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Prépare les données du formulaire
+     * Prepare form data
      */
     prepareFormData(form, searchType, searchValue) {
         const formData = new FormData(form);
         const params = new URLSearchParams();
         
-        // Ajoute tous les champs existants
+        // Add all existing fields
         for (const [key, value] of formData.entries()) {
             params.append(key, value);
         }
         
-        // Met à jour les champs spécifiques
+        // Update specific fields
         params.set(`search-${searchType}-hidden`, searchValue);
         params.set(`search-in-${searchType}`, '1');
         
-        // Ajoute les dossiers exclus
+        // Add excluded folders
         const excludedFolders = [...this.state.excludedFolders];
         if (excludedFolders.length > 0) {
             params.set('excluded_folders', JSON.stringify(excludedFolders));
@@ -235,20 +228,20 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Traite la réponse AJAX
+     * Processes AJAX response
      */
     async handleAjaxResponse(html, formParams) {
         try {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
-            // Met à jour les colonnes
+            // Update les colonnes
             this.updateColumns(doc);
             
-            // Met à jour l'URL
+            // Update l'URL
             this.updateBrowserHistory(formParams);
             
-            // Réinitialise après mise à jour DOM
+            // Reset after DOM update
             await this.reinitializeAfterAjax();
             
         } catch (error) {
@@ -258,7 +251,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Met à jour les colonnes du DOM
+     * Updates DOM columns
      */
     updateColumns(doc) {
         const updates = [
@@ -277,26 +270,26 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Met à jour l'historique du navigateur
+     * Updates browser history
      */
     updateBrowserHistory(formParams) {
         try {
             const newUrl = `${window.location.pathname}?${formParams}`;
             history.pushState({}, '', newUrl);
         } catch (error) {
-            // Ignore les erreurs d'historique
-            console.warn('Impossible de mettre à jour l\'historique:', error);
+            // Ignore history errors
+            console.warn('Cannot update history:', error);
         }
     }
 
     /**
-     * Réinitialise après une requête AJAX
+     * Resets after AJAX request AJAX
      */
     async reinitializeAfterAjax() {
         // Invalide le cache DOM
         DOMUtils.invalidateCache();
         
-        // Réinitialise les composants externes
+        // Reset les composants externes
         const reinitTasks = [
             () => typeof reinitializeClickableTagsAfterAjax === 'function' && reinitializeClickableTagsAfterAjax(),
             () => typeof initializeWorkspaceMenu === 'function' && initializeWorkspaceMenu(),
@@ -309,14 +302,14 @@ class UnifiedSearchManager {
             }
         });
         
-        // Réinitialise la recherche
+        // Reset the search
         this.isInitialized = false;
         this.initialize();
         
-        // Restaure l'état
+        // Restore state
         this.state.restoreState();
         
-        // Highlight avec délai
+        // Highlight with delay
         setTimeout(() => {
             if (typeof highlightSearchTerms === 'function') {
                 highlightSearchTerms();
@@ -325,7 +318,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Filtre les dossiers
+     * Filters folders
      */
     filterFolders(filterValue) {
         const normalizedFilter = filterValue.toLowerCase().trim();
@@ -354,7 +347,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Gère les erreurs de validation
+     * Handles validation errors
      */
     handleValidationError(validation, isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
@@ -362,7 +355,7 @@ class UnifiedSearchManager {
         if (!validation.isValid) {
             // Erreur de type de recherche
             this.showValidationError('Please select at least one search option (Notes or Tags)', isMobile);
-            // Réinitialise à 'notes' par défaut
+            // Reset to 'notes' by default
             this.state.setSearchType('notes');
         } else if (validation.isEmpty) {
             // Recherche vide - nettoie
@@ -371,16 +364,16 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Affiche une erreur de validation
+     * Displays a validation error
      */
     showValidationError(message, isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
         if (!elements.container) return;
 
-        // Supprime les erreurs existantes
+        // Remove existing errors
         DOMUtils.removeValidationErrors(elements.container);
 
-        // Crée la nouvelle erreur
+        // Create the new error
         const errorElement = DOMUtils.createValidationError(message);
         const searchBar = elements.container.querySelector(SearchConfig.SELECTORS.searchBarRow);
         
@@ -388,7 +381,7 @@ class UnifiedSearchManager {
             searchBar.parentNode.insertBefore(errorElement, searchBar.nextSibling);
         }
 
-        // Style d'erreur sur les boutons
+        // Error style on buttons
         Object.values(elements.buttons).forEach(button => {
             DOMUtils.toggleClass(button, SearchConfig.CSS_CLASSES.error, true);
         });
@@ -398,7 +391,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Cache les erreurs de validation
+     * Hides validation errors
      */
     hideValidationError(isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
@@ -412,38 +405,38 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Met à jour l'interface utilisateur
+     * Update user interface
      */
     updateUI() {
         [false, true].forEach(isMobile => this.updateUIForDevice(isMobile));
     }
 
     /**
-     * Met à jour l'interface pour un appareil spécifique
+     * Update interface for specific device
      */
     updateUIForDevice(isMobile) {
         const elements = DOMUtils.getSearchElements(isMobile);
         if (!elements.form) return;
 
-        // Met à jour les boutons actifs
+        // Update active buttons
         SearchConfig.SEARCH_TYPES.forEach(type => {
             const isActive = type === this.state.currentType;
             DOMUtils.toggleClass(elements.buttons[type], SearchConfig.CSS_CLASSES.active, isActive);
         });
 
-        // Met à jour le placeholder
+        // Update the placeholder
         const placeholder = SearchConfig.PLACEHOLDERS[this.state.currentType];
         if (elements.searchInput && placeholder) {
             elements.searchInput.placeholder = placeholder;
             elements.searchInput.disabled = false;
         }
 
-        // Met à jour les champs cachés
+        // Update hidden fields
         this.updateHiddenInputs(elements);
     }
 
     /**
-     * Met à jour les champs cachés
+     * Updates hidden fields
      */
     updateHiddenInputs(elements) {
         SearchConfig.SEARCH_TYPES.forEach(type => {
@@ -459,7 +452,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Gère les changements d'état
+     * Handles state changes
      */
     handleStateChange(event, data) {
         switch (event) {
@@ -469,7 +462,7 @@ class UnifiedSearchManager {
                 break;
                 
             case 'searchingStateChanged':
-                // Pourrait ajouter un indicateur de chargement
+                // Could add a loading indicator
                 break;
                 
             case 'stateReset':
@@ -479,18 +472,18 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Nettoie la recherche
+     * Clears the search
      */
     clearSearch() {
         if (typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
 
-        // Construit l'URL de nettoyage
+        // Build the cleanup URL
         const urlParams = new URLSearchParams(window.location.search);
         const newParams = new URLSearchParams();
         
-        // Préserve workspace et folder
+        // Preserve workspace and folder
         ['workspace', 'folder'].forEach(param => {
             const value = urlParams.get(param);
             if (value && (param !== 'workspace' || value !== 'Poznote')) {
@@ -503,7 +496,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Gestion des gestionnaires d'événements
+     * Event handler management
      */
     addEventHandler(element, event, handler, key) {
         element.addEventListener(event, handler);
@@ -519,7 +512,7 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Nettoie tous les gestionnaires d'événements
+     * Cleans up all event handlers
      */
     cleanup() {
         this.eventHandlers.forEach(({ element, event, handler }) => {
@@ -530,7 +523,7 @@ class UnifiedSearchManager {
     }
 }
 
-// Instance globale
+// Global instance
 let unifiedSearchManager;
 
 // Initialisation
@@ -538,18 +531,18 @@ document.addEventListener('DOMContentLoaded', function() {
     unifiedSearchManager = new UnifiedSearchManager();
     unifiedSearchManager.initialize();
     
-    // Gestion du bouton retour
+    // Back button management
     window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
         const hasSearch = urlParams.get('search') || urlParams.get('tags_search');
         const hasPreserve = urlParams.get('preserve_notes') || urlParams.get('preserve_tags');
         
         if (hasSearch && hasPreserve) {
-            return; // Laisse la page se recharger pour restaurer l'état
+            return; // Let page reload to restore state
         }
     });
 
-    // Highlight initial avec délai
+    // Initial highlight with delay
     setTimeout(() => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('search') && typeof highlightSearchTerms === 'function') {
@@ -558,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
-// Fonctions de compatibilité pour l'ancien code
+// Compatibility functions for legacy code
 window.clearUnifiedSearch = () => unifiedSearchManager?.clearSearch();
 window.goHomeWithSearch = () => unifiedSearchManager?.clearSearch();
 
@@ -574,7 +567,7 @@ window.reinitializeSearchAfterWorkspaceChange = () => {
     }
 };
 
-// Nettoyage lors du déchargement
+// Cleanup on unload
 window.addEventListener('beforeunload', () => {
     unifiedSearchManager?.cleanup();
 });

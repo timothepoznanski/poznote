@@ -1,4 +1,4 @@
-// Gestion des notes (création, édition, sauvegarde)
+// Note management (creation, editing, saving)
 
 function createNewNote() {
     var params = new URLSearchParams({
@@ -47,34 +47,34 @@ function saveNote() {
         displaySavingInProgress();
         saveNoteToServer();
     }
-    // Note: suppression du popup "Aucune modification à sauvegarder" sur demande utilisateur
+    // Note: removed "No changes to save" popup per user request
 }
 
 function saveNoteToServer() {
     updateNoteEnCours = 1;
 
-    // Vérifier que noteid est valide
+    // Check that noteid is valid
     if (!noteid || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
         console.error('saveNoteToServer: invalid noteid', noteid);
         updateNoteEnCours = 0;
         return;
     }
 
-    // Récupérer les éléments de la note
+    // Get note elements of the note
     var titleInput = document.getElementById("inp" + noteid);
     var entryElem = document.getElementById("entry" + noteid);
     var tagsElem = document.getElementById("tags" + noteid);
     var folderElem = document.getElementById("folder" + noteid);
 
-    // Vérifier que les éléments existent
+    // Check that elements exist
     if (!titleInput || !entryElem) {
-        console.error('saveNoteToServer: éléments manquants pour noteid=', noteid);
+        console.error('saveNoteToServer: missing elements for noteid=', noteid);
         updateNoteEnCours = 0;
         editedButNotSaved = 1;
         return;
     }
     
-    // Préparer les données
+    // Prepare data
     var headi = titleInput.value || '';
     var ent = cleanSearchHighlightsFromElement(entryElem);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
@@ -121,7 +121,7 @@ function handleSaveResponse(data) {
             setSaveButtonRed(true);
             return;
         } else if (jsonData.date && jsonData.title) {
-            // Titre modifié pour assurer l'unicité
+            // Title modified to ensure uniqueness
             editedButNotSaved = 0;
             updateLastSavedTime(jsonData.date);
             
@@ -137,10 +137,10 @@ function handleSaveResponse(data) {
             return;
         }
     } catch(e) {
-        // Réponse normale (pas JSON)
+        // Normal response (not JSON)
         if(data == '1') {
             editedButNotSaved = 0;
-            updateLastSavedTime('Sauvegardé aujourd\'hui');
+            updateLastSavedTime('Saved today');
         } else {
             editedButNotSaved = 0;
             updateLastSavedTime(data);
@@ -193,7 +193,7 @@ function redirectToWorkspace() {
     window.location.href = wsRedirect;
 }
 
-// Fonctions utilitaires pour le contenu des notes
+// Utility functions for note content
 function cleanSearchHighlightsFromElement(element) {
     if (!element) return "";
     
@@ -242,16 +242,16 @@ function updateNoteTitleInLeftColumn() {
     var newTitle = titleInput.value.trim();
     if (newTitle === '') newTitle = 'Note sans titre';
     
-    // Chercher les éléments à mettre à jour
+    // Search elements to update
     var elementsToUpdate = [];
     
-    // Méthode 1: par data-note-db-id
+    // Method 1: by data-note-db-id
     var noteLinksById = document.querySelectorAll('.links_arbo_left[data-note-db-id="' + noteid + '"]');
     for (var i = 0; i < noteLinksById.length; i++) {
         elementsToUpdate.push(noteLinksById[i]);
     }
     
-    // Méthode 2: note sélectionnée
+    // Method 2: selected note
     if (elementsToUpdate.length === 0) {
         var selectedNote = document.querySelector('.links_arbo_left.selected-note');
         if (selectedNote) {
@@ -259,7 +259,7 @@ function updateNoteTitleInLeftColumn() {
         }
     }
     
-    // Mettre à jour tous les éléments trouvés
+    // Update all found elements found
     for (var i = 0; i < elementsToUpdate.length; i++) {
         updateTitleInElement(elementsToUpdate[i], newTitle);
     }

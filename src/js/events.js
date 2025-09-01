@@ -1,28 +1,28 @@
-// Gestion des événements et interactions utilisateur
+// Event and user interaction management
 
 function initializeEventListeners() {
-    // Événements pour la modification des notes
+    // Events for note modification
     setupNoteEditingEvents();
     
-    // Événements pour les fichiers attachés
+    // Events for attached files
     setupAttachmentEvents();
     
-    // Événements pour le drag & drop d'images
+    // Events for image drag & drop
     setupDragDropEvents();
     
-    // Événements pour la gestion des liens
+    // Events for link management
     setupLinkEvents();
     
-    // Événements de focus
+    // Focus events
     setupFocusEvents();
     
-    // Vérification automatique des modifications
+    // Automatic change checking
     setupAutoSaveCheck();
     
-    // Avertissement avant fermeture
+    // Warning before page close
     setupPageUnloadWarning();
     
-    // Événements pour la recherche de dossiers (déplacement de notes)
+    // Events for folder search (note movement)
     setupFolderSearchEvents();
 }
 
@@ -36,7 +36,7 @@ function setupNoteEditingEvents() {
         });
     }
     
-    // Gestion spéciale pour les tags avec la barre d'espace
+        // Special handling for tags with the space bar
     document.body.addEventListener('keydown', function(e) {
         handleTagsKeydown(e);
     });
@@ -58,7 +58,7 @@ function handleNoteEditEvent(e) {
             updateNote();
         }
     } else if (target.tagName === 'INPUT') {
-        // Ignorer les champs de recherche
+        // Ignore search fields
         if (target.classList.contains('searchbar') ||
             target.id === 'search' ||
             target.classList.contains('searchtrash') ||
@@ -66,7 +66,7 @@ function handleNoteEditEvent(e) {
             return;
         }
         
-        // Traiter les champs de note
+        // Process note fields
         if (target.classList.contains('css-title') ||
             (target.id && target.id.startsWith('inp')) ||
             (target.id && target.id.startsWith('tags'))) {
@@ -82,7 +82,7 @@ function handleNoteEditEvent(e) {
 function handleTagsKeydown(e) {
     var target = e.target;
     
-    // Vérifier si c'est un champ de tags classique
+    // Check if this is a standard tags field
     if (target.tagName === 'INPUT' && 
         target.id && 
         target.id.startsWith('tags') &&
@@ -183,14 +183,14 @@ function setupDragDropEvents() {
                 handleImageFilesAndInsert(dt.files, note);
             }
         } catch (err) {
-            console.log('Erreur lors du drop:', err);
+            console.log('Error during drop:', err);
         }
     });
 }
 
 function setupLinkEvents() {
     document.addEventListener('click', function(e) {
-        // Rendre les liens cliquables dans les zones contenteditable
+        // Make links clickable in contenteditable areas
         if (e.target.tagName === 'A' && e.target.closest('[contenteditable="true"]')) {
             e.preventDefault();
             e.stopPropagation();
@@ -198,7 +198,7 @@ function setupLinkEvents() {
         }
     });
     
-    // Gestion du collage d'images
+    // Image paste management
     document.body.addEventListener('paste', function(e) {
         try {
             var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
@@ -219,7 +219,7 @@ function setupLinkEvents() {
                 }
             }
         } catch (err) {
-            console.log('Erreur lors du collage:', err);
+            console.log('Error during paste:', err);
         }
     });
 }
@@ -255,7 +255,7 @@ function setupPageUnloadWarning() {
     });
 }
 
-// Fonctions utilitaires
+// Utility functions
 function updateNote() {
     if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
     
@@ -272,20 +272,20 @@ function checkAndAutoSave() {
     var curdate = new Date();
     var curtime = curdate.getTime();
     
-    // Si modifié depuis plus de 15 secondes et pas de sauvegarde en cours
+    // If modified for more than 15 seconds and no save in progress
     if (updateNoteEnCours == 0 && editedButNotSaved == 1 && curtime - lastudpdate > 15000) {
         displaySavingInProgress();
         saveNoteToServer();
     }
 }
 
-// Fonctions pour les IDs des éléments
+// Functions for element IDs
 function updateidsearch(el) {
     noteid = el.id.substr(5);
 }
 
 function updateidhead(el) {
-    noteid = el.id.substr(3); // 3 pour 'inp'
+    noteid = el.id.substr(3); // 3 for 'inp'
 }
 
 function updateidtags(el) {
@@ -293,14 +293,14 @@ function updateidtags(el) {
 }
 
 function updateidfolder(el) {
-    noteid = el.id.substr(6); // 6 pour 'folder'
+    noteid = el.id.substr(6); // 6 for 'folder'
 }
 
 function updateident(el) {
     noteid = el.id.substr(5);
 }
 
-// Alias pour compatibilité
+// Alias for compatibility
 function newnote() {
     createNewNote();
 }
@@ -313,7 +313,7 @@ function saveFocusedNoteJS() {
     saveNote();
 }
 
-// Gestion de la sélection de texte pour la barre d'outils de formatage
+// Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
     // Check if we're in desktop mode
     if (window.innerWidth <= 800) {
@@ -448,14 +448,14 @@ function initTextSelectionHandlers() {
 }
 
 function setupFolderSearchEvents() {
-    // Événements pour la recherche de dossiers dans le modal de déplacement
+    // Events for folder search in move modal
     var folderSearchInput = document.getElementById('folderSearchInput');
     if (folderSearchInput) {
         folderSearchInput.addEventListener('input', handleFolderSearch);
         folderSearchInput.addEventListener('keydown', handleFolderKeydown);
     }
     
-    // Fermer dropdown en cliquant à l'extérieur
+    // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
         var dropdown = document.getElementById('folderDropdown');
         var input = document.getElementById('folderSearchInput');
