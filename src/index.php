@@ -21,150 +21,38 @@ if (isset($_SERVER['HTTP_USER_AGENT'])) {
 include 'functions.php';
 include 'db_connect.php';
 
-// Ensure $workspaces and $labels are defined to avoid PHP notices
-// which can inject HTML into scripts and cause JS parsing errors
-if (!isset($workspaces) || !is_array($workspaces)) {
-    $workspaces = [];
-    try {
-        // Try to read workspaces from the DB if the table exists
-        $stmt_ws = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
-        while ($r = $stmt_ws->fetch(PDO::FETCH_ASSOC)) {
-            $workspaces[] = $r['name'];
-        }
-    } catch (Exception $e) {
-        // ignore - leave as empty array
-        $workspaces = [];
-    }
-}
+// Include les nouveaux fichiers modulaires
+require_once 'page_init.php';
+require_once 'search_handler.php';
+require_once 'note_loader.php';
+require_once 'favorites_handler.php';
+require_once 'folders_display.php';
 
-if (!isset($labels) || !is_array($labels)) {
-    // Labels table is optional in some installs; default to empty labels map
-    $labels = [];
-}
+// Initialisation des workspaces et labels
+initializeWorkspacesAndLabels($con);
 
-// Workspace filter (only show notes from this workspace) - initialize early to avoid undefined variable warnings
-// Determine workspace filter (client may pass workspace param). Default workspace is 'Poznote'.
-$workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+// Initialisation des paramètres de recherche
+$search_params = initializeSearchParams();
+extract($search_params); // Extrait les variables: $search, $tags_search, $note, etc.
 
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
 
-$search = $_POST['search'] ?? $_GET['search'] ?? '';
-$tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
-
 // Handle folder exclusions from search
-$excluded_folders = [];
-if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
-    $excluded_folders = json_decode($_POST['excluded_folders'], true);
-    if (!is_array($excluded_folders)) {
-        $excluded_folders = [];
-    }
-}
-
-// Handle search type preservation when clearing search
-$preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
-$preserve_tags = isset($_GET['preserve_tags']) && $_GET['preserve_tags'] === '1';
-
-// Track if we're using unified search
-$using_unified_search = false;
+$excluded_folders = handleExcludedFolders();
 
 // Handle unified search
-if (!empty($_POST['unified_search'])) {
-    $unified_search = $_POST['unified_search'];
-    $search_in_notes = isset($_POST['search_in_notes']) && $_POST['search_in_notes'] !== '';
-    $search_in_tags = isset($_POST['search_in_tags']) && $_POST['search_in_tags'] !== '';
-    
-    $using_unified_search = true;
-    
-    // Only proceed if at least one option is selected
-    if ($search_in_notes || $search_in_tags) {
-        // Set search values based on selected options
-        if ($search_in_notes) {
-            $search = $unified_search;
-        } else {
-            $search = '';
-        }
-        
-        if ($search_in_tags) {
-            $tags_search = $unified_search;
-        } else {
-            $tags_search = '';
-        }
-    }
-    // If no options are selected, ignore the search (keep existing search state)
-}
-
-$note = $_GET['note'] ?? '';
-$folder_filter = $_GET['folder'] ?? '';
+$using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-        // Determine default note folder before JavaScript
-        $default_note_folder = null; // Track folder of default note
-        $res_right = null; // Initialize $res_right to avoid undefined variable error
-        
-        if($note!='') // If the note is not empty, it means we have just clicked on a note.
-        {          
-            $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt->execute([$note, $workspace_filter, $workspace_filter]);
-            $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if($note_data) {
-                $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
-                // Prepare result for right column (ensure it's in the workspace)
-                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt_right->execute([$note, $workspace_filter, $workspace_filter]);
-                $res_right = $stmt_right;
-            } else {
-                // If the requested note doesn't exist, display the last updated note
-                $note = ''; // Reset note to trigger showing latest note
-                $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $check_stmt->execute([$workspace_filter, $workspace_filter]);
-                $note_count_row = $check_stmt->fetch(PDO::FETCH_ASSOC);
-                $note_count = $note_count_row['note_count'];
-                
-                if ($note_count > 0) {
-                    // Show the most recently updated note in the selected workspace
-                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-                    $stmt_right->execute([$workspace_filter, $workspace_filter]);
-                    $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                    if($latest_note) {
-                        $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
-                        // Reset statement to be used in display loop (workspace filtered)
-                        $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-                        $stmt_right->execute([$workspace_filter, $workspace_filter]);
-                        $res_right = $stmt_right;
-                    }
-                } else {
-                    // No notes available
-                    $res_right = null;
-                }
-            }
-        } else {
-            // No specific note requested, check if we have notes to show the latest one
-            $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $check_stmt->execute([$workspace_filter, $workspace_filter]);
-            $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
-            
-            if ($note_count > 0) {
-                // Show the most recently updated note in the selected workspace
-                $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-                $stmt_right->execute([$workspace_filter, $workspace_filter]);
-                $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                if($latest_note) {
-                    $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
-                    // Reset statement to be used in display loop (workspace filtered)
-                    $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-                    $stmt_right->execute([$workspace_filter, $workspace_filter]);
-                    $res_right = $stmt_right;
-                }
-            } else {
-                // No notes available
-                $res_right = null;
-            }
-        }
+// Chargement des données de note
+$note_data = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
+$default_note_folder = $note_data['default_note_folder'];
+$current_note_folder = $note_data['current_note_folder'];
+$res_right = $note_data['res_right'];
 ?>
 
 <html>
@@ -213,14 +101,7 @@ $folder_filter = $_GET['folder'] ?? '';
     <script>
     // Set workspace display map for JavaScript
     window.workspaceDisplayMap = <?php
-        $display_map = [];
-        foreach ($workspaces as $w) {
-            if (isset($labels[$w]) && $labels[$w] !== '') {
-                $display_map[$w] = $labels[$w];
-            } else {
-                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
-            }
-        }
+        $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
         echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
     ?>;
     </script>
@@ -551,97 +432,10 @@ $folder_filter = $_GET['folder'] ?? '';
     <!-- Depending on the cases, we create the queries. -->  
         
     <?php
-    // SECURE SEARCH TEMPORARY
-    // TODO: Replace with complete version with all functionalities
-    $where_conditions = ["trash = 0"];
-    $search_params = [];
-    
-    // Simple secure search (basic version)
-    if (!empty($search)) {
-        // Split search string into individual terms (whitespace separated)
-        $search_terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
-
-        if (count($search_terms) <= 1) {
-            // Single term: preserve previous behavior
-            $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
-            $search_params[] = '%' . $search . '%';
-            $search_params[] = '%' . $search . '%';
-        } else {
-            // Multiple terms: require ALL terms to appear (AND)
-            $term_conditions = [];
-            foreach ($search_terms as $t) {
-                $term_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
-                $search_params[] = '%' . $t . '%';
-                $search_params[] = '%' . $t . '%';
-            }
-            $where_conditions[] = "(" . implode(" AND ", $term_conditions) . ")";
-        }
-    }
-    
-    if (!empty($tags_search)) {
-        // Handle multiple tags search - split by comma or space
-        $search_tags = array_filter(array_map('trim', preg_split('/[,\s]+/', $tags_search)));
-        
-        if (count($search_tags) == 1) {
-            // Single tag search
-            $where_conditions[] = "tags LIKE ?";
-            $search_params[] = '%' . $search_tags[0] . '%';
-        } else {
-            // Multiple tags search - all tags must be present
-            $tag_conditions = [];
-            foreach ($search_tags as $tag) {
-                $tag_conditions[] = "tags LIKE ?";
-                $search_params[] = '%' . $tag . '%';
-            }
-            $where_conditions[] = "(" . implode(" AND ", $tag_conditions) . ")";
-        }
-    }
-    
-    // Secure folder filter
-    if (!empty($folder_filter)) {
-        if ($folder_filter === 'Favorites') {
-            $where_conditions[] = "favorite = 1";
-        } else {
-            $where_conditions[] = "folder = ?";
-            $search_params[] = $folder_filter;
-        }
-    }
-
-    // Apply workspace filter
-    if (!empty($workspace_filter)) {
-        $where_conditions[] = "(workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        // We push workspace twice to match the two placeholders
-        $search_params[] = $workspace_filter;
-        $search_params[] = $workspace_filter;
-    }
-    
-    // Exclude folders from search if specified
-    if (!empty($excluded_folders)) {
-        $exclude_placeholders = [];
-        $exclude_favorite = false;
-        
-        foreach ($excluded_folders as $excludedFolder) {
-            if ($excludedFolder === 'Favorites') {
-                // For Favorites, exclude favorite notes
-                $exclude_favorite = true;
-            } else {
-                $exclude_placeholders[] = "?";
-                $search_params[] = $excludedFolder;
-            }
-        }
-        
-        // Add folder exclusion condition
-        if (!empty($exclude_placeholders)) {
-            $where_conditions[] = "(folder IS NULL OR folder NOT IN (" . implode(", ", $exclude_placeholders) . "))";
-        }
-        
-        // Add favorite exclusion condition
-        if ($exclude_favorite) {
-            $where_conditions[] = "(favorite IS NULL OR favorite != 1)";
-        }
-    }
-    
-    $where_clause = implode(" AND ", $where_conditions);
+    // Construction des conditions de recherche sécurisées
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $excluded_folders);
+    $where_clause = $search_conditions['where_clause'];
+    $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
@@ -794,110 +588,38 @@ $folder_filter = $_GET['folder'] ?? '';
         $stmt_left = $con->prepare($query_left_secure);
         $stmt_left->execute($search_params);
         
-        // Execute query for right column (for search results)
+        // Execute query for right column 
         if ($is_search_mode) {
-            // If a specific note is selected, show that note instead of the most recent one
-            if (!empty($note)) {
-                // Build query to show the selected note if it matches search criteria
-                $where_conditions_with_note = $where_conditions;
-                $search_params_with_note = $search_params;
-                $where_conditions_with_note[] = "heading = ?";
-                $search_params_with_note[] = $note;
-                
-                $where_clause_with_note = implode(" AND ", $where_conditions_with_note);
-                $query_right_with_note = "SELECT * FROM entries WHERE $where_clause_with_note LIMIT 1";
-                
-                $stmt_right = $con->prepare($query_right_with_note);
-                $stmt_right->execute($search_params_with_note);
-                $selected_note_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                
-                if ($selected_note_result) {
-                    // Reset statement for display loop
-                    $stmt_right = $con->prepare($query_right_with_note);
-                    $stmt_right->execute($search_params_with_note);
-                    $res_right = $stmt_right;
-                } else {
-                    // Selected note doesn't match search criteria, show most recent matching note
-                    $stmt_right = $con->prepare($query_right_secure);
-                    $stmt_right->execute($search_params);
-                    $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                    if ($search_result) {
-                        // Reset statement for display loop
-                        $stmt_right = $con->prepare($query_right_secure);
-                        $stmt_right->execute($search_params);
-                        $res_right = $stmt_right;
-                    } else {
-                        $res_right = null; // No results found
-                    }
-                }
-            } else {
-                // No specific note selected, show most recent matching note
-                $stmt_right = $con->prepare($query_right_secure);
-                $stmt_right->execute($search_params);
-                $search_result = $stmt_right->fetch(PDO::FETCH_ASSOC);
-                if ($search_result) {
-                    // Reset statement for display loop
-                    $stmt_right = $con->prepare($query_right_secure);
-                    $stmt_right->execute($search_params);
-                    $res_right = $stmt_right;
-                } else {
-                    $res_right = null; // No results found
-                }
-            }
+            // Pour le mode recherche, remplacer $res_right par les résultats de recherche
+            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
         }
+        // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
         // Group notes by folder for hierarchical display
-        $folders = [];
-        $folders_with_results = []; // Track folders that have search results
-        $favorites = []; // Store favorite notes
+        $folders = organizeNotesByFolder($stmt_left, $defaultFolderName);
         
-        while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
-            $folder = $row1["folder"] ?: $defaultFolderName;
-            if (!isset($folders[$folder])) {
-                $folders[$folder] = [];
-            }
-            $folders[$folder][] = $row1;
-            
-            // If the note is a favorite, also add it to the favorites "folder"
-            if ($row1["favorite"]) {
-                $favorites[] = $row1;
-            }
-            
-            // If in search mode, track folders with results
-            if($is_search_mode) {
-                $folders_with_results[$folder] = true;
-                if ($row1["favorite"]) {
-                    $folders_with_results['Favorites'] = true;
+        // Handle favorites
+        $folders = handleFavorites($folders);
+        
+        // Track folders with search results for favorites
+        $folders_with_results = [];
+        if($is_search_mode) {
+            foreach($folders as $folderName => $notes) {
+                if (!empty($notes)) {
+                    $folders_with_results[$folderName] = true;
                 }
             }
+            $folders_with_results = updateFavoritesSearchResults($folders_with_results, $folders);
         }
         
-        // Add favorites as a special folder if there are any favorites
-        if (!empty($favorites)) {
-            $folders = ['Favorites' => $favorites] + $folders;
-        }
+        // Add empty folders from folders table
+        $folders = addEmptyFolders($con, $folders, $workspace_filter);
         
-        // Add empty folders from folders table (workspace-scoped)
-        $folders_sql = "SELECT name FROM folders";
-        if (!empty($workspace_filter)) {
-            $folders_sql .= " WHERE (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
-        }
-        $folders_sql .= " ORDER BY name";
-        $empty_folders_query = $con->query($folders_sql);
-        while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
-            if (!isset($folders[$folder_row['name']])) {
-                $folders[$folder_row['name']] = [];
-            }
-        }
+        // Sort folders
+        $folders = sortFolders($folders, $defaultFolderName, $workspace_filter);
         
-        // Sort folders alphabetically (Favorites first, then default folder, then others)
-        uksort($folders, function($a, $b) use ($defaultFolderName, $workspace_filter) {
-            if ($a === 'Favorites') return -1;
-            if ($b === 'Favorites') return 1;
-            if (isDefaultFolder($a, $workspace_filter)) return -1;
-            if (isDefaultFolder($b, $workspace_filter)) return 1;
-            return strcasecmp($a, $b);
-        });
+        // Get total notes count for folder opening logic
+        $total_notes = getTotalNotesCount($con, $workspace_filter);
         
         // Display folders and notes
         foreach($folders as $folderName => $notes) {
@@ -913,37 +635,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 $folderId = 'folder-' . md5($folderName);
                 
                 // Determine if this folder should be open
-                $should_be_open = false;
-                
-                // Check if we have very few notes (likely just created demo notes)
-                $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
-                if (isset($workspace_filter)) {
-                    $total_notes_query .= " AND (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
-                }
-                $total_notes_result = $con->query($total_notes_query);
-                $total_notes = $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
-                
-                if($total_notes <= 3) {
-                    // If we have very few notes (demo notes just created), open all folders
-                    $should_be_open = true;
-                } else if($is_search_mode) {
-                    // In search mode: open folders that have results
-                    $should_be_open = isset($folders_with_results[$folderName]);
-                } else if($note != '') {
-                    // If a note is selected: open the folder of the current note AND Favoris if note is favorite
-                    if ($folderName === $current_note_folder) {
-                        $should_be_open = true;
-                    } else if ($folderName === 'Favoris') {
-                        // Open Favoris folder if the current note is favorite
-                        $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                        $stmt_check_favorite->execute([$note, $workspace_filter, $workspace_filter]);
-                        $favorite_data = $stmt_check_favorite->fetch(PDO::FETCH_ASSOC);
-                        $should_be_open = $favorite_data && $favorite_data['favorite'] == 1;
-                    }
-                } else if($default_note_folder) {
-                    // If no specific note selected but default note loaded: open its folder
-                    $should_be_open = ($folderName === $default_note_folder);
-                }
+                $should_be_open = shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
                 
                 // Set appropriate icon and display style
                 $chevron_icon = $should_be_open ? 'fa-chevron-down' : 'fa-chevron-right';
@@ -960,21 +652,9 @@ $folder_filter = $_GET['folder'] ?? '';
                 echo "<span class='folder-note-count'>(" . count($notes) . ")</span>";
                 echo "<span class='folder-actions'>";
                 
-                // Different actions depending on folder type
-                if ($folderName === 'Favorites') {
-                    // Search filter icon for Favorites folder
-                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                } else if (isDefaultFolder($folderName, $workspace_filter)) {
-                    // For the default folder: allow search and empty, but do not allow renaming
-                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
-                    echo "<i class='fas fa-trash-alt folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
-                } else {
-                    echo "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
-                    echo "<i class='fas fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
-                    echo "<i class='fas fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
-                    echo "<i class='fas fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
-                }
+                // Generate folder actions
+                echo generateFolderActions($folderName, $workspace_filter);
+                
                 echo "</span>";
                 echo "</div>";
                 echo "<div class='folder-content' id='$folderId' style='display: $folder_display;'>";
@@ -983,16 +663,9 @@ $folder_filter = $_GET['folder'] ?? '';
             // Display notes in folder
             foreach($notes as $row1) {
                 $isSelected = ($note === $row1["heading"]) ? 'selected-note' : '';
-                // Preserve search state in note links
-                $params = [];
-                if (!empty($search)) $params[] = 'search=' . urlencode($search);
-                if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
-                if (!empty($folder_filter)) $params[] = 'folder=' . urlencode($folder_filter);
-                if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
-                if ($preserve_notes) $params[] = 'preserve_notes=1';
-                if ($preserve_tags) $params[] = 'preserve_tags=1';
-                $params[] = 'note=' . urlencode($row1["heading"]);
-                $link = 'index.php?' . implode('&', $params);
+                
+                // Generate note link
+                $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["heading"]);
                 
                 $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
                 $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
