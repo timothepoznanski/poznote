@@ -170,6 +170,9 @@ function switchToWorkspace(workspaceName) {
         localStorage.setItem('poznote_selected_workspace', workspaceName); 
     } catch(e) {}
     
+    // Clear the right column when switching workspace
+    clearRightColumn();
+    
     var url = new URL(window.location.href);
     url.searchParams.delete('note');
     url.searchParams.delete('preserve_notes');
@@ -221,4 +224,23 @@ function refreshLeftColumnForWorkspace(workspaceName) {
     .catch(function(err) {
         console.log('Error during refresh:', err);
     });
+}
+
+function clearRightColumn() {
+    // Clear the right column content when switching workspace
+    var rightCol = document.getElementById('right_col');
+    if (rightCol) {
+        rightCol.innerHTML = '';
+    }
+    
+    // Reset global note variables
+    if (typeof noteid !== 'undefined') {
+        noteid = -1;
+    }
+    if (typeof editedButNotSaved !== 'undefined') {
+        editedButNotSaved = 0;
+    }
+    if (typeof updateNoteEnCours !== 'undefined') {
+        updateNoteEnCours = 0;
+    }
 }

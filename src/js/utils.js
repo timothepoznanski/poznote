@@ -409,19 +409,14 @@ function checkForUpdates() {
     // Show checking modal
     showUpdateCheckModal();
     
-    console.log('Starting update check...');
-    
     fetch('check_updates.php')
         .then(function(response) { 
-            console.log('Response received:', response.status, response.statusText);
             if (!response.ok) {
                 throw new Error('HTTP Error: ' + response.status);
             }
             return response.json(); 
         })
         .then(function(data) {
-            console.log('Data received:', data);
-            
             if (data.error) {
                 showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error, 'error');
             } else if (data.has_updates) {
