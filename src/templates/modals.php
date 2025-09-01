@@ -1,7 +1,7 @@
 <?php
 /**
- * Template pour toutes les modales de index.php
- * Variables attendues: $defaultFolderName
+ * Template for all modals in index.php
+ * Expected variables: $defaultFolderName
  */
 ?>
 

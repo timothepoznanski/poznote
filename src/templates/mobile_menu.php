@@ -1,7 +1,7 @@
 <?php
 /**
- * Template pour le menu mobile de index.php
- * Variables attendues: $is_mobile, $displayWorkspace, $workspace_filter
+ * Template for the mobile menu of index.php
+ * Expected variables: $is_mobile, $displayWorkspace, $workspace_filter
  */
 ?>
 

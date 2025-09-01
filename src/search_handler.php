@@ -1,11 +1,4 @@
 <?php
-/**
- * Gestion de la recherche et des filtres
- */
-
-/**
- * Traite les paramètres de recherche unifiée
- */
 function handleUnifiedSearch() {
     global $search, $tags_search, $using_unified_search;
     
