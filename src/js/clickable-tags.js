@@ -81,14 +81,14 @@ function convertTagsToEditable(noteId) {
     tagInput.setAttribute('autocorrect', 'off');
     tagInput.setAttribute('spellcheck', 'false');
     
-    // Empêcher les retours à la ligne de façon plus agressive
+    // Prevent line breaks more aggressively more aggressively
     tagInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
-        // La touche espace sera gérée dans keydown pour créer un tag
+        // Space key will be handled in keydown to create tag
     });
     
     tagInput.addEventListener('keydown', function(e) {
@@ -342,8 +342,8 @@ function addTagElement(container, tagText, noteId) {
  */
 function handleTagInput(e, noteId, container) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
-        e.preventDefault(); // Empêche le comportement par défaut (nouvelle ligne, etc.)
-        e.stopPropagation(); // Empêche la propagation de l'événement
+        e.preventDefault(); // Prevents default behavior (nouvelle ligne, etc.)
+        e.stopPropagation(); // Prevents event propagation
         
         const input = e.target;
         let tagText = input.value.trim();
@@ -357,7 +357,7 @@ function handleTagInput(e, noteId, container) {
                 return false;
             }
             
-            // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
+            // If user types words separated by spaces, treat them as separate tags
             const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
             
             tags.forEach(singleTag => {
@@ -393,13 +393,13 @@ function handleTagInput(e, noteId, container) {
                 }
             }, 100);
             
-            // Garde le focus sur l'input pour continuer à taper
+            // Keep focus on input to continue typing
             setTimeout(() => {
                 input.focus();
             }, 10);
         }
         
-        return false; // Empêche complètement la propagation
+        return false; // Completely prevents propagation
     } else if (e.key === 'Backspace' && e.target.value === '') {
         // If backspace on empty input, remove last tag
         const tagWrappers = container.querySelectorAll('.clickable-tag-wrapper');
@@ -426,7 +426,7 @@ function handleTagInputBlur(e, noteId, container) {
             return;
         }
         
-        // Si l'utilisateur tape des mots séparés par des espaces, on les traite comme des tags séparés
+        // If user types words separated by spaces, treat them as separate tags
         const tags = tagText.split(/\s+/).filter(tag => tag.trim() !== '');
         
         tags.forEach(singleTag => {

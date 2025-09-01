@@ -259,13 +259,13 @@ function toggleYellowHighlight() {
 // Helper function to convert font size value to CSS size
 function getFontSizeFromValue(value) {
   const sizeMap = {
-    '1': '0.75rem',   // Très petit
-    '2': '0.875rem',  // Petit  
+    '1': '0.75rem',   // Very small
+    '2': '0.875rem',  // Small  
     '3': '1rem',      // Normal
-    '4': '1.125rem',  // Grand
-    '5': '1.5rem',    // Très grand
-    '6': '2rem',      // Énorme
-    '7': '3rem'       // Géant
+    '4': '1.125rem',  // Large
+    '5': '1.5rem',    // Very large
+    '6': '2rem',      // Huge
+    '7': '3rem'       // Giant
   };
   return sizeMap[value] || '1rem';
 }
@@ -304,13 +304,13 @@ function changeFontSize() {
   
   // Font size options with labels
   const fontSizes = [
-    { value: '1', label: 'Très petit', preview: 'Aa' },
-    { value: '2', label: 'Petit', preview: 'Aa' },
+    { value: '1', label: 'Very small', preview: 'Aa' },
+    { value: '2', label: 'Small', preview: 'Aa' },
     { value: '3', label: 'Normal', preview: 'Aa' },
-    { value: '4', label: 'Grand', preview: 'Aa' },
-    { value: '5', label: 'Très grand', preview: 'Aa' },
-    { value: '6', label: 'Énorme', preview: 'Aa' },
-    { value: '7', label: 'Géant', preview: 'Aa' }
+    { value: '4', label: 'Large', preview: 'Aa' },
+    { value: '5', label: 'Very large', preview: 'Aa' },
+    { value: '6', label: 'Huge', preview: 'Aa' },
+    { value: '7', label: 'Giant', preview: 'Aa' }
   ];
 
   // Build popup content
@@ -743,64 +743,83 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-    // Minimal link helpers (lightweight, prompt-based fallback)
+    // Link insertion functionality
     function addLinkToNote() {
       try {
         const sel = window.getSelection();
         const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
-        const url = window.prompt('Enter URL', 'https://');
-        if (!url) return;
+        const selectedText = hasSelection ? sel.toString() : '';
+        
+        // Save the current selection before opening modal to preserve it
         if (hasSelection) {
-          // Try to create link around selection
-          try {
-            document.execCommand('createLink', false, url);
-          } catch (e) {
-            const range = sel.getRangeAt(0);
-            const a = document.createElement('a');
-            a.href = url;
-            a.textContent = sel.toString();
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            range.deleteContents();
-            range.insertNode(a);
-          }
+          window.savedLinkRange = sel.getRangeAt(0).cloneRange();
         } else {
-          // No selection: ask for link text and insert at caret or end of editor
-          const text = window.prompt('Link text (optional)', url) || url;
+          window.savedLinkRange = null;
+        }
+        
+        showLinkModal('https://', selectedText, function(url, text) {
+          if (!url) return;
+          
+          // Create the link element
           const a = document.createElement('a');
           a.href = url;
           a.textContent = text;
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
-          const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
-          if (range) {
-            range.insertNode(a);
-            // move caret after inserted link
-            range.setStartAfter(a);
-            range.setEndAfter(a);
+          
+          if (window.savedLinkRange) {
+            // Restore the saved selection and replace it with the link
+            const sel = window.getSelection();
             sel.removeAllRanges();
-            sel.addRange(range);
+            sel.addRange(window.savedLinkRange);
+            
+            // Replace the selected text with the link
+            window.savedLinkRange.deleteContents();
+            window.savedLinkRange.insertNode(a);
+            
+            // Clear selection and position cursor after the link
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.setStartAfter(a);
+            newRange.setEndAfter(a);
+            sel.addRange(newRange);
           } else {
-            const noteentry = document.querySelector('.noteentry');
-            if (noteentry) noteentry.appendChild(a);
+            // No saved selection, insert at current cursor position or end of editor
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+              const range = sel.getRangeAt(0);
+              range.insertNode(a);
+              // Position cursor after the link
+              range.setStartAfter(a);
+              range.setEndAfter(a);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            } else {
+              // Fallback: append to editor
+              const noteentry = document.querySelector('.noteentry');
+              if (noteentry) {
+                noteentry.appendChild(a);
+              }
+            }
           }
-        }
-
-        const noteentry = document.querySelector('.noteentry');
-        if (noteentry && typeof window.update === 'function') window.update();
+          
+          // Save the note automatically
+          const noteentry = document.querySelector('.noteentry');
+          if (noteentry && typeof window.updatenote === 'function') {
+            window.updatenote();
+          }
+          
+          // Clean up saved range
+          window.savedLinkRange = null;
+        });
       } catch (err) {
-        
+        console.error('Error in addLinkToNote:', err);
       }
     }
 
     function createLinkFromModal() {
       // Backwards-compatible stub: fallback to addLinkToNote behaviour
       return addLinkToNote();
-    }
-
-    function closeLinkModal() {
-      // No modal in this minimal implementation
-      return;
     }
 
 // Ensure all toolbar functions are available in global scope
