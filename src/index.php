@@ -185,8 +185,22 @@ $folder_filter = $_GET['folder'] ?? '';
     <link rel="stylesheet" href="css/index-inline.css?v=<?php echo $__poznote_index_inline_css_mtime; ?>" />
     <?php $__poznote_toolbar_js_mtime = @filemtime(__DIR__ . '/js/toolbar.js') ?: time(); ?>
     <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
-    <?php $__poznote_note_loader_js_mtime = @filemtime(__DIR__ . '/js/note-loader.js') ?: time(); ?>
-    <script src="js/note-loader.js?v=<?php echo $__poznote_note_loader_js_mtime; ?>"></script>
+    <?php $__poznote_note_loader_common_js_mtime = @filemtime(__DIR__ . '/js/note-loader-common.js') ?: time(); ?>
+    <script src="js/note-loader-common.js?v=<?php echo $__poznote_note_loader_common_js_mtime; ?>"></script>
+    <script>
+        // Load appropriate note loader based on device type
+        if (window.innerWidth <= 800 || /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent)) {
+            // Mobile device
+            var mobileScript = document.createElement('script');
+            mobileScript.src = 'js/note-loader-mobile.js?v=<?php echo $__poznote_note_loader_common_js_mtime; ?>';
+            document.head.appendChild(mobileScript);
+        } else {
+            // Desktop device
+            var desktopScript = document.createElement('script');
+            desktopScript.src = 'js/note-loader-desktop.js?v=<?php echo $__poznote_note_loader_common_js_mtime; ?>';
+            document.head.appendChild(desktopScript);
+        }
+    </script>
     <?php $__poznote_login_prompt_js_mtime = @filemtime(__DIR__ . '/js/index-login-prompt.js') ?: time(); ?>
     <script src="js/index-login-prompt.js?v=<?php echo $__poznote_login_prompt_js_mtime; ?>"></script>
     <?php $__poznote_workspace_display_js_mtime = @filemtime(__DIR__ . '/js/index-workspace-display.js') ?: time(); ?>
