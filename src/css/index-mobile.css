@@ -104,16 +104,6 @@ body {
 }
 
 /* Alternative approach - target by URL or JavaScript class addition */
-.mobile-scroll-enabled {
-    overflow: auto !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    position: static !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
 html {
 overflow-x: hidden;
 }
@@ -144,9 +134,6 @@ body {
 
 /* When in color mode, hide original toolbar buttons and show the inline color toolbar */
 .note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
-.note-edit-toolbar.color-mode .color-toolbar { display: flex !important; gap: 8px; align-items: center; padding: 6px 8px; }
-.note-edit-toolbar .toolbar-color-item { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08); box-shadow: none; cursor: pointer; }
-.note-edit-toolbar .toolbar-color-item:focus { outline: 2px solid #95c2ff; outline-offset: 2px; }
 
 /* Reduce space between toolbar and tags on mobile */
 .note-header {
@@ -271,10 +258,6 @@ body {
 /* baseline removed - simplified palette */
 
 /* caret removed - popup has no arrow */
-.color-palette-popup.in-innernote::after,
-.color-palette-popup.in-innernote::before {
-    display: none;
-}
 
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
@@ -567,17 +550,9 @@ a.links_arbo_left.selected-note {
     opacity: 1 !important; /* Always visible on mobile */
 }
 
-.note-actions {
-    opacity: 1 !important; /* Always visible on mobile */
-}
-
 .folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
     font-size: 14px !important;
     padding: 8px !important;
-}
-
-.move-note-btn {
-    display: none !important; /* Hide move note button on mobile */
 }
 
 /* MODAL MOBILE ADJUSTMENTS */
@@ -598,37 +573,6 @@ a.links_arbo_left.selected-note {
     font-size: 16px !important;
 }
 
-/* MOVE FOLDER MODAL MOBILE STYLES */
-
-.move-folder-modal {
-    margin: 5% 5% !important;
-    width: calc(100% - 40px) !important;
-    max-width: 90% !important;
-    min-width: unset !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;
-    padding: 20px !important;
-}
-
-/* Override general modal styles for move folder modal */
-#moveNoteFolderModal .modal-content.move-folder-modal {
-    position: fixed !important;
-    top: 5% !important;
-    left: 20px !important;
-    right: 20px !important;
-    width: auto !important;
-    max-width: none !important;
-    margin: 0 !important;
-    transform: none !important;
-}
-
-.move-folder-modal h3 {
-    font-size: 20px !important;
-    margin-bottom: 20px !important;
-    text-align: center !important;
-    margin-top: 0 !important;
-}
-
 .folder-search-section {
     margin-bottom: 0px !important;
 }
@@ -639,14 +583,6 @@ a.links_arbo_left.selected-note {
     width: 100% !important;
     box-sizing: border-box !important;
     border-radius: 8px !important;
-}
-
-.suggested-folders-section {
-    margin-bottom: 15px !important;
-}
-
-.suggested-folders-list {
-    gap: 10px !important;
 }
 
 .suggested-folder-option {
@@ -664,12 +600,6 @@ a.links_arbo_left.selected-note {
     font-size: 14px !important;
 }
 
-.folders-selection-list {
-    max-height: 200px !important;
-    font-size: 15px !important;
-    margin-bottom: 20px !important;
-    border-radius: 8px !important;
-}
 
 .folder-option {
     padding: 16px 14px !important;
@@ -693,51 +623,6 @@ a.links_arbo_left.selected-note {
 .folder-option .note-count {
     margin-left: 8px !important;
     font-size: 13px !important;
-}
-
-.create-folder-section {
-    margin-bottom: 20px !important;
-    padding-top: 15px !important;
-}
-
-.create-folder-section input {
-    font-size: 16px !important;
-    padding: 14px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    border-radius: 8px !important;
-    margin-bottom: 15px !important;
-}
-
-.create-folder-buttons {
-    flex-direction: column !important;
-    gap: 12px !important;
-}
-
-.create-folder-buttons button {
-    width: 100% !important;
-    padding: 14px !important;
-    font-size: 16px !important;
-    min-height: 50px !important;
-    border-radius: 8px !important;
-}
-
-.move-folder-modal .modal-buttons {
-    flex-direction: column !important;
-    gap: 12px !important;
-    margin-top: 20px !important;
-    padding-top: 20px !important;
-    border-top: 1px solid #e0e0e0 !important;
-}
-
-.move-folder-modal .modal-buttons button {
-    width: 100% !important;
-    padding: 16px !important;
-    font-size: 16px !important;
-    min-height: 52px !important;
-    margin: 0 !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
 }
 
 /* Modal error message styles for mobile */
@@ -850,32 +735,6 @@ a.links_arbo_left.selected-note {
     margin-top: 5px !important;
 }
 
-.toolbar-menu-btn {
-    display: block !important;
-    width: 100% !important;
-    padding: 12px 16px !important;
-    border: none !important;
-    background: transparent !important;
-    text-align: left !important;
-    cursor: pointer !important;
-    color: #333 !important;
-    font-size: 16px !important;
-    text-decoration: none !important;
-    transition: background-color 0.2s ease !important;
-    box-sizing: border-box !important;
-}
-
-.toolbar-menu-btn:hover {
-    background: #f5f5f5 !important;
-    color: #007DB8 !important;
-}
-
-.toolbar-menu-btn i {
-    width: 24px !important;
-    margin-right: 12px !important;
-    text-align: center !important;
-}
-
 .btn-settings {
     min-width: 40px !important;
     min-height: 40px !important;
@@ -931,24 +790,16 @@ a.links_arbo_left.selected-note {
     opacity: 1;
 }
 
-/* When clear button is present on mobile, add more padding */
 .searchbar-input-wrapper.has-clear-button .searchbar-input {
     padding-right: 50px !important;
 }
 
-/* Mobile clear button positioning */
 .searchbar-clear {
     right: 15px !important;
     height: 32px !important;
     width: 32px !important;
 }
 
-/* Legacy search-type-buttons - hide for new design */
-.search-type-buttons {
-    display: none;
-}
-
-/* New modern search options for mobile */
 .search-options-container.mobile {
     margin-top: 8px;
     padding: 0;
@@ -1323,5 +1174,100 @@ input[type="search"]::-webkit-search-results-decoration {
     /* Settings section spacing */
     .settings-section {
         margin-bottom: 30px !important;
+    }
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+    
+    /* Mobile search container */
+    .mobile-search-container {
+        padding: 0 15px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .mobile-search-container .unified-search-container {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .mobile-search-container .search-options-container {
+        margin-top: 12px;
+    }
+    
+    .mobile-search-container .search-type-pills {
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    /* Styles spécifiques pour les filtres en mobile - force l'apparence comme desktop */
+    .mobile-search-container .search-pill.active,
+    .mobile .search-pill.active {
+        background: #f8f9fa !important;
+        border-color: #007DB8 !important;
+        color: #007DB8 !important;
+        box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
+        opacity: 1 !important;
+    }
+
+    .mobile-search-container .search-pill.active:hover,
+    .mobile .search-pill.active:hover {
+        background: #e9ecef !important;
+        border-color: #007DB8 !important;
+        color: #007DB8 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
+    }
+
+    .mobile-search-container .search-pill.active:active,
+    .mobile .search-pill.active:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
+    }
+}
+
+/* Styles pour les écrans petits/moyens (ordinateurs portables inclus) */
+@media (max-width: 1024px) {
+    /* Assure-toi que les filtres desktop sont centrés même sur les petits écrans */
+    .contains_forms_search {
+        padding: 0 15px;
+    }
+    
+    .unified-search-container {
+        max-width: 90%;
+    }
+    
+    .search-options-container {
+        margin-top: 10px;
+    }
+    
+    .search-type-pills {
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .search-pill {
+        font-size: 0.75em;
+        padding: 3px 8px;
+        min-height: 26px;
+    }
+}
+
+/* Styles pour les très petits écrans */
+@media (max-width: 480px) {
+    .unified-search-container {
+        max-width: 100%;
+    }
+    
+    .search-pill {
+        font-size: 0.7em;
+        padding: 2px 6px;
+        min-height: 24px;
+    }
+    
+    .search-pill span {
+        font-size: 0.75em;
     }
 }

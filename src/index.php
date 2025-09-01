@@ -15,8 +15,7 @@ require_once 'default_folder_settings.php';
 // Mobile detection by user agent (must be done BEFORE any output and never redefined)
 $is_mobile = false;
 if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', $user_agent) ? true : false;
+    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
 }
 
 include 'functions.php';
@@ -47,38 +46,10 @@ if (!isset($labels) || !is_array($labels)) {
 // Determine workspace filter (client may pass workspace param). Default workspace is 'Poznote'.
 $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 
-// Debug log for workspace
-error_log("DEBUG: Received workspace = '$workspace_filter', GET=" . ($_GET['workspace'] ?? 'null') . ", POST=" . ($_POST['workspace'] ?? 'null'));
-
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
-
-// Column verification (only on application startup)
-// In SQLite, we use PRAGMA table_info to check columns
-$stmt = $con->query("PRAGMA table_info(entries)");
-$columns = [];
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $columns[] = $row['name'];
-}
-
-if (!in_array('folder', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN folder varchar(255) DEFAULT '$defaultFolderName'");
-}
-
-if (!in_array('favorite', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN favorite INTEGER DEFAULT 0");
-}
-
-if (!in_array('attachments', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN attachments TEXT DEFAULT NULL");
-}
-
-// Add workspace column if missing (default to 'Poznote')
-if (!in_array('workspace', $columns)) {
-    $con->query("ALTER TABLE entries ADD COLUMN workspace TEXT DEFAULT 'Poznote'");
-}
 
 $search = $_POST['search'] ?? $_GET['search'] ?? '';
 $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
@@ -90,16 +61,6 @@ if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
     if (!is_array($excluded_folders)) {
         $excluded_folders = [];
     }
-    // Debug: uncomment to see what folders are being excluded
-    // if (!empty($excluded_folders)) {
-    //     error_log("Excluded folders: " . print_r($excluded_folders, true));
-    // }
-    // if (!empty($_POST)) {
-    //     error_log("POST search: " . $search . ", tags_search: " . $tags_search);
-    //     error_log("POST unified_search: " . ($_POST['unified_search'] ?? 'empty'));
-    //     error_log("POST search_in_notes: " . ($_POST['search_in_notes'] ?? 'empty'));
-    //     error_log("POST search_in_tags: " . ($_POST['search_in_tags'] ?? 'empty'));
-    // }
 }
 
 // Handle search type preservation when clearing search
@@ -116,9 +77,6 @@ if (!empty($_POST['unified_search'])) {
     $search_in_tags = isset($_POST['search_in_tags']) && $_POST['search_in_tags'] !== '';
     
     $using_unified_search = true;
-    
-    // Debug output (remove in production)
-    // Debugging removed - search working correctly
     
     // Only proceed if at least one option is selected
     if ($search_in_notes || $search_in_tags) {
@@ -217,72 +175,40 @@ $folder_filter = $_GET['folder'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <?php $__poznote_css_mtime = @filemtime(__DIR__ . '/css/index.css') ?: time(); ?>
+    <?php $__poznote_modal_css_mtime = @filemtime(__DIR__ . '/css/modal.css') ?: time(); ?>
     <?php $__poznote_css_mobile_mtime = @filemtime(__DIR__ . '/css/index-mobile.css') ?: time(); ?>
     <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $__poznote_css_mtime; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal.css?v=<?php echo $__poznote_modal_css_mtime; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $__poznote_css_mobile_mtime; ?>" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/font-awesome.css" />
+    <?php $__poznote_index_inline_css_mtime = @filemtime(__DIR__ . '/css/index-inline.css') ?: time(); ?>
+    <link rel="stylesheet" href="css/index-inline.css?v=<?php echo $__poznote_index_inline_css_mtime; ?>" />
     <?php $__poznote_toolbar_js_mtime = @filemtime(__DIR__ . '/js/toolbar.js') ?: time(); ?>
     <script src="js/toolbar.js?v=<?php echo $__poznote_toolbar_js_mtime; ?>"></script>
     <?php $__poznote_note_loader_js_mtime = @filemtime(__DIR__ . '/js/note-loader.js') ?: time(); ?>
     <script src="js/note-loader.js?v=<?php echo $__poznote_note_loader_js_mtime; ?>"></script>
-    <style>
-    /* Minimal workspace link styling (displayed next to header logo) */
-    .left-header .workspace-link {
-        display: inline-block;
-        margin-left: 8px;
-        font-size: 1.5rem;
-        color: #007DB8;
-        text-decoration: none;
-        font-weight: 600;
-    }
-    </style>
+    <?php $__poznote_login_prompt_js_mtime = @filemtime(__DIR__ . '/js/index-login-prompt.js') ?: time(); ?>
+    <script src="js/index-login-prompt.js?v=<?php echo $__poznote_login_prompt_js_mtime; ?>"></script>
+    <?php $__poznote_workspace_display_js_mtime = @filemtime(__DIR__ . '/js/index-workspace-display.js') ?: time(); ?>
+    <script src="js/index-workspace-display.js?v=<?php echo $__poznote_workspace_display_js_mtime; ?>"></script>
 </head>
 
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
 
     <div class="main-container">
     <script>
-    // Ensure the prompt function exists in case external JS hasn't loaded yet
-    if (typeof window.showLoginDisplayNamePrompt !== 'function') {
-        window.showLoginDisplayNamePrompt = function(){
-            var val = prompt('Login display name (blank to clear):');
-            if (val === null) return;
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api_settings.php');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function(){ try { var resp = JSON.parse(xhr.responseText); if (resp && resp.success) alert('Saved'); else alert('Error'); } catch(e){ alert('Error'); } };
-            xhr.send('action=set&key=login_display_name&value=' + encodeURIComponent(val));
-        };
-    }
-    </script>
-    <script>
-    (function(){
-        try {
-            var params = new URLSearchParams(window.location.search);
-            if (!params.has('workspace')) {
-                var stored = null;
-                try { stored = localStorage.getItem('poznote_selected_workspace'); } catch(e) {}
-                if (stored) {
-                    var workspaceDisplayMap = <?php
-                        $display_map = [];
-                        foreach ($workspaces as $w) {
-                            if (isset($labels[$w]) && $labels[$w] !== '') {
-                                $display_map[$w] = $labels[$w];
-                            } else {
-                                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
-                            }
-                        }
-                        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-                    ?>;
-                    var left = document.querySelector('.left-header-text');
-                    if (left) {
-                        if (workspaceDisplayMap[stored]) left.textContent = workspaceDisplayMap[stored];
-                        else left.textContent = stored;
-                    }
-                }
+    // Set workspace display map for JavaScript
+    window.workspaceDisplayMap = <?php
+        $display_map = [];
+        foreach ($workspaces as $w) {
+            if (isset($labels[$w]) && $labels[$w] !== '') {
+                $display_map[$w] = $labels[$w];
+            } else {
+                $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
             }
-        } catch(e) {}
-    })();
+        }
+        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+    ?>;
     </script>
 
     <!-- workspace selector removed (now shown under left header) -->
@@ -309,14 +235,14 @@ $folder_filter = $_GET['folder'] ?? '';
         <div class="modal-content">
             <h3>Checking for Updates...</h3>
             <p id="updateCheckStatus">Please wait while we check for updates...</p>
-            <div class="modal-buttons" id="updateCheckButtons" style="display: none;">
+            <div class="modal-buttons" id="updateCheckButtons">
                 <button type="button" class="btn-cancel" onclick="closeUpdateCheckModal()">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Login Display Name Modal -->
-    <div id="loginDisplayModal" class="modal" style="display:none;">
+    <div id="loginDisplayModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeLoginDisplayModal()">&times;</span>
             <h3>Login display name</h3>
@@ -406,7 +332,7 @@ $folder_filter = $_GET['folder'] ?? '';
             </div>
             
             <!-- Error message display -->
-            <div id="moveFolderErrorMessage" class="modal-error-message" style="display: none;">
+            <div id="moveFolderErrorMessage" class="modal-error-message">
                 Please enter a folder name
             </div>
         </div>
@@ -457,7 +383,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="upload-button-container">
                     <button onclick="uploadAttachment()">Upload File</button>
                 </div>
-                <div id="attachmentErrorMessage" class="modal-error-message" style="display: none;"></div>
+                <div id="attachmentErrorMessage" class="modal-error-message"></div>
             </div>
             <div id="attachmentsList" class="attachments-list">
                 <!-- Attachments will be loaded here -->
@@ -485,7 +411,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
                 <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')">Cancel</button>
             </div>
-            <div id="moveFilesErrorMessage" class="modal-error-message" style="display: none;"></div>
+            <div id="moveFilesErrorMessage" class="modal-error-message"></div>
         </div>
     </div>
     
@@ -495,7 +421,7 @@ $folder_filter = $_GET['folder'] ?? '';
         <!-- Mobile menu -->
         <?php if ($is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text">
             <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
         </span>
     </div>
@@ -544,7 +470,7 @@ $folder_filter = $_GET['folder'] ?? '';
                     <div class="settings-menu-item" id="update-check-item-mobile" onclick="checkForUpdates();">
                         <i id="update-icon-mobile" class="fas fa-sync-alt"></i>
                         <span>Check for Updates</span>
-                        <small id="update-status-mobile" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
+                        <small id="update-status-mobile"></small>
                     </div>
                     <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                         <i class="fas fa-code-branch"></i>
@@ -598,8 +524,8 @@ $folder_filter = $_GET['folder'] ?? '';
                     <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                     <input type="hidden" id="search-tags-hidden-mobile" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
                     <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-in-notes-mobile" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes'])) || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
-                    <input type="hidden" id="search-in-tags-mobile" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags'])) || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
+                    <input type="hidden" id="search-in-notes-mobile" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
+                    <input type="hidden" id="search-in-tags-mobile" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
                     <input type="hidden" id="search-in-folders-mobile" name="search_in_folders" value="">
                 </div>
             </form>
@@ -703,10 +629,6 @@ $folder_filter = $_GET['folder'] ?? '';
     
     $where_clause = implode(" AND ", $where_conditions);
     
-    // Debug: uncomment to see the final query and parameters
-    // error_log("Where clause: " . $where_clause);
-    // error_log("Search params: " . print_r($search_params, true));
-    
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
@@ -716,7 +638,7 @@ $folder_filter = $_GET['folder'] ?? '';
 
     <?php if (!$is_mobile): ?>
     <div class="left-header">
-        <span class="left-header-text" style="text-decoration: none; color: #007DB8;">
+        <span class="left-header-text">
             <span id="workspaceNameDesktop"><?php echo $displayWorkspace; ?></span>
         </span>
     </div>
@@ -766,7 +688,7 @@ $folder_filter = $_GET['folder'] ?? '';
                 <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
                     <i id="update-icon-desktop" class="fas fa-sync-alt"></i>
                     <span>Check for Updates</span>
-                    <small id="update-status" style="display: none; color: #666; font-size: 0.8em; margin-top: 2px;"></small>
+                    <small id="update-status"></small>
                 </div>
                 <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <i class="fas fa-code-branch"></i>
@@ -826,8 +748,8 @@ $folder_filter = $_GET['folder'] ?? '';
                 <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes'])) || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
-                <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags'])) || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search)) ? '1' : ''); ?>">
+                <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
+                <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
                 <input type="hidden" id="search-in-folders" name="search_in_folders" value="">
             </div>
         </form>
@@ -835,19 +757,18 @@ $folder_filter = $_GET['folder'] ?? '';
     <?php endif; ?>
         
     <script>
-        // Configuration variables for the main page
-        isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
-        currentNoteFolder = <?php 
-            if ($note != '' && empty($search) && empty($tags_search)) {
-                echo json_encode($current_note_folder ?? $defaultFolderName);
-            } else if ($default_note_folder && empty($search) && empty($tags_search)) {
-                echo json_encode($default_note_folder);
-            } else {
-                echo 'null';
-            }
-        ?>;
-    // selected workspace for client-side actions
-    selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+    // Set configuration variables for the main page
+    window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
+    window.currentNoteFolder = <?php 
+        if ($note != '' && empty($search) && empty($tags_search)) {
+            echo json_encode($current_note_folder ?? $defaultFolderName);
+        } else if ($default_note_folder && empty($search) && empty($tags_search)) {
+            echo json_encode($default_note_folder);
+        } else {
+            echo 'null';
+        }
+    ?>;
+    window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
     </script>
                     
     <?php
@@ -1434,10 +1355,10 @@ $folder_filter = $_GET['folder'] ?? '';
                     <i class="fas fa-robot rotating"></i>
                     <p>Generating summary...</p>
                 </div>
-                <div id="aiSummaryContent" style="display: none;">
+                <div id="aiSummaryContent">
                     <div id="summaryText" class="summary-text-simple"></div>
                 </div>
-                <div id="aiSummaryError" style="display: none;">
+                <div id="aiSummaryError">
                     <div class="error-content">
                         <i class="fas fa-exclamation-triangle"></i>
                         <p id="errorMessage"></p>

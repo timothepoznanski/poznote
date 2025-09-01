@@ -1,0 +1,56 @@
+/* Minimal workspace link styling (displayed next to header logo) */
+.left-header .workspace-link {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 1.5rem;
+    color: #007DB8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Modal and UI element default states */
+#updateCheckButtons {
+    display: none;
+}
+
+#loginDisplayModal {
+    display: none;
+}
+
+#moveFolderErrorMessage {
+    display: none;
+}
+
+#attachmentErrorMessage {
+    display: none;
+}
+
+#moveFilesErrorMessage {
+    display: none;
+}
+
+#aiSummaryContent {
+    display: none;
+}
+
+#aiSummaryError {
+    display: none;
+}
+
+/* Header text styling */
+.left-header-text {
+    text-decoration: none;
+    color: #007DB8;
+}
+
+/* Update status styling */
+#update-status-mobile,
+#update-status {
+    display: none;
+    color: #666;
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+/* Note: .folder-content elements have dynamic inline styles (display: block/none)
+   controlled by PHP based on folder state. These cannot be moved to CSS. */
