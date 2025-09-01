@@ -1,7 +1,7 @@
 <?php
 /**
- * Template pour le menu desktop de index.php  
- * Variables attendues: $is_mobile, $displayWorkspace, $workspace_filter, $search, $tags_search
+ * Template for the desktop menu of index.php  
+ * Expected variables: $is_mobile, $displayWorkspace, $workspace_filter, $search, $tags_search
  */
 ?>
 

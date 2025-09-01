@@ -1,7 +1,7 @@
 <?php
 /**
- * Template pour la liste des notes (colonne gauche) de index.php
- * Variables attendues: $folders, $is_search_mode, $folder_filter, $workspace_filter, etc.
+ * Template for the notes list (left column) of index.php
+ * Expected variables: $folders, $is_search_mode, $folder_filter, $workspace_filter, etc.
  */
 ?>
 
