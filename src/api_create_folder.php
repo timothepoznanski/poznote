@@ -1,6 +1,13 @@
 <?php
 require 'auth.php';
-requireApiAuth();
+
+// Vérification simple de la session pour les appels AJAX
+if (!isAuthenticated()) {
+    http_response_code(401);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Authentication required']);
+    exit;
+}
 
 header('Content-Type: application/json');
 require_once 'config.php';
@@ -51,65 +58,41 @@ foreach ($forbidden_chars as $char) {
 
 try {
     // Check if folder already exists
-    // Optional workspace
-    $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
+    $workspace = isset($data['workspace']) ? trim($data['workspace']) : 'Poznote';
 
-    if ($workspace) {
-        $checkStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $checkStmt->execute([$folder_name, $workspace, $workspace]);
-        $count = $checkStmt->fetchColumn();
-    } else {
-        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-        $stmt->execute([$folder_name]);
-        $count = $stmt->fetchColumn();
-    }
+    $checkStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ?");
+    $checkStmt->execute([$folder_name, $workspace]);
+    $count = $checkStmt->fetchColumn();
     
     if ($count > 0) {
         http_response_code(409);
-        echo json_encode(['error' => 'Folder already exists']);
+        echo json_encode(['success' => false, 'error' => 'Folder already exists', 'folder_name' => $folder_name, 'workspace' => $workspace]);
         exit;
     }
     
     // Create folder in database
-    if ($workspace) {
-        $stmt = $con->prepare("INSERT INTO folders (name, workspace, created) VALUES (?, ?, datetime('now'))");
-        $stmt->execute([$folder_name, $workspace]);
-    } else {
-        $stmt = $con->prepare("INSERT INTO folders (name, created) VALUES (?, datetime('now'))");
-        $stmt->execute([$folder_name]);
+    $stmt = $con->prepare("INSERT INTO folders (name, workspace, created) VALUES (?, ?, datetime('now'))");
+    $result = $stmt->execute([$folder_name, $workspace]);
+    
+    if (!$result) {
+        echo json_encode(['success' => false, 'error' => 'Failed to insert folder']);
+        exit;
     }
     
     $folder_id = $con->lastInsertId();
     
-    // Create physical folder
-    // Store physical folders under workspace-specific path to avoid collisions
-    $wsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
-    $folder_path = __DIR__ . '/entries/' . $wsSegment . '/' . $folder_name;
-    if (!file_exists($folder_path)) {
-        if (!mkdir($folder_path, 0755, true)) {
-            // Database rollback if folder creation fails
-            $stmt = $con->prepare("DELETE FROM folders WHERE id = ?");
-            $stmt->execute([$folder_id]);
-            
-            http_response_code(500);
-            echo json_encode(['error' => 'Failed to create folder directory']);
-            exit;
-        }
-    }
-    
-    http_response_code(201);
     echo json_encode([
         'success' => true,
         'message' => 'Folder created successfully',
         'folder' => [
             'id' => $folder_id,
             'name' => $folder_name,
-            'path' => $folder_path
+            'workspace' => $workspace
         ]
     ]);
     
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
 }
 ?>

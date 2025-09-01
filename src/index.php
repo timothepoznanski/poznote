@@ -550,7 +550,17 @@ $res_right = $note_data['res_right'];
     
 </body>
 <script src="js/index-config.js"></script>
-<script src="js/script.js"></script>
+<!-- Modules refactorisés de script.js -->
+<script src="js/globals.js"></script>
+<script src="js/workspaces.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/attachments.js"></script>
+<script src="js/events.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/search-highlight.js"></script>
+<script src="js/toolbar.js"></script>
+<script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js"></script>

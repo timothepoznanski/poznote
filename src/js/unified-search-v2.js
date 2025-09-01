@@ -305,7 +305,7 @@ class UnifiedSearchManager {
 
         reinitTasks.forEach(task => {
             try { task(); } catch (error) {
-                console.warn('Erreur lors de la réinitialisation:', error);
+                console.warn('Reset error:', error);
             }
         });
         

@@ -176,7 +176,17 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 		</div>
 	</div>
 	
-	<script src="js/script.js"></script>
+	<!-- Modules refactorisés de script.js -->
+	<script src="js/globals.js"></script>
+	<script src="js/workspaces.js"></script>
+	<script src="js/notes.js"></script>
+	<script src="js/ui.js"></script>
+	<script src="js/attachments.js"></script>
+	<script src="js/events.js"></script>
+	<script src="js/utils.js"></script>
+	<script src="js/search-highlight.js"></script>
+	<script src="js/toolbar.js"></script>
+	<script src="js/main.js"></script>
 	<script src="js/trash.js"></script>
 	<script>
 		var pageWorkspace = <?php echo $pageWorkspace ? json_encode($pageWorkspace) : 'undefined'; ?>;
