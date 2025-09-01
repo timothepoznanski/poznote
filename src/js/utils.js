@@ -1229,3 +1229,18 @@ function executeFolderAction() {
         showNotificationPopup('Error moving note: ' + error, 'error');
     });
 }
+
+// Function to download a file
+function downloadFile(url, filename) {
+    // Ensure the filename has .html extension
+    if (filename && !filename.toLowerCase().endsWith('.html') && !filename.toLowerCase().endsWith('.htm')) {
+        filename = filename + '.html';
+    }
+    
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
