@@ -71,15 +71,21 @@ function loadDefaultFolderSettings() {
 function toggleWorkspaceMenu(event) {
     event.stopPropagation();
     
-    var isMobile = window.innerWidth <= 768;
-    var menuId = isMobile ? 'workspaceMenuMobile' : 'workspaceMenu';
-    var menu = document.getElementById(menuId);
+    // Try both mobile and desktop menus to ensure it works
+    var mobileMenu = document.getElementById('workspaceMenuMobile');
+    var desktopMenu = document.getElementById('workspaceMenu');
     
-    if (!menu) return;
+    // Use a more flexible mobile detection
+    var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var preferredMenu = isMobile ? mobileMenu : desktopMenu;
+    var menu = preferredMenu || mobileMenu || desktopMenu;
+    
+    if (!menu) {
+        return;
+    }
     
     // Close the other menu if it exists
-    var otherMenuId = isMobile ? 'workspaceMenu' : 'workspaceMenuMobile';
-    var otherMenu = document.getElementById(otherMenuId);
+    var otherMenu = (menu === mobileMenu) ? desktopMenu : mobileMenu;
     if (otherMenu) {
         otherMenu.style.display = 'none';
     }
