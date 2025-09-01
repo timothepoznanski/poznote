@@ -393,13 +393,24 @@ function initializeSearchButtonsWithState(isMobile, forcedState) {
         finalTagsActive = currentTagsActive;
         finalFoldersActive = currentFoldersActive;
     } else {
-        // Normal priority logic: notes > tags > folders
-        if (hasNotesPreference) {
+        // Normal priority logic: respect the exact preferences without automatic priority
+        if (hasNotesPreference && !hasTagsPreference && !hasFoldersPreference) {
             finalNotesActive = true;
-        } else if (hasTagsPreference) {
+        } else if (hasTagsPreference && !hasNotesPreference && !hasFoldersPreference) {
             finalTagsActive = true;
-        } else if (hasFoldersPreference) {
+        } else if (hasFoldersPreference && !hasNotesPreference && !hasTagsPreference) {
             finalFoldersActive = true;
+        } else if (hasNotesPreference && hasTagsPreference) {
+            // If both notes and tags are preferred, check URL parameters to decide
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('preserve_tags') === '1') {
+                finalTagsActive = true;
+            } else if (urlParams.get('preserve_notes') === '1') {
+                finalNotesActive = true;
+            } else {
+                // Default to notes only if no clear preference from URL
+                finalNotesActive = true;
+            }
         } else {
             // Default: activate notes
             finalNotesActive = true;
@@ -1044,13 +1055,43 @@ function ensureAtLeastOneButtonActive() {
                          foldersBtn.classList.contains('active');
         
         if (!hasActive) {
-            setActiveStyle(notesBtn);
-            setInactiveStyle(tagsBtn);
-            setInactiveStyle(foldersBtn);
-            updateSearchPlaceholder(false);
-            if (notesHidden) notesHidden.value = '1';
-            if (tagsHidden) tagsHidden.value = '';
-            if (foldersHidden) foldersHidden.value = '';
+            // Check URL parameters to see if we should preserve a specific search type
+            const urlParams = new URLSearchParams(window.location.search);
+            const preserveNotes = urlParams.get('preserve_notes') === '1';
+            const preserveTags = urlParams.get('preserve_tags') === '1';
+            const preserveFolders = urlParams.get('preserve_folders') === '1';
+            
+            // Also check hidden field values to see what should be active
+            const hasNotesPreference = notesHidden && notesHidden.value === '1';
+            const hasTagsPreference = tagsHidden && tagsHidden.value === '1';
+            const hasFoldersPreference = foldersHidden && foldersHidden.value === '1';
+            
+            if (preserveTags || hasTagsPreference) {
+                setActiveStyle(tagsBtn);
+                setInactiveStyle(notesBtn);
+                setInactiveStyle(foldersBtn);
+                updateSearchPlaceholder(false);
+                if (notesHidden) notesHidden.value = '';
+                if (tagsHidden) tagsHidden.value = '1';
+                if (foldersHidden) foldersHidden.value = '';
+            } else if (preserveFolders || hasFoldersPreference) {
+                setActiveStyle(foldersBtn);
+                setInactiveStyle(notesBtn);
+                setInactiveStyle(tagsBtn);
+                updateSearchPlaceholder(false);
+                if (notesHidden) notesHidden.value = '';
+                if (tagsHidden) tagsHidden.value = '';
+                if (foldersHidden) foldersHidden.value = '1';
+            } else {
+                // Default to notes only if no specific preservation requested
+                setActiveStyle(notesBtn);
+                setInactiveStyle(tagsBtn);
+                setInactiveStyle(foldersBtn);
+                updateSearchPlaceholder(false);
+                if (notesHidden) notesHidden.value = '1';
+                if (tagsHidden) tagsHidden.value = '';
+                if (foldersHidden) foldersHidden.value = '';
+            }
         }
     }
     
@@ -1068,13 +1109,43 @@ function ensureAtLeastOneButtonActive() {
                                foldersBtnMobile.classList.contains('active');
         
         if (!hasMobileActive) {
-            setActiveStyle(notesBtnMobile);
-            setInactiveStyle(tagsBtnMobile);
-            setInactiveStyle(foldersBtnMobile);
-            updateSearchPlaceholder(true);
-            if (notesHiddenMobile) notesHiddenMobile.value = '1';
-            if (tagsHiddenMobile) tagsHiddenMobile.value = '';
-            if (foldersHiddenMobile) foldersHiddenMobile.value = '';
+            // Check URL parameters to see if we should preserve a specific search type
+            const urlParams = new URLSearchParams(window.location.search);
+            const preserveNotes = urlParams.get('preserve_notes') === '1';
+            const preserveTags = urlParams.get('preserve_tags') === '1';
+            const preserveFolders = urlParams.get('preserve_folders') === '1';
+            
+            // Also check hidden field values to see what should be active
+            const hasNotesPreference = notesHiddenMobile && notesHiddenMobile.value === '1';
+            const hasTagsPreference = tagsHiddenMobile && tagsHiddenMobile.value === '1';
+            const hasFoldersPreference = foldersHiddenMobile && foldersHiddenMobile.value === '1';
+            
+            if (preserveTags || hasTagsPreference) {
+                setActiveStyle(tagsBtnMobile);
+                setInactiveStyle(notesBtnMobile);
+                setInactiveStyle(foldersBtnMobile);
+                updateSearchPlaceholder(true);
+                if (notesHiddenMobile) notesHiddenMobile.value = '';
+                if (tagsHiddenMobile) tagsHiddenMobile.value = '1';
+                if (foldersHiddenMobile) foldersHiddenMobile.value = '';
+            } else if (preserveFolders || hasFoldersPreference) {
+                setActiveStyle(foldersBtnMobile);
+                setInactiveStyle(notesBtnMobile);
+                setInactiveStyle(tagsBtnMobile);
+                updateSearchPlaceholder(true);
+                if (notesHiddenMobile) notesHiddenMobile.value = '';
+                if (tagsHiddenMobile) tagsHiddenMobile.value = '';
+                if (foldersHiddenMobile) foldersHiddenMobile.value = '1';
+            } else {
+                // Default to notes only if no specific preservation requested
+                setActiveStyle(notesBtnMobile);
+                setInactiveStyle(tagsBtnMobile);
+                setInactiveStyle(foldersBtnMobile);
+                updateSearchPlaceholder(true);
+                if (notesHiddenMobile) notesHiddenMobile.value = '1';
+                if (tagsHiddenMobile) tagsHiddenMobile.value = '';
+                if (foldersHiddenMobile) foldersHiddenMobile.value = '';
+            }
         }
     }
 }
