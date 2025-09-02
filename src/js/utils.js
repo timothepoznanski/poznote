@@ -447,7 +447,7 @@ function closeUpdateModal() {
 }
 
 function goToUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote#update', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-application', '_blank');
 }
 
 function showUpdateCheckModal() {
