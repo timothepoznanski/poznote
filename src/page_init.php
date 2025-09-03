@@ -43,6 +43,7 @@ function initializeSearchParams() {
     // Handle search type preservation when clearing search
     $preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
     $preserve_tags = isset($_GET['preserve_tags']) && $_GET['preserve_tags'] === '1';
+    $preserve_folders = isset($_GET['preserve_folders']) && $_GET['preserve_folders'] === '1';
     
     return [
         'search' => $search,
@@ -51,7 +52,8 @@ function initializeSearchParams() {
         'folder_filter' => $folder_filter,
         'workspace_filter' => $workspace_filter,
         'preserve_notes' => $preserve_notes,
-        'preserve_tags' => $preserve_tags
+        'preserve_tags' => $preserve_tags,
+        'preserve_folders' => $preserve_folders
     ];
 }
 

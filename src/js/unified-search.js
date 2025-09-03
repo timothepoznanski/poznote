@@ -491,7 +491,7 @@ class SearchManager {
             clearSearchHighlights();
         }
 
-        // Build URL preserving workspace and folder
+        // Build URL preserving workspace, folder, and search type
         const urlParams = new URLSearchParams(window.location.search);
         const newParams = new URLSearchParams();
         
@@ -503,6 +503,38 @@ class SearchManager {
         const currentFolder = urlParams.get('folder');
         if (currentFolder) {
             newParams.set('folder', currentFolder);
+        }
+
+        // Preserve the currently active search type
+        // Try to detect if we're in mobile mode first
+        const mobileContainer = document.querySelector('.unified-search-container.mobile');
+        const isMobile = mobileContainer && mobileContainer.offsetParent !== null;
+        
+        let activeSearchType = this.getActiveSearchType(isMobile);
+        
+        // If we couldn't determine the type from the current view, try the other view
+        if (activeSearchType === 'notes' && !isMobile) {
+            // Check if mobile view has an active type different from notes
+            const mobileActiveType = this.getActiveSearchType(true);
+            if (mobileActiveType !== 'notes') {
+                activeSearchType = mobileActiveType;
+            }
+        } else if (activeSearchType === 'notes' && isMobile) {
+            // Check if desktop view has an active type different from notes
+            const desktopActiveType = this.getActiveSearchType(false);
+            if (desktopActiveType !== 'notes') {
+                activeSearchType = desktopActiveType;
+            }
+        }
+        
+        // Set the appropriate preserve parameter based on active search type
+        if (activeSearchType === 'tags') {
+            newParams.set('preserve_tags', '1');
+        } else if (activeSearchType === 'folders') {
+            newParams.set('preserve_folders', '1');
+        } else {
+            // Default to notes or explicitly preserve notes
+            newParams.set('preserve_notes', '1');
         }
 
         const newUrl = 'index.php' + (newParams.toString() ? '?' + newParams.toString() : '');
