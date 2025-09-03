@@ -28,7 +28,18 @@ try {
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
-    header('Location: index.php');
+    // Redirect to index with JavaScript to include localStorage workspace
+    // Include minimal HTML to ensure proper execution
+    echo '<!DOCTYPE html><html><head>';
+    echo '<script>
+        var workspace = localStorage.getItem("poznote_selected_workspace");
+        if (workspace) {
+            window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    echo '</head><body>Redirecting...</body></html>';
     exit;
 }
 
@@ -37,7 +48,18 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
     if (authenticate($username, $password)) {
-        header('Location: index.php');
+        // Redirect to index with JavaScript to include localStorage workspace
+        // Include minimal HTML to ensure proper execution
+        echo '<!DOCTYPE html><html><head>';
+        echo '<script>
+            var workspace = localStorage.getItem("poznote_selected_workspace");
+            if (workspace) {
+                window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
+            } else {
+                window.location.href = "index.php";
+            }
+        </script>';
+        echo '</head><body>Redirecting...</body></html>';
         exit;
     } else {
         $error = 'Incorrect username or password.';
