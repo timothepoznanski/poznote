@@ -482,7 +482,51 @@ function toggleInlineCode() {
   const selectedText = sel.toString();
   if (!selectedText.trim()) return;
   
-  // Escape HTML and create inline code
+  // Check if we're dealing with a partial word with hyphens
+  if (selectedText.indexOf('-') === -1 && // No hyphens in selection
+      container.nodeType === 3 && // Text node
+      container.textContent.indexOf('-') !== -1) { // Parent contains hyphens
+    
+    // Get the current word including hyphens
+    const startPoint = range.startOffset;
+    const endPoint = range.endOffset;
+    const fullText = container.textContent;
+    
+    // Find word boundaries including hyphens
+    let wordStart = startPoint;
+    while (wordStart > 0 && /[\w\-]/.test(fullText.charAt(wordStart - 1))) {
+      wordStart--;
+    }
+    
+    let wordEnd = endPoint;
+    while (wordEnd < fullText.length && /[\w\-]/.test(fullText.charAt(wordEnd))) {
+      wordEnd++;
+    }
+    
+    // If we found a larger word with hyphens, adjust the selection
+    if (wordStart < startPoint || wordEnd > endPoint) {
+      const newRange = document.createRange();
+      newRange.setStart(container, wordStart);
+      newRange.setEnd(container, wordEnd);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      
+      // Get the new selected text
+      const newSelectedText = sel.toString();
+      
+      // Escape HTML and create inline code for the new selection
+      const escapedText = newSelectedText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      const codeHTML = `<code>${escapedText}</code>`;
+      document.execCommand('insertHTML', false, codeHTML);
+      return;
+    }
+  }
+  
+  // Escape HTML and create inline code for normal selections
   const escapedText = selectedText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
