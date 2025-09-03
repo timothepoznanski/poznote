@@ -45,7 +45,7 @@ function generateMenuItem($onclick, $icon, $text, $additional_info = '') {
 }
 
 // Generate unified search form
-function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter, $using_unified_search, $preserve_notes, $preserve_tags) {
+function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter, $using_unified_search, $preserve_notes, $preserve_tags, $preserve_folders = false) {
     $form_id = $is_mobile ? 'unified-search-form-mobile' : 'unified-search-form';
     $search_id = $is_mobile ? 'unified-search-mobile' : 'unified-search';
     $container_class = $is_mobile ? 'unified-search-container mobile' : 'unified-search-container';
@@ -75,8 +75,9 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
     </div>';
     
     // Hidden fields
-    $search_in_notes_value = ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : '');
+    $search_in_notes_value = ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags && !$preserve_folders) ? '1' : '');
     $search_in_tags_value = ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : '';
+    $search_in_folders_value = ($using_unified_search && !empty($_POST['search_in_folders']) && $_POST['search_in_folders'] === '1') || (!$using_unified_search && $preserve_folders) ? '1' : '';
     
     return '<form id="' . $form_id . '" action="index.php" method="POST">
         <div class="' . $container_class . '">
@@ -98,7 +99,7 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
             <input type="hidden" name="workspace" value="' . htmlspecialchars($workspace_filter, ENT_QUOTES) . '">
             <input type="hidden" id="search-in-notes' . $pills_suffix . '" name="search_in_notes" value="' . $search_in_notes_value . '">
             <input type="hidden" id="search-in-tags' . $pills_suffix . '" name="search_in_tags" value="' . $search_in_tags_value . '">
-            <input type="hidden" id="search-in-folders' . $pills_suffix . '" name="search_in_folders" value="">
+            <input type="hidden" id="search-in-folders' . $pills_suffix . '" name="search_in_folders" value="' . $search_in_folders_value . '">
         </div>
     </form>';
 }

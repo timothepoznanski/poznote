@@ -418,7 +418,8 @@ function checkForUpdates() {
         })
         .then(function(data) {
             if (data.error) {
-                showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error, 'error');
+                const versionInfo = data.current_version ? '\nCurrent version: ' + data.current_version : '';
+                showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error + versionInfo, 'error');
             } else if (data.has_updates) {
                 closeUpdateCheckModal();
                 showUpdateInstructions();
@@ -428,7 +429,22 @@ function checkForUpdates() {
         })
         .catch(function(error) {
             console.error('Failed to check for updates:', error);
-            showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message, 'error');
+            
+            // Try to get current version even when network fails
+            fetch('version.txt')
+                .then(function(response) {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Cannot read version file');
+                })
+                .then(function(version) {
+                    const currentVersion = version.trim();
+                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message + '\nCurrent version: ' + currentVersion, 'error');
+                })
+                .catch(function(versionError) {
+                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message, 'error');
+                });
         });
 }
 
