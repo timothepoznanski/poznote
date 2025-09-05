@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
 <link rel="stylesheet" href="css/font-awesome.css" />
 <link rel="stylesheet" href="css/index-inline.css" />
+<link rel="stylesheet" href="css/font-size-settings.css" />
 
 <!-- JavaScript Files -->
 <script src="js/toolbar.js"></script>
