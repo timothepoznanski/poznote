@@ -495,8 +495,25 @@ $res_right = $note_data['res_right'];
                 echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
                 // Title
                 echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
-                // Note content
-                echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true">'.$entryfinal.'</div>';
+                
+                // Get font size from settings based on device
+                $font_size = '16';
+                $is_mobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $_SERVER['HTTP_USER_AGENT']);
+                
+                try {
+                    $setting_key = $is_mobile ? 'note_font_size_mobile' : 'note_font_size_desktop';
+                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                    $stmt->execute([$setting_key]);
+                    $font_size_value = $stmt->fetchColumn();
+                    if ($font_size_value !== false) {
+                        $font_size = $font_size_value;
+                    }
+                } catch (Exception $e) {
+                    // Use default if error
+                }
+                
+                // Note content with font size style
+                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true">'.$entryfinal.'</div>';
                 echo '<div class="note-bottom-space"></div>';
                 echo '</div>';
                 echo '</div>';
@@ -564,6 +581,7 @@ $res_right = $note_data['res_right'];
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js"></script>
+<script src="js/font-size-settings.js"></script>
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>

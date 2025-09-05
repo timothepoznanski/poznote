@@ -46,6 +46,42 @@
     </div>
 </div>
 
+<!-- Font Size Settings Modal -->
+<div id="fontSizeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Note Font Size</h2>
+            <span class="close" id="closeFontSizeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Select the default font size for your notes:</p>
+            <div class="font-size-controls">
+                <div class="font-size-section">
+                    <h3>Desktop View</h3>
+                    <label for="fontSizeDesktopInput">Font size for desktop (px):</label>
+                    <input type="number" id="fontSizeDesktopInput" min="10" max="32" step="1" value="16">
+                    <div class="font-size-preview">
+                        <p id="fontSizeDesktopPreview">This is a preview text for desktop view</p>
+                    </div>
+                </div>
+
+                <div class="font-size-section">
+                    <h3>Mobile View</h3>
+                    <label for="fontSizeMobileInput">Font size for mobile (px):</label>
+                    <input type="number" id="fontSizeMobileInput" min="10" max="32" step="1" value="16">
+                    <div class="font-size-preview">
+                        <p id="fontSizeMobilePreview">This is a preview text for mobile view</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="saveFontSizeBtn">Save</button>
+            <button id="cancelFontSizeBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- Confirmation Modal -->
 <div id="confirmModal" class="modal">
     <div class="modal-content">

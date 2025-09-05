@@ -47,6 +47,10 @@
                 <i class="fas fa-user"></i>
                 <span>Login display name</span>
             </div>
+            <div class="settings-menu-item" onclick="showNoteFontSizePrompt();">
+                <i class="fas fa-text-height"></i>
+                <span>Note font size</span>
+            </div>
             <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
                 <i class="fas fa-upload"></i>
                 <span>Backup (Export)</span>
