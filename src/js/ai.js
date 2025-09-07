@@ -287,6 +287,17 @@ function autoGenerateTags(noteId) {
         return;
     }
     
+    // Get current workspace from localStorage
+    let workspaceParam = '';
+    try {
+        const stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored && stored !== 'Poznote') {
+            workspaceParam = '&workspace=' + encodeURIComponent(stored);
+        }
+    } catch(e) {
+        console.error('Error getting workspace from localStorage:', e);
+    }
+    
     // Redirect to the dedicated Auto Tags page
-    window.location.href = 'auto_tags.php?note_id=' + encodeURIComponent(noteId);
+    window.location.href = 'auto_tags.php?note_id=' + encodeURIComponent(noteId) + workspaceParam;
 }

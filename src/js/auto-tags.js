@@ -40,7 +40,8 @@ async function generateTags() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                note_id: noteId
+                note_id: noteId,
+                workspace: typeof noteWorkspace !== 'undefined' ? noteWorkspace : null
             })
         });
         
@@ -163,15 +164,20 @@ async function applyTags() {
             },
             body: JSON.stringify({
                 note_id: noteId,
-                tags: generatedTags
+                tags: generatedTags,
+                workspace: typeof noteWorkspace !== 'undefined' ? noteWorkspace : null
             })
         });
         
         const data = await response.json();
         
         if (response.ok && data.success) {
-            // Close the window immediately
-            window.location.href = 'index.php';
+            // Close the window and return to the correct workspace
+            let redirectUrl = 'index.php';
+            if (typeof noteWorkspace !== 'undefined' && noteWorkspace && noteWorkspace !== 'Poznote') {
+                redirectUrl += '?workspace=' + encodeURIComponent(noteWorkspace);
+            }
+            window.location.href = redirectUrl;
         } else {
             alert('Error applying tags: ' + (data.error || 'Unknown error'));
         }

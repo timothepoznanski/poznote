@@ -27,9 +27,10 @@ if (!isset($input['note_id']) || !is_numeric($input['note_id'])) {
 }
 
 $note_id = intval($input['note_id']);
+$workspace = $input['workspace'] ?? null;
 
 // Use AIHelper to generate tags
-$result = AIHelper::generateTags($note_id, $con);
+$result = AIHelper::generateTags($note_id, $con, $workspace);
 
 if (isset($result['error'])) {
     http_response_code(400);
