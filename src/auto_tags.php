@@ -99,8 +99,9 @@ try {
     </div>
     
     <script>
-        // Set the note ID as global variable for use by the external JavaScript
+        // Set the note ID and workspace as global variables for use by the external JavaScript
         var noteId = <?php echo json_encode($note_id); ?>;
+        var noteWorkspace = <?php echo json_encode($workspace); ?>;
     </script>
     <script src="js/auto-tags.js"></script>
     <script>
