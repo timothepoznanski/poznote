@@ -500,3 +500,31 @@
 .modal-footer .btn:hover {
     opacity: 0.9;
 }
+
+/* Workspace selector styles for move note modal */
+.workspace-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.workspace-select:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
+}
+
+#moveNoteFolderModal .form-group {
+    margin-bottom: 20px;
+}
+
+#moveNoteFolderModal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}

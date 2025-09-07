@@ -128,6 +128,15 @@
     <div class="modal-content">
         <span class="close" onclick="closeModal('moveNoteFolderModal')">&times;</span>
         <h3>Move Note to Folder</h3>
+        
+        <!-- Workspace selection -->
+        <div class="form-group">
+            <label for="workspaceSelect">Workspace:</label>
+            <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
+                <!-- Workspaces will be loaded here -->
+            </select>
+        </div>
+        
         <p>Search or enter a folder name:</p>
         
         <!-- Smart folder search/input -->
