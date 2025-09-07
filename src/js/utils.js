@@ -922,6 +922,59 @@ function showMoveFolderDialog(noteId) {
     // Get current folder of the note
     var currentFolder = document.getElementById('folder' + noteId).value;
     
+    // Load workspaces first
+    loadWorkspacesForMoveModal(function() {
+        // Load folders after workspaces are loaded
+        loadFoldersForMoveModal(currentFolder);
+    });
+}
+
+function loadWorkspacesForMoveModal(callback) {
+    fetch("api_workspaces.php?action=list", {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            var workspaceSelect = document.getElementById('workspaceSelect');
+            workspaceSelect.innerHTML = '';
+            
+            // Add current workspace as selected
+            var currentWorkspace = getSelectedWorkspace();
+            
+            // Add all workspaces
+            data.workspaces.forEach(function(workspace) {
+                var option = document.createElement('option');
+                option.value = workspace.name;
+                option.textContent = workspace.name;
+                if (workspace.name === currentWorkspace) {
+                    option.selected = true;
+                }
+                workspaceSelect.appendChild(option);
+            });
+            
+            // Add default workspace if not in list
+            if (!data.workspaces.find(function(w) { return w.name === 'Poznote'; })) {
+                var defaultOption = document.createElement('option');
+                defaultOption.value = 'Poznote';
+                defaultOption.textContent = 'Poznote';
+                if ('Poznote' === currentWorkspace) {
+                    defaultOption.selected = true;
+                }
+                workspaceSelect.appendChild(defaultOption);
+            }
+            
+            if (callback) callback();
+        }
+    })
+    .catch(function(error) {
+        console.error('Error loading workspaces:', error);
+        if (callback) callback();
+    });
+}
+
+function loadFoldersForMoveModal(currentFolder) {
     // Load folders
     var params = new URLSearchParams({
         action: 'list'
@@ -969,6 +1022,57 @@ function showMoveFolderDialog(noteId) {
     })
     .catch(function(error) {
         showNotificationPopup('Error loading folders: ' + error);
+    });
+}
+
+function onWorkspaceChange() {
+    // When workspace changes, reload folders for the new workspace
+    var selectedWorkspace = document.getElementById('workspaceSelect').value;
+    var currentFolder = null; // We don't exclude any folder when changing workspace
+    
+    // Clear the current folder search
+    var input = document.getElementById('folderSearchInput');
+    var dropdown = document.getElementById('folderDropdown');
+    
+    input.value = '';
+    dropdown.classList.remove('show');
+    dropdown.innerHTML = '';
+    
+    selectedFolderOption = null;
+    highlightedIndex = -1;
+    
+    updateMoveButton('');
+    hideMoveFolderError();
+    
+    // Load folders for the selected workspace
+    var params = new URLSearchParams({
+        action: 'list',
+        workspace: selectedWorkspace
+    });
+    
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            // Store all folders for the new workspace
+            allFolders = data.folders || [];
+            
+            // Clear and reload recent folders section for the new workspace
+            var recentFoldersList = document.getElementById('recentFoldersList');
+            var recentFoldersSection = document.getElementById('recentFoldersSection');
+            
+            // Get recent folders (this function should work across workspaces)
+            loadRecentFolders(currentFolder);
+            
+            console.log('Loaded ' + allFolders.length + ' folders for workspace: ' + selectedWorkspace);
+        }
+    })
+    .catch(function(error) {
+        console.error('Error loading folders for workspace:', error);
     });
 }
 
@@ -1211,11 +1315,13 @@ function executeFolderAction() {
     }
     
     var folderToMoveTo = selectedFolderOption || searchTerm;
+    var selectedWorkspace = document.getElementById('workspaceSelect').value;
     
     var params = new URLSearchParams({
         action: 'move_to',
         note_id: noteid,
-        folder: folderToMoveTo
+        folder: folderToMoveTo,
+        workspace: selectedWorkspace
     });
     
     fetch("folder_operations.php", {
@@ -1223,17 +1329,46 @@ function executeFolderAction() {
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
     })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data && data.success) {
-            // Add to recent folders
-            addToRecentFolders(folderToMoveTo);
-            try { closeModal('moveNoteFolderModal'); } catch(e) {}
-            try { closeModal('moveNoteModal'); } catch(e) {}
-            location.reload();
-        } else {
-            var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-            showNotificationPopup('Error: ' + err, 'error');
+    .then(function(response) { 
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        return response.text(); // Get text first to debug if needed
+    })
+    .then(function(text) {
+        try {
+            var data = JSON.parse(text);
+            if (data && data.success) {
+                // Add to recent folders
+                addToRecentFolders(folderToMoveTo);
+                
+                try { closeModal('moveNoteFolderModal'); } catch(e) {}
+                try { closeModal('moveNoteModal'); } catch(e) {}
+                
+                // If moved to different workspace, redirect to that workspace
+                if (data.old_workspace !== data.new_workspace) {
+                    // Update the global workspace variable and interface immediately
+                    selectedWorkspace = selectedWorkspace;
+                    updateWorkspaceNameInHeaders(selectedWorkspace);
+                    try { 
+                        localStorage.setItem('poznote_selected_workspace', selectedWorkspace); 
+                    } catch(e) {}
+                    
+                    setTimeout(function() {
+                        var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace);
+                        window.location.href = wsRedirect;
+                    }, 200);
+                } else {
+                    location.reload();
+                }
+            } else {
+                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+                showNotificationPopup('Error: ' + err, 'error');
+            }
+        } catch (parseError) {
+            console.error('JSON Parse Error:', parseError);
+            console.error('Response text:', text);
+            showNotificationPopup('Error: Invalid server response', 'error');
         }
     })
     .catch(function(error) {

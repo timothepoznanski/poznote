@@ -165,29 +165,73 @@ switch($action) {
         break;
         
     case 'move_to':
-        require_once 'default_folder_settings.php';
-        
-        $noteId = $_POST['note_id'] ?? '';
-    $targetFolder = $_POST['folder'] ?? $_POST['target_folder'] ?? getDefaultFolderForNewNotes($workspace);
-        
-        if (empty($noteId)) {
-            echo json_encode(['success' => false, 'error' => 'Note ID is required']);
-            exit;
-        }
-        
-        if ($workspace) {
-            $query = "UPDATE entries SET folder = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $stmt = $con->prepare($query);
-            $success = $stmt->execute([$targetFolder, $noteId, $workspace, $workspace]);
-        } else {
-            $query = "UPDATE entries SET folder = ? WHERE id = ?";
-            $stmt = $con->prepare($query);
-            $success = $stmt->execute([$targetFolder, $noteId]);
-        }
-        if ($success) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Database error']);
+        try {
+            require_once 'default_folder_settings.php';
+            
+            $noteId = $_POST['note_id'] ?? '';
+            $targetFolder = $_POST['folder'] ?? $_POST['target_folder'] ?? getDefaultFolderForNewNotes($workspace);
+            
+            if (empty($noteId)) {
+                echo json_encode(['success' => false, 'error' => 'Note ID is required']);
+                exit;
+            }
+            
+            // Get current note info to know what we're moving
+            $checkStmt = $con->prepare("SELECT id, folder, workspace FROM entries WHERE id = ?");
+            $checkStmt->execute([$noteId]);
+            $currentNote = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$currentNote) {
+                echo json_encode(['success' => false, 'error' => 'Note not found']);
+                exit;
+            }
+            
+            // If workspace is specified and folder is not default, ensure folder exists in destination workspace
+            if ($workspace && !isDefaultFolder($targetFolder, $workspace)) {
+                try {
+                    // Check if folder exists in destination workspace
+                    $folderCheckStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                    $folderCheckStmt->execute([$targetFolder, $workspace, $workspace]);
+                    $folderExists = $folderCheckStmt->fetchColumn() > 0;
+                    
+                    // If folder doesn't exist, create it in the destination workspace
+                    if (!$folderExists) {
+                        $createFolderStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
+                        $createFolderStmt->execute([$targetFolder, $workspace]);
+                    }
+                } catch (Exception $e) {
+                    // If folder creation fails, continue anyway - the folder might exist in entries
+                    error_log("Folder creation warning: " . $e->getMessage());
+                }
+            }
+            
+            // Update both folder and workspace
+            if ($workspace) {
+                $query = "UPDATE entries SET folder = ?, workspace = ?, updated = datetime('now') WHERE id = ?";
+                $stmt = $con->prepare($query);
+                $success = $stmt->execute([$targetFolder, $workspace, $noteId]);
+            } else {
+                // If no workspace specified, just update folder
+                $query = "UPDATE entries SET folder = ?, updated = datetime('now') WHERE id = ?";
+                $stmt = $con->prepare($query);
+                $success = $stmt->execute([$targetFolder, $noteId]);
+            }
+            
+            if ($success) {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Note moved successfully',
+                    'old_folder' => $currentNote['folder'],
+                    'new_folder' => $targetFolder,
+                    'old_workspace' => $currentNote['workspace'],
+                    'new_workspace' => $workspace
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Database error']);
+            }
+        } catch (Exception $e) {
+            error_log("Move note error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Internal server error: ' . $e->getMessage()]);
         }
         break;
         
