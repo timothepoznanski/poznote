@@ -47,6 +47,38 @@ function onWorkspaceChange() {
     
     // Reload the page with the new workspace
     var url = new URL(window.location.href);
+    
+    // Preserve current search type when switching workspace
+    var currentSearchType = 'notes'; // default
+    if (window.searchManager) {
+        // Try to get active search type from desktop first, then mobile
+        var desktopActiveType = window.searchManager.getActiveSearchType(false);
+        var mobileActiveType = window.searchManager.getActiveSearchType(true);
+        
+        // Use non-default type if available
+        if (desktopActiveType !== 'notes') {
+            currentSearchType = desktopActiveType;
+        } else if (mobileActiveType !== 'notes') {
+            currentSearchType = mobileActiveType;
+        } else {
+            currentSearchType = desktopActiveType; // fallback to desktop
+        }
+    }
+    
+    // Clear existing preserve parameters
+    url.searchParams.delete('preserve_notes');
+    url.searchParams.delete('preserve_tags');
+    url.searchParams.delete('preserve_folders');
+    
+    // Set appropriate preserve parameter based on current search type
+    if (currentSearchType === 'tags') {
+        url.searchParams.set('preserve_tags', '1');
+    } else if (currentSearchType === 'folders') {
+        url.searchParams.set('preserve_folders', '1');
+    } else {
+        url.searchParams.set('preserve_notes', '1');
+    }
+    
     url.searchParams.set('workspace', val);
     window.location.href = url.toString();
 }
@@ -181,8 +213,38 @@ function switchToWorkspace(workspaceName) {
     
     var url = new URL(window.location.href);
     url.searchParams.delete('note');
+    
+    // Preserve current search type when switching workspace
+    var currentSearchType = 'notes'; // default
+    if (window.searchManager) {
+        // Try to get active search type from desktop first, then mobile
+        var desktopActiveType = window.searchManager.getActiveSearchType(false);
+        var mobileActiveType = window.searchManager.getActiveSearchType(true);
+        
+        // Use non-default type if available
+        if (desktopActiveType !== 'notes') {
+            currentSearchType = desktopActiveType;
+        } else if (mobileActiveType !== 'notes') {
+            currentSearchType = mobileActiveType;
+        } else {
+            currentSearchType = desktopActiveType; // fallback to desktop
+        }
+    }
+    
+    // Clear existing preserve parameters
     url.searchParams.delete('preserve_notes');
     url.searchParams.delete('preserve_tags');
+    url.searchParams.delete('preserve_folders');
+    
+    // Set appropriate preserve parameter based on current search type
+    if (currentSearchType === 'tags') {
+        url.searchParams.set('preserve_tags', '1');
+    } else if (currentSearchType === 'folders') {
+        url.searchParams.set('preserve_folders', '1');
+    } else {
+        url.searchParams.set('preserve_notes', '1');
+    }
+    
     url.searchParams.set('workspace', workspaceName);
     
     history.pushState({workspace: workspaceName}, '', url.toString());
@@ -211,8 +273,9 @@ function updateWorkspaceNameInHeaders(workspaceName) {
 function refreshLeftColumnForWorkspace(workspaceName) {
     var url = new URL(window.location.href);
     url.searchParams.delete('note');
-    url.searchParams.delete('preserve_notes');
-    url.searchParams.delete('preserve_tags');
+    // Don't delete preserve parameters - they should be maintained
+    // url.searchParams.delete('preserve_notes');
+    // url.searchParams.delete('preserve_tags');
     url.searchParams.set('workspace', workspaceName);
     
     fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -225,6 +288,28 @@ function refreshLeftColumnForWorkspace(workspaceName) {
         
         if (newLeftCol && currentLeftCol) {
             currentLeftCol.innerHTML = newLeftCol.innerHTML;
+            
+            // Reinitialize components after workspace change
+            try {
+                // Reinitialize workspace menus
+                if (typeof initializeWorkspaceMenu === 'function') {
+                    initializeWorkspaceMenu();
+                }
+                
+                // Reinitialize search manager
+                if (window.searchManager) {
+                    window.searchManager.initializeSearch();
+                    // Ensure at least one button is active
+                    window.searchManager.ensureAtLeastOneButtonActive();
+                }
+                
+                // Reinitialize other components that might depend on left column content
+                if (typeof reinitializeClickableTagsAfterAjax === 'function') {
+                    reinitializeClickableTagsAfterAjax();
+                }
+            } catch (error) {
+                console.error('Error reinitializing after workspace change:', error);
+            }
         }
     })
     .catch(function(err) {

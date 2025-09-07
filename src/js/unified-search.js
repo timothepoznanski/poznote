@@ -682,6 +682,9 @@ let searchManager;
 document.addEventListener('DOMContentLoaded', function() {
     searchManager = new SearchManager();
     
+    // Make searchManager globally accessible
+    window.searchManager = searchManager;
+    
     // Handle browser back button
     window.addEventListener('popstate', function(event) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -726,3 +729,6 @@ window.reinitializeSearchAfterWorkspaceChange = function() {
         searchManager.initializeSearch();
     }
 };
+
+// Make searchManager globally accessible
+window.searchManager = searchManager;
