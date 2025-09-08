@@ -118,7 +118,7 @@ function createCompleteBackup() {
     global $con;
     $query = "SELECT id, heading, tags, folder, workspace, attachments FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
     $result = $con->query($query);
-    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { color: #dc3545; margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.tags { color: #6c757d; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
+    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.tags { color: #6c757d; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
     
     $currentWorkspace = '';
     $currentFolder = '';
@@ -223,19 +223,6 @@ function createCompleteBackup() {
         $zip->addFromString('attachments/poznote_attachments_metadata.json', $metadataContent);
     }
     
-    // Add README
-    $readmeContent = "Poznote Complete Backup\n";
-    $readmeContent .= "========================\n\n";
-    $readmeContent .= "This backup contains:\n";
-    $readmeContent .= "- database/poznote_backup.sql: Complete database dump\n";
-    $readmeContent .= "- entries/: All HTML note files\n";
-    $readmeContent .= "- attachments/: All attachment files\n";
-    $readmeContent .= "- attachments/poznote_attachments_metadata.json: Attachment metadata\n\n";
-    $readmeContent .= "Created on: " . date('Y-m-d H:i:s') . "\n";
-    $readmeContent .= "Poznote version: " . (file_exists('version.txt') ? trim(file_get_contents('version.txt')) : 'Unknown') . "\n";
-    
-    $zip->addFromString('README.txt', $readmeContent);
-    
     $zip->close();
     
     // Send file to browser
@@ -286,7 +273,12 @@ function createBackup() {
         <!-- Complete Backup Section -->
         <div class="backup-section">
             <h3><i class="fas fa-archive"></i> Complete Backup</h3>
-            <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.</p>
+            <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
+            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
+                <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li>
+                <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li>
+            </ul>
+            
             <form method="post">
                 <input type="hidden" name="action" value="complete_backup">
                 <button type="submit" class="btn btn-primary">
