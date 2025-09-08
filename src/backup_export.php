@@ -35,8 +35,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+function generateSQLDump() {
+    global $con;
+    
+    $sql = "-- Poznote Database Dump\n-- Generated on " . date('Y-m-d H:i:s') . "\n\n";
+    
+    // Get all table names
+    $tables = $con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+    $tableNames = [];
+    while ($row = $tables->fetch(PDO::FETCH_ASSOC)) {
+        $tableNames[] = $row['name'];
+    }
+    
+    foreach ($tableNames as $table) {
+        // Get CREATE TABLE statement
+        $createStmt = $con->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='{$table}'")->fetch(PDO::FETCH_ASSOC);
+        if ($createStmt && $createStmt['sql']) {
+            $sql .= $createStmt['sql'] . ";\n\n";
+        }
+        
+        // Get all data
+        $data = $con->query("SELECT * FROM \"{$table}\"");
+        while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
+            $columns = array_keys($row);
+            $values = array_map(function($value) use ($con) {
+                if ($value === null) {
+                    return 'NULL';
+                }
+                return $con->quote($value);
+            }, array_values($row));
+            
+            $sql .= "INSERT INTO \"{$table}\" (" . implode(', ', array_map(function($col) {
+                return "\"{$col}\"";
+            }, $columns)) . ") VALUES (" . implode(', ', $values) . ");\n";
+        }
+        $sql .= "\n";
+    }
+    
+    return $sql;
+}
+
 function createCompleteBackup() {
-    $dbPath = SQLITE_DATABASE;
     $tempDir = sys_get_temp_dir();
     $zipFileName = $tempDir . '/poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip';
     
@@ -46,12 +85,8 @@ function createCompleteBackup() {
     }
     
     // Add SQL dump
-    $command = "sqlite3 {$dbPath} .dump 2>&1";
-    $output = [];
-    exec($command, $output, $returnCode);
-    
-    if ($returnCode === 0) {
-        $sqlContent = implode("\n", $output);
+    $sqlContent = generateSQLDump();
+    if ($sqlContent) {
         $zip->addFromString('database/poznote_backup.sql', $sqlContent);
     } else {
         $zip->close();
@@ -78,6 +113,66 @@ function createCompleteBackup() {
             }
         }
     }
+    
+    // Generate index.html for entries
+    global $con;
+    $query = "SELECT id, heading, tags, folder, workspace, attachments FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
+    $result = $con->query($query);
+    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { color: #dc3545; margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.tags { color: #6c757d; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
+    
+    $currentWorkspace = '';
+    $currentFolder = '';
+    if ($result) {
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $workspace = htmlspecialchars($row['workspace'] ?: 'Poznote');
+            $folder = htmlspecialchars($row['folder'] ?: 'Default');
+            if ($currentWorkspace !== $workspace) {
+                if ($currentWorkspace !== '') {
+                    if ($currentFolder !== '') {
+                        $indexContent .= "</ul>\n";
+                    }
+                    $indexContent .= "</div>\n";
+                }
+                $indexContent .= "<h2>Workspace: {$workspace}</h2>\n<div>\n";
+                $currentWorkspace = $workspace;
+                $currentFolder = '';
+            }
+            if ($currentFolder !== $folder) {
+                if ($currentFolder !== '') {
+                    $indexContent .= "</ul>\n";
+                }
+                $indexContent .= "<h3>Folder: {$folder}</h3>\n<ul>\n";
+                $currentFolder = $folder;
+            }
+            $heading = htmlspecialchars($row['heading'] ?: 'Untitled');
+            $tags = json_decode($row['tags'], true);
+            $tagsStr = is_array($tags) ? implode(', ', array_map('htmlspecialchars', $tags)) : '';
+            $attachments = json_decode($row['attachments'], true);
+            $attachmentsStr = '';
+            if (is_array($attachments) && !empty($attachments)) {
+                $attachmentLinks = [];
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['filename'])) {
+                        $filename = htmlspecialchars($attachment['filename']);
+                        $attachmentLinks[] = "<a href='attachments/{$filename}' target='_blank'>{$filename}</a>";
+                    }
+                }
+                if (!empty($attachmentLinks)) {
+                    $attachmentsStr = ' <span class="attachments">(' . implode(', ', $attachmentLinks) . ')</span>';
+                }
+            }
+            $indexContent .= "<li><a href='entries/{$row['id']}.html'>{$heading}</a> <span class='tags'>{$tagsStr}</span>{$attachmentsStr}</li>\n";
+        }
+        if ($currentFolder !== '') {
+            $indexContent .= "</ul>\n";
+        }
+        if ($currentWorkspace !== '') {
+            $indexContent .= "</div>\n";
+        }
+    }
+    
+    $indexContent .= "</body>\n</html>";
+    $zip->addFromString('index.html', $indexContent);
     
     // Add attachments
     $attachmentsPath = getAttachmentsPath();
@@ -158,6 +253,10 @@ function createCompleteBackup() {
         unlink($zipFileName);
         return ['success' => false, 'error' => 'Failed to create backup file'];
     }
+}
+
+function createBackup() {
+    return createCompleteBackup();
 }
 ?>
 
