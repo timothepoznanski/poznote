@@ -70,7 +70,7 @@
             </div>
             <div class="settings-menu-item" onclick="window.open('https://poznote.com', '_blank');">
                 <i class="fas fa-globe"></i>
-                <span>Website</span>
+                <span>About</span>
             </div>
             <!-- Tim's projects removed from settings per request -->
             <div class="settings-menu-item" onclick="window.location = 'logout.php';">

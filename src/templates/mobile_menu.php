@@ -67,6 +67,10 @@
                 <i class="fas fa-code-branch"></i>
                 <span>GitHub Repository</span>
             </div>
+            <div class="settings-menu-item" onclick="window.open('https://poznote.com', '_blank');">
+                <i class="fas fa-globe"></i>
+                <span>About</span>
+            </div>
             <!-- Tim's projects removed from settings per request -->
             <div class="settings-menu-item" onclick="window.location = 'logout.php';">
                 <i class="fas fa-sign-out-alt"></i>

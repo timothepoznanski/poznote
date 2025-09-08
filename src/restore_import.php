@@ -645,7 +645,7 @@ function importAttachmentsZip($uploadedFile) {
                 </div>
                 
                 <button type="button" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
-                    <i class="fas fa-upload"></i> Complete Restore
+                    <span> Complete Restore
                 </button>
             </form>
             
