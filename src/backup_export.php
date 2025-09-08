@@ -278,30 +278,40 @@ function createBackup() {
 </head>
 <body>
     <div class="backup-container">
-        <h1>Backup (Export)</h1>
+        <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            Back to Notes
+            <i class="fas fa-arrow-left"></i> Back to Notes
         </a>
         <a href="restore_import.php" class="btn btn-secondary">
-            Go to Restore (Import)
+            <i class="fas fa-download"></i> Go to Restore (Import)
         </a>
 
-        <br><br>
+    <br><br>
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3>Complete Backup</h3>
+            <h3><i class="fas fa-archive"></i> Complete Backup</h3>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
             <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
-                <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li>
-                <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li>
+                <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li><br>
+                <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li><br>
             </ul>
             
             <form method="post">
                 <input type="hidden" name="action" value="complete_backup">
                 <button type="submit" class="btn btn-primary">
-                    Download Complete Backup (ZIP)
+                    <span>Download Complete Backup (ZIP)
                 </button>
             </form>
         </div>
