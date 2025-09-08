@@ -118,7 +118,8 @@ function createCompleteBackup() {
     global $con;
     $query = "SELECT id, heading, tags, folder, workspace, attachments FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
     $result = $con->query($query);
-    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.tags { color: #6c757d; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
+    // Generate a simple, icon-free index.html header
+    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
     
     $currentWorkspace = '';
     $currentFolder = '';
@@ -133,7 +134,8 @@ function createCompleteBackup() {
                     }
                     $indexContent .= "</div>\n";
                 }
-                $indexContent .= "<h2>Workspace: {$workspace}</h2>\n<div>\n";
+                // Workspace header (no icon)
+                $indexContent .= "<h2>{$workspace}</h2>\n<div>\n";
                 $currentWorkspace = $workspace;
                 $currentFolder = '';
             }
@@ -141,12 +143,21 @@ function createCompleteBackup() {
                 if ($currentFolder !== '') {
                     $indexContent .= "</ul>\n";
                 }
-                $indexContent .= "<h3>Folder: {$folder}</h3>\n<ul>\n";
+                // Folder header (no icon)
+                $indexContent .= "<h3>{$folder}</h3>\n<ul>\n";
                 $currentFolder = $folder;
             }
             $heading = htmlspecialchars($row['heading'] ?: 'Untitled');
-            $tags = json_decode($row['tags'], true);
-            $tagsStr = is_array($tags) ? implode(', ', array_map('htmlspecialchars', $tags)) : '';
+            $tags = $row['tags'];
+            $tagsStr = '';
+            if (!empty($tags)) {
+                // Tags are stored as comma-separated string, not JSON
+                $tagsArray = array_map('trim', explode(',', $tags));
+                $tagsArray = array_filter($tagsArray); // Remove empty tags
+                if (!empty($tagsArray)) {
+                    $tagsStr = implode(', ', array_map('htmlspecialchars', $tagsArray));
+                }
+            }
             $attachments = json_decode($row['attachments'], true);
             $attachmentsStr = '';
             if (is_array($attachments) && !empty($attachments)) {
@@ -157,11 +168,17 @@ function createCompleteBackup() {
                         $attachmentLinks[] = "<a href='attachments/{$filename}' target='_blank'>{$filename}</a>";
                     }
                 }
-                if (!empty($attachmentLinks)) {
-                    $attachmentsStr = ' <span class="attachments">(' . implode(', ', $attachmentLinks) . ')</span>';
-                }
+                    if (!empty($attachmentLinks)) {
+                        // Attachments list (no icon)
+                        $attachmentsStr = implode(', ', $attachmentLinks);
+                    }
             }
-            $indexContent .= "<li><a href='entries/{$row['id']}.html'>{$heading}</a> <span class='tags'>{$tagsStr}</span>{$attachmentsStr}</li>\n";
+            // Note line (no icons) — put dashes between title, tags and attachments when present
+            $parts = [];
+            $parts[] = "<a href='entries/{$row['id']}.html'>{$heading}</a>";
+            if (!empty($tagsStr)) { $parts[] = $tagsStr; }
+            if (!empty($attachmentsStr)) { $parts[] = $attachmentsStr; }
+            $indexContent .= "<li>" . implode(' - ', $parts) . "</li>\n";
         }
         if ($currentFolder !== '') {
             $indexContent .= "</ul>\n";
@@ -222,6 +239,8 @@ function createCompleteBackup() {
         $metadataContent = json_encode($metadataInfo, JSON_PRETTY_PRINT);
         $zip->addFromString('attachments/poznote_attachments_metadata.json', $metadataContent);
     }
+
+    // No external icon/font files added to ZIP — index.html is icon-free
     
     $zip->close();
     
@@ -259,20 +278,20 @@ function createBackup() {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
+        <h1>Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
         <a href="restore_import.php" class="btn btn-secondary">
-            <i class="fas fa-download"></i> Go to Restore (Import)
+            Go to Restore (Import)
         </a>
 
         <br><br>
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-archive"></i> Complete Backup</h3>
+            <h3>Complete Backup</h3>
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
             <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
                 <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li>
@@ -282,7 +301,7 @@ function createBackup() {
             <form method="post">
                 <input type="hidden" name="action" value="complete_backup">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Download Complete Backup (ZIP)
+                    Download Complete Backup (ZIP)
                 </button>
             </form>
         </div>
