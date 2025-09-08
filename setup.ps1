@@ -555,7 +555,7 @@ function Install-Poznote {
         
         Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green
     Write-Host "  1. Update application (get latest code)" -ForegroundColor $Colors.White
-    Write-Host "  2. Change settings (password/port, etc.)" -ForegroundColor $Colors.White
+    Write-Host "  2. Change settings (login/password/port)" -ForegroundColor $Colors.White
     Write-Host "  3. Cancel" -ForegroundColor $Colors.Gray
         
         do {

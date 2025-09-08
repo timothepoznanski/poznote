@@ -53,7 +53,7 @@ FEATURES:
         • Interactive menu with options:
             - New installation (fresh setup)
             - Update application (get latest code)
-            - Change configuration (password/port, etc.)
+            - Change configuration (login/password/port)
         • Configuration preservation during updates
 
 REQUIREMENTS:
@@ -569,7 +569,7 @@ main() {
         
         echo -e "\n${GREEN}What would you like to do?${NC}\n"
         echo -e "  1) Update application (get latest code)"
-    echo -e "  2) Change settings (password/port, etc.)"
+    echo -e "  2) Change settings (login/password/port)"
         echo -e "  3) Cancel"
         
         while true; do
