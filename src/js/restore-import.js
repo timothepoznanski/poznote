@@ -50,6 +50,20 @@ function proceedWithCompleteRestore() {
     }
 }
 
+// Advanced Import Toggle Function
+function toggleAdvancedImport() {
+    const advancedOptions = document.getElementById('advancedImportOptions');
+    const toggleButton = document.querySelector('button[onclick="toggleAdvancedImport()"]');
+    
+    if (advancedOptions.style.display === 'none') {
+        advancedOptions.style.display = 'block';
+        toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Advanced Import Options';
+    } else {
+        advancedOptions.style.display = 'none';
+        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show Advanced Import Options';
+    }
+}
+
 // Database Import Functions
 function showImportConfirmation() {
     const fileInput = document.getElementById('backup_file');

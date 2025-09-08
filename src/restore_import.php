@@ -622,31 +622,9 @@ function importAttachmentsZip($uploadedFile) {
         </a>
         <br><br>
         
-        <!-- Global backup/restore warning (important) -->
-        <div class="alert alert-danger" style="margin-top:12px;">
-            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
-            <p style="margin:0; color:#333;">
-                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
-            </p>
-        </div>
-
-        <!-- Information Section -->
-        <div class="warning">
-            <h4>Complete Restore</h4>
-            <p>Use this to restore from a complete backup ZIP file that contains database, notes, and attachments.</p>
-            <p><strong>This is the recommended restore method</strong> for complete backups created with the "Complete Backup" option.</p>
-            <h4>⚠️ Important Notes:</h4>
-            <ul>
-                <li><strong>Complete restore</strong> will replace your database and restore all notes and attachments</li>
-                <li><strong>Individual imports</strong> are available below for specific components</li>
-                <br>Always backup your current data before restoring.
-            </ul>
-        </div>
-        
         <!-- Complete Import Section -->
         <div class="backup-section">
             <h3><i class="fas fa-archive"></i> Complete Restore</h3>
-            <p><strong>⚠️ Warning:</strong> This will replace your database, restore all notes, and attachments from the backup ZIP!</p>
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-success">
@@ -663,120 +641,125 @@ function importAttachmentsZip($uploadedFile) {
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="complete_restore">
                 <div class="form-group">
-                    <label for="complete_backup_file">Complete backup ZIP file to restore:</label>
                     <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
-                </div>
-                
-                <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                    <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
-                    <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
-                    Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
                 </div>
                 
                 <button type="button" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
                     <i class="fas fa-upload"></i> Complete Restore
                 </button>
             </form>
+            
+            <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
+                <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
+                <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
+                Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
+            </div>
         </div>
         
-        <!-- Legacy Import Options (for specific needs) -->
-        <div class="warning" style="margin-top: 30px;">
-            <h4>Individual Import Options</h4>
-            <p>For specific needs, you can still import individual components separately:</p>
-        </div>
-        
-        <!-- Import Database Section -->
+        <!-- Advanced Import Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-database"></i> Import Database Only</h3>
-            <p><strong>⚠️ Warning:</strong> This will replace note titles, tags, search index and metadata, but not the actual note content!</p>
-            
-            <?php if ($restore_message && (!isset($_POST['action']) || $_POST['action'] !== 'complete_restore')): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($restore_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($restore_error && (!isset($_POST['action']) || $_POST['action'] !== 'complete_restore')): ?>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($restore_error); ?>
-                </div>
-            <?php endif; ?>
+            <h3><i class="fas fa-cogs"></i> Advanced Import Options</h3>
+            <p>For specific needs, you can import individual components separately.</p>
+            <button type="button" class="btn btn-secondary" onclick="toggleAdvancedImport()">
+                <i class="fas fa-chevron-down"></i> Show Advanced Import Options
+            </button>
+        </div>
+        
+        <!-- Advanced Import Options (hidden by default) -->
+        <div id="advancedImportOptions" style="display: none;">
+            <!-- Import Database Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-database"></i> Import Database Only</h3>
+                <p><strong>⚠️ Warning:</strong> This will replace note titles, tags, search index and metadata, but not the actual note content!</p>
+                
+                <?php if ($restore_message && (!isset($_POST['action']) || $_POST['action'] !== 'complete_restore')): ?>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($restore_message); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($restore_error && (!isset($_POST['action']) || $_POST['action'] !== 'complete_restore')): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($restore_error); ?>
+                    </div>
+                <?php endif; ?>
 
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="restore">
-                <div class="form-group">
-                    <label for="backup_file">SQL file to import:</label>
-                    <input type="file" id="backup_file" name="backup_file" accept=".sql" required>
-                </div>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="restore">
+                    <div class="form-group">
+                        <label for="backup_file">SQL file to import:</label>
+                        <input type="file" id="backup_file" name="backup_file" accept=".sql" required>
+                    </div>
+                    
+                    <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
+                        <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
+                        <strong>Automatic Backup:</strong> Your current database will be automatically backed up before import. 
+                        Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="showImportConfirmation()">
+                        <i class="fas fa-upload"></i> Import Database
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Import Notes Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-file-upload"></i> Import Notes Only</h3>
+                <p>Upload a ZIP file containing HTML notes to import. Notes will be added to your existing collection.</p>
                 
-                <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                    <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
-                    <strong>Automatic Backup:</strong> Your current database will be automatically backed up before import. 
-                    Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
-                </div>
+                <?php if ($import_notes_message): ?>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_notes_message); ?>
+                    </div>
+                <?php endif; ?>
                 
-                <button type="button" class="btn btn-primary" onclick="showImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Database
-                </button>
-            </form>
-        </div>
-        
-        <!-- Import Notes Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-file-upload"></i> Import Notes</h3>
-            <p>Upload a ZIP file containing HTML notes to import. Notes will be added to your existing collection.</p>
+                <?php if ($import_notes_error): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_notes_error); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="import_notes">
+                    <div class="form-group">
+                        <label for="notes_file">ZIP file containing notes:</label>
+                        <input type="file" id="notes_file" name="notes_file" accept=".zip" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="showNotesImportConfirmation()">
+                        <i class="fas fa-upload"></i> Import Notes (ZIP)
+                    </button>
+                </form>
+            </div>
             
-            <?php if ($import_notes_message): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_notes_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($import_notes_error): ?>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_notes_error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="import_notes">
-                <div class="form-group">
-                    <label for="notes_file">ZIP file containing notes:</label>
-                    <input type="file" id="notes_file" name="notes_file" accept=".zip" required>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="showNotesImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Notes (ZIP)
-                </button>
-            </form>
-        </div>
-        
-        <!-- Import Attachments Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-paperclip"></i> Import Attachments</h3>
-            <p>Upload a ZIP file containing attachments to import. Files will be added to your attachments folder.</p>
-            
-            <?php if ($import_attachments_message): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_attachments_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($import_attachments_error): ?>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_attachments_error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="import_attachments">
-                <div class="form-group">
-                    <label for="attachments_file">ZIP file containing attachments:</label>
-                    <input type="file" id="attachments_file" name="attachments_file" accept=".zip" required>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="showAttachmentsImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Attachments (ZIP)
-                </button>
-            </form>
+            <!-- Import Attachments Section -->
+            <div class="backup-section">
+                <h3><i class="fas fa-paperclip"></i> Import Attachments Only</h3>
+                <p>Upload a ZIP file containing attachments to import. Files will be added to your attachments folder.</p>
+                
+                <?php if ($import_attachments_message): ?>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_attachments_message); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($import_attachments_error): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_attachments_error); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="import_attachments">
+                    <div class="form-group">
+                        <label for="attachments_file">ZIP file containing attachments:</label>
+                        <input type="file" id="attachments_file" name="attachments_file" accept=".zip" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="showAttachmentsImportConfirmation()">
+                        <i class="fas fa-upload"></i> Import Attachments (ZIP)
+                    </button>
+                </form>
+            </div>
         </div>
         
         <!-- Bottom padding for better spacing -->
@@ -804,8 +787,7 @@ function importAttachmentsZip($uploadedFile) {
     <div id="completeRestoreConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
             <h3>Complete Restore?</h3>
-            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments from the backup ZIP. This action cannot be undone.</p>
-            <p>Your current database will be automatically backed up before the restore.</p>
+            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideCompleteRestoreConfirmation()">

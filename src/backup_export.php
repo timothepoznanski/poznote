@@ -174,7 +174,6 @@ function createCompleteBackup() {
 <body>
     <div class="backup-container">
         <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
-        <p>Export your data for backup or migration purposes.</p>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
@@ -185,65 +184,14 @@ function createCompleteBackup() {
 
         <br><br>
         
-        <!-- Global backup/restore warning (important) -->
-        <div class="alert alert-danger" style="margin-top:12px;">
-            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
-            <p style="margin:0; color:#333;">
-                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
-            </p>
-        </div>
-
-        <!-- Information Section -->
-        <div class="warning">
-            <h4>Complete Backup</h4>
-            <p>Create a single ZIP file containing your entire Poznote data: database, notes, and attachments.</p>
-            <p><strong>This is the recommended backup method</strong> as it includes everything needed for a complete restoration.</p>
-        </div>
-        
         <!-- Complete Backup Section -->
         <div class="backup-section">
             <h3><i class="fas fa-archive"></i> Complete Backup</h3>
-            <p>Download a complete backup containing database, notes, and attachments in a single ZIP file.</p>
+            <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.</p>
             <form method="post">
                 <input type="hidden" name="action" value="complete_backup">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-download"></i> Download Complete Backup (ZIP)
-                </button>
-            </form>
-        </div>
-        
-        <!-- Legacy Export Options (for specific needs) -->
-        <div class="warning" style="margin-top: 30px;">
-            <h4>Individual Export Options</h4>
-            <p>For specific needs, you can still export individual components separately:</p>
-        </div>
-        
-        <!-- Export Notes Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-file-archive"></i> Export Notes Only</h3>
-            <p>Download all notes as HTML files in a ZIP archive (for offline reading).</p>
-            <button type="button" class="btn btn-secondary" onclick="startDownload();">
-                <i class="fas fa-download"></i> Download Notes (ZIP)
-            </button>
-        </div>
-        
-        <!-- Export Attachments Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-paperclip"></i> Export Attachments Only</h3>
-            <p>Download all attached files in a ZIP archive.</p>
-            <button type="button" class="btn btn-secondary" onclick="startAttachmentsDownload();">
-                <i class="fas fa-download"></i> Download Attachments (ZIP)
-            </button>
-        </div>
-        
-        <!-- Export Database Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-database"></i> Export Database Only</h3>
-            <p>Download database structure as SQL format.</p>
-            <form method="post">
-                <input type="hidden" name="action" value="backup">
-                <button type="submit" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Download Database (SQL)
                 </button>
             </form>
         </div>
