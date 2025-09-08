@@ -1651,6 +1651,12 @@ hr {
     background-color: transparent;
 }
 
+.folder-header.drag-over {
+    background-color: rgba(0, 125, 184, 0.1);
+    border: 2px dashed #007DB8;
+    box-shadow: 0 0 8px rgba(0, 125, 184, 0.3);
+}
+
 .folder-toggle {
     display: flex;
     align-items: center;
@@ -1797,6 +1803,20 @@ hr {
 /* Au survol, garder le titre à gauche (pas de changement) */
 .note-in-folder:hover a.links_arbo_left .note-title {
     margin-left: 0px !important; /* Reste à gauche */
+}
+
+/* Drag and drop styles for notes */
+.note-in-folder a.links_arbo_left[draggable="true"] {
+    cursor: grab;
+}
+
+.note-in-folder a.links_arbo_left[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.note-in-folder a.links_arbo_left.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
 }
 
 .modal {

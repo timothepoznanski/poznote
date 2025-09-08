@@ -10,6 +10,9 @@ function initializeEventListeners() {
     // Events for image drag & drop
     setupDragDropEvents();
     
+    // Events for note drag & drop between folders
+    setupNoteDragDropEvents();
+    
     // Events for link management
     setupLinkEvents();
     
@@ -185,6 +188,145 @@ function setupDragDropEvents() {
         } catch (err) {
             console.log('Error during drop:', err);
         }
+    });
+}
+
+function setupNoteDragDropEvents() {
+    // Remove existing event listeners to avoid duplicates
+    document.querySelectorAll('.links_arbo_left.note-in-folder').forEach(function(link) {
+        link.removeEventListener('dragstart', handleNoteDragStart);
+        link.removeEventListener('dragend', handleNoteDragEnd);
+    });
+    
+    document.querySelectorAll('.folder-header').forEach(function(header) {
+        header.removeEventListener('dragover', handleFolderDragOver);
+        header.removeEventListener('drop', handleFolderDrop);
+        header.removeEventListener('dragleave', handleFolderDragLeave);
+    });
+    
+    // Add drag events to note links
+    var noteLinks = document.querySelectorAll('.links_arbo_left.note-in-folder');
+    noteLinks.forEach(function(link) {
+        link.draggable = true;
+        link.addEventListener('dragstart', handleNoteDragStart);
+        link.addEventListener('dragend', handleNoteDragEnd);
+    });
+    
+    // Add drop events to folder headers
+    var folderHeaders = document.querySelectorAll('.folder-header');
+    folderHeaders.forEach(function(header) {
+        header.addEventListener('dragover', handleFolderDragOver);
+        header.addEventListener('drop', handleFolderDrop);
+        header.addEventListener('dragleave', handleFolderDragLeave);
+    });
+}
+
+function handleNoteDragStart(e) {
+    var noteLink = e.target.closest('.links_arbo_left.note-in-folder');
+    if (!noteLink) return;
+    
+    var noteId = noteLink.getAttribute('data-note-db-id');
+    var currentFolder = noteLink.getAttribute('data-folder');
+    
+    if (noteId) {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            noteId: noteId,
+            currentFolder: currentFolder
+        }));
+        e.dataTransfer.effectAllowed = 'move';
+        
+        // Add visual feedback
+        noteLink.classList.add('dragging');
+    }
+}
+
+function handleNoteDragEnd(e) {
+    // Remove dragging class
+    var noteLink = e.target.closest('.links_arbo_left.note-in-folder');
+    if (noteLink) {
+        noteLink.classList.remove('dragging');
+    }
+    
+    // Remove drag-over class from all folders
+    document.querySelectorAll('.folder-header.drag-over').forEach(function(header) {
+        header.classList.remove('drag-over');
+    });
+}
+
+function handleFolderDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    var folderHeader = e.target.closest('.folder-header');
+    if (folderHeader) {
+        folderHeader.classList.add('drag-over');
+    }
+}
+
+function handleFolderDragLeave(e) {
+    var folderHeader = e.target.closest('.folder-header');
+    if (folderHeader) {
+        folderHeader.classList.remove('drag-over');
+    }
+}
+
+function handleFolderDrop(e) {
+    e.preventDefault();
+    
+    var folderHeader = e.target.closest('.folder-header');
+    if (!folderHeader) return;
+    
+    folderHeader.classList.remove('drag-over');
+    
+    // Remove dragging class from all notes
+    document.querySelectorAll('.links_arbo_left.dragging').forEach(function(link) {
+        link.classList.remove('dragging');
+    });
+    
+    try {
+        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        var targetFolder = folderHeader.getAttribute('data-folder');
+        
+        if (data.noteId && targetFolder && data.currentFolder !== targetFolder) {
+            moveNoteToTargetFolder(data.noteId, targetFolder);
+        }
+    } catch (err) {
+        console.log('Error parsing drag data:', err);
+    }
+}
+
+function moveNoteToTargetFolder(noteId, targetFolder) {
+    var params = new URLSearchParams({
+        action: 'move_to',
+        note_id: noteId,
+        folder: targetFolder,
+        workspace: selectedWorkspace || 'Poznote'
+    });
+    
+    fetch("folder_operations.php", {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/x-www-form-urlencoded", 
+            'X-Requested-With': 'XMLHttpRequest', 
+            'Accept': 'application/json' 
+        },
+        body: params.toString()
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            // Note moved successfully - no notification needed
+            // Reload the page to reflect changes
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        } else {
+            var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error moving note: ' + err, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Error moving note: ' + error.message, 'error');
     });
 }
 
