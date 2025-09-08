@@ -284,26 +284,26 @@ To update Poznote to the latest version, run the setup script and select "Update
 
 ## Backup and Restore
 
-Poznote includes built-in backup functionality accessible through Settings.
+Poznote includes built-in backup (export) and restoration (import) functionality accessible through Settings.
 
-### Backup Options
+**📦Complete Backup**
 
-- **📦Complete Backup** - Single ZIP containing database, all notes, and attachments for all workspaces
+Single ZIP containing database, all notes, and attachments for all workspaces:
+
   - Includes an `index.html` at the root for offline browsing
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
-### Restore Options
+**🔄 Complete Restore** 
 
-- **🔄 Complete Restore** - Upload the complete backup ZIP to restore everything
+Upload the complete backup ZIP to restore everything:
+
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
-⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
+⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
-### Automatic Database Backup
-
-🔒 **Safety Feature:** Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
+🔒 Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
 
 - **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
 - **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)

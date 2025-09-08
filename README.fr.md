@@ -284,26 +284,26 @@ Pour mettre à jour Poznote vers la dernière version, lancez le script de confi
 
 ## Sauvegarde et restauration
 
-Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Paramètres.
+Poznote inclut une fonctionnalité de sauvegarde (export) et restoration (import) intégrée accessible via Paramètres.
 
-### Options de sauvegarde
+**📦 Sauvegarde complète** 
 
-- **📦 Sauvegarde complète** - ZIP unique contenant la base de données, toutes les notes et pièces jointes pour tous les espaces de travail
+ZIP unique contenant la base de données, toutes les notes et pièces jointes pour tous les espaces de travail :
+
   - Inclut un `index.html` à la racine pour la navigation hors-ligne
   - Les notes sont organisées par espace de travail et dossier
   - Les pièces jointes sont accessibles via des liens cliquables
 
-### Options de restauration
+**🔄 Restauration complète**
 
-- **🔄 Restauration complète** - Téléchargez le ZIP de sauvegarde complète pour tout restaurer
+Téléchargez le ZIP de sauvegarde complète pour tout restaurer :
+
   - Remplace la base de données, restaure toutes les notes et pièces jointes
   - Fonctionne pour tous les espaces de travail en une fois
 
-⚠️ **Important :** L'import de base de données remplace complètement les données actuelles. La base contient les métadonnées (titres, tags, dates) tandis que le contenu des notes est stocké dans des fichiers HTML.
+⚠️ L'import de base de données remplace complètement les données actuelles et pour tous les workspaces. La base contient les métadonnées (titres, tags, dates) tandis que le contenu des notes est stocké dans des fichiers HTML.
 
-### Sauvegarde automatique de la base
-
-🔒 **Fonctionnalité de sécurité :** À chaque import/restauration via l'interface web, Poznote crée automatiquement une sauvegarde de la base avant de procéder.
+🔒 À chaque import/restauration via l'interface web, Poznote crée automatiquement une sauvegarde de la base avant de procéder.
 
 - **Emplacement :** `data/database/poznote.db.backup.AAAA-MM-JJ_HH-MM-SS`
 - **Format :** Fichiers de sauvegarde horodatés (ex : `poznote.db.backup.2025-08-15_14-36-19`)
