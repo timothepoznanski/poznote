@@ -18,10 +18,37 @@ document.addEventListener('DOMContentLoaded', function() {
             hideImportConfirmation();
             hideNotesImportConfirmation();
             hideAttachmentsImportConfirmation();
+            hideCompleteRestoreConfirmation();
             hideCustomAlert();
         }
     });
 });
+
+// Complete Restore Functions
+function showCompleteRestoreConfirmation() {
+    const fileInput = document.getElementById('complete_backup_file');
+    if (!fileInput.files.length) {
+        showCustomAlert('No ZIP File Selected', 'Please select a complete backup ZIP file before proceeding with the restore.');
+        return;
+    }
+    document.getElementById('completeRestoreConfirmModal').style.display = 'flex';
+}
+
+function hideCompleteRestoreConfirmation() {
+    document.getElementById('completeRestoreConfirmModal').style.display = 'none';
+}
+
+function proceedWithCompleteRestore() {
+    const forms = document.querySelectorAll('form[method="post"]');
+    const completeForm = Array.from(forms).find(form => 
+        form.querySelector('input[name="action"][value="complete_restore"]')
+    );
+    if (completeForm) {
+        completeForm.submit();
+    } else {
+        alert('Complete restore form not found. Please try again.');
+    }
+}
 
 // Database Import Functions
 function showImportConfirmation() {
