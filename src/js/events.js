@@ -312,6 +312,7 @@ function moveNoteToTargetFolder(noteId, targetFolder) {
         },
         body: params.toString()
     })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data && data.success) {
             // Note moved successfully - no notification needed
