@@ -13,6 +13,11 @@ class OpenAIProvider extends AIProvider {
     }
     
     public function generateSummary($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'French' : 'English';
+        
         $messages = [
             [
                 'role' => 'system',
@@ -25,7 +30,8 @@ Rules:
 - Do not include personal opinions or interpretations
 - Make it clear and easy to understand
 
-CRITICAL: Your entire response must be written in the same primary language as the note content above. Do not translate, do not mix languages, and do not respond in any other language than the one predominantly used in the note content.'
+DETECTED LANGUAGE: The note appears to be in ' . $languageName . '.
+CRITICAL: Your entire response must be written ONLY in ' . $languageName . '. Do not translate, do not mix languages, and do not respond in any other language than ' . $languageName . '. If the note is in French, respond in French. If the note is in English, respond in English.'
             ],
             [
                 'role' => 'user',
@@ -37,6 +43,11 @@ CRITICAL: Your entire response must be written in the same primary language as t
     }
     
     public function generateTags($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'French' : 'English';
+        
         $messages = [
             [
                 'role' => 'system',
@@ -51,7 +62,10 @@ Rules:
 - Avoid generic tags like "note" or "text"
 - Make tags specific and meaningful
 - Use lowercase for consistency
-- Return only the tags as a comma-separated list, nothing else'
+- Return only the tags as a comma-separated list, nothing else
+
+DETECTED LANGUAGE: The note appears to be in ' . $languageName . '.
+CRITICAL: All tags must be in ' . $languageName . '. If the note is in French, generate tags in French. If the note is in English, generate tags in English.'
             ],
             [
                 'role' => 'user',
@@ -85,29 +99,37 @@ Rules:
     }
     
     public function checkErrors($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'French' : 'English';
+        
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'Tu es un assistant expert en correction de texte. Analyse le contenu fourni et identifie les erreurs factuelles, les incohérences logiques, les contradictions et les informations potentiellement incorrectes.
+                'content' => 'You are an expert assistant for text correction. Analyze the provided content and identify factual errors, logical inconsistencies, contradictions, and potentially incorrect information.
 
-RÈGLES IMPORTANTES:
-- Ignore complètement l\'orthographe, la grammaire et la syntaxe
-- Concentre-toi UNIQUEMENT sur les erreurs FACTUELLES et logiques
-- Identifie les contradictions internes dans le texte
-- Signale les affirmations qui semblent factuellement incorrectes
-- Mentionne les dates, chiffres ou faits qui paraissent erronés
-- Indique les incohérences logiques dans le raisonnement
+IMPORTANT RULES:
+- Completely ignore spelling, grammar, and syntax
+- Focus ONLY on FACTUAL and logical errors
+- Identify internal contradictions in the text
+- Flag statements that appear factually incorrect
+- Mention dates, numbers, or facts that appear wrong
+- Indicate logical inconsistencies in reasoning
 
-Format de réponse:
-- Si tu trouves des erreurs factuelles: liste-les clairement avec des explications
-- Si aucune erreur factuelle: réponds simplement "Aucune erreur factuelle détectée."
-- Utilise la même langue que le contenu analysé
+Response format:
+- If you find factual errors: list them clearly with explanations
+- If no factual errors: simply respond "No factual errors detected."
+- Use the same language as the analyzed content
 
-IMPORTANT: Ignore l\'orthographe/grammaire, concentre-toi sur les FAITS!'
+DETECTED LANGUAGE: The content appears to be in ' . $languageName . '.
+CRITICAL: Your entire response must be in ' . $languageName . '. If the content is in French, respond in French. If the content is in English, respond in English.
+
+IMPORTANT: Ignore spelling/grammar, focus on FACTS!'
             ],
             [
                 'role' => 'user',
-                'content' => "Titre: \"$title\"\n\nContenu:\n$content\n\nAnalyse ce contenu pour détecter les erreurs factuelles, contradictions et incohérences logiques (ignore l'orthographe et la grammaire):"
+                'content' => "Title: \"$title\"\n\nContent:\n$content\n\nAnalyze this content to detect factual errors, contradictions, and logical inconsistencies (ignore spelling and grammar):"
             ]
         ];
         

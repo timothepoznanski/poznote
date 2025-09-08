@@ -13,6 +13,11 @@ class MistralProvider extends AIProvider {
     }
     
     public function generateSummary($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'français' : 'anglais';
+        
         $messages = [
             [
                 'role' => 'system',
@@ -25,7 +30,8 @@ Règles :
 - N\'inclus pas d\'opinions personnelles ou d\'interprétations
 - Rends-le clair et facile à comprendre
 
-CRITIQUE : Toute ta réponse doit être écrite dans la même langue principale que le contenu de la note ci-dessus. Ne traduis pas, ne mélange pas les langues, et ne réponds dans aucune autre langue que celle utilisée principalement dans le contenu de la note.'
+LANGUE DÉTECTÉE : La note semble être en ' . $languageName . '.
+CRITIQUE : Toute ta réponse doit être écrite UNIQUEMENT en ' . $languageName . '. Ne traduis pas, ne mélange pas les langues, et ne réponds dans aucune autre langue que le ' . $languageName . '. Si la note est en français, réponds en français. Si la note est en anglais, réponds en anglais.'
             ],
             [
                 'role' => 'user',
@@ -37,6 +43,11 @@ CRITIQUE : Toute ta réponse doit être écrite dans la même langue principale 
     }
     
     public function generateTags($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'français' : 'anglais';
+        
         $messages = [
             [
                 'role' => 'system',
@@ -51,7 +62,10 @@ Règles :
 - Évite les tags génériques comme "note" ou "texte"
 - Rends les tags spécifiques et significatifs
 - Utilise des minuscules pour la cohérence
-- Retourne seulement les tags sous forme de liste séparée par des virgules, rien d\'autre'
+- Retourne seulement les tags sous forme de liste séparée par des virgules, rien d\'autre
+
+LANGUE DÉTECTÉE : La note semble être en ' . $languageName . '.
+CRITIQUE : Tous les tags doivent être en ' . $languageName . '. Si la note est en français, génère les tags en français. Si la note est en anglais, génère les tags en anglais.'
             ],
             [
                 'role' => 'user',
@@ -85,6 +99,11 @@ Règles :
     }
     
     public function checkErrors($content, $title) {
+        // Detect the language of the content
+        include_once __DIR__ . '/functions.php';
+        $detectedLanguage = detectLanguage($content);
+        $languageName = ($detectedLanguage === 'fr') ? 'français' : 'anglais';
+        
         $messages = [
             [
                 'role' => 'system',
@@ -102,6 +121,9 @@ Format de réponse:
 - Si tu trouves des erreurs factuelles: liste-les clairement avec des explications
 - Si aucune erreur factuelle: réponds simplement "Aucune erreur factuelle détectée."
 - Utilise la même langue que le contenu analysé
+
+LANGUE DÉTECTÉE : Le contenu semble être en ' . $languageName . '.
+CRITIQUE : Toute ta réponse doit être en ' . $languageName . '. Si le contenu est en français, réponds en français. Si le contenu est en anglais, réponds en anglais.
 
 IMPORTANT: Ignore l\'orthographe/grammaire, concentre-toi sur les FAITS!'
             ],
