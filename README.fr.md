@@ -284,11 +284,11 @@ Pour mettre à jour Poznote vers la dernière version, lancez le script de confi
 
 ## Sauvegarde et restauration
 
-Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Paramètres → "Exporter/Importer la base de données".
+Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Paramètres.
 
 ### Options de sauvegarde
 
-- **� Sauvegarde complète** - ZIP unique contenant la base de données, toutes les notes et pièces jointes pour tous les espaces de travail
+- **📦 Sauvegarde complète** - ZIP unique contenant la base de données, toutes les notes et pièces jointes pour tous les espaces de travail
   - Inclut un `index.html` à la racine pour la navigation hors-ligne
   - Les notes sont organisées par espace de travail et dossier
   - Les pièces jointes sont accessibles via des liens cliquables
@@ -311,14 +311,7 @@ Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Param
 
 ## Vue hors-ligne
 
-La **� Sauvegarde complète** crée une version hors-ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web.
-
-**Fonctionnalités de la vue hors-ligne :**
-- **📁 Organisé par espace de travail et dossier** - Les notes sont groupées hiérarchiquement
-- **🔗 Pièces jointes cliquables** - Accès direct à tous les fichiers attachés
-- **🔍 Recherche navigateur** - Utilisez la recherche de votre navigateur pour trouver des notes par titre, tags ou contenu
-- **📱 Portable** - Partagez ou archivez facilement vos notes
-- **🚀 Aucune installation requise** - Fonctionne dans tout navigateur moderne
+La **📦 Sauvegarde complète** crée une version hors-ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web.
 
 ## Fonctionnalités IA
 

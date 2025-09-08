@@ -284,11 +284,11 @@ To update Poznote to the latest version, run the setup script and select "Update
 
 ## Backup and Restore
 
-Poznote includes built-in backup functionality accessible through Settings → "Export/Import Database".
+Poznote includes built-in backup functionality accessible through Settings.
 
 ### Backup Options
 
-- **� Complete Backup** - Single ZIP containing database, all notes, and attachments for all workspaces
+- **📦Complete Backup** - Single ZIP containing database, all notes, and attachments for all workspaces
   - Includes an `index.html` at the root for offline browsing
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
@@ -311,14 +311,7 @@ Poznote includes built-in backup functionality accessible through Settings → "
 
 ## Offline View
 
-The **� Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
-
-**Features of offline view:**
-- **📁 Organized by workspace and folder** - Notes are grouped hierarchically
-- **🔗 Clickable attachments** - Direct access to all attached files
-- **🔍 Browser search** - Use your browser's search to find notes by title, tags, or content
-- **📱 Portable** - Share or archive your notes easily
-- **🚀 No installation required** - Works in any modern web browser
+The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
 
 ## AI Features
 
