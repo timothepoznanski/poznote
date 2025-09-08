@@ -151,7 +151,7 @@ function newFolder() {
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.success) {
-                showNotificationPopup('Folder created successfully');
+                // Folder created successfully - no notification needed
                 window.location.reload();
             } else {
                 showNotificationPopup('Error creating folder: ' + (data.message || data.error), 'error');
@@ -237,7 +237,7 @@ function executeDeleteFolderOperation(folderName) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            showNotificationPopup('Folder deleted successfully');
+            // Folder deleted successfully - no notification needed
             window.location.reload();
         } else {
             showNotificationPopup('Error: ' + data.error, 'error');
@@ -318,7 +318,7 @@ function showNewWorkspacePrompt() {
                 } catch(e) {}
                 
                 refreshLeftColumnForWorkspace(name);
-                showNotificationPopup('Workspace created and selected', 'success');
+                // Workspace created and selected - no notification needed
             } else {
                 // Fallback: reload the page
                 var url = new URL(window.location.href);
@@ -747,7 +747,7 @@ function executeMoveAllFiles() {
     })
     .then(function(data) {
         if (data.success) {
-            showNotificationPopup('Successfully moved ' + data.moved_count + ' files from "' + sourceFolderName + '" to "' + targetFolderName + '"');
+            // Successfully moved files - no notification needed
             closeModal('moveFolderFilesModal');
             // Refresh the page to reflect changes
             location.reload();
@@ -806,7 +806,7 @@ function saveFolderName() {
             // Clean localStorage entries for the old folder name and update recent folders
             cleanupRenamedFolderInLocalStorage(oldName, newName);
             closeModal('editFolderModal');
-            showNotificationPopup('Folder renamed successfully');
+            // Folder renamed successfully - no notification needed
             location.reload();
         } else {
             showNotificationPopup('Error: ' + data.error, 'error');
