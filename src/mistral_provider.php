@@ -80,6 +80,8 @@ Rules:
 - Make tags specific and meaningful
 - Use lowercase for consistency
 - Return only the tags as a comma-separated list, nothing else
+- NEVER use Markdown formatting in your response
+- Respond in plain text only
 
 ' . $language_instruction
                 ],
@@ -103,6 +105,8 @@ Règles :
 - Rends les tags spécifiques et significatifs
 - Utilise des minuscules pour la cohérence
 - Retourne seulement les tags sous forme de liste séparée par des virgules, rien d\'autre
+- N\'utilise JAMAIS de formatage Markdown dans ta réponse
+- Réponds en texte brut uniquement
 
 ' . $language_instruction
                 ],
