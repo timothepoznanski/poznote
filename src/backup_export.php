@@ -1,6 +1,8 @@
 <?php
 require_once 'auth.php';
 require_once 'config.php';
+include 'functions.php';
+require_once 'db_connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -23,34 +25,225 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Export error: " . $result['error'];
             }
             break;
+        case 'complete_backup':
+            $result = createCompleteBackup();
+            // createCompleteBackup() handles download directly, so we only get here on error
+            if (!$result['success']) {
+                $error = "Complete backup error: " . $result['error'];
+            }
+            break;
+    }
+}
+
+function generateSQLDump() {
+    global $con;
+    
+    $sql = "-- Poznote Database Dump\n-- Generated on " . date('Y-m-d H:i:s') . "\n\n";
+    
+    // Get all table names
+    $tables = $con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+    $tableNames = [];
+    while ($row = $tables->fetch(PDO::FETCH_ASSOC)) {
+        $tableNames[] = $row['name'];
+    }
+    
+    foreach ($tableNames as $table) {
+        // Get CREATE TABLE statement
+        $createStmt = $con->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='{$table}'")->fetch(PDO::FETCH_ASSOC);
+        if ($createStmt && $createStmt['sql']) {
+            $sql .= $createStmt['sql'] . ";\n\n";
+        }
+        
+        // Get all data
+        $data = $con->query("SELECT * FROM \"{$table}\"");
+        while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
+            $columns = array_keys($row);
+            $values = array_map(function($value) use ($con) {
+                if ($value === null) {
+                    return 'NULL';
+                }
+                return $con->quote($value);
+            }, array_values($row));
+            
+            $sql .= "INSERT INTO \"{$table}\" (" . implode(', ', array_map(function($col) {
+                return "\"{$col}\"";
+            }, $columns)) . ") VALUES (" . implode(', ', $values) . ");\n";
+        }
+        $sql .= "\n";
+    }
+    
+    return $sql;
+}
+
+function createCompleteBackup() {
+    $tempDir = sys_get_temp_dir();
+    $zipFileName = $tempDir . '/poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip';
+    
+    $zip = new ZipArchive();
+    if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+        return ['success' => false, 'error' => 'Cannot create ZIP file'];
+    }
+    
+    // Add SQL dump
+    $sqlContent = generateSQLDump();
+    if ($sqlContent) {
+        $zip->addFromString('database/poznote_backup.sql', $sqlContent);
+    } else {
+        $zip->close();
+        unlink($zipFileName);
+        return ['success' => false, 'error' => 'Failed to create database backup'];
+    }
+    
+    // Add HTML entries
+    $entriesPath = getEntriesPath();
+    if ($entriesPath && is_dir($entriesPath)) {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($entriesPath), 
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        foreach ($files as $name => $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($entriesPath) + 1);
+                
+                if (pathinfo($relativePath, PATHINFO_EXTENSION) === 'html') {
+                    $zip->addFile($filePath, 'entries/' . $relativePath);
+                }
+            }
+        }
+    }
+    
+    // Generate index.html for entries
+    global $con;
+    $query = "SELECT id, heading, tags, folder, workspace, attachments FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
+    $result = $con->query($query);
+    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.tags { color: #6c757d; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
+    
+    $currentWorkspace = '';
+    $currentFolder = '';
+    if ($result) {
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $workspace = htmlspecialchars($row['workspace'] ?: 'Poznote');
+            $folder = htmlspecialchars($row['folder'] ?: 'Default');
+            if ($currentWorkspace !== $workspace) {
+                if ($currentWorkspace !== '') {
+                    if ($currentFolder !== '') {
+                        $indexContent .= "</ul>\n";
+                    }
+                    $indexContent .= "</div>\n";
+                }
+                $indexContent .= "<h2>Workspace: {$workspace}</h2>\n<div>\n";
+                $currentWorkspace = $workspace;
+                $currentFolder = '';
+            }
+            if ($currentFolder !== $folder) {
+                if ($currentFolder !== '') {
+                    $indexContent .= "</ul>\n";
+                }
+                $indexContent .= "<h3>Folder: {$folder}</h3>\n<ul>\n";
+                $currentFolder = $folder;
+            }
+            $heading = htmlspecialchars($row['heading'] ?: 'Untitled');
+            $tags = json_decode($row['tags'], true);
+            $tagsStr = is_array($tags) ? implode(', ', array_map('htmlspecialchars', $tags)) : '';
+            $attachments = json_decode($row['attachments'], true);
+            $attachmentsStr = '';
+            if (is_array($attachments) && !empty($attachments)) {
+                $attachmentLinks = [];
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['filename'])) {
+                        $filename = htmlspecialchars($attachment['filename']);
+                        $attachmentLinks[] = "<a href='attachments/{$filename}' target='_blank'>{$filename}</a>";
+                    }
+                }
+                if (!empty($attachmentLinks)) {
+                    $attachmentsStr = ' <span class="attachments">(' . implode(', ', $attachmentLinks) . ')</span>';
+                }
+            }
+            $indexContent .= "<li><a href='entries/{$row['id']}.html'>{$heading}</a> <span class='tags'>{$tagsStr}</span>{$attachmentsStr}</li>\n";
+        }
+        if ($currentFolder !== '') {
+            $indexContent .= "</ul>\n";
+        }
+        if ($currentWorkspace !== '') {
+            $indexContent .= "</div>\n";
+        }
+    }
+    
+    $indexContent .= "</body>\n</html>";
+    $zip->addFromString('index.html', $indexContent);
+    
+    // Add attachments
+    $attachmentsPath = getAttachmentsPath();
+    if ($attachmentsPath && is_dir($attachmentsPath)) {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($attachmentsPath), 
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        foreach ($files as $name => $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
+                
+                // Skip hidden files
+                if (!str_starts_with($relativePath, '.')) {
+                    $zip->addFile($filePath, 'attachments/' . $relativePath);
+                }
+            }
+        }
+    }
+    
+    // Add metadata file for attachments
+    include 'db_connect.php';
+    $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+    $queryResult = $con->query($query);
+    $metadataInfo = [];
+    
+    if ($queryResult) {
+        while ($row = $queryResult->fetch(PDO::FETCH_ASSOC)) {
+            $attachments = json_decode($row['attachments'], true);
+            if (is_array($attachments) && !empty($attachments)) {
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['filename'])) {
+                        $metadataInfo[] = [
+                            'note_id' => $row['id'],
+                            'note_heading' => $row['heading'],
+                            'attachment_data' => $attachment
+                        ];
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!empty($metadataInfo)) {
+        $metadataContent = json_encode($metadataInfo, JSON_PRETTY_PRINT);
+        $zip->addFromString('attachments/poznote_attachments_metadata.json', $metadataContent);
+    }
+    
+    $zip->close();
+    
+    // Send file to browser
+    if (file_exists($zipFileName) && filesize($zipFileName) > 0) {
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip"');
+        header('Content-Length: ' . filesize($zipFileName));
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Expires: 0');
+        
+        readfile($zipFileName);
+        unlink($zipFileName);
+        exit;
+    } else {
+        unlink($zipFileName);
+        return ['success' => false, 'error' => 'Failed to create backup file'];
     }
 }
 
 function createBackup() {
-    $dbPath = SQLITE_DATABASE;
-    
-    $filename = "poznote_backup_" . date('Y-m-d_H-i-s') . ".sql";
-    
-    // Use sqlite3 to create backup
-    $command = "sqlite3 {$dbPath} .dump 2>&1";
-    
-    $output = [];
-    exec($command, $output, $returnCode);
-    
-    if ($returnCode === 0) {
-        $sqlContent = implode("\n", $output);
-        
-        // Set headers for download
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Length: ' . strlen($sqlContent));
-        
-        echo $sqlContent;
-        exit;
-    } else {
-        $errorMessage = implode("\n", $output);
-        return ['success' => false, 'error' => $errorMessage];
-    }
+    return createCompleteBackup();
 }
 ?>
 
@@ -67,7 +260,6 @@ function createBackup() {
 <body>
     <div class="backup-container">
         <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
-        <p>Export your data for backup or migration purposes.</p>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
@@ -78,63 +270,19 @@ function createBackup() {
 
         <br><br>
         
-        <!-- Global backup/restore warning (important) -->
-        <div class="alert alert-danger" style="margin-top:12px;">
-            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
-            <p style="margin:0; color:#333;">
-                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
-            </p>
-        </div>
-
-        <!-- Information Section -->
-        <div class="warning">
-            <h4>For a complete backup, export all three components:</h4>
-            <ol>
-                <li><strong>Notes</strong> - Your note content (HTML files)</li>
-                <li><strong>Attachments</strong> - Attachments files</li>
-                <li><strong>Database</strong> - Structure, tags, folders, settings</li>
-            </ol>
-            <h4>For offline reading (no Poznote needed), export only html notes.</h4>
-        </div>
-        
-        <?php if ($message): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($error): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <!-- Export Notes Section -->
+        <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-file-archive"></i> Export Notes</h3>
-            <p>Download all notes as HTML files in a ZIP archive (perfect for offline reading).</p>
-            <button type="button" class="btn btn-primary" onclick="startDownload();">
-                <i class="fas fa-download"></i> Download Notes (ZIP)
-            </button>
-        </div>
-        
-        <!-- Export Attachments Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-paperclip"></i> Export Attachments</h3>
-            <p>Download all attached files in a ZIP archive.</p>
-            <button type="button" class="btn btn-primary" onclick="startAttachmentsDownload();">
-                <i class="fas fa-download"></i> Download Attachments (ZIP)
-            </button>
-        </div>
-        
-        <!-- Export Database Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-database"></i> Export Database</h3>
-            <p>Download database structure (SQL format).</p>
+            <h3><i class="fas fa-archive"></i> Complete Backup</h3>
+            <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
+            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
+                <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li>
+                <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li>
+            </ul>
+            
             <form method="post">
-                <input type="hidden" name="action" value="backup">
+                <input type="hidden" name="action" value="complete_backup">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Download Database (SQL)
+                    <i class="fas fa-download"></i> Download Complete Backup (ZIP)
                 </button>
             </form>
         </div>

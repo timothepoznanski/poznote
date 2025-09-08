@@ -288,14 +288,16 @@ Poznote includes built-in backup functionality accessible through Settings → "
 
 ### Backup Options
 
-- **📝 Export Notes** - Complete ZIP with all your notes (Allows offline viewing without Poznote)
-- **📎 Export Attachments** - All file attachments as ZIP
-- **🗄️ Export Database** - SQLite database dump
+- **� Complete Backup** - Single ZIP containing database, all notes, and attachments for all workspaces
+  - Includes an `index.html` at the root for offline browsing
+  - Notes are organized by workspace and folder
+  - Attachments are accessible via clickable links
 
 ### Restore Options
 
-- **Complete Restore** - Requires notes + attachments + database for full functionality
-- **Offline Viewing** - Exported notes work independently with included `index.html`
+- **🔄 Complete Restore** - Upload the complete backup ZIP to restore everything
+  - Replaces database, restores all notes, and attachments
+  - Works for all workspaces at once
 
 ⚠️ **Important:** Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
@@ -309,14 +311,14 @@ Poznote includes built-in backup functionality accessible through Settings → "
 
 ## Offline View
 
-When you export notes using the **📝 Export Notes** option, you get a ZIP file containing all your notes in HTML format along with a special `index.html` file. This creates a completely standalone offline version of your notes that works without Poznote installed.
+The **� Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
 
 **Features of offline view:**
-- **Search by title and tags** - Find notes quickly using the search functionality of your browser
-- **No installation required** - Works in any web browser
-- **Portable** - Share or archive your notes easily
-
-Simply extract the ZIP file and open `index.html` in any web browser to access your notes offline.
+- **📁 Organized by workspace and folder** - Notes are grouped hierarchically
+- **🔗 Clickable attachments** - Direct access to all attached files
+- **🔍 Browser search** - Use your browser's search to find notes by title, tags, or content
+- **📱 Portable** - Share or archive your notes easily
+- **🚀 No installation required** - Works in any modern web browser
 
 ## AI Features
 

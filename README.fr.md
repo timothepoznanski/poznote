@@ -288,14 +288,16 @@ Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Param
 
 ### Options de sauvegarde
 
-- **📝 Exporter les notes** - ZIP complet avec toutes vos notes (permet la consultation hors-ligne sans Poznote)
-- **📎 Exporter les pièces jointes** - Toutes les pièces jointes en ZIP
-- **🗄️ Exporter la base de données** - Dump SQLite
+- **� Sauvegarde complète** - ZIP unique contenant la base de données, toutes les notes et pièces jointes pour tous les espaces de travail
+  - Inclut un `index.html` à la racine pour la navigation hors-ligne
+  - Les notes sont organisées par espace de travail et dossier
+  - Les pièces jointes sont accessibles via des liens cliquables
 
 ### Options de restauration
 
-- **Restauration complète** - Nécessite notes + pièces jointes + base pour un fonctionnement complet
-- **Vue hors-ligne** - Les notes exportées fonctionnent indépendamment avec `index.html` inclus
+- **🔄 Restauration complète** - Téléchargez le ZIP de sauvegarde complète pour tout restaurer
+  - Remplace la base de données, restaure toutes les notes et pièces jointes
+  - Fonctionne pour tous les espaces de travail en une fois
 
 ⚠️ **Important :** L'import de base de données remplace complètement les données actuelles. La base contient les métadonnées (titres, tags, dates) tandis que le contenu des notes est stocké dans des fichiers HTML.
 
@@ -309,14 +311,14 @@ Poznote inclut une fonctionnalité de sauvegarde intégrée accessible via Param
 
 ## Vue hors-ligne
 
-Quand vous exportez vos notes via **📝 Exporter les notes**, vous obtenez un ZIP contenant toutes vos notes en HTML ainsi qu'un fichier spécial `index.html`. Cela crée une version hors-ligne autonome de vos notes qui fonctionne sans Poznote installé.
+La **� Sauvegarde complète** crée une version hors-ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web.
 
 **Fonctionnalités de la vue hors-ligne :**
-- **Recherche par titre et tags** - Trouvez rapidement vos notes via la recherche du navigateur
-- **Aucune installation requise** - Fonctionne dans tout navigateur
-- **Portable** - Partagez ou archivez facilement vos notes
-
-Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans un navigateur pour accéder à vos notes hors-ligne.
+- **📁 Organisé par espace de travail et dossier** - Les notes sont groupées hiérarchiquement
+- **🔗 Pièces jointes cliquables** - Accès direct à tous les fichiers attachés
+- **🔍 Recherche navigateur** - Utilisez la recherche de votre navigateur pour trouver des notes par titre, tags ou contenu
+- **📱 Portable** - Partagez ou archivez facilement vos notes
+- **🚀 Aucune installation requise** - Fonctionne dans tout navigateur moderne
 
 ## Fonctionnalités IA
 

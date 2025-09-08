@@ -2,6 +2,7 @@
 require_once 'auth.php';
 require_once 'config.php';
 require_once 'functions.php';
+require_once 'db_connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -38,6 +39,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
             
+        case 'complete_restore':
+            if (isset($_FILES['complete_backup_file']) && $_FILES['complete_backup_file']['error'] === UPLOAD_ERR_OK) {
+                $result = restoreCompleteBackup($_FILES['complete_backup_file']);
+                if ($result['success']) {
+                    $restore_message = "Complete backup restored successfully! " . $result['message'];
+                } else {
+                    $restore_error = "Complete restore error: " . $result['error'] . " - " . $result['message'];
+                }
+            } else {
+                $restore_error = "No complete backup file selected or upload error.";
+            }
+            break;
+            
         case 'import_notes':
             if (isset($_FILES['notes_file']) && $_FILES['notes_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importNotesZip($_FILES['notes_file']);
@@ -64,6 +78,199 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
     }
+}
+
+function restoreCompleteBackup($uploadedFile) {
+    // Check file type
+    if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
+        return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
+    }
+    
+    $tempFile = '/tmp/poznote_complete_restore_' . uniqid() . '.zip';
+    
+    // Move uploaded file
+    if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
+        return ['success' => false, 'error' => 'Error uploading file'];
+    }
+    
+    // Extract ZIP to temporary directory
+    $tempExtractDir = '/tmp/poznote_restore_' . uniqid();
+    if (!mkdir($tempExtractDir, 0755, true)) {
+        unlink($tempFile);
+        return ['success' => false, 'error' => 'Cannot create temporary directory'];
+    }
+    
+    $zip = new ZipArchive;
+    $res = $zip->open($tempFile);
+    
+    if ($res !== TRUE) {
+        unlink($tempFile);
+        rmdir($tempExtractDir);
+        return ['success' => false, 'error' => 'Cannot open ZIP file'];
+    }
+    
+    $zip->extractTo($tempExtractDir);
+    $zip->close();
+    unlink($tempFile);
+    
+    $results = [];
+    $hasErrors = false;
+    
+    // Restore database if SQL file exists
+    $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
+    if (file_exists($sqlFile)) {
+        $dbResult = restoreDatabaseFromFile($sqlFile);
+        $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
+        if (!$dbResult['success']) $hasErrors = true;
+    } else {
+        $results[] = 'Database: No SQL file found in backup';
+    }
+    
+    // Restore entries if entries directory exists
+    $entriesDir = $tempExtractDir . '/entries';
+    if (is_dir($entriesDir)) {
+        $entriesResult = restoreEntriesFromDir($entriesDir);
+        $results[] = 'Notes: ' . ($entriesResult['success'] ? 'Restored ' . $entriesResult['count'] . ' files' : 'Failed - ' . $entriesResult['error']);
+        if (!$entriesResult['success']) $hasErrors = true;
+    } else {
+        $results[] = 'Notes: No entries directory found in backup';
+    }
+    
+    // Restore attachments if attachments directory exists
+    $attachmentsDir = $tempExtractDir . '/attachments';
+    if (is_dir($attachmentsDir)) {
+        $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
+        $results[] = 'Attachments: ' . ($attachmentsResult['success'] ? 'Restored ' . $attachmentsResult['count'] . ' files' : 'Failed - ' . $attachmentsResult['error']);
+        if (!$attachmentsResult['success']) $hasErrors = true;
+    } else {
+        $results[] = 'Attachments: No attachments directory found in backup';
+    }
+    
+    // Clean up temporary directory
+    deleteDirectory($tempExtractDir);
+    
+    return [
+        'success' => !$hasErrors,
+        'message' => implode('; ', $results),
+        'error' => $hasErrors ? 'Some components failed to restore' : ''
+    ];
+}
+
+function restoreDatabaseFromFile($sqlFile) {
+    $content = file_get_contents($sqlFile);
+    if (!$content) {
+        return ['success' => false, 'error' => 'Cannot read SQL file'];
+    }
+    
+    $dbPath = SQLITE_DATABASE;
+    
+    // First, backup current database
+    $backupPath = $dbPath . '.backup.' . date('Y-m-d_H-i-s');
+    if (file_exists($dbPath)) {
+        copy($dbPath, $backupPath);
+    }
+    
+    // Remove current database
+    if (file_exists($dbPath)) {
+        unlink($dbPath);
+    }
+    
+    // Restore database
+    $command = "sqlite3 {$dbPath} < {$sqlFile} 2>&1";
+    
+    exec($command, $output, $returnCode);
+    
+    if ($returnCode === 0) {
+        return ['success' => true];
+    } else {
+        $errorMessage = implode("\n", $output);
+        return ['success' => false, 'error' => $errorMessage];
+    }
+}
+
+function restoreEntriesFromDir($sourceDir) {
+    $entriesPath = getEntriesPath();
+    
+    if (!$entriesPath || !is_dir($entriesPath)) {
+        return ['success' => false, 'error' => 'Cannot find entries directory'];
+    }
+    
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($sourceDir), 
+        RecursiveIteratorIterator::LEAVES_ONLY
+    );
+    
+    $importedCount = 0;
+    
+    foreach ($files as $name => $file) {
+        if (!$file->isDir()) {
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($sourceDir) + 1);
+            
+            if (pathinfo($relativePath, PATHINFO_EXTENSION) === 'html') {
+                $targetFile = $entriesPath . '/' . basename($relativePath);
+                if (copy($filePath, $targetFile)) {
+                    chmod($targetFile, 0644);
+                    $importedCount++;
+                }
+            }
+        }
+    }
+    
+    return ['success' => true, 'count' => $importedCount];
+}
+
+function restoreAttachmentsFromDir($sourceDir) {
+    $attachmentsPath = getAttachmentsPath();
+    
+    if (!$attachmentsPath || !is_dir($attachmentsPath)) {
+        return ['success' => false, 'error' => 'Cannot find attachments directory'];
+    }
+    
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($sourceDir), 
+        RecursiveIteratorIterator::LEAVES_ONLY
+    );
+    
+    $importedCount = 0;
+    
+    foreach ($files as $name => $file) {
+        if (!$file->isDir()) {
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($sourceDir) + 1);
+            
+            // Skip metadata file
+            if (basename($relativePath) === 'poznote_attachments_metadata.json') {
+                continue;
+            }
+            
+            $targetFile = $attachmentsPath . '/' . basename($relativePath);
+            if (copy($filePath, $targetFile)) {
+                chmod($targetFile, 0644);
+                $importedCount++;
+            }
+        }
+    }
+    
+    return ['success' => true, 'count' => $importedCount];
+}
+
+function deleteDirectory($dir) {
+    if (!is_dir($dir)) {
+        return;
+    }
+    
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    
+    foreach ($files as $fileinfo) {
+        $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+        $todo($fileinfo->getRealPath());
+    }
+    
+    rmdir($dir);
 }
 
 function restoreBackup($uploadedFile) {
@@ -405,7 +612,6 @@ function importAttachmentsZip($uploadedFile) {
 <body>
     <div class="backup-container">
         <h1><i class="fas fa-download"></i> Restore (Import)</h1>
-        <p>Import data from backup files.</p>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Notes
@@ -415,117 +621,39 @@ function importAttachmentsZip($uploadedFile) {
         </a>
         <br><br>
         
-        <!-- Global backup/restore warning (important) -->
-        <div class="alert alert-danger" style="margin-top:12px;">
-            <h3 style="margin-top:0; margin-bottom:8px;">Important</h3>
-            <p style="margin:0; color:#333;">
-                You cannot backup or restore workspaces data separately.<br>The backup files contains the entire database and html files of all workspaces.
-            </p>
-        </div>
-
-        <!-- Information Section -->
-        <div class="warning">
-            <h4>⚠️ Important Notes:</h4>
-            <ul>
-                <li><strong>Database restore</strong> will replace note titles, tags, search index and metadata (not note content)</li>
-                <li><strong>Notes import</strong> will overwrite existing notes and add missing ones</li>
-                <li><strong>Attachments import</strong> will overwrite existing attachments and add missing ones</li>
-                <br>Always backup your current data before restoring.
-            </ul>
-        </div>
-        
-        <!-- Import Database Section -->
+        <!-- Complete Import Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-database"></i> Import Database</h3>
-            <p><strong>⚠️ Warning:</strong> This will replace note titles, tags, search index and metadata, but not the actual note content!</p>
+            <h3><i class="fas fa-archive"></i> Complete Restore</h3>
+            <p>Upload a complete backup ZIP file to restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
             
-            <?php if ($restore_message): ?>
+            <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($restore_message); ?>
                 </div>
             <?php endif; ?>
             
-            <?php if ($restore_error): ?>
+            <?php if ($restore_error && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($restore_error); ?>
                 </div>
             <?php endif; ?>
 
             <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="restore">
+                <input type="hidden" name="action" value="complete_restore">
                 <div class="form-group">
-                    <label for="backup_file">SQL file to import:</label>
-                    <input type="file" id="backup_file" name="backup_file" accept=".sql" required>
+                    <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
                 </div>
                 
-                <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                    <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
-                    <strong>Automatic Backup:</strong> Your current database will be automatically backed up before import. 
-                    Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
-                </div>
-                
-                <button type="button" class="btn btn-primary" onclick="showImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Database
+                <button type="button" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
+                    <i class="fas fa-upload"></i> Complete Restore
                 </button>
             </form>
-        </div>
-        
-        <!-- Import Notes Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-file-upload"></i> Import Notes</h3>
-            <p>Upload a ZIP file containing HTML notes to import. Notes will be added to your existing collection.</p>
             
-            <?php if ($import_notes_message): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_notes_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($import_notes_error): ?>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_notes_error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="import_notes">
-                <div class="form-group">
-                    <label for="notes_file">ZIP file containing notes:</label>
-                    <input type="file" id="notes_file" name="notes_file" accept=".zip" required>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="showNotesImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Notes (ZIP)
-                </button>
-            </form>
-        </div>
-        
-        <!-- Import Attachments Section -->
-        <div class="backup-section">
-            <h3><i class="fas fa-paperclip"></i> Import Attachments</h3>
-            <p>Upload a ZIP file containing attachments to import. Files will be added to your attachments folder.</p>
-            
-            <?php if ($import_attachments_message): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($import_attachments_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($import_attachments_error): ?>
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($import_attachments_error); ?>
-                </div>
-            <?php endif; ?>
-            
-            <form method="post" enctype="multipart/form-data">
-                <input type="hidden" name="action" value="import_attachments">
-                <div class="form-group">
-                    <label for="attachments_file">ZIP file containing attachments:</label>
-                    <input type="file" id="attachments_file" name="attachments_file" accept=".zip" required>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="showAttachmentsImportConfirmation()">
-                    <i class="fas fa-upload"></i> Import Attachments (ZIP)
-                </button>
-            </form>
+            <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
+                <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
+                <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
+                Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
+            </div>
         </div>
         
         <!-- Bottom padding for better spacing -->
@@ -544,6 +672,23 @@ function importAttachmentsZip($uploadedFile) {
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithImport()">
                     Yes, Import
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Restore Confirmation Modal -->
+    <div id="completeRestoreConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Complete Restore?</h3>
+            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideCompleteRestoreConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithCompleteRestore()">
+                    Yes, Complete Restore
                 </button>
             </div>
         </div>
