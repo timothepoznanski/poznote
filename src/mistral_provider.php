@@ -8,56 +8,114 @@ require_once __DIR__ . '/ai_provider.php';
 class MistralProvider extends AIProvider {
     private $api_url = 'https://api.mistral.ai/v1/chat/completions';
     
-    public function __construct($api_key, $model = 'mistral-large-latest') {
-        parent::__construct($api_key, $model);
+    public function __construct($api_key, $model = 'mistral-large-latest', $language = 'en') {
+        parent::__construct($api_key, $model, $language);
     }
     
     public function generateSummary($content, $title) {
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => 'Tu es un assistant qui aide à résumer des notes. Crée un résumé concis et informatif de la note fournie. Le résumé doit capturer les points clés et les informations importantes.
+        $language_instruction = $this->getLanguageInstruction();
+        
+        if ($this->language === 'en') {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an assistant that helps summarize notes. Create a concise and informative summary of the provided note. The summary should capture the key points and important information.
+
+Rules:
+- Keep the summary concise but informative (2-4 sentences)
+- Focus on the main ideas and key information
+- Do not include personal opinions or interpretations
+- Make it clear and easy to understand
+- NEVER use Markdown formatting in your response
+- Respond in plain text only
+
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Here is a note titled \"$title\":\n\n$content\n\nProvide a concise summary of this note."
+                ]
+            ];
+        } else {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'Tu es un assistant qui aide à résumer des notes. Crée un résumé concis et informatif de la note fournie. Le résumé doit capturer les points clés et les informations importantes.
 
 Règles :
 - Garde le résumé concis mais informatif (2-4 phrases)
 - Concentre-toi sur les idées principales et les informations clés
-- Utilise la même langue que la note originale
 - N\'inclus pas d\'opinions personnelles ou d\'interprétations
 - Rends-le clair et facile à comprendre
+- N\'utilise JAMAIS de formatage Markdown dans ta réponse
+- Réponds en texte brut uniquement
 
-CRITIQUE : Toute ta réponse doit être écrite dans la même langue principale que le contenu de la note ci-dessus. Ne traduis pas, ne mélange pas les langues, et ne réponds dans aucune autre langue que celle utilisée principalement dans le contenu de la note.'
-            ],
-            [
-                'role' => 'user',
-                'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nFournis un résumé concis de cette note."
-            ]
-        ];
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nFournis un résumé concis de cette note."
+                ]
+            ];
+        }
         
         return $this->makeRequest($messages, 300, 0.5);
     }
     
     public function generateTags($content, $title) {
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => 'Tu es un assistant qui génère des tags pertinents pour les notes. Ta tâche est d\'analyser le contenu et de créer une liste de 3 à 8 tags pertinents qui décrivent le mieux les sujets principaux, thèmes et sujets couverts dans la note.
+        $language_instruction = $this->getLanguageInstruction();
+        
+        if ($this->language === 'en') {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an assistant that generates relevant tags for notes. Your task is to analyze the content and create a list of 3-8 relevant tags that best describe the main topics, themes, and subjects covered in the note. 
+
+Rules:
+- Generate between 3 to 8 tags maximum
+- Tags MUST be single words only (no spaces allowed)
+- If a concept requires multiple words, use camelCase or underscores (e.g., "machineLearning" or "machine_learning")
+- Focus on the main topics, concepts, and themes
+- Avoid generic tags like "note" or "text"
+- Make tags specific and meaningful
+- Use lowercase for consistency
+- Return only the tags as a comma-separated list, nothing else
+- NEVER use Markdown formatting in your response
+- Respond in plain text only
+
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Here is a note titled \"$title\":\n\n$content\n\nGenerate relevant single-word tags for this note. Return only the tags as a comma-separated list."
+                ]
+            ];
+        } else {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'Tu es un assistant qui génère des tags pertinents pour les notes. Ta tâche est d\'analyser le contenu et de créer une liste de 3 à 8 tags pertinents qui décrivent le mieux les sujets principaux, thèmes et sujets couverts dans la note.
 
 Règles :
 - Génère entre 3 et 8 tags maximum
 - Les tags DOIVENT être des mots uniques seulement (pas d\'espaces autorisés)
 - Si un concept nécessite plusieurs mots, utilise camelCase ou des underscores (ex: "apprentissageAutomatique" ou "apprentissage_automatique")
-- Les tags doivent être dans la même langue que le contenu de la note
 - Concentre-toi sur les sujets principaux, concepts et thèmes
 - Évite les tags génériques comme "note" ou "texte"
 - Rends les tags spécifiques et significatifs
 - Utilise des minuscules pour la cohérence
-- Retourne seulement les tags sous forme de liste séparée par des virgules, rien d\'autre'
-            ],
-            [
-                'role' => 'user',
-                'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nGénère des tags pertinents composés d'un seul mot pour cette note. Retourne seulement les tags sous forme de liste séparée par des virgules."
-            ]
-        ];
+- Retourne seulement les tags sous forme de liste séparée par des virgules, rien d\'autre
+- N\'utilise JAMAIS de formatage Markdown dans ta réponse
+- Réponds en texte brut uniquement
+
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Voici une note intitulée \"$title\" :\n\n$content\n\nGénère des tags pertinents composés d'un seul mot pour cette note. Retourne seulement les tags sous forme de liste séparée par des virgules."
+                ]
+            ];
+        }
         
         $result = $this->makeRequest($messages, 100, 0.3);
         
@@ -85,10 +143,40 @@ Règles :
     }
     
     public function checkErrors($content, $title) {
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => 'Tu es un assistant expert en correction de texte. Analyse le contenu fourni et identifie les erreurs factuelles, les incohérences logiques, les contradictions et les informations potentiellement incorrectes.
+        $language_instruction = $this->getLanguageInstruction();
+        
+        if ($this->language === 'en') {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an expert assistant for text correction. Analyze the provided content and identify factual errors, logical inconsistencies, contradictions, and potentially incorrect information.
+
+IMPORTANT RULES:
+- Completely ignore spelling, grammar, and syntax
+- Focus ONLY on FACTUAL and logical errors
+- Identify internal contradictions in the text
+- Flag statements that seem factually incorrect
+- Mention dates, numbers, or facts that appear erroneous
+- Indicate logical inconsistencies in the reasoning
+
+Response format:
+- If you find factual errors: list them clearly with explanations
+- If no factual errors: simply respond "No factual errors detected."
+- NEVER use Markdown formatting in your response
+- Respond in plain text only
+
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Title: \"$title\"\n\nContent:\n$content\n\nAnalyze this content for factual errors, contradictions, and logical inconsistencies (ignore spelling and grammar):"
+                ]
+            ];
+        } else {
+            $messages = [
+                [
+                    'role' => 'system',
+                    'content' => 'Tu es un assistant expert en correction de texte. Analyse le contenu fourni et identifie les erreurs factuelles, les incohérences logiques, les contradictions et les informations potentiellement incorrectes.
 
 RÈGLES IMPORTANTES:
 - Ignore complètement l\'orthographe, la grammaire et la syntaxe
@@ -101,15 +189,17 @@ RÈGLES IMPORTANTES:
 Format de réponse:
 - Si tu trouves des erreurs factuelles: liste-les clairement avec des explications
 - Si aucune erreur factuelle: réponds simplement "Aucune erreur factuelle détectée."
-- Utilise la même langue que le contenu analysé
+- N\'utilise JAMAIS de formatage Markdown dans ta réponse
+- Réponds en texte brut uniquement
 
-IMPORTANT: Ignore l\'orthographe/grammaire, concentre-toi sur les FAITS!'
-            ],
-            [
-                'role' => 'user',
-                'content' => "Titre: \"$title\"\n\nContenu:\n$content\n\nAnalyse ce contenu pour détecter les erreurs factuelles, contradictions et incohérences logiques (ignore l'orthographe et la grammaire):"
-            ]
-        ];
+' . $language_instruction
+                ],
+                [
+                    'role' => 'user',
+                    'content' => "Titre: \"$title\"\n\nContenu:\n$content\n\nAnalyse ce contenu pour détecter les erreurs factuelles, contradictions et incohérences logiques (ignore l'orthographe et la grammaire):"
+                ]
+            ];
+        }
         
         $result = $this->makeRequest($messages, 2000, 0.2);
         
@@ -202,5 +292,14 @@ IMPORTANT: Ignore l\'orthographe/grammaire, concentre-toi sur les FAITS!'
         }
         
         return ['content' => trim($api_response['choices'][0]['message']['content'])];
+    }
+    
+    private function getLanguageInstruction() {
+        $language_map = [
+            'en' => 'CRITIQUE : Toute ta réponse doit être écrite en anglais. N\'utilise aucune autre langue.',
+            'fr' => 'CRITIQUE : Toute ta réponse doit être écrite en français. N\'utilise aucune autre langue.'
+        ];
+        
+        return isset($language_map[$this->language]) ? $language_map[$this->language] : $language_map['en'];
     }
 }

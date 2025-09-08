@@ -15,8 +15,8 @@ class AIProviderFactory {
     public static function create($database) {
         try {
             // Get AI configuration from settings
-            $stmt = $database->prepare("SELECT key, value FROM settings WHERE key IN (?, ?, ?, ?)");
-            $stmt->execute(['ai_enabled', 'ai_provider', 'openai_api_key', 'mistral_api_key']);
+            $stmt = $database->prepare("SELECT key, value FROM settings WHERE key IN (?, ?, ?, ?, ?)");
+            $stmt->execute(['ai_enabled', 'ai_provider', 'openai_api_key', 'mistral_api_key', 'ai_language']);
             
             $settings = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -29,6 +29,7 @@ class AIProviderFactory {
             }
             
             $provider = isset($settings['ai_provider']) ? $settings['ai_provider'] : 'openai';
+            $language = isset($settings['ai_language']) ? $settings['ai_language'] : 'auto';
             
             switch ($provider) {
                 case 'mistral':
@@ -41,7 +42,7 @@ class AIProviderFactory {
                     $stmt->execute(['mistral_model']);
                     $model = $stmt->fetchColumn() ?: 'mistral-large-latest';
                     
-                    return new MistralProvider($settings['mistral_api_key'], $model);
+                    return new MistralProvider($settings['mistral_api_key'], $model, $language);
                     
                 case 'openai':
                 default:
@@ -54,7 +55,7 @@ class AIProviderFactory {
                     $stmt->execute(['openai_model']);
                     $model = $stmt->fetchColumn() ?: 'gpt-4o-mini';
                     
-                    return new OpenAIProvider($settings['openai_api_key'], $model);
+                    return new OpenAIProvider($settings['openai_api_key'], $model, $language);
             }
             
         } catch (Exception $e) {
@@ -82,12 +83,12 @@ class AIProviderFactory {
     public static function getModelsForProvider($provider) {
         switch ($provider) {
             case 'mistral':
-                $mistralProvider = new MistralProvider('dummy', 'mistral-large-latest');
+                $mistralProvider = new MistralProvider('dummy', 'mistral-large-latest', 'en');
                 return $mistralProvider->getAvailableModels();
                 
             case 'openai':
             default:
-                $openaiProvider = new OpenAIProvider('dummy', 'gpt-4o-mini');
+                $openaiProvider = new OpenAIProvider('dummy', 'gpt-4o-mini', 'en');
                 return $openaiProvider->getAvailableModels();
         }
     }

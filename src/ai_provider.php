@@ -7,10 +7,12 @@
 abstract class AIProvider {
     protected $api_key;
     protected $model;
+    protected $language;
     
-    public function __construct($api_key, $model = null) {
+    public function __construct($api_key, $model = null, $language = 'en') {
         $this->api_key = $api_key;
         $this->model = $model;
+        $this->language = $language;
     }
     
     /**

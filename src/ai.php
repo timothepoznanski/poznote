@@ -49,6 +49,13 @@ if ($_POST) {
             $stmt->execute(['mistral_model', $mistral_model]);
         }
         
+        // Handle language setting
+        if (isset($_POST['ai_language'])) {
+            $ai_language = trim($_POST['ai_language']);
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+            $stmt->execute(['ai_language', $ai_language]);
+        }
+        
         $message = 'AI settings saved successfully!';
     } catch (Exception $e) {
         $error = 'Error saving configuration: ' . $e->getMessage();
@@ -57,7 +64,7 @@ if ($_POST) {
 
 // Get current settings
 $stmt = $con->prepare("SELECT key, value FROM settings WHERE key IN (?, ?, ?, ?, ?, ?, ?)");
-$stmt->execute(['ai_enabled', 'ai_provider', 'openai_api_key', 'mistral_api_key', 'openai_model', 'mistral_model']);
+$stmt->execute(['ai_enabled', 'ai_provider', 'openai_api_key', 'mistral_api_key', 'openai_model', 'mistral_model', 'ai_language']);
 
 $settings = [];
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -70,6 +77,7 @@ $openai_api_key = isset($settings['openai_api_key']) ? $settings['openai_api_key
 $mistral_api_key = isset($settings['mistral_api_key']) ? $settings['mistral_api_key'] : '';
 $openai_model = isset($settings['openai_model']) ? $settings['openai_model'] : 'gpt-4o-mini';
 $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] : 'mistral-large-latest';
+$ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en';
 
 ?>
 <!DOCTYPE html>
@@ -130,6 +138,18 @@ $mistral_model = isset($settings['mistral_model']) ? $settings['mistral_model'] 
                         <option value="openai" <?php echo $ai_provider === 'openai' ? 'selected' : ''; ?>>OpenAI</option>
                         <option value="mistral" <?php echo $ai_provider === 'mistral' ? 'selected' : ''; ?>>Mistral AI</option>
                     </select>
+                </div>
+                
+                <!-- AI Language Selection -->
+                <div class="form-group">
+                    <label for="ai_language">Response Language</label>
+                    <select id="ai_language" name="ai_language">
+                        <option value="en" <?php echo $ai_language === 'en' ? 'selected' : ''; ?>>English</option>
+                        <option value="fr" <?php echo $ai_language === 'fr' ? 'selected' : ''; ?>>Français</option>
+                    </select>
+                    <div class="help-text">
+                        <i class="fas fa-info-circle"></i> Choose the language for AI responses.
+                    </div>
                 </div>
                 
                 <!-- OpenAI Configuration -->

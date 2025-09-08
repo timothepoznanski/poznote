@@ -57,6 +57,7 @@ try {
 
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_enabled', '1')");
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_language', 'en')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_desktop', '16')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_mobile', '16')");
 
