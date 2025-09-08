@@ -91,3 +91,4 @@ window.updateidhead = updateidhead;
 window.updateidtags = updateidtags;
 window.updateidfolder = updateidfolder;
 window.updateident = updateident;
+window.setupNoteDragDropEvents = setupNoteDragDropEvents;
