@@ -32,7 +32,7 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - 🗑️ Corbeille avec restauration
 - 🌐 API REST pour l'automatisation
 
-[![Démo Poznote](screenshot.png)](poznote.mp4)
+🔗 [Visitez le site web Poznote](https://poznote.com/)
 
 ## Table des matières
 
