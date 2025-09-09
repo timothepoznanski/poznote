@@ -32,11 +32,10 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
 
-## Examples
-
-![alt text](image.png)
-
-![alt text](image-1.png)
+<video width="320" height="240" controls>
+  <source src="poznote.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Table of Contents
 
