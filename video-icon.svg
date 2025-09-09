@@ -1,0 +1,5 @@
+<svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="15" width="100" height="50" fill="#0078d7" rx="5"/>
+  <polygon points="35,25 35,55 65,40" fill="white"/>
+  <text x="60" y="70" text-anchor="middle" fill="#666" font-size="10">Poznote Demo</text>
+</svg>
