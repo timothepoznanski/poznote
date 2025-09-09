@@ -51,7 +51,7 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 
 ## Démonstration
 
-Découvrez le site web Poznote pour une vidéo de démonstration de toutes les fonctionnalités !
+Visitez le site web Poznote pour une vidéo de démonstration !
 
 🔗 **[Visitez le site web Poznote](https://poznote.com/)**
 
