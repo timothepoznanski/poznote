@@ -17,6 +17,23 @@
 
 A powerful note-taking application that puts you in complete control of your data. Poznote can be installed locally on your computer or on a remote server to access your notes from your phone or your computer web browser.
 
+## Table of Contents
+
+- [Features](#features)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Access Your Instance](#access-your-instance)
+- [Workspaces](#workspaces)
+- [Multiple Instances](#multiple-instances)
+- [Change Settings](#change-settings)
+- [Reset Password](#reset-password)
+- [Update Application](#update-application)
+- [Backup and Restore](#backup-and-restore)
+- [Offline View](#offline-view)
+- [AI Features](#ai-features)
+- [API Documentation](#api-documentation)
+- [Manual Operations](#manual-operations)
+
 ## Features
 
 - 📝 Rich Text Editor
@@ -37,21 +54,6 @@ A powerful note-taking application that puts you in complete control of your dat
 Check out the Poznote website for a video demonstration of all features!
 
 🔗 **[Visit Poznote Website](https://poznote.com/)**
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Access Your Instance](#access-your-instance)
-- [Workspaces](#workspaces)
-- [Multiple Instances](#multiple-instances)
-- [Change Settings](#change-settings)
-- [Reset Password](#reset-password)
-- [Update Application](#update-application)
-- [Backup and Restore](#backup-and-restore)
-- [Offline View](#offline-view)
-- [AI Features](#ai-features)
-- [API Documentation](#api-documentation)
-- [Manual Operations](#manual-operations)
 
 ## Installation
 

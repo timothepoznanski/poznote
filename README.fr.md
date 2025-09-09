@@ -17,6 +17,23 @@
 
 Une application de prise de notes puissante qui vous donne un contrôle total sur vos données. Poznote peut être installée localement sur votre ordinateur ou sur un serveur distant pour accéder à vos notes depuis votre téléphone ou le navigateur web de votre ordinateur.
 
+## Table des matières
+
+- [Fonctionnalités](#fonctionnalités)
+- [Démonstration](#démonstration)
+- [Installation](#installation)
+- [Accéder à votre instance](#accéder-à-votre-instance)
+- [Espaces de travail](#espaces-de-travail)
+- [Instances multiples](#instances-multiples)
+- [Modifier les paramètres](#modifier-les-paramètres)
+- [Réinitialiser le mot de passe](#réinitialiser-le-mot-de-passe)
+- [Mettre à jour l'application](#mettre-à-jour-lapplication)
+- [Sauvegarde et restauration](#sauvegarde-et-restauration)
+- [Vue hors-ligne](#vue-hors-ligne)
+- [Fonctionnalités IA](#fonctionnalités-ia)
+- [Documentation API](#documentation-api)
+- [Opérations manuelles](#opérations-manuelles)
+
 ## Fonctionnalités
 
 - 📝 Éditeur de texte enrichi
@@ -37,21 +54,6 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 Découvrez le site web Poznote pour une vidéo de démonstration de toutes les fonctionnalités !
 
 🔗 **[Visitez le site web Poznote](https://poznote.com/)**
-
-## Table des matières
-
-- [Installation](#installation)
-- [Accéder à votre instance](#accéder-à-votre-instance)
-- [Espaces de travail](#espaces-de-travail)
-- [Instances multiples](#instances-multiples)
-- [Modifier les paramètres](#modifier-les-paramètres)
-- [Réinitialiser le mot de passe](#réinitialiser-le-mot-de-passe)
-- [Mettre à jour l'application](#mettre-à-jour-lapplication)
-- [Sauvegarde et restauration](#sauvegarde-et-restauration)
-- [Vue hors-ligne](#vue-hors-ligne)
-- [Fonctionnalités IA](#fonctionnalités-ia)
-- [Documentation API](#documentation-api)
-- [Opérations manuelles](#opérations-manuelles)
 
 ## Installation
 
