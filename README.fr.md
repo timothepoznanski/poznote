@@ -32,11 +32,10 @@ Une application de prise de notes puissante qui vous donne un contrôle total su
 - 🗑️ Corbeille avec restauration
 - 🌐 API REST pour l'automatisation
 
-## Exemples
-
-![texte alternatif](image.png)
-
-![texte alternatif](image-1.png)
+<video width="320" height="240" controls>
+  <source src="poznote.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Table des matières
 
