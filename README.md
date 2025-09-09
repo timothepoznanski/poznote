@@ -32,7 +32,11 @@ A powerful note-taking application that puts you in complete control of your dat
 - 🗑️ Trash system with restore functionality
 - 🌐 REST API for automation
 
-🔗 [Visit Poznote Website](https://poznote.com/)
+## Demo
+
+Check out the Poznote website for a video demonstration of all features!
+
+🔗 **[Visit Poznote Website](https://poznote.com/)**
 
 ## Table of Contents
 
