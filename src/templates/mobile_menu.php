@@ -25,6 +25,28 @@
     <div class="sidebar-newfolder-row">
         <button class="btn-new-folder mobile" onclick="newFolder();"><i class="fas fa-folder-plus"></i> Nouveau dossier</button>
     </div>
+    <div class="mobile-search-container">
+        <form id="unified-search-form-mobile" action="index.php" method="POST">
+            <div class="unified-search-container mobile">
+                <div class="searchbar-row searchbar-icon-row">
+                    <div class="searchbar-input-wrapper">
+                        <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                        <span class="searchbar-icon"><span class="fas fa-search"></span></span>
+                        <?php if (!empty($search) || !empty($tags_search)): ?>
+                            <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <!-- Hidden inputs to maintain compatibility -->
+                <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
+                <input type="hidden" id="search-tags-hidden-mobile" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
+                <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+                <input type="hidden" id="search-in-notes-mobile" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags && !$preserve_folders) ? '1' : ''); ?>">
+                <input type="hidden" id="search-in-tags-mobile" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
+                <input type="hidden" id="search-in-folders-mobile" name="search_in_folders" value="<?php echo ($using_unified_search && !empty($_POST['search_in_folders']) && $_POST['search_in_folders'] === '1') || (!$using_unified_search && $preserve_folders) ? '1' : ''; ?>">
+            </div>
+        </form>
+    </div>
 
 </div>
 <div class="containbuttons">
