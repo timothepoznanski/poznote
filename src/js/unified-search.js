@@ -180,12 +180,10 @@ class SearchManager {
             const urlParams = new URLSearchParams(window.location.search);
             const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
             // Also consider hidden inputs which are used during AJAX submissions
-            // Distinguish between flag inputs (search-in-*) and term-carrying hidden inputs
-            const hasHiddenNotesFlag = Boolean(elements.hiddenInputs.notesFlag?.value === '1');
-            const hasHiddenTagsFlag = Boolean(elements.hiddenInputs.tagsFlag?.value === '1');
+            // Only term-bearing hidden inputs should count as an ongoing search.
             const hasHiddenNotesTerm = Boolean(elements.hiddenInputs.notesTerm?.value && elements.hiddenInputs.notesTerm.value.trim());
             const hasHiddenTagsTerm = Boolean(elements.hiddenInputs.tagsTerm?.value && elements.hiddenInputs.tagsTerm.value.trim());
-            const isSearching = term !== '' || hasUrlSearch || hasHiddenNotesFlag || hasHiddenTagsFlag || hasHiddenNotesTerm || hasHiddenTagsTerm;
+            const isSearching = term !== '' || hasUrlSearch || hasHiddenNotesTerm || hasHiddenTagsTerm;
 
             const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
