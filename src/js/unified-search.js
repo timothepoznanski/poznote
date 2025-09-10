@@ -114,8 +114,10 @@ class SearchManager {
         if (activeButton) {
             activeButton.classList.add('active');
         }
-        
-        this.updateInterface(isMobile);
+    // Persist state even if buttons are absent
+    this.currentSearchType = searchType;
+
+    this.updateInterface(isMobile);
     }
 
     /**
@@ -356,10 +358,8 @@ class SearchManager {
     }
 
     /**
-        // Persist state even if buttons are absent
-        this.currentSearchType = searchType;
-
-        this.updateInterface(isMobile);
+     * Handle form submission
+     */
     handleSearchSubmit(e, isMobile) {
         e.preventDefault();
         
