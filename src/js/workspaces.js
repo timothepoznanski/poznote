@@ -190,6 +190,11 @@ function displayWorkspaceMenu(menu, workspaces) {
     menuHtml += '<i class="fas fa-cog"></i>';
     menuHtml += '<span>Settings</span>';
     menuHtml += '</div>';
+    // Add Logout right after Settings
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
+    menuHtml += '<i class="fas fa-sign-out-alt"></i>';
+    menuHtml += '<span>Logout</span>';
+    menuHtml += '</div>';
     
     menu.innerHTML = menuHtml;
 }

@@ -261,15 +261,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
             
-            <!-- Logout -->
-            <div class="settings-card" onclick="window.location = 'logout.php';">
-                <div class="settings-card-icon" style="background: #fee2e2; color: #dc2626;">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Logout</h3>
-                </div>
-            </div>
+            <!-- Logout removed per UI simplification -->
         </div>
     </div>
     
