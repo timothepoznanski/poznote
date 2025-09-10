@@ -645,17 +645,29 @@ class SearchManager {
                 }
             }
 
-            // Restore focus/caret if requested
+            // Restore focus/caret if requested. Try immediate, then retry after short delays
             try {
                 if (this.focusAfterAjax) {
-                    const desktopInput = this.getElements(false).searchInput;
-                    const mobileInput = this.getElements(true).searchInput;
-                    const input = desktopInput && desktopInput.offsetParent !== null ? desktopInput : (mobileInput || desktopInput);
-                    if (input) {
-                        input.focus();
-                        if (typeof this.focusCaretPos === 'number') {
-                            try { input.setSelectionRange(this.focusCaretPos, this.focusCaretPos); } catch (e) {}
+                    const restore = () => {
+                        const desktopInput = this.getElements(false).searchInput;
+                        const mobileInput = this.getElements(true).searchInput;
+                        const input = desktopInput && desktopInput.offsetParent !== null ? desktopInput : (mobileInput || desktopInput);
+                        if (!input) return false;
+                        try {
+                            input.focus();
+                            // If stored position is available use it, otherwise put caret at end
+                            const pos = (typeof this.focusCaretPos === 'number' && this.focusCaretPos >= 0) ? this.focusCaretPos : input.value.length;
+                            try { input.setSelectionRange(pos, pos); } catch (e) { /* ignore */ }
+                            return true;
+                        } catch (e) {
+                            return false;
                         }
+                    };
+
+                    // Try immediate
+                    if (!restore()) {
+                        // Retry shortly after to allow DOM/paint
+                        setTimeout(() => { if (!restore()) setTimeout(restore, 150); }, 50);
                     }
                 }
             } catch (e) {
