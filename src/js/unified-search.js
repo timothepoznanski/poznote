@@ -455,9 +455,11 @@ class SearchManager {
             return;
         }
 
-        this.updateHiddenInputs(isMobile);
-        this.addExcludedFoldersToForm(elements.form, isMobile);
-        this.performAjaxSearch(elements.form, isMobile);
+    // Update hidden inputs and hide special folders immediately so UI reflects search
+    this.updateHiddenInputs(isMobile);
+    this.hideSpecialFolders(isMobile);
+    this.addExcludedFoldersToForm(elements.form, isMobile);
+    this.performAjaxSearch(elements.form, isMobile);
     }
 
     /**
@@ -745,8 +747,10 @@ class SearchManager {
         const elements = this.getElements(isMobile);
         if (!elements.form) return;
 
-        this.addExcludedFoldersToForm(elements.form, isMobile);
-        this.updateHiddenInputs(isMobile);
+    this.addExcludedFoldersToForm(elements.form, isMobile);
+    this.updateHiddenInputs(isMobile);
+    // Hide special folders now so they won't appear while AJAX completes
+    this.hideSpecialFolders(isMobile);
         
         const formData = new FormData(elements.form);
         const params = new URLSearchParams();
