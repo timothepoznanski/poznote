@@ -806,6 +806,15 @@ a.links_arbo_left.selected-note {
     outline: none !important;
 }
 
+/* Ensure mobile browsers (including iOS/Android) don't show a blue focus ring */
+.searchbar-input:focus,
+.searchbar-input:focus-visible,
+.searchbar-input::-moz-focus-inner {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: #e8ebee !important;
+}
+
 .search-options-container.mobile {
     margin-top: 8px;
     padding: 0;
