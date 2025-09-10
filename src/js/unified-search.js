@@ -607,17 +607,47 @@ class SearchManager {
      * Save current search state
      */
     saveCurrentSearchState() {
+        // Try to capture explicit button state; if buttons/pills were removed,
+        // fall back to internal currentSearchType so the choice survives AJAX.
+        const desktopElements = this.getElements(false);
+        const mobileElements = this.getElements(true);
+
+        const desktopButtonsExist = Object.values(desktopElements.buttons).some(b => b !== null && b !== undefined);
+        const mobileButtonsExist = Object.values(mobileElements.buttons).some(b => b !== null && b !== undefined);
+
+        const desktopState = {
+            notes: false,
+            tags: false,
+            folders: false
+        };
+        const mobileState = {
+            notes: false,
+            tags: false,
+            folders: false
+        };
+
+        if (desktopButtonsExist) {
+            desktopState.notes = desktopElements.buttons.notes?.classList.contains('active') || false;
+            desktopState.tags = desktopElements.buttons.tags?.classList.contains('active') || false;
+            desktopState.folders = desktopElements.buttons.folders?.classList.contains('active') || false;
+        } else {
+            // Fallback to internal state
+            const t = this.currentSearchType || 'notes';
+            desktopState[t] = true;
+        }
+
+        if (mobileButtonsExist) {
+            mobileState.notes = mobileElements.buttons.notes?.classList.contains('active') || false;
+            mobileState.tags = mobileElements.buttons.tags?.classList.contains('active') || false;
+            mobileState.folders = mobileElements.buttons.folders?.classList.contains('active') || false;
+        } else {
+            const t = this.currentSearchType || 'notes';
+            mobileState[t] = true;
+        }
+
         return {
-            desktop: {
-                notes: this.getElements(false).buttons.notes?.classList.contains('active') || false,
-                tags: this.getElements(false).buttons.tags?.classList.contains('active') || false,
-                folders: this.getElements(false).buttons.folders?.classList.contains('active') || false
-            },
-            mobile: {
-                notes: this.getElements(true).buttons.notes?.classList.contains('active') || false,
-                tags: this.getElements(true).buttons.tags?.classList.contains('active') || false,
-                folders: this.getElements(true).buttons.folders?.classList.contains('active') || false
-            }
+            desktop: desktopState,
+            mobile: mobileState
         };
     }
 
