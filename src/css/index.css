@@ -444,15 +444,16 @@ body {
     background: #0b78e6; /* flat primary */
     color: #fff;
     border: none;
-    padding: 10px 14px;
+    padding: 0 14px;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     width: 100%;
     justify-content: center;
     font-size: 0.98rem;
+    height: 40px; /* enforce same height as search */
 }
-.btn-new-note i { font-size: 1rem; color: #fff; }
+.btn-new-note i { font-size: 16px; color: #fff; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
 .btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
 .btn-new-note:hover { filter: brightness(0.96); }
 
@@ -463,15 +464,16 @@ body {
     background: #f7fafc; /* subtle light */
     color: #0b4da6;
     border: 1px solid #e6eef8;
-    padding: 10px 12px;
+    padding: 0 12px;
     border-radius: 8px;
     width: 100%;
     justify-content: center;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.98rem;
+    height: 40px; /* enforce same height as search */
 }
-.btn-new-folder i { color: #0b4da6; font-size: 0.98rem; }
+.btn-new-folder i { color: #0b4da6; font-size: 16px; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
 .btn-new-folder:hover { background: #f3f7fb; }
 
 /* Make search bar full width of sidebar and align spacing with buttons */
@@ -841,9 +843,9 @@ a.links_arbo_left.selected-note {
     align-items: center;
     justify-content: center;
     color: #6b7280;
-    font-size: 1rem;
-    width: 28px;
-    height: 28px;
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
 }
 
 .searchbar-icon {
