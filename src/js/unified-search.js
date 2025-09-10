@@ -10,6 +10,8 @@
 
 class SearchManager {
     constructor() {
+    // Toggle debug logging for tracing search-type issues
+    this.debug = false; // set true temporarily to enable verbose logs
         this.searchTypes = ['notes', 'tags', 'folders'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
@@ -105,6 +107,7 @@ class SearchManager {
     const preserveFolders = urlParams.get('preserve_folders') === '1';
     const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
     const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
+    if (this.debug) console.debug('restoreSearchStateFromURL', {isMobile, preserveNotes, preserveTags, preserveFolders, hasTagsSearchParam, hasNotesSearchParam, notesFlag: elements.hiddenInputs.notesFlag?.value, tagsFlag: elements.hiddenInputs.tagsFlag?.value, notesTerm: elements.hiddenInputs.notesTerm?.value, tagsTerm: elements.hiddenInputs.tagsTerm?.value});
         
     // Check hidden field values: flags vs term-bearing inputs
     const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
@@ -150,7 +153,9 @@ class SearchManager {
             activeButton.classList.add('active');
         }
     // Persist state even if buttons are absent
+    const prev = this.currentSearchType;
     this.currentSearchType = searchType;
+    if (this.debug) console.debug('setActiveSearchType', {isMobile, searchType, prev});
 
     this.updateInterface(isMobile);
     }
@@ -292,6 +297,7 @@ class SearchManager {
         if (elements.hiddenInputs.tagsTerm) {
             elements.hiddenInputs.tagsTerm.value = activeType === 'tags' ? searchValue : '';
         }
+        if (this.debug) console.debug('updateHiddenInputs', {isMobile, activeType, searchValue, notesTerm: elements.hiddenInputs.notesTerm?.value, tagsTerm: elements.hiddenInputs.tagsTerm?.value});
 
         // Update flag inputs (search-in-*) to reflect active type
         if (elements.hiddenInputs.notesFlag) {
@@ -470,7 +476,8 @@ class SearchManager {
             return;
         }
 
-    // Update hidden inputs and hide special folders immediately so UI reflects search
+        // Update hidden inputs and hide special folders immediately so UI reflects search
+    if (this.debug) console.debug('handleSearchSubmit', {isMobile, activeType, searchValue});
     this.updateHiddenInputs(isMobile);
     this.hideSpecialFolders(isMobile);
     this.addExcludedFoldersToForm(elements.form, isMobile);
@@ -518,6 +525,7 @@ class SearchManager {
             }
 
             const searchState = this.saveCurrentSearchState();
+            if (this.debug) console.debug('performAjaxSearch', {isMobile, action: form.action, params: params.toString(), searchState});
 
             fetch(form.action || window.location.pathname, {
                 method: 'POST',
@@ -541,6 +549,7 @@ class SearchManager {
      */
     handleAjaxResponse(html, formParams, searchState) {
         try {
+            if (this.debug) console.debug('handleAjaxResponse start', {formParams, searchState});
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
@@ -568,6 +577,7 @@ class SearchManager {
 
             // Reinitialize components
             this.reinitializeAfterAjax(searchState);
+            if (this.debug) console.debug('handleAjaxResponse done');
 
         } catch (error) {
             // Fallback to page reload
