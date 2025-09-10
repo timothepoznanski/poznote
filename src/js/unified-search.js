@@ -123,6 +123,7 @@ class SearchManager {
      */
     updateInterface(isMobile) {
         this.updatePlaceholder(isMobile);
+    this.updateIcon(isMobile);
         this.updateHiddenInputs(isMobile);
         this.hideValidationError(isMobile);
     }
@@ -144,6 +145,32 @@ class SearchManager {
             elements.searchInput.placeholder = placeholders[activeType] || placeholders.notes;
             elements.searchInput.disabled = false;
         }
+    }
+
+    /**
+     * Update the searchbar icon according to active search type
+     */
+    updateIcon(isMobile) {
+        const elements = this.getElements(isMobile);
+        // Prefer the container's icon element
+        let iconSpan = elements.container?.querySelector('.searchbar-icon span');
+
+        // Fallback to searching globally by id/class
+        if (!iconSpan) {
+            const selector = isMobile ? '.unified-search-container.mobile .searchbar-icon span' : '.unified-search-container .searchbar-icon span';
+            iconSpan = document.querySelector(selector);
+        }
+
+        if (!iconSpan) return;
+
+        const activeType = this.getActiveSearchType(isMobile);
+        const iconMap = {
+            notes: 'fas fa-file-alt',
+            tags: 'fas fa-tags',
+            folders: 'fas fa-folder'
+        };
+
+        iconSpan.className = iconMap[activeType] || 'fas fa-search';
     }
 
     /**
@@ -194,6 +221,44 @@ class SearchManager {
         this.setupFormListeners(true);  // Mobile
         this.setupButtonListeners(false);
         this.setupButtonListeners(true);
+        this.setupIconListeners(false);
+        this.setupIconListeners(true);
+    }
+
+    /**
+     * Setup click listeners on the searchbar icon to cycle search type
+     */
+    setupIconListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+        // Try to get the icon wrapper from the container; if not available (timing/AJAX),
+        // fall back to a global query to ensure the listener is attached.
+        let iconWrapper = elements?.container?.querySelector('.searchbar-icon');
+        if (!iconWrapper) {
+            const selector = isMobile ? '.unified-search-container.mobile .searchbar-icon' : '.unified-search-container .searchbar-icon';
+            iconWrapper = document.querySelector(selector);
+        }
+
+        if (!iconWrapper) return;
+
+        const handlerKey = `icon-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingHandler = this.eventHandlers.get(handlerKey);
+        if (existingHandler) {
+            try { iconWrapper.removeEventListener('click', existingHandler); } catch (e) {}
+        }
+
+        const handler = (e) => {
+            e.preventDefault();
+            // Cycle to next search type
+            const current = this.getActiveSearchType(isMobile);
+            const idx = this.searchTypes.indexOf(current);
+            const next = this.searchTypes[(idx + 1) % this.searchTypes.length];
+            this.handleButtonClick(next, isMobile);
+        };
+
+        this.eventHandlers.set(handlerKey, handler);
+        iconWrapper.addEventListener('click', handler);
+        // make it look clickable
+        iconWrapper.style.cursor = 'pointer';
     }
 
     /**
