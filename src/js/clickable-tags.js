@@ -197,17 +197,25 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
         return;
     }
 
+    // Support multiple tokens separated by commas or whitespace (e.g. "tag1, tag2" or "tag1 tag2")
+    const tokens = normalized.split(/[\,\s]+/).map(t => t.trim()).filter(t => t.length > 0);
+    if (tokens.length === 0) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+
     let matched = 0;
     tagEls.forEach(el => {
         const text = (el.textContent || '').trim().toLowerCase();
-        if (text === normalized || text.includes(normalized)) {
+        const isMatch = tokens.some(tok => text === tok || text.includes(tok));
+        if (isMatch) {
             el.classList.add('tag-highlight');
             matched++;
         } else {
             el.classList.remove('tag-highlight');
         }
     });
-    console.debug && console.debug('debug: highlightMatchingTags applied, found elements=', tagEls.length, 'matched=', matched);
+    console.debug && console.debug('debug: highlightMatchingTags applied, found elements=', tagEls.length, 'tokens=', tokens, 'matched=', matched);
 }
 
 // Expose helper so other modules can call it after AJAX reinit
