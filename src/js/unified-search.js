@@ -178,14 +178,17 @@ class SearchManager {
      */
     getActiveSearchType(isMobile) {
         const elements = this.getElements(isMobile);
-        
+        // Prefer DOM state if buttons are present
         for (const type of this.searchTypes) {
             if (elements.buttons[type]?.classList.contains('active')) {
+                // keep internal sync
+                this.currentSearchType = type;
                 return type;
             }
         }
-        
-        return 'notes'; // Default
+
+        // Fallback to internal state (useful when pills were removed)
+        return this.currentSearchType || 'notes'; // Default
     }
 
     /**
@@ -252,7 +255,21 @@ class SearchManager {
             const current = this.getActiveSearchType(isMobile);
             const idx = this.searchTypes.indexOf(current);
             const next = this.searchTypes[(idx + 1) % this.searchTypes.length];
-            this.handleButtonClick(next, isMobile);
+
+            // Persist the new type and update UI
+            this.setActiveSearchType(next, isMobile);
+
+            // Trigger behavior similar to clicking the pill
+            const elements = this.getElements(isMobile);
+            if (next === 'folders') {
+                const searchValue = elements.searchInput?.value.trim();
+                if (searchValue) this.filterFolders(searchValue, isMobile);
+                elements.searchInput?.focus();
+            } else if (elements.searchInput?.value.trim()) {
+                this.submitSearchWithExcludedFolders(isMobile);
+            } else {
+                elements.searchInput?.focus();
+            }
         };
 
         this.eventHandlers.set(handlerKey, handler);
@@ -339,8 +356,10 @@ class SearchManager {
     }
 
     /**
-     * Handle form submission
-     */
+        // Persist state even if buttons are absent
+        this.currentSearchType = searchType;
+
+        this.updateInterface(isMobile);
     handleSearchSubmit(e, isMobile) {
         e.preventDefault();
         
