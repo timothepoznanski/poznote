@@ -591,12 +591,25 @@ class SearchManager {
                 reinitializeNoteContent();
             }
 
-            // Reinitialize search
+            // Reinitialize search (set up listeners/DOM hooks)
             this.initializeSearch();
-            
-            // Restore search state
+
+            // Restore search state (force UI to reflect saved choice)
             if (searchState) {
-                this.restoreSearchState(searchState);
+                try {
+                    this.restoreSearchState(searchState);
+                    // Ensure placeholders, icons and hidden inputs reflect restored state
+                    this.updateInterface(false);
+                    this.updateInterface(true);
+                    // Guard: reapply after a short delay in case other init code overrides
+                    setTimeout(() => {
+                        this.restoreSearchState(searchState);
+                        this.updateInterface(false);
+                        this.updateInterface(true);
+                    }, 50);
+                } catch (e) {
+                    // ignore
+                }
             }
 
             // Highlight search terms
