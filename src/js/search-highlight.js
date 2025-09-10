@@ -17,7 +17,23 @@ function highlightSearchTerms() {
     
     // Check if we're in notes search mode
     var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
-    if (!notesBtn || !notesBtn.classList.contains('active')) {
+    var isNotesActive = false;
+    if (notesBtn && notesBtn.classList.contains('active')) {
+        isNotesActive = true;
+    } else if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+        // Fallback when pills/buttons were removed: consult SearchManager
+        try {
+            var desktopType = window.searchManager.getActiveSearchType(false);
+            var mobileType = window.searchManager.getActiveSearchType(true);
+            if (desktopType === 'notes' || mobileType === 'notes' || window.searchManager.currentSearchType === 'notes') {
+                isNotesActive = true;
+            }
+        } catch (e) {
+            // ignore and fallthrough
+        }
+    }
+
+    if (!isNotesActive) {
         return; // Only highlight in notes search mode
     }
     
