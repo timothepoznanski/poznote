@@ -7,29 +7,23 @@
 
 <!-- Desktop menu -->
 <?php if (!$is_mobile): ?>
-<div class="left-header">
-    <span class="left-header-text">
-        <span id="workspaceNameDesktop"><?php echo $displayWorkspace; ?></span>
-    </span>
-</div>
-<div class="containbuttons">
-    <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
-    <div class="newfolderbutton" onclick="newFolder();"><span><span title="Create a new folder" class="fas fa-folder-plus"></span></span></div>
-<div class="list_tags" onclick="window.location = 'list_tags.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="List the tags" class="fas fa-tags"></span></span></div>
-    <!-- Small workspace icon (desktop) with dropdown menu -->
-    <div class="workspace-dropdown">
-        <div class="small-workspace-btn" title="Switch workspace" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleWorkspaceMenu(event)">
-            <span><span class="fas fa-layer-group" aria-hidden="true"></span></span>
+<div class="sidebar-header">
+    <div class="sidebar-title-row">
+    <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
+        <i class="fas fa-layer-group workspace-title-icon" aria-hidden="true"></i>
+        <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+    </div>
+        <div class="sidebar-title-actions">
+            <button class="sidebar-gear" onclick="toggleSettingsMenu(event);" title="Settings"><i class="fas fa-cog"></i></button>
         </div>
+
+        <!-- Workspace menu container (desktop) -->
         <div class="workspace-menu" id="workspaceMenu">
             <!-- Menu items will be loaded dynamically -->
         </div>
-    </div>
-    <div class="settings-dropdown">
-        <div class="settingsbutton" onclick="toggleSettingsMenu(event);" title="Settings">
-            <span><span class="fas fa-cog"></span></span>
-        </div>
-        <div class="settings-menu" id="settingsMenu">
+
+        <!-- Settings menu container (desktop) -->
+        <div class="settings-menu" id="settingsMenu" style="display: none;">
             <div class="settings-menu-item" onclick="foldAllFolders();">
                 <i class="fas fa-minus-square"></i>
                 <span>Fold All Folders</span>
@@ -79,11 +73,18 @@
             </div>
         </div>
     </div>
-<div class="trashnotebutton" onclick="window.location = 'trash.php?workspace=<?php echo urlencode($workspace_filter); ?>';"><span><span title="Go to the trash" class="fas fa-archive"></span></span></div>
-    <?php
-    // Red cross removed
-    ?>
+
+    <div class="sidebar-newnote-row">
+        <button class="btn-new-note" onclick="newnote();"><i class="fas fa-plus"></i> Nouvelle note</button>
+    </div>
+
+    <div class="sidebar-newfolder-row">
+        <button class="btn-new-folder" onclick="newFolder();"><i class="fas fa-folder-plus"></i> Nouveau dossier</button>
+    </div>
+
 </div>
+
+
 <?php endif; ?>
 
 <!-- Desktop search form -->
@@ -93,7 +94,7 @@
         <div class="unified-search-container">
             <div class="searchbar-row searchbar-icon-row">
                 <div class="searchbar-input-wrapper">
-                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Search..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                     <span class="searchbar-icon"><span class="fas fa-search"></span></span>
                     <?php if (!empty($search) || !empty($tags_search)): ?>
                         <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>

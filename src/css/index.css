@@ -399,18 +399,117 @@ body {
     overflow-x: hidden;
     padding: 16px;
     box-sizing: border-box;
-    background: #F8FAFC;
+    background: #FFFFFF;
     flex-shrink: 0;
 }
+
+/* Sidebar header and primary action */
+.sidebar-header {
+    padding: 6px 0 14px 0;
+    margin-bottom: 6px;
+}
+.sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 2px;
+    position: relative; /* anchor dropdown menus inside the title row */
+}
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937; /* dark */
+}
+.workspace-title-icon {
+    margin-right: 8px;
+    color: #007DB8;
+    font-size: 1.05rem;
+    vertical-align: middle;
+}
+.workspace-title-text { vertical-align: middle; }
+.sidebar-title[role="button"] { cursor: pointer; }
+.sidebar-title-actions { display: flex; align-items: center; gap: 6px; }
+.sidebar-gear { background: transparent; border: none; color: #6b7280; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-gear:hover { background: rgba(0,0,0,0.04); color: #374151; }
+
+.sidebar-newnote-row { padding: 8px 0 10px 0; }
+.btn-new-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(3,102,214,0.08);
+    width: 100%;
+    justify-content: center;
+    font-size: 0.98rem;
+}
+.btn-new-note i { font-size: 0.95rem; }
+.btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
+.btn-new-note:hover { filter: brightness(0.95); }
+
+.sidebar-newfolder-row { padding: 8px 6px 12px 0; }
+.btn-new-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #0b4da6;
+    border: 1px solid #e6eef8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 100%;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-new-folder i { color: #0b4da6; }
+.btn-new-folder:hover { background: #f7fbff; }
+
+/* Make the unified search placeholder French when shown in left column */
+
+/* Folder header adjustments to match visual spacing */
+.folder-header {
+    margin-top: 6px;
+    padding: 6px 4px;
+    border-radius: 8px;
+}
+.folder-toggle { display:flex; align-items:center; gap:8px; cursor: pointer; }
+.folder-name { font-weight:600; color:#111827; }
+.folder-note-count { color:#6b7280; margin-left:6px; font-weight:400; }
+
+/* Folder content / notes styling */
+.note-in-folder { padding-left: 26px; display:block; }
+.links_arbo_left { padding: 8px 10px; margin: 4px 0; }
+.links_arbo_left .note-title { font-weight: 500; color: #1f2937; }
+
+/* Selected note style matching light blue band from screenshot */
+.links_arbo_left.selected-note {
+    background-color: #e9f5ff; /* light blue */
+    border-radius: 8px;
+    color: #0b4da6;
+}
+.links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
+
+/* Folder actions icons keep small size */
+.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; }
+.folder-actions i:hover { color:#374151; }
+
 
 .resize-handle {
     width: 3px;
     height: 100vh;
-    background: #F8FAFC;
+    background: #FFFFFF;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    /* border-right: 1px solid #ddd; */
+    /* subtle divider line to match the mockup */
     border-right: 1px solid #e9ecef;
 
 }

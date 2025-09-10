@@ -6,7 +6,7 @@
     position: fixed;
     inset: 0;
     padding: 16px;
-    background: #F8FAFC;
+    background: #FFFFFF;
     box-sizing: border-box;
     overflow-y: scroll !important; /* Always show scrollbar on mobile */
     overflow-x: hidden !important; /* Hide horizontal scrollbar */

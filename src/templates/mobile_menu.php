@@ -7,10 +7,25 @@
 
 <!-- Mobile menu -->
 <?php if ($is_mobile): ?>
-<div class="left-header">
-    <span class="left-header-text">
-        <span id="workspaceNameMobile"><?php echo $displayWorkspace; ?></span>
-    </span>
+<div class="sidebar-header">
+    <div class="sidebar-title-row">
+        <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
+            <i class="fas fa-layer-group workspace-title-icon" aria-hidden="true"></i>
+            <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+        </div>
+        <div class="sidebar-title-actions">
+            <button class="sidebar-gear" onclick="toggleSettingsMenu(event);" title="Settings"><i class="fas fa-cog"></i></button>
+        </div>
+    </div>
+
+    <div class="sidebar-newnote-row">
+        <button class="btn-new-note mobile" onclick="newnote();"><i class="fas fa-plus"></i> Nouvelle note</button>
+    </div>
+
+    <div class="sidebar-newfolder-row">
+        <button class="btn-new-folder mobile" onclick="newFolder();"><i class="fas fa-folder-plus"></i> Nouveau dossier</button>
+    </div>
+
 </div>
 <div class="containbuttons">
     <div class="newbutton" onclick="newnote();"><span><span title="Create a new note" class="fas fa-file-medical"></span></span></div>
@@ -89,7 +104,7 @@
         <div class="unified-search-container mobile">
             <div class="searchbar-row searchbar-icon-row">
                 <div class="searchbar-input-wrapper">
-                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Search..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                     <span class="searchbar-icon"><span class="fas fa-search"></span></span>
                     <?php if (!empty($search) || !empty($tags_search)): ?>
                         <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>
