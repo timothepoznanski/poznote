@@ -187,7 +187,7 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
 
     // If no tag elements yet, retry a few times (they may be created asynchronously after AJAX)
     if (tagEls.length === 0 && _attempt < 6) {
-        console.debug && console.debug('debug: highlightMatchingTags - no clickable-tag elements yet, retry', _attempt);
+        // Elements not yet present; retry shortly
         setTimeout(() => highlightMatchingTags(searchTerm, _attempt + 1), 80);
         return;
     }
@@ -218,7 +218,7 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
             else el.classList.remove('tag-highlight');
         }
     });
-    console.debug && console.debug('debug: highlightMatchingTags applied, found elements=', tagEls.length, 'tokens=', tokens, 'matched=', matched);
+    // debug logs removed
 }
 
 // Expose helper so other modules can call it after AJAX reinit
