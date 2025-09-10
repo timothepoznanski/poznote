@@ -225,54 +225,6 @@ function toggleSettingsMenu(event) {
     }
 }
 
-// Fold all folders
-function foldAllFolders() {
-    var folderContents = document.querySelectorAll('.folder-content');
-    var folderIcons = document.querySelectorAll('.folder-icon');
-    
-    for (var i = 0; i < folderContents.length; i++) {
-        var content = folderContents[i];
-        content.style.display = 'none';
-        try {
-            localStorage.setItem('folder_' + content.id, 'closed');
-        } catch(e) {}
-    }
-    
-    for (var i = 0; i < folderIcons.length; i++) {
-        var icon = folderIcons[i];
-    // set closed folder icon
-    icon.classList.remove('fa-folder-open');
-    icon.classList.add('fa-folder');
-    }
-    
-    // Close settings menu
-    closeSettingsMenus();
-}
-
-// Unfold all folders
-function unfoldAllFolders() {
-    var folderContents = document.querySelectorAll('.folder-content');
-    var folderIcons = document.querySelectorAll('.folder-icon');
-    
-    for (var i = 0; i < folderContents.length; i++) {
-        var content = folderContents[i];
-        content.style.display = 'block';
-        try {
-            localStorage.setItem('folder_' + content.id, 'open');
-        } catch(e) {}
-    }
-    
-    for (var i = 0; i < folderIcons.length; i++) {
-        var icon = folderIcons[i];
-    // set open folder icon
-    icon.classList.remove('fa-folder');
-    icon.classList.add('fa-folder-open');
-    }
-    
-    // Close settings menu
-    closeSettingsMenus();
-}
-
 // Close settings menus
 function closeSettingsMenus() {
     var settingsMenu = document.getElementById('settingsMenu');

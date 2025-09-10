@@ -104,9 +104,16 @@
 }
 
 /* Mobile content spacing */
+/* .mobile-search-container removed (search moved/hidden in mobile view) */
+/* Minimal mobile search styles restored */
 .mobile-search-container {
-    margin-bottom: 15px !important;
-    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    margin-top: 6px !important;
+    padding: 0 12px;
+}
+
+.mobile-search-container .unified-search-container {
+    width: 100%;
 }
 
 /* Folder filter spacing on mobile */
@@ -1274,54 +1281,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Responsive design for mobile devices */
-@media (max-width: 768px) {
-    
-    /* Mobile search container */
-    .mobile-search-container {
-        padding: 0 15px;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .mobile-search-container .unified-search-container {
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    .mobile-search-container .search-options-container {
-        margin-top: 12px;
-    }
-    
-    .mobile-search-container .search-type-pills {
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    /* Styles spécifiques pour les filtres en mobile - force l'apparence comme desktop */
-    .mobile-search-container .search-pill.active,
-    .mobile .search-pill.active {
-        background: #f8f9fa !important;
-        border-color: #007DB8 !important;
-        color: #007DB8 !important;
-        box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
-        opacity: 1 !important;
-    }
-
-    .mobile-search-container .search-pill.active:hover,
-    .mobile .search-pill.active:hover {
-        background: #e9ecef !important;
-        border-color: #007DB8 !important;
-        color: #007DB8 !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
-    }
-
-    .mobile-search-container .search-pill.active:active,
-    .mobile .search-pill.active:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
-    }
-}
+/* Mobile search container styles removed - mobile search UI hidden */
 
 /* Styles pour les écrans petits/moyens (ordinateurs portables inclus) */
 @media (max-width: 1024px) {

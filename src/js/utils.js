@@ -262,19 +262,6 @@ function selectFolder(folderName, element) {
     }
 }
 
-function toggleFolder(folderId) {
-    var folderElement = document.getElementById('folder-' + folderId);
-    if (!folderElement) return;
-    
-    var isExpanded = folderElement.classList.contains('expanded');
-    
-    if (isExpanded) {
-        folderElement.classList.remove('expanded');
-    } else {
-        folderElement.classList.add('expanded');
-    }
-}
-
 // Workspace management (creation/deletion)
 function showNewWorkspacePrompt() {
     var name = prompt('Nom du nouveau workspace:');

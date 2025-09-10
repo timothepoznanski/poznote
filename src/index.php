@@ -65,7 +65,59 @@ $res_right = $note_data['res_right'];
     <?php include 'templates/head_includes.php'; ?>
 </head>
 
-<body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
+<body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>  
+    <script>
+    // Apply folder counts visibility based on settings stored in localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+            if (!showCounts) {
+                document.body.classList.add('hide-folder-counts');
+            } else {
+                document.body.classList.remove('hide-folder-counts');
+            }
+        } catch (e) {
+            // Ignore localStorage access errors
+        }
+        
+        // Restore folder states from localStorage
+        try {
+            var folderContents = document.querySelectorAll('.folder-content');
+            for (var i = 0; i < folderContents.length; i++) {
+                var content = folderContents[i];
+                var folderId = content.id;
+                var savedState = localStorage.getItem('folder_' + folderId);
+                
+                if (savedState === 'closed') {
+                    // Close folder
+                    content.style.display = 'none';
+                    var toggle = content.parentElement.querySelector('.folder-toggle');
+                    if (toggle) {
+                        var icon = toggle.querySelector('.folder-icon');
+                        if (icon) {
+                            icon.classList.remove('fa-folder-open');
+                            icon.classList.add('fa-folder');
+                        }
+                    }
+                } else if (savedState === 'open') {
+                    // Open folder
+                    content.style.display = 'block';
+                    var toggle = content.parentElement.querySelector('.folder-toggle');
+                    if (toggle) {
+                        var icon = toggle.querySelector('.folder-icon');
+                        if (icon) {
+                            icon.classList.remove('fa-folder');
+                            icon.classList.add('fa-folder-open');
+                        }
+                    }
+                }
+                // If no saved state, keep the default state determined by PHP
+            }
+        } catch (e) {
+            // Ignore localStorage access errors
+        }
+    });
+    </script>
 
     <div class="main-container">
     <script>
@@ -195,7 +247,7 @@ $res_right = $note_data['res_right'];
         folderItem.className = 'create-menu-item';
         folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
         folderItem.onclick = function() {
-            openFolderModal();
+            newFolder();
             createMenu.remove();
         };
         
@@ -221,7 +273,6 @@ $res_right = $note_data['res_right'];
     
     // Make function globally available
     window.toggleCreateMenu = toggleCreateMenu;
-    console.log('toggleCreateMenu function loaded');
     </script>
     
     <!-- RESIZE HANDLE (Desktop only) -->

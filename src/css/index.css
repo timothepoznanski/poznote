@@ -1328,29 +1328,7 @@ img {
 
 /* MENU LEFT */
 
-.containbuttons{
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    /* padding-top: 8px; */
-    /* padding-bottom: 8px; */
-}
-
-/* Ensure all icons within containbuttons are properly centered */
-.containbuttons > * {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.containbuttons span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
+/* .containbuttons removed (mobile buttons moved to sidebar footer) */
 
 .newbutton[style], .list_tags[style] {
     text-align: center;

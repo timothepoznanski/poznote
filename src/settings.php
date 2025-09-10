@@ -59,7 +59,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         .settings-card {
             background: transparent;
             border-radius: 0;
-            padding: 8px 6px;
+            padding: 12px 6px;
             cursor: pointer;
             transition: background 0.12s ease;
             border-bottom: 1px solid #eef2f5;
@@ -142,25 +142,6 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         </a>
         
         <div class="settings-grid">
-            <!-- Folder Management -->
-            <div class="settings-card" onclick="foldAllFolders(); showNotification('All folders folded');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-minus-square"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Fold All Folders</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="unfoldAllFolders(); showNotification('All folders unfolded');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-plus-square"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Unfold All Folders</h3>
-                </div>
-            </div>
-            
             <!-- Workspace Management -->
             <div class="settings-card" onclick="window.location = 'manage_workspaces.php';">
                 <div class="settings-card-icon">
