@@ -30,78 +30,67 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             font-family: 'Inter', sans-serif;
         }
         .settings-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
+            max-width: 800px;
+            margin: 10px auto;
+            padding: 8px 12px;
+            display: block;
         }
         .settings-header {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 12px 8px;
+            margin-bottom: 8px;
         }
         .settings-header h1 {
-            margin: 0 0 8px 0;
+            margin: 0 0 6px 0;
             color: #1f2937;
-            font-size: 1.5rem;
+            font-size: 1.15rem;
             font-weight: 600;
         }
-        .settings-header p {
-            margin: 0;
-            color: #6b7280;
-        }
+        .settings-header p { display: none; }
+
+        /* settings list: vertical simple rows */
         .settings-grid {
-            display: grid;
-            gap: 12px;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: block;
+            margin: 0;
+            padding: 0;
         }
+
+        .back-link { display: inline-flex; margin-bottom: 10px; }
+
         .settings-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: transparent;
+            border-radius: 0;
+            padding: 8px 6px;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid #e5e7eb;
+            transition: background 0.12s ease;
+            border-bottom: 1px solid #eef2f5;
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        .settings-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-1px);
-        }
+        .settings-card:hover { background: rgba(15,23,42,0.02); }
         .settings-card-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background: #f3f4f6;
-            display: flex;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            background: transparent;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             color: #6b7280;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
         .settings-card-content {
-            flex: 1;
-            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
         }
         .settings-card h3 {
-            margin: 0 0 2px 0;
-            color: #1f2937;
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .settings-card p {
             margin: 0;
-            color: #6b7280;
-            font-size: 0.8rem;
-            line-height: 1.3;
+            color: #1f2937;
+            font-size: 0.95rem;
+            font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
