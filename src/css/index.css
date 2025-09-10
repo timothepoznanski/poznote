@@ -840,6 +840,18 @@ a.links_arbo_left.selected-note {
     justify-content: center;
 }
 
+/* Ensure the actual FontAwesome icon inside the searchbar has a consistent size
+   different fa-* glyphs can appear visually different; normalize to 1em */
+.searchbar-icon i,
+.searchbar-icon .fas,
+.searchbar-icon .far,
+.searchbar-icon .fab,
+.searchbar-icon .fa {
+    font-size: 1em; /* normalize inside the wrapper */
+    line-height: 1;
+    display: inline-block;
+}
+
 /* Highlight a tag when it matches an active tag search */
 .tag-highlight {
     background: #fff3b0; /* soft yellow */
