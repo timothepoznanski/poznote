@@ -61,9 +61,34 @@ class SearchManager {
         const elements = this.getElements(isMobile);
         if (!elements.form || !elements.searchInput) return;
 
+        // Clear any previous search-only hiding so folders are visible by default
+        this.clearSearchHiddenMarkers();
+
         // Restore state from URL parameters or defaults
         this.restoreSearchStateFromURL(isMobile);
         this.updateInterface(isMobile);
+    }
+
+    /**
+     * Remove search-only hidden markers from special folders; called on init
+     */
+    clearSearchHiddenMarkers() {
+        try {
+            const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    el.classList.remove('search-hidden');
+                    const folderToggle = el.querySelector('[data-folder-id]');
+                    if (folderToggle) {
+                        const folderId = folderToggle.getAttribute('data-folder-id');
+                        const folderContent = document.getElementById(folderId);
+                        if (folderContent) folderContent.classList.remove('search-hidden');
+                    }
+                });
+            });
+        } catch (err) {
+            // ignore
+        }
     }
 
     /**
@@ -149,22 +174,22 @@ class SearchManager {
             const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    if ((activeType === 'notes' || activeType === 'tags') && isSearching) {
-                        el.classList.add('hidden');
+                            if ((activeType === 'notes' || activeType === 'tags') && isSearching) {
+                                el.classList.add('search-hidden');
                         // also hide its content pane if present
                         const folderToggle = el.querySelector('[data-folder-id]');
                         if (folderToggle) {
                             const folderId = folderToggle.getAttribute('data-folder-id');
                             const folderContent = document.getElementById(folderId);
-                            if (folderContent) folderContent.classList.add('hidden');
+                                    if (folderContent) folderContent.classList.add('search-hidden');
                         }
                     } else {
-                        el.classList.remove('hidden');
+                                el.classList.remove('search-hidden');
                         const folderToggle = el.querySelector('[data-folder-id]');
                         if (folderToggle) {
                             const folderId = folderToggle.getAttribute('data-folder-id');
                             const folderContent = document.getElementById(folderId);
-                            if (folderContent) folderContent.classList.remove('hidden');
+                                    if (folderContent) folderContent.classList.remove('search-hidden');
                         }
                     }
                 });
