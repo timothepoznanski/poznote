@@ -393,17 +393,27 @@ class SearchManager {
      */
     validateSearchState(isMobile) {
         const elements = this.getElements(isMobile);
-        const activeTypes = this.searchTypes.filter(type => 
-            elements.buttons[type]?.classList.contains('active')
-        );
-
-        if (activeTypes.length !== 1) {
-            // Reset to notes as default
-            this.setActiveSearchType('notes', isMobile);
-            return false;
+        // If explicit buttons exist in the DOM (older UI with pills), use them
+        const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
+        if (buttonsExist) {
+            const activeTypes = this.searchTypes.filter(type => elements.buttons[type]?.classList.contains('active'));
+            if (activeTypes.length !== 1) {
+                // Reset to notes as default
+                this.setActiveSearchType('notes', isMobile);
+                return false;
+            }
+            return true;
         }
 
-        return true;
+        // When buttons/pills have been removed, rely on internal state (currentSearchType)
+        const activeType = this.getActiveSearchType(isMobile);
+        if (this.searchTypes.includes(activeType)) {
+            return true;
+        }
+
+        // As a last resort, reset to notes
+        this.setActiveSearchType('notes', isMobile);
+        return false;
     }
 
     /**
