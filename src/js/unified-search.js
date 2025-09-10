@@ -691,6 +691,7 @@ class SearchManager {
                 // If we're in tags search mode, also highlight matching tag UI elements
                 try {
                     const activeType = this.getActiveSearchType();
+                    console.debug && console.debug('debug: highlight check', { activeType, hasHighlightFn: typeof window.highlightMatchingTags });
                     if (activeType === 'tags' && typeof window.highlightMatchingTags === 'function') {
                         // Prefer hidden tags term if present, otherwise use visible search input
                         const desktopElements = this.getElements(false);
@@ -698,9 +699,11 @@ class SearchManager {
                         const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
                         const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
                         const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
+                        console.debug && console.debug('debug: calling highlightMatchingTags with term:', term);
                         window.highlightMatchingTags(term);
                     } else if (typeof window.highlightMatchingTags === 'function') {
                         // Clear any previous highlights when not in tags mode
+                        console.debug && console.debug('debug: clearing tag highlights');
                         window.highlightMatchingTags('');
                     }
                 } catch (e) { /* ignore */ }
