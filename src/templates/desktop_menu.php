@@ -102,23 +102,7 @@
                 </div>
             </div>
             
-            <!-- Search options pills below the search bar -->
-            <div class="search-options-container">
-                <div class="search-type-pills">
-                    <button type="button" class="search-pill" id="search-notes-btn" title="Search in note content" data-type="notes">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Notes</span>
-                    </button>
-                    <button type="button" class="search-pill" id="search-tags-btn" title="Search in one or more tags" data-type="tags">
-                        <i class="fas fa-tags"></i>
-                        <span>Tags</span>
-                    </button>
-                    <button type="button" class="search-pill" id="search-folders-btn" title="Filter folders" data-type="folders">
-                        <i class="fas fa-folder"></i>
-                        <span>Folders</span>
-                    </button>
-                </div>
-            </div>
+            <!-- Search options removed per UI update -->
             
             <!-- Hidden inputs to maintain compatibility -->
             <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
