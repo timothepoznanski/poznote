@@ -238,7 +238,17 @@ $res_right = $note_data['res_right'];
         noteItem.className = 'create-menu-item';
         noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
         noteItem.onclick = function() {
-            window.open('insert_new.php', '_blank');
+            // Use in-page creation flow instead of opening a new tab
+            if (typeof newnote === 'function') {
+                newnote();
+            } else if (typeof createNewNote === 'function') {
+                createNewNote();
+            } else if (window.NoteManager && typeof window.NoteManager.createNote === 'function') {
+                window.NoteManager.createNote();
+            } else {
+                // Fallback: open insert_new.php if JS handlers are unavailable
+                window.open('insert_new.php', '_blank');
+            }
             createMenu.remove();
         };
         
