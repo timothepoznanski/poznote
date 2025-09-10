@@ -901,8 +901,7 @@ a.links_arbo_left.selected-note {
     gap: 0;
     position: relative;
     width: 100%;
-    max-width: 500px;
-    margin: 0 auto 8px auto;
+    margin: 0 0 8px 0;
 }
 
 /* Folder filter clear buttons (hidden by default) */
