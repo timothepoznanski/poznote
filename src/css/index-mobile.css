@@ -779,10 +779,14 @@ a.links_arbo_left.selected-note {
 
 /* Mobile searchbar input adjustments */
 .searchbar-input {
-    padding: 8px 15px 8px 40px !important;
+    padding: 10px 12px 10px 40px !important;
     font-size: 16px !important; /* Prevent zoom on iOS */
     color: #2b2b2b !important;
     caret-color: #000000 !important;
+    border-radius: 8px !important;
+    border: 1px solid #e6eef8 !important;
+    height: 40px !important;
+    box-sizing: border-box !important;
 }
 
 .searchbar-input::placeholder {
@@ -801,8 +805,8 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input:focus {
-    border-color: #e8ebee !important;
-    box-shadow: none !important;
+    border-color: #cfe6ff !important;
+    box-shadow: 0 0 0 3px rgba(15,120,230,0.06) !important;
     outline: none !important;
 }
 
