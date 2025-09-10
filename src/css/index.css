@@ -826,9 +826,11 @@ a.links_arbo_left.selected-note {
     top: 50%;
     transform: translateY(-50%);
     color: #b0b0b0;
-    pointer-events: none;
+    /* allow clicks on the icon so JS listeners can attach */
+    pointer-events: auto;
     z-index: 2;
     font-size: 0.8em;
+    cursor: pointer;
 }
 
 .searchbar-desktop {
