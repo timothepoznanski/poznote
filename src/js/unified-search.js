@@ -99,10 +99,12 @@ class SearchManager {
         const urlParams = new URLSearchParams(window.location.search);
         const elements = this.getElements(isMobile);
         
-        // Check URL preferences
-        const preserveNotes = urlParams.get('preserve_notes') === '1';
-        const preserveTags = urlParams.get('preserve_tags') === '1';
-        const preserveFolders = urlParams.get('preserve_folders') === '1';
+    // Check URL preferences and explicit search params
+    const preserveNotes = urlParams.get('preserve_notes') === '1';
+    const preserveTags = urlParams.get('preserve_tags') === '1';
+    const preserveFolders = urlParams.get('preserve_folders') === '1';
+    const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
+    const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
         
     // Check hidden field values: flags vs term-bearing inputs
     const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
@@ -110,11 +112,18 @@ class SearchManager {
     const hasFoldersValue = elements.hiddenInputs.folders?.value === '1';
         
         // Determine active search type
-        if (preserveTags || hasTagsFlag) {
+        // Prefer explicit URL params (tags_search / search) if present
+        if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
-        } else if (preserveFolders || hasFoldersValue) {
-            this.setActiveSearchType('folders', isMobile);
+        } else if (hasNotesSearchParam || preserveNotes || (preserveFolders ? false : hasFoldersValue)) {
+            // If notes param present or preserve_notes, choose notes; folders only if explicitly preserved or flagged
+            if (preserveFolders || hasFoldersValue) {
+                this.setActiveSearchType('folders', isMobile);
+            } else {
+                this.setActiveSearchType('notes', isMobile);
+            }
         } else {
+            // Default to notes
             this.setActiveSearchType('notes', isMobile);
         }
     }
@@ -278,11 +287,12 @@ class SearchManager {
         const searchValue = elements.searchInput?.value.trim() || '';
 
         // Update term-bearing hidden inputs (so AJAX receives the actual search term)
+        // Only set the active type's term input; clear the other to avoid sending both params.
         if (elements.hiddenInputs.notesTerm) {
-            elements.hiddenInputs.notesTerm.value = searchValue;
+            elements.hiddenInputs.notesTerm.value = activeType === 'notes' ? searchValue : '';
         }
         if (elements.hiddenInputs.tagsTerm) {
-            elements.hiddenInputs.tagsTerm.value = searchValue;
+            elements.hiddenInputs.tagsTerm.value = activeType === 'tags' ? searchValue : '';
         }
 
         // Update flag inputs (search-in-*) to reflect active type
