@@ -169,7 +169,10 @@ class SearchManager {
             const term = elements.searchInput?.value?.trim() || '';
             const urlParams = new URLSearchParams(window.location.search);
             const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
-            const isSearching = term !== '' || hasUrlSearch;
+            // Also consider hidden inputs which are used during AJAX submissions
+            const hasHiddenNotes = Boolean(elements.hiddenInputs.notes?.value === '1' || elements.hiddenInputs.notes?.value);
+            const hasHiddenTags = Boolean(elements.hiddenInputs.tags?.value === '1' || elements.hiddenInputs.tags?.value);
+            const isSearching = term !== '' || hasUrlSearch || hasHiddenNotes || hasHiddenTags;
 
             const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
