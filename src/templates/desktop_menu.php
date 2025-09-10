@@ -10,77 +10,20 @@
 <div class="sidebar-header">
     <div class="sidebar-title-row">
     <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
-        <i class="fas fa-layer-group workspace-title-icon" aria-hidden="true"></i>
+        <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
         <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
     </div>
         <div class="sidebar-title-actions">
-            <button class="sidebar-gear" onclick="toggleSettingsMenu(event);" title="Settings"><i class="fas fa-cog"></i></button>
+            <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fas fa-plus"></i></button>
         </div>
 
         <!-- Workspace menu container (desktop) -->
         <div class="workspace-menu" id="workspaceMenu">
             <!-- Menu items will be loaded dynamically -->
         </div>
-
-        <!-- Settings menu container (desktop) -->
-        <div class="settings-menu" id="settingsMenu" style="display: none;">
-            <div class="settings-menu-item" onclick="foldAllFolders();">
-                <i class="fas fa-minus-square"></i>
-                <span>Fold All Folders</span>
-            </div>
-            <div class="settings-menu-item" onclick="unfoldAllFolders();">
-                <i class="fas fa-plus-square"></i>
-                <span>Unfold All Folders</span>
-            </div>
-            <!-- Manage workspaces moved to the left header workspace control -->
-            <div class="settings-menu-item" onclick="window.location = 'ai.php';">
-                <i class="fas fa-robot"></i>
-                <span>AI<?php echo isAIEnabled() ? '<span class="ai-status enabled">(enabled)</span>' : '<span class="ai-status disabled">(disabled)</span>'; ?></span>
-            </div>
-            <div class="settings-menu-item" onclick="showLoginDisplayNamePrompt();">
-                <i class="fas fa-user"></i>
-                <span>Login display name</span>
-            </div>
-            <div class="settings-menu-item" onclick="showNoteFontSizePrompt();">
-                <i class="fas fa-text-height"></i>
-                <span>Note font size</span>
-            </div>
-            <div class="settings-menu-item" onclick="window.location = 'backup_export.php';">
-                <i class="fas fa-upload"></i>
-                <span>Backup (Export)</span>
-            </div>
-            <div class="settings-menu-item" onclick="window.location = 'restore_import.php';">
-                <i class="fas fa-download"></i>
-                <span>Restore (Import)</span>
-            </div>
-            <div class="settings-menu-item" id="update-check-item" onclick="checkForUpdates();">
-                <i id="update-icon-desktop" class="fas fa-sync-alt"></i>
-                <span>Check for Updates</span>
-                <small id="update-status"></small>
-            </div>
-            <div class="settings-menu-item" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
-                <i class="fas fa-code-branch"></i>
-                <span>GitHub Repository</span>
-            </div>
-            <div class="settings-menu-item" onclick="window.open('https://poznote.com', '_blank');">
-                <i class="fas fa-globe"></i>
-                <span>About</span>
-            </div>
-            <!-- Tim's projects removed from settings per request -->
-            <div class="settings-menu-item" onclick="window.location = 'logout.php';">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </div>
-        </div>
     </div>
 
-    <div class="sidebar-newnote-row">
-        <button class="btn-new-note" onclick="newnote();"><i class="fas fa-plus"></i> Nouvelle note</button>
-    </div>
-
-    <div class="sidebar-newfolder-row">
-        <button class="btn-new-folder" onclick="newFolder();"><i class="fas fa-folder-plus"></i> Nouveau dossier</button>
-    </div>
+    <!-- CTA buttons moved to sidebar footer (index.php) -->
 
     <div class="contains_forms_search searchbar-desktop">
         <form id="unified-search-form" action="index.php" method="POST">

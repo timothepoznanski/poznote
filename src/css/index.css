@@ -397,7 +397,7 @@ body {
     height: 100vh;
     overflow-y: scroll;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 6 16 16 16;
     box-sizing: border-box;
     background: #FFFFFF;
     flex-shrink: 0;
@@ -405,7 +405,7 @@ body {
 
 /* Sidebar header and primary action */
 .sidebar-header {
-    padding: 6px 0 14px 0;
+    /* padding: 6px 0 14px 0; */
     margin-bottom: 6px;
 }
 .sidebar-title-row {
@@ -423,15 +423,17 @@ body {
 }
 .workspace-title-icon {
     margin-right: 8px;
-    color: #007DB8;
-    font-size: 1.05rem;
+    width: 20px;
+    height: 20px;
     vertical-align: middle;
+    pointer-events: none;
 }
 .workspace-title-text { vertical-align: middle; }
 .sidebar-title[role="button"] { cursor: pointer; }
-.sidebar-title-actions { display: flex; align-items: center; gap: 6px; }
-.sidebar-gear { background: transparent; border: none; color: #6b7280; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
-.sidebar-gear:hover { background: rgba(0,0,0,0.04); color: #374151; }
+.sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
+.sidebar-gear { display: none; }
+.sidebar-plus { background: transparent; border: none; color: #6b7280; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #374151; }
 
 /* Align new note/folder rows with the search bar */
 .sidebar-newnote-row { padding: 6px 0 8px 0; }
@@ -484,13 +486,14 @@ body {
 
 /* Folder header adjustments to match visual spacing */
 .folder-header {
-    margin-top: 6px;
-    padding: 6px 4px;
+    /* margin-top: 6px; */
+    /* padding: 6px 4px; */
     border-radius: 8px;
 }
-.folder-toggle { display:flex; align-items:center; gap:8px; cursor: pointer; }
+.folder-toggle { display:flex; align-items:center; gap:2px; cursor: pointer; }
 .folder-name { font-weight:600; color:#111827; }
 .folder-note-count { color:#6b7280; margin-left:6px; font-weight:400; }
+.hide-folder-counts .folder-note-count { display: none; }
 
 /* Folder content / notes styling */
 .note-in-folder { padding-left: 26px; display:block; }
@@ -518,9 +521,114 @@ body {
     position: relative;
     flex-shrink: 0;
     /* subtle divider line to match the mockup */
-    border-right: 1px solid #e9ecef;
+    border-right: 1px solid #ccc;
 
 }
+
+/* Sidebar footer: CTA buttons pinned at bottom of left column */
+.sidebar-footer {
+    position: sticky;
+    bottom: 16px;
+    width: 100%;
+    padding: 8px 0 0 0;
+    box-sizing: border-box;
+}
+.sidebar-footer-inner {
+    display: flex;
+    gap: 8px;
+    flex-direction: column; /* stack buttons vertically */
+}
+.sidebar-footer .btn-new-note, .sidebar-footer .btn-new-folder {
+    display: none; /* deprecated: use unified create button */
+}
+
+/* Unified create button */
+.create-dropdown {
+    position: relative;
+    width: 100%;
+}
+.btn-create {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    background: #007DB8;
+    color: #fff;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.btn-create:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,123,184,0.12); }
+.create-caret { margin-left: 6px; font-size: 0.9rem; }
+.create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    box-shadow: 0 8px 24px rgba(15,120,230,0.08);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 60;
+    min-width: 140px;
+}
+
+#header-create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 140px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.create-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.create-menu-item:last-child {
+    border-bottom: none;
+}
+
+.create-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+.create-menu-item {
+    background: transparent;
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.create-menu-item:hover { background: #f6fbff; }
 
 /* LEFT HEADER */
 
@@ -789,20 +897,20 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input {
-    padding: 10px 12px 10px 44px; /* room for icon */
+    padding: 10px 12px 10px 44px;
     border-radius: 8px;
-    border: 1px solid #e6eef8;
-    background: #ffffff;
-    font-size: 0.95em;
-    transition: border-color 0.12s;
-    box-shadow: none;
+    /* border: 1px solid #d3d6db; */
+    background: #f6f7f9;
+    font-size: 1em;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    box-shadow: 0 0 0 1px #e6e6e6;
     outline: none;
     width: 100%;
     min-width: 0;
     font-family: 'Inter', sans-serif !important;
-    color: #2b2b2b;
-    caret-color: #6b6b6b;
-    height: 40px; /* match button visual height */
+    color: #6c7580;
+    caret-color: #6c7580;
+    height: 40px;
     box-sizing: border-box;
 }
 
@@ -813,14 +921,14 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input::placeholder {
-    color: #b0b0b0;
+    color: #6c7580;
     opacity: 1;
-    font-size: 0.95em;
+    font-size: 1em;
 }
 
 .searchbar-input:focus {
-    border-color: #cfe6ff; /* subtle focus ring color */
-    box-shadow: 0 0 0 3px rgba(15,120,230,0.06);
+    border-color: #b0b3b8;
+    /* box-shadow: 0 0 0 2px #d3d6db; */
     outline: none;
 }
 
@@ -829,6 +937,16 @@ a.links_arbo_left.selected-note {
     flex: 1;
     display: flex;
     align-items: center;
+}
+
+.searchbar-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c7580;
+    font-size: 1.2em;
+    pointer-events: none;
 }
 
 /* Icon box for search inside left column */
@@ -941,8 +1059,8 @@ a.links_arbo_left.selected-note {
     margin: 12px 0 15px 0;
     text-align: center;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
+    /* display: flex; */
+    /* justify-content: center; */
 }
 
 img {

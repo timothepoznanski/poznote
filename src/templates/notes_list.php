@@ -23,7 +23,7 @@ echo "<div class='folder-header' data-folder='Corbeille'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fas fa-trash folder-icon'></i>";
 echo "<span class='folder-name'>Corbeille</span>";
-echo "<span class='folder-note-count'>(" . $trash_count . ")</span>";
+echo "<span class='folder-note-count' id='count-corbeille'>(" . $trash_count . ")</span>";
 echo "</div></div>";
 
 // Render a dedicated "Tags" folder that links to the tag listing page
@@ -60,7 +60,7 @@ echo "<div class='folder-header' data-folder='Tags'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fas fa-tags folder-icon'></i>";
 echo "<span class='folder-name'>Tags</span>";
-echo "<span class='folder-note-count'>(" . $tag_count . ")</span>";
+echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
 
 // Display folders and notes
@@ -91,7 +91,7 @@ foreach($folders as $folderName => $notes) {
         // Disable double-click rename for default folder
         $ondbl = isDefaultFolder($folderName, $workspace_filter) ? '' : 'editFolderName("' . $folderName . '")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
-        echo "<span class='folder-note-count'>(" . count($notes) . ")</span>";
+        echo "<span class='folder-note-count' id='count-" . md5($folderName) . "'>(" . count($notes) . ")</span>";
         echo "<span class='folder-actions'>";
         
         // Generate folder actions

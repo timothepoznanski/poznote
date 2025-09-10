@@ -167,7 +167,83 @@ $res_right = $note_data['res_right'];
         include 'templates/notes_list.php';
                  
     ?>
+
     </div>
+    <script>
+    // Create menu functionality with debugging
+    function toggleCreateMenu() {
+        var existingMenu = document.getElementById('header-create-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+            return;
+        }
+        
+        var createMenu = document.createElement('div');
+        createMenu.id = 'header-create-menu';
+        
+        // Note item
+        var noteItem = document.createElement('button');
+        noteItem.className = 'create-menu-item';
+        noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.onclick = function() {
+            createNewNote();
+            createMenu.remove();
+        };
+        
+        // Folder item
+        var folderItem = document.createElement('button');
+        folderItem.className = 'create-menu-item';
+        folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.onclick = function() {
+            newFolder();
+            createMenu.remove();
+        };
+        
+        createMenu.appendChild(noteItem);
+        createMenu.appendChild(folderItem);
+        
+        var plusButton = document.querySelector('.sidebar-plus');
+        if (plusButton && plusButton.parentNode) {
+            plusButton.parentNode.appendChild(createMenu);
+            createMenu.style.display = 'block';
+        }
+    }
+    
+    // Expose function globally
+    window.toggleCreateMenu = toggleCreateMenu;
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('header-create-menu');
+        var plusBtn = document.querySelector('.sidebar-plus');
+        if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+            plusBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    // Make function globally available
+    window.toggleCreateMenu = toggleCreateMenu;
+    
+    // Folder note counts display management
+    function applyFolderCountsPreference() {
+        const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+        const leftCol = document.getElementById('left_col');
+        if (leftCol) {
+            if (showCounts) {
+                leftCol.classList.remove('hide-folder-counts');
+            } else {
+                leftCol.classList.add('hide-folder-counts');
+            }
+        }
+    }
+    
+    // Apply preference on page load
+    document.addEventListener('DOMContentLoaded', applyFolderCountsPreference);
+    
+    // Check for changes in localStorage (when coming back from settings)
+    window.addEventListener('focus', applyFolderCountsPreference);
+    </script>
     
     <!-- RESIZE HANDLE (Desktop only) -->
     <?php if (!$is_mobile): ?>
@@ -550,6 +626,13 @@ $res_right = $note_data['res_right'];
                         <i class="fas fa-exclamation-triangle"></i>
                         <p id="errorMessage"></p>
                     </div>
+                </div>
+            </div>
+            <!-- Sidebar footer: CTA buttons are rendered here so they're at the bottom of the left column -->
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-inner">
+                    <button class="btn-new-note" id="btn-new-note">New note</button>
+                    <button class="btn-new-folder" id="btn-new-folder">New folder</button>
                 </div>
             </div>
             <div class="modal-footer">

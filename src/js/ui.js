@@ -472,7 +472,6 @@ function createInputModal() {
         '<div class="modal-content">' +
         '<div class="modal-header">' +
         '<h3 id="inputModalTitle">Title</h3>' +
-        '<span class="close" onclick="closeInputModal()">&times;</span>' +
         '</div>' +
         '<div class="modal-body">' +
         '<input type="text" id="inputModalInput" placeholder="Enter text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +

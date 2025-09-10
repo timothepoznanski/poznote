@@ -1,0 +1,343 @@
+<?php
+require 'auth.php';
+requireAuth();
+
+require_once 'config.php';
+include 'db_connect.php';
+include 'functions.php';
+
+// Mobile detection
+$is_mobile = false;
+if (isset($_SERVER['HTTP_USER_AGENT'])) {
+    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
+}
+
+// Get current workspace
+$workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+    <title>Settings - Poznote</title>
+    <?php include 'templates/head_includes.php'; ?>
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+        }
+        .settings-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .settings-header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .settings-header h1 {
+            margin: 0 0 8px 0;
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .settings-header p {
+            margin: 0;
+            color: #6b7280;
+        }
+        .settings-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        .settings-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        .settings-card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #6b7280;
+            font-size: 1rem;
+        }
+        .settings-card-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .settings-card h3 {
+            margin: 0 0 2px 0;
+            color: #1f2937;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .settings-card p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .back-link {
+            color: #007DB8;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .back-link:hover {
+            color: #005a8a;
+        }
+        .ai-status {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        .ai-status.enabled {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .ai-status.disabled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        @media (max-width: 640px) {
+            .settings-container {
+                margin: 10px;
+                padding: 10px;
+            }
+            .settings-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings-container">
+        <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Notes
+        </a>
+        
+        <div class="settings-grid">
+            <!-- Folder Management -->
+            <div class="settings-card" onclick="foldAllFolders(); showNotification('All folders folded');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-minus-square"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Fold All Folders</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="unfoldAllFolders(); showNotification('All folders unfolded');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-plus-square"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Unfold All Folders</h3>
+                </div>
+            </div>
+            
+            <!-- Workspace Management -->
+            <div class="settings-card" onclick="window.location = 'manage_workspaces.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Workspaces</h3>
+                </div>
+            </div>
+            
+            <!-- AI Settings -->
+            <div class="settings-card" onclick="window.location = 'ai.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>AI Settings
+                        <?php echo isAIEnabled() ? '<span class="ai-status enabled">enabled</span>' : '<span class="ai-status disabled">disabled</span>'; ?>
+                    </h3>
+                </div>
+            </div>
+            
+            <!-- User Preferences -->
+            <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Login Display Name</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="showNoteFontSizePrompt();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-text-height"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Note Font Size</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="toggleFolderNoteCounts();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-hashtag"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3 id="folder-counts-title">Folder Note Counts 
+                        <span id="folder-counts-status" class="ai-status disabled">disabled</span>
+                    </h3>
+                </div>
+            </div>
+            
+            <!-- Data Management -->
+            <div class="settings-card" onclick="window.location = 'backup_export.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Backup (Export)</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="window.location = 'restore_import.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Restore (Import)</h3>
+                </div>
+            </div>
+            
+            <!-- System -->
+            <div class="settings-card" onclick="checkForUpdates();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Check for Updates</h3>
+                </div>
+            </div>
+            
+            <!-- Links -->
+            <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>GitHub Repository</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>About Poznote</h3>
+                </div>
+            </div>
+            
+            <!-- Logout -->
+            <div class="settings-card" onclick="window.location = 'logout.php';">
+                <div class="settings-card-icon" style="background: #fee2e2; color: #dc2626;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Logout</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include necessary modals -->
+    <?php include 'templates/modals.php'; ?>
+    
+    <!-- Include JavaScript files -->
+    <script src="js/globals.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/font-size-settings.js"></script>
+    
+    <script>
+        function showNotification(message) {
+            // Simple notification for fold/unfold actions
+            var notification = document.createElement('div');
+            notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1000; font-family: Inter, sans-serif;';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(function() {
+                notification.remove();
+            }, 2000);
+        }
+        
+        function toggleFolderNoteCounts() {
+            // Get current setting from localStorage (default: false - disabled)
+            const currentSetting = localStorage.getItem('showFolderNoteCounts') === 'true';
+            const newSetting = !currentSetting;
+            
+            // Save new setting
+            localStorage.setItem('showFolderNoteCounts', newSetting);
+            
+            // Update the card badge
+            updateFolderCountsBadge(newSetting);
+            
+            // Apply the setting immediately if on main page
+            if (window.opener && window.opener.location.pathname.includes('index.php')) {
+                window.opener.location.reload();
+            }
+        }
+        
+        function updateFolderCountsBadge(isEnabled) {
+            const badge = document.getElementById('folder-counts-status');
+            if (badge) {
+                badge.textContent = isEnabled ? 'enabled' : 'disabled';
+                badge.className = 'ai-status ' + (isEnabled ? 'enabled' : 'disabled');
+            }
+        }
+        
+        // Update badge on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+            updateFolderCountsBadge(showCounts);
+        });
+        
+        // Set workspace context for JavaScript functions
+        window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+    </script>
+</body>
+</html>

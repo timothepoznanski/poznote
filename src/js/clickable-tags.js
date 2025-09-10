@@ -389,7 +389,7 @@ function addTagElement(container, tagText, noteId) {
  */
 function handleTagInput(e, noteId, container) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
-        e.preventDefault(); // Prevents default behavior (nouvelle ligne, etc.)
+        e.preventDefault(); // Prevents default behavior
         e.stopPropagation(); // Prevents event propagation
         
         const input = e.target;
