@@ -847,7 +847,7 @@ a.links_arbo_left.selected-note {
 .searchbar-icon .far,
 .searchbar-icon .fab,
 .searchbar-icon .fa {
-    font-size: 1em; /* normalize inside the wrapper */
+    font-size: 0.9em; /* slightly smaller icons */
     line-height: 1;
     display: inline-block;
 }
