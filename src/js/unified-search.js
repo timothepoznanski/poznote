@@ -711,8 +711,17 @@ class SearchManager {
                 elements.buttons[type]?.classList.contains('active')
             );
 
-            if (!hasActive) {
-                this.setActiveSearchType('notes', isMobile);
+            // If there are explicit buttons in the DOM, ensure one is active.
+            // If buttons/pills were removed, respect the internal currentSearchType
+            const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
+            if (buttonsExist) {
+                if (!hasActive) {
+                    this.setActiveSearchType('notes', isMobile);
+                }
+            } else {
+                // No buttons: apply internal state (avoid forcing 'notes')
+                const t = this.currentSearchType || 'notes';
+                this.setActiveSearchType(t, isMobile);
             }
         });
     }
