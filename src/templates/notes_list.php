@@ -79,13 +79,13 @@ foreach($folders as $folderName => $notes) {
         // Determine if this folder should be open
         $should_be_open = shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
-        // Set appropriate icon and display style
-        $chevron_icon = $should_be_open ? 'fa-chevron-down' : 'fa-chevron-right';
+    // Set appropriate folder icon (open/closed) and display style
+    $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
         $folder_display = $should_be_open ? 'block' : 'none';
         
         echo "<div class='$folderClass' data-folder='$folderName' onclick='selectFolder(\"$folderName\", this)'>";
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
-        echo "<i class='fas $chevron_icon folder-icon'></i>";
+    echo "<i class='fas $chevron_icon folder-icon'></i>";
         
         // Workspace-aware default folder handling in UI
         // Disable double-click rename for default folder

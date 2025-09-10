@@ -850,20 +850,26 @@ function getRecentFolders() {
     }
 }
 
-// Fonction de gestion des dossiers (chevron)
+// Fonction de gestion des dossiers (icône dossier ouvert/fermé)
 function toggleFolder(folderId) {
     var content = document.getElementById(folderId);
     var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');
     
     if (content.style.display === 'none') {
         content.style.display = 'block';
-        icon.classList.remove('fa-chevron-right');
-        icon.classList.add('fa-chevron-down');
+        // show open folder icon
+        if (icon) {
+            icon.classList.remove('fa-folder');
+            icon.classList.add('fa-folder-open');
+        }
         localStorage.setItem('folder_' + folderId, 'open');
     } else {
         content.style.display = 'none';
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-right');
+        // show closed folder icon
+        if (icon) {
+            icon.classList.remove('fa-folder-open');
+            icon.classList.add('fa-folder');
+        }
         localStorage.setItem('folder_' + folderId, 'closed');
     }
 }

@@ -240,8 +240,9 @@ function foldAllFolders() {
     
     for (var i = 0; i < folderIcons.length; i++) {
         var icon = folderIcons[i];
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-right');
+    // set closed folder icon
+    icon.classList.remove('fa-folder-open');
+    icon.classList.add('fa-folder');
     }
     
     // Close settings menu
@@ -263,8 +264,9 @@ function unfoldAllFolders() {
     
     for (var i = 0; i < folderIcons.length; i++) {
         var icon = folderIcons[i];
-        icon.classList.remove('fa-chevron-right');
-        icon.classList.add('fa-chevron-down');
+    // set open folder icon
+    icon.classList.remove('fa-folder');
+    icon.classList.add('fa-folder-open');
     }
     
     // Close settings menu
