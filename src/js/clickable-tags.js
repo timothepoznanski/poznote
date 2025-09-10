@@ -178,6 +178,31 @@ function getOrCreateSuggestions(container) {
 }
 
 /**
+ * Highlight clickable tags that match the provided searchTerm (case-insensitive).
+ * If searchTerm is falsy, remove any existing highlight classes.
+ */
+function highlightMatchingTags(searchTerm) {
+    const normalized = searchTerm ? searchTerm.toString().trim().toLowerCase() : '';
+    // Find all displayed clickable tags
+    const tagEls = document.querySelectorAll('.clickable-tag');
+    if (!normalized) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+    tagEls.forEach(el => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        if (text === normalized || text.includes(normalized)) {
+            el.classList.add('tag-highlight');
+        } else {
+            el.classList.remove('tag-highlight');
+        }
+    });
+}
+
+// Expose helper so other modules can call it after AJAX reinit
+window.highlightMatchingTags = highlightMatchingTags;
+
+/**
  * Show suggestions filtered by prefix
  */
 function showTagSuggestions(inputEl, container, workspace, noteId) {

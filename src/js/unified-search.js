@@ -688,6 +688,22 @@ class SearchManager {
                 if (typeof highlightSearchTerms === 'function') {
                     highlightSearchTerms();
                 }
+                // If we're in tags search mode, also highlight matching tag UI elements
+                try {
+                    const activeType = this.getActiveSearchType();
+                    if (activeType === 'tags' && typeof window.highlightMatchingTags === 'function') {
+                        // Prefer hidden tags term if present, otherwise use visible search input
+                        const desktopElements = this.getElements(false);
+                        const mobileElements = this.getElements(true);
+                        const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
+                        const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
+                        const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
+                        window.highlightMatchingTags(term);
+                    } else if (typeof window.highlightMatchingTags === 'function') {
+                        // Clear any previous highlights when not in tags mode
+                        window.highlightMatchingTags('');
+                    }
+                } catch (e) { /* ignore */ }
             }, 150);
 
         } catch (error) {
