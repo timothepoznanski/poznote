@@ -655,21 +655,19 @@ class SearchManager {
      * Restore search state
      */
     restoreSearchState(state) {
-        if (!state) return;
+    if (!state) return;
 
-        setTimeout(() => {
-            // Restore desktop state
-            if (state.desktop.notes) this.setActiveSearchType('notes', false);
-            else if (state.desktop.tags) this.setActiveSearchType('tags', false);
-            else if (state.desktop.folders) this.setActiveSearchType('folders', false);
+    // Restore desktop state immediately to avoid intermediate UI reset
+    if (state.desktop.notes) this.setActiveSearchType('notes', false);
+    else if (state.desktop.tags) this.setActiveSearchType('tags', false);
+    else if (state.desktop.folders) this.setActiveSearchType('folders', false);
 
-            // Restore mobile state
-            if (state.mobile.notes) this.setActiveSearchType('notes', true);
-            else if (state.mobile.tags) this.setActiveSearchType('tags', true);
-            else if (state.mobile.folders) this.setActiveSearchType('folders', true);
+    // Restore mobile state immediately
+    if (state.mobile.notes) this.setActiveSearchType('notes', true);
+    else if (state.mobile.tags) this.setActiveSearchType('tags', true);
+    else if (state.mobile.folders) this.setActiveSearchType('folders', true);
 
-            this.ensureAtLeastOneButtonActive();
-        }, 100);
+    this.ensureAtLeastOneButtonActive();
     }
 
     /**
