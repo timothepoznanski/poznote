@@ -3112,6 +3112,26 @@ input[type="search"]::-webkit-search-results-decoration {
     color: #ef4444;
 }
 
+/* When a tag wrapper is highlighted, give the delete button a subtle yellow background and stronger contrast */
+.clickable-tag-wrapper.tag-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #fff3b0;
+}
+
+.clickable-tag-wrapper.tag-highlight .clickable-tag {
+    color: #2b2b2b;
+}
+
+.clickable-tag-wrapper.tag-highlight .tag-delete-button {
+    background: rgba(0,0,0,0.06);
+    border-radius: 4px;
+    color: #7a3b00;
+}
+
 .tag-input {
     border: none;
     outline: none;

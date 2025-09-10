@@ -208,11 +208,14 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
     tagEls.forEach(el => {
         const text = (el.textContent || '').trim().toLowerCase();
         const isMatch = tokens.some(tok => text === tok || text.includes(tok));
+        const wrapper = el.closest('.clickable-tag-wrapper');
         if (isMatch) {
-            el.classList.add('tag-highlight');
+            if (wrapper) wrapper.classList.add('tag-highlight');
+            else el.classList.add('tag-highlight');
             matched++;
         } else {
-            el.classList.remove('tag-highlight');
+            if (wrapper) wrapper.classList.remove('tag-highlight');
+            else el.classList.remove('tag-highlight');
         }
     });
     console.debug && console.debug('debug: highlightMatchingTags applied, found elements=', tagEls.length, 'tokens=', tokens, 'matched=', matched);
