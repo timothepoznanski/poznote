@@ -137,11 +137,19 @@ class SearchManager {
      */
     hideSpecialFolders(isMobile) {
         try {
+            const elements = this.getElements(isMobile);
             const activeType = this.getActiveSearchType(isMobile);
+
+            // Only hide special folders when there is an actual search in progress
+            const term = elements.searchInput?.value?.trim() || '';
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
+            const isSearching = term !== '' || hasUrlSearch;
+
             const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
-                    if (activeType === 'notes' || activeType === 'tags') {
+                    if ((activeType === 'notes' || activeType === 'tags') && isSearching) {
                         el.classList.add('hidden');
                         // also hide its content pane if present
                         const folderToggle = el.querySelector('[data-folder-id]');
