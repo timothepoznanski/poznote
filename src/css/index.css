@@ -810,7 +810,10 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input:focus {
-    border-color: #cfeff7;
+    /* Keep focus without adding a colored border or glow */
+    border-color: #e8ebee; /* same as default */
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    outline: none;
 }
 
 .searchbar-icon-row {

@@ -781,7 +781,7 @@ a.links_arbo_left.selected-note {
 .searchbar-input {
     padding: 8px 15px 8px 40px !important;
     font-size: 16px !important; /* Prevent zoom on iOS */
-    color: #007DB8 !important;
+    color: #2b2b2b !important;
     caret-color: #000000 !important;
 }
 
@@ -798,6 +798,12 @@ a.links_arbo_left.selected-note {
     right: 15px !important;
     height: 32px !important;
     width: 32px !important;
+}
+
+.searchbar-input:focus {
+    border-color: #e8ebee !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 .search-options-container.mobile {
