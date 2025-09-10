@@ -17,6 +17,9 @@ class SearchManager {
         this.currentSearchType = 'notes';
     // When set, skip restore from URL during initialization (used after AJAX)
     this.suppressURLRestore = false;
+    // Focus handling after AJAX: when true, reinitializeAfterAjax will restore focus
+    this.focusAfterAjax = false;
+    this.focusCaretPos = null;
         this.eventHandlers = new Map();
         
         // Initialize both desktop and mobile
@@ -484,6 +487,14 @@ class SearchManager {
 
         // Update hidden inputs and hide special folders immediately so UI reflects search
     if (this.debug) console.debug('handleSearchSubmit', {isMobile, activeType, searchValue});
+    // Save caret pos and request focus restoration after AJAX
+    try {
+        this.focusAfterAjax = true;
+        this.focusCaretPos = elements.searchInput && typeof elements.searchInput.selectionStart === 'number' ? elements.searchInput.selectionStart : null;
+    } catch (e) {
+        this.focusAfterAjax = false;
+        this.focusCaretPos = null;
+    }
     this.updateHiddenInputs(isMobile);
     this.hideSpecialFolders(isMobile);
     this.addExcludedFoldersToForm(elements.form, isMobile);
@@ -632,6 +643,26 @@ class SearchManager {
                 } catch (e) {
                     // ignore
                 }
+            }
+
+            // Restore focus/caret if requested
+            try {
+                if (this.focusAfterAjax) {
+                    const desktopInput = this.getElements(false).searchInput;
+                    const mobileInput = this.getElements(true).searchInput;
+                    const input = desktopInput && desktopInput.offsetParent !== null ? desktopInput : (mobileInput || desktopInput);
+                    if (input) {
+                        input.focus();
+                        if (typeof this.focusCaretPos === 'number') {
+                            try { input.setSelectionRange(this.focusCaretPos, this.focusCaretPos); } catch (e) {}
+                        }
+                    }
+                }
+            } catch (e) {
+                // ignore
+            } finally {
+                this.focusAfterAjax = false;
+                this.focusCaretPos = null;
             }
 
             // Highlight search terms
