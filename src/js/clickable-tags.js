@@ -181,22 +181,33 @@ function getOrCreateSuggestions(container) {
  * Highlight clickable tags that match the provided searchTerm (case-insensitive).
  * If searchTerm is falsy, remove any existing highlight classes.
  */
-function highlightMatchingTags(searchTerm) {
+function highlightMatchingTags(searchTerm, _attempt = 0) {
     const normalized = searchTerm ? searchTerm.toString().trim().toLowerCase() : '';
-    // Find all displayed clickable tags
     const tagEls = document.querySelectorAll('.clickable-tag');
+
+    // If no tag elements yet, retry a few times (they may be created asynchronously after AJAX)
+    if (tagEls.length === 0 && _attempt < 6) {
+        console.debug && console.debug('debug: highlightMatchingTags - no clickable-tag elements yet, retry', _attempt);
+        setTimeout(() => highlightMatchingTags(searchTerm, _attempt + 1), 80);
+        return;
+    }
+
     if (!normalized) {
         tagEls.forEach(el => el.classList.remove('tag-highlight'));
         return;
     }
+
+    let matched = 0;
     tagEls.forEach(el => {
         const text = (el.textContent || '').trim().toLowerCase();
         if (text === normalized || text.includes(normalized)) {
             el.classList.add('tag-highlight');
+            matched++;
         } else {
             el.classList.remove('tag-highlight');
         }
     });
+    console.debug && console.debug('debug: highlightMatchingTags applied, found elements=', tagEls.length, 'matched=', matched);
 }
 
 // Expose helper so other modules can call it after AJAX reinit
