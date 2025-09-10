@@ -433,7 +433,10 @@ body {
 .sidebar-gear { background: transparent; border: none; color: #6b7280; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-gear:hover { background: rgba(0,0,0,0.04); color: #374151; }
 
-.sidebar-newnote-row { padding: 8px 0 10px 0; }
+/* Align new note/folder rows with the search bar */
+.sidebar-newnote-row { padding: 6px 0 8px 0; }
+.sidebar-newfolder-row { padding: 6px 0 8px 0; }
+
 .btn-new-note {
     display: inline-flex;
     align-items: center;
@@ -454,23 +457,27 @@ body {
 .btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
 .btn-new-note:hover { filter: brightness(0.95); }
 
-.sidebar-newfolder-row { padding: 8px 6px 12px 0; }
 .btn-new-folder {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: #ffffff;
+    gap: 10px;
+    background: #f6f7f8; /* light gray background like screenshot */
     color: #0b4da6;
-    border: 1px solid #e6eef8;
-    padding: 8px 12px;
+    border: 1px solid rgba(11,77,166,0.08);
+    padding: 10px 12px;
     border-radius: 8px;
     width: 100%;
     justify-content: center;
     cursor: pointer;
     font-weight: 600;
+    color: #0b4da6;
 }
-.btn-new-folder i { color: #0b4da6; }
-.btn-new-folder:hover { background: #f7fbff; }
+.btn-new-folder i { color: #0b4da6; background: transparent; }
+.btn-new-folder:hover { background: #eef6ff; }
+
+/* Make search bar full width of sidebar and align spacing with buttons */
+.searchbar-row { margin-bottom: 8px; max-width: 100%; }
+.searchbar-input-wrapper { width: 100%; }
 
 /* Make the unified search placeholder French when shown in left column */
 
