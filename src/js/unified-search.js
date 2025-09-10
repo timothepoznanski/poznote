@@ -34,10 +34,11 @@ class SearchManager {
                 folders: document.getElementById(`search-folders-btn${suffix}`)
             },
             hiddenInputs: {
-                notes: document.getElementById(`search-in-notes${suffix}`) || 
-                       document.getElementById(`search-notes-hidden${suffix}`),
-                tags: document.getElementById(`search-in-tags${suffix}`) || 
-                      document.getElementById(`search-tags-hidden${suffix}`),
+                // Separate the "flag" inputs (search-in-*) from the term-carrying hidden inputs
+                notesFlag: document.getElementById(`search-in-notes${suffix}`),
+                notesTerm: document.getElementById(`search-notes-hidden${suffix}`),
+                tagsFlag: document.getElementById(`search-in-tags${suffix}`),
+                tagsTerm: document.getElementById(`search-tags-hidden${suffix}`),
                 folders: document.getElementById(`search-in-folders${suffix}`)
             },
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
@@ -103,13 +104,13 @@ class SearchManager {
         const preserveTags = urlParams.get('preserve_tags') === '1';
         const preserveFolders = urlParams.get('preserve_folders') === '1';
         
-        // Check hidden field values
-        const hasNotesValue = elements.hiddenInputs.notes?.value === '1';
-        const hasTagsValue = elements.hiddenInputs.tags?.value === '1';
-        const hasFoldersValue = elements.hiddenInputs.folders?.value === '1';
+    // Check hidden field values: flags vs term-bearing inputs
+    const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
+    const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
+    const hasFoldersValue = elements.hiddenInputs.folders?.value === '1';
         
         // Determine active search type
-        if (preserveTags || hasTagsValue) {
+        if (preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
         } else if (preserveFolders || hasFoldersValue) {
             this.setActiveSearchType('folders', isMobile);
@@ -170,9 +171,12 @@ class SearchManager {
             const urlParams = new URLSearchParams(window.location.search);
             const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
             // Also consider hidden inputs which are used during AJAX submissions
-            const hasHiddenNotes = Boolean(elements.hiddenInputs.notes?.value === '1' || elements.hiddenInputs.notes?.value);
-            const hasHiddenTags = Boolean(elements.hiddenInputs.tags?.value === '1' || elements.hiddenInputs.tags?.value);
-            const isSearching = term !== '' || hasUrlSearch || hasHiddenNotes || hasHiddenTags;
+            // Distinguish between flag inputs (search-in-*) and term-carrying hidden inputs
+            const hasHiddenNotesFlag = Boolean(elements.hiddenInputs.notesFlag?.value === '1');
+            const hasHiddenTagsFlag = Boolean(elements.hiddenInputs.tagsFlag?.value === '1');
+            const hasHiddenNotesTerm = Boolean(elements.hiddenInputs.notesTerm?.value && elements.hiddenInputs.notesTerm.value.trim());
+            const hasHiddenTagsTerm = Boolean(elements.hiddenInputs.tagsTerm?.value && elements.hiddenInputs.tagsTerm.value.trim());
+            const isSearching = term !== '' || hasUrlSearch || hasHiddenNotesFlag || hasHiddenTagsFlag || hasHiddenNotesTerm || hasHiddenTagsTerm;
 
             const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
@@ -272,21 +276,24 @@ class SearchManager {
         const elements = this.getElements(isMobile);
         const activeType = this.getActiveSearchType(isMobile);
         const searchValue = elements.searchInput?.value.trim() || '';
-        
-        // Clear all hidden inputs
-        this.searchTypes.forEach(type => {
-            const input = elements.hiddenInputs[type];
-            if (input) {
-                input.value = type === activeType ? (type === 'folders' ? '1' : searchValue) : '';
-            }
-        });
-        
-        // Special handling for checkbox-style hidden inputs
-        if (activeType === 'notes' && elements.hiddenInputs.notes) {
-            elements.hiddenInputs.notes.value = '1';
+
+        // Update term-bearing hidden inputs (so AJAX receives the actual search term)
+        if (elements.hiddenInputs.notesTerm) {
+            elements.hiddenInputs.notesTerm.value = searchValue;
         }
-        if (activeType === 'tags' && elements.hiddenInputs.tags) {
-            elements.hiddenInputs.tags.value = '1';
+        if (elements.hiddenInputs.tagsTerm) {
+            elements.hiddenInputs.tagsTerm.value = searchValue;
+        }
+
+        // Update flag inputs (search-in-*) to reflect active type
+        if (elements.hiddenInputs.notesFlag) {
+            elements.hiddenInputs.notesFlag.value = activeType === 'notes' ? '1' : '';
+        }
+        if (elements.hiddenInputs.tagsFlag) {
+            elements.hiddenInputs.tagsFlag.value = activeType === 'tags' ? '1' : '';
+        }
+        if (elements.hiddenInputs.folders) {
+            elements.hiddenInputs.folders.value = activeType === 'folders' ? '1' : '';
         }
     }
 
