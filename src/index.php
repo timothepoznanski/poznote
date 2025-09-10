@@ -186,7 +186,7 @@ $res_right = $note_data['res_right'];
         noteItem.className = 'create-menu-item';
         noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
         noteItem.onclick = function() {
-            createNewNote();
+            window.open('insert_new.php', '_blank');
             createMenu.remove();
         };
         
@@ -195,7 +195,7 @@ $res_right = $note_data['res_right'];
         folderItem.className = 'create-menu-item';
         folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
         folderItem.onclick = function() {
-            newFolder();
+            openFolderModal();
             createMenu.remove();
         };
         
@@ -209,9 +209,6 @@ $res_right = $note_data['res_right'];
         }
     }
     
-    // Expose function globally
-    window.toggleCreateMenu = toggleCreateMenu;
-    
     // Close menu when clicking outside
     document.addEventListener('click', function(e) {
         var menu = document.getElementById('header-create-menu');
@@ -224,25 +221,7 @@ $res_right = $note_data['res_right'];
     
     // Make function globally available
     window.toggleCreateMenu = toggleCreateMenu;
-    
-    // Folder note counts display management
-    function applyFolderCountsPreference() {
-        const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
-        const leftCol = document.getElementById('left_col');
-        if (leftCol) {
-            if (showCounts) {
-                leftCol.classList.remove('hide-folder-counts');
-            } else {
-                leftCol.classList.add('hide-folder-counts');
-            }
-        }
-    }
-    
-    // Apply preference on page load
-    document.addEventListener('DOMContentLoaded', applyFolderCountsPreference);
-    
-    // Check for changes in localStorage (when coming back from settings)
-    window.addEventListener('focus', applyFolderCountsPreference);
+    console.log('toggleCreateMenu function loaded');
     </script>
     
     <!-- RESIZE HANDLE (Desktop only) -->

@@ -7,7 +7,7 @@
 
 <!-- Notes list display -->
 <?php
-// Render a dedicated "Corbeille" folder above Favorites
+// Render a dedicated "Trash" folder above Favorites
 try {
     $trash_count = 0;
     if (isset($con)) {
@@ -19,11 +19,11 @@ try {
     $trash_count = 0;
 }
 
-echo "<div class='folder-header' data-folder='Corbeille'>";
+echo "<div class='folder-header' data-folder='Trash'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fas fa-trash folder-icon'></i>";
-echo "<span class='folder-name'>Corbeille</span>";
-echo "<span class='folder-note-count' id='count-corbeille'>(" . $trash_count . ")</span>";
+echo "<span class='folder-name'>Trash</span>";
+echo "<span class='folder-note-count' id='count-Trash'>(" . $trash_count . ")</span>";
 echo "</div></div>";
 
 // Render a dedicated "Tags" folder that links to the tag listing page
@@ -81,7 +81,7 @@ foreach($folders as $folderName => $notes) {
         
     // Set appropriate folder icon (open/closed) and display style
     $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
-        $folder_display = $should_be_open ? 'block' : 'none';
+    $folder_display = $should_be_open ? 'block' : 'none';
         
         echo "<div class='$folderClass' data-folder='$folderName' onclick='selectFolder(\"$folderName\", this)'>";
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";

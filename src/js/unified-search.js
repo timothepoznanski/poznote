@@ -84,7 +84,7 @@ class SearchManager {
      */
     clearSearchHiddenMarkers() {
         try {
-            const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
+            const selectors = ['.folder-header[data-folder="Trash"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
                     el.classList.remove('search-hidden');
@@ -173,14 +173,14 @@ class SearchManager {
     updateInterface(isMobile) {
         this.updatePlaceholder(isMobile);
     this.updateIcon(isMobile);
-        // Hide or show special folders (Corbeille, Tags) depending on active search type
+        // Hide or show special folders (Trash, Tags) depending on active search type
         this.hideSpecialFolders(isMobile);
         this.updateHiddenInputs(isMobile);
         this.hideValidationError(isMobile);
     }
 
     /**
-     * Hide special folders (Corbeille and Tags) when searching notes or tags
+     * Hide special folders (Trash and Tags) when searching notes or tags
      */
     hideSpecialFolders(isMobile) {
         try {
@@ -197,7 +197,7 @@ class SearchManager {
             const hasHiddenTagsTerm = Boolean(elements.hiddenInputs.tagsTerm?.value && elements.hiddenInputs.tagsTerm.value.trim());
             const isSearching = term !== '' || hasUrlSearch || hasHiddenNotesTerm || hasHiddenTagsTerm;
 
-            const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
+            const selectors = ['.folder-header[data-folder="Trash"]', '.folder-header[data-folder="Tags"]'];
             selectors.forEach(sel => {
                 document.querySelectorAll(sel).forEach(el => {
                             if ((activeType === 'notes' || activeType === 'tags') && isSearching) {

@@ -141,6 +141,17 @@
 .workspace-list ul li > .ws-col .action-btn { margin: 0; }
 .workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
 .workspace-list .btn-danger:hover { background: #c43b3b; }
+/* Ensure destructive buttons inside modals are visually prominent */
+.modal .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+.modal .btn-danger:hover {
+    background: #c43b3b;
+}
 /* .btn-rename visibility controlled earlier */
 .workspace-list .btn-rename {
     display: inline-flex;
@@ -1946,11 +1957,12 @@ hr {
 }
 
 .folder-icon {
-    font-size: 12px;
+    font-size: 13px;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
     width: 12px;
+    align-content: center;
 }
 
 .folder-name {
@@ -2047,7 +2059,7 @@ hr {
 }
 
 .folder-content {
-    margin-left: 20px;
+    margin-left: 29px;
     margin-bottom: 5px; /* Réduction de l'espace sous chaque dossier */
 }
 
