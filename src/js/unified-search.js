@@ -126,8 +126,44 @@ class SearchManager {
     updateInterface(isMobile) {
         this.updatePlaceholder(isMobile);
     this.updateIcon(isMobile);
+        // Hide or show special folders (Corbeille, Tags) depending on active search type
+        this.hideSpecialFolders(isMobile);
         this.updateHiddenInputs(isMobile);
         this.hideValidationError(isMobile);
+    }
+
+    /**
+     * Hide special folders (Corbeille and Tags) when searching notes or tags
+     */
+    hideSpecialFolders(isMobile) {
+        try {
+            const activeType = this.getActiveSearchType(isMobile);
+            const selectors = ['.folder-header[data-folder="Corbeille"]', '.folder-header[data-folder="Tags"]'];
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (activeType === 'notes' || activeType === 'tags') {
+                        el.classList.add('hidden');
+                        // also hide its content pane if present
+                        const folderToggle = el.querySelector('[data-folder-id]');
+                        if (folderToggle) {
+                            const folderId = folderToggle.getAttribute('data-folder-id');
+                            const folderContent = document.getElementById(folderId);
+                            if (folderContent) folderContent.classList.add('hidden');
+                        }
+                    } else {
+                        el.classList.remove('hidden');
+                        const folderToggle = el.querySelector('[data-folder-id]');
+                        if (folderToggle) {
+                            const folderId = folderToggle.getAttribute('data-folder-id');
+                            const folderContent = document.getElementById(folderId);
+                            if (folderContent) folderContent.classList.remove('hidden');
+                        }
+                    }
+                });
+            });
+        } catch (err) {
+            // ignore
+        }
     }
 
     /**
