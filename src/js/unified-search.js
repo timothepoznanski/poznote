@@ -118,6 +118,22 @@ class SearchManager {
     this.currentSearchType = searchType;
 
     this.updateInterface(isMobile);
+    // If there's a current search term, trigger an immediate search/filter for the new type
+    try {
+        const elements = this.getElements(isMobile);
+        const currentTerm = elements.searchInput?.value.trim();
+        if (currentTerm) {
+            if (searchType === 'folders') {
+                this.filterFolders(currentTerm, isMobile);
+            } else {
+                // Submit via AJAX with excluded folders handling
+                this.submitSearchWithExcludedFolders(isMobile);
+            }
+        }
+    } catch (err) {
+        // swallow errors; don't block UI
+        console.warn('Error auto-triggering search on type change', err);
+    }
     }
 
     /**
@@ -258,20 +274,8 @@ class SearchManager {
             const idx = this.searchTypes.indexOf(current);
             const next = this.searchTypes[(idx + 1) % this.searchTypes.length];
 
-            // Persist the new type and update UI
+            // Persist the new type and update UI; setActiveSearchType will auto-trigger search if needed
             this.setActiveSearchType(next, isMobile);
-
-            // Trigger behavior similar to clicking the pill
-            const elements = this.getElements(isMobile);
-            if (next === 'folders') {
-                const searchValue = elements.searchInput?.value.trim();
-                if (searchValue) this.filterFolders(searchValue, isMobile);
-                elements.searchInput?.focus();
-            } else if (elements.searchInput?.value.trim()) {
-                this.submitSearchWithExcludedFolders(isMobile);
-            } else {
-                elements.searchInput?.focus();
-            }
         };
 
         this.eventHandlers.set(handlerKey, handler);
