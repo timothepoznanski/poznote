@@ -11,7 +11,7 @@
 class SearchManager {
     constructor() {
     // Toggle debug logging for tracing search-type issues
-    this.debug = false; // set true temporarily to enable verbose logs
+    this.debug = true; // enabled temporarily to capture logs during debugging
         this.searchTypes = ['notes', 'tags', 'folders'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
