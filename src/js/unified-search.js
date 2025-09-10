@@ -588,6 +588,16 @@ class SearchManager {
             try {
                 const newUrl = window.location.pathname + '?' + formParams;
                 history.pushState({}, '', newUrl);
+                // Update global search mode flag so reinitialized code knows we're in search
+                try {
+                    const newParams = new URLSearchParams(formParams);
+                    const unified = newParams.get('unified_search');
+                    const search = newParams.get('search');
+                    const tagsSearch = newParams.get('tags_search');
+                    window.isSearchMode = Boolean(unified || search || tagsSearch);
+                } catch (e) {
+                    // ignore
+                }
             } catch (err) {
                 // Ignore history errors
             }
