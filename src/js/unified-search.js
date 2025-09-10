@@ -15,6 +15,8 @@ class SearchManager {
         this.searchTypes = ['notes', 'tags', 'folders'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
+    // When set, skip restore from URL during initialization (used after AJAX)
+    this.suppressURLRestore = false;
         this.eventHandlers = new Map();
         
         // Initialize both desktop and mobile
@@ -68,7 +70,11 @@ class SearchManager {
         this.clearSearchHiddenMarkers();
 
         // Restore state from URL parameters or defaults
-        this.restoreSearchStateFromURL(isMobile);
+        if (!this.suppressURLRestore) {
+            this.restoreSearchStateFromURL(isMobile);
+        } else if (this.debug) {
+            console.debug('initializeSearchInterface: skipping restoreSearchStateFromURL due to suppressURLRestore', {isMobile});
+        }
         this.updateInterface(isMobile);
     }
 
@@ -602,7 +608,13 @@ class SearchManager {
             }
 
             // Reinitialize search (set up listeners/DOM hooks)
-            this.initializeSearch();
+            // Prevent restore-from-URL happening during this reinit which may override saved state
+            this.suppressURLRestore = true;
+            try {
+                this.initializeSearch();
+            } finally {
+                this.suppressURLRestore = false;
+            }
 
             // Restore search state (force UI to reflect saved choice)
             if (searchState) {
