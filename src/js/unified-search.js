@@ -10,8 +10,8 @@
 
 class SearchManager {
     constructor() {
-    // Toggle debug logging for tracing search-type issues
-    this.debug = true; // enabled temporarily to capture logs during debugging
+    // Debug logging disabled by default
+    this.debug = false;
         this.searchTypes = ['notes', 'tags', 'folders'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
@@ -75,8 +75,6 @@ class SearchManager {
         // Restore state from URL parameters or defaults
         if (!this.suppressURLRestore) {
             this.restoreSearchStateFromURL(isMobile);
-        } else if (this.debug) {
-            console.debug('initializeSearchInterface: skipping restoreSearchStateFromURL due to suppressURLRestore', {isMobile});
         }
         this.updateInterface(isMobile);
     }
@@ -116,7 +114,7 @@ class SearchManager {
     const preserveFolders = urlParams.get('preserve_folders') === '1';
     const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
     const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
-    if (this.debug) console.debug('restoreSearchStateFromURL', {isMobile, preserveNotes, preserveTags, preserveFolders, hasTagsSearchParam, hasNotesSearchParam, notesFlag: elements.hiddenInputs.notesFlag?.value, tagsFlag: elements.hiddenInputs.tagsFlag?.value, notesTerm: elements.hiddenInputs.notesTerm?.value, tagsTerm: elements.hiddenInputs.tagsTerm?.value});
+    // debug info removed
         
     // Check hidden field values: flags vs term-bearing inputs
     const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
@@ -164,7 +162,7 @@ class SearchManager {
     // Persist state even if buttons are absent
     const prev = this.currentSearchType;
     this.currentSearchType = searchType;
-    if (this.debug) console.debug('setActiveSearchType', {isMobile, searchType, prev});
+    // debug info removed
 
     this.updateInterface(isMobile);
     }
@@ -306,7 +304,6 @@ class SearchManager {
         if (elements.hiddenInputs.tagsTerm) {
             elements.hiddenInputs.tagsTerm.value = activeType === 'tags' ? searchValue : '';
         }
-        if (this.debug) console.debug('updateHiddenInputs', {isMobile, activeType, searchValue, notesTerm: elements.hiddenInputs.notesTerm?.value, tagsTerm: elements.hiddenInputs.tagsTerm?.value});
 
         // Update flag inputs (search-in-*) to reflect active type
         if (elements.hiddenInputs.notesFlag) {
@@ -486,7 +483,7 @@ class SearchManager {
         }
 
         // Update hidden inputs and hide special folders immediately so UI reflects search
-    if (this.debug) console.debug('handleSearchSubmit', {isMobile, activeType, searchValue});
+    // debug info removed
     // Save caret pos and request focus restoration after AJAX
     try {
         this.focusAfterAjax = true;
@@ -542,7 +539,6 @@ class SearchManager {
             }
 
             const searchState = this.saveCurrentSearchState();
-            if (this.debug) console.debug('performAjaxSearch', {isMobile, action: form.action, params: params.toString(), searchState});
 
             fetch(form.action || window.location.pathname, {
                 method: 'POST',
@@ -566,7 +562,7 @@ class SearchManager {
      */
     handleAjaxResponse(html, formParams, searchState) {
         try {
-            if (this.debug) console.debug('handleAjaxResponse start', {formParams, searchState});
+            // debug info removed
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
