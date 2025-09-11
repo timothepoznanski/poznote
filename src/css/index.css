@@ -1805,7 +1805,7 @@ hr {
 .toolbar-btn.save-modified {
     background: transparent !important;
     border: none !important;
-    animation: pulse-save 2s infinite;
+    /* animation: pulse-save 2s infinite; */
 }
 
 /* Animation de pulsation pour le bouton save modifié */

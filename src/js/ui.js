@@ -124,31 +124,54 @@ function displayEditInProgress() {
 }
 
 function setSaveButtonRed(isRed) {
-    // Search the save button
-    var saveBtn = document.querySelector('.toolbar-btn > .fa-save');
-    if (saveBtn) {
-        saveBtn = saveBtn.parentElement;
+    // Search the save button within the current note's container
+    var noteContainer = document.getElementById('note' + noteid);
+    var saveBtn = null;
+    
+    if (noteContainer) {
+        // Search within the current note container
+        saveBtn = noteContainer.querySelector('.toolbar-btn > .fa-save');
+        if (saveBtn) {
+            saveBtn = saveBtn.parentElement;
+        }
+        
+        if (!saveBtn) {
+            // Fallback: search among all toolbar buttons in this note
+            var btns = noteContainer.querySelectorAll('.toolbar-btn');
+            for (var i = 0; i < btns.length; i++) {
+                var btn = btns[i];
+                if (btn.querySelector('.fa-save')) {
+                    saveBtn = btn;
+                    break;
+                }
+            }
+        }
     }
     
     if (!saveBtn) {
-        // Fallback: search among all buttons
-        var btns = document.querySelectorAll('.toolbar-btn');
-        for (var i = 0; i < btns.length; i++) {
-            var btn = btns[i];
-            if (btn.querySelector('.fa-save')) {
-                saveBtn = btn;
-                break;
+        // Global fallback for cases where noteid is not set or container not found
+        saveBtn = document.querySelector('.toolbar-btn > .fa-save');
+        if (saveBtn) {
+            saveBtn = saveBtn.parentElement;
+        }
+        
+        if (!saveBtn) {
+            var btns = document.querySelectorAll('.toolbar-btn');
+            for (var i = 0; i < btns.length; i++) {
+                var btn = btns[i];
+                if (btn.querySelector('.fa-save')) {
+                    saveBtn = btn;
+                    break;
+                }
             }
         }
     }
     
     if (saveBtn) {
         if (isRed) {
-            saveBtn.style.color = '#FF0000';
-            saveBtn.style.fontWeight = 'bold';
+            saveBtn.classList.add('save-modified');
         } else {
-            saveBtn.style.color = '';
-            saveBtn.style.fontWeight = '';
+            saveBtn.classList.remove('save-modified');
         }
     }
 }
