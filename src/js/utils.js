@@ -841,11 +841,15 @@ function getRecentFolders() {
 function toggleFolder(folderId) {
     var content = document.getElementById(folderId);
     var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');
+    // Determine folder name to avoid changing icon for the Favorites pseudo-folder
+    var folderHeader = document.querySelector('[data-folder-id="' + folderId + '"]').parentElement;
+    var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+    var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
     
     if (content.style.display === 'none') {
         content.style.display = 'block';
         // show open folder icon
-        if (icon) {
+        if (icon && folderNameText !== 'Favorites') {
             icon.classList.remove('fa-folder');
             icon.classList.add('fa-folder-open');
         }
@@ -853,7 +857,7 @@ function toggleFolder(folderId) {
     } else {
         content.style.display = 'none';
         // show closed folder icon
-        if (icon) {
+        if (icon && folderNameText !== 'Favorites') {
             icon.classList.remove('fa-folder-open');
             icon.classList.add('fa-folder');
         }
@@ -867,7 +871,8 @@ function emptyFolder(folderName) {
         'Are you sure you want to move all notes from "' + folderName + '" to trash?',
         function() {
             executeEmptyFolder(folderName);
-        }
+        },
+        { danger: true }
     );
 }
 

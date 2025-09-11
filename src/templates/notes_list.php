@@ -85,7 +85,12 @@ foreach($folders as $folderName => $notes) {
         
         echo "<div class='$folderClass' data-folder='$folderName' onclick='selectFolder(\"$folderName\", this)'>";
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
-    echo "<i class='fas $chevron_icon folder-icon'></i>";
+        // Use an empty star icon for the Favorites pseudo-folder
+        if ($folderName === 'Favorites') {
+            echo "<i class='far fa-star folder-icon'></i>";
+        } else {
+            echo "<i class='fas $chevron_icon folder-icon'></i>";
+        }
         
         // Workspace-aware default folder handling in UI
         // Disable double-click rename for default folder
@@ -122,6 +127,10 @@ foreach($folders as $folderName => $notes) {
     if (empty($folder_filter)) {
         echo "</div>"; // Close folder-content
         echo "</div>"; // Close folder-header
+        // Add a thin separator after Favorites to visually separate the top sections
+        if ($folderName === 'Favorites') {
+            echo "<div class='favorites-separator' aria-hidden='true'></div>";
+        }
     }
 }
 ?>

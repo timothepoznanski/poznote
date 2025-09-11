@@ -242,8 +242,8 @@
             <span id="filesCountText"></span>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
             <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')">Cancel</button>
+            <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
         </div>
         <div id="moveFilesErrorMessage" class="modal-error-message"></div>
     </div>

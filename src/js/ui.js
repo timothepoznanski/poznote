@@ -369,14 +369,43 @@ function closeLoginDisplayModal() {
 // Confirmation modal functions
 var confirmedActionCallback = null;
 
-function showConfirmModal(title, message, callback) {
+function showConfirmModal(title, message, callback, options) {
     var modal = document.getElementById('confirmModal');
     var titleElement = document.getElementById('confirmTitle');
     var messageElement = document.getElementById('confirmMessage');
+    var confirmBtn = document.getElementById('confirmButton');
     
     titleElement.textContent = title;
     messageElement.textContent = message;
     confirmedActionCallback = callback;
+
+    // Reset button classes first
+    if (confirmBtn) {
+        confirmBtn.classList.remove('btn-danger');
+        confirmBtn.classList.add('btn-primary');
+    }
+
+    // If options specify danger, mark button as dangerous
+    if (options && options.danger && confirmBtn) {
+        confirmBtn.classList.remove('btn-primary');
+        confirmBtn.classList.add('btn-danger');
+        // Also set inline styles as a fallback if CSS is overridden elsewhere
+        try {
+            confirmBtn.style.backgroundColor = '#e04b4b';
+            confirmBtn.style.color = '#ffffff';
+            confirmBtn.style.border = 'none';
+        } catch (e) {
+            // ignore
+        }
+    }
+    else if (confirmBtn) {
+        // ensure any inline danger styles are cleared when not dangerous
+        try {
+            confirmBtn.style.backgroundColor = '';
+            confirmBtn.style.color = '';
+            confirmBtn.style.border = '';
+        } catch (e) {}
+    }
     
     modal.style.display = 'flex';
 }

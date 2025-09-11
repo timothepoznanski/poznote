@@ -536,6 +536,13 @@ body {
 
 }
 
+/* Separator after Favorites to visually separate important folders */
+.favorites-separator {
+    height: 8px;
+    border-bottom: 1px solid #ccc; /* match left column right border */
+    margin: 8px 6px;
+}
+
 /* Sidebar footer: CTA buttons pinned at bottom of left column */
 .sidebar-footer {
     position: sticky;
@@ -2326,6 +2333,130 @@ hr {
     background-color: #0056b3 !important;
 }
 
+/* Ensure danger variant inside confirmModal is strongly red (overrides primary rules) */
+#confirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#confirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Explicit rules for the confirm button to avoid style conflicts */
+#confirmModal #confirmButton.btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+/* Delete Folder Modal: make Delete prominent red and Cancel gray */
+#deleteFolderModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteFolderModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteFolderModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteFolderModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Permanently Delete Note Modal: make Delete red and Cancel gray */
+#deleteConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Empty Trash Modal: make Empty Trash red and Cancel gray */
+#emptyTrashConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#emptyTrashConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#emptyTrashConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#emptyTrashConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Restore Confirmation Modal: make Restore primary blue and Cancel gray */
+#restoreConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#restoreConfirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
 .close {
     color: #aaa;
     float: right;
@@ -3373,6 +3504,30 @@ input[type="search"]::-webkit-search-results-decoration {
 
 #moveFolderFilesModal .btn-primary:disabled:hover {
     background-color: #ccc;
+}
+
+/* Ensure moveFolderFilesModal buttons use class-based coloring regardless of DOM order */
+#moveFolderFilesModal .modal-buttons {
+    justify-content: flex-end; /* keep buttons to the right */
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel {
+    background-color: #f8f9fa !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel:hover {
+    background-color: #e9ecef !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-primary:hover {
+    background-color: #0056b3 !important;
 }
 
 /* Small workspace button near settings */

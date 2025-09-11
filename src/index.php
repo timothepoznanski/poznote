@@ -93,10 +93,16 @@ $res_right = $note_data['res_right'];
                     content.style.display = 'none';
                     var toggle = content.parentElement.querySelector('.folder-toggle');
                     if (toggle) {
-                        var icon = toggle.querySelector('.folder-icon');
-                        if (icon) {
-                            icon.classList.remove('fa-folder-open');
-                            icon.classList.add('fa-folder');
+                        // Do not change the icon for the Favorites pseudo-folder
+                        var folderHeader = content.parentElement;
+                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+                        if (folderNameText !== 'Favorites') {
+                            var icon = toggle.querySelector('.folder-icon');
+                            if (icon) {
+                                icon.classList.remove('fa-folder-open');
+                                icon.classList.add('fa-folder');
+                            }
                         }
                     }
                 } else if (savedState === 'open') {
@@ -104,10 +110,16 @@ $res_right = $note_data['res_right'];
                     content.style.display = 'block';
                     var toggle = content.parentElement.querySelector('.folder-toggle');
                     if (toggle) {
-                        var icon = toggle.querySelector('.folder-icon');
-                        if (icon) {
-                            icon.classList.remove('fa-folder');
-                            icon.classList.add('fa-folder-open');
+                        // Do not change the icon for the Favorites pseudo-folder
+                        var folderHeader = content.parentElement;
+                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+                        if (folderNameText !== 'Favorites') {
+                            var icon = toggle.querySelector('.folder-icon');
+                            if (icon) {
+                                icon.classList.remove('fa-folder');
+                                icon.classList.add('fa-folder-open');
+                            }
                         }
                     }
                 }
