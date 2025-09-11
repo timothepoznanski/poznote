@@ -5,16 +5,15 @@
 
 /**
  * Initialize touch event handlers for mobile note links
- * Note: For mobile, we still use touch handlers for better UX
- * but they will coexist with onclick handlers
+ * On mobile, we use touch handlers instead of onclick for better UX
  */
 function initializeMobileTouchHandlers() {
     if (!isMobileDevice()) {
         return; // Skip if not mobile
     }
 
-    // Find all note links that don't already have onclick handlers
-    const noteLinks = document.querySelectorAll('.links_arbo_left a:not([onclick])');
+    // Find all note links
+    const noteLinks = document.querySelectorAll('.links_arbo_left a');
 
     noteLinks.forEach(link => {
         // Remove existing event listeners to avoid duplicates
@@ -58,11 +57,8 @@ function handleMobileTouchEnd(event) {
 
     // Validate tap: reasonable duration, no significant movement
     if (touchDuration > 50 && touchDuration < 1000 && !hasMoved && !this.touchHandled) {
-        console.log('Valid mobile tap detected, loading note:', noteTitle);
         this.touchHandled = true; // Mark as handled
         loadNoteDirectly(url, noteTitle);
-    } else {
-        console.log('Invalid mobile tap - Duration:', touchDuration, 'ms, Movement:', deltaX, deltaY);
     }
 
     return false;
@@ -81,6 +77,9 @@ window.goBackToNoteList = function() {
         document.querySelectorAll('.links_arbo_left').forEach(link => {
             link.classList.remove('selected-note');
         });
+
+        // Reset loading state to ensure next note click works
+        window.isLoadingNote = false;
 
         // Update URL to remove note parameter while preserving workspace and other parameters
         const url = new URL(window.location);
@@ -120,6 +119,8 @@ function initializeNoteLoaderMobile() {
                 document.querySelectorAll('.links_arbo_left').forEach(link => {
                     link.classList.remove('selected-note');
                 });
+                // Reset loading state to ensure next note click works
+                window.isLoadingNote = false;
             }
         }
     });

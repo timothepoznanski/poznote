@@ -123,10 +123,17 @@ foreach($folders as $folderName => $notes) {
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add onclick handler for AJAX loading
+        // Add onclick handler for AJAX loading (desktop only, mobile uses touch handlers)
         $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
         $escapedLink = htmlspecialchars($link, ENT_QUOTES);
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName' onclick='return loadNoteDirectly(\"$escapedLink\", \"$escapedHeading\");'>";
+        
+        // Detect if mobile (simple server-side detection)
+        $onclickHandler = '';
+        if (!$is_mobile) {
+            $onclickHandler = " onclick='return loadNoteDirectly(\"$escapedLink\", \"$escapedHeading\");'";
+        }
+        
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
