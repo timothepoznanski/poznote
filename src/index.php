@@ -67,6 +67,71 @@ $res_right = $note_data['res_right'];
 
 <body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>  
     <script>
+    // Global error handler to catch all JavaScript errors
+    window.addEventListener('error', function(event) {
+        console.error('JavaScript Error caught:', {
+            message: event.message,
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            error: event.error,
+            stack: event.error ? event.error.stack : 'No stack trace available'
+        });
+        
+        // Store in sessionStorage for inspection
+        try {
+            const errorInfo = {
+                timestamp: new Date().toISOString(),
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                stack: event.error ? event.error.stack : 'No stack trace'
+            };
+            sessionStorage.setItem('lastJSError', JSON.stringify(errorInfo));
+        } catch (e) {
+            // Ignore storage errors
+        }
+    });
+    
+    // Catch unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled Promise Rejection:', event.reason);
+        try {
+            const errorInfo = {
+                timestamp: new Date().toISOString(),
+                type: 'Promise Rejection',
+                reason: event.reason.toString(),
+                stack: event.reason.stack || 'No stack trace'
+            };
+            sessionStorage.setItem('lastPromiseError', JSON.stringify(errorInfo));
+        } catch (e) {
+            // Ignore storage errors
+        }
+    });
+    
+    // Helper function to check last errors (callable from console)
+    window.checkLastErrors = function() {
+        try {
+            const lastJSError = sessionStorage.getItem('lastJSError');
+            const lastPromiseError = sessionStorage.getItem('lastPromiseError');
+            
+            if (lastJSError) {
+                console.log('Last JavaScript Error:', JSON.parse(lastJSError));
+            }
+            if (lastPromiseError) {
+                console.log('Last Promise Error:', JSON.parse(lastPromiseError));
+            }
+            
+            if (!lastJSError && !lastPromiseError) {
+                console.log('No recent errors found.');
+            }
+        } catch (e) {
+            console.log('Error checking stored errors:', e);
+        }
+    };
+    </script>
+    <script>
     // Apply folder counts visibility based on settings stored in localStorage
     document.addEventListener('DOMContentLoaded', function() {
         try {
