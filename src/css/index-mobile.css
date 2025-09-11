@@ -1100,6 +1100,14 @@ input[type="search"]::-webkit-search-results-decoration {
     50% { opacity: 0.7; }
 }
 
+/* Title search highlight for input elements */
+.title-search-highlight {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+    border: 2px solid #ffdd00 !important;
+    box-shadow: 0 0 5px rgba(255, 255, 0, 0.5) !important;
+}
+
 /* Modal IA adaptée pour mobile */
 #aiSummaryModal .modal-content {
     max-width: 95% !important;

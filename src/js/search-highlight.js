@@ -69,6 +69,32 @@ function highlightSearchTerms() {
 function highlightInElement(element, searchWords) {
     var highlightCount = 0;
     
+    // Special handling for input elements (like note titles)
+    if (element.tagName === 'INPUT' && element.type === 'text') {
+        var inputValue = element.value;
+        
+        // Create a combined regex pattern for all search words
+        var escapedWords = [];
+        for (var i = 0; i < searchWords.length; i++) {
+            escapedWords.push(escapeRegExp(searchWords[i]));
+        }
+        var pattern = escapedWords.join('|');
+        var regex = new RegExp('(' + pattern + ')', 'gi');
+        
+        // Check if any search word matches
+        var matches = inputValue.match(regex);
+        if (matches) {
+            // Add a class to highlight the input background
+            element.classList.add('title-search-highlight');
+            highlightCount = matches.length;
+        } else {
+            // Remove highlight class if no matches
+            element.classList.remove('title-search-highlight');
+        }
+        
+        return highlightCount;
+    }
+    
     // Create a combined regex pattern for all search words
     var escapedWords = [];
     for (var i = 0; i < searchWords.length; i++) {
@@ -126,6 +152,12 @@ function clearSearchHighlights() {
         parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
         // Normalize the parent to merge adjacent text nodes
         parent.normalize();
+    }
+    
+    // Clear title highlights from input elements
+    var titleHighlights = document.querySelectorAll('.title-search-highlight');
+    for (var i = 0; i < titleHighlights.length; i++) {
+        titleHighlights[i].classList.remove('title-search-highlight');
     }
     
     // Restore folder filter state after clearing search
