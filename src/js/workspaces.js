@@ -186,9 +186,14 @@ function displayWorkspaceMenu(menu, workspaces) {
     
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
-    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'manage_workspaces.php\';">';
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'settings.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
     menuHtml += '<i class="fas fa-cog"></i>';
-    menuHtml += '<span>Workspaces</span>';
+    menuHtml += '<span>Settings</span>';
+    menuHtml += '</div>';
+    // Add Logout right after Settings
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
+    menuHtml += '<i class="fas fa-sign-out-alt"></i>';
+    menuHtml += '<span>Logout</span>';
     menuHtml += '</div>';
     
     menu.innerHTML = menuHtml;

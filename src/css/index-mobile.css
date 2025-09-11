@@ -5,8 +5,8 @@
     height: 100dvh !important;
     position: fixed;
     inset: 0;
-    padding: 16px;
-    background: #F8FAFC;
+    padding: 16 26 26 26;
+    background: #FFFFFF;
     box-sizing: border-box;
     overflow-y: scroll !important; /* Always show scrollbar on mobile */
     overflow-x: hidden !important; /* Hide horizontal scrollbar */
@@ -17,10 +17,103 @@
     display: none !important;
 }
 
+/* Mobile: ensure footer CTA buttons are full-width and stacked */
+.sidebar-footer {
+    padding: 10px 12px 10px 44px !important;
+    font-size: 16px !important;
+    color: #6c7580 !important;
+    caret-color: #6c7580 !important;
+    border-radius: 8px !important;
+    border: 1px solid #ccc !important;
+    background: #f6f7f9 !important;
+    height: 40px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 0 0 1px #e6e6e6 !important;
+    transition: border-color 0.18s, box-shadow 0.18s !important;
+    outline: none !important;
+.sidebar-footer .btn-new-note, .sidebar-footer .btn-new-folder {
+    display: none; /* deprecated */
+}
+    color: #6c7580 !important;
+    opacity: 1;
+    font-size: 16px !important;
+.create-dropdown {
+    width: 100%;
+}
+    border-color: #b0b3b8 !important;
+    box-shadow: 0 0 0 2px #d3d6db !important;
+    outline: none !important;
+    border-radius: 8px !important;
+    background: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-size: 1rem !important;
+    padding: 8px 12px !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+}
+#header-create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 140px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.create-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.create-menu-item:last-child {
+    border-bottom: none;
+}
+
+.create-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+
+.create-menu {
+    position: absolute;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+}
+
 /* Mobile content spacing */
+/* .mobile-search-container removed (search moved/hidden in mobile view) */
+/* Minimal mobile search styles restored */
 .mobile-search-container {
-    margin-bottom: 15px !important;
-    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    margin-top: 20px !important;
+    padding: 0 12px;
+}
+
+.mobile-search-container .unified-search-container {
+    width: 100%;
 }
 
 /* Folder filter spacing on mobile */
@@ -779,10 +872,14 @@ a.links_arbo_left.selected-note {
 
 /* Mobile searchbar input adjustments */
 .searchbar-input {
-    padding: 8px 15px 8px 40px !important;
-    font-size: 16px !important; /* Prevent zoom on iOS */
-    color: #007DB8 !important;
+    padding: 10px 12px 10px 40px !important;
+    font-size: 0.9em !important; /* Prevent zoom on iOS */
+    color: #2b2b2b !important;
     caret-color: #000000 !important;
+    border-radius: 8px !important;
+    border: 1px solid #e6eef8 !important;
+    height: 40px !important;
+    box-sizing: border-box !important;
 }
 
 .searchbar-input::placeholder {
@@ -798,6 +895,12 @@ a.links_arbo_left.selected-note {
     right: 15px !important;
     height: 32px !important;
     width: 32px !important;
+}
+
+.searchbar-input:focus {
+    border-color: #cfe6ff !important;
+    box-shadow: 0 0 0 3px rgba(15,120,230,0.06) !important;
+    outline: none !important;
 }
 
 .search-options-container.mobile {
@@ -997,6 +1100,19 @@ input[type="search"]::-webkit-search-results-decoration {
     50% { opacity: 0.7; }
 }
 
+/* Input highlight overlay for precise word highlighting in input elements */
+.input-highlight-overlay {
+    background-color: #ffff00 !important;
+    opacity: 0.8 !important; /* Slightly more opaque on mobile for better visibility */
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+    position: absolute !important;
+    pointer-events: none !important;
+    z-index: 1000 !important;
+    /* Ensure it works with mobile zoom */
+    transform-origin: top left;
+}
+
 /* Modal IA adaptée pour mobile */
 #aiSummaryModal .modal-content {
     max-width: 95% !important;
@@ -1178,54 +1294,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Responsive design for mobile devices */
-@media (max-width: 768px) {
-    
-    /* Mobile search container */
-    .mobile-search-container {
-        padding: 0 15px;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .mobile-search-container .unified-search-container {
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    .mobile-search-container .search-options-container {
-        margin-top: 12px;
-    }
-    
-    .mobile-search-container .search-type-pills {
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    /* Styles spécifiques pour les filtres en mobile - force l'apparence comme desktop */
-    .mobile-search-container .search-pill.active,
-    .mobile .search-pill.active {
-        background: #f8f9fa !important;
-        border-color: #007DB8 !important;
-        color: #007DB8 !important;
-        box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
-        opacity: 1 !important;
-    }
-
-    .mobile-search-container .search-pill.active:hover,
-    .mobile .search-pill.active:hover {
-        background: #e9ecef !important;
-        border-color: #007DB8 !important;
-        color: #007DB8 !important;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
-    }
-
-    .mobile-search-container .search-pill.active:active,
-    .mobile .search-pill.active:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
-    }
-}
+/* Mobile search container styles removed - mobile search UI hidden */
 
 /* Styles pour les écrans petits/moyens (ordinateurs portables inclus) */
 @media (max-width: 1024px) {

@@ -89,9 +89,7 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
                 </div>
             </div>
             
-            <div class="search-options-container' . ($is_mobile ? ' mobile' : '') . '">
-                ' . $search_pills . '
-            </div>
+            <!-- Search options removed per UI update -->
             
             <!-- Hidden inputs for compatibility -->
             <input type="hidden" id="search-notes-hidden' . $pills_suffix . '" name="search" value="' . htmlspecialchars($search ?? '', ENT_QUOTES) . '">

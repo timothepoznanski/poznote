@@ -22,13 +22,32 @@
 
 	if ($stmt->execute([$uniqueTitle, $folder, $workspace, $created_date, $created_date])) {
 		$id = $con->lastInsertId();
-		// Return both the heading and the id (for future-proofing)
-		echo json_encode([
-			'status' => 1,
-			'heading' => $uniqueTitle,
-			'id' => $id
-		]);
+
+		// Detect AJAX/Fetch requests (prefer JSON response) versus direct browser open
+		$isAjax = false;
+		if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+			$isAjax = true;
+		}
+		if (!$isAjax && !empty($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+			$isAjax = true;
+		}
+
+		if ($isAjax) {
+			// Return JSON for fetch/AJAX clients
+			header('Content-Type: application/json; charset=utf-8');
+			echo json_encode([
+				'status' => 1,
+				'heading' => $uniqueTitle,
+				'id' => $id
+			]);
+		} else {
+			// If opened directly in browser, redirect to the editor/view for the new note
+			$redirectUrl = 'index.php?note=' . urlencode($id);
+			header('Location: ' . $redirectUrl);
+			exit;
+		}
 	} else {
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode([
 			'status' => 0,
 			'error' => 'Database error: ' . $stmt->errorInfo()[2]

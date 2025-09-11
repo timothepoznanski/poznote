@@ -112,7 +112,7 @@ try {
         }
         
     } else {
-        // Suppression douce (déplacer vers la corbeille)
+        // Trashing the note
         
         if ($note['trash'] == 1) {
             http_response_code(400);

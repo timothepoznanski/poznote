@@ -60,6 +60,7 @@ try {
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_language', 'en')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_desktop', '16')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_mobile', '16')");
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '0')");
 
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());

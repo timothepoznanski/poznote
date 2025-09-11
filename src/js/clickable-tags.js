@@ -178,6 +178,53 @@ function getOrCreateSuggestions(container) {
 }
 
 /**
+ * Highlight clickable tags that match the provided searchTerm (case-insensitive).
+ * If searchTerm is falsy, remove any existing highlight classes.
+ */
+function highlightMatchingTags(searchTerm, _attempt = 0) {
+    const normalized = searchTerm ? searchTerm.toString().trim().toLowerCase() : '';
+    const tagEls = document.querySelectorAll('.clickable-tag');
+
+    // If no tag elements yet, retry a few times (they may be created asynchronously after AJAX)
+    if (tagEls.length === 0 && _attempt < 6) {
+        // Elements not yet present; retry shortly
+        setTimeout(() => highlightMatchingTags(searchTerm, _attempt + 1), 80);
+        return;
+    }
+
+    if (!normalized) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+
+    // Support multiple tokens separated by commas or whitespace (e.g. "tag1, tag2" or "tag1 tag2")
+    const tokens = normalized.split(/[\,\s]+/).map(t => t.trim()).filter(t => t.length > 0);
+    if (tokens.length === 0) {
+        tagEls.forEach(el => el.classList.remove('tag-highlight'));
+        return;
+    }
+
+    let matched = 0;
+    tagEls.forEach(el => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        const isMatch = tokens.some(tok => text === tok || text.includes(tok));
+        const wrapper = el.closest('.clickable-tag-wrapper');
+        if (isMatch) {
+            if (wrapper) wrapper.classList.add('tag-highlight');
+            else el.classList.add('tag-highlight');
+            matched++;
+        } else {
+            if (wrapper) wrapper.classList.remove('tag-highlight');
+            else el.classList.remove('tag-highlight');
+        }
+    });
+    // debug logs removed
+}
+
+// Expose helper so other modules can call it after AJAX reinit
+window.highlightMatchingTags = highlightMatchingTags;
+
+/**
  * Show suggestions filtered by prefix
  */
 function showTagSuggestions(inputEl, container, workspace, noteId) {
@@ -342,7 +389,7 @@ function addTagElement(container, tagText, noteId) {
  */
 function handleTagInput(e, noteId, container) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === ',') {
-        e.preventDefault(); // Prevents default behavior (nouvelle ligne, etc.)
+        e.preventDefault(); // Prevents default behavior
         e.stopPropagation(); // Prevents event propagation
         
         const input = e.target;

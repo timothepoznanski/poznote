@@ -225,52 +225,6 @@ function toggleSettingsMenu(event) {
     }
 }
 
-// Fold all folders
-function foldAllFolders() {
-    var folderContents = document.querySelectorAll('.folder-content');
-    var folderIcons = document.querySelectorAll('.folder-icon');
-    
-    for (var i = 0; i < folderContents.length; i++) {
-        var content = folderContents[i];
-        content.style.display = 'none';
-        try {
-            localStorage.setItem('folder_' + content.id, 'closed');
-        } catch(e) {}
-    }
-    
-    for (var i = 0; i < folderIcons.length; i++) {
-        var icon = folderIcons[i];
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-right');
-    }
-    
-    // Close settings menu
-    closeSettingsMenus();
-}
-
-// Unfold all folders
-function unfoldAllFolders() {
-    var folderContents = document.querySelectorAll('.folder-content');
-    var folderIcons = document.querySelectorAll('.folder-icon');
-    
-    for (var i = 0; i < folderContents.length; i++) {
-        var content = folderContents[i];
-        content.style.display = 'block';
-        try {
-            localStorage.setItem('folder_' + content.id, 'open');
-        } catch(e) {}
-    }
-    
-    for (var i = 0; i < folderIcons.length; i++) {
-        var icon = folderIcons[i];
-        icon.classList.remove('fa-chevron-right');
-        icon.classList.add('fa-chevron-down');
-    }
-    
-    // Close settings menu
-    closeSettingsMenus();
-}
-
 // Close settings menus
 function closeSettingsMenus() {
     var settingsMenu = document.getElementById('settingsMenu');
@@ -415,14 +369,43 @@ function closeLoginDisplayModal() {
 // Confirmation modal functions
 var confirmedActionCallback = null;
 
-function showConfirmModal(title, message, callback) {
+function showConfirmModal(title, message, callback, options) {
     var modal = document.getElementById('confirmModal');
     var titleElement = document.getElementById('confirmTitle');
     var messageElement = document.getElementById('confirmMessage');
+    var confirmBtn = document.getElementById('confirmButton');
     
     titleElement.textContent = title;
     messageElement.textContent = message;
     confirmedActionCallback = callback;
+
+    // Reset button classes first
+    if (confirmBtn) {
+        confirmBtn.classList.remove('btn-danger');
+        confirmBtn.classList.add('btn-primary');
+    }
+
+    // If options specify danger, mark button as dangerous
+    if (options && options.danger && confirmBtn) {
+        confirmBtn.classList.remove('btn-primary');
+        confirmBtn.classList.add('btn-danger');
+        // Also set inline styles as a fallback if CSS is overridden elsewhere
+        try {
+            confirmBtn.style.backgroundColor = '#e04b4b';
+            confirmBtn.style.color = '#ffffff';
+            confirmBtn.style.border = 'none';
+        } catch (e) {
+            // ignore
+        }
+    }
+    else if (confirmBtn) {
+        // ensure any inline danger styles are cleared when not dangerous
+        try {
+            confirmBtn.style.backgroundColor = '';
+            confirmBtn.style.color = '';
+            confirmBtn.style.border = '';
+        } catch (e) {}
+    }
     
     modal.style.display = 'flex';
 }
@@ -470,7 +453,6 @@ function createInputModal() {
         '<div class="modal-content">' +
         '<div class="modal-header">' +
         '<h3 id="inputModalTitle">Title</h3>' +
-        '<span class="close" onclick="closeInputModal()">&times;</span>' +
         '</div>' +
         '<div class="modal-body">' +
         '<input type="text" id="inputModalInput" placeholder="Enter text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +

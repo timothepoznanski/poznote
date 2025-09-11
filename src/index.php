@@ -65,7 +65,71 @@ $res_right = $note_data['res_right'];
     <?php include 'templates/head_includes.php'; ?>
 </head>
 
-<body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>   
+<body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>  
+    <script>
+    // Apply folder counts visibility based on settings stored in localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+            if (!showCounts) {
+                document.body.classList.add('hide-folder-counts');
+            } else {
+                document.body.classList.remove('hide-folder-counts');
+            }
+        } catch (e) {
+            // Ignore localStorage access errors
+        }
+        
+        // Restore folder states from localStorage
+        try {
+            var folderContents = document.querySelectorAll('.folder-content');
+            for (var i = 0; i < folderContents.length; i++) {
+                var content = folderContents[i];
+                var folderId = content.id;
+                var savedState = localStorage.getItem('folder_' + folderId);
+                
+                if (savedState === 'closed') {
+                    // Close folder
+                    content.style.display = 'none';
+                    var toggle = content.parentElement.querySelector('.folder-toggle');
+                    if (toggle) {
+                        // Do not change the icon for the Favorites pseudo-folder
+                        var folderHeader = content.parentElement;
+                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+                        if (folderNameText !== 'Favorites') {
+                            var icon = toggle.querySelector('.folder-icon');
+                            if (icon) {
+                                icon.classList.remove('fa-folder-open');
+                                icon.classList.add('fa-folder');
+                            }
+                        }
+                    }
+                } else if (savedState === 'open') {
+                    // Open folder
+                    content.style.display = 'block';
+                    var toggle = content.parentElement.querySelector('.folder-toggle');
+                    if (toggle) {
+                        // Do not change the icon for the Favorites pseudo-folder
+                        var folderHeader = content.parentElement;
+                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+                        if (folderNameText !== 'Favorites') {
+                            var icon = toggle.querySelector('.folder-icon');
+                            if (icon) {
+                                icon.classList.remove('fa-folder');
+                                icon.classList.add('fa-folder-open');
+                            }
+                        }
+                    }
+                }
+                // If no saved state, keep the default state determined by PHP
+            }
+        } catch (e) {
+            // Ignore localStorage access errors
+        }
+    });
+    </script>
 
     <div class="main-container">
     <script>
@@ -167,7 +231,71 @@ $res_right = $note_data['res_right'];
         include 'templates/notes_list.php';
                  
     ?>
+
     </div>
+    <script>
+    // Create menu functionality with debugging
+    function toggleCreateMenu() {
+        var existingMenu = document.getElementById('header-create-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+            return;
+        }
+        
+        var createMenu = document.createElement('div');
+        createMenu.id = 'header-create-menu';
+        
+        // Note item
+        var noteItem = document.createElement('button');
+        noteItem.className = 'create-menu-item';
+        noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.onclick = function() {
+            // Use in-page creation flow instead of opening a new tab
+            if (typeof newnote === 'function') {
+                newnote();
+            } else if (typeof createNewNote === 'function') {
+                createNewNote();
+            } else if (window.NoteManager && typeof window.NoteManager.createNote === 'function') {
+                window.NoteManager.createNote();
+            } else {
+                // Fallback: open insert_new.php if JS handlers are unavailable
+                window.open('insert_new.php', '_blank');
+            }
+            createMenu.remove();
+        };
+        
+        // Folder item
+        var folderItem = document.createElement('button');
+        folderItem.className = 'create-menu-item';
+        folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.onclick = function() {
+            newFolder();
+            createMenu.remove();
+        };
+        
+        createMenu.appendChild(noteItem);
+        createMenu.appendChild(folderItem);
+        
+        var plusButton = document.querySelector('.sidebar-plus');
+        if (plusButton && plusButton.parentNode) {
+            plusButton.parentNode.appendChild(createMenu);
+            createMenu.style.display = 'block';
+        }
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('header-create-menu');
+        var plusBtn = document.querySelector('.sidebar-plus');
+        if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+            plusBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    // Make function globally available
+    window.toggleCreateMenu = toggleCreateMenu;
+    </script>
     
     <!-- RESIZE HANDLE (Desktop only) -->
     <?php if (!$is_mobile): ?>
@@ -214,6 +342,10 @@ $res_right = $note_data['res_right'];
                 if (!empty($folder_filter)) {
                     $home_params[] = 'folder=' . urlencode($folder_filter);
                 }
+                // Always preserve workspace if it's not the default
+                if (!empty($workspace_filter) && $workspace_filter !== 'Poznote') {
+                    $home_params[] = 'workspace=' . urlencode($workspace_filter);
+                }
                 if (!empty($home_params)) {
                     $home_url .= '?' . implode('&', $home_params);
                 }
@@ -252,8 +384,9 @@ $res_right = $note_data['res_right'];
                 // Note action buttons (desktop only)
                     if (!$is_mobile) {
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    // Save button first, then separator (minus) to match requested order
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
@@ -374,8 +507,9 @@ $res_right = $note_data['res_right'];
                     // Note action buttons 
                     // AI actions dropdown menu for mobile (only if AI is enabled)
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    // Save button first for mobile, then separator (minus)
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
                         echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
@@ -550,6 +684,13 @@ $res_right = $note_data['res_right'];
                         <i class="fas fa-exclamation-triangle"></i>
                         <p id="errorMessage"></p>
                     </div>
+                </div>
+            </div>
+            <!-- Sidebar footer: CTA buttons are rendered here so they're at the bottom of the left column -->
+            <div class="sidebar-footer">
+                <div class="sidebar-footer-inner">
+                    <button class="btn-new-note" id="btn-new-note">New note</button>
+                    <button class="btn-new-folder" id="btn-new-folder">New folder</button>
                 </div>
             </div>
             <div class="modal-footer">

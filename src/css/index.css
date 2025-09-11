@@ -141,6 +141,17 @@
 .workspace-list ul li > .ws-col .action-btn { margin: 0; }
 .workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
 .workspace-list .btn-danger:hover { background: #c43b3b; }
+/* Ensure destructive buttons inside modals are visually prominent */
+.modal .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+.modal .btn-danger:hover {
+    background: #c43b3b;
+}
 /* .btn-rename visibility controlled earlier */
 .workspace-list .btn-rename {
     display: inline-flex;
@@ -397,23 +408,246 @@ body {
     height: 100vh;
     overflow-y: scroll;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 6 16 16 16;
     box-sizing: border-box;
-    background: #F8FAFC;
+    background: #FFFFFF;
     flex-shrink: 0;
 }
+
+/* Sidebar header and primary action */
+.sidebar-header {
+    /* padding: 6px 0 14px 0; */
+    margin-bottom: 6px;
+}
+.sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 2px;
+    position: relative; /* anchor dropdown menus inside the title row */
+}
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937; /* dark */
+}
+.workspace-title-icon {
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+.workspace-title-text { vertical-align: middle; }
+.sidebar-title[role="button"] { cursor: pointer; }
+.sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
+.sidebar-gear { display: none; }
+.sidebar-plus { background: transparent; border: none; color: #007DB8; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; }
+
+/* Align new note/folder rows with the search bar */
+.sidebar-newnote-row { padding: 6px 0 8px 0; }
+.sidebar-newfolder-row { padding: 6px 0 8px 0; }
+
+.btn-new-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #0b78e6; /* flat primary */
+    color: #fff;
+    border: none;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    font-size: 0.98rem;
+    height: 40px; /* enforce same height as search */
+}
+.btn-new-note i { font-size: 16px; color: #fff; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
+.btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
+.btn-new-note:hover { filter: brightness(0.96); }
+
+.btn-new-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #f7fafc; /* subtle light */
+    color: #0b4da6;
+    border: 1px solid #e6eef8;
+    padding: 0 12px;
+    border-radius: 8px;
+    width: 100%;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.98rem;
+    height: 40px; /* enforce same height as search */
+}
+.btn-new-folder i { color: #0b4da6; font-size: 16px; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
+.btn-new-folder:hover { background: #f3f7fb; }
+
+/* Make search bar full width of sidebar and align spacing with buttons */
+.searchbar-row { margin-bottom: 8px; max-width: 100%; }
+.searchbar-input-wrapper { width: 100%; }
+
+/* Make the unified search placeholder French when shown in left column */
+
+/* Folder header adjustments to match visual spacing */
+.folder-header {
+    /* margin-top: 6px; */
+    /* padding: 6px 4px; */
+    border-radius: 8px;
+}
+.folder-toggle { display:flex; align-items:center; gap:2px; cursor: pointer; }
+.folder-name { font-weight:600; color:#111827; }
+.folder-note-count { color:#6b7280; margin-left:6px; font-weight:400; }
+.hide-folder-counts .folder-note-count { display: none; }
+
+/* Folder content / notes styling */
+.note-in-folder { padding-left: 26px; display:block; }
+.links_arbo_left { padding: 8px 10px; margin: 4px 0; }
+.links_arbo_left .note-title { font-weight: 500; color: #1f2937; }
+
+/* Selected note style matching light blue band from screenshot */
+.links_arbo_left.selected-note {
+    background-color: transparent; /* remove blue background */
+    /* keep layout consistent but remove rounded background */
+    border-radius: 0;
+    color: #0b4da6;
+}
+.links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
+
+/* Folder actions icons keep small size */
+.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; }
+.folder-actions i:hover { color:#374151; }
+
 
 .resize-handle {
     width: 3px;
     height: 100vh;
-    background: #F8FAFC;
+    background: #FFFFFF;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    /* border-right: 1px solid #ddd; */
-    border-right: 1px solid #e9ecef;
+    /* subtle divider line to match the mockup */
+    border-right: 1px solid #ccc;
 
 }
+
+/* Separator after Favorites to visually separate important folders */
+.favorites-separator {
+    height: 8px;
+    border-bottom: 1px solid #ccc; /* match left column right border */
+    margin: 8px 6px;
+}
+
+/* Sidebar footer: CTA buttons pinned at bottom of left column */
+.sidebar-footer {
+    position: sticky;
+    bottom: 16px;
+    width: 100%;
+    padding: 8px 0 0 0;
+    box-sizing: border-box;
+}
+.sidebar-footer-inner {
+    display: flex;
+    gap: 8px;
+    flex-direction: column; /* stack buttons vertically */
+}
+.sidebar-footer .btn-new-note, .sidebar-footer .btn-new-folder {
+    display: none; /* deprecated: use unified create button */
+}
+
+/* Unified create button */
+.create-dropdown {
+    position: relative;
+    width: 100%;
+}
+.btn-create {
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    background: #007DB8;
+    color: #fff;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.btn-create:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,123,184,0.12); }
+.create-caret { margin-left: 6px; font-size: 0.9rem; }
+.create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e6eef8;
+    box-shadow: 0 8px 24px rgba(15,120,230,0.08);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 60;
+    min-width: 140px;
+}
+
+#header-create-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 140px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.create-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.create-menu-item:last-child {
+    border-bottom: none;
+}
+
+.create-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #007DB8;
+}
+.create-menu-item {
+    background: transparent;
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.create-menu-item:hover { background: #f6fbff; }
 
 /* LEFT HEADER */
 
@@ -663,7 +897,7 @@ a.links_arbo_left .note-title {
 }
 
 a.links_arbo_left.selected-note {
-    background-color: #EFEFED;
+    background-color: transparent;
 }
 
 /* SEARCHBARS */
@@ -682,19 +916,21 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input {
-    padding: 6px 80px 6px 38px;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
-    background: #fff;
-    font-size: 0.95em;
-    transition: box-shadow 0.2s, border-color 0.2s, opacity 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    padding: 10px 12px 10px 44px;
+    border-radius: 8px;
+    /* border: 1px solid #d3d6db; */
+    background: #f6f7f9;
+    font-size: 0.9em;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    box-shadow: 0 0 0 1px #e6e6e6;
     outline: none;
     width: 100%;
     min-width: 0;
     font-family: 'Inter', sans-serif !important;
-    color: #007DB8;
-    caret-color: #b0b0b0;
+    color: #6c7580;
+    caret-color: #6c7580;
+    height: 40px;
+    box-sizing: border-box;
 }
 
 .searchbar-input:disabled {
@@ -704,13 +940,15 @@ a.links_arbo_left.selected-note {
 }
 
 .searchbar-input::placeholder {
-    color: #b0b0b0;
+    color: #6c7580;
     opacity: 1;
-    font-size: 0.95em;
+    font-size: 1em;
 }
 
 .searchbar-input:focus {
-    border-color: #32a1ce;
+    border-color: #b0b3b8;
+    /* box-shadow: 0 0 0 2px #d3d6db; */
+    outline: none;
 }
 
 .searchbar-icon-row {
@@ -722,14 +960,67 @@ a.links_arbo_left.selected-note {
 
 .searchbar-icon {
     position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c7580;
+    font-size: 1.2em;
+    pointer-events: none;
+}
+
+/* Icon box for search inside left column */
+
+.searchbar-icon {
+    position: absolute;
     left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
+}
+
+.searchbar-icon {
+    position: absolute;
+    left: 14px;
     right: auto;
     top: 50%;
     transform: translateY(-50%);
-    color: #b0b0b0;
-    pointer-events: none;
+    color: #9aa3a8;
+    /* allow clicks on the icon so JS listeners can attach */
+    pointer-events: auto;
     z-index: 2;
-    font-size: 0.8em;
+    font-size: 1.05em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure the actual FontAwesome icon inside the searchbar has a consistent size
+   different fa-* glyphs can appear visually different; normalize to 1em */
+.searchbar-icon i,
+.searchbar-icon .fas,
+.searchbar-icon .far,
+.searchbar-icon .fab,
+.searchbar-icon .fa {
+    font-size: 0.9em; /* slightly smaller icons */
+    line-height: 1;
+    display: inline-block;
+}
+
+/* Highlight a tag when it matches an active tag search */
+.tag-highlight {
+    background: #fff3b0; /* soft yellow */
+    padding: 2px 6px;
+    border-radius: 6px;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.03);
+    color: #2b2b2b;
 }
 
 .searchbar-desktop {
@@ -747,8 +1038,7 @@ a.links_arbo_left.selected-note {
     gap: 0;
     position: relative;
     width: 100%;
-    max-width: 500px;
-    margin: 0 auto 8px auto;
+    margin: 0 0 8px 0;
 }
 
 /* Folder filter clear buttons (hidden by default) */
@@ -788,8 +1078,8 @@ a.links_arbo_left.selected-note {
     margin: 12px 0 15px 0;
     text-align: center;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
+    /* display: flex; */
+    /* justify-content: center; */
 }
 
 img {
@@ -1046,29 +1336,7 @@ img {
 
 /* MENU LEFT */
 
-.containbuttons{
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    /* padding-top: 8px; */
-    /* padding-bottom: 8px; */
-}
-
-/* Ensure all icons within containbuttons are properly centered */
-.containbuttons > * {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.containbuttons span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
+/* .containbuttons removed (mobile buttons moved to sidebar footer) */
 
 .newbutton[style], .list_tags[style] {
     text-align: center;
@@ -1675,11 +1943,12 @@ hr {
 }
 
 .folder-icon {
-    font-size: 12px;
+    font-size: 13px;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
     width: 12px;
+    align-content: center;
 }
 
 .folder-name {
@@ -1708,6 +1977,9 @@ hr {
 .folder-toggle:hover .folder-actions {
     opacity: 1;
 }
+
+/* search-only hiding to avoid interfering with general hidden class */
+.search-hidden { display: none !important; }
 
 .folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn, .folder-move-files-btn {
     font-size: 12px;
@@ -1773,7 +2045,7 @@ hr {
 }
 
 .folder-content {
-    margin-left: 20px;
+    margin-left: 29px;
     margin-bottom: 5px; /* Réduction de l'espace sous chaque dossier */
 }
 
@@ -2059,6 +2331,130 @@ hr {
 }
 
 #confirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+/* Ensure danger variant inside confirmModal is strongly red (overrides primary rules) */
+#confirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#confirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Explicit rules for the confirm button to avoid style conflicts */
+#confirmModal #confirmButton.btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+/* Delete Folder Modal: make Delete prominent red and Cancel gray */
+#deleteFolderModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteFolderModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteFolderModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteFolderModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Permanently Delete Note Modal: make Delete red and Cancel gray */
+#deleteConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Empty Trash Modal: make Empty Trash red and Cancel gray */
+#emptyTrashConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#emptyTrashConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#emptyTrashConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#emptyTrashConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Restore Confirmation Modal: make Restore primary blue and Cancel gray */
+#restoreConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#restoreConfirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-primary:hover {
     background-color: #0056b3 !important;
 }
 
@@ -2844,6 +3240,14 @@ input[type="search"]::-webkit-search-results-decoration {
     50% { opacity: 0.7; }
 }
 
+/* Input highlight overlay for precise word highlighting in input elements */
+.input-highlight-overlay {
+    background-color: #ffff00 !important;
+    opacity: 0.7;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+}
+
 /* Note Loading State Styles */
 .note-loading-state {
     display: flex;
@@ -2884,8 +3288,8 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .links_arbo_left.selected-note {
-    background-color: #e3f2fd !important;
-    border-left: 3px solid #1976d2 !important;
+    background-color: transparent !important;
+    border-left: none !important;
 }
 
 /* Styles responsive pour les modals sur mobile */
@@ -2992,6 +3396,26 @@ input[type="search"]::-webkit-search-results-decoration {
     color: #ef4444;
 }
 
+/* When a tag wrapper is highlighted, give the delete button a subtle yellow background and stronger contrast */
+.clickable-tag-wrapper.tag-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #fff3b0;
+}
+
+.clickable-tag-wrapper.tag-highlight .clickable-tag {
+    color: #2b2b2b;
+}
+
+.clickable-tag-wrapper.tag-highlight .tag-delete-button {
+    background: rgba(0,0,0,0.06);
+    border-radius: 4px;
+    color: #7a3b00;
+}
+
 .tag-input {
     border: none;
     outline: none;
@@ -3017,6 +3441,26 @@ input[type="search"]::-webkit-search-results-decoration {
     outline: none;
     background: rgba(0, 125, 184, 0.1);
     border-radius: 4px;
+}
+
+/* Hide emoji icons site-wide when user disables them in settings */
+.emoji-hidden .emoji-icon {
+    display: none !important;
+}
+
+/* Also hide FontAwesome smile icons, emoji toolbar buttons and the emoji picker when disabled */
+.emoji-hidden .fa-smile,
+.emoji-hidden .btn-emoji,
+.emoji-hidden .btn-emoji i,
+.emoji-hidden .emoji-picker {
+    display: none !important;
+}
+
+/* Exception: keep the smile icon visible inside the Settings card (#emoji-icons-card) */
+.emoji-hidden #emoji-icons-card .fa-smile,
+.emoji-hidden #emoji-icons-card i {
+    display: inline-block !important;
+    color: inherit !important;
 }
 
 /* Hide original input when showing editable tags */
@@ -3089,6 +3533,30 @@ input[type="search"]::-webkit-search-results-decoration {
 
 #moveFolderFilesModal .btn-primary:disabled:hover {
     background-color: #ccc;
+}
+
+/* Ensure moveFolderFilesModal buttons use class-based coloring regardless of DOM order */
+#moveFolderFilesModal .modal-buttons {
+    justify-content: flex-end; /* keep buttons to the right */
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel {
+    background-color: #f8f9fa !important;
+    color: #333 !important;
+    border: 1px solid #ddd !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel:hover {
+    background-color: #e9ecef !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-primary:hover {
+    background-color: #0056b3 !important;
 }
 
 /* Small workspace button near settings */
