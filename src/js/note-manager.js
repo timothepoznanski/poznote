@@ -173,7 +173,7 @@ const NoteManager = {
 
         fetch("insert_new.php", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
             body: params.toString()
         })
         .then(response => response.text())

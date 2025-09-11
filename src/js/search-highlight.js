@@ -17,7 +17,32 @@ function highlightSearchTerms() {
     
     // Check if we're in notes search mode
     var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
-    if (!notesBtn || !notesBtn.classList.contains('active')) {
+    var isNotesActive = false;
+    
+    // First try to detect from buttons
+    if (notesBtn && notesBtn.classList.contains('active')) {
+        isNotesActive = true;
+    } else if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+        // Fallback when pills/buttons were removed: consult SearchManager
+        try {
+            var desktopType = window.searchManager.getActiveSearchType(false);
+            var mobileType = window.searchManager.getActiveSearchType(true);
+            if (desktopType === 'notes' || mobileType === 'notes' || window.searchManager.currentSearchType === 'notes') {
+                isNotesActive = true;
+            }
+        } catch (e) {
+            // ignore and fallthrough
+        }
+    }
+    
+    // Additional fallback: if we're on mobile and no explicit search type is set, default to notes
+    var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isNotesActive && isMobile) {
+        // In mobile, if no specific type is detected, assume notes search for highlighting
+        isNotesActive = true;
+    }
+
+    if (!isNotesActive) {
         return; // Only highlight in notes search mode
     }
     
@@ -52,6 +77,36 @@ function highlightSearchTerms() {
  */
 function highlightInElement(element, searchWords) {
     var highlightCount = 0;
+    
+    // Special handling for input elements (like note titles)
+    if (element.tagName === 'INPUT' && element.type === 'text') {
+        var inputValue = element.value;
+        
+        // Create a combined regex pattern for all search words
+        var escapedWords = [];
+        for (var i = 0; i < searchWords.length; i++) {
+            escapedWords.push(escapeRegExp(searchWords[i]));
+        }
+        var pattern = escapedWords.join('|');
+        var regex = new RegExp('(' + pattern + ')', 'gi');
+        
+        // Clear any existing overlays for this input
+        clearInputOverlays(element);
+        
+        // Find matches and create overlay highlights
+        var matches;
+        var index = 0;
+        while ((matches = regex.exec(inputValue)) !== null) {
+            createInputOverlay(element, matches[0], matches.index);
+            highlightCount++;
+            // Prevent infinite loop with global regex
+            if (regex.lastIndex === matches.index) {
+                regex.lastIndex++;
+            }
+        }
+        
+        return highlightCount;
+    }
     
     // Create a combined regex pattern for all search words
     var escapedWords = [];
@@ -112,12 +167,184 @@ function clearSearchHighlights() {
         parent.normalize();
     }
     
+    // Clear input overlays
+    var overlays = document.querySelectorAll('.input-highlight-overlay');
+    for (var i = 0; i < overlays.length; i++) {
+        overlays[i].remove();
+    }
+    
+    // Clean up event listeners if no more overlays exist
+    if (window.inputOverlayListeners) {
+        window.removeEventListener('scroll', updateAllOverlayPositions, true);
+        window.removeEventListener('resize', updateAllOverlayPositions);
+        window.inputOverlayListeners = false;
+    }
+    
+    // Clean up input event listeners
+    var inputsWithListeners = document.querySelectorAll('input[data-overlay-listener]');
+    for (var i = 0; i < inputsWithListeners.length; i++) {
+        inputsWithListeners[i].removeAttribute('data-overlay-listener');
+        // Note: We don't remove the event listener as it's anonymous, but the attribute prevents duplicates
+    }
+    
     // Restore folder filter state after clearing search
     setTimeout(function() {
         if (typeof initializeFolderSearchFilters === 'function') {
             initializeFolderSearchFilters();
         }
     }, 200);
+}
+
+/**
+ * Create an overlay highlight for a word in an input element
+ */
+function createInputOverlay(inputElement, word, startIndex) {
+    // Create a hidden span to measure text width
+    var measurer = document.createElement('span');
+    measurer.style.position = 'absolute';
+    measurer.style.visibility = 'hidden';
+    measurer.style.whiteSpace = 'pre';
+    measurer.style.font = window.getComputedStyle(inputElement).font;
+    document.body.appendChild(measurer);
+    
+    // Measure the position of the word
+    var textBefore = inputElement.value.substring(0, startIndex);
+    measurer.textContent = textBefore;
+    var offsetX = measurer.offsetWidth;
+    
+    measurer.textContent = word;
+    var wordWidth = measurer.offsetWidth;
+    
+    document.body.removeChild(measurer);
+    
+    // Create the overlay
+    var overlay = document.createElement('div');
+    overlay.className = 'input-highlight-overlay';
+    overlay.style.position = 'absolute';
+    overlay.style.backgroundColor = '#ffff00';
+    overlay.style.color = 'transparent';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.borderRadius = '2px';
+    overlay.style.zIndex = '1';
+    overlay.style.opacity = '0.7';
+    
+    // Add data attribute to link it to the input
+    overlay.setAttribute('data-input-id', inputElement.id);
+    overlay.setAttribute('data-start-index', startIndex.toString());
+    overlay.setAttribute('data-word', word);
+    
+    // Position the overlay
+    positionOverlay(overlay, inputElement, offsetX, wordWidth);
+    
+    document.body.appendChild(overlay);
+    
+    // Add input event listener to update overlay when content changes
+    if (!inputElement.hasAttribute('data-overlay-listener')) {
+        inputElement.setAttribute('data-overlay-listener', 'true');
+        inputElement.addEventListener('input', function() {
+            // Delay to allow the input value to update
+            setTimeout(function() {
+                // Re-run highlighting for this specific input
+                var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
+                if (searchInput && searchInput.value.trim()) {
+                    var searchWords = searchInput.value.trim().split(/\s+/).filter(function(word) { return word.length > 0; });
+                    if (searchWords.length > 0) {
+                        highlightInElement(inputElement, searchWords);
+                    }
+                }
+            }, 50);
+        });
+    }
+    
+    // Update position on scroll or resize
+    if (!window.inputOverlayListeners) {
+        window.inputOverlayListeners = true;
+        window.addEventListener('scroll', updateAllOverlayPositions, true);
+        window.addEventListener('resize', updateAllOverlayPositions);
+    }
+}
+
+/**
+ * Position an overlay relative to its input element
+ */
+function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
+    var inputRect = inputElement.getBoundingClientRect();
+    var inputStyle = window.getComputedStyle(inputElement);
+    var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
+    var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
+    
+    // Get viewport scaling for mobile devices
+    var viewport = document.querySelector('meta[name="viewport"]');
+    var scale = 1;
+    if (viewport && viewport.content.includes('initial-scale=')) {
+        var scaleMatch = viewport.content.match(/initial-scale=([0-9.]+)/);
+        if (scaleMatch) {
+            scale = parseFloat(scaleMatch[1]);
+        }
+    }
+    
+    // Calculate position accounting for page scroll and mobile viewport
+    var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    
+    overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
+    overlay.style.top = (inputRect.top + scrollY) + 'px';
+    overlay.style.width = wordWidth + 'px';
+    overlay.style.height = inputRect.height + 'px';
+    overlay.style.lineHeight = inputRect.height + 'px';
+    
+    // Ensure overlay is visible on mobile
+    overlay.style.zIndex = '1000';
+    overlay.style.pointerEvents = 'none';
+}
+
+/**
+ * Update positions of all overlay highlights
+ */
+function updateAllOverlayPositions() {
+    var overlays = document.querySelectorAll('.input-highlight-overlay');
+    for (var i = 0; i < overlays.length; i++) {
+        var overlay = overlays[i];
+        var inputId = overlay.getAttribute('data-input-id');
+        var inputElement = document.getElementById(inputId);
+        
+        if (inputElement) {
+            var startIndex = parseInt(overlay.getAttribute('data-start-index'));
+            var word = overlay.getAttribute('data-word');
+            
+            // Recalculate position
+            var measurer = document.createElement('span');
+            measurer.style.position = 'absolute';
+            measurer.style.visibility = 'hidden';
+            measurer.style.whiteSpace = 'pre';
+            measurer.style.font = window.getComputedStyle(inputElement).font;
+            document.body.appendChild(measurer);
+            
+            var textBefore = inputElement.value.substring(0, startIndex);
+            measurer.textContent = textBefore;
+            var offsetX = measurer.offsetWidth;
+            
+            measurer.textContent = word;
+            var wordWidth = measurer.offsetWidth;
+            
+            document.body.removeChild(measurer);
+            
+            positionOverlay(overlay, inputElement, offsetX, wordWidth);
+        } else {
+            // Input element no longer exists, remove overlay
+            overlay.remove();
+        }
+    }
+}
+
+/**
+ * Clear existing overlays for an input element
+ */
+function clearInputOverlays(inputElement) {
+    var overlays = document.querySelectorAll('.input-highlight-overlay[data-input-id="' + inputElement.id + '"]');
+    for (var i = 0; i < overlays.length; i++) {
+        overlays[i].remove();
+    }
 }
 
 /**

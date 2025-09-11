@@ -497,7 +497,8 @@ function reinitializeNoteContent() {
 
     // Focus on the note content if it exists
     const noteContent = document.querySelector('[contenteditable="true"]');
-    if (noteContent) {
+    // Only focus the note content when not in search mode; otherwise keep focus in the search input
+    if (noteContent && !isSearchMode) {
         setTimeout(() => {
             noteContent.focus();
         }, 100);

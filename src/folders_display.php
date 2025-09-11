@@ -89,8 +89,7 @@ function generateFolderActions($folderName, $workspace_filter) {
     $actions = "";
     
     if ($folderName === 'Favorites') {
-        // Search filter icon for Favorites folder
-        $actions .= "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";
+        // No actions for Favorites folder
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
         $actions .= "<i class='fas fa-search folder-search-btn' onclick='event.stopPropagation(); toggleFolderSearchFilter(\"$folderName\")' title='Include/exclude from search' data-folder='$folderName'></i>";

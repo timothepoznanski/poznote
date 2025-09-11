@@ -148,7 +148,14 @@ function newFolder() {
             credentials: 'same-origin',
             body: JSON.stringify(data)
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            if (!response.ok) {
+                return response.json().then(function(errorData) {
+                    throw new Error(errorData.error || errorData.message || 'Unknown error');
+                });
+            }
+            return response.json();
+        })
         .then(function(data) {
             if (data.success) {
                 // Folder created successfully - no notification needed
@@ -259,19 +266,6 @@ function selectFolder(folderName, element) {
     
     if (element) {
         element.classList.add('selected');
-    }
-}
-
-function toggleFolder(folderId) {
-    var folderElement = document.getElementById('folder-' + folderId);
-    if (!folderElement) return;
-    
-    var isExpanded = folderElement.classList.contains('expanded');
-    
-    if (isExpanded) {
-        folderElement.classList.remove('expanded');
-    } else {
-        folderElement.classList.add('expanded');
     }
 }
 
@@ -850,20 +844,30 @@ function getRecentFolders() {
     }
 }
 
-// Fonction de gestion des dossiers (chevron)
+// Fonction de gestion des dossiers (icône dossier ouvert/fermé)
 function toggleFolder(folderId) {
     var content = document.getElementById(folderId);
     var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');
+    // Determine folder name to avoid changing icon for the Favorites pseudo-folder
+    var folderHeader = document.querySelector('[data-folder-id="' + folderId + '"]').parentElement;
+    var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+    var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
     
     if (content.style.display === 'none') {
         content.style.display = 'block';
-        icon.classList.remove('fa-chevron-right');
-        icon.classList.add('fa-chevron-down');
+        // show open folder icon
+        if (icon && folderNameText !== 'Favorites') {
+            icon.classList.remove('fa-folder');
+            icon.classList.add('fa-folder-open');
+        }
         localStorage.setItem('folder_' + folderId, 'open');
     } else {
         content.style.display = 'none';
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-right');
+        // show closed folder icon
+        if (icon && folderNameText !== 'Favorites') {
+            icon.classList.remove('fa-folder-open');
+            icon.classList.add('fa-folder');
+        }
         localStorage.setItem('folder_' + folderId, 'closed');
     }
 }
@@ -874,7 +878,8 @@ function emptyFolder(folderName) {
         'Are you sure you want to move all notes from "' + folderName + '" to trash?',
         function() {
             executeEmptyFolder(folderName);
-        }
+        },
+        { danger: true }
     );
 }
 

@@ -19,7 +19,7 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 <title>Trash - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="css/font-awesome.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash-mobile.css"/>
