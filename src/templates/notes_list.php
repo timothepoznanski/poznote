@@ -63,6 +63,11 @@ echo "<span class='folder-name'>Tags</span>";
 echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
 
+// If there is no Favorites folder in the list, render the separator here so it always appears
+if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
+    echo "<div class='favorites-separator' aria-hidden='true'></div>";
+}
+
 // Display folders and notes
 foreach($folders as $folderName => $notes) {
     // In search mode, don't display empty folders

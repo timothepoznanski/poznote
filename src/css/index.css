@@ -513,8 +513,9 @@ body {
 
 /* Selected note style matching light blue band from screenshot */
 .links_arbo_left.selected-note {
-    background-color: #e9f5ff; /* light blue */
-    border-radius: 8px;
+    background-color: transparent; /* remove blue background */
+    /* keep layout consistent but remove rounded background */
+    border-radius: 0;
     color: #0b4da6;
 }
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
@@ -896,7 +897,7 @@ a.links_arbo_left .note-title {
 }
 
 a.links_arbo_left.selected-note {
-    background-color: #EFEFED;
+    background-color: transparent;
 }
 
 /* SEARCHBARS */
@@ -3279,8 +3280,8 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .links_arbo_left.selected-note {
-    background-color: #e3f2fd !important;
-    border-left: 3px solid #1976d2 !important;
+    background-color: transparent !important;
+    border-left: none !important;
 }
 
 /* Styles responsive pour les modals sur mobile */
