@@ -919,7 +919,7 @@ a.links_arbo_left.selected-note {
     border-radius: 8px;
     /* border: 1px solid #d3d6db; */
     background: #f6f7f9;
-    font-size: 1em;
+    font-size: 0.9em;
     transition: border-color 0.18s, box-shadow 0.18s;
     box-shadow: 0 0 0 1px #e6e6e6;
     outline: none;
@@ -3445,6 +3445,13 @@ input[type="search"]::-webkit-search-results-decoration {
 .emoji-hidden .btn-emoji i,
 .emoji-hidden .emoji-picker {
     display: none !important;
+}
+
+/* Exception: keep the smile icon visible inside the Settings card (#emoji-icons-card) */
+.emoji-hidden #emoji-icons-card .fa-smile,
+.emoji-hidden #emoji-icons-card i {
+    display: inline-block !important;
+    color: inherit !important;
 }
 
 /* Hide original input when showing editable tags */

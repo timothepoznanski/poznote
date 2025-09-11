@@ -380,8 +380,9 @@ $res_right = $note_data['res_right'];
                 // Note action buttons (desktop only)
                     if (!$is_mobile) {
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    // Save button first, then separator (minus) to match requested order
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
@@ -502,8 +503,9 @@ $res_right = $note_data['res_right'];
                     // Note action buttons 
                     // AI actions dropdown menu for mobile (only if AI is enabled)
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    // Save button first for mobile, then separator (minus)
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
                         echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
