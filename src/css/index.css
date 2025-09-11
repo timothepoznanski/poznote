@@ -3240,12 +3240,12 @@ input[type="search"]::-webkit-search-results-decoration {
     50% { opacity: 0.7; }
 }
 
-/* Title search highlight for input elements */
-.title-search-highlight {
+/* Input highlight overlay for precise word highlighting in input elements */
+.input-highlight-overlay {
     background-color: #ffff00 !important;
-    color: #000 !important;
-    border: 2px solid #ffdd00 !important;
-    box-shadow: 0 0 5px rgba(255, 255, 0, 0.5) !important;
+    opacity: 0.7;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
 }
 
 /* Note Loading State Styles */
