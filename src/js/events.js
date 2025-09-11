@@ -266,6 +266,7 @@ function handleFolderDragOver(e) {
             return;
         }
         
+        // Allow drag-over for all other folders including Favorites
         e.dataTransfer.dropEffect = 'move';
         folderHeader.classList.add('drag-over');
     }
@@ -297,6 +298,13 @@ function handleFolderDrop(e) {
         
         // Prevent dropping notes into the Tags folder
         if (targetFolder === 'Tags') {
+            return;
+        }
+        
+        // Special handling for Favorites folder
+        if (targetFolder === 'Favorites') {
+            // Add note to favorites instead of moving it
+            toggleFavorite(data.noteId);
             return;
         }
         
