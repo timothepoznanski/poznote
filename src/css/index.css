@@ -3434,6 +3434,19 @@ input[type="search"]::-webkit-search-results-decoration {
     border-radius: 4px;
 }
 
+/* Hide emoji icons site-wide when user disables them in settings */
+.emoji-hidden .emoji-icon {
+    display: none !important;
+}
+
+/* Also hide FontAwesome smile icons, emoji toolbar buttons and the emoji picker when disabled */
+.emoji-hidden .fa-smile,
+.emoji-hidden .btn-emoji,
+.emoji-hidden .btn-emoji i,
+.emoji-hidden .emoji-picker {
+    display: none !important;
+}
+
 /* Hide original input when showing editable tags */
 .name_tags.showing-editable-tags > input {
     display: none;

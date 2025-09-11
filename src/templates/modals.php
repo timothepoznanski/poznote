@@ -163,8 +163,8 @@
         
         <!-- Action buttons -->
         <div class="modal-buttons">
-            <button type="button" id="moveActionButton" class="btn-primary" onclick="executeFolderAction()">Move</button>
             <button type="button" class="btn-cancel" onclick="closeModal('moveNoteFolderModal')">Cancel</button>
+            <button type="button" id="moveActionButton" class="btn-primary" onclick="executeFolderAction()">Move</button>
         </div>
         
         <!-- Error message display -->

@@ -193,6 +193,16 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     </h3>
                 </div>
             </div>
+
+            <!-- Emoji Icons toggle -->
+            <div class="settings-card" id="emoji-icons-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-smile"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
+                </div>
+            </div>
             
             <!-- Data Management -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
@@ -297,6 +307,53 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
             updateFolderCountsBadge(showCounts);
         });
+
+        // Emoji icons toggle logic
+        (function() {
+            var card = document.getElementById('emoji-icons-card');
+            var status = document.getElementById('emoji-icons-status');
+
+            function refreshStatus() {
+                var form = new FormData();
+                form.append('action', 'get');
+                form.append('key', 'emoji_icons_enabled');
+                fetch('api_settings.php', { method: 'POST', body: form })
+                .then(function(r) { return r.json(); })
+                .then(function(j) {
+                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
+                    if (status) {
+                        status.textContent = enabled ? 'enabled' : 'disabled';
+                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
+                    }
+                    if (enabled) document.body.classList.remove('emoji-hidden'); else document.body.classList.add('emoji-hidden');
+                })
+                .catch(function(){});
+            }
+
+            if (card) {
+                card.addEventListener('click', function() {
+                    var form = new FormData();
+                    form.append('action', 'get');
+                    form.append('key', 'emoji_icons_enabled');
+                    fetch('api_settings.php', { method: 'POST', body: form })
+                    .then(function(r) { return r.json(); })
+                    .then(function(j) {
+                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                        var toSet = currently ? '0' : '1';
+                        var setForm = new FormData();
+                        setForm.append('action', 'set');
+                        setForm.append('key', 'emoji_icons_enabled');
+                        setForm.append('value', toSet);
+                        return fetch('api_settings.php', { method: 'POST', body: setForm });
+                    })
+                    .then(function() { refreshStatus(); })
+                    .catch(function(e){ console.error(e); });
+                });
+            }
+
+            // initial load
+            refreshStatus();
+        })();
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
