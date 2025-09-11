@@ -16,6 +16,11 @@
         <div class="sidebar-title-actions">
             <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fas fa-plus"></i></button>
         </div>
+
+        <!-- Workspace menu container (mobile) -->
+        <div class="workspace-menu" id="workspaceMenuMobile">
+            <!-- Menu items will be loaded dynamically -->
+        </div>
     </div>
 
         <!-- Compact mobile search bar -->
