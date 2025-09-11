@@ -308,6 +308,13 @@ function handleFolderDrop(e) {
             return;
         }
         
+        // Special handling for Trash folder
+        if (targetFolder === 'Trash') {
+            // Delete note and move it to trash
+            deleteNote(data.noteId);
+            return;
+        }
+        
         if (data.noteId && targetFolder && data.currentFolder !== targetFolder) {
             moveNoteToTargetFolder(data.noteId, targetFolder);
         }
