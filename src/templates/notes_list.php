@@ -98,8 +98,9 @@ foreach($folders as $folderName => $notes) {
         }
         
         // Workspace-aware default folder handling in UI
-        // Disable double-click rename for default folder
-        $ondbl = isDefaultFolder($folderName, $workspace_filter) ? '' : 'editFolderName("' . $folderName . '")';
+        // Disable double-click rename for default folder and system folders
+        $systemFolders = ['Favorites', 'Tags', 'Trash'];
+        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName("' . $folderName . '")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
         echo "<span class='folder-note-count' id='count-" . md5($folderName) . "'>(" . count($notes) . ")</span>";
         echo "<span class='folder-actions'>";
