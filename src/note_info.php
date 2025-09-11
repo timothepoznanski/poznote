@@ -364,7 +364,7 @@ $locationText = $note['location'] ?: 'Not specified';
                     // Mettre à jour l'affichage et quitter le mode édition
                     document.getElementById('location-display').textContent = newLocation || 'Not specified';
                     cancelLocationEdit();
-                    showNotificationPopup('Location updated successfully', 'success');
+                    // Success: no popup shown per user request
                 } else {
                     showNotificationPopup('Failed to update location: ' + (data.message || 'Unknown error'), 'error');
                 }
