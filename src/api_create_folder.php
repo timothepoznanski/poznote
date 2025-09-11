@@ -66,7 +66,7 @@ try {
     
     if ($count > 0) {
         http_response_code(409);
-        echo json_encode(['success' => false, 'error' => 'Folder already exists', 'folder_name' => $folder_name, 'workspace' => $workspace]);
+        echo json_encode(['success' => false, 'error' => 'A folder with this name already exists in this workspace']);
         exit;
     }
     

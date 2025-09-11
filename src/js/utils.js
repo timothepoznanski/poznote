@@ -148,7 +148,14 @@ function newFolder() {
             credentials: 'same-origin',
             body: JSON.stringify(data)
         })
-        .then(function(response) { return response.json(); })
+        .then(function(response) {
+            if (!response.ok) {
+                return response.json().then(function(errorData) {
+                    throw new Error(errorData.error || errorData.message || 'Unknown error');
+                });
+            }
+            return response.json();
+        })
         .then(function(data) {
             if (data.success) {
                 // Folder created successfully - no notification needed
