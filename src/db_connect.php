@@ -28,6 +28,13 @@ try {
         attachments TEXT
     )');
 
+    // Add location column if it doesn't exist (for backward compatibility)
+    try {
+        $con->exec('ALTER TABLE entries ADD COLUMN location TEXT');
+    } catch(PDOException $e) {
+        // Column might already exist, ignore error
+    }
+
     // Create folders table for empty folders (scoped by workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

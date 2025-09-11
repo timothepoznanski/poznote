@@ -21,10 +21,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -86,6 +86,8 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
         $attachmentsCount = count(array_filter(array_map('trim', $attachmentsArray)));
     }
 }
+
+$locationText = $note['location'] ?: 'Not specified';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,24 +106,6 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
         .info-page {
             max-width: 800px;
             margin: 0 auto;
-        }
-        
-        .info-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .info-header h1 {
-            color: #007DB8;
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        
-        .info-subtitle {
-            color: #6c757d;
-            margin-top: 10px;
-            font-size: 16px;
         }
         
         .info-content {
@@ -150,11 +134,14 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             font-weight: 600;
             color: #495057;
             min-width: 140px;
+            margin-right: 20px;
         }
         
         .info-value {
             flex: 1;
             color: #212529;
+            display: flex;
+            align-items: center;
         }
         
         .favorite-yes {
@@ -197,24 +184,87 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             color: white;
         }
         
-        .btn-secondary:hover {
-            background: #5a6268;
+        #location-input {
+            width: 350px;
+            max-width: 100%;
+            padding: 7px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 15px;
+            margin-right: 12px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        
+        #location-input:focus {
+            border-color: #007db8;
+            outline: none;
+        }
+        
+        #location-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-save {
+            background: linear-gradient(90deg, #28a745 80%, #218838 100%);
             color: white;
-            text-decoration: none;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(40,167,69,0.08);
+            transition: background 0.2s;
+        }
+        
+        .btn-save:hover {
+            background: linear-gradient(90deg, #218838 80%, #28a745 100%);
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(90deg, #6c757d 80%, #5a6268 100%);
+            color: white;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(108,117,125,0.08);
+            transition: background 0.2s;
+        }
+        
+        .btn-cancel:hover {
+            background: linear-gradient(90deg, #5a6268 80%, #6c757d 100%);
+        }
+        
+        .btn-edit {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            opacity: 0.7;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        
+        .btn-edit:hover {
+            opacity: 1;
+            background-color: #e9ecef;
         }
     </style>
 </head>
 <body>
     <div class="info-page">
-        <div class="info-header">
-            <h1>Note Information</h1>
-            <div class="info-subtitle"><?php echo htmlspecialchars($title); ?></div>
-        </div>
         
         <div class="info-content">
             <div class="info-row">
-                <div class="info-label">Note ID:</div>
-                <div class="info-value"><?php echo htmlspecialchars($note_id); ?></div>
+                <div class="info-label">Note title:</div>
+                <div class="info-value"><?php echo htmlspecialchars($title); ?></div>
             </div>
 
             <div class="info-row">
@@ -228,28 +278,6 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             </div>
 
             <div class="info-row">
-                <div class="info-label">Full Path:</div>
-                <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Favorite:</div>
-                <div class="info-value <?php echo $isFavorite ? 'favorite-yes' : 'favorite-no'; ?>">
-                    <?php echo $isFavorite ? 'Yes ⭐' : 'No'; ?>
-                </div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Attachments:</div>
-                <div class="info-value"><?php echo $attachmentsCount; ?> file(s)</div>
-            </div>
-
-            <div class="info-row">
-                <div class="info-label">Tags:</div>
-                <div class="info-value"><?php echo htmlspecialchars($tagsText); ?></div>
-            </div>
-
-            <div class="info-row">
                 <div class="info-label">Created:</div>
                 <div class="info-value"><?php echo htmlspecialchars($createdText); ?></div>
             </div>
@@ -258,6 +286,39 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
                 <div class="info-label">Last Modified:</div>
                 <div class="info-value"><?php echo htmlspecialchars($updatedText); ?></div>
             </div>
+
+            <div class="info-row">
+                <div class="info-label">Location:</div>
+                <div class="info-value">
+                    <span id="location-display"><?php echo htmlspecialchars($locationText); ?></span>
+                    <input type="text" id="location-input" style="display: none;" />
+                    <div id="location-buttons" style="display: none; margin-left: 10px;">
+                        <button type="button" class="btn-save" onclick="saveLocation(<?php echo $note_id; ?>)">Save</button>
+                        <button type="button" class="btn-cancel" onclick="cancelLocationEdit()">Cancel</button>
+                    </div>
+                    <button type="button" id="edit-location-btn" class="btn-edit" onclick="editLocationInline('<?php echo addslashes($note['location'] ?? ''); ?>')" title="Edit location">✏️</button>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Tags:</div>
+                <div class="info-value"><?php echo htmlspecialchars($tagsText); ?></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Attachments:</div>
+                <div class="info-value"><?php echo $attachmentsCount; ?> file(s)</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Note ID:</div>
+                <div class="info-value"><?php echo htmlspecialchars($note_id); ?></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Full Path:</div>
+                <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
+            </div>
         </div>
 
         <div class="action-buttons">
@@ -265,5 +326,74 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             <a href="<?php echo $close_href; ?>" class="btn btn-secondary">Close</a>
         </div>
     </div>
+
+    <script src="js/ui.js"></script>
+    <script>
+        function editLocationInline(currentLocation) {
+            // Masquer le texte et le bouton d'édition
+            document.getElementById('location-display').style.display = 'none';
+            document.getElementById('edit-location-btn').style.display = 'none';
+            
+            // Afficher l'input et les boutons
+            const input = document.getElementById('location-input');
+            const buttons = document.getElementById('location-buttons');
+            
+            input.style.display = 'inline-block';
+            input.value = currentLocation || '';
+            input.focus();
+            input.select();
+            
+            buttons.style.display = 'inline-block';
+        }
+        
+        function saveLocation(noteId) {
+            const input = document.getElementById('location-input');
+            const newLocation = input.value.trim();
+            
+            // Envoyer la requête de mise à jour
+            fetch('api_update_location.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'note_id=' + encodeURIComponent(noteId) + '&location=' + encodeURIComponent(newLocation)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mettre à jour l'affichage et quitter le mode édition
+                    document.getElementById('location-display').textContent = newLocation || 'Not specified';
+                    cancelLocationEdit();
+                    // Success: no popup shown per user request
+                } else {
+                    showNotificationPopup('Failed to update location: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotificationPopup('Network error while updating location', 'error');
+            });
+        }
+        
+        function cancelLocationEdit() {
+            // Masquer l'input et les boutons
+            document.getElementById('location-input').style.display = 'none';
+            document.getElementById('location-buttons').style.display = 'none';
+            
+            // Afficher le texte et le bouton d'édition
+            document.getElementById('location-display').style.display = 'inline';
+            document.getElementById('edit-location-btn').style.display = 'inline-block';
+        }
+        
+        // Gérer la touche Enter pour sauvegarder
+        document.getElementById('location-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const noteId = <?php echo $note_id; ?>;
+                saveLocation(noteId);
+            } else if (e.key === 'Escape') {
+                cancelLocationEdit();
+            }
+        });
+    </script>
 </body>
 </html>
