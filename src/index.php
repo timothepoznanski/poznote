@@ -342,6 +342,10 @@ $res_right = $note_data['res_right'];
                 if (!empty($folder_filter)) {
                     $home_params[] = 'folder=' . urlencode($folder_filter);
                 }
+                // Always preserve workspace if it's not the default
+                if (!empty($workspace_filter) && $workspace_filter !== 'Poznote') {
+                    $home_params[] = 'workspace=' . urlencode($workspace_filter);
+                }
                 if (!empty($home_params)) {
                     $home_url .= '?' . implode('&', $home_params);
                 }

@@ -80,9 +80,19 @@ window.goBackToNoteList = function() {
             link.classList.remove('selected-note');
         });
 
-        // Update URL to remove note parameter
+        // Update URL to remove note parameter while preserving workspace and other parameters
         const url = new URL(window.location);
         url.searchParams.delete('note');
+        
+        // Ensure workspace is preserved if it exists
+        const currentWorkspace = selectedWorkspace || window.selectedWorkspace;
+        if (currentWorkspace && currentWorkspace !== 'Poznote') {
+            url.searchParams.set('workspace', currentWorkspace);
+        } else if (!currentWorkspace || currentWorkspace === 'Poznote') {
+            // If workspace is the default 'Poznote', we can remove it from URL for cleaner URLs
+            url.searchParams.delete('workspace');
+        }
+        
         history.pushState({}, '', url.toString());
     }
 };
