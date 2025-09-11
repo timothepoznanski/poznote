@@ -18,6 +18,8 @@ function highlightSearchTerms() {
     // Check if we're in notes search mode
     var notesBtn = document.getElementById('search-notes-btn') || document.getElementById('search-notes-btn-mobile');
     var isNotesActive = false;
+    
+    // First try to detect from buttons
     if (notesBtn && notesBtn.classList.contains('active')) {
         isNotesActive = true;
     } else if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
@@ -31,6 +33,13 @@ function highlightSearchTerms() {
         } catch (e) {
             // ignore and fallthrough
         }
+    }
+    
+    // Additional fallback: if we're on mobile and no explicit search type is set, default to notes
+    var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isNotesActive && isMobile) {
+        // In mobile, if no specific type is detected, assume notes search for highlighting
+        isNotesActive = true;
     }
 
     if (!isNotesActive) {
@@ -261,14 +270,32 @@ function createInputOverlay(inputElement, word, startIndex) {
 function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var inputRect = inputElement.getBoundingClientRect();
     var inputStyle = window.getComputedStyle(inputElement);
-    var paddingLeft = parseInt(inputStyle.paddingLeft);
-    var borderLeft = parseInt(inputStyle.borderLeftWidth);
+    var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
+    var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
     
-    overlay.style.left = (inputRect.left + window.pageXOffset + paddingLeft + borderLeft + offsetX) + 'px';
-    overlay.style.top = (inputRect.top + window.pageYOffset) + 'px';
+    // Get viewport scaling for mobile devices
+    var viewport = document.querySelector('meta[name="viewport"]');
+    var scale = 1;
+    if (viewport && viewport.content.includes('initial-scale=')) {
+        var scaleMatch = viewport.content.match(/initial-scale=([0-9.]+)/);
+        if (scaleMatch) {
+            scale = parseFloat(scaleMatch[1]);
+        }
+    }
+    
+    // Calculate position accounting for page scroll and mobile viewport
+    var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    
+    overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
+    overlay.style.top = (inputRect.top + scrollY) + 'px';
     overlay.style.width = wordWidth + 'px';
     overlay.style.height = inputRect.height + 'px';
     overlay.style.lineHeight = inputRect.height + 'px';
+    
+    // Ensure overlay is visible on mobile
+    overlay.style.zIndex = '1000';
+    overlay.style.pointerEvents = 'none';
 }
 
 /**

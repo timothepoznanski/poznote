@@ -1103,9 +1103,14 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Input highlight overlay for precise word highlighting in input elements */
 .input-highlight-overlay {
     background-color: #ffff00 !important;
-    opacity: 0.7;
+    opacity: 0.8 !important; /* Slightly more opaque on mobile for better visibility */
     border-radius: 2px;
     box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+    position: absolute !important;
+    pointer-events: none !important;
+    z-index: 1000 !important;
+    /* Ensure it works with mobile zoom */
+    transform-origin: top left;
 }
 
 /* Modal IA adaptée pour mobile */
