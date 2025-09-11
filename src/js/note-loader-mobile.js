@@ -5,6 +5,7 @@
 
 /**
  * Initialize touch event handlers for mobile note links
+ * On mobile, we use touch handlers instead of onclick for better UX
  */
 function initializeMobileTouchHandlers() {
     if (!isMobileDevice()) {
@@ -56,11 +57,8 @@ function handleMobileTouchEnd(event) {
 
     // Validate tap: reasonable duration, no significant movement
     if (touchDuration > 50 && touchDuration < 1000 && !hasMoved && !this.touchHandled) {
-        console.log('Valid mobile tap detected, loading note:', noteTitle);
         this.touchHandled = true; // Mark as handled
         loadNoteDirectly(url, noteTitle);
-    } else {
-        console.log('Invalid mobile tap - Duration:', touchDuration, 'ms, Movement:', deltaX, deltaY);
     }
 
     return false;
@@ -79,6 +77,9 @@ window.goBackToNoteList = function() {
         document.querySelectorAll('.links_arbo_left').forEach(link => {
             link.classList.remove('selected-note');
         });
+
+        // Reset loading state to ensure next note click works
+        window.isLoadingNote = false;
 
         // Update URL to remove note parameter while preserving workspace and other parameters
         const url = new URL(window.location);
@@ -118,6 +119,8 @@ function initializeNoteLoaderMobile() {
                 document.querySelectorAll('.links_arbo_left').forEach(link => {
                     link.classList.remove('selected-note');
                 });
+                // Reset loading state to ensure next note click works
+                window.isLoadingNote = false;
             }
         }
     });

@@ -22,21 +22,23 @@ function isMobileDevice() {
  * Direct note loading function called from onclick
  */
 window.loadNoteDirectly = function(url, noteTitle) {
-    console.log('Direct loadNoteDirectly called for:', noteTitle, 'URL:', url);
-
     // Prevent multiple simultaneous loads
     if (window.isLoadingNote) {
-        console.log('Note already loading, ignoring request');
         return false;
     }
     window.isLoadingNote = true;
 
+    // Find the clicked link to update selection
+    const clickedLink = document.querySelector(`[data-note-id="${noteTitle}"]`);
+    
     // Show loading state immediately
     showNoteLoadingState();
     
+    // Update selected note state
+    updateSelectedNote(clickedLink);
+    
     // On mobile, add note-open class
     if (isMobileDevice()) {
-        console.log('Mobile device detected, adding note-open class');
         document.body.classList.add('note-open');
     }
 
@@ -48,24 +50,20 @@ window.loadNoteDirectly = function(url, noteTitle) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             window.isLoadingNote = false;
-            console.log('AJAX request completed with status:', xhr.status);
 
             if (xhr.status === 200) {
                 try {
-                    console.log('Parsing response...');
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(xhr.responseText, 'text/html');
                     const rightColumn = doc.getElementById('right_col');
 
                     if (rightColumn) {
-                        console.log('Found right column, updating content');
                         const currentRightColumn = document.getElementById('right_col');
                         if (currentRightColumn) {
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
                             reinitializeNoteContent();
                             updateBrowserUrl(url, noteTitle);
                             hideNoteLoadingState();
-                            console.log('Note loaded successfully');
                         } else {
                             throw new Error('Could not find current right column');
                         }
@@ -114,7 +112,6 @@ window.loadNoteDirectly = function(url, noteTitle) {
     // Set timeout
     xhr.timeout = 10000; // 10 seconds
 
-    console.log('Sending AJAX request...');
     xhr.send();
     return false;
 };

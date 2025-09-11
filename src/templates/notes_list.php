@@ -98,8 +98,9 @@ foreach($folders as $folderName => $notes) {
         }
         
         // Workspace-aware default folder handling in UI
-        // Disable double-click rename for default folder
-        $ondbl = isDefaultFolder($folderName, $workspace_filter) ? '' : 'editFolderName("' . $folderName . '")';
+        // Disable double-click rename for default folder and system folders
+        $systemFolders = ['Favorites', 'Tags', 'Trash'];
+        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName("' . $folderName . '")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
         echo "<span class='folder-note-count' id='count-" . md5($folderName) . "'>(" . count($notes) . ")</span>";
         echo "<span class='folder-actions'>";
@@ -122,8 +123,17 @@ foreach($folders as $folderName => $notes) {
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // No onclick handler - touch events will be handled via JavaScript
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'>";
+        // Add onclick handler for AJAX loading (desktop only, mobile uses touch handlers)
+        $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
+        $escapedLink = htmlspecialchars($link, ENT_QUOTES);
+        
+        // Detect if mobile (simple server-side detection)
+        $onclickHandler = '';
+        if (!$is_mobile) {
+            $onclickHandler = " onclick='return loadNoteDirectly(\"$escapedLink\", \"$escapedHeading\");'";
+        }
+        
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

@@ -28,13 +28,19 @@ switch($action) {
         
         if ($folderName === $defaultFolderName) {
             echo json_encode(['success' => false, 'error' => 'Cannot create folder with the same name as the default folder']);
-                if ($workspace !== null) {
-                    $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                    $check1->execute([$folderName, $workspace, $workspace]);
-                } else {
-                    $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
-                    $check1->execute([$folderName]);
-                }
+            exit;
+        }
+        
+        // Prevent creating folders with reserved system names
+        $reserved_names = ['Favorites', 'Tags', 'Trash'];
+        if (in_array($folderName, $reserved_names)) {
+            echo json_encode(['success' => false, 'error' => 'Cannot create folder with reserved name: ' . $folderName]);
+            exit;
+        }
+        
+        if ($workspace !== null) {
+            $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $check1->execute([$folderName, $workspace, $workspace]);
         } else {
             $check1 = $con->prepare("SELECT COUNT(*) as count FROM entries WHERE folder = ?");
             $check1->execute([$folderName]);
@@ -85,9 +91,21 @@ switch($action) {
             exit;
         }
         
+        // Do not allow renaming special system folders
+        if (in_array($oldName, ['Favorites', 'Tags', 'Trash'])) {
+            echo json_encode(['success' => false, 'error' => 'Renaming system folders is not allowed']);
+            exit;
+        }
+        
         // Don't allow renaming TO the current default folder name
         if ($newName === $defaultFolderName) {
             echo json_encode(['success' => false, 'error' => 'Cannot rename to default folder name']);
+            exit;
+        }
+        
+        // Don't allow renaming TO reserved system folder names
+        if (in_array($newName, ['Favorites', 'Tags', 'Trash'])) {
+            echo json_encode(['success' => false, 'error' => 'Cannot rename to reserved system folder name']);
             exit;
         }
 
