@@ -19,101 +19,139 @@ function isMobileDevice() {
 }
 
 /**
+ * Find note link by title (robust method that handles quotes and special characters)
+ */
+function findNoteLinkByTitle(noteTitle) {
+    const noteLinks = document.querySelectorAll('a.links_arbo_left[data-note-id]');
+    for (let link of noteLinks) {
+        if (link.getAttribute('data-note-id') === noteTitle) {
+            return link;
+        }
+    }
+    return null;
+}
+
+/**
  * Direct note loading function called from onclick
  */
-window.loadNoteDirectly = function(url, noteTitle) {
-    // Prevent multiple simultaneous loads
-    if (window.isLoadingNote) {
-        return false;
-    }
-    window.isLoadingNote = true;
+window.loadNoteDirectly = function(url, noteTitle, event) {
+    try {
+        // Prevent default link behavior
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        // Prevent multiple simultaneous loads
+        if (window.isLoadingNote) {
+            return false;
+        }
+        window.isLoadingNote = true;
 
-    // Find the clicked link to update selection
-    const clickedLink = document.querySelector(`[data-note-id="${noteTitle}"]`);
-    
-    // Show loading state immediately
-    showNoteLoadingState();
-    
-    // Update selected note state
-    updateSelectedNote(clickedLink);
-    
-    // On mobile, add note-open class
-    if (isMobileDevice()) {
-        document.body.classList.add('note-open');
-    }
+        // Find the clicked link to update selection using robust method
+        const clickedLink = findNoteLinkByTitle(noteTitle);
+        
+        // Show loading state immediately
+        showNoteLoadingState();
+        
+        // On mobile, add note-open class
+        if (isMobileDevice()) {
+            document.body.classList.add('note-open');
+        }
 
-    // Create XMLHttpRequest
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        // Create XMLHttpRequest
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            window.isLoadingNote = false;
+        xhr.onreadystatechange = function() {
+            try {
+                if (xhr.readyState === 4) {
+                    window.isLoadingNote = false;
 
-            if (xhr.status === 200) {
-                try {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(xhr.responseText, 'text/html');
-                    const rightColumn = doc.getElementById('right_col');
+                    if (xhr.status === 200) {
+                        try {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                            const rightColumn = doc.getElementById('right_col');
 
-                    if (rightColumn) {
-                        const currentRightColumn = document.getElementById('right_col');
-                        if (currentRightColumn) {
-                            currentRightColumn.innerHTML = rightColumn.innerHTML;
-                            reinitializeNoteContent();
-                            updateBrowserUrl(url, noteTitle);
+                            if (rightColumn) {
+                                const currentRightColumn = document.getElementById('right_col');
+                                if (currentRightColumn) {
+                                    currentRightColumn.innerHTML = rightColumn.innerHTML;
+                                    reinitializeNoteContent();
+                                    updateBrowserUrl(url, noteTitle);
+                                    hideNoteLoadingState();
+                                    
+                                    // Apply selection after content is loaded and initialized
+                                    updateSelectedNote(clickedLink);
+                                } else {
+                                    throw new Error('Could not find current right column');
+                                }
+                            } else {
+                                throw new Error('Could not find note content in response');
+                            }
+                        } catch (error) {
+                            console.error('Error parsing note content:', error);
+                            showNotificationPopup('Error loading note: ' + error.message);
                             hideNoteLoadingState();
-                        } else {
-                            throw new Error('Could not find current right column');
+                            if (isMobileDevice()) {
+                                document.body.classList.remove('note-open');
+                            }
                         }
                     } else {
-                        throw new Error('Could not find note content in response');
-                    }
-                } catch (error) {
-                    console.error('Error loading note:', error);
-                    showNotificationPopup('Error loading note: ' + error.message);
-                    hideNoteLoadingState();
-                    if (isMobileDevice()) {
-                        document.body.classList.remove('note-open');
+                        console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
+                        showNotificationPopup('Failed to load note (status: ' + xhr.status + ')');
+                        hideNoteLoadingState();
+                        if (isMobileDevice()) {
+                            document.body.classList.remove('note-open');
+                        }
                     }
                 }
-            } else {
-                console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
-                showNotificationPopup('Failed to load note (status: ' + xhr.status + ')');
+            } catch (error) {
+                console.error('Error in xhr onreadystatechange:', error);
+                window.isLoadingNote = false;
                 hideNoteLoadingState();
                 if (isMobileDevice()) {
                     document.body.classList.remove('note-open');
                 }
             }
-        }
-    };
+        };
 
-    xhr.onerror = function() {
+        xhr.onerror = function() {
+            window.isLoadingNote = false;
+            console.error('Network error during note loading');
+            showNotificationPopup('Network error - please check your connection');
+            hideNoteLoadingState();
+            if (isMobileDevice()) {
+                document.body.classList.remove('note-open');
+            }
+        };
+
+        xhr.ontimeout = function() {
+            window.isLoadingNote = false;
+            console.error('Request timeout during note loading');
+            showNotificationPopup('Request timeout - please try again');
+            hideNoteLoadingState();
+            if (isMobileDevice()) {
+                document.body.classList.remove('note-open');
+            }
+        };
+
+        // Set timeout
+        xhr.timeout = 10000; // 10 seconds
+
+        xhr.send();
+        return false;
+    } catch (error) {
+        console.error('Error in loadNoteDirectly:', error);
         window.isLoadingNote = false;
-        console.error('Network error during note loading');
-        showNotificationPopup('Network error - please check your connection');
-        hideNoteLoadingState();
         if (isMobileDevice()) {
             document.body.classList.remove('note-open');
         }
-    };
-
-    xhr.ontimeout = function() {
-        window.isLoadingNote = false;
-        console.error('Request timeout during note loading');
-        showNotificationPopup('Request timeout - please try again');
-        hideNoteLoadingState();
-        if (isMobileDevice()) {
-            document.body.classList.remove('note-open');
-        }
-    };
-
-    // Set timeout
-    xhr.timeout = 10000; // 10 seconds
-
-    xhr.send();
-    return false;
+        showNotificationPopup('Error initializing note load: ' + error.message);
+        return false;
+    }
 };
 
 /**
@@ -228,8 +266,8 @@ function loadNoteFromUrl(url) {
     const noteTitle = urlParams.get('note');
 
     if (noteTitle) {
-        // Find the corresponding note link
-        const noteLink = document.querySelector(`[data-note-id="${noteTitle}"]`);
+        // Find the corresponding note link using robust method
+        const noteLink = findNoteLinkByTitle(noteTitle);
         if (noteLink) {
             loadNoteViaAjax(url, noteTitle, noteLink);
         }
@@ -273,6 +311,14 @@ function updateSelectedNote(clickedLink) {
     // Add selected class to clicked note
     if (clickedLink) {
         clickedLink.classList.add('selected-note');
+        
+        // Ensure the selection persists by re-applying it after a short delay
+        // This helps in case other scripts interfere with the selection
+        setTimeout(() => {
+            if (clickedLink && !clickedLink.classList.contains('selected-note')) {
+                clickedLink.classList.add('selected-note');
+            }
+        }, 50);
     }
 }
 

@@ -104,9 +104,6 @@ window.goBackToNoteList = function() {
 function initializeNoteLoaderMobile() {
     // Simple initialization - events are now handled directly in HTML
 
-    // Keep the existing functions available for compatibility
-    window.loadNoteViaAjax = loadNoteViaAjax;
-
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
         if (event.state && event.state.noteTitle) {

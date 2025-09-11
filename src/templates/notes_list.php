@@ -127,13 +127,17 @@ foreach($folders as $folderName => $notes) {
         $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
         $escapedLink = htmlspecialchars($link, ENT_QUOTES);
         
+        // Escape for JavaScript (for onclick handler) - use json_encode but without outer quotes
+        $jsEscapedHeading = json_encode($row1["heading"], JSON_HEX_APOS | JSON_HEX_QUOT);
+        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
+        
         // Detect if mobile (simple server-side detection)
         $onclickHandler = '';
         if (!$is_mobile) {
-            $onclickHandler = " onclick='return loadNoteDirectly(\"$escapedLink\", \"$escapedHeading\");'";
+            $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $jsEscapedHeading, event);'";
         }
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $escapedHeading . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
