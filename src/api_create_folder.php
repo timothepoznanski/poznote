@@ -56,6 +56,14 @@ foreach ($forbidden_chars as $char) {
     }
 }
 
+// Prevent creating folders with reserved system names
+$reserved_names = ['Favorites', 'Tags', 'Trash'];
+if (in_array($folder_name, $reserved_names)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Cannot create folder with reserved name: ' . $folder_name]);
+    exit;
+}
+
 try {
     // Check if folder already exists
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : 'Poznote';

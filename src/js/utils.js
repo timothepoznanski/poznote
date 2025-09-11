@@ -761,6 +761,12 @@ function executeMoveAllFiles() {
 }
 
 function editFolderName(oldName) {
+    // Prevent renaming system folders
+    if (oldName === 'Favorites' || oldName === 'Tags' || oldName === 'Trash') {
+        showNotificationPopup('Cannot rename system folders', 'error');
+        return;
+    }
+    
     document.getElementById('editFolderModal').style.display = 'flex';
     document.getElementById('editFolderName').value = oldName;
     document.getElementById('editFolderName').dataset.oldName = oldName;
