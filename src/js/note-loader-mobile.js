@@ -5,14 +5,16 @@
 
 /**
  * Initialize touch event handlers for mobile note links
+ * Note: For mobile, we still use touch handlers for better UX
+ * but they will coexist with onclick handlers
  */
 function initializeMobileTouchHandlers() {
     if (!isMobileDevice()) {
         return; // Skip if not mobile
     }
 
-    // Find all note links
-    const noteLinks = document.querySelectorAll('.links_arbo_left a');
+    // Find all note links that don't already have onclick handlers
+    const noteLinks = document.querySelectorAll('.links_arbo_left a:not([onclick])');
 
     noteLinks.forEach(link => {
         // Remove existing event listeners to avoid duplicates

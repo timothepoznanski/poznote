@@ -123,8 +123,10 @@ foreach($folders as $folderName => $notes) {
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // No onclick handler - touch events will be handled via JavaScript
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'>";
+        // Add onclick handler for AJAX loading
+        $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
+        $escapedLink = htmlspecialchars($link, ENT_QUOTES);
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $row1["heading"] . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName' onclick='return loadNoteDirectly(\"$escapedLink\", \"$escapedHeading\");'>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

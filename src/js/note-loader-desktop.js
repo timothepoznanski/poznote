@@ -5,22 +5,16 @@
 
 /**
  * Initialize desktop click handlers for note links
+ * Note: Click handling is now done via onclick attributes in HTML
+ * This function is kept for compatibility but doesn't add event listeners
  */
 function initializeDesktopClickHandlers() {
     if (isMobileDevice()) {
         return; // Skip if mobile
     }
 
-    const noteLinks = document.querySelectorAll('.links_arbo_left a');
-    noteLinks.forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            const url = this.getAttribute('href');
-            const noteTitle = this.querySelector('.note-title')?.textContent?.trim() || this.textContent.trim();
-            loadNoteDirectly(url, noteTitle);
-            return false;
-        });
-    });
+    // Click handlers are now managed via onclick attributes in the template
+    // This function is kept for backwards compatibility
 }
 
 /**
