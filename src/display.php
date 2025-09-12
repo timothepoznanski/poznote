@@ -127,7 +127,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             <div class="settings-card" id="show-subheading-card">
                 <div class="settings-card-icon"><i class="fas fa-map-marker-alt"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Note Heading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Note Subheading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
 
