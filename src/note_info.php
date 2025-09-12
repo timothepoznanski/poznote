@@ -289,6 +289,15 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             opacity: 1;
             background-color: #e9ecef;
         }
+        /* Make subheading appear clickable (blue) but not underlined */
+        #subheading-display {
+            color: #007DB8;
+            font-weight: 600;
+        }
+        #subheading-display:hover, #subheading-display:focus {
+            color: #005a8a;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -323,7 +332,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             <div class="info-row">
                 <div class="info-label">Subheading:</div>
                 <div class="info-value">
-                    <span id="subheading-display"><?php echo htmlspecialchars($subheadingText); ?></span>
+                    <span id="subheading-display" style="cursor:pointer;" role="button" tabindex="0" onclick='editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? ''), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);'><?php echo htmlspecialchars($subheadingText); ?></span>
                     <input type="text" id="subheading-input" style="display: none;" />
                     <div id="subheading-buttons" style="display: none; margin-left: 10px;">
                         <button type="button" class="btn-save" onclick="saveSubheading(<?php echo $note_id; ?>)">Save</button>
@@ -375,7 +384,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
         // If requested via query param, auto-open subheading edit
         <?php if (isset($_GET['edit_subheading']) && $_GET['edit_subheading'] == '1'): ?>
             document.addEventListener('DOMContentLoaded', function() {
-                try { editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? '')); ?>); } catch(e) { console.error(e); }
+                try { editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? ''), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>); } catch(e) { console.error(e); }
             });
         <?php endif; ?>
         function editSubheadingInline(currentSub) {
