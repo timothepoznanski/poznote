@@ -118,7 +118,7 @@ $locationText = $note['location'] ?: 'Not specified';
         .info-row {
             display: flex;
             align-items: center;
-            padding: 20px 30px;
+            padding: 15px 30px;
             border-bottom: 1px solid #f0f0f0;
         }
         
