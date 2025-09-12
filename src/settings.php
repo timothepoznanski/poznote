@@ -149,10 +149,12 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 
 <body>
     <div class="settings-container">
+        <br>
         <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
             <i class="fas fa-arrow-left"></i>
             Back to Notes
         </a>
+        <br>
         
         <div class="settings-grid">
             <!-- Workspace Management -->
@@ -177,24 +179,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
             
-            <!-- User Preferences -->
-            <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Login Display Name</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="showNoteFontSizePrompt();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-text-height"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Note Font Size</h3>
-                </div>
-            </div>
+            <!-- User Preferences (moved to Display page) -->
             
             <!-- Data Management -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
@@ -214,10 +199,6 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     <h3>Restore (Import)</h3>
                 </div>
             </div>
-
-            <!-- (removed horizontal footer) -->
-                <!-- Separator before footer links -->
-                <div class="settings-sep" aria-hidden="true"></div>
 
                 <!-- Footer links moved back into column as regular settings cards -->
                 <div class="settings-card" onclick="checkForUpdates();">

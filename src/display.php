@@ -91,6 +91,25 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         </a>
 
         <div class="settings-grid">
+            <!-- Moved from settings.php: user preferences -->
+            <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Login Display Name</h3>
+                </div>
+            </div>
+
+            <div class="settings-card" onclick="showNoteFontSizePrompt();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-text-height"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Note Font Size</h3>
+                </div>
+            </div>
+
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon"><i class="fas fa-smile"></i></div>
                 <div class="settings-card-content">
@@ -125,6 +144,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/font-size-settings.js"></script>
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){
