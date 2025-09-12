@@ -53,6 +53,19 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             margin: 0;
             padding: 0;
         }
+        .settings-sep {
+            height: 1px;
+            background: #e6edf3;
+            margin: 12px 0;
+        }
+        .settings-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+            padding: 12px 6px;
+            border-top: 1px solid #eef2f5;
+            margin-top: 12px;
+        }
 
         .back-link { display: inline-flex; margin-bottom: 10px; }
 
@@ -194,6 +207,42 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
 
+            <!-- Toggle settings moved to display.php -->
+            
+            <!-- Data Management -->
+            <div class="settings-card" onclick="window.location = 'backup_export.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Backup (Export)</h3>
+                </div>
+            </div>
+            
+            <div class="settings-card" onclick="window.location = 'restore_import.php';">
+                <div class="settings-card-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Restore (Import)</h3>
+                </div>
+            </div>
+
+            <!-- Separator before toggles -->
+            <div class="settings-sep" aria-hidden="true"></div>
+
+            <!-- Toggle settings group -->
+            <div class="settings-card" onclick="toggleFolderNoteCounts();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-hashtag"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3 id="folder-counts-title">Show Folders Notes Counts 
+                        <span id="folder-counts-status" class="ai-status disabled">disabled</span>
+                    </h3>
+                </div>
+            </div>
+
             <!-- Emoji Icons toggle -->
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon">
@@ -223,52 +272,34 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     <h3>Show Note Heading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
-            
-            <!-- Data Management -->
-            <div class="settings-card" onclick="window.location = 'backup_export.php';">
-                <div class="settings-card-icon">
-                    <i class="fas fa-upload"></i>
+
+            <!-- Separator before footer links -->
+            <div class="settings-sep" aria-hidden="true"></div>
+
+            <div class="settings-footer">
+                <div class="settings-card" onclick="checkForUpdates();" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3 style="margin:0; font-size:0.95rem;">Check for Updates</h3>
+                    </div>
                 </div>
-                <div class="settings-card-content">
-                    <h3>Backup (Export)</h3>
+                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3 style="margin:0; font-size:0.95rem;">GitHub Repository</h3>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="settings-card" onclick="window.location = 'restore_import.php';">
-                <div class="settings-card-icon">
-                    <i class="fas fa-download"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Restore (Import)</h3>
-                </div>
-            </div>
-            
-            <!-- System -->
-            <div class="settings-card" onclick="checkForUpdates();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-sync-alt"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Check for Updates</h3>
-                </div>
-            </div>
-            
-            <!-- Links -->
-            <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-code-branch"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>GitHub Repository</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>About Poznote</h3>
+                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3 style="margin:0; font-size:0.95rem;">About Poznote</h3>
+                    </div>
                 </div>
             </div>
             
@@ -334,146 +365,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             }
         });
 
-        // Emoji icons toggle logic
-        (function() {
-            var card = document.getElementById('emoji-icons-card');
-            var status = document.getElementById('emoji-icons-status');
-
-            function refreshStatus() {
-                var form = new FormData();
-                form.append('action', 'get');
-                form.append('key', 'emoji_icons_enabled');
-                fetch('api_settings.php', { method: 'POST', body: form })
-                .then(function(r) { return r.json(); })
-                .then(function(j) {
-                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
-                    if (status) {
-                        status.textContent = enabled ? 'enabled' : 'disabled';
-                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
-                    }
-                    if (enabled) document.body.classList.remove('emoji-hidden'); else document.body.classList.add('emoji-hidden');
-                })
-                .catch(function(){});
-            }
-
-            if (card) {
-                card.addEventListener('click', function() {
-                    var form = new FormData();
-                    form.append('action', 'get');
-                    form.append('key', 'emoji_icons_enabled');
-                    fetch('api_settings.php', { method: 'POST', body: form })
-                    .then(function(r) { return r.json(); })
-                    .then(function(j) {
-                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                        var toSet = currently ? '0' : '1';
-                        var setForm = new FormData();
-                        setForm.append('action', 'set');
-                        setForm.append('key', 'emoji_icons_enabled');
-                        setForm.append('value', toSet);
-                        return fetch('api_settings.php', { method: 'POST', body: setForm });
-                    })
-                    .then(function() { refreshStatus(); if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); })
-                    .catch(function(e){ console.error(e); });
-                });
-            }
-
-            // initial load
-            refreshStatus();
-        })();
-        
-        // Show created date toggle logic
-        (function() {
-            var card = document.getElementById('show-created-card');
-            var status = document.getElementById('show-created-status');
-
-            function refreshStatus() {
-                var form = new FormData();
-                form.append('action', 'get');
-                form.append('key', 'show_note_created');
-                fetch('api_settings.php', { method: 'POST', body: form })
-                .then(function(r) { return r.json(); })
-                .then(function(j) {
-                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
-                    if (status) {
-                        status.textContent = enabled ? 'enabled' : 'disabled';
-                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
-                    }
-                    if (enabled) document.body.classList.add('show-note-created'); else document.body.classList.remove('show-note-created');
-                })
-                .catch(function(){});
-            }
-
-            if (card) {
-                card.addEventListener('click', function() {
-                    var form = new FormData();
-                    form.append('action', 'get');
-                    form.append('key', 'show_note_created');
-                    fetch('api_settings.php', { method: 'POST', body: form })
-                    .then(function(r) { return r.json(); })
-                    .then(function(j) {
-                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                        var toSet = currently ? '0' : '1';
-                        var setForm = new FormData();
-                        setForm.append('action', 'set');
-                        setForm.append('key', 'show_note_created');
-                        setForm.append('value', toSet);
-                        return fetch('api_settings.php', { method: 'POST', body: setForm });
-                    })
-                    .then(function() { refreshStatus(); if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); })
-                    .catch(function(e){ console.error(e); });
-                });
-            }
-
-            // initial load
-            refreshStatus();
-        })();
-
-        // Show subheading toggle logic (renamed from location)
-        (function() {
-            var card = document.getElementById('show-subheading-card');
-            var status = document.getElementById('show-subheading-status');
-
-            function refreshStatus() {
-                var form = new FormData();
-                form.append('action', 'get');
-                form.append('key', 'show_note_subheading');
-                fetch('api_settings.php', { method: 'POST', body: form })
-                .then(function(r) { return r.json(); })
-                .then(function(j) {
-                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
-                    if (status) {
-                        status.textContent = enabled ? 'enabled' : 'disabled';
-                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
-                    }
-                    if (enabled) document.body.classList.add('show-note-subheading'); else document.body.classList.remove('show-note-subheading');
-                })
-                .catch(function(){});
-            }
-
-            if (card) {
-                card.addEventListener('click', function() {
-                    var form = new FormData();
-                    form.append('action', 'get');
-                    form.append('key', 'show_note_subheading');
-                    fetch('api_settings.php', { method: 'POST', body: form })
-                    .then(function(r) { return r.json(); })
-                    .then(function(j) {
-                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                        var toSet = currently ? '0' : '1';
-                        var setForm = new FormData();
-                        setForm.append('action', 'set');
-                        setForm.append('key', 'show_note_subheading');
-                        setForm.append('value', toSet);
-                        return fetch('api_settings.php', { method: 'POST', body: setForm });
-                    })
-                    .then(function() { refreshStatus(); })
-                    .catch(function(e){ console.error(e); });
-                });
-            }
-
-            // initial load
-            refreshStatus();
-        })();
+        // Toggle logic moved to display.php
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;

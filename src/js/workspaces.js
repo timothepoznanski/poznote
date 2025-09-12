@@ -186,6 +186,10 @@ function displayWorkspaceMenu(menu, workspaces) {
     
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'display.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
+    menuHtml += '<i class="fas fa-eye"></i>';
+    menuHtml += '<span>Display</span>';
+    menuHtml += '</div>';
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'settings.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
     menuHtml += '<i class="fas fa-cog"></i>';
     menuHtml += '<span>Settings</span>';
