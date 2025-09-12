@@ -90,7 +90,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             <i class="fas fa-arrow-left"></i>
             Back to Notes
         </a>
-        <br>
+        <br><br>
 
         <div class="settings-grid">
             <!-- Moved from settings.php: user preferences -->
