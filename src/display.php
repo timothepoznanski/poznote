@@ -85,10 +85,12 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 </head>
 <body>
     <div class="settings-container">
+        <br>
         <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
             <i class="fas fa-arrow-left"></i>
-            Back
+            Back to Notes
         </a>
+        <br>
 
         <div class="settings-grid">
             <!-- Moved from settings.php: user preferences -->
