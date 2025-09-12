@@ -150,7 +150,9 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
         }
         
         .favorite-no {
-            color: #6c757d;
+            /* Use the same color as regular info values to match surrounding text */
+            color: inherit;
+            font-weight: 400;
         }
         
         .action-buttons {
@@ -309,17 +311,6 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             </div>
 
             <div class="info-row">
-                <div class="info-label">Favorites:</div>
-                <div class="info-value">
-                    <?php if ($isFavorite): ?>
-                        <span class="favorite-yes"><i class="fas fa-star"></i> Yes</span>
-                    <?php else: ?>
-                        <span class="favorite-no"><i class="far fa-star"></i> No</span>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="info-row">
                 <div class="info-label">Created:</div>
                 <div class="info-value"><?php echo htmlspecialchars($createdText); ?></div>
             </div>
@@ -338,14 +329,23 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
                         <button type="button" class="btn-save" onclick="saveSubheading(<?php echo $note_id; ?>)">Save</button>
                         <button type="button" class="btn-cancel" onclick="cancelSubheadingEdit()">Cancel</button>
                     </div>
-                    <?php $sub_js = json_encode($note['subheading'] ?? ($note['location'] ?? '')); ?>
-                    <button type="button" id="edit-subheading-btn" class="btn-edit" onclick="editSubheadingInline(<?php echo $sub_js; ?>)" title="Edit heading">✏️</button>
                 </div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">Tags:</div>
                 <div class="info-value"><?php echo htmlspecialchars($tagsText); ?></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Favorite:</div>
+                <div class="info-value">
+                    <?php if ($isFavorite): ?>
+                        <span class="favorite-yes"><i class="fas fa-star"></i> Yes</span>
+                    <?php else: ?>
+                        <span class="favorite-no"><i class="far fa-star"></i> No</span>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="info-row">
@@ -379,9 +379,10 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             });
         <?php endif; ?>
         function editSubheadingInline(currentSub) {
-            // Masquer le texte et le bouton d'édition
+            // Masquer le texte (le bouton d'édition a été retiré)
             document.getElementById('subheading-display').style.display = 'none';
-            document.getElementById('edit-subheading-btn').style.display = 'none';
+            var editBtnEl = document.getElementById('edit-subheading-btn');
+            if (editBtnEl) editBtnEl.style.display = 'none';
             
             // Afficher l'input et les boutons
             const input = document.getElementById('subheading-input');
@@ -429,9 +430,10 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             document.getElementById('subheading-input').style.display = 'none';
             document.getElementById('subheading-buttons').style.display = 'none';
             
-            // Afficher le texte et le bouton d'édition
+            // Afficher le texte (le bouton d'édition a été retiré)
             document.getElementById('subheading-display').style.display = 'inline';
-            document.getElementById('edit-subheading-btn').style.display = 'inline-block';
+            var editBtnEl2 = document.getElementById('edit-subheading-btn');
+            if (editBtnEl2) editBtnEl2.style.display = 'inline-block';
         }
         
         // Gérer la touche Enter pour sauvegarder
