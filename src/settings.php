@@ -188,7 +188,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     <i class="fas fa-hashtag"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3 id="folder-counts-title">Folder Note Counts 
+                    <h3 id="folder-counts-title">Show Folders Notes Counts 
                         <span id="folder-counts-status" class="ai-status disabled">disabled</span>
                     </h3>
                 </div>
@@ -200,7 +200,27 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     <i class="fas fa-smile"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
+                </div>
+            </div>
+
+            <!-- Show Created Date toggle -->
+            <div class="settings-card" id="show-created-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Show Note Creation Date <span id="show-created-status" class="ai-status disabled">disabled</span></h3>
+                </div>
+            </div>
+
+            <!-- Show Subheading toggle (renamed from Location) -->
+            <div class="settings-card" id="show-subheading-card">
+                <div class="settings-card-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Show Note Heading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
             
@@ -278,8 +298,9 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         }
         
         function toggleFolderNoteCounts() {
-            // Get current setting from localStorage (default: false - disabled)
-            const currentSetting = localStorage.getItem('showFolderNoteCounts') === 'true';
+            // Get current setting from localStorage (default: true - enabled)
+            const currentSettingRaw = localStorage.getItem('showFolderNoteCounts');
+            const currentSetting = currentSettingRaw === null ? true : (currentSettingRaw === 'true');
             const newSetting = !currentSetting;
             
             // Save new setting
@@ -304,8 +325,13 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         
         // Update badge on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+            const raw = localStorage.getItem('showFolderNoteCounts');
+            const showCounts = raw === null ? true : (raw === 'true');
             updateFolderCountsBadge(showCounts);
+            // apply immediately on main if opened
+            if (window.opener && window.opener.location.pathname.includes('index.php')) {
+                window.opener.location.reload();
+            }
         });
 
         // Emoji icons toggle logic
@@ -343,6 +369,100 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                         var setForm = new FormData();
                         setForm.append('action', 'set');
                         setForm.append('key', 'emoji_icons_enabled');
+                        setForm.append('value', toSet);
+                        return fetch('api_settings.php', { method: 'POST', body: setForm });
+                    })
+                    .then(function() { refreshStatus(); if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); })
+                    .catch(function(e){ console.error(e); });
+                });
+            }
+
+            // initial load
+            refreshStatus();
+        })();
+        
+        // Show created date toggle logic
+        (function() {
+            var card = document.getElementById('show-created-card');
+            var status = document.getElementById('show-created-status');
+
+            function refreshStatus() {
+                var form = new FormData();
+                form.append('action', 'get');
+                form.append('key', 'show_note_created');
+                fetch('api_settings.php', { method: 'POST', body: form })
+                .then(function(r) { return r.json(); })
+                .then(function(j) {
+                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
+                    if (status) {
+                        status.textContent = enabled ? 'enabled' : 'disabled';
+                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
+                    }
+                    if (enabled) document.body.classList.add('show-note-created'); else document.body.classList.remove('show-note-created');
+                })
+                .catch(function(){});
+            }
+
+            if (card) {
+                card.addEventListener('click', function() {
+                    var form = new FormData();
+                    form.append('action', 'get');
+                    form.append('key', 'show_note_created');
+                    fetch('api_settings.php', { method: 'POST', body: form })
+                    .then(function(r) { return r.json(); })
+                    .then(function(j) {
+                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                        var toSet = currently ? '0' : '1';
+                        var setForm = new FormData();
+                        setForm.append('action', 'set');
+                        setForm.append('key', 'show_note_created');
+                        setForm.append('value', toSet);
+                        return fetch('api_settings.php', { method: 'POST', body: setForm });
+                    })
+                    .then(function() { refreshStatus(); if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); })
+                    .catch(function(e){ console.error(e); });
+                });
+            }
+
+            // initial load
+            refreshStatus();
+        })();
+
+        // Show subheading toggle logic (renamed from location)
+        (function() {
+            var card = document.getElementById('show-subheading-card');
+            var status = document.getElementById('show-subheading-status');
+
+            function refreshStatus() {
+                var form = new FormData();
+                form.append('action', 'get');
+                form.append('key', 'show_note_subheading');
+                fetch('api_settings.php', { method: 'POST', body: form })
+                .then(function(r) { return r.json(); })
+                .then(function(j) {
+                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
+                    if (status) {
+                        status.textContent = enabled ? 'enabled' : 'disabled';
+                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
+                    }
+                    if (enabled) document.body.classList.add('show-note-subheading'); else document.body.classList.remove('show-note-subheading');
+                })
+                .catch(function(){});
+            }
+
+            if (card) {
+                card.addEventListener('click', function() {
+                    var form = new FormData();
+                    form.append('action', 'get');
+                    form.append('key', 'show_note_subheading');
+                    fetch('api_settings.php', { method: 'POST', body: form })
+                    .then(function(r) { return r.json(); })
+                    .then(function(j) {
+                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                        var toSet = currently ? '0' : '1';
+                        var setForm = new FormData();
+                        setForm.append('action', 'set');
+                        setForm.append('key', 'show_note_subheading');
                         setForm.append('value', toSet);
                         return fetch('api_settings.php', { method: 'POST', body: setForm });
                     })

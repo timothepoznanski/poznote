@@ -93,6 +93,57 @@
 .ws-col-action { justify-content: center; gap: 12px; }
 .ws-col-move { justify-content: center; }
 .ws-col-delete { justify-content: center; }
+
+/* Note list subline (created date & subheading) */
+.note-subline {
+    font-size: 0.95em; /* slightly smaller than normal */
+    color: #6b7280;
+    margin-top: -2px; /* space between title and subline */
+    margin-bottom: 18px; /* same space between subline and note content */
+    display: none; /* hidden by default */
+}
+.inline-subheading-input {
+    font-size: 0.95em;
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+.btn-inline-edit, .btn-inline-save, .btn-inline-cancel {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    margin-left: 6px;
+    font-size: 0.95em;
+}
+.btn-inline-save, .btn-inline-cancel {
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #111827;
+}
+/* Make clickable subheading appear neutral (not blue/underlined) */
+.subheading-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+.note-subline .note-sub-sep { margin: 0 6px; color: #cbd5e1; }
+
+/* When enabled via settings, show the created and/or location pieces */
+body.show-note-created .note-subline { display: inline-block; }
+body.show-note-subheading .note-subline { display: inline-block; }
+
+/* If only one piece is enabled, ensure spacing is correct */
+body:not(.show-note-created) .note-sub-created { display: none; }
+body:not(.show-note-subheading) .note-sub-subheading { display: none; }
+/* Hide separator when created date is not shown */
+body:not(.show-note-created) .note-sub-sep { display: none; }
+
+/* Right-column title spacing adjustments */
+.innernote h4 { margin: 0 0 8px 0; }
+.innernote h4 .css-title { width: 100%; box-sizing: border-box; }
 .workspace-list .action-btn {
     min-width: 140px;
     padding: 10px 16px;
@@ -1295,7 +1346,7 @@ img {
 .note-attachments-row {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     margin-top: 15px;
 }
 
@@ -1608,7 +1659,7 @@ textarea:focus{
 
 .noteentry{
     padding: 0;
-    padding-top: 5px; 
+    padding-top: 8px; 
     width:100%;
     border: 0 none white;
     overflow-wrap: break-word;

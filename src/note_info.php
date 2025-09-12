@@ -21,10 +21,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -87,7 +87,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     }
 }
 
-$locationText = $note['location'] ?: 'Not specified';
+$subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -184,7 +184,7 @@ $locationText = $note['location'] ?: 'Not specified';
             color: white;
         }
         
-        #location-input {
+        #subheading-input {
             width: 350px;
             max-width: 100%;
             padding: 7px 12px;
@@ -196,18 +196,51 @@ $locationText = $note['location'] ?: 'Not specified';
             transition: border-color 0.2s;
         }
         
-        #location-input:focus {
+        #subheading-input:focus {
             border-color: #007db8;
             outline: none;
         }
         
-        #location-buttons {
+        #subheading-buttons {
             display: flex;
             gap: 8px;
         }
+
+        /* Responsive adjustments for mobile: stack label/value and make inputs full-width */
+        @media (max-width: 640px) {
+            .info-row {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 12px 16px;
+            }
+            .info-label {
+                min-width: auto;
+                margin-bottom: 8px;
+            }
+            .info-value {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            #subheading-input {
+                width: 100% !important;
+                margin-right: 0;
+                display: block;
+            }
+            #subheading-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 6px;
+            }
+            .btn-save, .btn-cancel { padding: 8px 14px; }
+            #edit-subheading-btn { margin-left: 0; }
+        }
         
         .btn-save {
-            background: linear-gradient(90deg, #28a745 80%, #218838 100%);
+            background: linear-gradient(90deg, #28a745 100%);
             color: white;
             border: none;
             padding: 6px 18px;
@@ -215,16 +248,15 @@ $locationText = $note['location'] ?: 'Not specified';
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 1px 2px rgba(40,167,69,0.08);
             transition: background 0.2s;
         }
         
         .btn-save:hover {
-            background: linear-gradient(90deg, #218838 80%, #28a745 100%);
+            background: linear-gradient(90deg, #218838 100%);
         }
         
         .btn-cancel {
-            background: linear-gradient(90deg, #6c757d 80%, #5a6268 100%);
+            background: linear-gradient(90deg, #6c757d 100%);
             color: white;
             border: none;
             padding: 6px 18px;
@@ -232,12 +264,11 @@ $locationText = $note['location'] ?: 'Not specified';
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 1px 2px rgba(108,117,125,0.08);
             transition: background 0.2s;
         }
         
         .btn-cancel:hover {
-            background: linear-gradient(90deg, #5a6268 80%, #6c757d 100%);
+            background: linear-gradient(90deg, #5a6268 100%);
         }
         
         .btn-edit {
@@ -278,6 +309,17 @@ $locationText = $note['location'] ?: 'Not specified';
             </div>
 
             <div class="info-row">
+                <div class="info-label">Favorites:</div>
+                <div class="info-value">
+                    <?php if ($isFavorite): ?>
+                        <span class="favorite-yes"><i class="fas fa-star"></i> Yes</span>
+                    <?php else: ?>
+                        <span class="favorite-no"><i class="far fa-star"></i> No</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="info-row">
                 <div class="info-label">Created:</div>
                 <div class="info-value"><?php echo htmlspecialchars($createdText); ?></div>
             </div>
@@ -288,15 +330,16 @@ $locationText = $note['location'] ?: 'Not specified';
             </div>
 
             <div class="info-row">
-                <div class="info-label">Location:</div>
+                <div class="info-label">Subheading:</div>
                 <div class="info-value">
-                    <span id="location-display"><?php echo htmlspecialchars($locationText); ?></span>
-                    <input type="text" id="location-input" style="display: none;" />
-                    <div id="location-buttons" style="display: none; margin-left: 10px;">
-                        <button type="button" class="btn-save" onclick="saveLocation(<?php echo $note_id; ?>)">Save</button>
-                        <button type="button" class="btn-cancel" onclick="cancelLocationEdit()">Cancel</button>
+                    <span id="subheading-display"><?php echo htmlspecialchars($subheadingText); ?></span>
+                    <input type="text" id="subheading-input" style="display: none;" />
+                    <div id="subheading-buttons" style="display: none; margin-left: 10px;">
+                        <button type="button" class="btn-save" onclick="saveSubheading(<?php echo $note_id; ?>)">Save</button>
+                        <button type="button" class="btn-cancel" onclick="cancelSubheadingEdit()">Cancel</button>
                     </div>
-                    <button type="button" id="edit-location-btn" class="btn-edit" onclick="editLocationInline('<?php echo addslashes($note['location'] ?? ''); ?>')" title="Edit location">✏️</button>
+                    <?php $sub_js = json_encode($note['subheading'] ?? ($note['location'] ?? '')); ?>
+                    <button type="button" id="edit-subheading-btn" class="btn-edit" onclick="editSubheadingInline(<?php echo $sub_js; ?>)" title="Edit heading">✏️</button>
                 </div>
             </div>
 
@@ -329,69 +372,75 @@ $locationText = $note['location'] ?: 'Not specified';
 
     <script src="js/ui.js"></script>
     <script>
-        function editLocationInline(currentLocation) {
+        // If requested via query param, auto-open subheading edit
+        <?php if (isset($_GET['edit_subheading']) && $_GET['edit_subheading'] == '1'): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                try { editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? '')); ?>); } catch(e) { console.error(e); }
+            });
+        <?php endif; ?>
+        function editSubheadingInline(currentSub) {
             // Masquer le texte et le bouton d'édition
-            document.getElementById('location-display').style.display = 'none';
-            document.getElementById('edit-location-btn').style.display = 'none';
+            document.getElementById('subheading-display').style.display = 'none';
+            document.getElementById('edit-subheading-btn').style.display = 'none';
             
             // Afficher l'input et les boutons
-            const input = document.getElementById('location-input');
-            const buttons = document.getElementById('location-buttons');
+            const input = document.getElementById('subheading-input');
+            const buttons = document.getElementById('subheading-buttons');
             
             input.style.display = 'inline-block';
-            input.value = currentLocation || '';
+            input.value = currentSub || '';
             input.focus();
             input.select();
             
             buttons.style.display = 'inline-block';
         }
         
-        function saveLocation(noteId) {
-            const input = document.getElementById('location-input');
-            const newLocation = input.value.trim();
+        function saveSubheading(noteId) {
+            const input = document.getElementById('subheading-input');
+            const newSub = input.value.trim();
             
             // Envoyer la requête de mise à jour
-            fetch('api_update_location.php', {
+            fetch('api_update_subheading.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'note_id=' + encodeURIComponent(noteId) + '&location=' + encodeURIComponent(newLocation)
+                body: 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newSub)
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // Mettre à jour l'affichage et quitter le mode édition
-                    document.getElementById('location-display').textContent = newLocation || 'Not specified';
-                    cancelLocationEdit();
+                    document.getElementById('subheading-display').textContent = newSub || 'Not specified';
+                    cancelSubheadingEdit();
                     // Success: no popup shown per user request
                 } else {
-                    showNotificationPopup('Failed to update location: ' + (data.message || 'Unknown error'), 'error');
+                    showNotificationPopup('Failed to update heading: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotificationPopup('Network error while updating location', 'error');
+                showNotificationPopup('Network error while updating heading', 'error');
             });
         }
         
-        function cancelLocationEdit() {
+        function cancelSubheadingEdit() {
             // Masquer l'input et les boutons
-            document.getElementById('location-input').style.display = 'none';
-            document.getElementById('location-buttons').style.display = 'none';
+            document.getElementById('subheading-input').style.display = 'none';
+            document.getElementById('subheading-buttons').style.display = 'none';
             
             // Afficher le texte et le bouton d'édition
-            document.getElementById('location-display').style.display = 'inline';
-            document.getElementById('edit-location-btn').style.display = 'inline-block';
+            document.getElementById('subheading-display').style.display = 'inline';
+            document.getElementById('edit-subheading-btn').style.display = 'inline-block';
         }
         
         // Gérer la touche Enter pour sauvegarder
-        document.getElementById('location-input').addEventListener('keypress', function(e) {
+        document.getElementById('subheading-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const noteId = <?php echo $note_id; ?>;
-                saveLocation(noteId);
+                saveSubheading(noteId);
             } else if (e.key === 'Escape') {
-                cancelLocationEdit();
+                cancelSubheadingEdit();
             }
         });
     </script>
