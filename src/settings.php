@@ -55,7 +55,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         }
         .settings-sep {
             height: 1px;
-            background: #e6edf3;
+            background: #afb3b6ff;
             margin: 12px 0;
         }
         .settings-footer {
@@ -196,19 +196,6 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
             
-            <div class="settings-card" onclick="toggleFolderNoteCounts();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-hashtag"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3 id="folder-counts-title">Show Folders Notes Counts 
-                        <span id="folder-counts-status" class="ai-status disabled">disabled</span>
-                    </h3>
-                </div>
-            </div>
-
-            <!-- Toggle settings moved to display.php -->
-            
             <!-- Data Management -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
                 <div class="settings-card-icon">
@@ -228,82 +215,37 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
 
-            <!-- Separator before toggles -->
-            <div class="settings-sep" aria-hidden="true"></div>
+            <!-- (removed horizontal footer) -->
+                <!-- Separator before footer links -->
+                <div class="settings-sep" aria-hidden="true"></div>
 
-            <!-- Toggle settings group -->
-            <div class="settings-card" onclick="toggleFolderNoteCounts();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-hashtag"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3 id="folder-counts-title">Show Folders Notes Counts 
-                        <span id="folder-counts-status" class="ai-status disabled">disabled</span>
-                    </h3>
-                </div>
-            </div>
-
-            <!-- Emoji Icons toggle -->
-            <div class="settings-card" id="emoji-icons-card">
-                <div class="settings-card-icon">
-                    <i class="fas fa-smile"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Show Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
-                </div>
-            </div>
-
-            <!-- Show Created Date toggle -->
-            <div class="settings-card" id="show-created-card">
-                <div class="settings-card-icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Show Note Creation Date <span id="show-created-status" class="ai-status disabled">disabled</span></h3>
-                </div>
-            </div>
-
-            <!-- Show Subheading toggle (renamed from Location) -->
-            <div class="settings-card" id="show-subheading-card">
-                <div class="settings-card-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Show Note Heading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
-                </div>
-            </div>
-
-            <!-- Separator before footer links -->
-            <div class="settings-sep" aria-hidden="true"></div>
-
-            <div class="settings-footer">
-                <div class="settings-card" onclick="checkForUpdates();" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+                <!-- Footer links moved back into column as regular settings cards -->
+                <div class="settings-card" onclick="checkForUpdates();">
                     <div class="settings-card-icon">
                         <i class="fas fa-sync-alt"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3 style="margin:0; font-size:0.95rem;">Check for Updates</h3>
+                        <h3>Check for Updates</h3>
                     </div>
                 </div>
-                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+
+                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                     <div class="settings-card-icon">
                         <i class="fas fa-code-branch"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3 style="margin:0; font-size:0.95rem;">GitHub Repository</h3>
+                        <h3>GitHub Repository</h3>
                     </div>
                 </div>
-                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');" style="flex: 0 0 auto; border-bottom: none; padding: 6px 8px;">
+
+                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                     <div class="settings-card-icon">
                         <i class="fas fa-globe"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3 style="margin:0; font-size:0.95rem;">About Poznote</h3>
+                        <h3>About Poznote</h3>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Logout removed per UI simplification -->
         </div>
     </div>
     
@@ -364,8 +306,6 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 window.opener.location.reload();
             }
         });
-
-        // Toggle logic moved to display.php
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
