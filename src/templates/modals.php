@@ -40,8 +40,8 @@
         <p>Set the name shown on the login screen.</p>
         <input type="text" id="loginDisplayInput" placeholder="Display name" maxlength="255" />
         <div class="modal-buttons">
-            <button type="button" id="saveLoginDisplayBtn">Save</button>
-            <button type="button" onclick="closeLoginDisplayModal()">Cancel</button>
+            <button type="button" class="btn-cancel" onclick="closeLoginDisplayModal()">Cancel</button>
+            <button type="button" class="btn-primary" id="saveLoginDisplayBtn">Save</button>
         </div>
     </div>
 </div>
@@ -76,8 +76,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button id="saveFontSizeBtn">Save</button>
-            <button id="cancelFontSizeBtn">Cancel</button>
+            <button id="cancelFontSizeBtn" class="btn-cancel">Cancel</button>
+            <button id="saveFontSizeBtn" class="btn-primary">Save</button>
         </div>
     </div>
 </div>

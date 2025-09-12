@@ -53,6 +53,19 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             margin: 0;
             padding: 0;
         }
+        .settings-sep {
+            height: 1px;
+            background: #afb3b6ff;
+            margin: 12px 0;
+        }
+        .settings-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+            padding: 12px 6px;
+            border-top: 1px solid #eef2f5;
+            margin-top: 12px;
+        }
 
         .back-link { display: inline-flex; margin-bottom: 10px; }
 
@@ -136,10 +149,12 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 
 <body>
     <div class="settings-container">
+        <br>
         <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
             <i class="fas fa-arrow-left"></i>
             Back to Notes
         </a>
+        <br>
         
         <div class="settings-grid">
             <!-- Workspace Management -->
@@ -164,45 +179,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
             
-            <!-- User Preferences -->
-            <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Login Display Name</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="showNoteFontSizePrompt();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-text-height"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Note Font Size</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="toggleFolderNoteCounts();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-hashtag"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3 id="folder-counts-title">Folder Note Counts 
-                        <span id="folder-counts-status" class="ai-status disabled">disabled</span>
-                    </h3>
-                </div>
-            </div>
-
-            <!-- Emoji Icons toggle -->
-            <div class="settings-card" id="emoji-icons-card">
-                <div class="settings-card-icon">
-                    <i class="fas fa-smile"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
-                </div>
-            </div>
+            <!-- User Preferences (moved to Display page) -->
             
             <!-- Data Management -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
@@ -222,37 +199,34 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     <h3>Restore (Import)</h3>
                 </div>
             </div>
-            
-            <!-- System -->
-            <div class="settings-card" onclick="checkForUpdates();">
-                <div class="settings-card-icon">
-                    <i class="fas fa-sync-alt"></i>
+
+                <!-- Footer links moved back into column as regular settings cards -->
+                <div class="settings-card" onclick="checkForUpdates();">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3>Check for Updates</h3>
+                    </div>
                 </div>
-                <div class="settings-card-content">
-                    <h3>Check for Updates</h3>
+
+                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3>GitHub Repository</h3>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Links -->
-            <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-code-branch"></i>
+
+                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3>About Poznote</h3>
+                    </div>
                 </div>
-                <div class="settings-card-content">
-                    <h3>GitHub Repository</h3>
-                </div>
-            </div>
-            
-            <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>About Poznote</h3>
-                </div>
-            </div>
-            
-            <!-- Logout removed per UI simplification -->
         </div>
     </div>
     
@@ -278,8 +252,9 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         }
         
         function toggleFolderNoteCounts() {
-            // Get current setting from localStorage (default: false - disabled)
-            const currentSetting = localStorage.getItem('showFolderNoteCounts') === 'true';
+            // Get current setting from localStorage (default: true - enabled)
+            const currentSettingRaw = localStorage.getItem('showFolderNoteCounts');
+            const currentSetting = currentSettingRaw === null ? true : (currentSettingRaw === 'true');
             const newSetting = !currentSetting;
             
             // Save new setting
@@ -304,56 +279,14 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         
         // Update badge on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
+            const raw = localStorage.getItem('showFolderNoteCounts');
+            const showCounts = raw === null ? true : (raw === 'true');
             updateFolderCountsBadge(showCounts);
+            // apply immediately on main if opened
+            if (window.opener && window.opener.location.pathname.includes('index.php')) {
+                window.opener.location.reload();
+            }
         });
-
-        // Emoji icons toggle logic
-        (function() {
-            var card = document.getElementById('emoji-icons-card');
-            var status = document.getElementById('emoji-icons-status');
-
-            function refreshStatus() {
-                var form = new FormData();
-                form.append('action', 'get');
-                form.append('key', 'emoji_icons_enabled');
-                fetch('api_settings.php', { method: 'POST', body: form })
-                .then(function(r) { return r.json(); })
-                .then(function(j) {
-                    var enabled = j && j.success && (j.value === '1' || j.value === 'true');
-                    if (status) {
-                        status.textContent = enabled ? 'enabled' : 'disabled';
-                        status.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled');
-                    }
-                    if (enabled) document.body.classList.remove('emoji-hidden'); else document.body.classList.add('emoji-hidden');
-                })
-                .catch(function(){});
-            }
-
-            if (card) {
-                card.addEventListener('click', function() {
-                    var form = new FormData();
-                    form.append('action', 'get');
-                    form.append('key', 'emoji_icons_enabled');
-                    fetch('api_settings.php', { method: 'POST', body: form })
-                    .then(function(r) { return r.json(); })
-                    .then(function(j) {
-                        var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                        var toSet = currently ? '0' : '1';
-                        var setForm = new FormData();
-                        setForm.append('action', 'set');
-                        setForm.append('key', 'emoji_icons_enabled');
-                        setForm.append('value', toSet);
-                        return fetch('api_settings.php', { method: 'POST', body: setForm });
-                    })
-                    .then(function() { refreshStatus(); })
-                    .catch(function(e){ console.error(e); });
-                });
-            }
-
-            // initial load
-            refreshStatus();
-        })();
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;

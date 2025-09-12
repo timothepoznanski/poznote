@@ -35,6 +35,20 @@ try {
         // Column might already exist, ignore error
     }
 
+    // Add subheading column (renamed from location) for new code paths. Keep location for compatibility.
+    try {
+        $con->exec('ALTER TABLE entries ADD COLUMN subheading TEXT');
+    } catch(PDOException $e) {
+        // ignore if already exists
+    }
+
+    // Migrate existing values: if subheading empty and location present, copy location -> subheading
+    try {
+        $con->exec("UPDATE entries SET subheading = location WHERE (subheading IS NULL OR subheading = '') AND (location IS NOT NULL AND location <> '')");
+    } catch(PDOException $e) {
+        // ignore migration errors
+    }
+
     // Create folders table for empty folders (scoped by workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +81,11 @@ try {
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_language', 'en')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_desktop', '16')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_mobile', '16')");
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '0')");
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
+    // Controls to show/hide metadata under note title in notes list (enabled by default)
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
+    // Renamed setting: show_note_subheading (was show_note_location)
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_subheading', '1')");
 
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());

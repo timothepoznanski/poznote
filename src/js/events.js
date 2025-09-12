@@ -510,7 +510,7 @@ function initTextSelectionHandlers() {
                 
                 // Go up the DOM tree to find an editable area
                 var isTitleOrTagField = false;
-                while (currentElement && currentElement !== document.body) {
+                    while (currentElement && currentElement !== document.body) {
                     
                     // Check the current element and its direct children for title/tag fields
                     function checkElementAndChildren(element) {
@@ -538,6 +538,11 @@ function initTextSelectionHandlers() {
                     }
                     
                     if (checkElementAndChildren(currentElement)) {
+                        isTitleOrTagField = true;
+                        break;
+                    }
+                    // Treat selection inside the note metadata subline as title-like (do not toggle toolbar)
+                    if (currentElement.classList && currentElement.classList.contains('note-subline')) {
                         isTitleOrTagField = true;
                         break;
                     }

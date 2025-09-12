@@ -65,7 +65,30 @@ $res_right = $note_data['res_right'];
     <?php include 'templates/head_includes.php'; ?>
 </head>
 
-<body<?php echo ($is_mobile && $note != '') ? ' class="note-open"' : ''; ?>>  
+<?php
+// Read settings to control body classes (so settings toggles affect index display on reload)
+$extra_body_classes = '';
+try {
+    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmt->execute(['show_note_created']);
+    $v1 = $stmt->fetchColumn();
+    if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
+
+    $stmt->execute(['show_note_subheading']);
+    $v2 = $stmt->fetchColumn();
+    if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
+} catch (Exception $e) {
+    // ignore errors and continue without extra classes
+}
+
+// Preserve existing note-open class for mobile when needed
+$note_open_class = ($is_mobile && $note != '') ? 'note-open' : '';
+// Combine classes
+$body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_body_classes);
+?>
+
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
+    <!-- Debug console info removed in production -->
     <script>
     // Global error handler to catch all JavaScript errors
     window.addEventListener('error', function(event) {
@@ -227,7 +250,7 @@ $res_right = $note_data['res_right'];
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, favorite FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
+    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
@@ -694,6 +717,27 @@ $res_right = $note_data['res_right'];
                 echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
                 // Title
                 echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
+                // Subline: creation date and location (visible when enabled in settings)
+                $created_display = '';
+                if (!empty($row['created'])) {
+                    try {
+                        $dt = new DateTime($row['created']);
+                        $created_display = $dt->format('d/m/Y H:i');
+                    } catch (Exception $e) {
+                        $created_display = '';
+                    }
+                }
+                $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES);
+                echo '<div class="note-subline">';
+                echo '<span class="note-sub-created">' . ($created_display ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
+                if (!empty($created_display) && !empty($subheading_display)) echo ' <span class="note-sub-sep">-</span> ';
+                // Subheading display with inline editing elements
+                // Render subheading as plain text (clickable, but not styled as a blue link)
+                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . ($subheading_display ?: '') . '</span>';
+                echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
+                echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
+                echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
+                echo '</div>';
                 
                 // Get font size from settings based on device
                 $font_size = '16';
@@ -769,9 +813,86 @@ $res_right = $note_data['res_right'];
             </div>
         </div>
     </div>
+    <script>
+        function startEditSubheading(noteId) {
+            var disp = document.getElementById('subheading-display-' + noteId);
+            var input = document.getElementById('subheading-input-' + noteId);
+            var editBtn = document.getElementById('edit-subheading-' + noteId);
+            var saveBtn = document.getElementById('save-subheading-' + noteId);
+            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
+            if (!disp || !input) return;
+            disp.style.display = 'none';
+            editBtn.style.display = 'none';
+            input.style.display = 'inline-block';
+            saveBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+            input.focus();
+            input.select();
+            // on mobile, scroll into view
+            try { input.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
+        }
+
+        function cancelSubheadingInline(noteId) {
+            var disp = document.getElementById('subheading-display-' + noteId);
+            var input = document.getElementById('subheading-input-' + noteId);
+            var editBtn = document.getElementById('edit-subheading-' + noteId);
+            var saveBtn = document.getElementById('save-subheading-' + noteId);
+            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
+            if (!disp || !input) return;
+            input.style.display = 'none';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            disp.style.display = 'inline';
+            editBtn.style.display = 'inline-block';
+            // restore original value
+            input.value = disp.textContent.trim();
+        }
+
+        function saveSubheadingInline(noteId) {
+            var disp = document.getElementById('subheading-display-' + noteId);
+            var input = document.getElementById('subheading-input-' + noteId);
+            var editBtn = document.getElementById('edit-subheading-' + noteId);
+            var saveBtn = document.getElementById('save-subheading-' + noteId);
+            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
+            if (!disp || !input) return;
+            var newVal = input.value.trim();
+            // POST to api_update_subheading.php
+            var body = 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newVal);
+            fetch('api_update_subheading.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body
+            }).then(r => r.json()).then(function(data) {
+                if (data && data.success) {
+                    disp.textContent = newVal || '';
+                    cancelSubheadingInline(noteId);
+                } else {
+                    alert('Failed to save heading');
+                }
+            }).catch(function(e){ console.error(e); alert('Network error'); });
+        }
+        
+        function openNoteInfoEdit(noteId) {
+            var url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
+            if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+                url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
+            }
+            window.location.href = url;
+        }
+    </script>
     <?php endif; ?>
     
 </body>
+<script>
+    // Ensure this function is defined globally so inline onclick handlers can call it even when AI modal block isn't rendered
+    function openNoteInfoEdit(noteId) {
+        var url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
+        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+            url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
+        }
+        window.location.href = url;
+    }
+</script>
 <script src="js/index-config.js"></script>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js"></script>
