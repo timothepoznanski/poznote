@@ -1284,7 +1284,7 @@ input[type="search"]::-webkit-search-results-decoration {
     
     h3 {
         font-size: 18px !important;
-        margin-bottom: 12px !important;
+        /* margin-bottom: 12px !important; */
     }
     
     /* Settings section spacing */
