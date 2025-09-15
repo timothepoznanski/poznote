@@ -727,17 +727,40 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         $created_display = '';
                     }
                 }
+                // Prepare subheading/location display (prefer explicit subheading, fallback to location)
                 $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES);
-                echo '<div class="note-subline">';
-                echo '<span class="note-sub-created">' . ($created_display ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
-                if (!empty($created_display) && !empty($subheading_display)) echo ' <span class="note-sub-sep">-</span> ';
-                // Subheading display with inline editing elements
-                // Render subheading as plain text (clickable, but not styled as a blue link)
-                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . ($subheading_display ?: '') . '</span>';
-                echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
-                echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
-                echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
-                echo '</div>';
+
+                // Determine whether we actually need to render the subline block.
+                $show_created_setting = false;
+                $show_subheading_setting = false;
+                try {
+                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                    $stmt->execute(['show_note_created']);
+                    $v1 = $stmt->fetchColumn();
+                    if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
+
+                    $stmt->execute(['show_note_subheading']);
+                    $v2 = $stmt->fetchColumn();
+                    if ($v2 === '1' || $v2 === 'true') $show_subheading_setting = true;
+                } catch (Exception $e) {
+                    // keep defaults (false) on error
+                }
+
+                $has_created = !empty($created_display) && $show_created_setting;
+                $has_subheading = !empty($subheading_display) && $show_subheading_setting;
+
+                if ($has_created || $has_subheading) {
+                    echo '<div class="note-subline">';
+                    echo '<span class="note-sub-created">' . ($has_created ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
+                    if ($has_created && $has_subheading) echo ' <span class="note-sub-sep">-</span> ';
+                    // Subheading display with inline editing elements
+                    // Render subheading as plain text (clickable, but not styled as a blue link)
+                    echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . ($has_subheading ? $subheading_display : '') . '</span>';
+                    echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
+                    echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
+                    echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
+                    echo '</div>';
+                }
                 
                 // Get font size from settings based on device
                 $font_size = '16';
