@@ -91,12 +91,73 @@
 @-webkit-keyframes fa-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(359deg); } }
 @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
 
+/* Global scaling for all custom SVG icons */
+.fas::before,
+.fa::before,
+.far::before {
+  transform: scale(1.2);
+  transform-origin: center;
+  transition: filter 0.3s ease;
+}
+
+/* Blue tint for toolbar icons by default - #007DB8 */
+.toolbar-btn .fas::before,
+.toolbar-btn .fa::before,
+.toolbar-btn .far::before {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Darker blue on hover for toolbar icons */
+.toolbar-btn:hover .fas::before,
+.toolbar-btn:hover .fa::before,
+.toolbar-btn:hover .far::before {
+  filter: brightness(0) saturate(100%) invert(20%) sepia(95%) saturate(1800%) hue-rotate(195deg) brightness(90%) contrast(110%);
+}
+
+/* Hover effect for other buttons and links - #007DB8 */
+button:hover .fas::before,
+button:hover .fa::before,
+button:hover .far::before,
+a:hover .fas::before,
+a:hover .fa::before,
+a:hover .far::before {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+.fa-align-left-svg,
+.fas.fa-align-left::before {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('../../webfonts/align-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-expand-svg,
+.fas.fa-expand::before {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('../../webfonts/maximize-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 /* SVG-based robot icon for offline use */
 .fa-robot-svg {
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNjQwIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDcuMC4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTMzNiA0OEMzMzYgMzkuMiAzMjguOCAzMiAzMjAgMzJDMzExLjIgMzIgMzA0IDM5LjIgMzA0IDQ4TDMwNCAxMjhMMTkyIDEyOEMxMzkgMTI4IDk2IDE3MSA5NiAyMjRMOTYgNDQ4Qzk2IDUwMSAxMzkgNTQ0IDE5MiA1NDRMNDQ4IDU0NEM1MDEgNTQ0IDU0NCA1MDEgNTQ0IDQ0OEw1NDQgMjI0QzU0NCAxNzEgNTAxIDEyOCA0NDggMTI4TDMzNiAxMjhMMzM2IDQ4ek0zMjAgMTYwTDQ0OCAxNjBDNDgzLjMgMTYwIDUxMiAxODguNyA1MTIgMjI0TDUxMiA0NDhDNTEyIDQ4My4zIDQ4My4zIDUxMiA0NDggNTEyTDE5MiA1MTJDMTU2LjcgNTEyIDEyOCA0ODMuMyAxMjggNDQ4TDEyOCAyMjRDMTI4IDE4OC43IDE1Ni43IDE2MCAxOTIgMTYwTDMyMCAxNjB6TTE5MiA0MzJDMTkyIDQ0MC44IDE5OS4yIDQ0OCAyMDggNDQ4TDI0MCA0NDhDMjQ4LjggNDQ4IDI1NiA0NDAuOCAyNTYgNDMyQzI1NiA0MjMuMiAyNDguOCA0MTYgMjQwIDQxNkwyMDggNDE2QzE5OS4yIDQxNiAxOTIgNDIzLjIgMTkyIDQzMnpNMjg4IDQzMkMyODggNDQwLjggMjk1LjIgNDQ4IDMwNCA0NDhMMzM2IDQ0OEMzNDQuOCA0NDggMzUyIDQ0MC44IDM1MiA0MzJDMzUyIDQyMy4yIDM0NC44IDQxNiAzMzYgNDE2TDMwNCA0MTZDMjk1LjIgNDE2IDI4OCA0MjMuMiAyODggNDMyek0zODQgNDMyQzM4NCA0NDAuOCAzOTEuMiA0NDggNDAwIDQ0OEw0MzIgNDQ4QzQ0MC44IDQ0OCA0NDggNDQwLjggNDQ4IDQzMkM0NDggNDIzLjIgNDQwLjggNDE2IDQzMiA0MTZMNDAwIDQxNkMzOTEuMiA0MTYgMzg0IDQyMy4yIDM4NCA0MzJ6TTI3MiAzMDRDMjcyIDMyMS43IDI1Ny43IDMzNiAyNDAgMzM2QzIyMi4zIDMzNiAyMDggMzIxLjcgMjA4IDMwNEMyMDggMjg2LjMgMjIyLjMgMjcyIDI0MCAyNzJDMjU3LjcgMjcyIDI3MiAyODYuMyAyNzIgMzA0ek0yNDAgMjQwQzIwNC43IDI0MCAxNzYgMjY4LjcgMTc2IDMwNEMxNzYgMzM5LjMgMjA0LjcgMzY4IDI0MCAzNjhDMjc1LjMgMzY4IDMwNCAzMzkuMyAzMDQgMzA0QzMwNCAyNjguNyAyNzUuMyAyNDAgMjQwIDI0MHpNNDAwIDMzNkMzODIuMyAzMzYgMzY4IDMyMS43IDM2OCAzMDRDMzY4IDI4Ni4zIDM4Mi4zIDI3IgNDAwIDI3MkM0MTcuNyAyNzIgNDMyIDI4Ni4zIDQzMiAzMDRDNzMyIDMyMS43IDQxNy43IDMzNiA0MDAgMzM2ek0zMzYgMzA0QzMzYiAzMzkuMyAzNjQuNyAzNjggNDAwIDM2OEM0MzUuMyAzNjggNDY0IDMzOS4zIDQ2NCAzMDRDNzY0IDI2OC43IDQzNS4zIDI0MCA0MDAgMjQwQzM2NC43IDI0MCAzMzYgMjY4LjcgMzM2IDMwNHpNNjQgMjcyQzY0IDI2My4yIDU2LjggMjU2IDQ4IDI1NkMzOS4yIDI1NiAzMiAyNjMuMiAzMiAyNzJMMyIgNDAwQzMyIDQwOC44IDM5LjIgNDE2IDQ4IDQxNkM1Ni44IDQxNiA2NCA0MDguOCA2NCA0MDBMNjQgMjcyek01OTIgMjU2QzU4My4yIDI1NiA1NzYgMjYzLjIgNTc2IDI3Mkw1NzYgNDAwQzU3NiA0MDguOCA1ODMuMiA0MTYgNTkyIDQxNkM2MDAuOCA0MTYgNjA4IDQwOC44IDYwOCA0MDBMNjA4IDI3MkM2MDggMjYzLjIgNjAwLjggMjU2IDU5MiAyNTZ6Ii8+PC9zdmc+');
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('../../webfonts/robot-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -111,4 +172,724 @@
 /* Support rotation animation for SVG robot icon */
 .fa-robot-svg.rotating {
   animation: fa-spin 2s infinite linear;
+}
+
+/* Custom SVG icons for offline use */
+.fa-smile-svg,
+.fas.fa-smile::before {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  background-image: url('../../webfonts/icons-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-folder-svg,
+.fas.fa-folder::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/folder-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-folder-open-svg,
+.fas.fa-folder-open::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/folder-open-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-edit-svg,
+.fas.fa-edit::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/pen-to-square-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-trash-svg,
+.fas.fa-trash::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/trash-can-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-download-svg,
+.fas.fa-download::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/download-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-save-svg,
+.fas.fa-save::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/floppy-disk-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-link-svg,
+.fas.fa-link::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/link-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-unlink-svg,
+.fas.fa-unlink::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/link-slash-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-paperclip-svg,
+.fas.fa-paperclip::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/paperclip-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-minus-svg,
+.fas.fa-minus::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/minus-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-info-circle-svg,
+.fas.fa-info-circle::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/info-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-search-svg,
+.fas.fa-search::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/magnifying-glass-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-star-svg,
+.fas.fa-star::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/star-solid-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.far.fa-star::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/star-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-layer-group-svg,
+.fas.fa-layer-group::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/layer-group-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-cog-svg,
+.fas.fa-cog::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/gear-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-eye-svg,
+.fas.fa-eye::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/eye-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-home-svg,
+.fas.fa-home::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/house-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-bold-svg,
+.fas.fa-bold::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/bold-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-italic-svg,
+.fas.fa-italic::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/italic-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-underline-svg,
+.fas.fa-underline::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/underline-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-eraser-svg,
+.fas.fa-eraser::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/eraser-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-strikethrough-svg,
+.fas.fa-strikethrough::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/strikethrough-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-palette-svg,
+.fas.fa-palette::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/palette-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-fill-drip-svg,
+.fas.fa-fill-drip::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/highlighter-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-list-ul-svg,
+.fas.fa-list-ul::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/list-ul-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-list-ol-svg,
+.fas.fa-list-ol::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/list-ol-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-text-height-svg,
+.fas.fa-text-height::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/text-height-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-code-svg,
+.fas.fa-code::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/code-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-terminal-svg,
+.fas.fa-terminal::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/terminal-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-tag-svg,
+.fas.fa-tag::before,
+.fa.fa-tag::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/tag-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-tags-svg,
+.fas.fa-tags::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/tags-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-sign-out-alt-svg,
+.fas.fa-sign-out-alt::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/right-from-bracket-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-sync-alt-svg,
+.fas.fa-sync-alt::before,
+.fas.fa-rotate::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/rotate-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-github-svg,
+.fab.fa-github::before,
+.fas.fa-github::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/github-brands-solid-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-globe-svg,
+.fas.fa-globe::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/earth-americas-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-upload-svg,
+.fas.fa-upload::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/upload-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-arrow-left-svg,
+.fas.fa-arrow-left::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/arrow-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-info-svg,
+.fas.fa-info::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/info-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-file-alt-svg,
+.fas.fa-file-alt::before,
+.fas.fa-file-lines::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/file-lines-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-plus-svg,
+.fas.fa-plus::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/plus-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-calendar-alt-svg,
+.fas.fa-calendar-alt::before,
+.fas.fa-calendar::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/calendar-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-code-branch-svg,
+.fas.fa-code-branch::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/code-branch-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-map-marker-alt-svg,
+.fas.fa-map-marker-alt::before,
+.fas.fa-map-marker::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/note-sticky-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-user-svg,
+.fas.fa-user::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/user-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-hashtag-svg,
+.fas.fa-hashtag::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/hashtag-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-align-left-svg,
+.fas.fa-align-left::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/align-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-arrow-circle-left-svg,
+.fas.fa-arrow-circle-left::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/arrow-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-trash-alt-svg,
+.fa.fa-trash-alt::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/broom-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-trash-restore-alt-svg,
+.fa.fa-trash-restore-alt::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/trash-can-arrow-up-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }

@@ -34,7 +34,6 @@ function createNewNote() {
 
 function saveNote() {
     if(noteid == -1 || noteid === null || noteid === undefined || noteid == '') {
-        showNotificationPopup("Modify a note and try again.");
         return;
     }
     
