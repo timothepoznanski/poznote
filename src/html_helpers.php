@@ -53,7 +53,7 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
     $search_value = htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES);
     $clear_button = '';
     if (!empty($search) || !empty($tags_search)) {
-        $clear_button = '<button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="fas fa-times-circle"></span></button>';
+        $clear_button = '<button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>';
     }
     
     // Search type buttons

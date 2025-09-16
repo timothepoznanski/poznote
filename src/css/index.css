@@ -1118,9 +1118,11 @@ a.links_arbo_left.selected-note {
     transition: background 0.2s, color 0.2s;
 }
 
-.searchbar-clear .fa-times-circle {
+.searchbar-clear .clear-icon {
     color: #d32f2f;
-    font-size: 0.8em;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .contains_forms_search
