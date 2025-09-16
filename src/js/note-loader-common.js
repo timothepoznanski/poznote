@@ -547,6 +547,29 @@ function reinitializeNoteContent() {
         }, 100);
     }
 
+    // If the loaded note(s) include any tasklist entries, initialize them so the JSON content
+    // is replaced with the interactive task list UI when notes are loaded via AJAX.
+    try {
+        const taskEntries = document.querySelectorAll('[data-note-type="tasklist"]');
+        taskEntries.forEach(function(entry) {
+            const idAttr = entry.id || '';
+            if (!idAttr) return;
+            const noteId = idAttr.replace('entry', '');
+            if (typeof initializeTaskList === 'function') {
+                // Call initializeTaskList after a short delay to ensure the DOM is stable
+                setTimeout(function() {
+                    try {
+                        initializeTaskList(noteId, 'tasklist');
+                    } catch (e) {
+                        console.error('Error initializing tasklist for noteId', noteId, e);
+                    }
+                }, 50);
+            }
+        });
+    } catch (e) {
+        console.error('Error while initializing tasklist entries after AJAX load:', e);
+    }
+
     // Re-initialize toolbar functionality
     if (typeof initializeToolbarHandlers === 'function') {
         initializeToolbarHandlers();
