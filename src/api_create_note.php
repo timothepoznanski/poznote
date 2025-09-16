@@ -24,6 +24,7 @@ $folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Default'
 $workspace = isset($input['workspace']) ? trim($input['workspace']) : 'Poznote';
 $entry = isset($input['entry']) ? $input['entry'] : ''; // HTML content for the file
 $entrycontent = isset($input['entrycontent']) ? $input['entrycontent'] : ''; // Text content for database
+$type = isset($input['type']) ? trim($input['type']) : 'note'; // Note type
 
 // Validation des tags : supprimer les tags qui contiennent des espaces
 if (!empty($tags)) {
@@ -57,9 +58,9 @@ if ($check->fetchColumn() > 0) {
 // Use the original heading (no auto-rename) since duplicates are disallowed
 $heading = $originalHeading;
 
-$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, created, updated) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
 
-if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace])) {
+if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace, $type])) {
     $id = $con->lastInsertId();
     
     // Create the HTML file for the note content

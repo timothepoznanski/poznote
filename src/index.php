@@ -361,8 +361,18 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             createMenu.remove();
         };
         
+        // Task list item
+        var taskListItem = document.createElement('button');
+        taskListItem.className = 'create-menu-item';
+        taskListItem.innerHTML = '<i class="fas fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list note';
+        taskListItem.onclick = function() {
+            createTaskListNote();
+            createMenu.remove();
+        };
+        
         createMenu.appendChild(noteItem);
         createMenu.appendChild(folderItem);
+        createMenu.appendChild(taskListItem);
         
         var plusButton = document.querySelector('.sidebar-plus');
         if (plusButton && plusButton.parentNode) {
@@ -383,6 +393,43 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     
     // Make function globally available
     window.toggleCreateMenu = toggleCreateMenu;
+    
+    // Task list note creation function
+    function createTaskListNote() {
+        var params = new URLSearchParams({
+            now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
+            folder: selectedFolder,
+            workspace: selectedWorkspace || 'Poznote',
+            type: 'tasklist'
+        });
+        
+        fetch("insert_new.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
+            body: params.toString()
+        })
+        .then(function(response) { return response.text(); })
+        .then(function(data) {
+            try {
+                var res = JSON.parse(data);
+                if(res.status === 1) {
+                    window.scrollTo(0, 0);
+                    var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + encodeURIComponent(res.heading);
+                } else {
+                    showNotificationPopup(res.error || 'Error creating task list note', 'error');
+                }
+            } catch(e) {
+                showNotificationPopup('Error creating task list note: ' + data, 'error');
+            }
+        })
+        .catch(function(error) {
+            showNotificationPopup('Network error: ' + error.message, 'error');
+        });
+    }
+    
+    // Make function globally available
+    window.createTaskListNote = createTaskListNote;
     </script>
     
     <!-- RESIZE HANDLE (Desktop only) -->
@@ -405,8 +452,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 {
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
-                    $title = $row['heading'];             
-                    $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                    $title = $row['heading'];
+                    $note_type = $row['type'] ?? 'note';
+                    
+                    if ($note_type === 'tasklist') {
+                        // For task list notes, use the database content (JSON) instead of HTML file
+                        $entryfinal = $row['entry'] ?? '';
+                    } else {
+                        // For regular notes, use the HTML file content
+                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                    }
                
            
                 // Harmonized desktop/mobile display:
@@ -781,10 +836,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 }
                 
                 // Note content with font size style
-                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true">'.$entryfinal.'</div>';
+                $note_type = $row['type'] ?? 'note';
+                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'">'.$entryfinal.'</div>';
                 echo '<div class="note-bottom-space"></div>';
                 echo '</div>';
                 echo '</div>';
+                
+                // Initialize task list if this is a task list note
+                if ($note_type === 'tasklist') {
+                    echo '<script>initializeTaskList('.$row['id'].', "'.$note_type.'");</script>';
+                }
             }
         } else {
             // Check if we're in search mode (search or tags search active)

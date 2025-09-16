@@ -621,3 +621,6 @@ function executeLinkModalAction() {
         }
     }, 50);
 }
+
+// Expose setSaveButtonRed globally for use in other modules
+window.setSaveButtonRed = setSaveButtonRed;

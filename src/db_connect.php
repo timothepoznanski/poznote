@@ -25,7 +25,8 @@ try {
         folder TEXT DEFAULT "Default",
         workspace TEXT DEFAULT "Poznote",
         favorite INTEGER DEFAULT 0,
-        attachments TEXT
+        attachments TEXT,
+        type TEXT DEFAULT "note"
     )');
 
     // Add location column if it doesn't exist (for backward compatibility)
@@ -38,6 +39,13 @@ try {
     // Add subheading column (renamed from location) for new code paths. Keep location for compatibility.
     try {
         $con->exec('ALTER TABLE entries ADD COLUMN subheading TEXT');
+    } catch(PDOException $e) {
+        // ignore if already exists
+    }
+
+    // Add type column for note types (regular note, tasklist, etc.)
+    try {
+        $con->exec('ALTER TABLE entries ADD COLUMN type TEXT DEFAULT "note"');
     } catch(PDOException $e) {
         // ignore if already exists
     }

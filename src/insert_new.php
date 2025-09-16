@@ -11,16 +11,17 @@
 	$now = $_POST['now'];
 	$workspace = $_POST['workspace'] ?? 'Poznote';
 	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
+	$type = $_POST['type'] ?? 'note';
 	$created_date = date("Y-m-d H:i:s", (int)$now);
 	
 	// Generate unique title for Untitled notes (workspace-aware)
 	$uniqueTitle = generateUniqueTitle('Untitled note', null, $workspace);
 
-	// Insert the new note (include workspace)
-	$query = "INSERT INTO entries (heading, entry, folder, workspace, created, updated) VALUES (?, '', ?, ?, ?, ?)";
+	// Insert the new note (include workspace and type)
+	$query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?)";
 	$stmt = $con->prepare($query);
 
-	if ($stmt->execute([$uniqueTitle, $folder, $workspace, $created_date, $created_date])) {
+	if ($stmt->execute([$uniqueTitle, $folder, $workspace, $type, $created_date, $created_date])) {
 		$id = $con->lastInsertId();
 
 		// Detect AJAX/Fetch requests (prefer JSON response) versus direct browser open
