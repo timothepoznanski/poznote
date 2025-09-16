@@ -149,6 +149,18 @@ function showShareModal(url) {
     // Remove the dividing line above buttons for this share modal
     buttonsDiv.style.borderTop = 'none';
 
+    // Open button: opens the URL in a new tab (keeps modal open)
+    const openBtn = document.createElement('button');
+    openBtn.type = 'button';
+    openBtn.className = 'btn-primary btn-open';
+    openBtn.textContent = 'Open';
+    openBtn.onclick = function(ev) {
+        try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+        // Open in new tab with noopener for safety
+        window.open(url, '_blank', 'noopener');
+    };
+    buttonsDiv.appendChild(openBtn);
+
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn-cancel';
