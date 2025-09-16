@@ -97,7 +97,7 @@
 .far::before {
   transform: scale(1.2);
   transform-origin: center;
-  transition: filter 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 /* Blue tint for toolbar icons by default - #007DB8 */
@@ -107,11 +107,12 @@
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Darker blue on hover for toolbar icons */
+/* More visible hover effect for toolbar icons */
 .toolbar-btn:hover .fas::before,
 .toolbar-btn:hover .fa::before,
 .toolbar-btn:hover .far::before {
-  filter: brightness(0) saturate(100%) invert(20%) sepia(95%) saturate(1800%) hue-rotate(195deg) brightness(90%) contrast(110%);
+  filter: brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(3500%) hue-rotate(195deg) brightness(85%) contrast(120%);
+  transform: scale(1.3);
 }
 
 /* Hover effect for other buttons and links - #007DB8 */
@@ -121,6 +122,12 @@ button:hover .far::before,
 a:hover .fas::before,
 a:hover .fa::before,
 a:hover .far::before {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* Blue color for plus icon - #007DB8 */
+.fa-plus::before,
+.fas.fa-plus::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
@@ -172,6 +179,13 @@ a:hover .far::before {
 /* Support rotation animation for SVG robot icon */
 .fa-robot-svg.rotating {
   animation: fa-spin 2s infinite linear;
+}
+
+/* Hover effect for robot icon */
+.fa-robot-svg:hover {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(3500%) hue-rotate(195deg) brightness(85%) contrast(120%);
+  transform: scale(1.35);
+  transition: all 0.3s ease;
 }
 
 /* Custom SVG icons for offline use */
@@ -892,4 +906,50 @@ a:hover .far::before {
   font-family: inherit !important;
   font-style: normal !important;
   content: '';
+}
+
+/* Enhanced hover effects - Dark blue color */
+.fa-save:hover::before,
+.fa-smile:hover::before,
+.fa-trash:hover::before,
+.fa-folder:hover::before,
+.fa-download:hover::before,
+.fa-search:hover::before,
+.fa-folder-open:hover::before,
+.fa-star:hover::before,
+.fa-hashtag:hover::before,
+.fa-tag:hover::before,
+.fa-tags:hover::before,
+.fa-cog:hover::before,
+.fa-home:hover::before,
+.fa-plus:hover::before,
+.fa-pencil-alt:hover::before,
+.fa-edit:hover::before,
+.fa-times:hover::before,
+.fa-close:hover::before,
+.fa-remove:hover::before,
+.fa-undo:hover::before,
+.fa-undo-alt:hover::before,
+.fa-database:hover::before,
+.fa-file-export:hover::before,
+.fa-file-import:hover::before,
+.fa-upload:hover::before,
+.fa-check:hover::before,
+.fa-chevron-left:hover::before,
+.fa-chevron-right:hover::before,
+.fa-expand-alt:hover::before,
+.fa-compress-alt:hover::before,
+.fa-arrows-alt:hover::before,
+.fa-arrow-left:hover::before,
+.fa-arrow-right:hover::before,
+.fa-eye:hover::before,
+.fa-eye-slash:hover::before,
+.fa-trash-restore-alt:hover::before {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(3500%) hue-rotate(195deg) brightness(85%) contrast(120%) !important;
+  transform: scale(1.35) !important;
+}
+
+/* Larger icons for left sidebar */
+.folder-icon::before {
+  transform: scale(1.4) !important;
 }
