@@ -37,7 +37,13 @@ try {
 
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-    $url = $protocol . '://' . $host . dirname($_SERVER['SCRIPT_NAME']) . '/public_note.php?token=' . $token;
+    // Build path safely: avoid double slashes when script is in webroot
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+    if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
+        $scriptDir = '';
+    }
+    $scriptDir = rtrim($scriptDir, '/\\');
+    $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token;
 
     header('Content-Type: application/json');
     echo json_encode(['url' => $url]);
