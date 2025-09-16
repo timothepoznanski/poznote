@@ -89,7 +89,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <title>Tags - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	<link rel="stylesheet" href="vendor/fontawesome/local-icons.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags-mobile.css"/>

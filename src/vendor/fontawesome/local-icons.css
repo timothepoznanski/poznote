@@ -1,0 +1,110 @@
+/* Minimal local Font Awesome loader using existing webfonts in src/webfonts
+   This file provides the @font-face declarations and a subset of icon
+   class-to-unicode mappings used by the app so it can work offline.
+   It intentionally keeps only the icons used by the project.
+*/
+
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 900;
+  src: url('../../webfonts/fa-solid-900.woff2') format('woff2'),
+       url('../../webfonts/fa-solid-900.woff') format('woff'),
+       url('../../webfonts/fa-solid-900.ttf') format('truetype');
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../../webfonts/fa-regular-400.woff2') format('woff2'),
+       url('../../webfonts/fa-regular-400.woff') format('woff'),
+       url('../../webfonts/fa-regular-400.ttf') format('truetype');
+  font-display: block;
+}
+
+/* Base helpers */
+.fa, .fas, .far, .fal, .fab {
+  font-family: 'Font Awesome 5 Free' !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.fas { font-weight: 900; }
+.far { font-weight: 400; }
+
+/* Common icon rule: use pseudo-element content */
+[class^="fa-"], [class*=" fa-"] {
+  display: inline-block;
+}
+
+/* Icon mappings used in the app (subset) */
+.fa-home:before { content: "\f015"; }
+.fa-file-alt:before { content: "\f15c"; }
+.fa-folder:before { content: "\f07b"; }
+.fa-folder-open:before { content: "\f07c"; }
+.fa-star:before { content: "\f005"; }
+.fa-paperclip:before { content: "\f0c6"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-search:before { content: "\f002"; }
+.fa-times-circle:before { content: "\f057"; }
+.fa-info-circle:before { content: "\f05a"; }
+.fa-download:before { content: "\f019"; }
+.fa-upload:before { content: "\f093"; }
+.fa-plus:before { content: "\f067"; }
+.fa-exclamation-triangle:before { content: "\f071"; }
+.fa-paperclip:before { content: "\f0c6"; }
+.fa-trash:before { content: "\f1f8"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-robot:before { content: "\f544"; }
+.fa-bold:before { content: "\f032"; }
+.fa-italic:before { content: "\f033"; }
+.fa-underline:before { content: "\f0cd"; }
+.fa-strikethrough:before { content: "\f0cc"; }
+.fa-link:before { content: "\f0c1"; }
+.fa-unlink:before { content: "\f127"; }
+.fa-palette:before { content: "\f53f"; }
+.fa-fill-drip:before { content: "\f576"; }
+.fa-list-ul:before { content: "\f0ca"; }
+.fa-list-ol:before { content: "\f0cb"; }
+.fa-text-height:before { content: "\f034"; }
+.fa-code:before { content: "\f121"; }
+.fa-terminal:before { content: "\f120"; }
+.fa-eraser:before { content: "\f12d"; }
+.fa-smile:before { content: "\f118"; }
+.fa-minus:before { content: "\f068"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-download:before { content: "\f019"; }
+.fa-robot:before { content: "\f544"; }
+.fa-info-circle:before { content: "\f05a"; }
+.fa-check-circle:before { content: "\f058"; }
+.fa-exclamation-triangle:before { content: "\f071"; }
+
+/* Additional icons discovered in templates/js */
+.fa-spinner:before { content: "\f110"; }
+.fa-times:before { content: "\f00d"; }
+.fa-check:before { content: "\f00c"; }
+.fa-file-pdf:before { content: "\f1c1"; }
+.fa-external-link-alt:before { content: "\f35d"; }
+
+/* spin helper */
+.fa-spin { -webkit-animation: fa-spin 2s infinite linear; animation: fa-spin 2s infinite linear; }
+@-webkit-keyframes fa-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(359deg); } }
+@keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
+
+/* SVG-based robot icon for offline use */
+.fa-robot-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNjQwIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDcuMC4xIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTMzNiA0OEMzMzYgMzkuMiAzMjguOCAzMiAzMjAgMzJDMzExLjIgMzIgMzA0IDM5LjIgMzA0IDQ4TDMwNCAxMjhMMTkyIDEyOEMxMzkgMTI4IDk2IDE3MSA5NiAyMjRMOTYgNDQ4Qzk2IDUwMSAxMzkgNTQ0IDE5MiA1NDRMNDQ4IDU0NEM1MDEgNTQ0IDU0NCA1MDEgNTQ0IDQ0OEw1NDQgMjI0QzU0NCAxNzEgNTAxIDEyOCA0NDggMTI4TDMzNiAxMjhMMzM2IDQ4ek0zMjAgMTYwTDQ0OCAxNjBDNDgzLjMgMTYwIDUxMiAxODguNyA1MTIgMjI0TDUxMiA0NDhDNTEyIDQ4My4zIDQ4My4zIDUxMiA0NDggNTEyTDE5MiA1MTJDMTU2LjcgNTEyIDEyOCA0ODMuMyAxMjggNDQ4TDEyOCAyMjRDMTI4IDE4OC43IDE1Ni43IDE2MCAxOTIgMTYwTDMyMCAxNjB6TTE5MiA0MzJDMTkyIDQ0MC44IDE5OS4yIDQ0OCAyMDggNDQ4TDI0MCA0NDhDMjQ4LjggNDQ4IDI1NiA0NDAuOCAyNTYgNDMyQzI1NiA0MjMuMiAyNDguOCA0MTYgMjQwIDQxNkwyMDggNDE2QzE5OS4yIDQxNiAxOTIgNDIzLjIgMTkyIDQzMnpNMjg4IDQzMkMyODggNDQwLjggMjk1LjIgNDQ4IDMwNCA0NDhMMzM2IDQ0OEMzNDQuOCA0NDggMzUyIDQ0MC44IDM1MiA0MzJDMzUyIDQyMy4yIDM0NC44IDQxNiAzMzYgNDE2TDMwNCA0MTZDMjk1LjIgNDE2IDI4OCA0MjMuMiAyODggNDMyek0zODQgNDMyQzM4NCA0NDAuOCAzOTEuMiA0NDggNDAwIDQ0OEw0MzIgNDQ4QzQ0MC44IDQ0OCA0NDggNDQwLjggNDQ4IDQzMkM0NDggNDIzLjIgNDQwLjggNDE2IDQzMiA0MTZMNDAwIDQxNkMzOTEuMiA0MTYgMzg0IDQyMy4yIDM4NCA0MzJ6TTI3MiAzMDRDMjcyIDMyMS43IDI1Ny43IDMzNiAyNDAgMzM2QzIyMi4zIDMzNiAyMDggMzIxLjcgMjA4IDMwNEMyMDggMjg2LjMgMjIyLjMgMjcyIDI0MCAyNzJDMjU3LjcgMjcyIDI3MiAyODYuMyAyNzIgMzA0ek0yNDAgMjQwQzIwNC43IDI0MCAxNzYgMjY4LjcgMTc2IDMwNEMxNzYgMzM5LjMgMjA0LjcgMzY4IDI0MCAzNjhDMjc1LjMgMzY4IDMwNCAzMzkuMyAzMDQgMzA0QzMwNCAyNjguNyAyNzUuMyAyNDAgMjQwIDI0MHpNNDAwIDMzNkMzODIuMyAzMzYgMzY4IDMyMS43IDM2OCAzMDRDMzY4IDI4Ni4zIDM4Mi4zIDI3IgNDAwIDI3MkM0MTcuNyAyNzIgNDMyIDI4Ni4zIDQzMiAzMDRDNzMyIDMyMS43IDQxNy43IDMzNiA0MDAgMzM2ek0zMzYgMzA0QzMzYiAzMzkuMyAzNjQuNyAzNjggNDAwIDM2OEM0MzUuMyAzNjggNDY0IDMzOS4zIDQ2NCAzMDRDNzY0IDI2OC43IDQzNS4zIDI0MCA0MDAgMjQwQzM2NC43IDI0MCAzMzYgMjY4LjcgMzM2IDMwNHpNNjQgMjcyQzY0IDI2My4yIDU2LjggMjU2IDQ4IDI1NkMzOS4yIDI1NiAzMiAyNjMuMiAzMiAyNzJMMyIgNDAwQzMyIDQwOC44IDM5LjIgNDE2IDQ4IDQxNkM1Ni44IDQxNiA2NCA0MDguOCA2NCA0MDBMNjQgMjcyek01OTIgMjU2QzU4My4yIDI1NiA1NzYgMjYzLjIgNTc2IDI3Mkw1NzYgNDAwQzU3NiA0MDguOCA1ODMuMiA0MTYgNTkyIDQxNkM2MDAuOCA0MTYgNjA4IDQwOC44IDYwOCA0MDBMNjA4IDI3MkM2MDggMjYzLjIgNjAwLjggMjU2IDU5MiAyNTZ6Ii8+PC9zdmc+');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Support rotation animation for SVG robot icon */
+.fa-robot-svg.rotating {
+  animation: fa-spin 2s infinite linear;
+}

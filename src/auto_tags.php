@@ -47,7 +47,7 @@ try {
     <title>Auto Generate Tags - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link href="css/modal.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">

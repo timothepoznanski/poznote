@@ -170,7 +170,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             <!-- AI Settings -->
             <div class="settings-card" onclick="window.location = 'ai.php';">
                 <div class="settings-card-icon">
-                    <i class="fas fa-robot"></i>
+                    <i class="fa-robot-svg"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>AI Settings

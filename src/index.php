@@ -478,7 +478,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
-                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-align-left"></i>';
@@ -600,7 +600,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
-                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-align-left"></i>';
@@ -805,7 +805,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         <div class="modal-content ai-summary-simple">
             <div class="modal-body">
                 <div id="aiSummaryLoading" class="ai-loading">
-                    <i class="fas fa-robot rotating"></i>
+                    <i class="fa-robot-svg rotating"></i>
                     <p>Generating summary...</p>
                 </div>
                 <div id="aiSummaryContent">
