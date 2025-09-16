@@ -422,12 +422,12 @@ a:active { color: #2E8CFA; } */
     color: #1e7e34 !important;
 }
 
-.btn-attachment.has-attachments {
-    color: #28a745 !important;
+.btn-attachment.has-attachments i::before {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(95%) saturate(3500%) hue-rotate(95deg) brightness(95%) contrast(95%) !important;
 }
 
-.btn-attachment.has-attachments:hover {
-    color: #1e7e34 !important;
+.btn-attachment.has-attachments:hover i::before {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(4000%) hue-rotate(95deg) brightness(85%) contrast(105%) !important;
 }
 
 .dropdown-item.has-attachments i {
@@ -1316,6 +1316,10 @@ img {
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
+}
+
+.fa-tag.icon_tag::before {
+    background-image: url('../webfonts/tags-light-full.svg') !important;
 } 
 
 .name_tags {
@@ -1883,9 +1887,24 @@ hr {
 .toolbar-btn.save-modified:focus i.fas.fa-save {
     color: #e53935 !important;
 }
-/* Pour l'icône save normale, permettre le changement de couleur au hover */
+.toolbar-btn.save-modified i.fas.fa-save::before {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
+}
+.toolbar-btn.save-modified:hover i.fas.fa-save::before,
+.toolbar-btn.save-modified:focus i.fas.fa-save::before {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
+}
+/* Pour l'icône save normale, couleur gris foncé par défaut */
 .toolbar-btn:not(.save-modified) i.fas.fa-save {
     color: inherit;
+}
+.toolbar-btn:not(.save-modified) i.fas.fa-save::before {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
+}
+/* Effet de survol bleu pour l'icône save normale */
+.toolbar-btn:not(.save-modified):hover i.fas.fa-save::before,
+.toolbar-btn:not(.save-modified):focus i.fas.fa-save::before {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
 }
 .toolbar-btn i.fas.fa-palette,
 .toolbar-btn i.fas.fa-fill-drip {
@@ -1911,16 +1930,22 @@ hr {
     color: #ffe066 !important;
 }
 
-.toolbar-btn i.fas.fa-robot {
-    color: #007DB8 !important;
+.toolbar-btn.btn-ai i.fas.fa-robot {
+    display: none;
 }
 
-.toolbar-btn:hover i.fas.fa-robot,
-.toolbar-btn:focus i.fas.fa-robot {
-    color: #005a8a !important;
+.toolbar-btn.btn-ai .fa-robot-svg {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
-.toolbar-btn.btn-ai.loading i.fas.fa-robot {
+/* Effet de survol bleu pour l'icône IA */
+.toolbar-btn.btn-ai:hover .fa-robot-svg,
+.toolbar-btn.btn-ai:focus .fa-robot-svg {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
+    transform: scale(1.3);
+}
+
+.toolbar-btn.btn-ai.loading .fa-robot-svg {
     animation: rotate 1s linear infinite;
 }
 

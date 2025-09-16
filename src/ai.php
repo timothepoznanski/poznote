@@ -87,17 +87,17 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-robot"></i> Artificial Intelligence</h1>
+        <h1><i class="fa-robot-svg"></i> Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
     
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
+                Back to Notes
             </a>
 
         <br><br>
@@ -219,7 +219,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                 </div>
                 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Configuration
+                    Save Configuration
                 </button>
             </form>
             
@@ -230,7 +230,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                         data-saved-provider="<?php echo htmlspecialchars($ai_provider); ?>"
                         data-saved-openai-model="<?php echo htmlspecialchars($openai_model); ?>"
                         data-saved-mistral-model="<?php echo htmlspecialchars($mistral_model); ?>">
-                    <i class="fas fa-plug"></i> <span id="test-btn-text">Test Connection</span>
+                    <span id="test-btn-text">Test Connection</span>
                 </button>
                 <div id="test-result" style="margin-top: 15px; display: none;"></div>
             </div>

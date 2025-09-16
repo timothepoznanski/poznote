@@ -89,18 +89,18 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <title>Tags - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	<link rel="stylesheet" href="vendor/fontawesome/local-icons.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags-mobile.css"/>
 </head>
 <body class="tags-page"<?php echo !empty($excluded_folders) ? ' data-has-exclusions="true"' : ''; ?>>
 	<div class="tags-container">
-		<h1 class="tags-header">Tags</h1>
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
 				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
 			</div>
+			<h1 class="tags-header">Tags</h1>
 		</div>
 		
 		<!-- Show excluded folders info if any -->

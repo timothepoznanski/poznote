@@ -51,7 +51,7 @@ $is_generating = false;
     <title>Content Verification - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link href="css/modal.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">
@@ -63,7 +63,7 @@ $is_generating = false;
         </div>        
         <div class="summary-content" id="summaryContent">
             <div id="loadingState" class="loading-state" style="display: none;">
-                <i class="fas fa-robot"></i>
+                <i class="fa-robot-svg"></i>
                 Checking content accuracy and coherence...
             </div>
             <div id="summaryText" style="display: none;"></div>
@@ -78,19 +78,19 @@ $is_generating = false;
         
         <div class="action-buttons">
             <button onclick="checkErrors()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-search"></i> Check Content
+                Check Content
             </button>
             
             <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
-                <i class="fas fa-copy"></i> Copy
+                Copy
             </button>
             
             <button onclick="checkErrors()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
-                <i class="fas fa-redo"></i> Re-check
+                Re-check
             </button>
             
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
+                Back to Notes
             </a>
         </div>
     </div>

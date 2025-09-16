@@ -478,7 +478,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
-                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-align-left"></i>';
@@ -514,9 +514,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
-                    $star_class = $is_favorite ? 'fas' : 'far';
+                    $star_class = 'far'; // Always outline
+                    $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
@@ -600,7 +601,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
-                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fas fa-robot"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fas fa-align-left"></i>';
@@ -624,9 +625,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
-                    $star_class = $is_favorite ? 'fas' : 'far';
+                    $star_class = 'far'; // Always outline
+                    $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
@@ -805,7 +807,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         <div class="modal-content ai-summary-simple">
             <div class="modal-body">
                 <div id="aiSummaryLoading" class="ai-loading">
-                    <i class="fas fa-robot rotating"></i>
+                    <i class="fa-robot-svg rotating"></i>
                     <p>Generating summary...</p>
                 </div>
                 <div id="aiSummaryContent">

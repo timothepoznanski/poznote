@@ -856,16 +856,16 @@ a.links_arbo_left.selected-note {
 }
 
 /* Green indicators for notes with attachments on mobile */
-.btn-settings.has-attachments,
-.btn-attachment.has-attachments {
-    color: #28a745 !important;
+.btn-settings.has-attachments i::before,
+.btn-attachment.has-attachments i::before {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(95%) saturate(3500%) hue-rotate(95deg) brightness(95%) contrast(95%) !important;
 }
 
-.btn-settings.has-attachments:hover,
-.btn-settings.has-attachments:focus,
-.btn-attachment.has-attachments:hover,
-.btn-attachment.has-attachments:focus {
-    color: #1e7e34 !important;
+.btn-settings.has-attachments:hover i::before,
+.btn-settings.has-attachments:focus i::before,
+.btn-attachment.has-attachments:hover i::before,
+.btn-attachment.has-attachments:focus i::before {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(4000%) hue-rotate(95deg) brightness(85%) contrast(105%) !important;
 }
 
 /* UNIFIED SEARCH MOBILE STYLES */
@@ -1284,7 +1284,7 @@ input[type="search"]::-webkit-search-results-decoration {
     
     h3 {
         font-size: 18px !important;
-        margin-bottom: 12px !important;
+        /* margin-bottom: 12px !important; */
     }
     
     /* Settings section spacing */
