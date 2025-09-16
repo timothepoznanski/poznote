@@ -364,7 +364,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Task list item
         var taskListItem = document.createElement('button');
         taskListItem.className = 'create-menu-item';
-        taskListItem.innerHTML = '<i class="fas fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list note';
+        taskListItem.innerHTML = '<i class="fas fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
         taskListItem.onclick = function() {
             createTaskListNote();
             createMenu.remove();
@@ -394,7 +394,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     // Make function globally available
     window.toggleCreateMenu = toggleCreateMenu;
     
-    // Task list note creation function
+    // Task list creation function
     function createTaskListNote() {
         var params = new URLSearchParams({
             now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
@@ -417,10 +417,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
                     window.location.href = "index.php?workspace=" + ws + "&note=" + encodeURIComponent(res.heading);
                 } else {
-                    showNotificationPopup(res.error || 'Error creating task list note', 'error');
+                    showNotificationPopup(res.error || 'Error creating task list', 'error');
                 }
             } catch(e) {
-                showNotificationPopup('Error creating task list note: ' + data, 'error');
+                showNotificationPopup('Error creating task list: ' + data, 'error');
             }
         })
         .catch(function(error) {
@@ -842,7 +842,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 echo '</div>';
                 echo '</div>';
                 
-                // Initialize task list if this is a task list note
+                // Initialize task list if this is a task list
                 if ($note_type === 'tasklist') {
                     echo '<script>initializeTaskList('.$row['id'].', "'.$note_type.'");</script>';
                 }
