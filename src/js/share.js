@@ -149,24 +149,33 @@ function showShareModal(url) {
     // Remove the dividing line above buttons for this share modal
     buttonsDiv.style.borderTop = 'none';
 
+    // Create Cancel and Open buttons. User requested Cancel and Open swapped and colored.
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn-cancel';
+    cancelBtn.textContent = 'Cancel';
+    // red styling for cancel
+    cancelBtn.style.background = '#dc3545';
+    cancelBtn.style.color = '#ffffff';
+    cancelBtn.style.border = 'none';
+    cancelBtn.onclick = function() { closeModal('shareModal'); };
+    buttonsDiv.appendChild(cancelBtn);
+
     // Open button: opens the URL in a new tab (keeps modal open)
     const openBtn = document.createElement('button');
     openBtn.type = 'button';
-    openBtn.className = 'btn-primary btn-open';
+    openBtn.className = 'btn-open';
     openBtn.textContent = 'Open';
+    // green styling for open
+    openBtn.style.background = '#28a745';
+    openBtn.style.color = '#ffffff';
+    openBtn.style.border = 'none';
     openBtn.onclick = function(ev) {
         try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
         // Open in new tab with noopener for safety
         window.open(url, '_blank', 'noopener');
     };
     buttonsDiv.appendChild(openBtn);
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.type = 'button';
-    cancelBtn.className = 'btn-cancel';
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.onclick = function() { closeModal('shareModal'); };
-    buttonsDiv.appendChild(cancelBtn);
 
     const copyBtn = document.createElement('button');
     copyBtn.type = 'button';
