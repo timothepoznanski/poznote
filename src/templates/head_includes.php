@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="vendor/fontawesome/local-icons.css" />
 <link rel="stylesheet" href="css/index-inline.css" />
 <link rel="stylesheet" href="css/font-size-settings.css" />
+<link rel="stylesheet" href="css/tasklist.css" />
 
 <!-- JavaScript Files -->
 <script src="js/toolbar.js"></script>
@@ -29,3 +30,4 @@
 
 <script src="js/index-login-prompt.js"></script>
 <script src="js/index-workspace-display.js"></script>
+<script src="js/tasklist.js"></script>

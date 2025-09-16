@@ -434,6 +434,7 @@ function updateNote() {
     var curtime = curdate.getTime();
     lastudpdate = curtime;
     displayEditInProgress();
+    setSaveButtonRed(true);
 }
 
 function checkAndAutoSave() {
@@ -682,3 +683,6 @@ function updateHighlight(options) {
         options[highlightedIndex].classList.add('highlighted');
     }
 }
+
+// Expose updateNote globally for use in other modules
+window.updateNote = updateNote;

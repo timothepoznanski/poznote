@@ -79,6 +79,15 @@ function saveNoteToServer() {
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     
     var entcontent = getTextContentFromElement(entryElem);
+    
+    // Check if this is a task list note
+    var noteType = entryElem.getAttribute('data-note-type') || 'note';
+    if (noteType === 'tasklist') {
+        // For task list notes, save the JSON data instead of HTML
+        entcontent = getTaskListData(noteid) || '';
+        ent = entcontent; // Also save JSON to HTML file for consistency
+    }
+    
     var tags = tagsElem ? tagsElem.value : '';
     var folder = folderElem ? folderElem.value : getDefaultFolderName();
 
