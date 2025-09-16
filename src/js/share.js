@@ -105,89 +105,92 @@ document.addEventListener('click', function(e) {
 function showShareModal(url) {
     // Remove existing if any
     const existing = document.getElementById('shareModal');
-    if (existing) existing.remove();
+    if (existing) existing.parentNode.removeChild(existing);
 
+    // Build modal using same structure and classes as other modals (modal -> modal-content -> modal-buttons)
     const modal = document.createElement('div');
     modal.id = 'shareModal';
     modal.className = 'modal';
     modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.left = '0';
-    modal.style.top = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-    modal.style.background = 'rgba(0,0,0,0.45)';
-    modal.style.zIndex = 10001;
 
-    const box = document.createElement('div');
-    box.style.width = 'min(720px, 92%)';
-    box.style.background = '#fff';
-    box.style.padding = '18px';
-    box.style.borderRadius = '8px';
-    box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
-    box.style.fontFamily = 'Inter, sans-serif';
+    const content = document.createElement('div');
+    content.className = 'modal-content';
 
-    const title = document.createElement('h3');
-    title.textContent = 'Public URL';
-    title.style.marginTop = '0';
-    box.appendChild(title);
+    const closeSpan = document.createElement('span');
+    closeSpan.className = 'close';
+    closeSpan.innerHTML = '&times;';
+    closeSpan.onclick = function() { closeModal('shareModal'); };
+    content.appendChild(closeSpan);
+
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Public URL';
+    content.appendChild(h3);
+
+    const p = document.createElement('p');
+    p.textContent = '';
+    content.appendChild(p);
 
     const input = document.createElement('input');
     input.type = 'text';
     input.value = url;
     input.id = 'shareModalUrl';
-    input.style.width = '100%';
-    input.style.padding = '10px';
-    input.style.border = '1px solid #ddd';
-    input.style.borderRadius = '4px';
-    input.style.fontSize = '14px';
     input.readOnly = true;
-    box.appendChild(input);
+    input.style.width = '100%';
+    input.style.padding = '8px';
+    input.style.border = '1px solid #ddd';
+    input.style.borderRadius = '6px';
+    input.style.boxSizing = 'border-box';
+    content.appendChild(input);
 
-    const footer = document.createElement('div');
-    footer.style.marginTop = '12px';
-    footer.style.display = 'flex';
-    footer.style.justifyContent = 'flex-end';
-    footer.style.gap = '8px';
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'modal-buttons';
 
     const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn-cancel';
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.className = 'btn btn-secondary';
-    cancelBtn.onclick = function() { modal.remove(); };
-    footer.appendChild(cancelBtn);
+    cancelBtn.onclick = function() { closeModal('shareModal'); };
+    buttonsDiv.appendChild(cancelBtn);
 
     const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'btn-primary';
     copyBtn.textContent = 'Copy';
-    copyBtn.className = 'btn btn-primary';
-    copyBtn.onclick = async function() {
+    copyBtn.onclick = async function(ev) {
+        // Prevent clicks from bubbling to global handlers
+        try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+
+        // Try to copy the URL, then close the modal. Do NOT change the button text.
         try {
             await navigator.clipboard.writeText(input.value);
-            copyBtn.textContent = 'Copied';
-            copyBtn.disabled = true;
-            setTimeout(function(){ if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.disabled = false; }}, 2000);
+            closeModal('shareModal');
         } catch (e) {
-            // fallback select
-            input.select();
-            document.execCommand('copy');
-            copyBtn.textContent = 'Copied';
-            setTimeout(function(){ if (copyBtn) { copyBtn.textContent = 'Copy'; }}, 2000);
+            // Fallback: select and execCommand, then close
+            try {
+                input.select();
+                document.execCommand('copy');
+                closeModal('shareModal');
+            } catch (err) {
+                // As last resort, show the prompt then close
+                window.prompt('Copy this URL', input.value);
+                closeModal('shareModal');
+            }
         }
     };
-    footer.appendChild(copyBtn);
+    buttonsDiv.appendChild(copyBtn);
 
-    box.appendChild(footer);
-    modal.appendChild(box);
+    content.appendChild(buttonsDiv);
+    modal.appendChild(content);
     document.body.appendChild(modal);
 
-    // Focus + select the url
-    setTimeout(function(){ input.focus(); input.select(); }, 100);
-
-    // Close when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) modal.remove();
-    });
+    // Focus and select the URL so it's highlighted when the modal opens
+    setTimeout(function(){
+        try {
+            input.focus();
+            input.select();
+            input.setSelectionRange(0, input.value.length);
+        } catch (e) {}
+    }, 50);
 }
 
 // Expose functions globally

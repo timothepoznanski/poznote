@@ -37,6 +37,47 @@ try {
 }
 
 // Render read-only page
+// If an HTML file was saved for this note (data/entries/<id>.html), prefer using it so we preserve the exact HTML (images, formatting).
+$htmlFile = getEntriesRelativePath() . $note_id . '.html';
+$content = '';
+if (is_readable($htmlFile)) {
+    $content = file_get_contents($htmlFile);
+} else {
+    // Fallback to DB field if no file exists
+    $content = $note['entry'] ?? '';
+}
+
+// Rewrite relative attachment URLs to absolute URLs so images load for anonymous users
+$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+// If the app is in a subdirectory, ensure the base includes the script dir
+$scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($scriptDir && $scriptDir !== '/') {
+    $baseUrl .= $scriptDir;
+}
+
+// Replace src and href references that point to relative attachments path
+$attachmentsRel = getAttachmentsRelativePath(); // returns 'data/attachments/'
+// Common patterns: src="data/attachments/..." or src='data/attachments/...' or src=/data/attachments/...
+$content = preg_replace_callback('#(src|href)=(["\']?)(/?' . preg_quote($attachmentsRel, '#') . ')([^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $attachmentsRel) {
+    $attr = $m[1];
+    $quote = $m[2] ?: '';
+    $path = $m[4];
+    // Ensure no duplicate slashes
+    $url = rtrim($baseUrl, '/') . '/' . ltrim($attachmentsRel, '/');
+    $url = rtrim($url, '/') . '/' . ltrim($path, '/');
+    return $attr . '=' . $quote . $url . $quote;
+}, $content);
+
+// Light sanitization: remove <script>...</script> blocks and inline event handlers (on*) to reduce XSS risk
+$content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
+$content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
+    $tag = $m[1];
+    $attrs = $m[2];
+    // Remove any on* attributes
+    $cleanAttrs = preg_replace('/\s+on[a-zA-Z]+=(["\"][^"\\]*["\\"]|[^\s>]*)/i', '', $attrs);
+    return '<' . $tag . $cleanAttrs . '>';
+}, $content);
+
 ?>
 <!doctype html>
 <html>
@@ -48,17 +89,17 @@ try {
     <style>
     /* Small adjustments for public view */
     body { background: #f7f7f7; }
-    .public-note { max-width: 900px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    .public-note { padding: 24px; }
     .public-note h1 { margin-top: 0; }
     .public-note .meta { color: #666; font-size: 0.9em; margin-bottom: 12px; }
-    .public-note .content { white-space: pre-wrap; }
+    .public-note .content { }
+    .public-note img { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
     <div class="public-note">
-        <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
-        <div class="meta">Shared on <?php echo htmlspecialchars($row['created']); ?></div>
-        <div class="content"><?php echo nl2br(htmlspecialchars($note['entry'] ?: '')); ?></div>
+    <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
+        <div class="content"><?php echo $content; ?></div>
     </div>
 </body>
 </html>
