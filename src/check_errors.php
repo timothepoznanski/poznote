@@ -78,19 +78,19 @@ $is_generating = false;
         
         <div class="action-buttons">
             <button onclick="checkErrors()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-search"></i> Check Content
+                Check Content
             </button>
             
             <button onclick="copyToClipboard()" class="btn btn-success" id="copyBtn" style="display: none;">
-                <i class="fas fa-copy"></i> Copy
+                Copy
             </button>
             
             <button onclick="checkErrors()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
-                <i class="fas fa-redo"></i> Re-check
+                Re-check
             </button>
             
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
+                Back to Notes
             </a>
         </div>
     </div>

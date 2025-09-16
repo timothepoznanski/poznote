@@ -422,12 +422,12 @@ a:active { color: #2E8CFA; } */
     color: #1e7e34 !important;
 }
 
-.btn-attachment.has-attachments {
-    color: #28a745 !important;
+.btn-attachment.has-attachments i::before {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(95%) saturate(3500%) hue-rotate(95deg) brightness(95%) contrast(95%) !important;
 }
 
-.btn-attachment.has-attachments:hover {
-    color: #1e7e34 !important;
+.btn-attachment.has-attachments:hover i::before {
+    filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(4000%) hue-rotate(95deg) brightness(85%) contrast(105%) !important;
 }
 
 .dropdown-item.has-attachments i {
@@ -1894,12 +1894,17 @@ hr {
 .toolbar-btn.save-modified:focus i.fas.fa-save::before {
     filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
 }
-/* Pour l'icône save normale, couleur bleue par défaut */
+/* Pour l'icône save normale, couleur gris foncé par défaut */
 .toolbar-btn:not(.save-modified) i.fas.fa-save {
     color: inherit;
 }
 .toolbar-btn:not(.save-modified) i.fas.fa-save::before {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
+}
+/* Effet de survol bleu pour l'icône save normale */
+.toolbar-btn:not(.save-modified):hover i.fas.fa-save::before,
+.toolbar-btn:not(.save-modified):focus i.fas.fa-save::before {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
 }
 .toolbar-btn i.fas.fa-palette,
 .toolbar-btn i.fas.fa-fill-drip {
@@ -1930,7 +1935,14 @@ hr {
 }
 
 .toolbar-btn.btn-ai .fa-robot-svg {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
+}
+
+/* Effet de survol bleu pour l'icône IA */
+.toolbar-btn.btn-ai:hover .fa-robot-svg,
+.toolbar-btn.btn-ai:focus .fa-robot-svg {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
+    transform: scale(1.3);
 }
 
 .toolbar-btn.btn-ai.loading .fa-robot-svg {

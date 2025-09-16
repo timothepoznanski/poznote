@@ -77,23 +77,23 @@ try {
         
         <div class="action-buttons">
             <button onclick="generateTags()" class="btn btn-primary" id="generateBtn">
-                <i class="fas fa-magic"></i> Generate Tags
+                Generate Tags
             </button>
             
             <button onclick="copyTags()" class="btn btn-success" id="copyBtn" style="display: none;">
-                <i class="fas fa-copy"></i> Copy
+                Copy
             </button>
             
             <button onclick="applyTags()" class="btn btn-warning" id="applyBtn" style="display: none;">
-                <i class="fas fa-check"></i> Apply Tags
+                Apply Tags
             </button>
             
             <button onclick="generateTags()" class="btn btn-primary" id="regenerateBtn" style="display: none;">
-                <i class="fas fa-redo"></i> Regenerate
+                Regenerate
             </button>
             
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Notes
+                Back to Notes
             </a>
         </div>
     </div>
