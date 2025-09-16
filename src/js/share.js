@@ -116,11 +116,7 @@ function showShareModal(url) {
     const content = document.createElement('div');
     content.className = 'modal-content';
 
-    const closeSpan = document.createElement('span');
-    closeSpan.className = 'close';
-    closeSpan.innerHTML = '&times;';
-    closeSpan.onclick = function() { closeModal('shareModal'); };
-    content.appendChild(closeSpan);
+    // No close (×) icon for the share modal per UX request
 
     const h3 = document.createElement('h3');
     h3.textContent = 'Public URL';
@@ -130,20 +126,28 @@ function showShareModal(url) {
     p.textContent = '';
     content.appendChild(p);
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = url;
-    input.id = 'shareModalUrl';
-    input.readOnly = true;
-    input.style.width = '100%';
-    input.style.padding = '8px';
-    input.style.border = '1px solid #ddd';
-    input.style.borderRadius = '6px';
-    input.style.boxSizing = 'border-box';
-    content.appendChild(input);
+    // Show the full URL as plain, non-selectable text (no input frame)
+    const urlDiv = document.createElement('div');
+    urlDiv.id = 'shareModalUrl';
+    urlDiv.textContent = url;
+    urlDiv.style.width = '100%';
+    urlDiv.style.padding = '0';
+    urlDiv.style.border = 'none';
+    urlDiv.style.background = 'transparent';
+    urlDiv.style.boxSizing = 'border-box';
+    urlDiv.style.whiteSpace = 'normal';
+    urlDiv.style.wordBreak = 'break-all';
+    urlDiv.style.userSelect = 'none';
+    urlDiv.style.webkitUserSelect = 'none';
+    urlDiv.style.MozUserSelect = 'none';
+    urlDiv.style.cursor = 'default';
+    // Ensure text is fully visible; allow wrapping
+    content.appendChild(urlDiv);
 
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'modal-buttons';
+    // Remove the dividing line above buttons for this share modal
+    buttonsDiv.style.borderTop = 'none';
 
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
@@ -162,17 +166,25 @@ function showShareModal(url) {
 
         // Try to copy the URL, then close the modal. Do NOT change the button text.
         try {
-            await navigator.clipboard.writeText(input.value);
+            // Copy from the div's text content (non-selectable but programmatically copyable)
+            await navigator.clipboard.writeText(urlDiv.textContent);
             closeModal('shareModal');
         } catch (e) {
-            // Fallback: select and execCommand, then close
+            // Fallback: create a temporary textarea, select and execCommand, then remove it
             try {
-                input.select();
+                const ta = document.createElement('textarea');
+                ta.value = urlDiv.textContent;
+                // Ensure off-screen and not visible
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
                 document.execCommand('copy');
+                document.body.removeChild(ta);
                 closeModal('shareModal');
             } catch (err) {
                 // As last resort, show the prompt then close
-                window.prompt('Copy this URL', input.value);
+                window.prompt('Copy this URL', urlDiv.textContent);
                 closeModal('shareModal');
             }
         }
@@ -183,14 +195,7 @@ function showShareModal(url) {
     modal.appendChild(content);
     document.body.appendChild(modal);
 
-    // Focus and select the URL so it's highlighted when the modal opens
-    setTimeout(function(){
-        try {
-            input.focus();
-            input.select();
-            input.setSelectionRange(0, input.value.length);
-        } catch (e) {}
-    }, 50);
+    // Do not auto-focus or select the URL — user requested no automatic highlighting
 }
 
 // Expose functions globally
