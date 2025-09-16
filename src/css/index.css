@@ -1911,16 +1911,23 @@ hr {
     color: #ffe066 !important;
 }
 
-.toolbar-btn i.fas.fa-robot {
-    color: #007DB8 !important;
+.toolbar-btn.btn-ai i.fas.fa-robot {
+    display: none;
 }
 
-.toolbar-btn:hover i.fas.fa-robot,
-.toolbar-btn:focus i.fas.fa-robot {
-    color: #005a8a !important;
+.toolbar-btn.btn-ai::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-image: url('../webfonts/robot-light-full.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
 }
 
-.toolbar-btn.btn-ai.loading i.fas.fa-robot {
+.toolbar-btn.btn-ai.loading::before {
     animation: rotate 1s linear infinite;
 }
 
