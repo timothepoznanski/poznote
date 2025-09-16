@@ -1578,6 +1578,49 @@ img {
 
 /* ICONES TRASH pour interface principale */
 
+/* Share / Export dropdown styles (reuse AI menu patterns) */
+.share-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.share-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 160px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.share-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.share-menu-item:last-child { border-bottom: none; }
+
+.share-menu-item:hover { background-color: #f8f9fa; color: #007DB8; }
+
+.share-menu-item i { margin-right: 10px; width: 16px; text-align: center; color: #007DB8; }
+
+.share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
+
+
 .icon_trash {
     color: #007DB8;
 }

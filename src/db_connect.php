@@ -84,6 +84,16 @@ try {
         value TEXT
     )');
 
+    // Table for public shared notes (token based)
+    $con->exec('CREATE TABLE IF NOT EXISTS shared_notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        note_id INTEGER NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        expires DATETIME,
+        FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
+    )');
+
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_enabled', '1')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_language', 'en')");
