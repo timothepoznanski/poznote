@@ -96,11 +96,11 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 </head>
 <body class="tags-page"<?php echo !empty($excluded_folders) ? ' data-has-exclusions="true"' : ''; ?>>
 	<div class="tags-container">
-		<h1 class="tags-header">Tags</h1>
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
 				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
 			</div>
+			<h1 class="tags-header">Tags</h1>
 		</div>
 		
 		<!-- Show excluded folders info if any -->
