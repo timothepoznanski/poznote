@@ -178,8 +178,8 @@ a:hover .far::before {
 .fa-smile-svg,
 .fas.fa-smile::before {
   display: inline-block;
-  width: 1.0em;
-  height: 1.0em;
+  width: 0.9em;
+  height: 0.9em;
   background-image: url('../../webfonts/icons-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
