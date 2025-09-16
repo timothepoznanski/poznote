@@ -181,6 +181,22 @@ a:hover .far::before {
   transition: all 0.3s ease;
 }
 
+/* Square share nodes SVG icon (used for share/export button) */
+.fa-square-share-nodes-svg {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('../../webfonts/square-share-nodes-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
+}
+
+
 /* Custom SVG icons for offline use */
 .fa-smile-svg,
 .fas.fa-smile::before {

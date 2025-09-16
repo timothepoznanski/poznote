@@ -582,7 +582,18 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     if ($title_json === false) $title_json = '"Note"';
                     
-                    echo '<button type="button" class="toolbar-btn btn-download'.$note_action_class.'" title="Export to HTML" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fas fa-download"></i></button>';
+                    // Share / Download dropdown (export or public share)
+                    echo '<div class="share-dropdown">';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    echo '<div class="share-menu" id="shareMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
+                    echo '<div class="share-menu-item" data-action="download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
+                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '</div>';
+                    echo '<div class="share-menu-item" data-action="public" onclick="createPublicShare(\''.$row['id'].'\'); closeShareMenu();">';
+                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                     
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -687,7 +698,18 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
-                    echo '<a href="'.$filename.'" download="'.htmlspecialchars($title, ENT_QUOTES).'" class="toolbar-btn btn-download" title="Export to HTML"><i class="fas fa-download"></i></a>';
+                    // Mobile: use share dropdown as well (simpler menu)
+                    echo '<div class="share-dropdown mobile">';
+                    echo '<button type="button" class="toolbar-btn btn-share" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    echo '<div class="share-menu" id="shareMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
+                    echo '<div class="share-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
+                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '</div>';
+                    echo '<div class="share-menu-item" onclick="createPublicShare(\''.$row['id'].'\'); closeShareMenu();">';
+                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                     
                     // Generate dates safely for JavaScript (same logic as desktop)
                     $created_raw = $row['created'] ?? '';
@@ -990,6 +1012,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <script src="js/utils.js"></script>
 <script src="js/search-highlight.js"></script>
 <script src="js/toolbar.js"></script>
+<script src="js/share.js"></script>
 <script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
