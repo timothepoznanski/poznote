@@ -1,38 +1,7 @@
-/* Minimal local Font Awesome loader using existing webfonts in src/webfonts
-   This file provides the @font-face declarations and a subset of icon
-   class-to-unicode mappings used by the app so it can work offline.
-   It intentionally keeps only the icons used by the project.
+/* Custom SVG icons replacing Font Awesome
+   This file provides SVG-based icon replacements for Font Awesome classes
+   used by the app, eliminating the need for font files.
 */
-
-@font-face {
-  font-family: 'Font Awesome 5 Free';
-  font-style: normal;
-  font-weight: 900;
-  src: url('../../webfonts/fa-solid-900.woff2') format('woff2'),
-       url('../../webfonts/fa-solid-900.woff') format('woff'),
-       url('../../webfonts/fa-solid-900.ttf') format('truetype');
-  font-display: block;
-}
-
-@font-face {
-  font-family: 'Font Awesome 5 Free';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../../webfonts/fa-regular-400.woff2') format('woff2'),
-       url('../../webfonts/fa-regular-400.woff') format('woff'),
-       url('../../webfonts/fa-regular-400.ttf') format('truetype');
-  font-display: block;
-}
-
-/* Base helpers */
-.fa, .fas, .far, .fal, .fab {
-  font-family: 'Font Awesome 5 Free' !important;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.fas { font-weight: 900; }
-.far { font-weight: 400; }
 
 /* Common icon rule: use pseudo-element content */
 [class^="fa-"], [class*=" fa-"] {
@@ -179,6 +148,17 @@ a:hover .far::before {
 /* Support rotation animation for SVG robot icon */
 .fa-robot-svg.rotating {
   animation: fa-spin 2s infinite linear;
+}
+
+/* Animation for spinner */
+.fa-spinner::before,
+.fa-spin::before {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Hover effect for robot icon */
@@ -908,6 +888,20 @@ a:hover .far::before {
   content: '';
 }
 
+.fa-spinner-svg,
+.fas.fa-spinner::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../webfonts/spinner-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 /* Enhanced hover effects - Dark blue color */
 .fa-save:hover::before,
 .fa-smile:hover::before,
@@ -944,7 +938,8 @@ a:hover .far::before {
 .fa-arrow-right:hover::before,
 .fa-eye:hover::before,
 .fa-eye-slash:hover::before,
-.fa-trash-restore-alt:hover::before {
+.fa-trash-restore-alt:hover::before,
+.fa-spinner:hover::before {
   filter: brightness(0) saturate(100%) invert(13%) sepia(100%) saturate(3500%) hue-rotate(195deg) brightness(85%) contrast(120%) !important;
   transform: scale(1.35) !important;
 }
