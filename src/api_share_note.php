@@ -1,6 +1,7 @@
 <?php
 require 'auth.php';
 requireAuth();
+require_once 'config.php';
 require_once 'db_connect.php';
 
 // Only accept JSON POST
