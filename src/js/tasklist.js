@@ -39,7 +39,7 @@ function renderTaskList(noteId, tasks) {
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
                 <input type="text" class="task-input" id="task-input-${noteId}"
-                       placeholder="Ajouter une nouvelle tâche..." maxlength="200">
+                       placeholder="Add new task..." maxlength="200">
                 <button class="task-add-btn" onclick="addTask(${noteId})">
                     <i class="fas fa-plus"></i>
                 </button>
