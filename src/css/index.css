@@ -1623,6 +1623,23 @@ img {
 
 .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
 
+/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
+   Use fixed positioning for the mobile share menu so it sits above the layout and
+   remains visible even when parent elements hide overflow. It will be centered
+   horizontally by default and placed slightly above the bottom toolbar. */
+@media (max-width: 900px) {
+    .share-dropdown.mobile .share-menu {
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 64px !important; /* above the toolbar */
+        top: auto !important;
+        margin-top: 0 !important;
+        z-index: 20000 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+    }
+}
+
 
 .icon_trash {
     color: #007DB8;
