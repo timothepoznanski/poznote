@@ -76,6 +76,16 @@
     border-color: #ccc;
 }
 
+/* Drag & drop visual helpers */
+.task-item.drag-over {
+    outline: 2px dashed rgba(0, 125, 184, 0.35);
+    background: #eef9ff;
+}
+
+.task-item.dragging {
+    opacity: 0.6;
+}
+
 .task-item.completed {
     background: #f0f8f0;
     border-color: #c8e6c9;

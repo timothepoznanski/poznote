@@ -65,6 +65,9 @@ function renderTaskList(noteId, tasks) {
 
     // Store tasks data
     noteEntry.dataset.tasks = JSON.stringify(tasks);
+
+    // Enable drag & drop reordering after initial render
+    enableDragAndDrop(noteId);
 }
 
 // Render individual tasks
@@ -76,7 +79,7 @@ function renderTasks(tasks) {
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${escapeHtml(task.text)}</span>
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
@@ -125,6 +128,8 @@ function addTask(noteId) {
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks);
+        // Re-enable DnD after DOM change
+        enableDragAndDrop(noteId);
     }
 
     // Clear input
@@ -226,6 +231,9 @@ function saveTaskEdit(taskId, noteId, newText) {
         }
     }
 
+    // Ensure drag & drop still works after inline edit
+    enableDragAndDrop(noteId);
+
     markNoteAsModified(noteId);
 }
 
@@ -265,6 +273,9 @@ function deleteTask(taskId, noteId) {
         taskItem.remove();
     }
 
+    // Ensure DnD state is consistent after deletion
+    enableDragAndDrop(noteId);
+
     markNoteAsModified(noteId);
 }
 
@@ -298,6 +309,8 @@ function toggleImportant(taskId, noteId) {
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks);
+        // Re-enable DnD after reorder
+        enableDragAndDrop(noteId);
     }
 
     markNoteAsModified(noteId);
@@ -342,3 +355,182 @@ window.editTask = editTask;
 window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
 window.toggleImportant = toggleImportant;
+
+// Enable HTML5 drag & drop reordering for a specific note task list
+function enableDragAndDrop(noteId) {
+    const tasksList = document.getElementById(`tasks-list-${noteId}`);
+    if (!tasksList) return;
+
+    // If Sortable has already been initialized for this list, skip
+    if (tasksList.dataset.sortable === '1') return;
+
+    // If SortableJS is available, use it for robust drag & drop (better mobile/touch support)
+    function initSortable() {
+        if (!tasksList || tasksList.dataset.sortable === '1') return;
+        try {
+            const sortable = new Sortable(tasksList, {
+                animation: 150,
+                onEnd: function(evt) {
+                    // sortable onEnd
+
+                    const noteEntry = document.getElementById('entry' + noteId);
+                    if (!noteEntry) return;
+
+                    let tasks = [];
+                    try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { return; }
+
+                    const oldIndex = evt.oldIndex;
+                    const newIndex = evt.newIndex;
+                    if (typeof oldIndex !== 'number' || typeof newIndex !== 'number' || oldIndex === newIndex) return;
+
+                    const [moved] = tasks.splice(oldIndex, 1);
+                    tasks.splice(newIndex, 0, moved);
+
+                    // Save new order
+                    noteEntry.dataset.tasks = JSON.stringify(tasks);
+
+                    // sortable moved
+
+                    // Mark note modified so it gets saved
+                    markNoteAsModified(noteId);
+                }
+            });
+
+            tasksList.dataset.sortable = '1';
+            // store instance if needed
+            tasksList._sortableInstance = sortable;
+        } catch (e) {
+            console.error('tasklist: failed to init Sortable', e);
+        }
+    }
+
+    // If Sortable is present, use it; otherwise load from CDN then init
+    if (typeof Sortable !== 'undefined') {
+        initSortable();
+        return;
+    }
+
+    // Load SortableJS from CDN as a progressive enhancement
+    const existingScript = document.querySelector('script[data-sortable-cdn]');
+    if (!existingScript) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+        script.async = true;
+        script.setAttribute('data-sortable-cdn', '1');
+        script.onload = function() { initSortable(); };
+        script.onerror = function() {
+            // If CDN fails, fall back to HTML5 implementation below
+            try { console.warn('tasklist: SortableJS CDN failed, falling back to HTML5 DnD'); } catch(e){}
+            // continue to HTML5 fallback
+            attachHTML5Handlers();
+        };
+        document.head.appendChild(script);
+    } else {
+        // Script already loading or present; wait a bit and try to init
+        setTimeout(function() {
+            if (typeof Sortable !== 'undefined') initSortable();
+            else attachHTML5Handlers();
+        }, 250);
+    }
+
+    // HTML5 DnD fallback (kept as before) --------------------------------------------------
+    function attachHTML5Handlers() {
+        // Avoid attaching listeners multiple times
+        if (tasksList.dataset.dragEnabled === '1') return;
+        tasksList.dataset.dragEnabled = '1';
+
+        let draggedId = null;
+
+        function clearDragOver() {
+            const prev = tasksList.querySelectorAll('.drag-over');
+            prev.forEach(el => el.classList.remove('drag-over'));
+        }
+
+        tasksList.addEventListener('dragstart', function(e) {
+            const item = e.target.closest('.task-item');
+            if (!item) return;
+            draggedId = item.dataset.taskId;
+            e.dataTransfer.effectAllowed = 'move';
+            try { e.dataTransfer.setData('text/plain', draggedId); } catch (err) { /* some browsers */ }
+            item.classList.add('dragging');
+            // dragstart
+        });
+
+        tasksList.addEventListener('dragover', function(e) {
+            e.preventDefault(); // allow drop
+            const over = e.target.closest('.task-item');
+            clearDragOver();
+            if (over && over.dataset.taskId !== draggedId) {
+                over.classList.add('drag-over');
+                // dragover
+            }
+        });
+
+        tasksList.addEventListener('dragleave', function(e) {
+            const left = e.target.closest('.task-item');
+            if (left) left.classList.remove('drag-over');
+        });
+
+        tasksList.addEventListener('drop', function(e) {
+            e.preventDefault();
+            clearDragOver();
+
+            const targetItem = e.target.closest('.task-item');
+            const noteEntry = document.getElementById('entry' + noteId);
+            if (!noteEntry) return;
+
+            let tasks = [];
+            try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { return; }
+
+            const draggedIdFromData = e.dataTransfer && e.dataTransfer.getData ? e.dataTransfer.getData('text/plain') : null;
+            const idStr = draggedIdFromData || draggedId;
+            if (!idStr) return;
+
+            const draggedIndex = tasks.findIndex(t => String(t.id) === String(idStr));
+            // drop
+            if (draggedIndex === -1) return;
+
+            // If dropped on an item, insert before it. If dropped on empty space, move to end.
+            let targetIndex = tasks.length;
+            if (targetItem) {
+                const targetId = targetItem.dataset.taskId;
+                targetIndex = tasks.findIndex(t => String(t.id) === String(targetId));
+                if (targetIndex === -1) return;
+            }
+
+            const [moved] = tasks.splice(draggedIndex, 1);
+            if (draggedIndex < targetIndex) targetIndex -= 1;
+            tasks.splice(targetIndex, 0, moved);
+
+            // Save new order
+            noteEntry.dataset.tasks = JSON.stringify(tasks);
+
+            // Re-render and re-enable handlers
+            const listEl = document.getElementById(`tasks-list-${noteId}`);
+            if (listEl) {
+                listEl.innerHTML = renderTasks(tasks);
+                // allow tiny timeout to ensure DOM nodes are present
+                setTimeout(() => enableDragAndDrop(noteId), 0);
+            }
+
+            // dropped and reordered
+            // Mark note modified so it gets saved
+            markNoteAsModified(noteId);
+        });
+
+        tasksList.addEventListener('dragend', function(e) {
+            const item = e.target.closest('.task-item');
+            if (item) item.classList.remove('dragging');
+            clearDragOver();
+            draggedId = null;
+            // dragend
+        });
+    }
+
+    // If Sortable fails to load within a short time, fall back to HTML5 handlers
+    setTimeout(function() {
+        if (typeof Sortable === 'undefined' && tasksList.dataset.dragEnabled !== '1' && tasksList.dataset.sortable !== '1') {
+            attachHTML5Handlers();
+        }
+    }, 500);
+}
