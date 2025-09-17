@@ -196,6 +196,11 @@ a:hover .far::before {
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
+/* Blue color when a note is shared publicly */
+.btn-share.is-shared .fa-square-share-nodes-svg {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
 
 /* Custom SVG icons for offline use */
 .fa-smile-svg,
