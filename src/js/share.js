@@ -158,7 +158,7 @@ function showShareModal(url, options) {
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn-cancel';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = 'Close';
     // red styling for cancel
     cancelBtn.style.background = '#dc3545';
     cancelBtn.style.color = '#ffffff';

@@ -125,11 +125,7 @@ a:hover .far::before {
 
 /* When favorite is active, force the solid star SVG and remove tint filter so the icon appears filled */
 .btn-favorite.is-favorite .fa-star::before {
-  background-image: url('../../webfonts/star-solid-full.svg') !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-size: contain !important;
-  /* tint star SVG to app blue */
+  /* Do not force solid; just tint the existing star icon to app blue */
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
 }
 

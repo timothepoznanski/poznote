@@ -453,6 +453,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];
+                    // Ensure we have a safe JSON-encoded title for JavaScript (used by both desktop and mobile)
+                    $title_safe = $title ?? 'Note';
+                    $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
+                    if ($title_json === false) $title_json = '"Note"';
                     $note_type = $row['type'] ?? 'note';
                     
                     if ($note_type === 'tasklist') {
@@ -576,11 +580,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
-                    
-                    // Encode title safely for JavaScript
-                    $title_safe = $title ?? 'Note';
-                    $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    if ($title_json === false) $title_json = '"Note"';
                     
                     // Share / Download dropdown (export or public share)
                     echo '<div class="share-dropdown">';

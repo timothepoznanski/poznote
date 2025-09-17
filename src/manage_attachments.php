@@ -497,7 +497,12 @@ if (!$note) {
             else cssClass += ` alert-${type}`;
 
             notification.className = cssClass;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+            // If the success message is the specific upload success message, show text only (no icon)
+            if (type === 'success' && message === 'File uploaded successfully!') {
+                notification.textContent = message;
+            } else {
+                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+            }
 
             const container = document.querySelector('.settings-container');
             // insert right below the main title so it's immediately visible
