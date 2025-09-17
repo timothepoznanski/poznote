@@ -65,7 +65,7 @@ if (!$hasAttachments) {
             
             <div class="action-buttons">
                 <a href="index.php" class="btn btn-primary">
-                    <i class="fas fa-arrow-left"></i> Back to notes
+                    Back to notes
                 </a>
                 <a href="backup_export.php" class="btn btn-secondary">
                     <i class="fas fa-download"></i> Other export options

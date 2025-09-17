@@ -71,17 +71,23 @@ function renderTaskList(noteId, tasks) {
 function renderTasks(tasks) {
     if (!Array.isArray(tasks)) return '';
 
-    return tasks.map(task => `
-        <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-            <input type="checkbox" class="task-checkbox"
-                   ${task.completed ? 'checked' : ''}
-                   onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
+    return tasks.map(task => {
+        const starClass = task.important ? 'fas fa-star' : 'far fa-star';
+        const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
+        const title = task.important ? 'Remove important' : 'Mark as important';
+        return `
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${escapeHtml(task.text)}</span>
+            <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
+                <i class="${starClass}"></i>
+            </button>
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="fas fa-trash"></i>
             </button>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Add a new task
@@ -108,6 +114,9 @@ function addTask(noteId) {
         completed: false,
         noteId: noteId
     };
+
+    // default important flag
+    newTask.important = false;
 
     tasks.push(newTask);
     noteEntry.dataset.tasks = JSON.stringify(tasks);
@@ -259,6 +268,41 @@ function deleteTask(taskId, noteId) {
     markNoteAsModified(noteId);
 }
 
+// Toggle important flag for a task and move it to top when important
+function toggleImportant(taskId, noteId) {
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+    } catch (e) {
+        return;
+    }
+
+    const taskIndex = tasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) return;
+
+    // Toggle flag
+    tasks[taskIndex].important = !tasks[taskIndex].important;
+
+    // Reorder: important tasks first (keep relative order otherwise)
+    tasks.sort((a, b) => {
+        if ((a.important ? 1 : 0) === (b.important ? 1 : 0)) return 0;
+        return (b.important ? 1 : 0) - (a.important ? 1 : 0);
+    });
+
+    noteEntry.dataset.tasks = JSON.stringify(tasks);
+
+    // Re-render tasks list
+    const tasksList = document.getElementById(`tasks-list-${noteId}`);
+    if (tasksList) {
+        tasksList.innerHTML = renderTasks(tasks);
+    }
+
+    markNoteAsModified(noteId);
+}
+
 // Mark note as modified (to trigger save)
 function markNoteAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -297,3 +341,4 @@ window.toggleTask = toggleTask;
 window.editTask = editTask;
 window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
+window.toggleImportant = toggleImportant;

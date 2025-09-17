@@ -49,7 +49,7 @@ if (!$note) {
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
 
         <br><br>

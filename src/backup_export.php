@@ -281,10 +281,10 @@ function createBackup() {
         <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
         <a href="restore_import.php" class="btn btn-secondary">
-            <i class="fas fa-download"></i> Go to Restore (Import)
+            Go to Restore (Import)
         </a>
 
     <br><br>

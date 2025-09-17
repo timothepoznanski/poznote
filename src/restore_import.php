@@ -614,7 +614,7 @@ function importAttachmentsZip($uploadedFile) {
         <h1><i class="fas fa-download"></i> Restore (Import)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
         <a href="backup_export.php" class="btn btn-secondary">
             <i class="fas fa-upload"></i> Go to Backup (Export)
