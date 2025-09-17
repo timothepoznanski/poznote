@@ -166,9 +166,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <div class="help-text">
-                            <a href="https://platform.openai.com/api-keys" target="_blank"><i class="fas fa-external-link-alt"></i> Get an API key from OpenAI</a>
-                        </div>
+                        <!-- Help text for OpenAI API key removed as requested -->
                     </div>
                     
                     <div class="form-group">
