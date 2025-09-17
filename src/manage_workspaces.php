@@ -382,7 +382,7 @@ try {
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
 
         <br><br>
@@ -1090,7 +1090,7 @@ try {
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Notes
+            Back to Notes
         </a>
 
         <br><br>
