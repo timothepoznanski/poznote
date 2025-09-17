@@ -76,6 +76,17 @@
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
+/* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
+.btn-attachment.has-attachments .fas.fa-paperclip::before,
+.btn-attachment.has-attachments .fa-paperclip::before {
+  filter: none !important;
+  background-image: url('../../webfonts/paperclip-light-full.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  content: '' !important; /* swap pseudo-element to use background-image */
+}
+
 /* Blue hover effect for toolbar icons */
 .toolbar-btn:hover .fas::before,
 .toolbar-btn:hover .fa::before,
@@ -109,6 +120,15 @@ a:hover .far::before {
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
 .btn-favorite.is-favorite .fa-star::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* When favorite is active, force the solid star SVG and remove tint filter so the icon appears filled */
+.btn-favorite.is-favorite .fa-star::before {
+  background-image: url('../../webfonts/star-solid-full.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  filter: none !important;
 }
 
 .fa-align-left-svg,
@@ -199,6 +219,13 @@ a:hover .far::before {
 /* Blue color when a note is shared publicly */
 .btn-share.is-shared .fa-square-share-nodes-svg {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* When shared, make the share icon visually filled/solid (remove dark tint) */
+.btn-share.is-shared .fa-square-share-nodes-svg {
+  filter: none !important;
+  /* keep existing SVG - if a solid variant exists replace url accordingly */
+  background-image: url('../../webfonts/square-share-nodes-light-full.svg') !important;
 }
 
 
