@@ -79,7 +79,8 @@
 /* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
 .btn-attachment.has-attachments .fas.fa-paperclip::before,
 .btn-attachment.has-attachments .fa-paperclip::before {
-  filter: none !important;
+  /* tint paperclip SVG to app blue */
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
   background-image: url('../../webfonts/paperclip-light-full.svg') !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
@@ -128,7 +129,8 @@ a:hover .far::before {
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-size: contain !important;
-  filter: none !important;
+  /* tint star SVG to app blue */
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
 }
 
 .fa-align-left-svg,
@@ -223,8 +225,8 @@ a:hover .far::before {
 
 /* When shared, make the share icon visually filled/solid (remove dark tint) */
 .btn-share.is-shared .fa-square-share-nodes-svg {
-  filter: none !important;
-  /* keep existing SVG - if a solid variant exists replace url accordingly */
+  /* tint share SVG to app blue */
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
   background-image: url('../../webfonts/square-share-nodes-light-full.svg') !important;
 }
 
