@@ -109,18 +109,44 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 				$heading = $row['heading'];
 				$updated = formatDateTime(strtotime($row['updated']));
 				
-				echo '<div id="note'.$id.'" class="trash-notecard">
-					<div class="trash-innernote">
-						<div class="trash-action-icons">
-							<i title="Restore this note" class="fa fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>
-							<i title="Delete permanently" class="fas fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>
-						</div>
-						<div class="lastupdated">Last modified on '.$updated.'</div>
-						<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>
-						<hr>
-						<div class="noteentry">'.$entryfinal.'</div>
-					</div>
-				</div>';
+				// If this is a tasklist type, try to parse the stored JSON and render a readable task list
+				$displayContent = $entryfinal;
+				if (isset($row['type']) && $row['type'] === 'tasklist') {
+					$decoded = json_decode($entryfinal, true);
+					if (is_array($decoded)) {
+						$tasksHtml = '<div class="task-list-container">';
+						$tasksHtml .= '<div class="tasks-list">';
+						foreach ($decoded as $task) {
+							$text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
+							$completed = !empty($task['completed']) ? ' completed' : '';
+							$checked = !empty($task['completed']) ? ' checked' : '';
+							$tasksHtml .= '<div class="task-item'.$completed.'">';
+							$tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
+							$tasksHtml .= '<span class="task-text">'.$text.'</span>';
+							$tasksHtml .= '</div>';
+						}
+						$tasksHtml .= '</div></div>';
+						$displayContent = $tasksHtml;
+					} else {
+						// If JSON parse fails, escape raw content
+						$displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
+					}
+				} else {
+					// non-tasklist: keep raw HTML content
+					$displayContent = $entryfinal;
+				}
+
+				echo '<div id="note'.$id.'" class="trash-notecard">'
+					.'<div class="trash-innernote">'
+					.'<div class="trash-action-icons">'
+					.'<i title="Restore this note" class="fa fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>'
+					.'<i title="Delete permanently" class="fas fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>'
+					.'</div>'
+					.'<div class="lastupdated">Last modified on '.$updated.'</div>'
+					.'<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>'
+					.'<hr>'
+					.'<div class="noteentry">'.$displayContent.'</div>'
+					.'</div></div>';
 			}
 		} else {
 			echo '<div class="trash-no-notes">No notes in trash.</div>';
