@@ -284,7 +284,7 @@ function createBackup() {
             Back to Notes
         </a>
         <a href="restore_import.php" class="btn btn-secondary">
-            <i class="fas fa-download"></i> Go to Restore (Import)
+            Go to Restore (Import)
         </a>
 
     <br><br>
