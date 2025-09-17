@@ -177,8 +177,17 @@ function showShareModal(url, options) {
     openBtn.style.border = 'none';
     openBtn.onclick = function(ev) {
         try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-        // Open in new tab with noopener for safety
-        window.open(url, '_blank', 'noopener');
+        // Read the current URL from the modal each time so Renew updates are respected
+        try {
+            const urlEl = document.getElementById('shareModalUrl');
+            const currentUrl = urlEl ? urlEl.textContent : url;
+            if (currentUrl) {
+                window.open(currentUrl, '_blank', 'noopener');
+            }
+        } catch (e) {
+            // fallback to original captured url
+            if (url) window.open(url, '_blank', 'noopener');
+        }
     };
     buttonsDiv.appendChild(openBtn);
 
@@ -282,6 +291,13 @@ function showShareModal(url, options) {
                             const urlDivEl = document.getElementById('shareModalUrl');
                             if (urlDivEl) urlDivEl.textContent = j.url;
                             markShareIconShared(noteId, true);
+                            // If Open/Copy were disabled because there was no URL, re-enable them
+                            try {
+                                if (openBtn) { openBtn.disabled = false; openBtn.style.opacity = ''; }
+                                if (copyBtn) { copyBtn.disabled = false; copyBtn.style.opacity = ''; }
+                            } catch (e) {
+                                // ignore
+                            }
                         }
                     }
                 } else {
