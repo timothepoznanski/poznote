@@ -855,17 +855,19 @@ a.links_arbo_left.selected-note {
     color: #005a8a !important;
 }
 
-/* Green indicators for notes with attachments on mobile */
+/* Attachment indicators on mobile (use app blue) */
 .btn-settings.has-attachments i::before,
 .btn-attachment.has-attachments i::before {
-    filter: brightness(0) saturate(100%) invert(50%) sepia(95%) saturate(3500%) hue-rotate(95deg) brightness(95%) contrast(95%) !important;
+    filter: none !important;
+    color: #007DB8 !important;
 }
 
 .btn-settings.has-attachments:hover i::before,
 .btn-settings.has-attachments:focus i::before,
 .btn-attachment.has-attachments:hover i::before,
 .btn-attachment.has-attachments:focus i::before {
-    filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(4000%) hue-rotate(95deg) brightness(85%) contrast(105%) !important;
+    filter: none !important;
+    color: #005a8a !important;
 }
 
 /* UNIFIED SEARCH MOBILE STYLES */

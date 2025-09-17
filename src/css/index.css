@@ -413,25 +413,28 @@ a:active { color: #2E8CFA; } */
     color: #007DB8 !important;
 }
 
-/* Green indicators for notes with attachments */
+/* Attachment indicators (use app blue instead of green) */
 .btn-settings.has-attachments {
-    color: #28a745 !important;
+    color: #007DB8 !important;
 }
 
 .btn-settings.has-attachments:hover {
-    color: #1e7e34 !important;
+    color: #005a8a !important;
 }
 
 .btn-attachment.has-attachments i::before {
-    filter: brightness(0) saturate(100%) invert(50%) sepia(95%) saturate(3500%) hue-rotate(95deg) brightness(95%) contrast(95%) !important;
+    /* adjust icon tint to match the blue color */
+    filter: none !important;
+    color: #007DB8 !important;
 }
 
 .btn-attachment.has-attachments:hover i::before {
-    filter: brightness(0) saturate(100%) invert(35%) sepia(95%) saturate(4000%) hue-rotate(95deg) brightness(85%) contrast(105%) !important;
+    filter: none !important;
+    color: #005a8a !important;
 }
 
 .dropdown-item.has-attachments i {
-    color: #28a745 !important;
+    color: #007DB8 !important;
 }
 
 /* LEFT COLUMN */
@@ -1360,7 +1363,7 @@ img {
     font-size: 12px;
     margin-right: 8px;
     flex-shrink: 0;
-    color: rgb(55, 53, 47);
+    color: #007DB8;
     align-self: center;
     line-height: 1;
 }
