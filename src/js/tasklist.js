@@ -371,7 +371,7 @@ function enableDragAndDrop(noteId) {
             const sortable = new Sortable(tasksList, {
                 animation: 150,
                 onEnd: function(evt) {
-                    try { console.debug('tasklist: sortable onEnd', { noteId: noteId, oldIndex: evt.oldIndex, newIndex: evt.newIndex }); } catch (e){}
+                    // sortable onEnd
 
                     const noteEntry = document.getElementById('entry' + noteId);
                     if (!noteEntry) return;
@@ -389,7 +389,7 @@ function enableDragAndDrop(noteId) {
                     // Save new order
                     noteEntry.dataset.tasks = JSON.stringify(tasks);
 
-                    try { console.debug('tasklist: sortable moved', { noteId: noteId, newOrder: tasks.map(t => t.id) }); } catch (e){}
+                    // sortable moved
 
                     // Mark note modified so it gets saved
                     markNoteAsModified(noteId);
@@ -453,7 +453,7 @@ function enableDragAndDrop(noteId) {
             e.dataTransfer.effectAllowed = 'move';
             try { e.dataTransfer.setData('text/plain', draggedId); } catch (err) { /* some browsers */ }
             item.classList.add('dragging');
-            try { console.debug('tasklist: dragstart', { noteId: noteId, draggedId: draggedId }); } catch (e){}
+            // dragstart
         });
 
         tasksList.addEventListener('dragover', function(e) {
@@ -462,7 +462,7 @@ function enableDragAndDrop(noteId) {
             clearDragOver();
             if (over && over.dataset.taskId !== draggedId) {
                 over.classList.add('drag-over');
-                try { console.debug('tasklist: dragover', { noteId: noteId, overId: over.dataset.taskId, draggedId: draggedId }); } catch (e){}
+                // dragover
             }
         });
 
@@ -487,7 +487,7 @@ function enableDragAndDrop(noteId) {
             if (!idStr) return;
 
             const draggedIndex = tasks.findIndex(t => String(t.id) === String(idStr));
-            try { console.debug('tasklist: drop', { noteId: noteId, draggedId: idStr, draggedIndex: draggedIndex, targetItemId: targetItem ? targetItem.dataset.taskId : null }); } catch (e){}
+            // drop
             if (draggedIndex === -1) return;
 
             // If dropped on an item, insert before it. If dropped on empty space, move to end.
@@ -513,7 +513,7 @@ function enableDragAndDrop(noteId) {
                 setTimeout(() => enableDragAndDrop(noteId), 0);
             }
 
-            try { console.debug('tasklist: dropped and reordered', { noteId: noteId, newOrder: tasks.map(t => t.id) }); } catch (e){}
+            // dropped and reordered
             // Mark note modified so it gets saved
             markNoteAsModified(noteId);
         });
@@ -523,7 +523,7 @@ function enableDragAndDrop(noteId) {
             if (item) item.classList.remove('dragging');
             clearDragOver();
             draggedId = null;
-            try { console.debug('tasklist: dragend', { noteId: noteId }); } catch (e){}
+            // dragend
         });
     }
 
