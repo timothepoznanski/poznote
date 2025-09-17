@@ -584,12 +584,21 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Share / Download dropdown (export or public share)
                     echo '<div class="share-dropdown">';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    // Check if note is already shared to add visual indicator
+                    $is_shared = false;
+                    try {
+                        $stmt2 = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
+                        $stmt2->execute([$row['id']]);
+                        $is_shared = (bool)$stmt2->fetchColumn();
+                    } catch (Exception $e) { /* ignore */ }
+
+                    $share_class_extra = $is_shared ? ' is-shared' : '';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class_extra.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" data-action="download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
                     echo '<i class="fas fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
-                    echo '<div class="share-menu-item" data-action="public" onclick="createPublicShare(\''.$row['id'].'\'); closeShareMenu();">';
+                    echo '<div class="share-menu-item" data-action="public" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
                     echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
@@ -700,12 +709,20 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
                     // Mobile: use share dropdown as well (simpler menu)
                     echo '<div class="share-dropdown mobile">';
-                    echo '<button type="button" class="toolbar-btn btn-share" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    // Mobile: reflect shared state too
+                    $is_shared_mobile = false;
+                    try {
+                        $stmt3 = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
+                        $stmt3->execute([$row['id']]);
+                        $is_shared_mobile = (bool)$stmt3->fetchColumn();
+                    } catch (Exception $e) { /* ignore */ }
+                    $share_class_mobile = $is_shared_mobile ? ' is-shared' : '';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$share_class_mobile.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
                     echo '<i class="fas fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
-                    echo '<div class="share-menu-item" onclick="createPublicShare(\''.$row['id'].'\'); closeShareMenu();">';
+                    echo '<div class="share-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
                     echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
