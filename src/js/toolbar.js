@@ -741,18 +741,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleFormatButtons() {
         const selection = window.getSelection();
         const toolbar = document.querySelector('.note-edit-toolbar');
-        
-        if (selection.toString().length > 0) {
-            // Text is selected, show formatting buttons
-            if (toolbar) {
-                toolbar.classList.add('show-format-buttons');
-            }
-        } else {
-            // No selection, hide formatting buttons
-            if (toolbar) {
-                toolbar.classList.remove('show-format-buttons');
-            }
+    // If selection is inside a task list, do not show the note-edit toolbar
+    if (selection && selection.rangeCount > 0) {
+      try {
+        const range = selection.getRangeAt(0);
+        let container = range.commonAncestorContainer;
+        if (container && container.nodeType === 3) container = container.parentElement;
+        if (container && container.closest && container.closest('.task-list-container, .tasks-list, .task-item, .task-text')) {
+          if (toolbar) toolbar.classList.remove('show-format-buttons');
+          return;
         }
+      } catch (e) {
+        // ignore errors and fall back to default behavior
+      }
+    }
+
+    if (selection.toString().length > 0) {
+      // Text is selected, show formatting buttons
+      if (toolbar) {
+        toolbar.classList.add('show-format-buttons');
+      }
+    } else {
+      // No selection, hide formatting buttons
+      if (toolbar) {
+        toolbar.classList.remove('show-format-buttons');
+      }
+    }
     }
     
     // Listen to selection events

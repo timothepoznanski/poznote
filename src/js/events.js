@@ -542,6 +542,15 @@ function initTextSelectionHandlers() {
                         isTitleOrTagField = true;
                         break;
                     }
+                    // If selection is inside a task list, treat it as non-editable for formatting
+                    try {
+                        if (currentElement && currentElement.closest && currentElement.closest('.task-list-container, .tasks-list, .task-item, .task-text')) {
+                            // Consider as not editable so formatting buttons won't appear
+                            editableElement = null;
+                            isTitleOrTagField = true;
+                            break;
+                        }
+                    } catch (err) {}
                     // Treat selection inside the note metadata subline as title-like (do not toggle toolbar)
                     if (currentElement.classList && currentElement.classList.contains('note-subline')) {
                         isTitleOrTagField = true;
