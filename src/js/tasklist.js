@@ -525,6 +525,152 @@ function enableDragAndDrop(noteId) {
             draggedId = null;
             // dragend
         });
+
+        // Mobile / touch fallback using Pointer events (long-press to start)
+        let pointerDragState = null;
+
+        function onPointerDown(e) {
+            // Only left button or touch
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const target = e.target.closest('.task-item');
+            if (!target) return;
+
+            // Prepare state
+            pointerDragState = {
+                startTarget: target,
+                noteId: noteId,
+                startX: e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0,
+                startY: e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY) || 0,
+                longPressTimer: null,
+                placeholder: null,
+                clone: null
+            };
+
+            // Long press to initiate drag (200ms)
+            pointerDragState.longPressTimer = setTimeout(() => {
+                startPointerDrag(e);
+            }, 200);
+
+            // Cancel on pointerup/cancel before longpress
+            function cancelInit() {
+                if (pointerDragState) {
+                    clearTimeout(pointerDragState.longPressTimer);
+                    pointerDragState = null;
+                }
+                window.removeEventListener('pointerup', cancelInit);
+                window.removeEventListener('pointercancel', cancelInit);
+            }
+
+            window.addEventListener('pointerup', cancelInit);
+            window.addEventListener('pointercancel', cancelInit);
+        }
+
+        function startPointerDrag(e) {
+            if (!pointerDragState) return;
+            const state = pointerDragState;
+            const item = state.startTarget;
+            const rect = item.getBoundingClientRect();
+
+            // Create placeholder
+            const placeholder = document.createElement('div');
+            placeholder.className = 'task-item placeholder';
+            placeholder.style.height = rect.height + 'px';
+            placeholder.style.background = 'rgba(0,0,0,0.03)';
+            item.parentNode.insertBefore(placeholder, item.nextSibling);
+            state.placeholder = placeholder;
+
+            // Create clone
+            const clone = item.cloneNode(true);
+            clone.style.position = 'fixed';
+            clone.style.left = rect.left + 'px';
+            clone.style.top = rect.top + 'px';
+            clone.style.width = rect.width + 'px';
+            clone.style.pointerEvents = 'none';
+            clone.style.opacity = '0.9';
+            clone.classList.add('dragging');
+            document.body.appendChild(clone);
+            state.clone = clone;
+
+            // mark source
+            item.style.visibility = 'hidden';
+
+            // Listen for move and end
+            function onPointerMove(ev) {
+                ev.preventDefault();
+                const x = ev.clientX;
+                const y = ev.clientY;
+                clone.style.left = (x - rect.width/2) + 'px';
+                clone.style.top = (y - rect.height/2) + 'px';
+
+                // Find element under pointer
+                const el = document.elementFromPoint(x, y);
+                const over = el ? el.closest('.task-item') : null;
+
+                // If over placeholder or clone skip
+                if (over && over !== item && over !== state.placeholder && over !== state.clone) {
+                    // Insert placeholder before/after depending on pointer Y
+                    const overRect = over.getBoundingClientRect();
+                    const middle = overRect.top + overRect.height/2;
+                    if (y < middle) {
+                        over.parentNode.insertBefore(state.placeholder, over);
+                    } else {
+                        over.parentNode.insertBefore(state.placeholder, over.nextSibling);
+                    }
+                }
+            }
+
+            function onPointerUp(ev) {
+                // finalize
+                window.removeEventListener('pointermove', onPointerMove);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
+
+                const noteEntry = document.getElementById('entry' + state.noteId);
+                if (noteEntry && state.placeholder) {
+                    // Rebuild tasks array order according to DOM
+                    let tasks = [];
+                    try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { tasks = []; }
+
+                    // Map DOM order to tasks order
+                    const items = Array.from(document.getElementById(`tasks-list-${state.noteId}`).querySelectorAll('.task-item'));
+                    const orderIds = items.map(it => it.dataset.taskId).filter(Boolean);
+
+                    // Reorder tasks according to orderIds
+                    const newTasks = [];
+                    orderIds.forEach(id => {
+                        const found = tasks.find(t => String(t.id) === String(id));
+                        if (found) newTasks.push(found);
+                    });
+                    // If clone was hidden source, ensure it's removed from visibility
+                    const original = state.startTarget;
+                    if (original) original.style.visibility = '';
+
+                    // Clean up placeholder and clone
+                    if (state.clone && state.clone.parentNode) state.clone.parentNode.removeChild(state.clone);
+                    if (state.placeholder && state.placeholder.parentNode) state.placeholder.parentNode.removeChild(state.placeholder);
+
+                    // Save new order
+                    if (newTasks.length > 0) {
+                        noteEntry.dataset.tasks = JSON.stringify(newTasks);
+                        const listEl = document.getElementById(`tasks-list-${state.noteId}`);
+                        if (listEl) {
+                            listEl.innerHTML = renderTasks(newTasks);
+                            setTimeout(() => enableDragAndDrop(state.noteId), 0);
+                        }
+                        markNoteAsModified(state.noteId);
+                    }
+                }
+
+                pointerDragState = null;
+            }
+
+            window.addEventListener('pointermove', onPointerMove, { passive: false });
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+        }
+
+        // Attach pointerdown for mobile-friendly dragging
+        tasksList.addEventListener('pointerdown', onPointerDown);
     }
 
     // If Sortable fails to load within a short time, fall back to HTML5 handlers
