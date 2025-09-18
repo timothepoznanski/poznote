@@ -122,6 +122,12 @@
     min-height: 20px;
 }
 
+.task-text a {
+    color: #007DB8;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
 .task-edit-input {
     flex: 1;
     padding: 2px 4px;

@@ -7,6 +7,23 @@ include 'functions.php';
 require_once 'config.php';
 include 'db_connect.php';
 
+// Helper: convert plain-text URLs into safe HTML anchors
+function linkify_html($text) {
+	if ($text === null || $text === '') return '';
+	// escape first to avoid XSS
+	$escaped = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+	// Use # as regex delimiter to make quoting easier. Matches http(s)://... or www....
+	$regex = '#\b(?:https?://|www\.)[^\s"\'<>]+#i';
+	$result = preg_replace_callback($regex, function($m) {
+		$url = $m[0];
+		$href = preg_match('/^https?:/i', $url) ? $url : 'http://' . $url;
+		$h = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
+		$label = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+		return '<a href="' . $h . '" target="_blank" rel="noopener noreferrer">' . $label . '</a>';
+	}, $escaped);
+	return $result;
+}
+
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 ?>
@@ -117,7 +134,7 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 						$tasksHtml = '<div class="task-list-container">';
 						$tasksHtml .= '<div class="tasks-list">';
 						foreach ($decoded as $task) {
-							$text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
+							$text = isset($task['text']) ? linkify_html($task['text']) : '';
 							$completed = !empty($task['completed']) ? ' completed' : '';
 							$checked = !empty($task['completed']) ? ' checked' : '';
 							$tasksHtml .= '<div class="task-item'.$completed.'">';
