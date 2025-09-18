@@ -8,12 +8,13 @@
  * On mobile, we use touch handlers instead of onclick for better UX
  */
 function initializeMobileTouchHandlers() {
-    if (!isMobileDevice()) {
-        return; // Skip if not mobile
+    // Use matchMedia to match the CSS mobile breakpoint (keep behavior aligned with styles)
+    if (!window.matchMedia('(max-width: 800px)').matches) {
+        return; // Skip if not in mobile-like viewport
     }
 
-    // Find all note links
-    const noteLinks = document.querySelectorAll('.links_arbo_left a');
+    // Find all note links (anchors themselves have the class 'links_arbo_left')
+    const noteLinks = document.querySelectorAll('a.links_arbo_left');
 
     noteLinks.forEach(link => {
         // Remove existing event listeners to avoid duplicates
@@ -23,7 +24,42 @@ function initializeMobileTouchHandlers() {
         // Add touch event listeners with passive option for touchstart
         link.addEventListener('touchstart', handleMobileTouchStart, { passive: true });
         link.addEventListener('touchend', handleMobileTouchEnd, { passive: false });
+        
+        // Add a click listener to avoid duplicate activation when touch handlers already handled the tap
+        link.removeEventListener('click', handleMobileClickFallback);
+        link.addEventListener('click', handleMobileClickFallback);
     });
+
+    // Capture-phase click handler to ensure single-click opens note in mobile/compact view
+    function mobileAnchorCaptureHandler(e) {
+    // Only handle in mobile-like layout (match CSS breakpoint)
+    if (!window.matchMedia('(max-width: 800px)').matches) return;
+
+        var link = e.target.closest('a.links_arbo_left');
+        if (!link) return;
+
+        // If touch already handled it, ignore
+        if (link.touchHandled) {
+            e.preventDefault();
+            e.stopPropagation();
+            // reset flag shortly after
+            setTimeout(() => { link.touchHandled = false; }, 300);
+            return;
+        }
+
+    // Prevent default navigation and ensure consistent AJAX loading
+        e.preventDefault();
+        e.stopPropagation();
+
+        var url = link.getAttribute('href');
+        var noteTitle = link.getAttribute('data-note-id');
+        // Call loader with the event so it can prevent default if needed
+        loadNoteDirectly(url, noteTitle, e);
+    }
+
+    // Attach capture listener once
+    document.removeEventListener('click', mobileAnchorCaptureHandler, true);
+    document.addEventListener('click', mobileAnchorCaptureHandler, true);
 }
 
 /**
@@ -35,6 +71,7 @@ function handleMobileTouchStart(event) {
     this.touchStartX = event.touches[0].clientX;
     this.touchStartY = event.touches[0].clientY;
     this.touchHandled = false; // Reset flag
+    // touch start recorded on element
 }
 
 /**
@@ -55,13 +92,27 @@ function handleMobileTouchEnd(event) {
     const deltaY = Math.abs(touch.clientY - (this.touchStartY || 0));
     const hasMoved = deltaX > 10 || deltaY > 10;
 
+    // touch end recorded on element
     // Validate tap: reasonable duration, no significant movement
     if (touchDuration > 50 && touchDuration < 1000 && !hasMoved && !this.touchHandled) {
-        this.touchHandled = true; // Mark as handled
+    this.touchHandled = true; // Mark as handled
         loadNoteDirectly(url, noteTitle);
     }
 
     return false;
+}
+
+// Fallback click handler to prevent duplicate open when touch already handled
+function handleMobileClickFallback(event) {
+    // If this link was recently handled by touch, ignore the click
+    if (this.touchHandled) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Reset flag shortly after to allow future clicks
+        setTimeout(() => { this.touchHandled = false; }, 300);
+        return false;
+    }
+    // Otherwise let normal click behavior proceed (desktop onclick or href)
 }
 
 /**
@@ -69,14 +120,12 @@ function handleMobileTouchEnd(event) {
  * Made available globally for use by mobile home button
  */
 window.goBackToNoteList = function() {
-    if (isMobileDevice()) {
+    if (window.matchMedia('(max-width: 800px)').matches) {
         // Remove note-open class to show left column
         document.body.classList.remove('note-open');
 
-        // Clear selected note
-        document.querySelectorAll('.links_arbo_left').forEach(link => {
-            link.classList.remove('selected-note');
-        });
+        // Keep the currently selected note highlighted so it can be re-opened with one tap
+        // (do not remove the 'selected-note' class here)
 
         // Reset loading state to ensure next note click works
         window.isLoadingNote = false;
@@ -110,12 +159,10 @@ function initializeNoteLoaderMobile() {
             loadNoteFromUrl(window.location.href);
         } else {
             // If no state (going back to list), handle mobile view
-            if (isMobileDevice()) {
+            if (window.matchMedia('(max-width: 800px)').matches) {
                 document.body.classList.remove('note-open');
-                // Clear selected note
-                document.querySelectorAll('.links_arbo_left').forEach(link => {
-                    link.classList.remove('selected-note');
-                });
+                // Keep the selected note highlighted so the user can re-open it with one tap
+                // (do not clear 'selected-note' here)
                 // Reset loading state to ensure next note click works
                 window.isLoadingNote = false;
             }
@@ -129,8 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     reinitializeImageClickHandlers(); // Initialize image handlers on page load
     initializeMobileTouchHandlers(); // Initialize mobile touch handlers
 
-    // Add touch move detection for mobile
-    if (isMobileDevice()) {
+    // Add touch move detection for mobile-like layout
+    if (window.matchMedia('(max-width: 800px)').matches) {
         document.addEventListener('touchmove', function(event) {
             if (window.touchStartX !== undefined && window.touchStartY !== undefined) {
                 const touch = event.touches[0];
@@ -152,8 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, true); // Use capture phase to ensure we get the event first
 
-    // On mobile, if we have a note parameter in URL, ensure note-open class is set
-    if (isMobileDevice()) {
+    // On mobile-like layout, if we have a note parameter in URL, ensure note-open class is set
+    if (window.matchMedia('(max-width: 800px)').matches) {
         const urlParams = new URLSearchParams(window.location.search);
         const noteParam = urlParams.get('note');
 
@@ -178,8 +225,8 @@ if (document.readyState !== 'loading') {
     reinitializeImageClickHandlers(); // Initialize image handlers if DOM already loaded
     initializeMobileTouchHandlers(); // Initialize mobile touch handlers if DOM already loaded
 
-    // Add touch move detection for mobile if DOM already loaded
-    if (isMobileDevice()) {
+    // Add touch move detection for mobile-like layout if DOM already loaded
+    if (window.matchMedia('(max-width: 800px)').matches) {
         document.addEventListener('touchmove', function(event) {
             if (window.touchStartX !== undefined && window.touchStartY !== undefined) {
                 const touch = event.touches[0];
@@ -193,8 +240,8 @@ if (document.readyState !== 'loading') {
         }, { passive: true });
     }
 
-    // Same mobile check for already loaded DOM
-    if (isMobileDevice()) {
+    // Same mobile-like check for already loaded DOM
+    if (window.matchMedia('(max-width: 800px)').matches) {
         const urlParams = new URLSearchParams(window.location.search);
         const noteParam = urlParams.get('note');
 
