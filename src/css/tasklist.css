@@ -86,6 +86,12 @@
     opacity: 0.6;
 }
 
+/* Placeholder used for touch drag-and-drop */
+.task-item.placeholder {
+    border: 1px dashed #cbd5e0;
+    background: rgba(0,0,0,0.02);
+}
+
 .task-item.completed {
     background: #f0f8f0;
     border-color: #c8e6c9;
