@@ -115,6 +115,8 @@
     font-size: 14px;
     line-height: 1.4;
     cursor: text;
+    /* Ensure very long words/URLs wrap to next line to avoid overflowing the container */
+    overflow-wrap: anywhere;
     word-break: break-word;
     padding: 2px 0;
     min-height: 20px;
@@ -129,6 +131,13 @@
     font-family: inherit;
     background: #fff;
     outline: none;
+}
+
+/* Make sure the inline edit input doesn't cause horizontal scrolling and wraps long content */
+.task-edit-input,
+.task-input {
+    white-space: pre-wrap; /* preserve user line breaks but allow wrapping */
+    overflow-wrap: anywhere;
 }
 
 .task-delete-btn {
