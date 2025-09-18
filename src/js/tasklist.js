@@ -81,7 +81,7 @@ function renderTasks(tasks) {
         return `
         <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
-            <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${escapeHtml(task.text)}</span>
+            <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
@@ -226,8 +226,11 @@ function saveTaskEdit(taskId, noteId, newText) {
         if (taskText) {
             const newTaskText = document.createElement('span');
             newTaskText.className = 'task-text';
-            newTaskText.textContent = newText;
+            newTaskText.innerHTML = linkifyHtml(newText);
             newTaskText.onclick = () => editTask(taskId, noteId);
+            // Ensure links inside don't trigger the span's onclick
+            const anchors = newTaskText.querySelectorAll('a');
+            anchors.forEach(a => a.addEventListener('click', e => e.stopPropagation()));
             taskText.replaceWith(newTaskText);
         }
     }
@@ -248,8 +251,10 @@ function cancelTaskEdit(taskId, noteId, originalText) {
 
     const taskText = document.createElement('span');
     taskText.className = 'task-text';
-    taskText.textContent = originalText;
+    taskText.innerHTML = linkifyHtml(originalText);
     taskText.onclick = () => editTask(taskId, noteId);
+    const anchors2 = taskText.querySelectorAll('a');
+    anchors2.forEach(a => a.addEventListener('click', e => e.stopPropagation()));
     input.replaceWith(taskText);
 }
 
@@ -346,6 +351,30 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Convert plain-text URLs into clickable anchor tags safely.
+// Strategy: escape the full text first, then replace URL-like substrings
+// in the escaped string with anchor tags. Anchors include
+// target="_blank" rel="noopener noreferrer" and stopPropagation
+// inline to avoid triggering parent click handlers.
+function linkifyHtml(text) {
+    if (!text) return '';
+    // Basic URL regex (http/https/www)
+    const urlRegex = /((https?:\/\/)[^\s"'<>]+)|(www\.[^\s"'<>]+)/ig;
+    // Escape input first
+    let escaped = escapeHtml(text);
+
+    // Replace matches with anchors. Because escaped may contain HTML entities,
+    // the regex still works on the escaped string for common URLs.
+    const replaced = escaped.replace(urlRegex, function(m) {
+        let href = m;
+        if (!/^https?:\/\//i.test(href)) href = 'http://' + href;
+        // Use double quotes around attributes and stop propagation on click to avoid editing
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
+    });
+
+    return replaced;
 }
 
 // Export functions globally
