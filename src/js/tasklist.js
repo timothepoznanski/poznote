@@ -38,8 +38,8 @@ function renderTaskList(noteId, tasks) {
     const taskListHtml = `
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
-                <input type="text" class="task-input" id="task-input-${noteId}"
-                       placeholder="Add new task..." maxlength="200">
+          <input type="text" class="task-input" id="task-input-${noteId}"
+              placeholder="Add new task..." maxlength="4000">
                 <button class="task-add-btn" onclick="addTask(${noteId})">
                     <i class="fas fa-plus"></i>
                 </button>
@@ -179,7 +179,8 @@ function editTask(taskId, noteId) {
     input.type = 'text';
     input.value = currentText;
     input.className = 'task-edit-input';
-    input.maxLength = 200;
+    // Allow up to 4000 characters for a task line
+    input.maxLength = 4000;
 
     input.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
