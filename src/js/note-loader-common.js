@@ -36,6 +36,7 @@ function findNoteLinkByTitle(noteTitle) {
  */
 window.loadNoteDirectly = function(url, noteTitle, event) {
     try {
+    // loadNoteDirectly start
         // Prevent default link behavior
         if (event) {
             event.preventDefault();
@@ -59,7 +60,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
             document.body.classList.add('note-open');
         }
 
-        // Create XMLHttpRequest
+    // Create XMLHttpRequest
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -70,25 +71,30 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                     window.isLoadingNote = false;
 
                     if (xhr.status === 200) {
+                        // xhr 200 received, processing response
                         try {
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(xhr.responseText, 'text/html');
                             const rightColumn = doc.getElementById('right_col');
 
                             if (rightColumn) {
+                                // right_col found in response
                                 const currentRightColumn = document.getElementById('right_col');
-                                if (currentRightColumn) {
+                                    if (currentRightColumn) {
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
-                                    reinitializeNoteContent();
+                                    // Update URL before reinitializing so reinitializeNoteContent
+                                    // can detect the 'note' param and keep the right column visible
                                     updateBrowserUrl(url, noteTitle);
+                                    reinitializeNoteContent();
                                     hideNoteLoadingState();
-                                    
+
                                     // Apply selection after content is loaded and initialized
                                     updateSelectedNote(clickedLink);
                                 } else {
                                     throw new Error('Could not find current right column');
                                 }
                             } else {
+                                // right_col NOT found in server response
                                 throw new Error('Could not find note content in response');
                             }
                         } catch (error) {
@@ -121,6 +127,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         xhr.onerror = function() {
             window.isLoadingNote = false;
             console.error('Network error during note loading');
+                                    console.error('Network error during note loading for', noteTitle);
             showNotificationPopup('Network error - please check your connection');
             hideNoteLoadingState();
             if (isMobileDevice()) {
@@ -142,6 +149,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         xhr.timeout = 10000; // 10 seconds
 
         xhr.send();
+    // xhr sent
         return false;
     } catch (error) {
         console.error('Error in loadNoteDirectly:', error);
@@ -193,14 +201,15 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                     if (rightColumn) {
                         // Update the right column content
                         const currentRightColumn = document.getElementById('right_col');
-                        if (currentRightColumn) {
+                            if (currentRightColumn) {
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
+
+                            // Update URL before reinitializing so reinitializeNoteContent
+                            // can detect the 'note' param and keep the right column visible
+                            updateBrowserUrl(url, noteTitle);
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
-
-                            // Update browser URL without reload
-                            updateBrowserUrl(url, noteTitle);
 
                             // Hide loading state
                             hideNoteLoadingState();
@@ -303,6 +312,7 @@ function hideNoteLoadingState() {
  * Update selected note in the left column
  */
 function updateSelectedNote(clickedLink) {
+    // updateSelectedNote start
     // Remove selected class from all notes
     document.querySelectorAll('.links_arbo_left').forEach(link => {
         link.classList.remove('selected-note');
@@ -316,6 +326,7 @@ function updateSelectedNote(clickedLink) {
         // This helps in case other scripts interfere with the selection
         setTimeout(() => {
             if (clickedLink && !clickedLink.classList.contains('selected-note')) {
+                // re-applying selected-note if removed by other scripts
                 clickedLink.classList.add('selected-note');
             }
         }, 50);
