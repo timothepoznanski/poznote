@@ -201,6 +201,15 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             </div>
 
                 <!-- Footer links moved back into column as regular settings cards -->
+                <div class="settings-card" onclick="openReleaseNotes();">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3>Release Notes</h3>
+                    </div>
+                </div>
+
                 <div class="settings-card" onclick="checkForUpdates();">
                     <div class="settings-card-icon">
                         <i class="fas fa-sync-alt"></i>
@@ -290,6 +299,35 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+        
+        function openReleaseNotes() {
+            const modal = document.getElementById('releaseNotesModal');
+            const content = document.getElementById('releaseNotesContent');
+            const openBtn = document.getElementById('openOnGitHubBtn');
+            if (!modal || !content) return;
+            content.textContent = 'Loading...';
+            modal.style.display = 'block';
+            fetch('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md')
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch release notes: ' + res.status);
+                    return res.text();
+                })
+                .then(text => {
+                    // Preserve line breaks and render as plain text inside <pre>
+                    content.textContent = text;
+                })
+                .catch(err => {
+                    content.textContent = 'Error loading release notes: ' + err.message;
+                });
+            openBtn.onclick = function() {
+                window.open('https://github.com/timothepoznanski/poznote/blob/main/RELEASE_NOTES.md', '_blank');
+            }
+        }
+
+        function closeReleaseNotes() {
+            const modal = document.getElementById('releaseNotesModal');
+            if (modal) modal.style.display = 'none';
+        }
     </script>
 </body>
 </html>

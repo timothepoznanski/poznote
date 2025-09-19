@@ -228,6 +228,19 @@
     </div>
 </div>
 
+<!-- Release Notes Modal -->
+<div id="releaseNotesModal" class="modal">
+    <div class="modal-content" style="max-width:800px;">
+        <span class="close" onclick="closeReleaseNotes()">&times;</span>
+        <h3>Release Notes</h3>
+        <pre id="releaseNotesContent" style="white-space:pre-wrap; max-height:60vh; overflow:auto; background:#fafafa; padding:12px; border-radius:6px;">Loading...</pre>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeReleaseNotes()">Close</button>
+            <button type="button" class="btn-primary" id="openOnGitHubBtn">Open on GitHub</button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for moving all files from one folder to another -->
 <div id="moveFolderFilesModal" class="modal">
     <div class="modal-content">
