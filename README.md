@@ -1,13 +1,3 @@
-
-<div align="center" style="border:2px solid #0078d7; border-radius:8px; padding:20px; background:#f0f8ff; margin-bottom:20px;">
-<h3 style="margin:0; display:flex; justify-content:center; align-items:center;">
-<a href="README.fr.md" style="text-decoration:none; display:flex; align-items:center;">
-  <span>Cliquez ici pour lire cette documentation en français</span>
-  <img src="https://flagcdn.com/24x18/fr.png" alt="FR flag" style="margin-left:10px;">
-</a>
-</h3>
-</div>
-
 # Poznote
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
@@ -370,6 +360,18 @@ When AI features are enabled:
 
 Poznote provides a REST API for programmatic access to notes and folders.
 
+### API quick links
+
+ - [List Notes](#list-notes)
+ - [Create Note](#create-note)
+ - [Create Task List](#create-task-list)
+ - [Update Task List](#update-task-list)
+ - [Create Folder](#create-folder)
+ - [Move Note](#move-note)
+ - [Delete Note](#delete-note)
+ - [Delete Folder](#delete-folder)
+
+
 ### Authentication
 
 All API requests require HTTP Basic authentication:
@@ -398,6 +400,7 @@ http://YOUR_SERVER:HTTP_WEB_PORT/
 ### Endpoints
 
 #### List Notes
+
 ```bash
 curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=MyWorkspace
 ```
@@ -410,6 +413,7 @@ You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST d
 ---
 
 #### Create Note
+
 ```bash
 curl -X POST http://localhost:8040/api_create_note.php \
   -u 'username:password' \
@@ -433,6 +437,88 @@ curl -X POST http://localhost:8040/api_create_note.php \
 - `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
 
 ---
+
+#### Create Task List
+
+```bash
+curl -X POST http://localhost:8040/api_create_note.php \
+  -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "heading": "Shopping list",
+    "type": "tasklist",
+    "entry": "",
+    "entrycontent": "[ { \"id\": 1690000000000, \"text\": \"Buy bread\", \"completed\": false, \"important\": false } ]",
+    "tags": "shopping,urgent",
+    "folder_name": "Home",
+    "workspace": "MyWorkspace"
+  }'
+```
+
+**Parameters:**
+- `heading` (string) - **Required** - The note title
+- `type` (string) - *Optional* - Set to `tasklist` to create a task list note
+- `entry` (string) - *Optional* - HTML content (can be empty for tasklist)
+- `entrycontent` (string) - *Optional* - JSON string containing the tasks (see structure below)
+- `tags` (string) - *Optional* - Comma-separated tags
+- `folder_name` (string) - *Optional* - Folder name (defaults to "Default")
+- `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
+
+Example `entrycontent` structure (JSON array of tasks):
+
+```
+[
+  { "id": 1690000000000, "text": "Buy milk", "completed": false, "important": false, "noteId": 123 },
+  { "id": 1690000001000, "text": "Prepare meeting", "completed": true, "important": true, "noteId": 123 }
+]
+```
+
+---
+
+#### Update Task List
+
+```bash
+curl -X POST http://localhost:8040/update_note.php \
+  -u 'username:password' \
+  -d 'id=123&heading=Shopping%20list&entry=&entrycontent=%5B%7B%22id%22%3A1690000000000%2C%22text%22%3A%22Buy%20bread%22%2C%22completed%22%3Afalse%2C%22important%22%3Afalse%7D%5D&workspace=MyWorkspace'
+```
+
+**Parameters:**
+- `id` (string|number) - **Required** - The note id to update
+- `heading` (string) - **Required** - The note title
+- `entry` (string) - *Optional* - HTML content (for compatibility; usually empty for tasklist)
+- `entrycontent` (string) - *Required* for tasklist updates - JSON string with the tasks
+- `tags` (string) - *Optional* - Comma-separated tags
+- `folder` (string) - *Optional* - Folder name
+- `workspace` (string) - *Optional* - Workspace name
+
+---
+
+#### Update Note (JSON API)
+
+```bash
+curl -X POST http://localhost:8040/api_update_note.php \
+  -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "123",
+    "heading": "Shopping list",
+    "entry": "",
+    "entrycontent": "[ { \"id\":1690000000000, \"text\":\"Buy milk\", \"completed\":false } ]",
+    "tags": "shopping,urgent",
+    "folder": "Home",
+    "workspace": "MyWorkspace"
+  }'
+```
+
+Parameters:
+- `id` (string|number) - **Required** - The note id to update
+- `heading` (string) - **Required** - The note title
+- `entry` (string) - *Optional* - HTML content (for compatibility; usually empty for tasklist)
+- `entrycontent` (string) - *Optional* - JSON string containing tasklist data or other structured content
+- `tags` (string) - *Optional* - Comma-separated tags
+- `folder` (string) - *Optional* - Folder name (if provided, must exist in the workspace or as an existing entry folder)
+- `workspace` (string) - *Optional* - Workspace name
 
 #### Create Folder
 ```bash
