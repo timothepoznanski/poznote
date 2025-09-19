@@ -1,11 +1,11 @@
-// Script principal d'initialisation
-// Ce fichier coordonne l'initialisation de tous les modules
+// Main initialization script
+// This file coordinates initialization of all modules
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser les variables globales et les workspaces
+    // Initialize global variables and workspaces
     initializeWorkspaces();
     
-    // Initialiser l'interface utilisateur
+    // Initialize the user interface
     initializeWorkspaceMenu();
     initializeBrowserHistory();
     

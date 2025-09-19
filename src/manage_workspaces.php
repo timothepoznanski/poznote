@@ -337,7 +337,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
+    <link rel="stylesheet" href="css/images.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
@@ -1045,7 +1045,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
+    <link rel="stylesheet" href="css/images.css">
     <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
