@@ -494,6 +494,44 @@ curl -X POST http://localhost:8040/update_note.php \
 
 ---
 
+#### Update Note (JSON API)
+
+This endpoint allows updating an existing note using JSON. It is intended for external clients and scripts. The server performs validation: the `workspace` and `folder` (if provided) must exist — otherwise a 404 is returned.
+
+```bash
+curl -X POST http://localhost:8040/api_update_note.php \
+  -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "123",
+    "heading": "Shopping list",
+    "entry": "",
+    "entrycontent": "[ { \"id\":1690000000000, \"text\":\"Buy milk\", \"completed\":false } ]",
+    "tags": "shopping,urgent",
+    "folder": "Home",
+    "workspace": "MyWorkspace"
+  }'
+```
+
+Parameters:
+- `id` (string|number) - **Required** - The note id to update
+- `heading` (string) - **Required** - The note title
+- `entry` (string) - *Optional* - HTML content (for compatibility; usually empty for tasklist)
+- `entrycontent` (string) - *Optional* - JSON string containing tasklist data or other structured content
+- `tags` (string) - *Optional* - Comma-separated tags
+- `folder` (string) - *Optional* - Folder name (if provided, must exist in the workspace or as an existing entry folder)
+- `workspace` (string) - *Optional* - Workspace name
+
+Responses:
+- 200 OK: JSON { "success": true, "message": "Note updated", "note": { "id": "123", "heading": "Shopping list" } }
+- 400 Bad Request: Invalid JSON or missing required parameters
+- 404 Not Found: Workspace or folder not found (the API now returns 404 if the provided workspace or target folder does not exist)
+- 409 Conflict: Heading already exists in the workspace (duplicate title)
+- 500 Server Error: Database or file write error
+
+Note: `update_note.php` (form-encoded, used by the web UI) remains available for browser-based saves and backward compatibility. `api_update_note.php` is the recommended JSON endpoint for programmatic updates and for clients that prefer JSON payloads.
+
+
 #### Create Folder
 ```bash
 curl -X POST http://localhost:8040/api_create_folder.php \
