@@ -360,6 +360,15 @@ When AI features are enabled:
 
 Poznote provides a REST API for programmatic access to notes and folders.
 
+### API quick links
+
+- [List Notes](#list-notes)
+- [Create Note](#create-note)
+- [Create Task List](#create-task-list)
+- [Create Folder](#create-folder)
+- [Move Note](#move-note)
+
+
 ### Authentication
 
 All API requests require HTTP Basic authentication:
