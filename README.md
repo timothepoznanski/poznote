@@ -362,12 +362,12 @@ Poznote provides a REST API for programmatic access to notes and folders.
 
 ### API quick links
 
-- [List Notes](#list-notes)
-- [Create Note](#create-note)
-- [Create Task List](#create-task-list)
-- [Create Folder](#create-folder)
-- [Move Note](#move-note)
+ - [List Notes](#list-notes)
+ - [Create Note](#create-note)
+ - [Create Task List](#create-task-list)
  - [Update Task List](#update-task-list)
+ - [Create Folder](#create-folder)
+ - [Move Note](#move-note)
  - [Delete Note](#delete-note)
  - [Delete Folder](#delete-folder)
 
