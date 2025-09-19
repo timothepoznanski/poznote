@@ -461,6 +461,8 @@ Example `entrycontent` structure (JSON array of tasks):
 ]
 ```
 
+---
+
 #### Update Task List
 
 ```bash
