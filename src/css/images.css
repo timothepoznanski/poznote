@@ -81,7 +81,7 @@
 .btn-attachment.has-attachments .fa-paperclip::before {
   /* tint paperclip SVG to app blue */
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-  background-image: url('../../webfonts/paperclip-light-full.svg') !important;
+  background-image: url('../../images/paperclip-light-full.svg') !important;
   background-repeat: no-repeat !important;
   background-position: center !important;
   background-size: contain !important;
@@ -134,7 +134,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  background-image: url('../../webfonts/align-left-light-full.svg');
+  background-image: url('../../images/align-left-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -148,7 +148,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  background-image: url('../../webfonts/maximize-light-full.svg');
+  background-image: url('../../images/maximize-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -162,7 +162,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  background-image: url('../../webfonts/robot-light-full.svg');
+  background-image: url('../../images/robot-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -204,7 +204,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  background-image: url('../../webfonts/square-share-nodes-light-full.svg');
+  background-image: url('../../images/square-share-nodes-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -223,7 +223,7 @@ a:hover .far::before {
 .btn-share.is-shared .fa-square-share-nodes-svg {
   /* tint share SVG to app blue */
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-  background-image: url('../../webfonts/square-share-nodes-light-full.svg') !important;
+  background-image: url('../../images/square-share-nodes-light-full.svg') !important;
 }
 
 
@@ -233,7 +233,7 @@ a:hover .far::before {
   display: inline-block;
   width: 0.9em;
   height: 0.9em;
-  background-image: url('../../webfonts/icons-light-full.svg');
+  background-image: url('../../images/icons-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -247,7 +247,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/folder-light-full.svg');
+  background-image: url('../../images/folder-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -261,7 +261,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/folder-open-light-full.svg');
+  background-image: url('../../images/folder-open-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -275,7 +275,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/pen-to-square-light-full.svg');
+  background-image: url('../../images/pen-to-square-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -289,7 +289,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/trash-can-light-full.svg');
+  background-image: url('../../images/trash-can-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -303,7 +303,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/download-light-full.svg');
+  background-image: url('../../images/download-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -317,7 +317,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/floppy-disk-light-full.svg');
+  background-image: url('../../images/floppy-disk-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -331,7 +331,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/link-light-full.svg');
+  background-image: url('../../images/link-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -345,7 +345,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/link-slash-light-full.svg');
+  background-image: url('../../images/link-slash-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -359,7 +359,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/paperclip-light-full.svg');
+  background-image: url('../../images/paperclip-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -373,7 +373,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/minus-light-full.svg');
+  background-image: url('../../images/minus-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -387,7 +387,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/info-light-full.svg');
+  background-image: url('../../images/info-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -401,7 +401,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/magnifying-glass-light-full.svg');
+  background-image: url('../../images/magnifying-glass-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -415,7 +415,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/star-solid-full.svg');
+  background-image: url('../../images/star-solid-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -428,7 +428,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/star-light-full.svg');
+  background-image: url('../../images/star-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -442,7 +442,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/layer-group-light-full.svg');
+  background-image: url('../../images/layer-group-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -456,7 +456,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/gear-light-full.svg');
+  background-image: url('../../images/gear-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -470,7 +470,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/eye-light-full.svg');
+  background-image: url('../../images/eye-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -484,7 +484,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/house-light-full.svg');
+  background-image: url('../../images/house-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -498,7 +498,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/bold-light-full.svg');
+  background-image: url('../../images/bold-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -512,7 +512,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/italic-light-full.svg');
+  background-image: url('../../images/italic-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -526,7 +526,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/underline-light-full.svg');
+  background-image: url('../../images/underline-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -540,7 +540,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/eraser-light-full.svg');
+  background-image: url('../../images/eraser-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -554,7 +554,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/strikethrough-light-full.svg');
+  background-image: url('../../images/strikethrough-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -568,7 +568,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/palette-light-full.svg');
+  background-image: url('../../images/palette-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -582,7 +582,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/highlighter-light-full.svg');
+  background-image: url('../../images/highlighter-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -596,7 +596,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/list-ul-light-full.svg');
+  background-image: url('../../images/list-ul-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -610,7 +610,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/list-ol-light-full.svg');
+  background-image: url('../../images/list-ol-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -624,7 +624,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/text-height-light-full.svg');
+  background-image: url('../../images/text-height-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -638,7 +638,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/code-light-full.svg');
+  background-image: url('../../images/code-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -652,7 +652,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/terminal-light-full.svg');
+  background-image: url('../../images/terminal-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -667,7 +667,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/tag-light-full.svg');
+  background-image: url('../../images/tag-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -681,7 +681,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/tags-light-full.svg');
+  background-image: url('../../images/tags-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -695,7 +695,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/right-from-bracket-light-full.svg');
+  background-image: url('../../images/right-from-bracket-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -710,7 +710,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/rotate-light-full.svg');
+  background-image: url('../../images/rotate-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -725,7 +725,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/github-brands-solid-full.svg');
+  background-image: url('../../images/github-brands-solid-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -739,7 +739,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/earth-americas-light-full.svg');
+  background-image: url('../../images/earth-americas-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -753,7 +753,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/upload-light-full.svg');
+  background-image: url('../../images/upload-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -767,7 +767,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/arrow-left-light-full.svg');
+  background-image: url('../../images/arrow-left-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -781,7 +781,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/info-light-full.svg');
+  background-image: url('../../images/info-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -796,7 +796,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/file-lines-light-full.svg');
+  background-image: url('../../images/file-lines-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -810,7 +810,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/plus-light-full.svg');
+  background-image: url('../../images/plus-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -825,7 +825,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/calendar-light-full.svg');
+  background-image: url('../../images/calendar-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -839,7 +839,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/code-branch-light-full.svg');
+  background-image: url('../../images/code-branch-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -854,7 +854,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/note-sticky-light-full.svg');
+  background-image: url('../../images/note-sticky-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -868,7 +868,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/user-light-full.svg');
+  background-image: url('../../images/user-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -882,7 +882,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/hashtag-light-full.svg');
+  background-image: url('../../images/hashtag-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -896,7 +896,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/align-left-light-full.svg');
+  background-image: url('../../images/align-left-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -910,7 +910,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/arrow-left-light-full.svg');
+  background-image: url('../../images/arrow-left-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -924,7 +924,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/broom-light-full.svg');
+  background-image: url('../../images/broom-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -938,7 +938,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/trash-can-arrow-up-light-full.svg');
+  background-image: url('../../images/trash-can-arrow-up-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -952,7 +952,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/spinner-light-full.svg');
+  background-image: url('../../images/spinner-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -966,7 +966,7 @@ a:hover .far::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  background-image: url('../../webfonts/check-light-full.svg');
+  background-image: url('../../images/check-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

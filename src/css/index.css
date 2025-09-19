@@ -1324,7 +1324,7 @@ img {
 }
 
 .fa-tag.icon_tag::before {
-    background-image: url('../webfonts/tags-light-full.svg') !important;
+    background-image: url('../images/tags-light-full.svg') !important;
 } 
 
 .name_tags {
