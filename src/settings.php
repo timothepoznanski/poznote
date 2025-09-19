@@ -201,7 +201,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             </div>
 
                 <!-- Footer links moved back into column as regular settings cards -->
-                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote/blob/main/RELEASE_NOTES.md', '_blank');">
+                <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
                     <div class="settings-card-icon">
                         <i class="fas fa-file-alt"></i>
                     </div>
