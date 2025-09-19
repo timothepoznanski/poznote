@@ -201,6 +201,15 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
             </div>
 
                 <!-- Footer links moved back into column as regular settings cards -->
+                <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="settings-card-content">
+                        <h3>Release Notes</h3>
+                    </div>
+                </div>
+
                 <div class="settings-card" onclick="checkForUpdates();">
                     <div class="settings-card-icon">
                         <i class="fas fa-sync-alt"></i>
@@ -290,6 +299,8 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+        
+        // Release Notes now open on GitHub (no local modal)
     </script>
 </body>
 </html>
