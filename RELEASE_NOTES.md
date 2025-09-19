@@ -1,4 +1,4 @@
-# Poznote — Simplified release notes (User fonctionnalities only)
+# Poznote — Simplified release notes (User features only)
 
 2025-09-18 — Linkify URLs inside task text
 2025-09-17 — Implement drag & drop task reordering
