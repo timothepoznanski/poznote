@@ -36,7 +36,7 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 <title>Trash - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="vendor/fontawesome/local-icons.css" />
+	<link rel="stylesheet" href="css/local-icons.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash-mobile.css"/>

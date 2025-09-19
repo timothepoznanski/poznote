@@ -52,7 +52,7 @@ $is_generating = false;
     <title>AI Summary - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link href="css/modal.css" rel="stylesheet">
-    <link rel="stylesheet" href="vendor/fontawesome/local-icons.css">
+    <link rel="stylesheet" href="css/local-icons.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">
