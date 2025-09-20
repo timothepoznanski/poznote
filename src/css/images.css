@@ -809,19 +809,6 @@ a:hover .far::before {
   content: '';
 }
 
-.fa-trash-alt-svg,
-.fa.fa-trash-alt::before {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../../images/broom-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
 
 .fa-trash-restore-alt-svg,
 .fa.fa-trash-restore-alt::before {
