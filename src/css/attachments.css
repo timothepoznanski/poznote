@@ -1,15 +1,5 @@
 /* Attachments Management Page - Poznote */
 
-.settings-container h1 {
-    color: #007DB8;
-    margin: 0 0 10px 0;
-    font-size: 28px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
 .settings-container {
     max-width: 1000px;
     margin: 20px auto;

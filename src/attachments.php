@@ -44,7 +44,7 @@ if (!$note) {
 </head>
 <body>
     <div class="settings-container">
-        <h1><img src="images/paperclip-light-full.svg" alt="Paperclip" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> Manage Attachments</h1>
+        <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
