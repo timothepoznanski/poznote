@@ -22,7 +22,7 @@ include 'functions.php';
     <div class="settings-container">
         <br>
         <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
-            <i class="fas fa-arrow-left"></i>
+            <i class="fa-arrow-left"></i>
             Back to Notes
         </a>
         <br><br>
@@ -31,7 +31,7 @@ include 'functions.php';
             <!-- Moved from settings.php: user preferences -->
             <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
                 <div class="settings-card-icon">
-                    <i class="fas fa-user"></i>
+                    <i class="fa-user"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Login Display Name</h3>
@@ -40,7 +40,7 @@ include 'functions.php';
 
             <div class="settings-card" onclick="showNoteFontSizePrompt();">
                 <div class="settings-card-icon">
-                    <i class="fas fa-text-height"></i>
+                    <i class="fa-text-height"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Note Font Size</h3>
@@ -48,28 +48,28 @@ include 'functions.php';
             </div>
 
             <div class="settings-card" id="emoji-icons-card">
-                <div class="settings-card-icon"><i class="fas fa-smile"></i></div>
+                <div class="settings-card-icon"><i class="fa-smile"></i></div>
                 <div class="settings-card-content">
                     <h3>Show Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="show-created-card">
-                <div class="settings-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>
                 <div class="settings-card-content">
                     <h3>Show Note Creation Date <span id="show-created-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="show-subheading-card">
-                <div class="settings-card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="settings-card-icon"><i class="fa-map-marker-alt"></i></div>
                 <div class="settings-card-content">
                     <h3>Show Note Subheading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="folder-counts-card">
-                <div class="settings-card-icon"><i class="fas fa-hashtag"></i></div>
+                <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
                     <h3>Show Folders Notes Counts <span id="folder-counts-status" class="ai-status disabled">disabled</span></h3>
                 </div>

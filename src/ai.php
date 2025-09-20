@@ -115,7 +115,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
         
         <!-- AI Configuration Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-key"></i> AI Configuration</h3>
+            <h3><i class="fa-key"></i> AI Configuration</h3>
             <p>Configure your AI provider and API keys to use artificial intelligence features like automatic note summarization.</p>
             
             <form method="POST" id="ai-config-form">
@@ -163,7 +163,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    placeholder="sk-..."
                                    autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('openai_api_key')">
-                                <i class="fas fa-eye"></i>
+                                <i class="fa-eye"></i>
                             </button>
                         </div>
                         <!-- Help text for OpenAI API key removed as requested -->
@@ -195,7 +195,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    placeholder="Enter your Mistral API key..."
                                    autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('mistral_api_key')">
-                                <i class="fas fa-eye"></i>
+                                <i class="fa-eye"></i>
                             </button>
                         </div>
                         <div class="help-text">

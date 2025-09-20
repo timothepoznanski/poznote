@@ -262,12 +262,12 @@ class SearchManager {
 
         const activeType = this.getActiveSearchType(isMobile);
         const iconMap = {
-            notes: 'fas fa-file-alt',
-            tags: 'fas fa-tags',
-            folders: 'fas fa-folder'
+            notes: 'fa-file-alt',
+            tags: 'fa-tags',
+            folders: 'fa-folder'
         };
 
-        iconSpan.className = iconMap[activeType] || 'fas fa-search';
+        iconSpan.className = iconMap[activeType] || 'fa-search';
     }
 
     /**

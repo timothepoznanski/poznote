@@ -49,7 +49,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 			<div class="trash-search-notice">
 				Results for "<?php echo htmlspecialchars($search); ?>"
 		<span class="trash-clear-search" onclick="window.location='trash.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>'">
-					<i class="fas fa-times"></i>
+					<i class="fa-times"></i>
 				</span>
 			</div>
 		<?php endif; ?>
@@ -68,7 +68,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
-				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
+				<i class="fa-arrow-circle-left trash-button-icon"></i>
 			</div>
 			<div class="trash-button trash-empty-button" id="emptyTrashBtn" title="Empty trash">
 				<i class="fa-trash-alt trash-button-icon"></i>
@@ -157,7 +157,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
 					.'<i title="Restore this note" class="fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>'
-					.'<i title="Delete permanently" class="fas fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>'
+					.'<i title="Delete permanently" class="fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">Last modified on '.$updated.'</div>'
 					.'<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>'

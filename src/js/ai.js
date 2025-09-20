@@ -161,7 +161,7 @@ async function copyToClipboard() {
         const copyBtn = document.getElementById('copyBtn');
         if (copyBtn) {
             const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.innerHTML = '<i class="fa-check"></i> Copied!';
             copyBtn.style.background = '#28a745';
             
             setTimeout(() => {
@@ -181,7 +181,7 @@ async function copyToClipboard() {
             const copyBtn = document.getElementById('copyBtn');
             if (copyBtn) {
                 const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.innerHTML = '<i class="fa-check"></i> Copied!';
                 copyBtn.style.background = '#28a745';
                 
                 setTimeout(() => {

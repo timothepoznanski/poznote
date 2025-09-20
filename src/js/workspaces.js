@@ -130,7 +130,7 @@ function toggleWorkspaceMenu(event) {
 }
 
 function loadAndShowWorkspaceMenu(menu) {
-    menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-spinner fa-spin"></i>Loading workspaces...</div>';
+    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>Loading workspaces...</div>';
     menu.style.display = 'block';
     
     fetch('api_workspaces.php?action=list')
@@ -139,11 +139,11 @@ function loadAndShowWorkspaceMenu(menu) {
             if (data.success) {
                 displayWorkspaceMenu(menu, data.workspaces);
             } else {
-                menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-exclamation-triangle"></i>Error loading workspaces</div>';
+                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>Error loading workspaces</div>';
             }
         })
         .catch(function(error) {
-            menu.innerHTML = '<div class="workspace-menu-item"><i class="fas fa-exclamation-triangle"></i>Error loading workspaces</div>';
+            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>Error loading workspaces</div>';
         });
 }
 
@@ -176,7 +176,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         var workspace = workspaces[i];
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
-        var icon = isCurrent ? 'fas fa-check' : 'fas fa-layer-group';
+        var icon = isCurrent ? 'fa-check' : 'fa-layer-group';
         
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" onclick="switchToWorkspace(\'' + workspace.name + '\')">';
         menuHtml += '<i class="' + icon + '"></i>';
@@ -187,16 +187,16 @@ function displayWorkspaceMenu(menu, workspaces) {
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'display.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
-    menuHtml += '<i class="fas fa-eye"></i>';
+    menuHtml += '<i class="fa-eye"></i>';
     menuHtml += '<span>Display</span>';
     menuHtml += '</div>';
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'settings.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
-    menuHtml += '<i class="fas fa-cog"></i>';
+    menuHtml += '<i class="fa-cog"></i>';
     menuHtml += '<span>Settings</span>';
     menuHtml += '</div>';
     // Add Logout right after Settings
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
-    menuHtml += '<i class="fas fa-sign-out-alt"></i>';
+    menuHtml += '<i class="fa-sign-out-alt"></i>';
     menuHtml += '<span>Logout</span>';
     menuHtml += '</div>';
     

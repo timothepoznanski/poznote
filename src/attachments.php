@@ -44,7 +44,7 @@ if (!$note) {
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
+        <h1><i class="fa-paperclip"></i> Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">

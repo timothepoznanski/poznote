@@ -98,7 +98,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<div class="tags-container">
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
-				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
+				<i class="fa-arrow-circle-left trash-button-icon"></i>
 			</div>
 			<h1 class="tags-header">Tags</h1>
 		</div>
@@ -106,7 +106,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		<!-- Show excluded folders info if any -->
 		<?php if (!empty($excluded_folders)): ?>
 		<div class="excluded-folders-info" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 8px 12px; margin-bottom: 15px; font-size: 0.9em;">
-			<i class="fas fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
+			<i class="fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
 			<strong>Folder exclusions active:</strong> <?php echo htmlspecialchars(implode(', ', $excluded_folders)); ?>
 		</div>
 		<?php endif; ?>

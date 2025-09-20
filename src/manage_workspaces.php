@@ -378,7 +378,7 @@ try {
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-layer-group"></i> Workspaces</h1>
+        <h1><i class="fa-layer-group"></i> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
@@ -397,18 +397,18 @@ try {
         </div>
 
         <div class="settings-section">
-            <h3><i class="fas fa-plus"></i> Create a new workspace</h3>
+            <h3><i class="fa-plus"></i> Create a new workspace</h3>
             <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
                 <input type="hidden" name="action" value="create">
                 <div class="form-group">
                     <input id="workspace-name" name="name" type="text" placeholder="Enter workspace name" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Create</button>
+                <button type="submit" class="btn btn-primary"><i class="fa-plus"></i> Create</button>
             </form>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fas fa-list"></i> Existing workspaces</h3>
+            <h3><i class="fa-list"></i> Existing workspaces</h3>
             <div class="workspace-list">
                 <?php if (empty($workspaces)): ?>
                     <div>No workspaces defined.</div>
@@ -1086,7 +1086,7 @@ try {
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-layer-group"></i> Workspaces</h1>
+        <h1><i class="fa-layer-group"></i> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
@@ -1105,18 +1105,18 @@ try {
         </div>
 
         <div class="settings-section">
-            <h3><i class="fas fa-plus"></i> Create a new workspace</h3>
+            <h3><i class="fa-plus"></i> Create a new workspace</h3>
             <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
                 <input type="hidden" name="action" value="create">
                 <div class="form-group">
                     <input id="workspace-name" name="name" type="text" placeholder="Enter workspace name" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Create</button>
+                <button type="submit" class="btn btn-primary"><i class="fa-plus"></i> Create</button>
             </form>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fas fa-list"></i> Existing workspaces</h3>
+            <h3><i class="fa-list"></i> Existing workspaces</h3>
             <div class="workspace-list">
                 <?php if (empty($workspaces)): ?>
                     <div>No workspaces defined.</div>

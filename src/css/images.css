@@ -2,7 +2,6 @@
 /* Custom SVG icons for offline use */
 
 /* Global scaling for all custom SVG icons */
-.fas::before,
 .fa::before,
 .far::before {
   transform: scale(1.2);
@@ -32,8 +31,7 @@
   content: '' !important; /* swap pseudo-element to use background-image */
 }
 /* Blue hover effect for toolbar icons */
-/* .toolbar-btn:hover .fas::before,
-.toolbar-btn:hover .fa::before,
+/* .toolbar-btn:hover .fa::before,
 .toolbar-btn:hover .far::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
   transform: scale(1.3);

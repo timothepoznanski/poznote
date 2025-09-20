@@ -12,10 +12,10 @@ function toggleApiKeyVisibility(fieldId) {
     
     if (input.type === 'password') {
         input.type = 'text';
-        button.className = 'fas fa-eye-slash';
+        button.className = 'fa-eye-slash';
     } else {
         input.type = 'password';
-        button.className = 'fas fa-eye';
+        button.className = 'fa-eye';
     }
 }
 
@@ -118,7 +118,7 @@ function testAIConnection() {
     })
     .catch(error => {
         testResult.className = 'alert alert-danger';
-        testResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Test failed: ' + error.message;
+        testResult.innerHTML = '<i class="fa-exclamation-triangle"></i> Test failed: ' + error.message;
         testResult.style.display = 'block';
     })
     .finally(() => {

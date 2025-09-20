@@ -41,7 +41,7 @@ function renderTaskList(noteId, tasks) {
           <input type="text" class="task-input" id="task-input-${noteId}"
               placeholder="Add new task..." maxlength="4000">
                 <button class="task-add-btn" onclick="addTask(${noteId})">
-                    <i class="fas fa-plus"></i>
+                    <i class="fa-plus"></i>
                 </button>
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
@@ -75,7 +75,7 @@ function renderTasks(tasks) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = task.important ? 'fas fa-star' : 'fa-star';
+        const starClass = task.important ? 'fa-star' : 'fa-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `
@@ -86,7 +86,7 @@ function renderTasks(tasks) {
                 <i class="${starClass}"></i>
             </button>
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="fas fa-trash"></i>
+                <i class="fa-trash"></i>
             </button>
         </div>
         `;

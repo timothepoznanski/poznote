@@ -292,7 +292,7 @@ function showNoteLoadingState() {
         const loadingHtml = `
             <div class="note-loading-state">
                 <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <i class="fa-spinner fa-spin"></i>
                     <p>Loading note...</p>
                 </div>
             </div>
@@ -383,11 +383,11 @@ function handleImageClick(event) {
     menu.className = 'image-menu';
     menu.innerHTML = `
         <div class="image-menu-item" data-action="view-large">
-            <i class="fas fa-expand"></i>
+            <i class="fa-expand"></i>
             View Large
         </div>
         <div class="image-menu-item" data-action="download">
-            <i class="fas fa-download"></i>
+            <i class="fa-download"></i>
             Download
         </div>
     `;

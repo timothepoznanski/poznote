@@ -548,7 +548,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<span>AI tags</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fas fa-cog"></i>';
+                        echo '<i class="fa-cog"></i>';
                         echo '<span>AI settings</span>';
                         echo '</div>';
                         echo '</div>';
@@ -574,8 +574,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Share / Download dropdown (export or public share)
                     echo '<div class="share-dropdown">';
@@ -591,10 +591,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class_extra.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" data-action="download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '<i class="fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
                     echo '<div class="share-menu-item" data-action="public" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -650,8 +650,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                 } else {
                     // Individual buttons for mobile (always visible)
                     // Calculate number of attachments for mobile button
@@ -665,10 +665,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Note action buttons 
                     // AI actions dropdown menu for mobile (only if AI is enabled)
-                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     // Save button first for mobile, then separator (minus)
-                    echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
                         echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
@@ -700,8 +700,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     // Mobile: use share dropdown as well (simpler menu)
                     echo '<div class="share-dropdown mobile">';
                     // Mobile: reflect shared state too
@@ -715,10 +715,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-share'.$share_class_mobile.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '<i class="fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
                     echo '<div class="share-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -769,8 +769,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                 }
                 
                 echo '</div>';
@@ -789,7 +789,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $attachments_data = json_decode($row['attachments'], true);
                     if (is_array($attachments_data) && !empty($attachments_data)) {
                         echo '<div class="note-attachments-row">';
-                        echo '<span class="fas fa-paperclip icon_attachment"></span>';
+                        echo '<span class="fa-paperclip icon_attachment"></span>';
                         echo '<span class="note-attachments-list">';
                         $attachment_links = [];
                         foreach ($attachments_data as $attachment) {
@@ -924,10 +924,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn">
-                    <i class="fas fa-copy"></i> Copy
+                    <i class="fa-copy"></i> Copy
                 </button>
                 <button id="regenerateSummaryBtn" class="btn btn-primary" onclick="regenerateCurrentSummary()">
-                    <i class="fas fa-redo"></i> Regenerate
+                    <i class="fa-redo"></i> Regenerate
                 </button>
                 <button class="btn btn-secondary" onclick="closeAISummaryModal()">Close</button>
             </div>

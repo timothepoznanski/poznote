@@ -103,12 +103,12 @@ function performFavoriteToggle(noteId) {
                 if (response.success) {
                     var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');
                     if (starIcon) {
-                        if (starIcon.classList.contains('fas')) {
-                            starIcon.classList.remove('fas');
+                        if (starIcon.classList.contains('fa')) {
+                            starIcon.classList.remove('fa');
                             starIcon.classList.add('far');
                         } else {
                             starIcon.classList.remove('far');
-                            starIcon.classList.add('fas');
+                            starIcon.classList.add('fa');
                         }
                     }
                     
@@ -1282,7 +1282,7 @@ function updateDropdown(matchingFolders, searchTerm) {
     if (!hasExactMatch && searchTerm.length > 0) {
         var createOption = document.createElement('div');
         createOption.className = 'folder-option create-option';
-        createOption.innerHTML = '<i class="fas fa-plus"></i> Create "' + searchTerm + '"';
+        createOption.innerHTML = '<i class="fa-plus"></i> Create "' + searchTerm + '"';
         createOption.onclick = function() { selectCreateFolder(searchTerm); };
         dropdown.appendChild(createOption);
     }
