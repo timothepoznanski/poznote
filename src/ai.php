@@ -160,7 +160,8 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    id="openai_api_key" 
                                    name="openai_api_key" 
                                    value="<?php echo htmlspecialchars($openai_api_key); ?>" 
-                                   placeholder="sk-...">
+                                   placeholder="sk-..."
+                                   autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('openai_api_key')">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -191,7 +192,8 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    id="mistral_api_key" 
                                    name="mistral_api_key" 
                                    value="<?php echo htmlspecialchars($mistral_api_key); ?>" 
-                                   placeholder="Enter your Mistral API key...">
+                                   placeholder="Enter your Mistral API key..."
+                                   autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('mistral_api_key')">
                                 <i class="fas fa-eye"></i>
                             </button>

@@ -128,10 +128,6 @@ function testAIConnection() {
     });
 }
 
-// Legacy function for backward compatibility
-function toggleApiKeyVisibility() {
-    toggleApiKeyVisibility('openai_api_key');
-}
 
 /**
  * Update saved configuration data attributes after successful save
