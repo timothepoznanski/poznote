@@ -1966,11 +1966,7 @@ hr {
 .toolbar-btn:not(.save-modified) i.fas.fa-save::before {
     filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
-/* Effet de survol bleu pour l'icône save normale */
-.toolbar-btn:not(.save-modified):hover i.fas.fa-save::before,
-.toolbar-btn:not(.save-modified):focus i.fas.fa-save::before {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-}
+
 .toolbar-btn i.fas.fa-palette,
 .toolbar-btn i.fas.fa-fill-drip {
     color: inherit !important;
@@ -2001,13 +1997,6 @@ hr {
 
 .toolbar-btn.btn-ai .fa-robot-svg {
     filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
-}
-
-/* Effet de survol bleu pour l'icône IA */
-.toolbar-btn.btn-ai:hover .fa-robot-svg,
-.toolbar-btn.btn-ai:focus .fa-robot-svg {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-    transform: scale(1.3);
 }
 
 .toolbar-btn.btn-ai.loading .fa-robot-svg {

@@ -34,32 +34,16 @@
   content: '' !important; /* swap pseudo-element to use background-image */
 }
 /* Blue hover effect for toolbar icons */
-.toolbar-btn:hover .fas::before,
+/* .toolbar-btn:hover .fas::before,
 .toolbar-btn:hover .fa::before,
 .toolbar-btn:hover .far::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
   transform: scale(1.3);
-}
-
-/* Blue hover effect for other buttons and links */
-button:hover .fas::before,
-button:hover .fa::before,
-button:hover .far::before,
-a:hover .fas::before,
-a:hover .fa::before,
-a:hover .far::before {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
-}
+} */
 
 /* Dark gray color for plus icon - #37352f */
 .fa-plus::before,
 .fas.fa-plus::before {
-  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
-}
-
-/* Dark gray color for save icon - #37352f */
-.fa-save::before,
-.fas.fa-save::before {
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
@@ -174,18 +158,18 @@ a:hover .far::before {
   font-style: normal !important;
   content: '';
 }
-.fa-trash-svg,
-.fas.fa-trash::before {
+.fa-trash-alt-svg {
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../../images/trash-can-light-full.svg');
+  width: 0.85em;
+  height: 0.85em;
+  background-image: url('../../images/broom-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
   font-family: inherit !important;
   font-style: normal !important;
   content: '';
+  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
 .fa-download-svg,
@@ -200,6 +184,21 @@ a:hover .far::before {
   font-family: inherit !important;
   font-style: normal !important;
   content: '';
+}
+
+.fa-trash-svg,
+.fas.fa-trash::before {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../../images/trash-can-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
 .fa-save-svg,
@@ -853,8 +852,9 @@ a:hover .far::before {
 }
 
 /* Enhanced hover effects - Blue color */
-.fa-save:hover::before,
+/* .fa-save:hover::before,
 .fa-smile:hover::before,
+.fas.fa-trash:hover,
 .fa-trash:hover::before,
 .fa-folder:hover::before,
 .fa-download:hover::before,
@@ -892,7 +892,7 @@ a:hover .far::before {
 .fa-spinner:hover::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
   transform: scale(1.35) !important;
-}
+} */
 
 /* Larger icons for left sidebar */
 .folder-icon::before {
