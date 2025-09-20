@@ -82,7 +82,6 @@ a:hover .far::before {
   content: '';
 }
 
-/* SVG-based robot icon for offline use */
 .fa-robot-svg {
   display: inline-block;
   width: 1.2em;
