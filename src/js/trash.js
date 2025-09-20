@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        if (e.target.classList.contains('icon_trash_trash')) {
+        if (e.target.classList.contains('fa-trash')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
             if (noteid) {

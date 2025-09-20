@@ -116,12 +116,12 @@
         gap: 15px;
     }
     
-    .icon_restore_trash,
+    /* .icon_restore_trash,
     .icon_trash_trash {
         font-size: 18px;
         padding: 8px;
     }
-    
+     */
     .css-title {
         font-size: 18px !important;
         margin-bottom: 15px;

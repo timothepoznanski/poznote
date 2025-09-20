@@ -196,7 +196,7 @@ body.trash-page {
     position: relative;
 }
 
-.icon_restore_trash,
+/* .icon_restore_trash,
 .icon_trash_trash {
     cursor: pointer;
     padding: 5px;
@@ -204,15 +204,15 @@ body.trash-page {
     transition: background-color 0.2s;
     font-size: 1.2em;
     color: #007DB8;
-}
+} */
 
 .icon_restore_trash {
     margin: 0;
 }
 
-.icon_trash_trash {
+/* .icon_trash_trash {
     margin: 0 0 0 8px;
-}
+} */
 
 /* Override for custom SVG icons in trash */
 .trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash {
@@ -233,15 +233,15 @@ body.trash-page {
     color: green;
 }
 
-.icon_trash_trash:hover {
+/* .icon_trash_trash:hover {
     background-color: rgba(255, 0, 0, 0.1);
     color: red;
-}
+} */
 
 /* Override hover for custom SVG icon */
-.trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash:hover {
+/* .trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash:hover {
     filter: brightness(0) saturate(100%) invert(39%) sepia(95%) saturate(1500%) hue-rotate(0deg) brightness(102%) contrast(105%) !important;
-}
+} */
 
 .trash-no-notes {
     text-align: center;
