@@ -101,17 +101,7 @@ function performFavoriteToggle(noteId) {
             try {
                 var response = JSON.parse(xhr.responseText);
                 if (response.success) {
-                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');
-                    if (starIcon) {
-                        if (starIcon.classList.contains('fa')) {
-                            starIcon.classList.remove('fa');
-                            starIcon.classList.add('far');
-                        } else {
-                            starIcon.classList.remove('far');
-                            starIcon.classList.add('fa');
-                        }
-                    }
-                    
+                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');                    
                     editedButNotSaved = 0;
                     updateNoteEnCours = 0;
                     
