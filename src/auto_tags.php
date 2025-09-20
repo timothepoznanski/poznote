@@ -60,7 +60,7 @@ try {
 
         <div class="auto-tags-content" id="autoTagsContent">
             <div id="loadingState" class="loading-state" style="display: none;">
-                <i class="fas fa-tags"></i>
+                <i class="fa-robot-svg"></i>
                 Generating tags...
             </div>
             <div id="tagsDisplay" style="display: none;">
