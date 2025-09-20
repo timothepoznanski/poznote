@@ -67,7 +67,7 @@ if (!$note) {
                 </div>
                 
                 <button type="button" onclick="uploadAttachment(event)" class="btn btn-primary" id="uploadBtn" disabled>
-                    <img src="images/upload-light-full.svg" alt="Upload" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Upload File
+                    Upload File
                 </button>
             </div>
             
@@ -142,7 +142,6 @@ if (!$note) {
                     reader.onload = function(e) {
                         htmlContent += `<div class="pdf-preview">
                             <embed src="${e.target.result}" type="application/pdf" width="200" height="150" style="border-radius: 4px; margin-top: 10px;">
-                            <p style="font-size: 12px; color: #666; margin-top: 5px;">Aperçu PDF</p>
                         </div>`;
                         fileNameDiv.innerHTML = htmlContent;
                     };
