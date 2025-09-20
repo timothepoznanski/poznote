@@ -1,3 +1,9 @@
+/* Centrage vertical de l’icône IA et du texte */
+.ai-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 /* AI Pages Styles - Poznote */
 
 /* Conteneur principal pour les pages de paramètres */

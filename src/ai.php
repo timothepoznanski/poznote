@@ -92,7 +92,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fa-robot-svg"></i> Artificial Intelligence</h1>
+    <h1 class="ai-header"><i class="fa-robot-svg"></i> Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
     
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
