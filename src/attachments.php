@@ -40,7 +40,6 @@ if (!$note) {
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/manage_attachments.css">
     <link rel="stylesheet" href="css/attachments.css">
 </head>
 <body>
@@ -60,7 +59,6 @@ if (!$note) {
             
             <div class="attachment-upload-section">
                 <div class="form-group">
-                    <label for="attachmentFile">Choose File</label>
                     <input type="file" id="attachmentFile" class="file-input" onchange="showFileName()">
                     <div class="accepted-types">
                         Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)

@@ -3,7 +3,7 @@
 function showAttachmentDialog(noteId) {
     var ws = selectedWorkspace || 'Poznote';
     var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
-    window.location.href = 'manage_attachments.php?note_id=' + noteId + wsParam;
+    window.location.href = 'attachments.php?note_id=' + noteId + wsParam;
 }
 
 function showAttachmentError(message) {
