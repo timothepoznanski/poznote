@@ -32,8 +32,8 @@ body {
 .settings-card:hover { background: rgba(15,23,42,0.02); }
 
 .settings-card-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 3px;
     background: transparent;
     display: inline-flex;
@@ -41,7 +41,7 @@ body {
     justify-content: center;
     flex-shrink: 0;
     color: #6b7280;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 .settings-card-content {
     display: flex;
