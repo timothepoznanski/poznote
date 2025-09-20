@@ -11,29 +11,25 @@ requireAuth();
 ob_start();
 require_once 'config.php';
 require_once 'default_folder_settings.php';
+include 'functions.php';
 
 // Mobile detection by user agent (must be done BEFORE any output and never redefined)
-$is_mobile = false;
-if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
-}
-
-include 'functions.php';
+$is_mobile = isMobileDevice();
 include 'db_connect.php';
 
-// Include les nouveaux fichiers modulaires
+// Include new modular files
 require_once 'page_init.php';
 require_once 'search_handler.php';
 require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
 
-// Initialisation des workspaces et labels
+// Initialization of workspaces and labels
 initializeWorkspacesAndLabels($con);
 
-// Initialisation des paramètres de recherche
+// Initialize search parameters
 $search_params = initializeSearchParams();
-extract($search_params); // Extrait les variables: $search, $tags_search, $note, etc.
+extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
@@ -48,7 +44,7 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Chargement des données de note
+// Load note data
 $note_data = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
 $default_note_folder = $note_data['default_note_folder'];
 $current_note_folder = $note_data['current_note_folder'];
@@ -859,10 +855,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 
                 // Get font size from settings based on device
                 $font_size = '16';
-                $is_mobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $_SERVER['HTTP_USER_AGENT']);
+                $is_mobile_for_font = isMobileDevice();
                 
                 try {
-                    $setting_key = $is_mobile ? 'note_font_size_mobile' : 'note_font_size_desktop';
+                    $setting_key = $is_mobile_for_font ? 'note_font_size_mobile' : 'note_font_size_desktop';
                     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
                     $stmt->execute([$setting_key]);
                     $font_size_value = $stmt->fetchColumn();
@@ -914,7 +910,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 </div>
                 <div id="aiSummaryError">
                     <div class="error-content">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
                         <p id="errorMessage"></p>
                     </div>
                 </div>

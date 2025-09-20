@@ -6,14 +6,6 @@ require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
 
-// Mobile detection
-$is_mobile = false;
-if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
-}
-
-// Get current workspace
-$workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 ?>
 
 <!DOCTYPE html>
@@ -24,69 +16,12 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Display - Poznote</title>
     <?php include 'templates/head_includes.php'; ?>
-    <style>
-        body {
-            background: #f8f9fa;
-            font-family: 'Inter', sans-serif;
-        }
-        .settings-container {
-            max-width: 800px;
-            margin: 10px auto;
-            padding: 8px 12px;
-            display: block;
-        }
-        .back-link { display: inline-flex; margin-bottom: 10px; color: #007DB8; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
-        .back-link:hover { color: #005a8a; }
-
-        /* settings list: vertical simple rows */
-        .settings-grid {
-            display: block;
-            margin: 0;
-            padding: 0;
-        }
-
-        .settings-card {
-            background: transparent;
-            border-radius: 0;
-            padding: 12px 6px;
-            cursor: pointer;
-            transition: background 0.12s ease;
-            border-bottom: 1px solid #eef2f5;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .settings-card:hover { background: rgba(15,23,42,0.02); }
-
-        .settings-card-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
-            background: transparent;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: #6b7280;
-            font-size: 0.95rem;
-        }
-        .settings-card-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .settings-card h3 { margin: 0; color: #1f2937; font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .ai-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
-        .ai-status.enabled { background: #dcfce7; color: #166534; }
-        .ai-status.disabled { background: #fee2e2; color: #991b1b; }
-    </style>
+    <link rel="stylesheet" href="css/display.css">
 </head>
 <body>
     <div class="settings-container">
         <br>
-        <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
+        <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
             <i class="fas fa-arrow-left"></i>
             Back to Notes
         </a>

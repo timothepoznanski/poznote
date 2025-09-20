@@ -3,6 +3,8 @@
  * Initialisation des paramètres et variables globales
  */
 
+require_once 'functions.php';
+
 /**
  * Initialise les workspaces et labels
  */
@@ -38,7 +40,6 @@ function initializeSearchParams() {
     $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
     $note = $_GET['note'] ?? '';
     $folder_filter = $_GET['folder'] ?? '';
-    $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
     
     // Handle search type preservation when clearing search
     $preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
@@ -50,7 +51,7 @@ function initializeSearchParams() {
         'tags_search' => $tags_search,
         'note' => $note,
         'folder_filter' => $folder_filter,
-        'workspace_filter' => $workspace_filter,
+        'workspace_filter' => getWorkspaceFilter(),
         'preserve_notes' => $preserve_notes,
         'preserve_tags' => $preserve_tags,
         'preserve_folders' => $preserve_folders

@@ -1,0 +1,253 @@
+/* Styles spécifiques pour la page manage_workspaces.php */
+
+/* Conteneur principal pour les pages de paramètres */
+.settings-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
+}
+
+/* Sections de paramètres */
+.settings-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 10px;
+}
+
+/* Groupes de formulaires */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Liste des espaces de travail */
+.workspace-list {
+    margin-top: 20px;
+}
+
+.workspace-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: white;
+    transition: box-shadow 0.2s;
+}
+
+.workspace-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Colonnes de la liste des workspaces */
+.ws-col {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.ws-col-name {
+    flex: 2;
+    min-width: 200px;
+}
+
+.ws-col-action {
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 150px;
+}
+
+/* Bloc de nom du workspace */
+.ws-name-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.workspace-name-item {
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+}
+
+.workspace-count {
+    font-size: 12px;
+    color: #666;
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+/* Boutons d'action */
+.action-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 5px;
+}
+
+.action-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.btn-rename {
+    background-color: #ffc107;
+    color: #212529;
+    border-color: #ffc107;
+}
+
+.btn-rename:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+.btn-delete-ws {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-delete-ws:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Modal de renommage */
+.rename-modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.rename-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.rename-modal-content h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.rename-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rename-form input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.rename-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Indicateur de chargement */
+.loading-workspaces {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px;
+}
+
+.loading-workspaces i {
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Message vide */
+.empty-workspaces {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+/* Statistiques des workspaces */
+.workspace-stats {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007DB8;
+    display: block;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

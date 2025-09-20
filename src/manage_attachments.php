@@ -38,14 +38,14 @@ if (!$note) {
     <title>Manage Attachments - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
+    <link rel="stylesheet" href="css/manage_attachments.css">
     <link rel="stylesheet" href="css/attachments.css">
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
+        <h1><img src="images/paperclip-light-full.svg" alt="Paperclip" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
@@ -56,7 +56,7 @@ if (!$note) {
 
         <!-- Upload Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-upload"></i> Upload New Attachment</h3>
+            <h3><img src="images/upload-light-full.svg" alt="Upload" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Upload New Attachment</h3>
             
             <div class="attachment-upload-section">
                 <div class="form-group">
@@ -69,7 +69,7 @@ if (!$note) {
                 </div>
                 
                 <button type="button" onclick="uploadAttachment(event)" class="btn btn-primary" id="uploadBtn" disabled>
-                    <i class="fas fa-upload"></i> Upload File
+                    <img src="images/upload-light-full.svg" alt="Upload" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Upload File
                 </button>
             </div>
             
@@ -83,10 +83,10 @@ if (!$note) {
 
         <!-- Attachments List Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-list"></i> Current Attachments</h3>
+            <h3><img src="images/list-ul-light-full.svg" alt="List" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Current Attachments</h3>
             <div id="attachmentsList" class="attachments-display">
                 <div class="loading-attachments">
-                    <i class="fas fa-spinner fa-spin"></i> Loading attachments...
+                    <img src="images/spinner-light-full.svg" alt="Loading" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle; animation: spin 1s linear infinite;"> Loading attachments...
                 </div>
             </div>
         </div>
@@ -124,7 +124,7 @@ if (!$note) {
                 else if (isPDF) iconType = 'file-pdf';
                 
                 let htmlContent = `<div class="selected-file-info">
-                    <i class="fas fa-${iconType}"></i> 
+                    <img src="images/${iconType === 'image' ? 'file-image' : iconType === 'file-pdf' ? 'file-pdf' : 'file-lines'}-light-full.svg" alt="${iconType}" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> 
                     <span>${fileName} (${fileSize})</span>
                 </div>`;
                 
@@ -267,7 +267,7 @@ if (!$note) {
             const container = document.getElementById('attachmentsList');
             
             if (attachments.length === 0) {
-                container.innerHTML = '<div class="no-attachments"><i class="fas fa-info-circle"></i> No attachments yet</div>';
+                container.innerHTML = '<div class="no-attachments"><img src="images/info-light-full.svg" alt="Info" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> No attachments yet</div>';
                 return;
             }
             
@@ -290,12 +290,12 @@ if (!$note) {
                     previewContent = `<div class="pdf-thumbnail" onclick="previewPDF('${fileUrl}', '${fileName}')">
                         <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
                         <div class="pdf-overlay">
-                            <i class="fas fa-file-pdf"></i>
+                            <img src="images/file-lines-light-full.svg" alt="PDF" style="width: 20px; height: 20px; margin-bottom: 4px;">
                             <span>PDF</span>
                         </div>
                     </div>`;
                 } else {
-                    previewContent = `<i class="fas fa-${getFileIcon(fileName)}"></i>`;
+                    previewContent = `<img src="images/${getFileIcon(fileName)}" alt="File" style="width: 32px; height: 32px;">`;
                 }
                 
                 html += `
@@ -312,10 +312,10 @@ if (!$note) {
                         </div>
                         <div class="attachment-actions">
                             <button onclick="downloadAttachment('${attachment.id}')" class="btn-icon btn-download" title="Download">
-                                <i class="fas fa-download"></i>
+                                <img src="images/download-light-full.svg" alt="Download" style="width: 14px; height: 14px;">
                             </button>
                             <button onclick="deleteAttachment('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
-                                <i class="fas fa-trash"></i>
+                                <img src="images/trash-can-light-full.svg" alt="Delete" style="width: 14px; height: 14px;">
                             </button>
                         </div>
                     </div>
@@ -328,17 +328,17 @@ if (!$note) {
         function getFileIcon(fileName) {
             const ext = fileName.split('.').pop().toLowerCase();
             switch (ext) {
-                case 'pdf': return 'file-pdf';
+                case 'pdf': return 'file-lines-light-full.svg';
                 case 'doc':
-                case 'docx': return 'file-word';
+                case 'docx': return 'file-lines-light-full.svg';
                 case 'xls':
-                case 'xlsx': return 'file-excel';
+                case 'xlsx': return 'file-lines-light-full.svg';
                 case 'ppt':
-                case 'pptx': return 'file-powerpoint';
-                case 'txt': return 'file-alt';
+                case 'pptx': return 'file-lines-light-full.svg';
+                case 'txt': return 'file-lines-light-full.svg';
                 case 'zip':
-                case 'rar': return 'file-archive';
-                default: return 'file';
+                case 'rar': return 'file-lines-light-full.svg';
+                default: return 'file-lines-light-full.svg';
             }
         }
 
@@ -376,10 +376,10 @@ if (!$note) {
                 <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
                 <div class="pdf-preview-actions">
                     <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
-                        <i class="fas fa-external-link-alt"></i> Ouvrir dans un nouvel onglet
+                        <img src="images/square-share-nodes-light-full.svg" alt="Open" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Ouvrir dans un nouvel onglet
                     </button>
                     <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
-                        <i class="fas fa-download"></i> Télécharger
+                        <img src="images/download-light-full.svg" alt="Download" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Télécharger
                     </button>
                 </div>
             </div>
@@ -501,7 +501,7 @@ if (!$note) {
             if (type === 'success' && message === 'File uploaded successfully!') {
                 notification.textContent = message;
             } else {
-                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+                notification.innerHTML = `<img src="images/${type === 'success' ? 'check-light-full.svg' : 'circle-info-solid-full.svg'}" alt="${type === 'success' ? 'Success' : 'Warning'}" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> ${message}`;
             }
 
             const container = document.querySelector('.settings-container');

@@ -6,14 +6,6 @@ require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
 
-// Mobile detection
-$is_mobile = false;
-if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
-}
-
-// Get current workspace
-$workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
 ?>
 
 <!DOCTYPE html>
@@ -24,133 +16,13 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Settings - Poznote</title>
     <?php include 'templates/head_includes.php'; ?>
-    <style>
-        body {
-            background: #f8f9fa;
-            font-family: 'Inter', sans-serif;
-        }
-        .settings-container {
-            max-width: 800px;
-            margin: 10px auto;
-            padding: 8px 12px;
-            display: block;
-        }
-        .settings-header {
-            padding: 12px 8px;
-            margin-bottom: 8px;
-        }
-        .settings-header h1 {
-            margin: 0 0 6px 0;
-            color: #1f2937;
-            font-size: 1.15rem;
-            font-weight: 600;
-        }
-        .settings-header p { display: none; }
-
-        /* settings list: vertical simple rows */
-        .settings-grid {
-            display: block;
-            margin: 0;
-            padding: 0;
-        }
-        .settings-sep {
-            height: 1px;
-            background: #afb3b6ff;
-            margin: 12px 0;
-        }
-        .settings-footer {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-start;
-            padding: 12px 6px;
-            border-top: 1px solid #eef2f5;
-            margin-top: 12px;
-        }
-
-        .back-link { display: inline-flex; margin-bottom: 10px; }
-
-        .settings-card {
-            background: transparent;
-            border-radius: 0;
-            padding: 12px 6px;
-            cursor: pointer;
-            transition: background 0.12s ease;
-            border-bottom: 1px solid #eef2f5;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .settings-card:hover { background: rgba(15,23,42,0.02); }
-        .settings-card-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
-            background: transparent;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: #6b7280;
-            font-size: 0.95rem;
-        }
-        .settings-card-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .settings-card h3 {
-            margin: 0;
-            color: #1f2937;
-            font-size: 0.95rem;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .back-link {
-            color: #007DB8;
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 20px;
-        }
-        .back-link:hover {
-            color: #005a8a;
-        }
-        .ai-status {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-        .ai-status.enabled {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .ai-status.disabled {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        @media (max-width: 640px) {
-            .settings-container {
-                margin: 10px;
-                padding: 10px;
-            }
-            .settings-grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/settings.css">
 </head>
 
 <body>
     <div class="settings-container">
         <br>
-        <a href="index.php?workspace=<?php echo urlencode($workspace_filter); ?>" class="back-link">
+        <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
             <i class="fas fa-arrow-left"></i>
             Back to Notes
         </a>
@@ -178,10 +50,8 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                     </h3>
                 </div>
             </div>
-            
-            <!-- User Preferences (moved to Display page) -->
-            
-            <!-- Data Management -->
+                        
+            <!-- Backup -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
                 <div class="settings-card-icon">
                     <i class="fas fa-upload"></i>
@@ -191,6 +61,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
             
+            <!-- Restore -->
             <div class="settings-card" onclick="window.location = 'restore_import.php';">
                 <div class="settings-card-icon">
                     <i class="fas fa-download"></i>
@@ -200,46 +71,49 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
                 </div>
             </div>
 
-                <!-- Footer links moved back into column as regular settings cards -->
-                <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3>Release Notes</h3>
-                    </div>
+            <!-- Release Notes -->
+            <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-file-alt"></i>
                 </div>
+                <div class="settings-card-content">
+                    <h3>Release Notes</h3>
+                </div>
+            </div>
 
-                <div class="settings-card" onclick="checkForUpdates();">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-sync-alt"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3>Check for Updates</h3>
-                    </div>
+            <!-- Updates -->
+            <div class="settings-card" onclick="checkForUpdates();">
+                <div class="settings-card-icon">
+                    <i class="fas fa-sync-alt"></i>
                 </div>
+                <div class="settings-card-content">
+                    <h3>Check for Updates</h3>
+                </div>
+            </div>
 
-                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3>GitHub Repository</h3>
-                    </div>
+            <!-- Github repository -->
+            <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-code-branch"></i>
                 </div>
+                <div class="settings-card-content">
+                    <h3>GitHub Repository</h3>
+                </div>
+            </div>
 
-                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
-                    <div class="settings-card-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="settings-card-content">
-                        <h3>About Poznote</h3>
-                    </div>
+            <!-- Poznote Website -->
+            <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fas fa-globe"></i>
                 </div>
+                <div class="settings-card-content">
+                    <h3>About Poznote</h3>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Include necessary modals -->
+    <!-- For Update modal -->
     <?php include 'templates/modals.php'; ?>
     
     <!-- Include JavaScript files -->
@@ -298,7 +172,7 @@ $workspace_filter = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
         });
         
         // Set workspace context for JavaScript functions
-        window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+        window.selectedWorkspace = <?php echo json_encode(getWorkspaceFilter()); ?>;
         
         // Release Notes now open on GitHub (no local modal)
     </script>

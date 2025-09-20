@@ -272,9 +272,9 @@ function createBackup() {
     <title>Backup (Export) - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
+    <link rel="stylesheet" href="css/backup_export.css">
 </head>
 <body>
     <div class="backup-container">
@@ -294,12 +294,12 @@ function createBackup() {
             <h3><i class="fas fa-archive"></i> Complete Backup</h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                    <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
                 </div>
             <?php endif; ?>
             <?php if (!empty($error)): ?>
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                    <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>

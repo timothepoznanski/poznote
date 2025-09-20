@@ -46,7 +46,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto Generate Tags - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
-    <link href="css/modal.css" rel="stylesheet">
+    <link href="css/modals.css" rel="stylesheet">
     <link rel="stylesheet" href="css/images.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
@@ -67,7 +67,7 @@ try {
                 <div id="tagsContainer" class="tags-display"></div>
             </div>
             <div id="errorState" class="error-state" style="display: none;">
-                <i class="fas fa-exclamation-triangle"></i>
+                <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">

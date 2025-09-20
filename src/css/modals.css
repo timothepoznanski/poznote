@@ -1,4 +1,18 @@
-/* MODAL base: place modal content at the top and center it horizontally */
+/* ===========================================
+   MODAL SYSTEM - Complete Modal Styles
+   ===========================================
+
+   Structure:
+   1. BASE MODAL STYLES - Core modal functionality
+   2. SPECIFIC MODAL STYLES - Individual modal customizations
+   3. RESPONSIVE STYLES - Mobile adaptations
+   =========================================== */
+
+/* ===========================================
+   1. BASE MODAL STYLES
+   =========================================== */
+
+/* Base modal overlay and positioning */
 .modal {
     display: none;
     position: fixed;
@@ -15,6 +29,7 @@
     box-sizing: border-box;
     overflow: auto;
 }
+
 /* Ensure modal overlays sit above other UI components (force higher stacking) */
 .modal {
     z-index: 9999 !important;
@@ -29,12 +44,17 @@
 }
 
 /* Modal base styles are defined below (responsive, centered) */
+.modal .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
 
-.modal .form-group label { display:block; margin-bottom:6px; font-weight:600; }
+/* ===========================================
+   2. SPECIFIC MODAL STYLES
+   =========================================== */
 
-
-/* ATTACHMENT MODAL AND STYLES */
-
+/* ATTACHMENT MODAL */
 .attachment-modal {
     z-index: 1001;
     margin: 5% auto !important;
@@ -42,7 +62,6 @@
     flex-direction: column;
 }
 
-/* Specific styling for attachment modal */
 #attachmentModal .modal-content {
     margin: 5% auto !important;
 }
@@ -169,7 +188,7 @@
     background: #c82333;
 }
 
-/* Link modal styles (used by addLinkToNote / createLinkFromModal) */
+/* LINK MODAL */
 .link-modal-overlay {
     position: fixed;
     inset: 0;
@@ -181,6 +200,7 @@
     padding: 20px;
     box-sizing: border-box;
 }
+
 .link-modal-content {
     background: #ffffff;
     border-radius: 10px;
@@ -190,13 +210,20 @@
     padding: 14px 16px;
     box-sizing: border-box;
 }
+
 .link-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
 }
-.link-modal-header h3 { margin: 0; font-size: 1.05rem; color: #222; }
+
+.link-modal-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #222;
+}
+
 .link-modal-close {
     background: transparent;
     border: none;
@@ -207,10 +234,31 @@
     padding: 4px 8px;
     border-radius: 6px;
 }
-.link-modal-close:hover { background: #f4f6f8; color: #333; }
-.link-modal-body { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-.link-modal-field { display: flex; flex-direction: column; gap: 6px; }
-.link-modal-field label { font-weight: 600; font-size: 0.95rem; color: #333; }
+
+.link-modal-close:hover {
+    background: #f4f6f8;
+    color: #333;
+}
+
+.link-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.link-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.link-modal-field label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+}
+
 .link-modal-field input[type="text"],
 .link-modal-field input[type="url"] {
     padding: 8px 10px;
@@ -219,21 +267,46 @@
     font-size: 0.98rem;
     box-sizing: border-box;
 }
-.link-modal-field input:focus { outline: none; border-color: #007DB8; box-shadow: 0 0 0 3px rgba(0,125,184,0.08); }
-.link-modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
-.link-modal-btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.95rem; }
-.link-modal-btn-cancel { background: #f1f3f5; color: #333; }
-.link-modal-btn-cancel:hover { background: #e9ecef; }
-.link-modal-btn-primary { background: #007DB8; color: #fff; }
-.link-modal-btn-primary:hover { background: #006494; }
 
-@media (max-width: 520px) {
-    .link-modal-content { padding: 12px; }
-    .link-modal-header h3 { font-size: 1rem; }
-    .link-modal-footer { flex-direction: column-reverse; gap: 10px; }
-    .link-modal-btn { width: 100%; }
+.link-modal-field input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0,125,184,0.08);
 }
 
+.link-modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.link-modal-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.link-modal-btn-cancel {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.link-modal-btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.link-modal-btn-primary {
+    background: #007DB8;
+    color: #fff;
+}
+
+.link-modal-btn-primary:hover {
+    background: #006494;
+}
+
+/* AI SUMMARY MODALS */
 .modal-content.ai-summary-simple {
     max-width: 600px;
     width: 90%;
@@ -501,7 +574,7 @@
     opacity: 0.9;
 }
 
-/* Workspace selector styles for move note modal */
+/* WORKSPACE SELECTOR */
 .workspace-select {
     width: 100%;
     padding: 8px 12px;
@@ -527,4 +600,211 @@
     margin-bottom: 6px;
     font-weight: 600;
     color: #333;
+}
+
+/* STANDARD MODALS - Consolidated from index.css */
+#noteInfoModal .modal-content {
+    max-width: 450px;
+    text-align: left;
+}
+
+#noteInfoModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #007DB8;
+    padding-bottom: 10px;
+}
+
+#noteInfoModal .modal-content h3 i {
+    margin-right: 8px;
+}
+
+#noteInfoModal .info-row {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #007DB8;
+}
+
+#noteInfoModal .info-row strong {
+    min-width: 180px;
+    color: #333;
+    font-weight: 600;
+}
+
+#noteInfoModal .info-row strong i {
+    margin-right: 6px;
+    color: #007DB8;
+    width: 16px;
+    text-align: center;
+}
+
+#noteInfoModal .info-value {
+    color: #555;
+    font-family: monospace;
+    background-color: #fff;
+    padding: 4px 8px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    flex: 1;
+    margin-left: 10px;
+}
+
+#updateModal .modal-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+#updateModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+}
+
+#updateModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+#updateModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#updateModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#updateModal .btn-update {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#updateModal .btn-update:hover {
+    background-color: #0056b3 !important;
+}
+
+#updateCheckModal .modal-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+#updateCheckModal .modal-content h3 {
+    color: #007DB8;
+    margin-bottom: 20px;
+}
+
+#updateCheckModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+#confirmModal .modal-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+#confirmModal .modal-content h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#confirmModal .modal-content p {
+    margin: 15px 0;
+    line-height: 1.5;
+    color: #555;
+    font-size: 16px;
+}
+
+#confirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#confirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+#confirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#confirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+#confirmModal #confirmButton.btn-primary {
+    background-color: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#confirmModal #confirmButton.btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
+#deleteFolderModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteFolderModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteFolderModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteFolderModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* ===========================================
+   3. RESPONSIVE STYLES
+   =========================================== */
+
+@media (max-width: 520px) {
+    .link-modal-content {
+        padding: 12px;
+    }
+
+    .link-modal-header h3 {
+        font-size: 1rem;
+    }
+
+    .link-modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .link-modal-btn {
+        width: 100%;
+    }
 }

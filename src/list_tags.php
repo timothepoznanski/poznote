@@ -88,7 +88,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tags - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link rel="stylesheet" href="css/images.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags.css"/>

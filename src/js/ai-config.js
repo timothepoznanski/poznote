@@ -109,10 +109,10 @@ function testAIConnection() {
     .then(data => {
         if (data.success) {
             testResult.className = 'alert alert-success';
-            testResult.innerHTML = '<i class="fas fa-check-circle"></i> Connection successful! Using: ' + data.provider;
+            testResult.innerHTML = '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> Connection successful! Using: ' + data.provider;
         } else {
             testResult.className = 'alert alert-danger';
-            testResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.error;
+            testResult.innerHTML = '<img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ' + data.error;
         }
         testResult.style.display = 'block';
     })

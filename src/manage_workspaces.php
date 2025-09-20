@@ -336,9 +336,9 @@ try {
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
+    <link rel="stylesheet" href="css/manage_workspaces.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
@@ -390,9 +390,9 @@ try {
         <!-- Top alert area: used for both server-side and client-side messages -->
         <div id="topAlert" style="<?php echo ($message || $error) ? '' : 'display:none;'; ?> margin-top:12px;" class="<?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
             <?php if ($message): ?>
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
             <?php elseif ($error): ?>
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                <i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> <?php echo htmlspecialchars($error); ?>
             <?php endif; ?>
         </div>
 
@@ -657,7 +657,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'Error') ? '<i class="fas fa-exclamation-triangle"></i> ' : '<i class="fas fa-check-circle"></i> ';
+            var icon = (type === 'danger' || type === 'Error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'Error')) {
@@ -1044,9 +1044,9 @@ try {
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
+    <link rel="stylesheet" href="css/manage_workspaces.css">
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link rel="stylesheet" href="css/ai.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
@@ -1098,9 +1098,9 @@ try {
         <!-- Top alert area: used for both server-side and client-side messages -->
         <div id="topAlert" style="<?php echo ($message || $error) ? '' : 'display:none;'; ?> margin-top:12px;" class="<?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
             <?php if ($message): ?>
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
             <?php elseif ($error): ?>
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                <i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> <?php echo htmlspecialchars($error); ?>
             <?php endif; ?>
         </div>
 
@@ -1351,7 +1351,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'error') ? '<i class="fas fa-exclamation-triangle"></i> ' : '<i class="fas fa-check-circle"></i> ';
+            var icon = (type === 'danger' || type === 'error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'error')) {

@@ -25,7 +25,7 @@ function linkify_html($text) {
 }
 
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
-$pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
+$pageWorkspace = trim(getWorkspaceFilter());
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -35,7 +35,7 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 <title>Trash - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/index.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link rel="stylesheet" href="css/images.css" />
 	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>

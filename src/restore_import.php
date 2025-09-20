@@ -464,150 +464,10 @@ function importAttachmentsZip($uploadedFile) {
     <title>Restore (Import) - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
-    <style>
-        /* Simple confirmation modal */
-        .import-confirm-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            /* Use flex centering when the element is shown (JS sets inline display:flex) */
-            align-items: center;
-            justify-content: center;
-        }
+    <link rel="stylesheet" href="css/restore_import.css">
 
-        .import-confirm-modal-content {
-            background-color: #fefefe;
-            /* remove large top margin so the flex centering can work properly */
-            margin: 0 auto;
-            padding: 20px;
-            border: none;
-            border-radius: 8px;
-            width: 400px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow: auto;
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .import-confirm-modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: rgb(55, 53, 47);
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .import-confirm-modal-content p {
-            margin-bottom: 20px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .import-confirm-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .import-confirm-buttons button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.2s;
-        }
-
-        .btn-confirm {
-            background-color: #007DB8;
-            color: white;
-        }
-
-        .btn-confirm:hover {
-            background-color: #005a8a;
-        }
-
-        .btn-cancel {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-
-        .btn-cancel:hover {
-            background-color: #e9ecef;
-        }
-
-        /* Alert message styling */
-        .custom-alert {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .custom-alert-content {
-            background-color: #fefefe;
-            margin: 0 auto;
-            padding: 20px;
-            border: none;
-            border-radius: 8px;
-            width: 350px;
-            max-width: 90%;
-            max-height: 80vh;
-            overflow: auto;
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .custom-alert-content h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #dc3545;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .custom-alert-content p {
-            margin-bottom: 20px;
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .alert-ok-button {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.2s;
-            background-color: #007DB8;
-            color: white;
-        }
-
-        .alert-ok-button:hover {
-            background-color: #005a8a;
-        }
-    </style>
 </head>
 <body>
     <div class="backup-container">
@@ -617,7 +477,7 @@ function importAttachmentsZip($uploadedFile) {
             Back to Notes
         </a>
         <a href="backup_export.php" class="btn btn-secondary">
-            <i class="fas fa-upload"></i> Go to Backup (Export)
+            Go to Backup (Export)
         </a>
         <br><br>
         
@@ -628,13 +488,13 @@ function importAttachmentsZip($uploadedFile) {
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($restore_message); ?>
+                    <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($restore_message); ?>
                 </div>
             <?php endif; ?>
             
             <?php if ($restore_error && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($restore_error); ?>
+                    <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($restore_error); ?>
                 </div>
             <?php endif; ?>
 
@@ -650,7 +510,7 @@ function importAttachmentsZip($uploadedFile) {
             </form>
             
             <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                <i class="fas fa-info-circle" style="color: #1976d2; margin-right: 8px;"></i>
+                <img src="images/info-light-full.svg" alt="Info" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
                 <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
                 Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
             </div>
