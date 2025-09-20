@@ -196,23 +196,9 @@ body.trash-page {
     position: relative;
 }
 
-/* .icon_restore_trash,
-.icon_trash_trash {
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-    font-size: 1.2em;
-    color: #007DB8;
-} */
-
 .icon_restore_trash {
     margin: 0;
 }
-
-/* .icon_trash_trash {
-    margin: 0 0 0 8px;
-} */
 
 /* Override for custom SVG icons in trash */
 .trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash {

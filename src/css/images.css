@@ -36,51 +36,16 @@
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-.fa-expand-svg,
-.fa-expand::before {
-  display: inline-block;
-  width: 1.2em;
-  height: 1.2em;
-  background-image: url('../../images/maximize-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
 .fa-robot-svg {
-  display: inline-block;
   width: 1.2em;
   height: 1.2em;
   background-image: url('../../images/robot-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  /* Override Font Awesome base styles that might interfere */
-  font-family: inherit !important;
-  font-style: normal !important;
-  -webkit-font-smoothing: auto !important;
-  -moz-osx-font-smoothing: auto !important;
-  text-rendering: auto !important;
-  /* Dark gray color by default - #37352f */
-  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
-/* Square share nodes SVG icon (used for share/export button) */
 .fa-square-share-nodes-svg {
-  display: inline-block;
   width: 1.2em;
   height: 1.2em;
   background-image: url('../../images/square-share-nodes-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-  filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
 /* Blue color when a note is shared publicly */
@@ -94,11 +59,6 @@
   width: 0.9em;
   height: 0.9em;
   background-image: url('../../images/icons-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
   content: '';
 }
 
