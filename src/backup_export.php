@@ -278,7 +278,7 @@ function createBackup() {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
+        <h1><i class="fa-upload"></i> Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
@@ -291,7 +291,7 @@ function createBackup() {
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-archive"></i> Complete Backup</h3>
+            <h3><i class="fa-archive"></i> Complete Backup</h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
                     <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>

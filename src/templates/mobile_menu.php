@@ -14,7 +14,7 @@
             <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
         </div>
         <div class="sidebar-title-actions">
-            <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fas fa-plus"></i></button>
+            <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
         </div>
 
         <!-- Workspace menu container (mobile) -->
@@ -30,7 +30,7 @@
                     <div class="searchbar-row searchbar-icon-row">
                         <div class="searchbar-input-wrapper">
                             <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                            <span class="searchbar-icon"><span class="fas fa-search"></span></span>
+                            <span class="searchbar-icon"><span class="fa-search"></span></span>
                             <?php if (!empty($search) || !empty($tags_search)): ?>
                                 <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
                             <?php endif; ?>

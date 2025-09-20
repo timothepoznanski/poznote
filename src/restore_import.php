@@ -471,7 +471,7 @@ function importAttachmentsZip($uploadedFile) {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-download"></i> Restore (Import)</h1>
+        <h1><i class="fa-download"></i> Restore (Import)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
@@ -483,7 +483,7 @@ function importAttachmentsZip($uploadedFile) {
         
         <!-- Complete Import Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-archive"></i> Complete Restore</h3>
+            <h3><i class="fa-archive"></i> Complete Restore</h3>
             <p>Upload a complete backup ZIP file to restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>

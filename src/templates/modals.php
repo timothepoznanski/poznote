@@ -238,7 +238,7 @@
             <option value="">Select target folder...</option>
         </select>
         <div id="folderFilesCount" class="modal-info-message">
-            <i class="fas fa-info-circle"></i>
+            <i class="fa-info-circle"></i>
             <span id="filesCountText"></span>
         </div>
         <div class="modal-buttons">

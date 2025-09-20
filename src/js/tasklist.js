@@ -75,7 +75,7 @@ function renderTasks(tasks) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = task.important ? 'fas fa-star' : 'far fa-star';
+        const starClass = task.important ? 'fas fa-star' : 'fa-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `

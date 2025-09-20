@@ -1056,18 +1056,6 @@ a.links_arbo_left.selected-note {
     justify-content: center;
 }
 
-/* Ensure the actual FontAwesome icon inside the searchbar has a consistent size
-   different fa-* glyphs can appear visually different; normalize to 1em */
-.searchbar-icon i,
-.searchbar-icon .fas,
-.searchbar-icon .far,
-.searchbar-icon .fab,
-.searchbar-icon .fa {
-    font-size: 0.9em; /* slightly smaller icons */
-    line-height: 1;
-    display: inline-block;
-}
-
 /* Highlight a tag when it matches an active tag search */
 .tag-highlight {
     background: #fff3b0; /* soft yellow */
@@ -1945,53 +1933,53 @@ hr {
 }
 
 /* Quand save est modifié, il reste rouge même au hover/focus */
-.toolbar-btn.save-modified i.fas.fa-save {
+.toolbar-btn.save-modified i.fa-save {
     color: #e53935 !important;
 }
-.toolbar-btn.save-modified:hover i.fas.fa-save,
-.toolbar-btn.save-modified:focus i.fas.fa-save {
+.toolbar-btn.save-modified:hover i.fa-save,
+.toolbar-btn.save-modified:focus i.fa-save {
     color: #e53935 !important;
 }
-.toolbar-btn.save-modified i.fas.fa-save::before {
+.toolbar-btn.save-modified i.fa-save::before {
     filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
 }
-.toolbar-btn.save-modified:hover i.fas.fa-save::before,
-.toolbar-btn.save-modified:focus i.fas.fa-save::before {
+.toolbar-btn.save-modified:hover i.fa-save::before,
+.toolbar-btn.save-modified:focus i.fa-save::before {
     filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
 }
 /* Pour l'icône save normale, couleur gris foncé par défaut */
-.toolbar-btn:not(.save-modified) i.fas.fa-save {
+.toolbar-btn:not(.save-modified) i.fa-save {
     color: inherit;
 }
-.toolbar-btn:not(.save-modified) i.fas.fa-save::before {
+.toolbar-btn:not(.save-modified) i.fa-save::before {
     filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
-.toolbar-btn i.fas.fa-palette,
-.toolbar-btn i.fas.fa-fill-drip {
+.toolbar-btn i.fa-palette,
+.toolbar-btn i.fa-fill-drip {
     color: inherit !important;
 }
 
 /* Couleurs par défaut des icônes */
-.toolbar-btn i.fas.fa-palette {
+.toolbar-btn i.fa-palette {
     color: #ff2222;
 }
 
-.toolbar-btn i.fas.fa-fill-drip {
+.toolbar-btn i.fa-fill-drip {
     color: #ffe066;
 }
 
-.toolbar-btn:hover i.fas.fa-palette,
-.toolbar-btn:focus i.fas.fa-palette {
+.toolbar-btn:hover i.fa-palette,
+.toolbar-btn:focus i.fa-palette {
     color: #ff2222 !important;
 }
 
-.toolbar-btn:hover i.fas.fa-fill-drip,
-.toolbar-btn:focus i.fas.fa-fill-drip {
+.toolbar-btn:hover i.fa-fill-drip,
+.toolbar-btn:focus i.fa-fill-drip {
     color: #ffe066 !important;
 }
 
-.toolbar-btn.btn-ai i.fas.fa-robot {
+.toolbar-btn.btn-ai i.fa-robot {
     display: none;
 }
 

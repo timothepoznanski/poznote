@@ -332,7 +332,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -351,7 +351,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Folder item
         var folderItem = document.createElement('button');
         folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
         folderItem.onclick = function() {
             newFolder();
             createMenu.remove();
@@ -360,7 +360,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Task list item
         var taskListItem = document.createElement('button');
         taskListItem.className = 'create-menu-item';
-        taskListItem.innerHTML = '<i class="fas fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
+        taskListItem.innerHTML = '<i class="fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
         taskListItem.onclick = function() {
             createTaskListNote();
             createMenu.remove();
@@ -501,50 +501,50 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 
                 // Use goBackToNoteList function for better mobile experience if no search parameters
                 if (empty($home_params)) {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fas fa-home"></i></button>';
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 } else {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fa-home"></i></button>';
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)
                 $text_format_class = $is_mobile ? '' : ' text-format-btn';
                 $note_action_class = $is_mobile ? '' : ' note-action-btn';
-                echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fas fa-bold"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fas fa-italic"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fas fa-underline"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-strikethrough'.$text_format_class.'" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fas fa-strikethrough"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-link'.$text_format_class.'" title="Link" onclick="addLinkToNote()"><i class="fas fa-link"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-unlink'.$text_format_class.'" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fas fa-unlink"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-color'.$text_format_class.'" title="Text color" onclick="toggleRedColor()"><i class="fas fa-palette"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-highlight'.$text_format_class.'" title="Highlight" onclick="toggleYellowHighlight()"><i class="fas fa-fill-drip"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ul'.$text_format_class.'" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fas fa-list-ul"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ol'.$text_format_class.'" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fas fa-list-ol"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-text-height'.$text_format_class.'" title="Font size" onclick="changeFontSize()"><i class="fas fa-text-height"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fas fa-code"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fas fa-terminal"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fas fa-eraser"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-strikethrough'.$text_format_class.'" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-link'.$text_format_class.'" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-unlink'.$text_format_class.'" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fa-unlink"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-color'.$text_format_class.'" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-highlight'.$text_format_class.'" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-list-ul'.$text_format_class.'" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-list-ol'.$text_format_class.'" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-text-height'.$text_format_class.'" title="Font size" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
              
                 // Note action buttons (desktop only)
                     if (!$is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     // Save button first, then separator (minus) to match requested order
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
                         echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<i class="fa-align-left"></i>';
                         echo '<span>Summarize note</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-search"></i>';
+                        echo '<i class="fa-search"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-tags"></i>';
+                        echo '<i class="fa-tags"></i>';
                         echo '<span>AI tags</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
@@ -674,19 +674,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<i class="fa-align-left"></i>';
                         echo '<span>Summarize note</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-search"></i>';
+                        echo '<i class="fa-search"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-tags"></i>';
+                        echo '<i class="fa-tags"></i>';
                         echo '<span>AI tags</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fas fa-cog"></i>';
+                        echo '<i class="fa-cog"></i>';
                         echo '<span>AI settings</span>';
                         echo '</div>';
                         echo '</div>';
@@ -778,7 +778,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 
                 // Tags only (folder selection removed)
                 echo '<div class="note-tags-row">';
-                echo '<span class="fa fa-tag icon_tag"></span>';
+                echo '<span class="fa-tag icon_tag"></span>';
                 echo '<span class="name_tags">'
                     .'<input class="add-margin" size="70px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Add tags here" onfocus="updateidtags(this);" id="tags'.$row['id'].'" type="text" placeholder="Tags ?" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                 .'</span>';

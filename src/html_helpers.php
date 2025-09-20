@@ -61,15 +61,15 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
     $search_pills = '
     <div class="search-type-pills">
         <button type="button" class="search-pill" id="search-notes-btn' . $pills_suffix . '" title="Search in note content" data-type="notes">
-            <i class="fas fa-file-alt"></i>
+            <i class="fa-file-alt"></i>
             <span>Notes</span>
         </button>
         <button type="button" class="search-pill" id="search-tags-btn' . $pills_suffix . '" title="Search in one or more tags" data-type="tags">
-            <i class="fas fa-tags"></i>
+            <i class="fa-tags"></i>
             <span>Tags</span>
         </button>
         <button type="button" class="search-pill" id="search-folders-btn' . $pills_suffix . '" title="Filter folders" data-type="folders">
-            <i class="fas fa-folder"></i>
+            <i class="fa-folder"></i>
             <span>Folders</span>
         </button>
     </div>';
@@ -84,7 +84,7 @@ function generateSearchForm($is_mobile, $search, $tags_search, $workspace_filter
             <div class="searchbar-row searchbar-icon-row">
                 <div class="searchbar-input-wrapper">
                     <input autocomplete="off" autocapitalize="off" spellcheck="false" id="' . $search_id . '" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Search..." value="' . $search_value . '" />
-                    <span class="searchbar-icon"><span class="fas fa-search"></span></span>
+                    <span class="searchbar-icon"><span class="fa-search"></span></span>
                     ' . $clear_button . '
                 </div>
             </div>

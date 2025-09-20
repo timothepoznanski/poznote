@@ -71,7 +71,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
 			</div>
 			<div class="trash-button trash-empty-button" id="emptyTrashBtn" title="Empty trash">
-				<i class="fa fa-trash-alt trash-button-icon"></i>
+				<i class="fa-trash-alt trash-button-icon"></i>
 			</div>
 		</div>
 		
@@ -156,7 +156,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="Restore this note" class="fa fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>'
+					.'<i title="Restore this note" class="fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>'
 					.'<i title="Delete permanently" class="fas fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">Last modified on '.$updated.'</div>'

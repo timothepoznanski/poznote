@@ -23,7 +23,7 @@ include 'functions.php';
     <div class="settings-container">
         <br>
         <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
-            <i class="fas fa-arrow-left"></i>
+            <i class="fa-arrow-left"></i>
             Back to Notes
         </a>
         <br>
@@ -32,7 +32,7 @@ include 'functions.php';
             <!-- Workspace Management -->
             <div class="settings-card" onclick="window.location = 'manage_workspaces.php';">
                 <div class="settings-card-icon">
-                    <i class="fas fa-layer-group"></i>
+                    <i class="fa-layer-group"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Workspaces</h3>
@@ -54,7 +54,7 @@ include 'functions.php';
             <!-- Backup -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">
                 <div class="settings-card-icon">
-                    <i class="fas fa-upload"></i>
+                    <i class="fa-upload"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Backup (Export)</h3>
@@ -64,7 +64,7 @@ include 'functions.php';
             <!-- Restore -->
             <div class="settings-card" onclick="window.location = 'restore_import.php';">
                 <div class="settings-card-icon">
-                    <i class="fas fa-download"></i>
+                    <i class="fa-download"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Restore (Import)</h3>
@@ -74,7 +74,7 @@ include 'functions.php';
             <!-- Release Notes -->
             <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="fa-file-alt"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Release Notes</h3>
@@ -84,7 +84,7 @@ include 'functions.php';
             <!-- Updates -->
             <div class="settings-card" onclick="checkForUpdates();">
                 <div class="settings-card-icon">
-                    <i class="fas fa-sync-alt"></i>
+                    <i class="fa-sync-alt"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Check for Updates</h3>
@@ -94,7 +94,7 @@ include 'functions.php';
             <!-- Github repository -->
             <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fas fa-code-branch"></i>
+                    <i class="fa-code-branch"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>GitHub Repository</h3>
@@ -104,7 +104,7 @@ include 'functions.php';
             <!-- Poznote Website -->
             <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fas fa-globe"></i>
+                    <i class="fa-globe"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>About Poznote</h3>

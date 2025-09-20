@@ -16,14 +16,12 @@
 @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
 
 /* Dark gray tint for toolbar icons by default - #37352f */
-.toolbar-btn .fas::before,
 .toolbar-btn .fa::before,
 .toolbar-btn .far::before {
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
 /* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
-.btn-attachment.has-attachments .fas.fa-paperclip::before,
 .btn-attachment.has-attachments .fa-paperclip::before {
   /* tint paperclip SVG to app blue */
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
@@ -42,8 +40,7 @@
 } */
 
 /* Dark gray color for plus icon - #37352f */
-.fa-plus::before,
-.fas.fa-plus::before {
+.fa-plus::before {
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
@@ -53,7 +50,7 @@
 }
 
 .fa-expand-svg,
-.fas.fa-expand::before {
+.fa-expand::before {
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
@@ -105,7 +102,7 @@
 }
 
 .fa-smile-svg,
-.fas.fa-smile::before {
+.fa-smile::before {
   display: inline-block;
   width: 0.9em;
   height: 0.9em;
@@ -119,7 +116,7 @@
 }
 
 .fa-folder-svg,
-.fas.fa-folder::before {
+.fa-folder::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -132,7 +129,7 @@
   content: '';
 }
 .fa-folder-open-svg,
-.fas.fa-folder-open::before {
+.fa-folder-open::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -146,7 +143,7 @@
 }
 
 .fa-edit-svg,
-.fas.fa-edit::before {
+.fa-edit::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -173,7 +170,7 @@
 }
 
 .fa-download-svg,
-.fas.fa-download::before {
+.fa-download::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -187,7 +184,7 @@
 }
 
 .fa-trash-svg,
-.fas.fa-trash::before {
+.fa-trash::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -202,7 +199,7 @@
 }
 
 .fa-save-svg,
-.fas.fa-save::before {
+.fa-save::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -216,7 +213,7 @@
 }
 
 .fa-link-svg,
-.fas.fa-link::before {
+.fa-link::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -230,7 +227,7 @@
 }
 
 .fa-unlink-svg,
-.fas.fa-unlink::before {
+.fa-unlink::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -244,7 +241,7 @@
 }
 
 .fa-paperclip-svg,
-.fas.fa-paperclip::before {
+.fa-paperclip::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -258,7 +255,7 @@
 }
 
 .fa-minus-svg,
-.fas.fa-minus::before {
+.fa-minus::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -272,7 +269,7 @@
 }
 
 .fa-info-circle-svg,
-.fas.fa-info-circle::before {
+.fa-info-circle::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -286,7 +283,7 @@
 }
 
 .fa-search-svg,
-.fas.fa-search::before {
+.fa-search::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -300,7 +297,7 @@
 }
 
 .fa-star-svg,
-.fas.fa-star::before {
+.fa-star::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -327,7 +324,7 @@
 }
 
 .fa-layer-group-svg,
-.fas.fa-layer-group::before {
+.fa-layer-group::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -341,7 +338,7 @@
 }
 
 .fa-cog-svg,
-.fas.fa-cog::before {
+.fa-cog::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -355,7 +352,7 @@
 }
 
 .fa-eye-svg,
-.fas.fa-eye::before {
+.fa-eye::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -369,7 +366,7 @@
 }
 
 .fa-home-svg,
-.fas.fa-home::before {
+.fa-home::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -383,7 +380,7 @@
 }
 
 .fa-bold-svg,
-.fas.fa-bold::before {
+.fa-bold::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -397,7 +394,7 @@
 }
 
 .fa-italic-svg,
-.fas.fa-italic::before {
+.fa-italic::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -411,7 +408,7 @@
 }
 
 .fa-underline-svg,
-.fas.fa-underline::before {
+.fa-underline::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -425,7 +422,7 @@
 }
 
 .fa-eraser-svg,
-.fas.fa-eraser::before {
+.fa-eraser::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -439,7 +436,7 @@
 }
 
 .fa-strikethrough-svg,
-.fas.fa-strikethrough::before {
+.fa-strikethrough::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -453,7 +450,7 @@
 }
 
 .fa-palette-svg,
-.fas.fa-palette::before {
+.fa-palette::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -467,7 +464,7 @@
 }
 
 .fa-fill-drip-svg,
-.fas.fa-fill-drip::before {
+.fa-fill-drip::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -481,7 +478,7 @@
 }
 
 .fa-list-ul-svg,
-.fas.fa-list-ul::before {
+.fa-list-ul::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -495,7 +492,7 @@
 }
 
 .fa-list-ol-svg,
-.fas.fa-list-ol::before {
+.fa-list-ol::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -509,7 +506,7 @@
 }
 
 .fa-text-height-svg,
-.fas.fa-text-height::before {
+.fa-text-height::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -523,7 +520,7 @@
 }
 
 .fa-code-svg,
-.fas.fa-code::before {
+.fa-code::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -537,7 +534,7 @@
 }
 
 .fa-terminal-svg,
-.fas.fa-terminal::before {
+.fa-terminal::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -551,8 +548,7 @@
 }
 
 .fa-tag-svg,
-.fas.fa-tag::before,
-.fa.fa-tag::before {
+.fa-tag::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -566,7 +562,7 @@
 }
 
 .fa-tags-svg,
-.fas.fa-tags::before {
+.fa-tags::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -580,7 +576,7 @@
 }
 
 .fa-sign-out-alt-svg,
-.fas.fa-sign-out-alt::before {
+.fa-sign-out-alt::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -594,8 +590,8 @@
 }
 
 .fa-sync-alt-svg,
-.fas.fa-sync-alt::before,
-.fas.fa-rotate::before {
+.fa-sync-alt::before,
+.fa-rotate::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -610,7 +606,7 @@
 
 .fa-github-svg,
 .fab.fa-github::before,
-.fas.fa-github::before {
+.fa-github::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -624,7 +620,7 @@
 }
 
 .fa-globe-svg,
-.fas.fa-globe::before {
+.fa-globe::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -638,7 +634,7 @@
 }
 
 .fa-upload-svg,
-.fas.fa-upload::before {
+.fa-upload::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -652,7 +648,7 @@
 }
 
 .fa-arrow-left-svg,
-.fas.fa-arrow-left::before {
+.fa-arrow-left::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -666,7 +662,7 @@
 }
 
 .fa-info-svg,
-.fas.fa-info::before {
+.fa-info::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -680,8 +676,8 @@
 }
 
 .fa-file-alt-svg,
-.fas.fa-file-alt::before,
-.fas.fa-file-lines::before {
+.fa-file-alt::before,
+.fa-file-lines::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -695,7 +691,7 @@
 }
 
 .fa-plus-svg,
-.fas.fa-plus::before {
+.fa-plus::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -709,8 +705,8 @@
 }
 
 .fa-calendar-alt-svg,
-.fas.fa-calendar-alt::before,
-.fas.fa-calendar::before {
+.fa-calendar-alt::before,
+.fa-calendar::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -724,7 +720,7 @@
 }
 
 .fa-code-branch-svg,
-.fas.fa-code-branch::before {
+.fa-code-branch::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -738,8 +734,8 @@
 }
 
 .fa-map-marker-alt-svg,
-.fas.fa-map-marker-alt::before,
-.fas.fa-map-marker::before {
+.fa-map-marker-alt::before,
+.fa-map-marker::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -753,7 +749,7 @@
 }
 
 .fa-user-svg,
-.fas.fa-user::before {
+.fa-user::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -767,7 +763,7 @@
 }
 
 .fa-hashtag-svg,
-.fas.fa-hashtag::before {
+.fa-hashtag::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -781,7 +777,7 @@
 }
 
 .fa-align-left-svg,
-.fas.fa-align-left::before {
+.fa-align-left::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -795,7 +791,7 @@
 }
 
 .fa-arrow-circle-left-svg,
-.fas.fa-arrow-circle-left::before {
+.fa-arrow-circle-left::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -824,7 +820,7 @@
 }
 
 .fa-spinner-svg,
-.fas.fa-spinner::before {
+.fa-spinner::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -838,7 +834,7 @@
 }
 
 .fa-check-svg,
-.fas.fa-check::before {
+.fa-check::before {
   display: inline-block;
   width: 1em;
   height: 1em;
@@ -854,7 +850,7 @@
 /* Enhanced hover effects - Blue color */
 /* .fa-save:hover::before,
 .fa-smile:hover::before,
-.fas.fa-trash:hover,
+.fa-trash:hover,
 .fa-trash:hover::before,
 .fa-folder:hover::before,
 .fa-download:hover::before,
