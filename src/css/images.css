@@ -1,64 +1,5 @@
-/* Custom SVG icons replacing Font Awesome
-   This file provides SVG-based icon replacements for Font Awesome classes
-   used by the app, eliminating the need for font files.
-*/
 
-/* Common icon rule: use pseudo-element content */
-[class^="fa-"], [class*=" fa-"] {
-  display: inline-block;
-}
-
-/* Icon mappings used in the app (subset) */
-.fa-home:before { content: "\f015"; }
-.fa-file-alt:before { content: "\f15c"; }
-.fa-folder:before { content: "\f07b"; }
-.fa-folder-open:before { content: "\f07c"; }
-.fa-star:before { content: "\f005"; }
-.fa-paperclip:before { content: "\f0c6"; }
-.fa-save:before { content: "\f0c7"; }
-.fa-search:before { content: "\f002"; }
-.fa-times-circle:before { content: "\f057"; }
-.fa-info-circle:before { content: "\f05a"; }
-.fa-download:before { content: "\f019"; }
-.fa-upload:before { content: "\f093"; }
-.fa-plus:before { content: "\f067"; }
-.fa-exclamation-triangle:before { content: "\f071"; }
-.fa-paperclip:before { content: "\f0c6"; }
-.fa-trash:before { content: "\f1f8"; }
-.fa-save:before { content: "\f0c7"; }
-.fa-bold:before { content: "\f032"; }
-.fa-italic:before { content: "\f033"; }
-.fa-underline:before { content: "\f0cd"; }
-.fa-strikethrough:before { content: "\f0cc"; }
-.fa-link:before { content: "\f0c1"; }
-.fa-unlink:before { content: "\f127"; }
-.fa-palette:before { content: "\f53f"; }
-.fa-fill-drip:before { content: "\f576"; }
-.fa-list-ul:before { content: "\f0ca"; }
-.fa-list-ol:before { content: "\f0cb"; }
-.fa-text-height:before { content: "\f034"; }
-.fa-code:before { content: "\f121"; }
-.fa-terminal:before { content: "\f120"; }
-.fa-eraser:before { content: "\f12d"; }
-.fa-smile:before { content: "\f118"; }
-.fa-minus:before { content: "\f068"; }
-.fa-save:before { content: "\f0c7"; }
-.fa-download:before { content: "\f019"; }
-.fa-info-circle:before { content: "\f05a"; }
-.fa-check-circle:before { content: "\f058"; }
-.fa-exclamation-triangle:before { content: "\f071"; }
-
-/* Additional icons discovered in templates/js */
-.fa-spinner:before { content: "\f110"; }
-.fa-times:before { content: "\f00d"; }
-.fa-check:before { content: "\f00c"; }
-.fa-file-pdf:before { content: "\f1c1"; }
-.fa-external-link-alt:before { content: "\f35d"; }
-
-/* spin helper */
-.fa-spin { -webkit-animation: fa-spin 2s infinite linear; animation: fa-spin 2s infinite linear; }
-@-webkit-keyframes fa-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(359deg); } }
-@keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
+/* Custom SVG icons for offline use */
 
 /* Global scaling for all custom SVG icons */
 .fas::before,
@@ -68,6 +9,11 @@
   transform-origin: center;
   transition: all 0.3s ease;
 }
+
+/* spin helper */
+.fa-spin { -webkit-animation: fa-spin 2s infinite linear; animation: fa-spin 2s infinite linear; }
+@-webkit-keyframes fa-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(359deg); } }
+@keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
 
 /* Dark gray tint for toolbar icons by default - #37352f */
 .toolbar-btn .fas::before,
@@ -87,7 +33,6 @@
   background-size: contain !important;
   content: '' !important; /* swap pseudo-element to use background-image */
 }
-
 /* Blue hover effect for toolbar icons */
 .toolbar-btn:hover .fas::before,
 .toolbar-btn:hover .fa::before,
@@ -123,26 +68,6 @@ a:hover .far::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* When favorite is active, force the solid star SVG and remove tint filter so the icon appears filled */
-.btn-favorite.is-favorite .fa-star::before {
-  /* Do not force solid; just tint the existing star icon to app blue */
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-}
-
-.fa-align-left-svg,
-.fas.fa-align-left::before {
-  display: inline-block;
-  width: 1.2em;
-  height: 1.2em;
-  background-image: url('../../images/align-left-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
 .fa-expand-svg,
 .fas.fa-expand::before {
   display: inline-block;
@@ -176,29 +101,6 @@ a:hover .far::before {
   filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
-/* Support rotation animation for SVG robot icon */
-.fa-robot-svg.rotating {
-  animation: fa-spin 2s infinite linear;
-}
-
-/* Animation for spinner */
-.fa-spinner::before,
-.fa-spin::before {
-  animation: fa-spin 2s infinite linear;
-}
-
-@keyframes fa-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Blue hover effect for robot icon */
-.fa-robot-svg:hover {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
-  transform: scale(1.35);
-  transition: all 0.3s ease;
-}
-
 /* Square share nodes SVG icon (used for share/export button) */
 .fa-square-share-nodes-svg {
   display: inline-block;
@@ -219,15 +121,6 @@ a:hover .far::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* When shared, make the share icon visually filled/solid (remove dark tint) */
-.btn-share.is-shared .fa-square-share-nodes-svg {
-  /* tint share SVG to app blue */
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-  background-image: url('../../images/square-share-nodes-light-full.svg') !important;
-}
-
-
-/* Custom SVG icons for offline use */
 .fa-smile-svg,
 .fas.fa-smile::before {
   display: inline-block;
@@ -255,7 +148,6 @@ a:hover .far::before {
   font-style: normal !important;
   content: '';
 }
-
 .fa-folder-open-svg,
 .fas.fa-folder-open::before {
   display: inline-block;
@@ -283,7 +175,6 @@ a:hover .far::before {
   font-style: normal !important;
   content: '';
 }
-
 .fa-trash-svg,
 .fas.fa-trash::before {
   display: inline-block;
@@ -1012,8 +903,7 @@ a:hover .far::before {
 .fa-eye:hover::before,
 .fa-eye-slash:hover::before,
 .fa-trash-restore-alt:hover::before,
-.fa-spinner:hover::before,
-.fa-check:hover::before {
+.fa-spinner:hover::before {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
   transform: scale(1.35) !important;
 }
