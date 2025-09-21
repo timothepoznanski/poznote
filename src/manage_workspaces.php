@@ -378,7 +378,7 @@ try {
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fa-layer-group"></i> Workspaces</h1>
+        <h1> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
@@ -390,25 +390,25 @@ try {
         <!-- Top alert area: used for both server-side and client-side messages -->
         <div id="topAlert" style="<?php echo ($message || $error) ? '' : 'display:none;'; ?> margin-top:12px;" class="<?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
             <?php if ($message): ?>
-                <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
+                <?php echo htmlspecialchars($message); ?>
             <?php elseif ($error): ?>
-                <i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> <?php echo htmlspecialchars($error); ?>
+                <?php echo htmlspecialchars($error); ?>
             <?php endif; ?>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fa-plus"></i> Create a new workspace</h3>
+            <h3> Create a new workspace</h3>
             <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
                 <input type="hidden" name="action" value="create">
                 <div class="form-group">
                     <input id="workspace-name" name="name" type="text" placeholder="Enter workspace name" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fa-plus"></i> Create</button>
+                <button type="submit" class="btn btn-primary"> Create</button>
             </form>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fa-list"></i> Existing workspaces</h3>
+            <h3> Existing workspaces</h3>
             <div class="workspace-list">
                 <?php if (empty($workspaces)): ?>
                     <div>No workspaces defined.</div>
@@ -657,7 +657,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'Error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
+            var icon = (type === 'danger' || type === 'Error') ? '' : '';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'Error')) {
@@ -1086,7 +1086,7 @@ try {
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fa-layer-group"></i> Workspaces</h1>
+        <h1> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
         <a href="index.php" class="btn btn-secondary">
@@ -1098,25 +1098,25 @@ try {
         <!-- Top alert area: used for both server-side and client-side messages -->
         <div id="topAlert" style="<?php echo ($message || $error) ? '' : 'display:none;'; ?> margin-top:12px;" class="<?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
             <?php if ($message): ?>
-                <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
+                <?php echo htmlspecialchars($message); ?>
             <?php elseif ($error): ?>
-                <i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> <?php echo htmlspecialchars($error); ?>
+                <?php echo htmlspecialchars($error); ?>
             <?php endif; ?>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fa-plus"></i> Create a new workspace</h3>
+            <h3> Create a new workspace</h3>
             <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
                 <input type="hidden" name="action" value="create">
                 <div class="form-group">
                     <input id="workspace-name" name="name" type="text" placeholder="Enter workspace name" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fa-plus"></i> Create</button>
+                <button type="submit" class="btn btn-primary"> Create</button>
             </form>
         </div>
 
         <div class="settings-section">
-            <h3><i class="fa-list"></i> Existing workspaces</h3>
+            <h3> Existing workspaces</h3>
             <div class="workspace-list">
                 <?php if (empty($workspaces)): ?>
                     <div>No workspaces defined.</div>
@@ -1351,7 +1351,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
+            var icon = (type === 'danger' || type === 'error') ? '' : '';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'error')) {
