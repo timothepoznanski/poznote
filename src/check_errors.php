@@ -51,7 +51,6 @@ $is_generating = false;
     <title>Content Verification - <?php echo htmlspecialchars($note_title); ?></title>
     <link href="css/index.css" rel="stylesheet">
     <link href="css/modals.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/images.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">

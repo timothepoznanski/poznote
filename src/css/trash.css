@@ -133,7 +133,6 @@ body.trash-page {
 }
 
 .trash-back-button:hover,
-.trash-empty-button:hover .trash-button-icon.fa.fa-trash-alt,
 .trash-empty-button:hover .trash-button-icon.fa-trash-alt {
     filter: brightness(0) saturate(100%) invert(78%) sepia(95%) saturate(1500%) hue-rotate(39deg) brightness(102%) contrast(105%) !important;
 }
@@ -145,8 +144,7 @@ body.trash-page {
 }
 
 /* Override for custom SVG icons in trash buttons */
-.trash-page .trash-empty-button .trash-button-icon.fa.fa-trash-alt,
-.trash-page .trash-empty-button .trash-button-icon.fa-trash-alt {
+.trash-empty-button .trash-button-icon.fa-trash-alt {
     font-size: inherit !important;
     color: inherit !important;
     background-image: url('../images/broom-light-full.svg') !important;
@@ -201,7 +199,7 @@ body.trash-page {
 }
 
 /* Override for custom SVG icons in trash */
-.trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash {
+.trash-notecard .trash-action-icons .icon_trash_trash.fa-trash {
     font-size: inherit !important;
     color: inherit !important;
     background-image: url('../images/trash-can-light-full.svg') !important;
@@ -225,7 +223,7 @@ body.trash-page {
 } */
 
 /* Override hover for custom SVG icon */
-/* .trash-page .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash:hover {
+/* .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash:hover {
     filter: brightness(0) saturate(100%) invert(39%) sepia(95%) saturate(1500%) hue-rotate(0deg) brightness(102%) contrast(105%) !important;
 } */
 
@@ -292,4 +290,25 @@ body.trash-page {
 
 .trash-clear-search:hover {
     color: #d32f2f;
+}
+
+/* Override icon styles specifically for trash page */
+.fa-arrow-circle-left-svg,
+.fa-arrow-circle-left::before {
+  background-image: url('../images/arrow-left-light-full.svg') !important;
+}
+
+.fa-trash-alt-svg {
+  width: 0.85em !important;
+  height: 0.85em !important;
+  background-image: url('../images/broom-light-full.svg') !important;
+}
+
+.fa-trash-restore-alt-svg {
+  background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
+}
+
+.fa-trash-svg,
+.fa-trash::before {
+  background-image: url('../images/trash-can-light-full.svg') !important;
 }
