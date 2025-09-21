@@ -58,9 +58,7 @@ $res_right = $note_data['res_right'];
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <!-- Index-specific stylesheet (moved from templates/head_includes.php) -->
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
-    <!-- Index-only JavaScript (moved from templates/head_includes.php) -->
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>
