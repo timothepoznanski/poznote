@@ -856,16 +856,16 @@ a.links_arbo_left.selected-note {
 }
 
 /* Attachment indicators on mobile (use app blue) */
-.btn-settings.has-attachments i::before,
-.btn-attachment.has-attachments i::before {
+.btn-settings.has-attachments i,
+.btn-attachment.has-attachments i {
     filter: none !important;
     color: #007DB8 !important;
 }
 
-.btn-settings.has-attachments:hover i::before,
-.btn-settings.has-attachments:focus i::before,
-.btn-attachment.has-attachments:hover i::before,
-.btn-attachment.has-attachments:focus i::before {
+.btn-settings.has-attachments:hover i,
+.btn-settings.has-attachments:focus i,
+.btn-attachment.has-attachments:hover i,
+.btn-attachment.has-attachments:focus i {
     filter: none !important;
     color: #005a8a !important;
 }

@@ -121,7 +121,7 @@ body {
 /* Icon sprites / replacements used across UI (copied from index.css)
      Ensures settings page shows the same icons after head_includes.php removal */
 .fa-arrow-left-svg,
-.fa-arrow-left::before {
+.fa-arrow-left {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -135,7 +135,7 @@ body {
 }
 
 .fa-layer-group-svg,
-.fa-layer-group::before {
+.fa-layer-group {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -155,7 +155,7 @@ body {
 }
 
 .fa-upload-svg,
-.fa-upload::before {
+.fa-upload {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -169,7 +169,7 @@ body {
 }
 
 .fa-download-svg,
-.fa-download::before {
+.fa-download {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -183,8 +183,8 @@ body {
 }
 
 .fa-file-alt-svg,
-.fa-file-alt::before,
-.fa-file-lines::before {
+.fa-file-alt,
+.fa-file-lines {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -198,8 +198,8 @@ body {
 }
 
 .fa-sync-alt-svg,
-.fa-sync-alt::before,
-.fa-rotate::before {
+.fa-sync-alt,
+.fa-rotate {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -213,7 +213,7 @@ body {
 }
 
 .fa-globe-svg,
-.fa-globe::before {
+.fa-globe {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -227,7 +227,7 @@ body {
 }
 
 .fa-info-svg,
-.fa-info::before {
+.fa-info {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -241,7 +241,7 @@ body {
 }
 
 .fa-code-branch-svg,
-.fa-code-branch::before {
+.fa-code-branch {
     display: inline-block;
     width: 1em;
     height: 1em;
