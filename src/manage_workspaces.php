@@ -657,7 +657,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'Error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
+            var icon = (type === 'danger' || type === 'Error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'Error')) {
@@ -1351,7 +1351,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
+            var icon = (type === 'danger' || type === 'error') ? '<i class="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"></i> ' : '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ';
             el.innerHTML = icon + message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'error')) {
