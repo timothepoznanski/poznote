@@ -117,3 +117,139 @@ body {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
 }
+
+/* Icon sprites / replacements used across UI (copied from index.css)
+     Ensures settings page shows the same icons after head_includes.php removal */
+.fa-arrow-left-svg,
+.fa-arrow-left::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/arrow-left-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-layer-group-svg,
+.fa-layer-group::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/layer-group-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-robot-svg {
+    width: 1.2em;
+    height: 1.2em;
+    background-image: url('../images/robot-light-full.svg');
+}
+
+.fa-upload-svg,
+.fa-upload::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/upload-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-download-svg,
+.fa-download::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/download-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-file-alt-svg,
+.fa-file-alt::before,
+.fa-file-lines::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/file-lines-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-sync-alt-svg,
+.fa-sync-alt::before,
+.fa-rotate::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/rotate-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-globe-svg,
+.fa-globe::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/earth-americas-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-info-svg,
+.fa-info::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/info-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-code-branch-svg,
+.fa-code-branch::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/code-branch-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
