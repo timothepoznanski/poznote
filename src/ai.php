@@ -92,7 +92,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 </head>
 <body>
     <div class="settings-container">
-    <h1 class="ai-header"><i class="fa-robot-svg"></i> Artificial Intelligence</h1>
+    <h1 class="ai-header">Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
     
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
@@ -103,19 +103,19 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 
         <?php if ($message): ?>
             <div class="alert alert-success">
-                <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
+                <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
         
         <?php if ($error): ?>
             <div class="alert alert-danger">
-                <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($error); ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
         
         <!-- AI Configuration Section -->
         <div class="settings-section">
-            <h3><i class="fa-key"></i> AI Configuration</h3>
+            <h3>AI Configuration</h3>
             <p>Configure your AI provider and API keys to use artificial intelligence features like automatic note summarization.</p>
             
             <form method="POST" id="ai-config-form">
@@ -147,7 +147,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                         <option value="fr" <?php echo $ai_language === 'fr' ? 'selected' : ''; ?>>Français</option>
                     </select>
                     <div class="help-text">
-                        <img src="images/info-light-full.svg" alt="Info" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Choose the language for AI responses.
+                        Choose the language for AI responses.
                     </div>
                 </div>
                 
@@ -163,7 +163,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    placeholder="sk-..."
                                    autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('openai_api_key')">
-                                <i class="fa-eye"></i>
+                                
                             </button>
                         </div>
                         <!-- Help text for OpenAI API key removed as requested -->
@@ -195,7 +195,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    placeholder="Enter your Mistral API key..."
                                    autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('mistral_api_key')">
-                                <i class="fa-eye"></i>
+                                
                             </button>
                         </div>
                         <div class="help-text">
@@ -224,7 +224,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
             
             <!-- Test Connection Section (after save) -->
             <div class="test-section">
-                <p><img src="images/info-light-full.svg" alt="Info" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Save your configuration first, then test the connection to verify it works.</p>
+                <p>Save your configuration first, then test the connection to verify it works.</p>
                 <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn"
                         data-saved-provider="<?php echo htmlspecialchars($ai_provider); ?>"
                         data-saved-openai-model="<?php echo htmlspecialchars($openai_model); ?>"
@@ -237,7 +237,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
         
         <!-- AI Features Information -->
         <div class="warning">
-            <p><img src="images/info-light-full.svg" alt="Info" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> An internet connection and sufficient API credits are required to use these features.</p>
+            <p>An internet connection and sufficient API credits are required to use these features.</p>
             <strong>Privacy Notice:</strong> Note content will be sent to the selected AI provider's servers for processing. Please review their privacy policies: 
                 <a href="https://openai.com/privacy/" target="_blank">OpenAI</a> | 
                 <a href="https://mistral.ai/terms/" target="_blank">Mistral AI</a>
