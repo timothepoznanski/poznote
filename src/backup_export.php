@@ -278,7 +278,7 @@ function createBackup() {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fa-upload"></i> Backup (Export)</h1>
+        <h1>Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
@@ -291,15 +291,15 @@ function createBackup() {
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3><i class="fa-archive"></i> Complete Backup</h3>
+            <h3>Complete Backup</h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
-                    <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($message); ?>
+                    <?php echo htmlspecialchars($message); ?>
                 </div>
             <?php endif; ?>
             <?php if (!empty($error)): ?>
                 <div class="alert alert-danger">
-                    <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($error); ?>
+                    <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>

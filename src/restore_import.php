@@ -471,7 +471,7 @@ function importAttachmentsZip($uploadedFile) {
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fa-download"></i> Restore (Import)</h1>
+        <h1>Restore (Import)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
@@ -483,18 +483,18 @@ function importAttachmentsZip($uploadedFile) {
         
         <!-- Complete Import Section -->
         <div class="backup-section">
-            <h3><i class="fa-archive"></i> Complete Restore</h3>
+            <h3>Complete Restore</h3>
             <p>Upload a complete backup ZIP file to restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-success">
-                    <img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($restore_message); ?>
+                    <?php echo htmlspecialchars($restore_message); ?>
                 </div>
             <?php endif; ?>
             
             <?php if ($restore_error && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-danger">
-                    <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> <?php echo htmlspecialchars($restore_error); ?>
+                    <?php echo htmlspecialchars($restore_error); ?>
                 </div>
             <?php endif; ?>
 
@@ -510,7 +510,7 @@ function importAttachmentsZip($uploadedFile) {
             </form>
             
             <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                <img src="images/info-light-full.svg" alt="Info" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
+                
                 <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
                 Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
             </div>

@@ -41,10 +41,12 @@ if (!$note) {
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/images.css">
     <link rel="stylesheet" href="css/attachments.css">
+    <link rel="stylesheet" href="css/manage_workspaces.css">
+    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fa-paperclip"></i> Manage Attachments</h1>
+        <h1>Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
@@ -55,7 +57,7 @@ if (!$note) {
 
         <!-- Upload Section -->
         <div class="settings-section">
-            <h3><img src="images/upload-light-full.svg" alt="Upload" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Upload New Attachment</h3>
+            <h3>Upload New Attachment</h3>
             
             <div class="attachment-upload-section">
                 <div class="form-group">
@@ -81,10 +83,10 @@ if (!$note) {
 
         <!-- Attachments List Section -->
         <div class="settings-section">
-            <h3><img src="images/list-ul-light-full.svg" alt="List" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Current Attachments</h3>
+            <h3>Current Attachments</h3>
             <div id="attachmentsList" class="attachments-display">
                 <div class="loading-attachments">
-                    <img src="images/spinner-light-full.svg" alt="Loading" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle; animation: spin 1s linear infinite;"> Loading attachments...
+                    Loading attachments...
                 </div>
             </div>
         </div>
@@ -122,7 +124,7 @@ if (!$note) {
                 else if (isPDF) iconType = 'file-pdf';
                 
                 let htmlContent = `<div class="selected-file-info">
-                    <img src="images/${iconType === 'image' ? 'file-image' : iconType === 'file-pdf' ? 'file-pdf' : 'file-lines'}-light-full.svg" alt="${iconType}" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> 
+                    
                     <span>${fileName} (${fileSize})</span>
                 </div>`;
                 
@@ -264,7 +266,7 @@ if (!$note) {
             const container = document.getElementById('attachmentsList');
             
             if (attachments.length === 0) {
-                container.innerHTML = '<div class="no-attachments"><img src="images/info-light-full.svg" alt="Info" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> No attachments yet</div>';
+                container.innerHTML = '<div class="no-attachments">No attachments yet</div>';
                 return;
             }
             
@@ -287,12 +289,12 @@ if (!$note) {
                     previewContent = `<div class="pdf-thumbnail" onclick="previewPDF('${fileUrl}', '${fileName}')">
                         <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
                         <div class="pdf-overlay">
-                            <img src="images/file-lines-light-full.svg" alt="PDF" style="width: 20px; height: 20px; margin-bottom: 4px;">
+                            
                             <span>PDF</span>
                         </div>
                     </div>`;
                 } else {
-                    previewContent = `<img src="images/${getFileIcon(fileName)}" alt="File" style="width: 32px; height: 32px;">`;
+                    previewContent = "";
                 }
                 
                 html += `
@@ -309,10 +311,19 @@ if (!$note) {
                         </div>
                         <div class="attachment-actions">
                             <button onclick="downloadAttachment('${attachment.id}')" class="btn-icon btn-download" title="Download">
-                                <img src="images/download-light-full.svg" alt="Download" style="width: 14px; height: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                             </button>
                             <button onclick="deleteAttachment('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
-                                <img src="images/trash-can-light-full.svg" alt="Delete" style="width: 14px; height: 14px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3,6 5,6 21,6"></polyline>
+                                    <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -373,10 +384,10 @@ if (!$note) {
                 <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
                 <div class="pdf-preview-actions">
                     <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
-                        <img src="images/square-share-nodes-light-full.svg" alt="Open" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Ouvrir dans un nouvel onglet
+                        Ouvrir dans un nouvel onglet
                     </button>
                     <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
-                        <img src="images/download-light-full.svg" alt="Download" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> Télécharger
+                        Télécharger
                     </button>
                 </div>
             </div>
@@ -498,7 +509,7 @@ if (!$note) {
             if (type === 'success' && message === 'File uploaded successfully!') {
                 notification.textContent = message;
             } else {
-                notification.innerHTML = `<img src="images/${type === 'success' ? 'check-light-full.svg' : 'circle-info-solid-full.svg'}" alt="${type === 'success' ? 'Success' : 'Warning'}" style="width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"> ${message}`;
+                notification.innerHTML = message;
             }
 
             const container = document.querySelector('.settings-container');

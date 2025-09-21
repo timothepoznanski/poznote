@@ -251,3 +251,39 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* Icon styles for attachments page */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+}
+
+.btn-icon:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-download:hover {
+    color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-delete:hover {
+    color: #dc3545;
+    border-color: #dc3545;
+}
