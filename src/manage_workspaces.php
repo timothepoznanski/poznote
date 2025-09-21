@@ -657,8 +657,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'Error') ? '' : '';
-            el.innerHTML = icon + message;
+            el.innerHTML = message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'Error')) {
                 setTimeout(function(){ el.style.display = 'none'; }, 3000);
@@ -1351,8 +1350,7 @@ try {
             if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
             el.style.display = 'block';
             el.className = 'alert ' + (type === 'danger' || type === 'error' ? 'alert-danger' : 'alert-success');
-            var icon = (type === 'danger' || type === 'error') ? '' : '';
-            el.innerHTML = icon + message;
+            el.innerHTML = message;
             // auto-hide for success messages after 3s
             if (!(type === 'danger' || type === 'error')) {
                 setTimeout(function(){ el.style.display = 'none'; }, 3000);
