@@ -6,7 +6,6 @@
 <link type="text/css" rel="stylesheet" href="css/index.css"/>
 <link type="text/css" rel="stylesheet" href="css/modals.css"/>
 <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
-<link rel="stylesheet" href="css/tasklist.css" />
 
 <!-- JavaScript Files -->
 

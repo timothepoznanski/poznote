@@ -86,15 +86,7 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
     <?php include 'templates/head_includes.php'; ?>
-    <style>
-    /* Small adjustments for public view */
-    body { background: #f7f7f7; }
-    .public-note { padding: 24px; }
-    .public-note h1 { margin-top: 0; }
-    .public-note .meta { color: #666; font-size: 0.9em; margin-bottom: 12px; }
-    .public-note .content { }
-    .public-note img { max-width: 100%; height: auto; }
-    </style>
+    <link rel="stylesheet" href="css/public_note.css">
 </head>
 <body>
     <div class="public-note">
