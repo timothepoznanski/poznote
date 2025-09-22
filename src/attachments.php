@@ -37,11 +37,8 @@ if (!$note) {
 <head>
     <title>Manage Attachments - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/attachments.css">
-    <link rel="stylesheet" href="css/manage_workspaces.css">
-    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="settings-container">

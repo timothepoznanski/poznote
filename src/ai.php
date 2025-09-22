@@ -85,9 +85,8 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 <head>
     <title>Artificial Intelligence - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="settings-container">

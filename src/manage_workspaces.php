@@ -319,7 +319,6 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
-    <!-- Emergency JS files removed: not present in repository -->
     <style id="workspaces-mobile-emergency-fix">
         @media (max-width: 800px) {
             body, html {
@@ -335,11 +334,8 @@ try {
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/manage_workspaces.css">
-    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
-    <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/modals.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
     <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
     <style>
@@ -1041,11 +1037,8 @@ try {
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/manage_workspaces.css">
-    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
-    <link rel="stylesheet" href="css/ai.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
     <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
     <style>

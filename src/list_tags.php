@@ -87,11 +87,8 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tags - Poznote</title>
-	<link type="text/css" rel="stylesheet" href="css/index.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/listtags.css"/>
-	<link type="text/css" rel="stylesheet" href="css/listtags-mobile.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 </head>
 <body class="tags-page"<?php echo !empty($excluded_folders) ? ' data-has-exclusions="true"' : ''; ?>>
 	<div class="tags-container">

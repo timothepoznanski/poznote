@@ -36,9 +36,8 @@ if (!$hasAttachments) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poznote - Attachments Export</title>
-        <link href="css/index.css" rel="stylesheet">
-        <link href="css/modals.css" rel="stylesheet">
         <link rel="stylesheet" href="css/ai.css">
+        <link href="css/modals.css" rel="stylesheet">
     </head>
     <body class="ai-page">
         <div class="summary-page">

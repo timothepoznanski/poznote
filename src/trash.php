@@ -34,9 +34,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 <title>Trash - Poznote</title>
-	<link type="text/css" rel="stylesheet" href="css/index.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash-mobile.css"/>
 </head>
