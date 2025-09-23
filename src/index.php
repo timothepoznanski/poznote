@@ -244,7 +244,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     <!-- workspace selector removed (now shown under left header) -->
 
 
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     
     <!-- LEFT COLUMN -->	
     <div id="left_col">

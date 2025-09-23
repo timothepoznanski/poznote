@@ -113,7 +113,7 @@ include 'functions.php';
     </div>
     
     <!-- For Update modal -->
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     
     <!-- Include JavaScript files -->
     <script src="js/globals.js"></script>

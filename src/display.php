@@ -76,7 +76,7 @@ include 'functions.php';
         </div>
     </div>
 
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
