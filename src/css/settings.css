@@ -118,8 +118,6 @@ body {
     }
 }
 
-/* Icon sprites / replacements used across UI (copied from index.css)
-     Ensures settings page shows the same icons after head_includes.php removal */
 .fa-arrow-left-svg,
 .fa-arrow-left {
     display: inline-block;
