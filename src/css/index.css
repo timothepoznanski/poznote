@@ -4040,6 +4040,20 @@ input[type="search"]::-webkit-search-results-decoration {
   content: '';
 }
 
+.fa-check-light-full-svg,
+.fa-check-light-full {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/check-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 .fa-align-left-svg,
 .fa-align-left {
   display: inline-block;

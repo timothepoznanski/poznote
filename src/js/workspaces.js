@@ -176,7 +176,7 @@ function displayWorkspaceMenu(menu, workspaces) {
         var workspace = workspaces[i];
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
-        var icon = isCurrent ? 'fa-check' : 'fa-layer-group';
+        var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
         
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" onclick="switchToWorkspace(\'' + workspace.name + '\')">';
         menuHtml += '<i class="' + icon + '"></i>';
