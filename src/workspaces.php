@@ -337,7 +337,7 @@ try {
     <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
-    <link rel="stylesheet" href="css/workspaces-mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/workspaces_mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -1040,7 +1040,7 @@ try {
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/workspaces.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
-    <link rel="stylesheet" href="css/workspaces-mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/workspaces_mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }

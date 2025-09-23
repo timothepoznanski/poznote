@@ -785,7 +785,7 @@ function saveTagsDirectly(noteId, tagsValue) {
 window.saveTagsDirectly = saveTagsDirectly;
 
 /**
- * Get excluded folders from localStorage (copied from listtags.js)
+ * Get excluded folders from localStorage (copied from list_tags.js)
  */
 function getExcludedFoldersFromLocalStorage() {
     const excludedFolders = [];
