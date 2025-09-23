@@ -142,7 +142,7 @@ if ($_POST) {
                     $logFile = $logDir . '/workspace_actions.log';
                     $who = (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['authenticated'])) ? 'session_user' : ($_SERVER['PHP_AUTH_USER'] ?? 'unknown');
                     $ip = $_SERVER['REMOTE_ADDR'] ?? 'cli';
-                    $entry = date('c') . "\tmanage_workspaces.php\tDELETE\t$name\tby:$who\tfrom:$ip\n";
+                    $entry = date('c') . "\tworkspaces.php\tDELETE\t$name\tby:$who\tfrom:$ip\n";
                     @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
                 } catch (Exception $e) {
                     // ignore logging errors
@@ -334,10 +334,10 @@ try {
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/manage_workspaces.css">
+    <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
-    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/workspaces-mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -519,7 +519,7 @@ try {
                     // disable to prevent double clicks
                     try { document.getElementById('confirmMoveBtn').disabled = true; } catch(e) {}
                     var params = new URLSearchParams({ action: 'move_notes', name: source, target: target });
-                    fetch('manage_workspaces.php', {
+                    fetch('workspaces.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type':'application/x-www-form-urlencoded',
@@ -693,7 +693,7 @@ try {
                     // client-side validation: allow letters/digits/-/_ only
                     if (!/^[A-Za-z0-9_-]+$/.test(newName)) { showAjaxAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); return; }
                     var params = new URLSearchParams({ action: 'rename', name: source, new_name: newName });
-                    fetch('manage_workspaces.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json'}, body: params.toString() })
+                    fetch('workspaces.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json'}, body: params.toString() })
                         .then(r=>r.json()).then(function(resp){
                             if (resp && resp.success) {
                                 showAjaxAlert('Workspace renamed', 'success');
@@ -1038,9 +1038,9 @@ try {
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/manage_workspaces.css">
+    <link rel="stylesheet" href="css/workspaces.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
-    <link rel="stylesheet" href="css/manage-workspaces-mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/workspaces-mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -1220,7 +1220,7 @@ try {
                     // disable to prevent double clicks
                     try { document.getElementById('confirmMoveBtn').disabled = true; } catch(e) {}
                     var params = new URLSearchParams({ action: 'move_notes', name: source, target: target });
-                    fetch('manage_workspaces.php', {
+                    fetch('workspaces.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type':'application/x-www-form-urlencoded',
@@ -1382,7 +1382,7 @@ try {
                     // client-side validation: allow letters/digits/-/_ only
                     if (!/^[A-Za-z0-9_-]+$/.test(newName)) { showAjaxAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); return; }
                     var params = new URLSearchParams({ action: 'rename', name: source, new_name: newName });
-                    fetch('manage_workspaces.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json'}, body: params.toString() })
+                    fetch('workspaces.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json'}, body: params.toString() })
                         .then(r=>r.json()).then(function(resp){
                             if (resp && resp.success) {
                                 showAjaxAlert('Workspace renamed', 'success');

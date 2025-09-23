@@ -29,7 +29,7 @@ include 'functions.php';
         
         <div class="settings-grid">
             <!-- Workspace Management -->
-            <div class="settings-card" onclick="window.location = 'manage_workspaces.php';">
+            <div class="settings-card" onclick="window.location = 'workspaces.php';">
                 <div class="settings-card-icon">
                     <i class="fa-layer-group"></i>
                 </div>
