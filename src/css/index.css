@@ -63,37 +63,6 @@
     min-height: 1.5em;
 }
 
-/* (welcome page styles removed) */
-
-/* Workspace list alignment: use a fixed 4-column grid so action buttons align consistently */
-.workspace-list ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-}
-.workspace-list ul li {
-    display: grid;
-    /* Use 3 action columns now that the Select column was removed: name | rename | move | delete */
-    /* Fix name column width so action buttons have consistent space */
-    grid-template-columns: 220px repeat(3, 140px);
-    align-items: center;
-    gap: 18px; /* uniform spacing between action columns */
-    margin: 14px 0;
-    min-height: 56px;
-    justify-items: center; /* center items in their grid cells */
-}
-.workspace-name-item {
-    grid-column: 1;
-    /* padding-left: 8px; */
-    font-size: 1rem;
-}
-.ws-col { display: flex; align-items: center; }
-.ws-col-name { justify-content: flex-start; padding-left: 8px; justify-self: start; }
-.ws-col-select { justify-content: center; }
-.ws-col-action { justify-content: center; gap: 12px; }
-.ws-col-move { justify-content: center; }
-.ws-col-delete { justify-content: center; }
-
 /* Note list subline (created date & subheading) */
 .note-subline {
     font-size: 0.95em; /* slightly smaller than normal */
