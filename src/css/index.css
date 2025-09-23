@@ -3335,7 +3335,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
-.btn-favorite.is-favorite .fa-star {
+.btn-favorite.is-favorite .fa-star-light {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
@@ -3546,20 +3546,7 @@ input[type="search"]::-webkit-search-results-decoration {
   content: '';
 }
 
-.fa-star-svg,
-.fa-star {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/star-solid-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-.fa-star-light {
+.fa-star-light-light {
     display: inline-block;
     width: 1em;
     height: 1em;
