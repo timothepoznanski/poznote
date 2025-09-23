@@ -3451,36 +3451,66 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-.fa-robot-svg {
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/robot-light-full.svg');
-}
-
-.fa-square-share-nodes-svg {
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/square-share-nodes-light-full.svg');
-}
-
 /* Blue color when a note is shared publicly */
 .btn-share.is-shared .fa-square-share-nodes-svg {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
+.fa-robot-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/robot-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-square-share-nodes-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/square-share-nodes-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-smile-svg,
+.fa-smile-svg,
 .fa-smile {
+  display: inline-block;
   width: 0.9em;
   height: 0.9em;
   background-image: url('../images/icons-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
+.fa-folder-svg,
+.fa-folder-svg,
 .fa-folder {
   display: inline-block;
   width: 1em;
   height: 1em;
   background-image: url('../images/folder-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
-
 .fa-folder-open-svg,
 .fa-folder-open-svg,
 .fa-folder-open {
