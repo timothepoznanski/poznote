@@ -3546,7 +3546,7 @@ input[type="search"]::-webkit-search-results-decoration {
   content: '';
 }
 
-.fa-star-light-light {
+.fa-star-light {
     display: inline-block;
     width: 1em;
     height: 1em;
