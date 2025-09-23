@@ -23,8 +23,6 @@
         </div>
     </div>
 
-    <!-- CTA buttons moved to sidebar footer (index.php) -->
-
     <div class="contains_forms_search searchbar-desktop">
         <form id="unified-search-form" action="index.php" method="POST">
             <div class="unified-search-container">

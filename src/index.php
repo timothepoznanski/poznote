@@ -167,6 +167,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         }
     };
     </script>
+
     <script>
     // Apply folder counts visibility based on settings stored in localStorage
     document.addEventListener('DOMContentLoaded', function() {
@@ -233,28 +234,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     </script>
 
     <div class="main-container">
+
     <script>
-    // Set workspace display map for JavaScript
-    window.workspaceDisplayMap = <?php
-        $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
-        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-    ?>;
+        // Set workspace display map for JavaScript
+        window.workspaceDisplayMap = <?php
+            $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
+            echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+        ?>;
     </script>
-
-    <!-- workspace selector removed (now shown under left header) -->
-
 
     <?php include 'modals.php'; ?>
     
     <!-- LEFT COLUMN -->	
     <div id="left_col">
-
-        <?php include 'templates/mobile_menu.php'; ?>
-
-        
-    <!-- MENU -->
-
-    <!-- Depending on the cases, we create the queries. -->  
         
     <?php
     // Construction des conditions de recherche sécurisées
@@ -267,10 +259,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
-    <!-- MENU -->
-
-    <?php include 'templates/desktop_menu.php'; ?>
-
+    <!-- MENU (Workspace name + search bar) left colum -->
+    <?php include 'menu_mobile.php'; ?>
+    <?php include 'menu_desktop.php'; ?>
         
     <script>
     // Set configuration variables for the main page
@@ -329,8 +320,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Get total notes count for folder opening logic
         $total_notes = getTotalNotesCount($con, $workspace_filter);
         
-        include 'templates/notes_list.php';
-                 
+        // Notes list left column
+        include 'notes_list.php';                 
     ?>
 
     </div>
