@@ -118,7 +118,6 @@ body {
     }
 }
 
-.fa-arrow-left-svg,
 .fa-arrow-left {
     display: inline-block;
     width: 1em;
@@ -132,7 +131,6 @@ body {
     content: '';
 }
 
-.fa-layer-group-svg,
 .fa-layer-group {
     display: inline-block;
     width: 1em;
@@ -147,12 +145,18 @@ body {
 }
 
 .fa-robot-svg {
-    width: 1.2em;
-    height: 1.2em;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
     background-image: url('../images/robot-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
 }
 
-.fa-upload-svg,
 .fa-upload {
     display: inline-block;
     width: 1em;
@@ -166,7 +170,6 @@ body {
     content: '';
 }
 
-.fa-download-svg,
 .fa-download {
     display: inline-block;
     width: 1em;
@@ -180,9 +183,7 @@ body {
     content: '';
 }
 
-.fa-file-alt-svg,
-.fa-file-alt,
-.fa-file-lines {
+.fa-file-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -195,9 +196,7 @@ body {
     content: '';
 }
 
-.fa-sync-alt-svg,
-.fa-sync-alt,
-.fa-rotate {
+.fa-sync-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -210,7 +209,6 @@ body {
     content: '';
 }
 
-.fa-globe-svg,
 .fa-globe {
     display: inline-block;
     width: 1em;
@@ -224,7 +222,6 @@ body {
     content: '';
 }
 
-.fa-info-svg,
 .fa-info {
     display: inline-block;
     width: 1em;
@@ -238,7 +235,6 @@ body {
     content: '';
 }
 
-.fa-code-branch-svg,
 .fa-code-branch {
     display: inline-block;
     width: 1em;
