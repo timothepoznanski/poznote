@@ -288,3 +288,58 @@
     border-color: #dc3545;
 }
 
+.workspace-list .action-btn:active { transform: translateY(1px); }
+
+/* Disabled / grayed buttons */
+.btn[disabled], .btn.disabled {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    opacity: 0.95;
+}
+
+/* Ensure delete column has consistent spacing */
+.ws-col-delete { justify-content: center; }
+
+/* Lock icon for default workspace */
+.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
+
+/* Responsive: stack controls on small screens */
+@media (max-width: 600px) {
+    .workspace-list ul li {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 8px;
+        padding: 10px 6px;
+        border-bottom: 1px solid #eee;
+    }
+    .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ws-col-name { padding-left: 0; font-size: 1rem; }
+    .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
+    .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
+}
+.delete-form { margin: 0; }
+.delete-form .btn { margin: 0; }
+.workspace-list ul li > .ws-col .action-btn { margin: 0; }
+.workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
+.workspace-list .btn-danger:hover { background: #c43b3b; }
+/* Ensure destructive buttons inside modals are visually prominent */
+.modal .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+.modal .btn-danger:hover {
+    background: #c43b3b;
+}
+/* .btn-rename visibility controlled earlier */
+.workspace-list .btn-rename {
+    display: inline-flex;
+    background: #f0ad4e; /* orange */
+    color: #111;
+    border: none;
+}
