@@ -1142,18 +1142,6 @@ img {
 }
 
 /* Image menu styles (similar to settings menu) */
-
-
-
-
-
-
-
-
-
-
-
-/* Image menu styles (similar to settings menu) */
 .image-menu {
     position: absolute;
     background: white;
@@ -1196,9 +1184,6 @@ img {
 
 /* Mobile responsiveness for image modals */
 @media (max-width: 768px) {
-    
-    
-    
     
     .image-preview-content {
         max-width: 98%;
