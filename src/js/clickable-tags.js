@@ -10,15 +10,12 @@ let notesWithClickableTags = new Set();
  * Initialize clickable tags system
  */
 function initializeClickableTags() {
-    // Convert tags to clickable format for all visible notes
-    const tagsRows = document.querySelectorAll('.note-tags-row');
-    
-    tagsRows.forEach((tagsRow) => {
-        const tagsInput = tagsRow.querySelector('input[id^="tags"]');
-        if (tagsInput) {
-            const noteId = tagsInput.id.replace('tags', '');
-            convertTagsToEditable(noteId);
-        }
+    // Convert tags to clickable format for all notes that have a tags input.
+    // Search for inputs with id starting with 'tags' so hidden inputs still initialize.
+    const tagsInputs = document.querySelectorAll('input[id^="tags"]');
+    tagsInputs.forEach((tagsInput) => {
+        const noteId = tagsInput.id.replace('tags', '');
+        convertTagsToEditable(noteId);
     });
 }
 

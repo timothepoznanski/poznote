@@ -1406,6 +1406,118 @@ img {
     font-size: 15px;
 }
 
+/* Editable tags styling */
+.editable-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    transition: border-color 0.2s ease;
+    overflow: visible;
+}
+
+.clickable-tag-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f4f8;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.clickable-tag-wrapper:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.clickable-tag {
+    color: #007DB8;
+    padding: 4px 8px 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.clickable-tag:hover {
+    color: #005a8a;
+    text-decoration: none;
+}
+
+.clickable-tag:visited {
+    color: #007DB8;
+}
+
+.clickable-tag:hover:visited {
+    color: #005a8a;
+}
+
+.tag-delete-button {
+    color: #94a3b8;
+    padding: 4px 6px 4px 2px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.tag-delete-button:hover {
+    color: #ef4444;
+}
+
+/* When a tag wrapper is highlighted, give the delete button a subtle yellow background and stronger contrast */
+.clickable-tag-wrapper.tag-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #fff3b0;
+}
+
+.clickable-tag-wrapper.tag-highlight .clickable-tag {
+    color: #2b2b2b;
+}
+
+.clickable-tag-wrapper.tag-highlight .tag-delete-button {
+    background: rgba(0,0,0,0.06);
+    border-radius: 4px;
+    color: #7a3b00;
+}
+
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #37352F;
+    min-width: 60px;
+    max-width: 150px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    resize: none;
+}
+
+.tag-input::placeholder {
+    color: #bababa;
+    font-style: italic;
+}
+
+.tag-input:focus {
+    outline: none;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 4px;
+}
+
 /* ATTACHMENTS ROW */
 
 .note-attachments-row {
@@ -3340,14 +3452,14 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .fa-robot-svg {
-  width: 1.2em;
-  height: 1.2em;
+  width: 1em;
+  height: 1em;
   background-image: url('../images/robot-light-full.svg');
 }
 
 .fa-square-share-nodes-svg {
-  width: 1.2em;
-  height: 1.2em;
+  width: 1em;
+  height: 1em;
   background-image: url('../images/square-share-nodes-light-full.svg');
 }
 
@@ -3356,30 +3468,19 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-.fa-smile-svg,
-.fa-smile-svg,
 .fa-smile {
-  display: inline-block;
   width: 0.9em;
   height: 0.9em;
   background-image: url('../images/icons-light-full.svg');
-  content: '';
 }
 
-.fa-folder-svg,
-.fa-folder-svg,
 .fa-folder {
   display: inline-block;
   width: 1em;
   height: 1em;
   background-image: url('../images/folder-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
 }
+
 .fa-folder-open-svg,
 .fa-folder-open-svg,
 .fa-folder-open {
