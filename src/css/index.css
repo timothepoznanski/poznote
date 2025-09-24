@@ -4026,8 +4026,3 @@ input[type="search"]::-webkit-search-results-decoration {
   font-style: normal !important;
   content: '';
 }
-
-/* Larger icons for left sidebar */
-.folder-icon {
-    transform: scale(1.4) !important;
-}
