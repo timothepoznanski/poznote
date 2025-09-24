@@ -344,3 +344,63 @@ function clearRightColumn() {
         updateNoteEnCours = 0;
     }
 }
+
+// Modal management functions for workspaces
+function closeMoveModal() {
+    document.getElementById('moveNotesModal').style.display = 'none';
+}
+
+function closeRenameModal() {
+    document.getElementById('renameModal').style.display = 'none';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    document.getElementById('confirmDeleteInput').value = '';
+    document.getElementById('confirmDeleteBtn').disabled = true;
+}
+
+function showAjaxAlert(msg, type) {
+    // Prefer topAlert if available so messages appear in the same place as server messages
+    if (typeof showTopAlert === 'function') {
+        showTopAlert(msg, type === 'success' ? 'success' : 'danger');
+        return;
+    }
+    var el = document.getElementById('ajaxAlert');
+    el.style.display = 'block';
+    el.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger');
+    el.innerHTML = msg;
+    // auto-hide after 4s
+    setTimeout(function(){ el.style.display = 'none'; }, 4000);
+}
+
+// Validation: only allow letters, digits, dash and underscore
+function isValidWorkspaceName(name) {
+    return /^[A-Za-z0-9_-]+$/.test(name);
+}
+
+function validateCreateWorkspaceForm(){
+    var el = document.getElementById('workspace-name');
+    if (!el) return true;
+    var v = el.value.trim();
+    if (v === '') { showTopAlert('Enter a workspace name', 'danger'); scrollToTopAlert(); return false; }
+    if (!isValidWorkspaceName(v)) { showTopAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); scrollToTopAlert(); return false; }
+    return true;
+}
+
+// Helper to display messages in the top alert container (same place as server-side messages)
+function showTopAlert(message, type) {
+    var el = document.getElementById('topAlert');
+    if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
+    el.style.display = 'block';
+    el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
+    el.innerHTML = message;
+    // auto-hide for success messages after 3s
+    if (!(type === 'danger' || type === 'Error')) {
+        setTimeout(function(){ el.style.display = 'none'; }, 3000);
+    }
+}
+
+function scrollToTopAlert(){
+    try { var el = document.getElementById('topAlert'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+}

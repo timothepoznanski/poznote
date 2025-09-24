@@ -321,7 +321,6 @@ try {
         }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
     <!-- Use existing mobile stylesheet for manage workspaces -->
@@ -358,50 +357,7 @@ try {
             .modal .btn { min-width: 0 !important; max-width: 100% !important; }
         }
     </style>
-    <style>
-        /* Custom styles for buttons on workspaces page */
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 6px;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
-        .btn-secondary {
-            background-color: #f8f9fa;
-            color: #495057;
-            border-color: #dee2e6;
-        }
-        .btn-secondary:hover {
-            background-color: #e9ecef;
-            border-color: #adb5bd;
-            text-decoration: none;
-            color: #495057;
-        }
-        .btn-primary {
-            background-color: #007DB8;
-            color: white;
-            border-color: #007DB8;
-        }
-        .btn-primary:hover {
-            background-color: #005a8a;
-            border-color: #004d6b;
-        }
-        .btn:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-        }
-        /* Specific adjustments for workspaces page */
-        .settings-container .btn {
-            margin-bottom: 10px;
-        }
-    </style>
+    
 </head>
 <body>
     <div class="settings-container">
@@ -506,28 +462,11 @@ try {
     </script>
     <?php endif; ?>
 
-    <!-- Move notes modal -->
-    <div id="moveNotesModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeMoveModal()">&times;</span>
-            <h3>Move notes from <span id="moveSourceName"></span></h3>
-            <div class="form-group">
-                <label for="moveTargetSelect">Select target workspace</label>
-                <select id="moveTargetSelect">
-                    <?php foreach ($workspaces as $w): if ($w !== $ws): ?>
-                        <option value="<?php echo htmlspecialchars($w, ENT_QUOTES); ?>"><?php echo htmlspecialchars($w); ?></option>
-                    <?php endif; endforeach; ?>
-                </select>
-            </div>
-            <div style="margin-top:12px;">
-                <button id="confirmMoveBtn" class="btn btn-primary">Move notes</button>
-                <button onclick="closeMoveModal()" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <?php include 'modals.php'; ?>
 
+    <script src="js/workspaces.js"></script>
     <script>
-        function closeMoveModal(){ document.getElementById('moveNotesModal').style.display = 'none'; }
+        // Event listeners for workspace modals that depend on PHP variables
         document.addEventListener('click', function(e){
             if (e.target && e.target.classList && e.target.classList.contains('btn-move')){
                 var source = e.target.getAttribute('data-ws');
@@ -620,21 +559,7 @@ try {
             }
         });
 
-            function showAjaxAlert(msg, type) {
-                // Prefer topAlert if available so messages appear in the same place as server messages
-                if (typeof showTopAlert === 'function') {
-                    showTopAlert(msg, type === 'success' ? 'success' : 'danger');
-                    return;
-                }
-                var el = document.getElementById('ajaxAlert');
-                el.style.display = 'block';
-                el.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger');
-                el.innerHTML = msg;
-                // auto-hide after 4s
-                setTimeout(function(){ el.style.display = 'none'; }, 4000);
-            }
-
-    // Build map of workspace -> name
+        // Build map of workspace -> name
         var workspaceDisplayMap = <?php
             $display_map = [];
             foreach ($workspaces as $w) {
@@ -655,131 +580,6 @@ try {
                 // navigate to main notes page with workspace filter
                 window.location = 'index.php?workspace=' + encodeURIComponent(name);
             }
-        });
-
-        // Validation: only allow letters, digits, dash and underscore
-        function isValidWorkspaceName(name) {
-            return /^[A-Za-z0-9_-]+$/.test(name);
-        }
-
-        function validateCreateWorkspaceForm(){
-            var el = document.getElementById('workspace-name');
-            if (!el) return true;
-            var v = el.value.trim();
-            if (v === '') { showTopAlert('Enter a workspace name', 'danger'); scrollToTopAlert(); return false; }
-            if (!isValidWorkspaceName(v)) { showTopAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); scrollToTopAlert(); return false; }
-            return true;
-        }
-        
-        // Helper to display messages in the top alert container (same place as server-side messages)
-        function showTopAlert(message, type) {
-            var el = document.getElementById('topAlert');
-            if (!el) return showAjaxAlert(message, type === 'danger' ? 'danger' : (type === 'error' ? 'danger' : 'success'));
-            el.style.display = 'block';
-            el.className = 'alert ' + (type === 'danger' || type === 'Error' ? 'alert-danger' : 'alert-success');
-            el.innerHTML = message;
-            // auto-hide for success messages after 3s
-            if (!(type === 'danger' || type === 'Error')) {
-                setTimeout(function(){ el.style.display = 'none'; }, 3000);
-            }
-        }
-
-        function scrollToTopAlert(){
-            try { var el = document.getElementById('topAlert'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
-        }
-    </script>
-    <!-- Rename modal -->
-    <div id="renameModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeRenameModal()">&times;</span>
-            <h3>Rename workspace <span id="renameSource"></span></h3>
-            <div class="form-group">
-                <label for="renameNewName">New name</label>
-                <input id="renameNewName" type="text" />
-            </div>
-            <div style="margin-top:12px;">
-                <button id="confirmRenameBtn" class="btn btn-primary">Rename</button>
-                <button onclick="closeRenameModal()" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function closeRenameModal(){ document.getElementById('renameModal').style.display = 'none'; }
-        document.addEventListener('click', function(e){
-            if (e.target && e.target.classList && e.target.classList.contains('btn-rename')){
-                var source = e.target.getAttribute('data-ws');
-                document.getElementById('renameSource').textContent = source;
-                document.getElementById('renameNewName').value = source;
-                document.getElementById('renameModal').style.display = 'flex';
-                document.getElementById('confirmRenameBtn').onclick = function(){
-                    var newName = document.getElementById('renameNewName').value.trim();
-                    if (!newName) return alert('Enter a new name');
-                    // client-side validation: allow letters/digits/-/_ only
-                    if (!/^[A-Za-z0-9_-]+$/.test(newName)) { showAjaxAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); return; }
-                    var params = new URLSearchParams({ action: 'rename', name: source, new_name: newName });
-                    fetch('workspaces.php', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json'}, body: params.toString() })
-                        .then(r=>r.json()).then(function(resp){
-                            if (resp && resp.success) {
-                                showAjaxAlert('Workspace renamed', 'success');
-                                // update the displayed list and left header
-                                var btns = document.querySelectorAll('[data-ws="'+source+'"]');
-                                btns.forEach(function(b){ b.setAttribute('data-ws', newName); });
-                                // update the workspace name text node in the list
-                                var spans = document.querySelectorAll('.workspace-name-item');
-                                spans.forEach(function(s){ if (s.textContent === source) s.textContent = newName; });
-                                try { localStorage.setItem('poznote_selected_workspace', newName); } catch(e) {}
-                                var leftHeader = document.querySelector('.left-header-text'); if (leftHeader) leftHeader.textContent = newName;
-                                closeRenameModal();
-                            } else {
-                                showAjaxAlert('Error: ' + (resp.error || 'unknown'), 'danger');
-                            }
-                        }).catch(function(){ showAjaxAlert('Network error', 'danger'); });
-                };
-            }
-        });
-    </script>
-    <!-- Delete confirmation modal -->
-    <div id="deleteModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeDeleteModal()">&times;</span>
-            <h3>Confirm delete workspace <span id="deleteWorkspaceName"></span></h3>
-            <p>Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.</p>
-            <div class="form-group">
-                <input id="confirmDeleteInput" type="text" placeholder="Type workspace name to confirm" />
-            </div>
-            <div style="margin-top:12px;">
-                <button id="confirmDeleteBtn" class="btn btn-danger" disabled>Delete workspace</button>
-                <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function closeDeleteModal(){ document.getElementById('deleteModal').style.display = 'none'; document.getElementById('confirmDeleteInput').value = ''; document.getElementById('confirmDeleteBtn').disabled = true; }
-        document.addEventListener('click', function(e){
-            if (e.target && e.target.classList && e.target.classList.contains('btn-delete')){
-                var source = e.target.getAttribute('data-ws');
-                // store the target form reference
-                window._deleteForm = e.target.closest('form.delete-form');
-                document.getElementById('deleteWorkspaceName').textContent = source;
-                document.getElementById('confirmDeleteInput').value = '';
-                document.getElementById('confirmDeleteBtn').disabled = true;
-                document.getElementById('deleteModal').style.display = 'flex';
-                // focus input
-                setTimeout(function(){ document.getElementById('confirmDeleteInput').focus(); }, 50);
-            }
-        });
-
-        document.getElementById('confirmDeleteInput').addEventListener('input', function(e){
-            var expected = document.getElementById('deleteWorkspaceName').textContent || '';
-            document.getElementById('confirmDeleteBtn').disabled = (e.target.value.trim() !== expected.trim());
-        });
-
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function(){
-            if (!window._deleteForm) return closeDeleteModal();
-            // submit the stored form
-            window._deleteForm.submit();
         });
     </script>
     

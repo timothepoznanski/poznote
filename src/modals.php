@@ -248,3 +248,52 @@
         <div id="moveFilesErrorMessage" class="modal-error-message"></div>
     </div>
 </div>
+
+<!-- Move notes modal (for workspaces.php) -->
+<div id="moveNotesModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeMoveModal()">&times;</span>
+        <h3>Move notes from <span id="moveSourceName"></span></h3>
+        <div class="form-group">
+            <label for="moveTargetSelect">Select target workspace</label>
+            <select id="moveTargetSelect">
+            </select>
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmMoveBtn" class="btn btn-primary">Move notes</button>
+            <button onclick="closeMoveModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rename modal (for workspaces.php) -->
+<div id="renameModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeRenameModal()">&times;</span>
+        <h3>Rename workspace <span id="renameSource"></span></h3>
+        <div class="form-group">
+            <label for="renameNewName">New name</label>
+            <input id="renameNewName" type="text" />
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmRenameBtn" class="btn btn-primary">Rename</button>
+            <button onclick="closeRenameModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal (for workspaces.php) -->
+<div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h3>Confirm delete workspace <span id="deleteWorkspaceName"></span></h3>
+        <p>Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.</p>
+        <div class="form-group">
+            <input id="confirmDeleteInput" type="text" placeholder="Type workspace name to confirm" />
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmDeleteBtn" class="btn btn-danger" disabled>Delete workspace</button>
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
