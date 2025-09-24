@@ -129,7 +129,7 @@ body {
     border-radius: 3px;
     border: 1px solid #dee2e6;
     background-color: white;
-    color: #495057;
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.2s;
     margin-left: 5px;
@@ -142,8 +142,11 @@ body {
 
 .btn-rename {
     background-color: #ffc107;
-    color: #212529;
+    color: white;
     border-color: #ffc107;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-rename:hover {
@@ -361,7 +364,6 @@ body {
 .workspace-list .btn-rename {
     display: inline-flex;
     background: #f0ad4e; /* orange */
-    color: #111;
     border: none;
 }
 
@@ -399,7 +401,7 @@ body {
 
 .btn-warning {
     background: #ffc107;
-    color: #212529;
+    /* color: #212529; */
 }
 
 .btn-warning:hover {
