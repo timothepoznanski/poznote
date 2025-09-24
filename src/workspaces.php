@@ -469,6 +469,7 @@ try {
             // Add event listeners for rename and select buttons
             document.addEventListener('click', handleRenameButtonClick);
             document.addEventListener('click', handleSelectButtonClick);
+            document.addEventListener('click', handleDeleteButtonClick);
         });
 
         // Event listeners for workspace modals that depend on PHP variables

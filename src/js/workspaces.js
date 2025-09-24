@@ -490,3 +490,71 @@ function handleSelectButtonClick(e) {
         window.location = 'index.php?workspace=' + encodeURIComponent(name);
     }
 }
+
+// Handle delete button clicks
+function handleDeleteButtonClick(e) {
+    if (e.target && e.target.classList && e.target.classList.contains('btn-delete')) {
+        var workspaceName = e.target.getAttribute('data-ws');
+        if (!workspaceName || e.target.disabled) return;
+
+        // Populate modal with workspace name
+        document.getElementById('deleteWorkspaceName').textContent = workspaceName;
+        document.getElementById('confirmDeleteInput').value = '';
+
+        // Show modal
+        document.getElementById('deleteModal').style.display = 'flex';
+
+        // Set up input validation
+        var inputEl = document.getElementById('confirmDeleteInput');
+        var confirmBtn = document.getElementById('confirmDeleteBtn');
+
+        function checkInput() {
+            confirmBtn.disabled = inputEl.value.trim() !== workspaceName;
+        }
+
+        inputEl.addEventListener('input', checkInput);
+        checkInput(); // initial check
+
+        // Set up confirm button handler
+        confirmBtn.onclick = function() {
+            if (inputEl.value.trim() !== workspaceName) return;
+
+            // Disable button to prevent double clicks
+            confirmBtn.disabled = true;
+
+            var params = new URLSearchParams({
+                action: 'delete',
+                name: workspaceName
+            });
+
+            fetch('workspaces.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params.toString()
+            })
+            .then(function(resp) { return resp.json(); })
+            .then(function(json) {
+                if (json && json.success) {
+                    showAjaxAlert('Workspace deleted successfully', 'success');
+                    // Close modal
+                    try { closeDeleteModal(); } catch(e) {}
+                    // Reload page to show updated workspace list
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAjaxAlert('Error: ' + (json.error || 'Unknown error'), 'danger');
+                    confirmBtn.disabled = false; // re-enable on error
+                }
+            })
+            .catch(function() {
+                confirmBtn.disabled = false; // re-enable on error
+                showAjaxAlert('Error deleting workspace', 'danger');
+            });
+        };
+    }
+}
