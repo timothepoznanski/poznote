@@ -80,7 +80,7 @@ function renderTasks(tasks, noteId) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = task.important ? 'fa-star-light' : 'fa-star-light';
+        const starClass = task.important ? 'task-icon-star' : 'task-icon-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `
@@ -91,7 +91,7 @@ function renderTasks(tasks, noteId) {
                 <i class="${starClass}"></i>
             </button>
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="fa-trash"></i>
+                <i class="task-icon-trash"></i>
             </button>
         </div>
         `;

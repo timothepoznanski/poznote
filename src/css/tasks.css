@@ -192,14 +192,28 @@
     justify-content: center;
 }
 
-/* star image styling */
-.task-star-img {
-    width: 1em;
-    height: 1em;
-    vertical-align: middle;
-    display: inline-block;
+.task-icon-trash {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/trash-can-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.task-important-btn.is-important .task-star-img {
-    filter: brightness(0) saturate(100%) invert(11%) sepia(96%) saturate(749%) hue-rotate(339deg) brightness(94%) contrast(102%) !important;
+.task-icon-star {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/star-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
