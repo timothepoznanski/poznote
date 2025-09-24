@@ -22,25 +22,6 @@ html.tags-page {
     position: relative;
 }
 
-.trash-back-button,
-.trash-empty-button {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-
-.trash-back-button:hover,
-.trash-empty-button:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-}
-
-.trash-button-icon {
-    text-align: center;
-    font-size: 20px;
-    color: #007DB8;
-}
-
 .tags-header {
     display: block;
     margin: 0;

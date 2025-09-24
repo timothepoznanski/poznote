@@ -64,11 +64,11 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		</form>
 		
 		<div class="trash-buttons-container">
-			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
-				<i class="fa-arrow-circle-left trash-button-icon"></i>
+			<div class="trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
+				<i class="fa-arrow-circle-left"></i>
 			</div>
-			<div class="trash-button trash-empty-button" id="emptyTrashBtn" title="Empty trash">
-				<i class="fa-trash-alt trash-button-icon"></i>
+			<div class="trash-empty-button" id="emptyTrashBtn" title="Empty trash">
+				<i class="trash-button-icon"></i>
 			</div>
 		</div>
 		
@@ -153,7 +153,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="Restore this note" class="fa-trash-restore-alt-svg icon_restore_trash" data-noteid="'.$id.'"></i>'
+					.'<i title="Restore this note" class="fa-trash-restore-alt-svg" data-noteid="'.$id.'"></i>'
 					.'<i title="Delete permanently" class="fa-trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">Last modified on '.$updated.'</div>'
