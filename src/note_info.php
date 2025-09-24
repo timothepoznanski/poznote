@@ -350,9 +350,9 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
                 <div class="info-label">Favorite:</div>
                 <div class="info-value">
                     <?php if ($isFavorite): ?>
-                        <span class="favorite-yes"><i class="fa-star-light"></i> Yes</span>
+                        <span class="favorite-yes"></i> Yes</span>
                     <?php else: ?>
-                        <span class="favorite-no"><i class="fa-star-light"></i> No</span>
+                        <span class="favorite-no"></i> No</span>
                     <?php endif; ?>
                 </div>
             </div>
