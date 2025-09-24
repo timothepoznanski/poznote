@@ -1,0 +1,205 @@
+/* Task List Styles (moved from index.css) */
+
+.task-list-container {
+    padding: 10px 0;
+    font-family: inherit;
+}
+
+.task-input-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.task-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.2s ease;
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+}
+
+.task-add-btn {
+    padding: 8px 12px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+}
+
+.task-add-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+}
+
+.task-add-btn i {
+    font-size: 12px;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+/* Drag & drop visual helpers */
+.task-item.drag-over {
+    outline: 2px dashed rgba(0, 125, 184, 0.35);
+    background: #eef9ff;
+}
+
+.task-item.dragging {
+    opacity: 0.6;
+}
+
+/* Placeholder used for touch drag-and-drop */
+.task-item.placeholder {
+    border: 1px dashed #cbd5e0;
+    background: rgba(0,0,0,0.02);
+}
+
+.task-item.completed {
+    background: #f0f8f0;
+    border-color: #c8e6c9;
+    opacity: 0.8;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #666;
+}
+
+.task-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #007DB8;
+}
+
+.task-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: text;
+    /* Ensure very long words/URLs wrap to next line to avoid overflowing the container */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    padding: 2px 0;
+    min-height: 20px;
+}
+
+.task-text a {
+    color: #007DB8;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+.task-edit-input {
+    flex: 1;
+    padding: 2px 4px;
+    border: 1px solid #007DB8;
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    outline: none;
+}
+
+/* Make sure the inline edit input doesn't cause horizontal scrolling and wraps long content */
+.task-edit-input,
+.task-input {
+    white-space: pre-wrap; /* preserve user line breaks but allow wrapping */
+    overflow-wrap: anywhere;
+}
+
+.task-delete-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-delete-btn i {
+    font-size: 18px;
+}
+
+.task-important-btn i {
+    font-size: 18px;
+}
+
+/* Important task styling */
+.task-item.important {
+    border-color: #ffcccc;
+    background: #fff6f6;
+}
+
+.task-item.important .task-text {
+    color: #c62828; /* red text for important tasks */
+    font-weight: 600;
+}
+
+.task-important-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* star image styling */
+.task-star-img {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.task-important-btn.is-important .task-star-img {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(96%) saturate(749%) hue-rotate(339deg) brightness(94%) contrast(102%) !important;
+}
