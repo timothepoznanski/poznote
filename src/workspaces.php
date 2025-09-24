@@ -462,10 +462,15 @@ try {
     </script>
     <?php endif; ?>
 
-    <?php include 'modals.php'; ?>
-
     <script src="js/workspaces.js"></script>
     <script>
+        // Initialize workspace page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for rename and select buttons
+            document.addEventListener('click', handleRenameButtonClick);
+            document.addEventListener('click', handleSelectButtonClick);
+        });
+
         // Event listeners for workspace modals that depend on PHP variables
         document.addEventListener('click', function(e){
             if (e.target && e.target.classList && e.target.classList.contains('btn-move')){
@@ -567,21 +572,9 @@ try {
             }
             echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
         ?>;
-
-        // When clicking the Select button in the list, store in localStorage, update header and navigate
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.classList && e.target.classList.contains('btn-select')) {
-                var name = e.target.getAttribute('data-ws');
-                if (!name) return;
-                try { localStorage.setItem('poznote_selected_workspace', name); } catch(err) {}
-                try {
-                    var leftHeader = document.querySelector('.left-header-text'); if (leftHeader) leftHeader.textContent = name;
-                } catch(err) {}
-                // navigate to main notes page with workspace filter
-                window.location = 'index.php?workspace=' + encodeURIComponent(name);
-            }
-        });
     </script>
+    
+    <?php include 'modals.php'; ?>
     
 </body>
 </html>

@@ -404,3 +404,89 @@ function showTopAlert(message, type) {
 function scrollToTopAlert(){
     try { var el = document.getElementById('topAlert'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
 }
+
+// Handle rename button clicks
+function handleRenameButtonClick(e) {
+    if (e.target && e.target.classList && e.target.classList.contains('btn-rename')) {
+        var currentName = e.target.getAttribute('data-ws');
+        if (!currentName || e.target.disabled) return;
+
+        // Populate modal with current name
+        document.getElementById('renameSource').textContent = currentName;
+        document.getElementById('renameNewName').value = currentName;
+
+        // Show modal
+        document.getElementById('renameModal').style.display = 'flex';
+
+        // Set up confirm button handler
+        document.getElementById('confirmRenameBtn').onclick = function() {
+            var newName = document.getElementById('renameNewName').value.trim();
+            if (!newName) {
+                showTopAlert('Please enter a new name', 'danger');
+                return;
+            }
+            if (!isValidWorkspaceName(newName)) {
+                showTopAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger');
+                return;
+            }
+            if (newName === currentName) {
+                showTopAlert('New name must be different from current name', 'danger');
+                return;
+            }
+
+            // Disable button to prevent double clicks
+            try { document.getElementById('confirmRenameBtn').disabled = true; } catch(e) {}
+
+            var params = new URLSearchParams({
+                action: 'rename',
+                name: currentName,
+                new_name: newName
+            });
+
+            fetch('workspaces.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params.toString()
+            })
+            .then(function(resp) { return resp.json(); })
+            .then(function(json) {
+                // Re-enable button
+                try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
+
+                if (json && json.success) {
+                    showAjaxAlert('Workspace renamed successfully', 'success');
+                    // Close modal
+                    try { closeRenameModal(); } catch(e) {}
+                    // Reload page to show updated workspace name
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAjaxAlert('Error: ' + (json.error || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(function() {
+                try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
+                showAjaxAlert('Error renaming workspace', 'danger');
+            });
+        };
+    }
+}
+
+// Handle select button clicks
+function handleSelectButtonClick(e) {
+    if (e.target && e.target.classList && e.target.classList.contains('btn-select')) {
+        var name = e.target.getAttribute('data-ws');
+        if (!name) return;
+        try { localStorage.setItem('poznote_selected_workspace', name); } catch(err) {}
+        try {
+            var leftHeader = document.querySelector('.left-header-text'); if (leftHeader) leftHeader.textContent = name;
+        } catch(err) {}
+        // navigate to main notes page with workspace filter
+        window.location = 'index.php?workspace=' + encodeURIComponent(name);
+    }
+}

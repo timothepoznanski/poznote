@@ -165,7 +165,8 @@ body {
     border-color: #bd2130;
 }
 
-/* Modal de renommage */
+/* Modal de renommage - target both legacy .rename-modal and the actual #renameModal element */
+#renameModal.modal,
 .rename-modal {
     display: none;
     position: fixed;
@@ -179,12 +180,37 @@ body {
     justify-content: center;
 }
 
+/* Ensure the rename modal's content uses the standard modal-content styling (but keep localized tweaks) */
+#renameModal .modal-content,
 .rename-modal-content {
     background-color: white;
     padding: 20px;
     border-radius: 6px;
     width: 90%;
     max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Move notes modal - ensure overlay and content styles apply to the actual element */
+#moveNotesModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5) !important;
+    align-items: center;
+    justify-content: center;
+}
+
+#moveNotesModal .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 420px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
