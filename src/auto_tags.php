@@ -45,7 +45,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auto Generate Tags - <?php echo htmlspecialchars($note_title); ?></title>
-    <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/auto_tags.css">
     <link href="css/modals.css" rel="stylesheet">
 </head>
 <body class="ai-page">

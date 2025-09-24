@@ -91,7 +91,7 @@ async function copyToClipboard() {
         
         // Visual feedback
         const originalHTML = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<i class="fa-check"></i> Copied!';
+        copyBtn.innerHTML = '<i class="fa-check-light-full"></i> Copied!';
         copyBtn.classList.add('copy-feedback');
         
         setTimeout(() => {
@@ -111,7 +111,7 @@ async function copyToClipboard() {
             document.execCommand('copy');
             
             const originalHTML = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fa-check"></i> Copied!';
+            copyBtn.innerHTML = '<i class="fa-check-light-full"></i> Copied!';
             copyBtn.classList.add('copy-feedback');
             
             setTimeout(() => {

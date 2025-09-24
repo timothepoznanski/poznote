@@ -2061,10 +2061,6 @@ hr {
     display: none;
 }
 
-.toolbar-btn.btn-ai .fa-robot-svg {
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
-}
-
 .toolbar-btn.btn-ai.loading .fa-robot-svg {
     animation: rotate 1s linear infinite;
 }

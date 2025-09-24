@@ -1,3 +1,26 @@
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    color: rgb(55, 53, 47);
+}
+
+body {
+    height: 100%;
+}
+
 /* Centrage vertical de l’icône IA et du texte */
 .ai-header {
     display: flex;
@@ -153,115 +176,51 @@
     color: #333;
 }
 
-/* AI Summary page styles */
-.summary-page {
-    max-width: 800px;
-    margin: 0 auto;
+/* AI Settings page styles */
+.api-key-input {
+    position: relative;
 }
 
-.summary-header {
-    text-align: center;
-    margin-bottom: 30px;
+.toggle-visibility {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
 }
 
-.summary-header h1 {
-    color: #007DB8;
-    margin: 0;
-    font-size: 28px;
-    font-weight: 600;
+.toggle-visibility:hover {
+    color: #333;
 }
 
-/* Auto Tags page styles */
-.auto-tags-page {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.auto-tags-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.auto-tags-header h1 {
-    color: #007DB8;
-    margin: 0;
-    font-size: 28px;
-    font-weight: 600;
-}
-
-.auto-tags-content {
-    background: white;
-    padding: 30px;
-    border-radius: 4px;
-    margin-bottom: 30px;
-    line-height: 1.6;
-    font-size: 16px;
+.form-group input[type="text"], 
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px 40px 10px 10px;
     border: 1px solid #ddd;
-}
-
-.tags-display {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.tag-item {
-    background: #007DB8;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 16px;
+    border-radius: 4px;
     font-size: 14px;
-    display: inline-block;
+    box-sizing: border-box;
 }
 
-.summary-content {
-    background: white;
-    padding: 30px;
-    border-radius: 4px;
-    margin-bottom: 30px;
-    line-height: 1.6;
-    font-size: 16px;
-    border: 1px solid #ddd;
+.help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    line-height: 1.4;
 }
 
-.loading-state {
-    text-align: center;
-    color: #6c757d;
-    font-style: italic;
-    font-size: 18px;
+.help-text a {
+    color: #007cba;
+    text-decoration: none;
 }
 
-.loading-state i {
-    animation: spin 1s linear infinite;
-    margin-right: 10px;
-    font-size: 20px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.error-state {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    padding: 20px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.error-state i {
-    margin-right: 10px;
-}
-
-.action-buttons {
-    text-align: center;
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
+.help-text a:hover {
+    text-decoration: underline;
 }
 
 /* Button styles for AI pages */
@@ -321,87 +280,9 @@
     text-decoration: none;
 }
 
-.copy-feedback {
-    background: #28a745 !important;
-}
-
-.apply-feedback {
-    background: #ffc107 !important;
-}
-
-/* AI Settings page styles */
-.api-key-input {
-    position: relative;
-}
-
-.toggle-visibility {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 5px;
-}
-
-.toggle-visibility:hover {
-    color: #333;
-}
-
-.form-group input[type="text"], 
-.form-group input[type="password"] {
-    width: 100%;
-    padding: 10px 40px 10px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.help-text {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-    line-height: 1.4;
-}
-
-.help-text a {
-    color: #007cba;
-    text-decoration: none;
-}
-
-.help-text a:hover {
-    text-decoration: underline;
-}
-
 /* Mobile responsiveness */
 @media (max-width: 600px) {
     .ai-page {
         padding: 15px;
-    }
-    
-    .summary-header h1 {
-        font-size: 24px;
-    }
-    
-    .auto-tags-header h1 {
-        font-size: 24px;
-    }
-    
-    .summary-content,
-    .auto-tags-content {
-        padding: 20px;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn {
-        width: 200px;
-        justify-content: center;
     }
 }

@@ -293,7 +293,6 @@ body.trash-page {
 }
 
 /* Override icon styles specifically for trash page */
-.fa-arrow-circle-left-svg,
 .fa-arrow-circle-left {
     background-image: url('../images/arrow-left-light-full.svg') !important;
 }
@@ -308,7 +307,6 @@ body.trash-page {
   background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
 }
 
-.fa-trash-svg,
 .fa-trash {
     background-image: url('../images/trash-can-light-full.svg') !important;
 }
