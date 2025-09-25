@@ -164,6 +164,38 @@ html, body {
     }
 }
 
+/* Exception for tags page */
+body.tags-page {
+    overflow: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+/* Exception for workspaces page - aggressive override */
+body.workspaces-page,
+html.workspaces-page {
+    overflow: auto !important;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* More specific rule to target workspaces page by content */
+body {
+    &:has(.settings-container) {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: static !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
 /* Alternative approach - target by URL or JavaScript class addition */
 html {
 overflow-x: hidden;
@@ -174,6 +206,10 @@ body {
     flex-direction: unset !important;
     position: relative;
 }
+
+/* .note-header {
+  display: none !important;
+} */
 
 /* Mobile toolbar optimization */
 .note-edit-toolbar {
@@ -246,7 +282,12 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save, .btn-ai, .btn-emoji, .btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
+.btn-separator, .btn-save, .btn-ai, .btn-emoji {
+    display: flex !important;
+}
+
+/* Action buttons visible by default on mobile */
+.btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
     display: flex !important;
 }
 
@@ -268,6 +309,49 @@ body {
     display: flex !important;
 }
 
+/* Color palette popup */
+.color-palette-popup {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    background: transparent; /* keep background transparent so it blends with toolbar */
+    padding: 6px 8px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+.color-palette-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.color-palette-popup .color-grid {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.98);
+    border-radius: 10px;
+}
+.color-item {
+    width: 28px;
+    height: 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.color-item:focus {
+    outline: 2px solid #007DB8;
+}
+
+/* Visual thin baseline under the palette like the attachment */
+/* baseline removed - simplified palette */
+
+/* caret removed - popup has no arrow */
+
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-emoji,
@@ -280,6 +364,27 @@ body {
 .show-format-buttons .btn-info, 
 .show-format-buttons .btn-trash {
     display: none !important;
+}
+
+/* Styles pour les cases à cocher sur mobile */
+.noteentry label {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.noteentry label span[contenteditable="true"] {
+    outline: none !important;
+    border: none !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text !important;
+    font-size: 16px !important; /* Taille adaptée au mobile */
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    min-width: 20px !important;
 }
 
 .noteentry label span[contenteditable="true"]:focus {
@@ -987,4 +1092,28 @@ input[type="search"]::-webkit-search-results-decoration {
 .modal-footer .btn {
     width: 100% !important;
     justify-content: center !important;
+}
+
+/* Mobile editable tags adjustments */
+@media (max-width: 800px) {
+    .editable-tags-container {
+        padding: 3px !important;
+        gap: 4px !important;
+    }
+    
+    .clickable-tag {
+        font-size: 12px !important;
+        padding: 3px 6px 3px 6px !important;
+    }
+    
+    .tag-delete-button {
+        padding: 3px 5px 3px 2px !important;
+        font-size: 12px !important;
+    }
+    
+    .tag-input {
+        font-size: 12px !important;
+        padding: 3px 6px !important;
+        min-width: 60px !important;
+    }
 }

@@ -60,7 +60,7 @@ $res_right = $note_data['res_right'];
     <title>Poznote</title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <!-- <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)"> -->
+    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>
