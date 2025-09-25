@@ -565,54 +565,6 @@ a.links_arbo_left.selected-note {
     flex: 0 0 auto !important;
 }
 
-/* Mobile styles for folder search buttons */
-.folder-actions {
-    opacity: 0.7 !important; /* Slightly visible on mobile but not fully opaque */
-    transition: opacity 0.2s !important;
-}
-
-.folder-toggle:active .folder-actions,
-.folder-toggle:focus .folder-actions {
-    opacity: 1 !important; /* Full opacity when folder is tapped */
-}
-
-.folder-search-btn {
-    font-size: 12px !important; /* Match desktop size */
-    padding: 4px !important; /* Match desktop padding */
-    margin-left: 4px !important; /* Reduce margin for mobile */
-    touch-action: manipulation !important;
-}
-
-.folder-search-btn,
-.folder-edit-btn,
-.folder-delete-btn,
-.folder-empty-btn {
-    min-width: 28px !important; /* Smaller than before but still touch-friendly */
-    min-height: 28px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-}
-
-/* Mobile diagonal line for excluded folder search buttons */
-.folder-search-btn.excluded {
-    position: relative !important;
-}
-
-.folder-search-btn.excluded::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 80% !important;
-    height: 2px !important;
-    background-color: #dc3545 !important;
-    transform: translate(-50%, -50%) rotate(-45deg) !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-}
-
 .folder-content {
     margin-left: 16px !important;
     margin-bottom: 5px !important; /* Reduce spacing under mobile folders (12px → 5px) */
@@ -640,12 +592,7 @@ a.links_arbo_left.selected-note {
 }
 
 .folder-actions {
-    opacity: 1 !important; /* Always visible on mobile */
-}
-
-.folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
-    font-size: 14px !important;
-    padding: 8px !important;
+    opacity: 1; /* Always visible on mobile */
 }
 
 /* MODAL MOBILE ADJUSTMENTS */

@@ -688,9 +688,6 @@ body {
     order: 2;
 }
 
-/* Color-mode: replace toolbar icons with inline color selectors */
-.note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
-
 .note-edit-toolbar::-webkit-scrollbar {
     display: none;
 }
@@ -712,8 +709,6 @@ body {
     color: #007DB8;
     outline: none;
     flex-shrink: 0;
-    min-width: 36px;
-    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -731,66 +726,55 @@ body {
     color: #005a8a;
 }
 
-    /* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
-    .text-format-btn {
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        width: 0;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
-    }
-    
-    .text-format-btn.show-on-selection {
-        opacity: 1;
-        visibility: visible;
-        position: relative;
-        width: auto;
-        padding: 6px 8px;
-        margin: 0 2px;
-        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
-    }
-    
-    /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
-    .note-action-btn {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
-        width: auto;
-        padding: 6px 8px;
-        margin: 0 4px;
-    }
-    
-    /* Ajustement de la toolbar pour les écrans desktop */
-    .note-edit-toolbar {
-        gap: 2px;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .toolbar-btn {
-        margin: 0 6px;
-        padding: 6px 8px;
-        min-width: 36px;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-    
-    .note-action-btn.hide-on-selection {
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        width: 0;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-    }
+/* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
+.text-format-btn {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
+}
+
+.text-format-btn.show-on-selection {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    width: auto;
+    padding: 6px 8px;
+    margin: 0 2px;
+    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
+}
+
+/* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
+.note-action-btn {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    width: auto;
+    padding: 6px 8px;
+    margin: 0 4px;
+}
+
+/* Ajustement de la toolbar pour les écrans desktop */
+.note-edit-toolbar {
+    gap: 2px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.note-action-btn.hide-on-selection {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
 
 .dropdown-menu {
     position: absolute;
@@ -1270,7 +1254,7 @@ img {
 }
 
 .fa-tag.icon_tag {
-    font-size: 12px;
+    /* font-size: 12px; */
     margin-right: 8px;
     flex-shrink: 0;
     align-self: center;
@@ -2135,7 +2119,7 @@ hr {
 }
 
 .folder-icon {
-    font-size: 13px;
+    /* font-size: 13px; */
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
@@ -2160,12 +2144,13 @@ hr {
 }
 
 .folder-actions {
-    opacity: 0;
+    opacity: 0; /* Hide folder actions buttons by default */ 
     transition: opacity 0.2s;
     margin-left: auto;
     flex: 0 0 auto;
 }
 
+/* Make folder actions buttons visible when hover */
 .folder-toggle:hover .folder-actions {
     opacity: 1;
 }
@@ -2174,13 +2159,13 @@ hr {
 .search-hidden { display: none !important; }
 
 .folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn, .folder-move-files-btn {
-    font-size: 12px;
+    /* font-size: 1em; */
     color: #007DB8;
     margin-left: 8px;
     cursor: pointer;
-    padding: 4px;
+    /* padding: 4px; */
     border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
+    /* transition: background-color 0.2s, color 0.2s; */
 }
 
 .folder-search-btn {
@@ -2206,43 +2191,49 @@ hr {
     z-index: 1;
 }
 
-.folder-search-btn:hover {
+/* Change button background color */
+/* .folder-search-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
-}
+} */
 
-.folder-search-btn.excluded:hover {
+/* Change button background color */
+/* .folder-search-btn.excluded:hover {
     background-color: rgba(220, 53, 69, 0.2);
-}
+} */
 
-.folder-edit-btn:hover {
+/* Change button background color */
+/* .folder-edit-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
-}
+} */
 
 /* Hide edit button for default folder to prevent renaming */
 .default-folder .folder-edit-btn { display: none !important; }
 
-.folder-delete-btn:hover {
+/* Change button background color */
+/* .folder-delete-btn:hover {
     background-color: rgba(220, 53, 69, 0.2);
     color: #dc3545;
-}
+} */
 
-.folder-empty-btn:hover {
+/* Change button background color */
+/* .folder-empty-btn:hover {
     background-color: rgba(255, 193, 7, 0.2);
     color: #ffc107;
-}
+} */
 
-.folder-move-files-btn:hover {
+/* Change button background color */
+/* .folder-move-files-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
     color: #007DB8;
-}
+} */
 
 .folder-content {
     margin-left: 29px;
-    margin-bottom: 5px; /* Réduction de l'espace sous chaque dossier */
+    margin-bottom: 5px; /* Reduce space below each folder */
 }
 
 .note-in-folder {
-    margin-bottom: 0px !important; /* Suppression de l'espace entre les notes */
+    margin-bottom: 0px !important; /* Remove space between notes */
     position: relative;
     display: flex !important;
     align-items: center !important;
