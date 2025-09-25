@@ -2604,19 +2604,12 @@ hr {
     color: white;
 }
 
-.folder-option .folder-name {
-    flex: 1;
-    font-weight: 500;
+.folder-name {
+    color: rgb(55, 53, 47);
 }
 
-.folder-option .note-count {
-    color: #888;
-    font-size: 12px;
-    margin-left: 8px;
-}
-
-.folder-option.selected .note-count {
-    color: rgba(255, 255, 255, 0.8);
+.folder-note-count {
+    color: #6b7280;
 }
 
 /* Create folder option styling */
@@ -2630,586 +2623,6 @@ hr {
 .create-folder-option:hover {
     background-color: #e8f0ff !important;
     border-color: #0056b3 !important;
-}
-
-.create-folder-option .folder-name {
-    color: #007DB8;
-    font-weight: 500;
-}
-
-.create-folder-option i {
-    color: #007DB8 !important;
-}
-
-.no-folders-found {
-    padding: 20px;
-    text-align: center;
-    color: #888;
-    font-style: italic;
-}
-
-/* Update modal buttons for new design */
-#moveNoteFolderModal .modal-buttons {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 15px;
-    margin-top: auto;
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-#moveNoteFolderModal .modal-buttons button:first-child {
-    background-color: #007DB8;
-    color: white;
-    flex: 1;
-}
-
-#moveNoteFolderModal .modal-buttons button:first-child:hover {
-    background-color: #005a8a;
-}
-
-#moveNoteFolderModal .modal-buttons button:nth-child(2) {
-    background-color: #28a745;
-    color: white;
-    flex: 1;
-}
-
-#moveNoteFolderModal .modal-buttons button:nth-child(2):hover {
-    background-color: #218838;
-}
-
-.modal-error-message {
-    text-align: center;
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 4px;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    display: none;
-}
-
-.unified-search-container {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.search-options-container {
-    margin-top: 8px;
-    padding: 0;
-    animation: fadeIn 0.3s ease-out;
-    display: flex;
-    justify-content: center;
-}
-
-.search-type-pills {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-}
-
-.search-pill {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 14px;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #6c757d;
-    font-size: 0.8em;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    outline: none;
-    position: relative;
-    min-height: 28px;
-    user-select: none;
-    opacity: 0.8;
-}
-
-.search-pill:hover {
-    background: #e9ecef;
-    border-color: #007DB8;
-    color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
-    opacity: 1;
-}
-
-.search-pill:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
-}
-
-.search-pill.active {
-    background: #f8f9fa;
-    border-color: #007DB8;
-    color: #007DB8;
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
-    opacity: 1;
-}
-
-.search-pill.active:hover {
-    background: #e9ecef;
-    border-color: #007DB8;
-    color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15);
-}
-
-.search-pill.active:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
-}
-
-.search-pill i {
-    font-size: 0.75em;
-}
-
-.search-pill span {
-    font-size: 0.8em;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Force correct appearance for active search pills on ALL devices */
-.search-pill.active,
-body .search-pill.active,
-html .search-pill.active {
-    background: #f8f9fa !important;
-    background-color: #f8f9fa !important;
-    border-color: #007DB8 !important;
-    color: #007DB8 !important;
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
-    opacity: 1 !important;
-}
-
-.search-pill.active:hover,
-body .search-pill.active:hover,
-html .search-pill.active:hover {
-    background: #e9ecef !important;
-    background-color: #e9ecef !important;
-    border-color: #007DB8 !important;
-    color: #007DB8 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
-}
-
-.search-pill.active:active,
-body .search-pill.active:active,
-html .search-pill.active:active {
-    background: #e9ecef !important;
-    background-color: #e9ecef !important;
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
-}
-
-/* Legacy search-type-btn styles - keep for JS compatibility */
-.search-type-btn {
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #b0b0b0;
-    font-size: 0.85em;
-    min-width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.search-type-btn:hover {
-    background: rgba(0, 125, 184, 0.1);
-}
-
-.search-type-btn:hover i {
-    color: #007DB8;
-}
-
-.search-type-btn.active i {
-    color: #007DB8;
-}
-
-.search-type-btn.active:hover i {
-    color: #007DB8;
-}
-
-.searchbar-row {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    position: relative;
-}
-
-/* Search validation error styles */
-.search-validation-error {
-    background-color: #ffebee;
-    color: #d32f2f;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    margin: 8px 0 4px 0;
-    border-left: 3px solid #d32f2f;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.search-type-btn-error {
-    animation: shake 0.5s ease-in-out;
-    border-color: #d32f2f !important;
-    background-color: #ffebee !important;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
-}
-
-/* CACHER LES BARRES DE SCROLL */
-
-/* Cacher la barre de scroll pour Webkit browsers (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    display: none;
-}
-
-/* Cacher la barre de scroll pour Firefox */
-* {
-    scrollbar-width: none;
-}
-
-/* Alternative pour cacher toutes les barres de scroll */
-html, body, #left_col {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
-}
-
-#right_col {
-    -ms-overflow-style: auto;  /* Internet Explorer 10+ */
-    scrollbar-width: auto;  /* Firefox */
-}
-
-html::-webkit-scrollbar, 
-body::-webkit-scrollbar, 
-#left_col::-webkit-scrollbar {
-    display: none;
-}
-
-#right_col::-webkit-scrollbar {
-    display: block;
-    width: 8px;
-}
-
-#right_col::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-#right_col::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-#right_col::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Hide webkit search controls (native blue cross) for all search inputs */
-.searchbar-input::-webkit-search-decoration,
-.searchbar-input::-webkit-search-cancel-button,
-.searchbar-input::-webkit-search-results-button,
-.searchbar-input::-webkit-search-results-decoration {
-    -webkit-appearance: none;
-    display: none;
-}
-
-/* Also apply to inputs with search class */
-.search::-webkit-search-decoration,
-.search::-webkit-search-cancel-button,
-.search::-webkit-search-results-button,
-.search::-webkit-search-results-decoration {
-    -webkit-appearance: none;
-    display: none;
-}
-
-/* General rule for any input that might have search type */
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
-    -webkit-appearance: none;
-    display: none;
-}
-
-/* EMOJI PICKER STYLES */
-
-.emoji-picker {
-    position: fixed;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    width: 360px;
-    max-height: 400px;
-    overflow-y: auto;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
-    padding: 10px;
-}
-
-.emoji-category {
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-    width: 100%;
-}
-
-.emoji-category:last-child {
-    border-bottom: none;
-}
-
-.emoji-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 10px;
-    justify-items: center;
-    padding: 5px 15px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.emoji-item {
-    font-size: 18px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-    user-select: none;
-}
-
-.emoji-item:hover {
-    background-color: #f0f8ff;
-    transform: scale(1.1);
-}
-
-.emoji-item:active {
-    transform: scale(0.95);
-}
-
-/* Custom scrollbar for emoji picker */
-.emoji-picker::-webkit-scrollbar {
-    width: 8px;
-}
-
-.emoji-picker::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.emoji-picker::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.emoji-picker::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-/* Mobile responsive styles for emoji picker */
-@media (max-width: 800px) {
-    .emoji-picker {
-        width: 300px !important;
-        max-height: 350px !important;
-        padding: 8px !important;
-    }
-    
-    .emoji-grid {
-        grid-template-columns: repeat(7, 1fr) !important;
-        gap: 8px !important;
-        padding: 3px 12px !important;
-    }
-    
-    .emoji-item {
-        font-size: 16px !important;
-        width: 28px !important;
-        height: 28px !important;
-    }
-    
-    .emoji-category {
-        padding: 10px 0 !important;
-    }
-}
-
-/* Smart folder search styling */
-.folder-search-container {
-    position: relative;
-    margin: 15px 0 20px 0;
-}
-
-.folder-search-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: white;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.folder-search-input:focus {
-    outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
-}
-
-.recent-folders-section {
-    margin-top: 12px;
-    margin-bottom: 15px;
-}
-
-.recent-folders-label {
-    font-size: 12px;
-    color: #6c757d;
-    margin-bottom: 6px;
-    font-weight: 500;
-}
-
-.recent-folders-list {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.recent-folder-item {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1px solid #dee2e6;
-    border-radius: 16px;
-    font-size: 13px;
-    color: #495057;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.recent-folder-item:hover {
-    background: linear-gradient(135deg, #007DB8 0%, #0056b3 100%);
-    color: white;
-    border-color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.2);
-}
-
-.recent-folder-icon {
-    margin-right: 6px;
-    font-size: 11px;
-}
-
-.recent-folder-item:hover .recent-folder-icon {
-    color: white;
-}
-
-.folder-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-}
-
-.folder-dropdown.show {
-    display: block;
-}
-
-.folder-option {
-    padding: 10px 16px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f3f4;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-}
-
-.folder-option:last-child {
-    border-bottom: none;
-}
-
-.folder-option:hover,
-.folder-option.highlighted {
-    background-color: #f8f9fa;
-}
-
-.folder-option.selected {
-    background-color: #007DB8;
-    color: white;
-}
-
-.folder-option.selected:hover {
-    background-color: #005a8a;
-}
-
-.folder-option i {
-    margin-right: 8px;
-    color: #666;
-    width: 16px;
-    text-align: center;
-}
-
-.folder-option.selected i {
-    color: white;
-}
-
-.create-folder-option {
-    padding: 12px 16px;
-    background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
-    border-bottom: 1px solid #007DB8;
-    color: #007DB8;
-    font-weight: 500;
-}
-
-.create-folder-option:hover {
-    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
 }
 
 .create-folder-option .folder-name {
@@ -3605,9 +3018,15 @@ input[type="search"]::-webkit-search-results-decoration {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+  transition: transform 0.2s ease;
   font-family: inherit !important;
   font-style: normal !important;
   content: '';
+}
+
+.fa-bold:hover {
+  transform: scale(1.2);
+  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
 }
 
 .fa-italic {
@@ -4001,15 +3420,376 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 
-.fa-redo {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/rotate-right-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+/* General rule for any input that might have search type */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
+
+/* EMOJI PICKER STYLES */
+
+.emoji-picker {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    width: 360px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.emoji-category {
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+}
+
+.emoji-category:last-child {
+    border-bottom: none;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    justify-items: center;
+    padding: 5px 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.emoji-item {
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    user-select: none;
+}
+
+.emoji-item:hover {
+    background-color: #f0f8ff;
+    transform: scale(1.1);
+}
+
+.emoji-item:active {
+    transform: scale(0.95);
+}
+
+/* Custom scrollbar for emoji picker */
+.emoji-picker::-webkit-scrollbar {
+    width: 8px;
+}
+
+.emoji-picker::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.emoji-picker::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.emoji-picker::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Mobile responsive styles for emoji picker */
+@media (max-width: 800px) {
+    .emoji-picker {
+        width: 300px !important;
+        max-height: 350px !important;
+        padding: 8px !important;
+    }
+    
+    .emoji-grid {
+        grid-template-columns: repeat(7, 1fr) !important;
+        gap: 8px !important;
+        padding: 3px 12px !important;
+    }
+    
+    .emoji-item {
+        font-size: 16px !important;
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
+    .emoji-category {
+        padding: 10px 0 !important;
+    }
+}
+
+/* Smart folder search styling */
+.folder-search-container {
+    position: relative;
+    margin: 15px 0 20px 0;
+}
+
+.folder-search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.folder-search-input:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+}
+
+.recent-folders-section {
+    margin-top: 12px;
+    margin-bottom: 15px;
+}
+
+.recent-folders-label {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.recent-folders-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.recent-folder-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.recent-folder-item:hover {
+    background: linear-gradient(135deg, #007DB8 0%, #0056b3 100%);
+    color: white;
+    border-color: #007DB8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.2);
+}
+
+.recent-folder-icon {
+    margin-right: 6px;
+    font-size: 11px;
+}
+
+.recent-folder-item:hover .recent-folder-icon {
+    color: white;
+}
+
+.folder-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.folder-dropdown.show {
+    display: block;
+}
+
+.folder-option {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f3f4;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.folder-option:last-child {
+    border-bottom: none;
+}
+
+.folder-option:hover,
+.folder-option.highlighted {
+    background-color: #f8f9fa;
+}
+
+.folder-option.selected {
+    background-color: #007DB8;
+    color: white;
+}
+
+.folder-option.selected:hover {
+    background-color: #005a8a;
+}
+
+.folder-option i {
+    margin-right: 8px;
+    color: #666;
+    width: 16px;
+    text-align: center;
+}
+
+.folder-option.selected i {
+    color: white;
+}
+
+.create-folder-option {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f8f9fa 100%);
+    border-bottom: 1px solid #007DB8;
+    color: #007DB8;
+    font-weight: 500;
+}
+
+.create-folder-option:hover {
+    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
+}
+
+.create-folder-option .folder-name {
+    color: #007DB8;
+    font-weight: 500;
+}
+
+.create-folder-option i {
+    color: #007DB8 !important;
+}
+
+/* Search validation error styles */
+.search-validation-error {
+    background-color: #ffebee;
+    color: #d32f2f;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin: 8px 0 4px 0;
+    border-left: 3px solid #d32f2f;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-type-btn {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #b0b0b0;
+    font-size: 0.85em;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-type-btn:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.search-type-btn:hover i {
+    color: #007DB8;
+}
+
+.search-type-btn.active i {
+    color: #007DB8;
+}
+
+.search-type-btn.active:hover i {
+    color: #007DB8;
+}
+
+.searchbar-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+/* Universal hover effect for toolbar icons: scale up and turn blue (#007DB8) */
+.toolbar-btn i, .fa-bold, .fa-italic, .fa-underline, .fa-strikethrough, .fa-palette, .fa-fill-drip, .fa-list-ul, .fa-list-ol, .fa-text-height, .fa-code, .fa-terminal, .fa-eraser, .fa-home, .fa-link, .fa-unlink {
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.toolbar-btn i:hover, .toolbar-btn i:focus,
+.fa-bold:hover, .fa-italic:hover, .fa-underline:hover, .fa-strikethrough:hover, .fa-palette:hover, .fa-fill-drip:hover,
+.fa-list-ul:hover, .fa-list-ol:hover, .fa-text-height:hover, .fa-code:hover, .fa-terminal:hover, .fa-eraser:hover, .fa-home:hover, .fa-link:hover, .fa-unlink:hover {
+  transform: scale(1.18);
+  /* filter approximating #007DB8 on dark icon SVGs */
+  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
+}
+
+/* Additional icons to get the same hover effect (plus, search, folders, favorites, trash, folder action icons, sidebar + and searchbar) */
+.sidebar-plus i,
+.searchbar-icon .fa-search,
+.fa-plus,
+.fa-search,
+.fa-folder,
+.fa-folder-open,
+.fa-star-light,
+.fa-trash,
+.folder-icon,
+.folder-search-btn,
+.folder-move-files-btn,
+.folder-empty-btn,
+.folder-edit-btn,
+.folder-delete-btn,
+.btn-favorite .fa-star-light {
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.sidebar-plus i:hover,
+.searchbar-icon .fa-search:hover,
+.fa-plus:hover,
+.fa-search:hover,
+.fa-folder:hover,
+.fa-folder-open:hover,
+.fa-star-light:hover,
+.fa-trash:hover,
+.folder-icon:hover,
+.folder-search-btn:hover,
+.folder-move-files-btn:hover,
+.folder-empty-btn:hover,
+.folder-edit-btn:hover,
+.folder-delete-btn:hover,
+.btn-favorite .fa-star-light:hover {
+  transform: scale(1.18);
+  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
 }
