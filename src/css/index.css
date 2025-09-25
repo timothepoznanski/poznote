@@ -616,6 +616,11 @@ body {
 }
 .create-menu-item:hover { background: #f6fbff; }
 
+/* Enlarge icons in create menu */
+.create-menu-item i {
+    font-size: 16px;
+}
+
 /* LEFT HEADER */
 
 .left-header {
