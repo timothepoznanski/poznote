@@ -341,7 +341,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>Note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -360,7 +360,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Folder item
         var folderItem = document.createElement('button');
         folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>Folder';
         folderItem.onclick = function() {
             newFolder();
             createMenu.remove();
