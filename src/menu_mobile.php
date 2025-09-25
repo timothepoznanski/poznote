@@ -24,7 +24,7 @@
     </div>
 
         <!-- Compact mobile search bar -->
-        <div class="mobile-search-container">
+        <div class="contains_forms_search mobile-search-container">
             <form id="unified-search-form-mobile" action="index.php" method="POST">
                 <div class="unified-search-container mobile">
                     <div class="searchbar-row searchbar-icon-row">
