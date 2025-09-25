@@ -711,24 +711,12 @@ body {
     cursor: pointer;
     margin: 0 6px;
     transition: color 0.2s;
-    color: #007DB8;
     outline: none;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-
-.toolbar-btn i {
-    display: block;
-    text-align: center;
-    line-height: 1;
-}
-.toolbar-btn:hover, .toolbar-btn:focus {
-    background: transparent !important;
-    border: none !important;
-    color: #005a8a;
 }
 
 @media (min-width: 801px) {
