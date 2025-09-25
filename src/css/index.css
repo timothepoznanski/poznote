@@ -488,7 +488,7 @@ body {
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
 
 /* Folder actions icons keep small size */
-.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; font-size: 1.0em; }
+.folder-actions i { margin-left: 18px; color:#6b7280; cursor:pointer; font-size: 1.0em; }
 .folder-actions i:hover { color:#374151; }
 
 

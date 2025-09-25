@@ -435,6 +435,10 @@ a.links_arbo_left.selected-note {
     opacity: 1; /* Always visible on mobile */
 }
 
+.folder-actions i {
+    margin-left: 12px !important;
+}
+
 /* Modal-related rules moved to css/modals.css */
 
 .folder-search-section {
