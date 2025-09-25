@@ -488,7 +488,7 @@ body {
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
 
 /* Folder actions icons keep small size */
-.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; }
+.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; font-size: 1.0em; }
 .folder-actions i:hover { color:#374151; }
 
 
@@ -1265,7 +1265,7 @@ img {
 }
 
 .fa-tag.icon_tag {
-    /* font-size: 12px; */
+    font-size: 18px;
     margin-right: 8px;
     flex-shrink: 0;
     align-self: center;
@@ -2127,7 +2127,7 @@ hr {
 }
 
 .folder-icon {
-    /* font-size: 13px; */
+    font-size: 1.2em;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
@@ -3897,8 +3897,8 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .fa-plus {
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 1.2em;
+  height: 1.2em;
   background-image: url('../images/plus-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
