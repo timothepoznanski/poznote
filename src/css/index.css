@@ -381,6 +381,10 @@ body {
     flex-shrink: 0;
 }
 
+#left_col::-webkit-scrollbar {
+    display: none;
+}
+
 /* Sidebar header and primary action */
 .sidebar-header {
     /* padding: 6px 0 14px 0; */
