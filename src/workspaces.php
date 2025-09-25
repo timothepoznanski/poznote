@@ -364,7 +364,7 @@ try {
         <h1> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
 
-        <a href="index.php" class="btn btn-secondary">
+        <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
 
@@ -470,6 +470,15 @@ try {
             document.addEventListener('click', handleRenameButtonClick);
             document.addEventListener('click', handleSelectButtonClick);
             document.addEventListener('click', handleDeleteButtonClick);
+
+            // Update back link with stored workspace
+            try {
+                var stored = localStorage.getItem('poznote_selected_workspace');
+                var a = document.getElementById('backToNotesLink');
+                if (a && stored) {
+                    a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+                }
+            } catch(e) {}
         });
 
         // Event listeners for workspace modals that depend on PHP variables
