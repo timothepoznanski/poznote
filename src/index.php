@@ -374,10 +374,21 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             createTaskListNote();
             createMenu.remove();
         };
+
+        // Workspace item
+        var workspaceItem = document.createElement('button');
+            workspaceItem.className = 'create-menu-item';
+            workspaceItem.innerHTML = '<i class="fa-layer-group" style="margin-right: 10px; color: #007DB8;"></i>Workspace';
+        workspaceItem.onclick = function() {
+            // Navigate to the workspaces management page
+            window.location = 'workspaces.php';
+            createMenu.remove();
+        };
         
         createMenu.appendChild(noteItem);
         createMenu.appendChild(folderItem);
         createMenu.appendChild(taskListItem);
+    createMenu.appendChild(workspaceItem);
         
         var plusButton = document.querySelector('.sidebar-plus');
         if (plusButton && plusButton.parentNode) {
