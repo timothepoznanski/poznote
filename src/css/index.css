@@ -3743,55 +3743,13 @@ input[type="search"]::-webkit-search-results-decoration {
     position: relative;
 }
 
-/* Universal hover effect for toolbar icons: scale up and turn blue (#007DB8) */
-.toolbar-btn i, .fa-bold, .fa-italic, .fa-underline, .fa-strikethrough, .fa-palette, .fa-fill-drip, .fa-list-ul, .fa-list-ol, .fa-text-height, .fa-code, .fa-terminal, .fa-eraser, .fa-home, .fa-link, .fa-unlink {
-  transition: transform 100ms ease, filter 100ms ease;
+/* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
+[class*="fa-"] {
+  filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.toolbar-btn i:hover, .toolbar-btn i:focus,
-.fa-bold:hover, .fa-italic:hover, .fa-underline:hover, .fa-strikethrough:hover, .fa-palette:hover, .fa-fill-drip:hover,
-.fa-list-ul:hover, .fa-list-ol:hover, .fa-text-height:hover, .fa-code:hover, .fa-terminal:hover, .fa-eraser:hover, .fa-home:hover, .fa-link:hover, .fa-unlink:hover {
-  transform: scale(1.18);
-  /* filter approximating #007DB8 on dark icon SVGs */
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
-}
-
-/* Additional icons to get the same hover effect (plus, search, folders, favorites, trash, folder action icons, sidebar + and searchbar) */
-.sidebar-plus i,
-.fa-plus,
-.searchbar-icon,
-.fa-search,
-.fa-folder,
-.fa-folder-open,
-.fa-star-light,
-.fa-trash,
-.folder-icon,
-.folder-search-btn,
-.folder-move-files-btn,
-.folder-empty-btn,
-.folder-edit-btn,
-.folder-delete-btn,
-.btn-favorite .fa-star-light {
-  transition: transform 100ms ease, filter 100ms ease;
-}
-
-.sidebar-plus i:hover,
-.searchbar-icon .fa-search:hover,
-.searchbar-icon .fa-file-alt:hover,
-.searchbar-icon .fa-tags:hover,
-.fa-plus:hover,
-.fa-search:hover,
-.fa-folder:hover,
-.fa-folder-open:hover,
-.fa-star-light:hover,
-.fa-trash:hover,
-.folder-icon:hover,
-.folder-search-btn:hover,
-.folder-move-files-btn:hover,
-.folder-empty-btn:hover,
-.folder-edit-btn:hover,
-.folder-delete-btn:hover,
-.btn-favorite .fa-star-light:hover {
+[class*="fa-"]:hover {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
