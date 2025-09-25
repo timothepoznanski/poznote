@@ -21,8 +21,7 @@ include 'functions.php';
 <body>
     <div class="settings-container">
         <br>
-        <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
-            <i class="fa-arrow-left"></i>
+        <a id="backToNotesLink" href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="btn btn-secondary">
             Back to Notes
         </a>
         <br><br>
