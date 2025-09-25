@@ -707,7 +707,7 @@ body {
     border: none !important;
     border-radius: 5px;
     padding: 6px 8px;
-    font-size: 1.2em;
+    font-size: 1.3em;
     cursor: pointer;
     margin: 0 6px;
     transition: color 0.2s;
@@ -2023,9 +2023,6 @@ hr {
 /* Pour l'icône save normale, couleur gris foncé par défaut */
 .toolbar-btn:not(.save-modified) i.fa-save {
     color: inherit;
-}
-.toolbar-btn:not(.save-modified) i.fa-save {
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
 }
 
 .toolbar-btn i.fa-palette,
