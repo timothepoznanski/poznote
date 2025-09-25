@@ -3745,7 +3745,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* Universal hover effect for toolbar icons: scale up and turn blue (#007DB8) */
 .toolbar-btn i, .fa-bold, .fa-italic, .fa-underline, .fa-strikethrough, .fa-palette, .fa-fill-drip, .fa-list-ul, .fa-list-ol, .fa-text-height, .fa-code, .fa-terminal, .fa-eraser, .fa-home, .fa-link, .fa-unlink {
-  transition: transform 180ms ease, filter 180ms ease;
+  transition: transform 100ms ease, filter 100ms ease;
 }
 
 .toolbar-btn i:hover, .toolbar-btn i:focus,
@@ -3753,13 +3753,13 @@ input[type="search"]::-webkit-search-results-decoration {
 .fa-list-ul:hover, .fa-list-ol:hover, .fa-text-height:hover, .fa-code:hover, .fa-terminal:hover, .fa-eraser:hover, .fa-home:hover, .fa-link:hover, .fa-unlink:hover {
   transform: scale(1.18);
   /* filter approximating #007DB8 on dark icon SVGs */
-  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
 /* Additional icons to get the same hover effect (plus, search, folders, favorites, trash, folder action icons, sidebar + and searchbar) */
 .sidebar-plus i,
-.searchbar-icon .fa-search,
 .fa-plus,
+.searchbar-icon,
 .fa-search,
 .fa-folder,
 .fa-folder-open,
@@ -3772,11 +3772,13 @@ input[type="search"]::-webkit-search-results-decoration {
 .folder-edit-btn,
 .folder-delete-btn,
 .btn-favorite .fa-star-light {
-  transition: transform 180ms ease, filter 180ms ease;
+  transition: transform 100ms ease, filter 100ms ease;
 }
 
 .sidebar-plus i:hover,
 .searchbar-icon .fa-search:hover,
+.searchbar-icon .fa-file-alt:hover,
+.searchbar-icon .fa-tags:hover,
 .fa-plus:hover,
 .fa-search:hover,
 .fa-folder:hover,
@@ -3791,5 +3793,5 @@ input[type="search"]::-webkit-search-results-decoration {
 .folder-delete-btn:hover,
 .btn-favorite .fa-star-light:hover {
   transform: scale(1.18);
-  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
