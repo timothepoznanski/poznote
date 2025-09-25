@@ -731,6 +731,12 @@ body {
     color: #005a8a;
 }
 
+@media (min-width: 801px) {
+    .btn-home {
+        display: none !important;
+    }
+}
+
 /* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
 .text-format-btn {
     opacity: 0;
