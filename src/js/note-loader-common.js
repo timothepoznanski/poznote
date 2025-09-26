@@ -383,7 +383,7 @@ function handleImageClick(event) {
     menu.className = 'image-menu';
     menu.innerHTML = `
         <div class="image-menu-item" data-action="view-large">
-            <i class="fa-expand"></i>
+            <i class="fa-maximize"></i>
             View Large
         </div>
         <div class="image-menu-item" data-action="download">
