@@ -146,6 +146,12 @@ class SearchManager {
         
         const elements = this.getElements(isMobile);
         
+        // If leaving 'notes' search, clear highlights immediately (titles and inputs)
+        const prev = this.currentSearchType;
+        if (prev === 'notes' && searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
+            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+        }
+
         // Clear all active states
         this.searchTypes.forEach(type => {
             const button = elements.buttons[type];
@@ -160,11 +166,15 @@ class SearchManager {
             activeButton.classList.add('active');
         }
     // Persist state even if buttons are absent
-    const prev = this.currentSearchType;
     this.currentSearchType = searchType;
     // debug info removed
 
     this.updateInterface(isMobile);
+
+    // If switching into 'notes' search, (re-)apply highlights now that state is set
+    if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
+        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+    }
     }
 
     /**
@@ -434,8 +444,8 @@ class SearchManager {
             return; // Already active, do nothing
         }
 
-        // Clear search highlights when switching away from notes
-        if (searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
+        // Clear search highlights when switching search types
+        if (typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
 
@@ -613,6 +623,18 @@ class SearchManager {
      */
     reinitializeAfterAjax(searchState) {
         try {
+            // Restore search state first (before reinitializing content)
+            if (searchState) {
+                try {
+                    this.restoreSearchState(searchState);
+                    // Ensure placeholders, icons and hidden inputs reflect restored state
+                    this.updateInterface(false);
+                    this.updateInterface(true);
+                } catch (e) {
+                    // ignore
+                }
+            }
+
             // Reinitialize other components
             if (typeof reinitializeClickableTagsAfterAjax === 'function') {
                 reinitializeClickableTagsAfterAjax();
@@ -633,22 +655,13 @@ class SearchManager {
                 this.suppressURLRestore = false;
             }
 
-            // Restore search state (force UI to reflect saved choice)
+            // Guard: reapply search state after a short delay in case other init code overrides
             if (searchState) {
-                try {
+                setTimeout(() => {
                     this.restoreSearchState(searchState);
-                    // Ensure placeholders, icons and hidden inputs reflect restored state
                     this.updateInterface(false);
                     this.updateInterface(true);
-                    // Guard: reapply after a short delay in case other init code overrides
-                    setTimeout(() => {
-                        this.restoreSearchState(searchState);
-                        this.updateInterface(false);
-                        this.updateInterface(true);
-                    }, 50);
-                } catch (e) {
-                    // ignore
-                }
+                }, 50);
             }
 
             // Restore focus/caret if requested. Try immediate, then retry after short delays
