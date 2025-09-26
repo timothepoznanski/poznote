@@ -272,6 +272,10 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var inputStyle = window.getComputedStyle(inputElement);
     var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
     var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
+    var borderTop = parseInt(inputStyle.borderTopWidth) || 0;
+    var paddingTop = parseInt(inputStyle.paddingTop) || 0;
+    var paddingBottom = parseInt(inputStyle.paddingBottom) || 0;
+    var borderBottom = parseInt(inputStyle.borderBottomWidth) || 0;
     
     // Get viewport scaling for mobile devices
     var viewport = document.querySelector('meta[name="viewport"]');
@@ -287,11 +291,16 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     var scrollY = window.pageYOffset || document.documentElement.scrollTop;
     
+    // Position overlay to align with the input's content area (account for borders & padding)
+    // Use clientHeight so the overlay height matches the inner area where text is rendered
+    var contentTop = inputRect.top + scrollY + borderTop; // start after border
+    var overlayHeight = inputElement.clientHeight || (inputRect.height - borderTop - borderBottom);
+
     overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
-    overlay.style.top = (inputRect.top + scrollY) + 'px';
+    overlay.style.top = contentTop + 'px';
     overlay.style.width = wordWidth + 'px';
-    overlay.style.height = inputRect.height + 'px';
-    overlay.style.lineHeight = inputRect.height + 'px';
+    overlay.style.height = overlayHeight + 'px';
+    overlay.style.lineHeight = overlayHeight + 'px';
     
     // Ensure overlay is visible on mobile
     overlay.style.zIndex = '1000';
