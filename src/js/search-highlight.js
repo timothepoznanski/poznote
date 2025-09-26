@@ -321,6 +321,58 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
 }
 
 /**
+ * Measure the bounding rect of a substring inside a text input by creating
+ * a hidden mirror positioned over the real input. Returns {left, top, width, height}
+ * in viewport coordinates, or null if measurement failed.
+ */
+function measureWordRectInInput(inputElement, startIndex, word) {
+    try {
+        var inputRect = inputElement.getBoundingClientRect();
+        var style = window.getComputedStyle(inputElement);
+
+        var mirror = document.createElement('div');
+        mirror.style.position = 'absolute';
+        mirror.style.left = inputRect.left + 'px';
+        mirror.style.top = inputRect.top + 'px';
+        mirror.style.visibility = 'hidden';
+        mirror.style.whiteSpace = 'pre';
+        mirror.style.overflow = 'hidden';
+        mirror.style.boxSizing = style.boxSizing;
+        mirror.style.font = style.font;
+        mirror.style.padding = style.padding;
+        mirror.style.border = style.border;
+        mirror.style.letterSpacing = style.letterSpacing;
+        mirror.style.textTransform = style.textTransform;
+        mirror.style.width = inputRect.width + 'px';
+        mirror.style.height = inputRect.height + 'px';
+        mirror.style.lineHeight = style.lineHeight;
+
+        // Build nodes: before text, highlighted span, after text
+        var before = document.createTextNode(inputElement.value.substring(0, startIndex));
+        var span = document.createElement('span');
+        span.textContent = word;
+        span.style.display = 'inline-block';
+        // Ensure span has minimal styles to measure accurately
+        span.style.background = 'transparent';
+        var after = document.createTextNode(inputElement.value.substring(startIndex + word.length));
+
+        mirror.appendChild(before);
+        mirror.appendChild(span);
+        mirror.appendChild(after);
+
+        document.body.appendChild(mirror);
+
+        var rect = span.getBoundingClientRect();
+
+        document.body.removeChild(mirror);
+
+        return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
  * Update positions of all overlay highlights
  */
 function updateAllOverlayPositions() {
