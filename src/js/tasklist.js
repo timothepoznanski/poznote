@@ -71,8 +71,8 @@ function renderTaskList(noteId, tasks) {
     // Store tasks data
     noteEntry.dataset.tasks = JSON.stringify(tasks);
 
-    // Enable drag & drop reordering after initial render
-    enableDragAndDrop(noteId);
+    // Drag & drop reordering is disabled
+    // enableDragAndDrop(noteId);
 }
 
 // Render individual tasks
@@ -84,7 +84,7 @@ function renderTasks(tasks, noteId) {
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
@@ -133,8 +133,8 @@ function addTask(noteId) {
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks, noteId);
-        // Re-enable DnD after DOM change
-        enableDragAndDrop(noteId);
+        // Drag & drop reordering is disabled
+        // enableDragAndDrop(noteId);
     }
 
     // Clear input
@@ -241,7 +241,8 @@ function saveTaskEdit(taskId, noteId, newText) {
     }
 
     // Ensure drag & drop still works after inline edit
-    enableDragAndDrop(noteId);
+    // Drag & drop reordering is disabled
+    // enableDragAndDrop(noteId);
 
     markNoteAsModified(noteId);
 }
@@ -285,7 +286,8 @@ function deleteTask(taskId, noteId) {
     }
 
     // Ensure DnD state is consistent after deletion
-    enableDragAndDrop(noteId);
+    // Drag & drop reordering is disabled
+    // enableDragAndDrop(noteId);
 
     markNoteAsModified(noteId);
 }
@@ -321,7 +323,8 @@ function toggleImportant(taskId, noteId) {
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks, noteId);
         // Re-enable DnD after reorder
-        enableDragAndDrop(noteId);
+        // Drag & drop reordering is disabled
+        // enableDragAndDrop(noteId);
     }
 
     markNoteAsModified(noteId);
@@ -545,7 +548,8 @@ function enableDragAndDrop(noteId) {
             if (listEl) {
                 listEl.innerHTML = renderTasks(tasks, noteId);
                 // allow tiny timeout to ensure DOM nodes are present
-                setTimeout(() => enableDragAndDrop(noteId), 0);
+                // Drag & drop reordering is disabled
+                // setTimeout(() => enableDragAndDrop(noteId), 0);
             }
 
             // dropped and reordered
@@ -690,7 +694,8 @@ function enableDragAndDrop(noteId) {
                         const listEl = document.getElementById(`tasks-list-${state.noteId}`);
                         if (listEl) {
                             listEl.innerHTML = renderTasks(newTasks, state.noteId);
-                            setTimeout(() => enableDragAndDrop(state.noteId), 0);
+                            // Drag & drop reordering is disabled
+                            // setTimeout(() => enableDragAndDrop(state.noteId), 0);
                         }
                         markNoteAsModified(state.noteId);
                     }
