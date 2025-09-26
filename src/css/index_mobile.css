@@ -247,6 +247,14 @@ pre, code {
     font-size: 16px !important;
 }
 
+/* Ensure images in notes don't overflow on mobile */
+.noteentry img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 10px 0 !important;
+}
+
 /* Increase text size in left column on mobile */
 #left_col .links_arbo_left {
     font-size: 16px !important;
