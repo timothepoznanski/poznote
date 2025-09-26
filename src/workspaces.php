@@ -306,20 +306,6 @@ try {
 <html>
 <head>
     <title>Manage Workspaces - Poznote</title>
-    <style id="workspaces-mobile-emergency-fix">
-        @media (max-width: 800px) {
-            body, html {
-                overflow: auto !important;
-                overflow-y: scroll !important;
-                overflow-x: hidden !important;
-                height: auto !important;
-                min-height: 100vh !important;
-                position: static !important;
-                -webkit-overflow-scrolling: touch !important;
-                max-height: none !important;
-            }
-        }
-    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
