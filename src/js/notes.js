@@ -69,7 +69,7 @@ function saveNoteToServer() {
     if (!titleInput || !entryElem) {
         console.error('saveNoteToServer: missing elements for noteid=', noteid);
         updateNoteEnCours = 0;
-        editedButNotSaved = 1;
+        // Don't set editedButNotSaved = 1 since the note elements no longer exist
         return;
     }
     

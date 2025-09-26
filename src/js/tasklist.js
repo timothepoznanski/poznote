@@ -331,10 +331,10 @@ function toggleImportant(taskId, noteId) {
 function markNoteAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
     if (noteEntry) {
+        // Ensure noteid is set correctly for task lists
+        noteid = noteId;
         // Trigger the existing save mechanism
-        editedButNotSaved = 1;
-        updateident(noteEntry);
-        setSaveButtonRed(true);
+        updateNote();
     }
 }
 

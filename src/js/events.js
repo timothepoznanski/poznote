@@ -405,11 +405,9 @@ function setupFocusEvents() {
 }
 
 function setupAutoSaveCheck() {
-    if (editedButNotSaved == 0) {
-        setInterval(function() {
-            checkAndAutoSave();
-        }, 2000);
-    }
+    setInterval(function() {
+        checkAndAutoSave();
+    }, 2000);
 }
 
 function setupPageUnloadWarning() {
