@@ -332,19 +332,26 @@ function measureWordRectInInput(inputElement, startIndex, word) {
 
         var mirror = document.createElement('div');
         mirror.style.position = 'absolute';
-        mirror.style.left = inputRect.left + 'px';
-        mirror.style.top = inputRect.top + 'px';
+    // Place mirror at the input's document coordinates (include page scroll)
+    mirror.style.left = (inputRect.left + (window.pageXOffset || document.documentElement.scrollLeft)) + 'px';
+    mirror.style.top = (inputRect.top + (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
         mirror.style.visibility = 'hidden';
         mirror.style.whiteSpace = 'pre';
         mirror.style.overflow = 'hidden';
         mirror.style.boxSizing = style.boxSizing;
-        mirror.style.font = style.font;
-        mirror.style.padding = style.padding;
-        mirror.style.border = style.border;
-        mirror.style.letterSpacing = style.letterSpacing;
-        mirror.style.textTransform = style.textTransform;
-        mirror.style.width = inputRect.width + 'px';
-        mirror.style.height = inputRect.height + 'px';
+    mirror.style.font = style.font;
+    mirror.style.fontFamily = style.fontFamily;
+    mirror.style.fontWeight = style.fontWeight;
+    mirror.style.fontStyle = style.fontStyle;
+    mirror.style.padding = style.padding;
+    mirror.style.border = style.border;
+    mirror.style.letterSpacing = style.letterSpacing;
+    mirror.style.wordSpacing = style.wordSpacing;
+    mirror.style.textTransform = style.textTransform;
+    mirror.style.textIndent = style.textIndent;
+    mirror.style.textAlign = style.textAlign;
+    mirror.style.width = inputRect.width + 'px';
+    mirror.style.height = inputRect.height + 'px';
         mirror.style.lineHeight = style.lineHeight;
 
         // Build nodes: before text, highlighted span, after text
