@@ -1672,7 +1672,14 @@ img {
 
 .share-menu-item:hover { background-color: #f8f9fa; color: #007DB8; }
 
-.share-menu-item i { margin-right: 10px; width: 16px; text-align: center; color: #007DB8; }
+.share-menu-item i { 
+    margin-right: 10px; 
+    width: 16px; 
+    text-align: center; 
+    color: #007DB8; 
+    width: 20px !important;
+    font-size: 18px !important;
+}
 
 .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
 
@@ -1691,6 +1698,7 @@ img {
         z-index: 20000 !important;
         box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
     }
+
 }
 
 
