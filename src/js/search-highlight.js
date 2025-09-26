@@ -80,6 +80,12 @@ function highlightInElement(element, searchWords) {
     
     // Special handling for input elements (like note titles)
     if (element.tagName === 'INPUT' && element.type === 'text') {
+        // Ensure the input is visible and rendered; if not, skip overlay logic
+        var elStyle = window.getComputedStyle(element);
+        var rects = element.getClientRects();
+        if (elStyle.display === 'none' || elStyle.visibility === 'hidden' || element.offsetWidth === 0 || rects.length === 0 || element.offsetParent === null) {
+            return 0; // no overlays for hidden inputs (visible heading will be highlighted instead)
+        }
         var inputValue = element.value;
         
         // Create a combined regex pattern for all search words
