@@ -934,7 +934,7 @@
 
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
-    margin: 25% auto !important;
+    margin: 15% auto 0 !important; /* Reduced from 25% to 15% for better vertical centering */
     width: 280px !important;
     max-width: 95% !important;
 }
@@ -1086,6 +1086,18 @@
     background-color: rgba(0,0,0,0.5) !important;
     align-items: center;
     justify-content: center;
+}
+
+/* Mobile-specific positioning for move notes modal */
+@media (max-width: 768px) {
+    #moveNotesModal.modal {
+        align-items: center !important; /* Override mobile default of flex-start */
+        padding: 20px 12px !important;
+    }
+    
+    #moveNotesModal .modal-content {
+        margin: 0 auto !important; /* Remove top margin for proper centering */
+    }
 }
 
 #moveNotesModal .modal-content {

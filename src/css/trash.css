@@ -292,8 +292,8 @@ body.trash-page {
 
 .fa-trash {
     display: inline-block;
-    width: 1em;
-    height: 1em;
+    width: 1.2em;
+    height: 1.2em;
     background-image: url('../images/trash-can-light-full.svg') !important;
     background-repeat: no-repeat;
     background-position: center;
@@ -301,12 +301,13 @@ body.trash-page {
     font-family: inherit !important;
     font-style: normal !important;
     content: '';
+    cursor: pointer;
 }
 
 .fa-trash-restore-alt-svg {
     display: inline-block;
-    width: 1em;
-    height: 1em;
+    width: 1.2em;
+    height: 1.2em;
     background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
     background-repeat: no-repeat;
     background-position: center;
@@ -314,5 +315,6 @@ body.trash-page {
     font-family: inherit !important;
     font-style: normal !important;
     content: '';
+    cursor: pointer;
 }
 

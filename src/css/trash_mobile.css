@@ -113,6 +113,12 @@
         gap: 15px;
     }
     
+    /* Larger trash action icons on mobile for better touch targets */
+    .fa-trash, .fa-trash-restore-alt-svg {
+        width: 1.5em !important;
+        height: 1.5em !important;
+    }
+    
     .css-title {
         font-size: 18px !important;
         margin-bottom: 15px;
