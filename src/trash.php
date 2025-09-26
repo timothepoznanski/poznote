@@ -64,12 +64,12 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		</form>
 		
 		<div class="trash-buttons-container">
-			<div class="trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
-				<i class="fa-arrow-circle-left"></i>
-			</div>
-			<div class="trash-empty-button" id="emptyTrashBtn" title="Empty trash">
-				<i class="trash-button-icon"></i>
-			</div>
+			<button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
+				Back to notes
+			</button>
+			<button class="btn btn-danger" id="emptyTrashBtn" title="Empty trash">
+				Empty trash
+			</button>
 		</div>
 		
 		<div class="trash-content">

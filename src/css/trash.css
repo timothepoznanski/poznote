@@ -124,10 +124,45 @@ body.trash-page {
     margin: 20px 30px;
 }
 
-.trash-button-icon {
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
     text-align: center;
-    font-size: 20px;
-    color: #007DB8;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c43b3b;
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
 .trash-content {
