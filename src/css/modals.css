@@ -934,7 +934,7 @@
 
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
-    margin: 15% auto 0 !important; /* Reduced from 25% to 15% for better vertical centering */
+    margin: 5% auto 0 !important; /* Further reduced from 15% to 10% for higher positioning */
     width: 280px !important;
     max-width: 95% !important;
 }

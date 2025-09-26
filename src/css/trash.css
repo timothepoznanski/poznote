@@ -302,6 +302,11 @@ body.trash-page {
     font-style: normal !important;
     content: '';
     cursor: pointer;
+    transition: filter 0.1s ease;
+}
+
+.fa-trash:hover {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
 }
 
 .fa-trash-restore-alt-svg {
@@ -316,5 +321,10 @@ body.trash-page {
     font-style: normal !important;
     content: '';
     cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.fa-trash-restore-alt-svg:hover {
+    filter: brightness(0) saturate(100%) invert(34%) sepia(86%) saturate(1352%) hue-rotate(100deg) brightness(92%) contrast(89%);
 }
 
