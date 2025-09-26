@@ -296,11 +296,24 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var contentTop = inputRect.top + scrollY + borderTop; // start after border
     var overlayHeight = inputElement.clientHeight || (inputRect.height - borderTop - borderBottom);
 
+    // Try to align overlay to the text baseline by using the computed line-height
+    var computedLineHeight = parseFloat(inputStyle.lineHeight);
+    if (!computedLineHeight || isNaN(computedLineHeight)) {
+        computedLineHeight = parseFloat(inputStyle.fontSize) || overlayHeight;
+    }
+
+    // Clamp line height to available overlay height
+    var finalLineHeight = Math.min(computedLineHeight, overlayHeight);
+
+    // Center the overlay vertically on the text line inside the input
+    var topOffsetForText = Math.round((overlayHeight - finalLineHeight) / 2);
+    var overlayTop = contentTop + topOffsetForText;
+
     overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
-    overlay.style.top = contentTop + 'px';
+    overlay.style.top = overlayTop + 'px';
     overlay.style.width = wordWidth + 'px';
-    overlay.style.height = overlayHeight + 'px';
-    overlay.style.lineHeight = overlayHeight + 'px';
+    overlay.style.height = finalLineHeight + 'px';
+    overlay.style.lineHeight = finalLineHeight + 'px';
     
     // Ensure overlay is visible on mobile
     overlay.style.zIndex = '1000';
