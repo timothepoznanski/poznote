@@ -130,8 +130,8 @@ function displayAttachments(attachments) {
         html += '<small>' + fileSize + ' - ' + uploadDate + '</small>';
         html += '</div>';
         html += '<div class="attachment-actions">';
-        html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="Download">';
-        html += '<i class="fa-download"></i>';
+    html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="View">';
+    html += '<i class="fa-eye"></i>';
         html += '</button>';
         html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Supprimer" class="delete-btn">';
         html += '<i class="fa-trash"></i>';
