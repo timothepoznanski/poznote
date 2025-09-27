@@ -528,7 +528,8 @@ body {
 }
 
 /* Button styles (consistent with other pages) */
-/* .btn {
+/* Button styles (consistent with other pages) */
+.btn {
     padding: 12px 25px;
     border: none;
     border-radius: 4px;
@@ -540,7 +541,7 @@ body {
     text-decoration: none;
     font-weight: 500;
     transition: all 0.2s ease;
-} */
+}
 
 .btn-primary {
     background: #007DB8;
@@ -562,6 +563,38 @@ body {
     color: white;
     text-decoration: none;
     transform: translateY(-1px);
+}
+
+/* Ensure 'Back to Notes' link in settings-container looks like a button */
+.settings-container > a.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+/* Stronger rule to ensure anchors inside settings-container look like buttons */
+.settings-container > a.btn,
+.settings-container > a.btn-secondary,
+.settings-container > a.btn-primary {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 12px 25px !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+}
+
+/* Ensure primary/secondary colors apply to anchors as on other pages */
+.settings-container > a.btn-primary {
+    background: #007DB8 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.settings-container > a.btn-secondary {
+    background: #6c757d !important;
+    color: #fff !important;
+    border: none !important;
 }
 
 .btn:disabled {

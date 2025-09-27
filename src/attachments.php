@@ -45,7 +45,7 @@ if (!$note) {
         <h1>Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
-    <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
+    <a id="backToNotesLink" href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
             Back to Notes
         </a>
 
@@ -514,6 +514,17 @@ if (!$note) {
                 notification.classList.remove('attention');
                 notification.remove();
             }, 6000);
+        }
+
+        // Ensure Back to Notes preserves selected workspace if stored in localStorage
+        try {
+            var stored = localStorage.getItem('poznote_selected_workspace');
+            if (stored && stored !== 'Poznote') {
+                var a = document.getElementById('backToNotesLink');
+                if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+            }
+        } catch (e) {
+            // ignore storage errors
         }
     </script>
 </body>
