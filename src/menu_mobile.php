@@ -35,6 +35,7 @@
                                 <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
                             <?php endif; ?>
                         </div>
+                            <!-- mobile search-type pills removed (not used) -->
                     </div>
                     <!-- Hidden inputs to maintain compatibility -->
                     <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">

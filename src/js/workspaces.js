@@ -68,13 +68,10 @@ function onWorkspaceChange() {
     // Clear existing preserve parameters
     url.searchParams.delete('preserve_notes');
     url.searchParams.delete('preserve_tags');
-    url.searchParams.delete('preserve_folders');
-    
+
     // Set appropriate preserve parameter based on current search type
     if (currentSearchType === 'tags') {
         url.searchParams.set('preserve_tags', '1');
-    } else if (currentSearchType === 'folders') {
-        url.searchParams.set('preserve_folders', '1');
     } else {
         url.searchParams.set('preserve_notes', '1');
     }
@@ -243,13 +240,10 @@ function switchToWorkspace(workspaceName) {
     // Clear existing preserve parameters
     url.searchParams.delete('preserve_notes');
     url.searchParams.delete('preserve_tags');
-    url.searchParams.delete('preserve_folders');
-    
+
     // Set appropriate preserve parameter based on current search type
     if (currentSearchType === 'tags') {
         url.searchParams.set('preserve_tags', '1');
-    } else if (currentSearchType === 'folders') {
-        url.searchParams.set('preserve_folders', '1');
     } else {
         url.searchParams.set('preserve_notes', '1');
     }

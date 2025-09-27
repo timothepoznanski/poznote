@@ -38,26 +38,7 @@ function applyHighlightsWithRetries() {
             } catch (e) { /* ignore */ }
         }
 
-        // 4) Mobile-folder-specific fallback: some mobile UIs don't include the
-        // `search-in-folders-mobile` hidden input. If a folder-search input is
-        // present and has a value, infer folders mode. Also respect preserve_folders
-        // URL param as an indicator of folder filtering.
-        if (!activeType) {
-            try {
-                var folderInput = document.getElementById('folderSearchInput');
-                if (folderInput && folderInput.value && folderInput.value.trim() !== '') {
-                    activeType = 'folders';
-                }
-            } catch (e) { /* ignore */ }
-        }
-        if (!activeType) {
-            try {
-                var _urlParams = new URLSearchParams(window.location.search || '');
-                if (_urlParams.get('preserve_folders') === '1') {
-                    activeType = 'folders';
-                }
-            } catch (e) { /* ignore */ }
-        }
+        // No folder-specific fallbacks: only detect notes or tags searches.
     } catch (e) { activeType = null; }
 
     // Extra fallback: use globally recorded last active search type from SearchManager
@@ -65,16 +46,7 @@ function applyHighlightsWithRetries() {
         activeType = window._lastActiveSearchType;
     }
 
-    // If we're explicitly in folders search, do not reapply any highlights.
-    // Folder search is only meant to filter the list — it should not trigger
-    // tag/notes highlighting inside the opened note content.
-    if (activeType === 'folders') {
-        // Still update overlay positions in case some overlays remain, but skip highlights.
-        if (typeof updateAllOverlayPositions === 'function') {
-            try { updateAllOverlayPositions(); } catch (e) {}
-        }
-        return;
-    }
+    // folders search removed: always allow notes/tags highlight reapplication
 
     // Reapply only the highlights relevant to the active search type
     if (activeType === 'tags') {
@@ -512,7 +484,7 @@ function updateBrowserUrl(url, noteTitle) {
     try {
         // Merge existing search params (search, tags_search, workspace) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
-        const preserveKeys = ['search', 'tags_search', 'workspace'];
+    const preserveKeys = ['search', 'tags_search', 'workspace'];
 
         const target = new URL(url, window.location.origin);
         const targetParams = new URLSearchParams(target.search || '');

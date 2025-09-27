@@ -519,11 +519,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $home_button_class .= ' desktop-home-btn';
                 }
                 
-                // Use goBackToNoteList function for better mobile experience if no search parameters
-                if (empty($home_params)) {
+                // For mobile, prefer the client-side handler so it can preserve the active search/folder state
+                // For desktop with explicit home params, use the server-generated URL
+                if ($is_mobile) {
                     echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 } else {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fa-home"></i></button>';
+                    if (empty($home_params)) {
+                        echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
+                    } else {
+                            echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'">' . "<i class=\"fa-home\"></i></button>";
+                    }
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)

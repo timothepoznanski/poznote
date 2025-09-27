@@ -1,18 +1,9 @@
-/**
- * Optimized Unified Search - Phase 1: Basic refactoring and cleanup
- * 
- * Key improvements:
- * 1. Centralized state management with SearchManager class
- * 2. Unified mobile/desktop handling
- * 3. Reduced code duplication
- * 4. Cleaner separation of concerns
- */
 
 class SearchManager {
     constructor() {
-    // Debug logging disabled by default
-    this.debug = false;
-        this.searchTypes = ['notes', 'tags', 'folders'];
+    // Debug logging enabled temporarily for troubleshooting; set to false to silence
+    this.debug = true; // set false after debugging
+    this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
     // When set, skip restore from URL during initialization (used after AJAX)
@@ -37,8 +28,7 @@ class SearchManager {
             searchInput: document.getElementById(`unified-search${suffix}`),
             buttons: {
                 notes: document.getElementById(`search-notes-btn${suffix}`),
-                tags: document.getElementById(`search-tags-btn${suffix}`),
-                folders: document.getElementById(`search-folders-btn${suffix}`)
+                tags: document.getElementById(`search-tags-btn${suffix}`)
             },
             hiddenInputs: {
                 // Separate the "flag" inputs (search-in-*) from the term-carrying hidden inputs
@@ -46,7 +36,7 @@ class SearchManager {
                 notesTerm: document.getElementById(`search-notes-hidden${suffix}`),
                 tagsFlag: document.getElementById(`search-in-tags${suffix}`),
                 tagsTerm: document.getElementById(`search-tags-hidden${suffix}`),
-                folders: document.getElementById(`search-in-folders${suffix}`)
+                // folders removed
             },
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
         };
@@ -111,7 +101,7 @@ class SearchManager {
     // Check URL preferences and explicit search params
     const preserveNotes = urlParams.get('preserve_notes') === '1';
     const preserveTags = urlParams.get('preserve_tags') === '1';
-    const preserveFolders = urlParams.get('preserve_folders') === '1';
+    const preserveFolders = false;
     const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
     const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
     // debug info removed
@@ -119,19 +109,14 @@ class SearchManager {
     // Check hidden field values: flags vs term-bearing inputs
     const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
     const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
-    const hasFoldersValue = elements.hiddenInputs.folders?.value === '1';
+    const hasFoldersValue = false;
         
         // Determine active search type
         // Prefer explicit URL params (tags_search / search) if present
         if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
-        } else if (hasNotesSearchParam || preserveNotes || (preserveFolders ? false : hasFoldersValue)) {
-            // If notes param present or preserve_notes, choose notes; folders only if explicitly preserved or flagged
-            if (preserveFolders || hasFoldersValue) {
-                this.setActiveSearchType('folders', isMobile);
-            } else {
-                this.setActiveSearchType('notes', isMobile);
-            }
+        } else if (hasNotesSearchParam || preserveNotes) {
+            this.setActiveSearchType('notes', isMobile);
         } else {
             // Default to notes
             this.setActiveSearchType('notes', isMobile);
@@ -259,9 +244,8 @@ class SearchManager {
         const activeType = this.getActiveSearchType(isMobile);
         
         const placeholders = {
-            notes: 'Search in contents and titles...',
-            tags: 'Search in one or more tags...',
-            folders: 'Filter folders...'
+            notes: 'Search for one or more words...',
+            tags: 'Search for one or more tags...'
         };
         
         if (elements.searchInput) {
@@ -289,8 +273,7 @@ class SearchManager {
         const activeType = this.getActiveSearchType(isMobile);
         const iconMap = {
             notes: 'fa-file-alt',
-            tags: 'fa-tags',
-            folders: 'fa-folder'
+            tags: 'fa-tags'
         };
 
         iconSpan.className = iconMap[activeType] || 'fa-search';
@@ -377,17 +360,43 @@ class SearchManager {
         }
 
         const handler = (e) => {
+            // Prevent double execution if a delegate already handled this event
+            try {
+                if (e && e._unifiedSearchHandled) return;
+            } catch (err) {}
+            // Diagnostic logging to ensure handler runs when user clicks the icon
+            try {
+                if (this.debug && console && console.debug) {
+                    const current = this.getActiveSearchType(isMobile);
+                    const elements = this.getElements(isMobile);
+                    const buttonsExist = Object.values(elements.buttons).some(b => b != null);
+                    console.debug('unified-search: icon click', { isMobile, current, buttonsExist });
+                }
+            } catch (err) {
+                try { console.debug && console.debug('unified-search: debug error', err); } catch (e) {}
+            }
             e.preventDefault();
-            // Cycle to next search type
+            // Determine current type and a robust next type. When the
+            // visible "pills" (buttons) are absent (mobile compact UI),
+            // rely on a simple toggle between 'notes' and 'tags' so the
+            // icon always switches as the user expects.
             const current = this.getActiveSearchType(isMobile);
-            const idx = this.searchTypes.indexOf(current);
-            const next = this.searchTypes[(idx + 1) % this.searchTypes.length];
+            const elements = this.getElements(isMobile);
+
+            let next;
+            const buttonsExist = Object.values(elements.buttons).some(b => b != null);
+            if (!buttonsExist && this.searchTypes.length === 2) {
+                // Simple toggle when no explicit buttons are present
+                next = (current === 'notes') ? 'tags' : 'notes';
+            } else {
+                const idx = this.searchTypes.indexOf(current);
+                next = this.searchTypes[(idx + 1) % this.searchTypes.length];
+            }
 
             // Persist the new type and update UI
             this.setActiveSearchType(next, isMobile);
 
             // Trigger behavior similar to clicking the pill
-            const elements = this.getElements(isMobile);
             if (next === 'folders') {
                 const searchValue = elements.searchInput?.value.trim();
                 if (searchValue) this.filterFolders(searchValue, isMobile);
@@ -397,10 +406,42 @@ class SearchManager {
             } else {
                 elements.searchInput?.focus();
             }
+            // mark the event as handled so duplicate listeners/delegates don't re-run
+            try { if (e) e._unifiedSearchHandled = true; } catch (err) {}
         };
 
-        this.eventHandlers.set(handlerKey, handler);
-        iconWrapper.addEventListener('click', handler);
+    this.eventHandlers.set(handlerKey, handler);
+    iconWrapper.addEventListener('click', handler);
+    // mark the wrapper to aid DOM inspection during debugging
+    try { iconWrapper.setAttribute('data-unified-search-listener', '1'); } catch (e) {}
+        // Also attach to the inner span (icon) as a fallback
+        try {
+            const innerIcon = iconWrapper.querySelector('span');
+            if (innerIcon && innerIcon !== iconWrapper) {
+                try { innerIcon.removeEventListener('click', handler); } catch (e) {}
+                innerIcon.addEventListener('click', handler);
+            }
+        } catch (e) { /* ignore */ }
+        // Add a document-level delegated fallback so clicks are captured
+        const delegateKey = `icon-delegate-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingDelegate = this.eventHandlers.get(delegateKey);
+        if (existingDelegate) {
+            try { document.removeEventListener('click', existingDelegate, true); } catch (e) {}
+        }
+        const delegate = (ev) => {
+            try {
+                // Use strict matching: desktop should not match the mobile container and vice-versa.
+                const sel = isMobile ? '.unified-search-container.mobile .searchbar-icon' : '.unified-search-container:not(.mobile) .searchbar-icon';
+                if (ev.target && ev.target.closest && ev.target.closest(sel)) {
+                    if (this.debug && console && console.debug) console.debug('unified-search: delegated icon click detected', { isMobile });
+                    // call the same handler
+                    handler(ev);
+                }
+            } catch (e) { /* ignore */ }
+        };
+        this.eventHandlers.set(delegateKey, delegate);
+        // Capture phase ensures we see the click before other handlers possibly stop propagation
+        document.addEventListener('click', delegate, true);
         // make it look clickable
         iconWrapper.style.cursor = 'pointer';
     }
@@ -901,8 +942,6 @@ class SearchManager {
         // Set the appropriate preserve parameter based on active search type
         if (activeSearchType === 'tags') {
             newParams.set('preserve_tags', '1');
-        } else if (activeSearchType === 'folders') {
-            newParams.set('preserve_folders', '1');
         } else {
             // Default to notes or explicitly preserve notes
             newParams.set('preserve_notes', '1');
