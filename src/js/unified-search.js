@@ -1,8 +1,6 @@
 
 class SearchManager {
     constructor() {
-    // Debug logging enabled temporarily to trace search-type toggles
-    this.debug = true; // set false after debugging
     this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
@@ -136,14 +134,7 @@ class SearchManager {
      */
     setActiveSearchType(searchType, isMobile) {
         if (!this.searchTypes.includes(searchType)) return;
-        if (this.debug && console && console.debug) {
-            console.debug('setActiveSearchType start', { searchType, isMobile, prev: this.currentSearchType });
-            // Log a short stack trace so we can see who called this
-            try {
-                const stack = new Error().stack;
-                console.debug('setActiveSearchType caller stack', stack);
-            } catch (e) { /* ignore */ }
-        }
+        // start tracing removed; keep behavior unchanged
         
         const elements = this.getElements(isMobile);
         
@@ -173,11 +164,8 @@ class SearchManager {
     this.currentSearchType = searchType;
     // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
     try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
-    // debug info removed
-
+    // update UI
     this.updateInterface(isMobile);
-
-    if (this.debug && console && console.debug) console.debug('setActiveSearchType end', { new: this.currentSearchType });
 
     // If switching into 'notes' search, (re-)apply highlights now that state is set
     if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
@@ -690,7 +678,6 @@ class SearchManager {
 
             // Reinitialize components
             this.reinitializeAfterAjax(searchState);
-            if (this.debug) console.debug('handleAjaxResponse done');
 
         } catch (error) {
             // Fallback to page reload
