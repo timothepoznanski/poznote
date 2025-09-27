@@ -100,6 +100,7 @@ $is_generating = false;
         var noteWorkspace = <?php echo $workspace ? json_encode($workspace) : 'undefined'; ?>;
     </script>
     <script src="js/ai-summary.js"></script>
+    <script src="js/copy-code-on-focus.js"></script>
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');

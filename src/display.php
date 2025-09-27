@@ -81,6 +81,7 @@ include 'functions.php';
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
+    <script src="js/copy-code-on-focus.js"></script>
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){

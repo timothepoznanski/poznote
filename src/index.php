@@ -1057,5 +1057,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>
+<script src="js/copy-code-on-focus.js"></script>
 
 </html>
