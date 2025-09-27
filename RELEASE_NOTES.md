@@ -1,4 +1,4 @@
-# Poznote — Simplified release notes (User features only)
+# Poznote — Simplified release notes
 
 2025-09-27 — Add option to duplicate a note
 2025-09-26 — Add option to copy a code block to the clipboard (long press the block for 2 seconds)
