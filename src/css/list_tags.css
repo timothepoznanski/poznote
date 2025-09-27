@@ -1,18 +1,21 @@
-/* Styles pour la page de tags */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
 
-/* Reset spécifique pour éviter les conflits avec index.css et index-mobile.css */
-body.tags-page {
-    overflow: auto !important;
-    position: static !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    display: block !important;
-    flex-direction: unset !important;
+@font-face {
+  font-family: 'Inter';
+  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
 }
 
 html.tags-page {
     overflow: auto !important;
     height: auto !important;
+    font-family: 'Inter', sans-serif;
 }
 
 .tags-container {
@@ -32,25 +35,6 @@ html.tags-page {
     gap: 20px;
     margin: 20px 30px;
     position: relative;
-}
-
-.trash-back-button,
-.trash-empty-button {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-
-.trash-back-button:hover,
-.trash-empty-button:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-}
-
-.trash-button-icon {
-    text-align: center;
-    font-size: 20px;
-    color: #007DB8;
 }
 
 .tags-header {

@@ -87,18 +87,14 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tags - Poznote</title>
-	<link type="text/css" rel="stylesheet" href="css/index.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="css/images.css" />
-	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
-	<link type="text/css" rel="stylesheet" href="css/listtags.css"/>
-	<link type="text/css" rel="stylesheet" href="css/listtags-mobile.css"/>
+	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 </head>
 <body class="tags-page"<?php echo !empty($excluded_folders) ? ' data-has-exclusions="true"' : ''; ?>>
 	<div class="tags-container">
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
-				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
+				<i class="fa-arrow-circle-left trash-button-icon"></i>
 			</div>
 			<h1 class="tags-header">Tags</h1>
 		</div>
@@ -106,7 +102,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		<!-- Show excluded folders info if any -->
 		<?php if (!empty($excluded_folders)): ?>
 		<div class="excluded-folders-info" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 8px 12px; margin-bottom: 15px; font-size: 0.9em;">
-			<i class="fas fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
+			<i class="fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
 			<strong>Folder exclusions active:</strong> <?php echo htmlspecialchars(implode(', ', $excluded_folders)); ?>
 		</div>
 		<?php endif; ?>
@@ -143,7 +139,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		</div>
 	</div>
 	
-	<script src="js/listtags.js"></script>
+	<script src="js/list_tags.js"></script>
 	<script>
 		// Expose current workspace to the tags page JS so redirects include it
 		var pageWorkspace = <?php echo $workspace !== null ? json_encode($workspace) : 'undefined'; ?>;

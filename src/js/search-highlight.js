@@ -35,11 +35,26 @@ function highlightSearchTerms() {
         }
     }
     
-    // Additional fallback: if we're on mobile and no explicit search type is set, default to notes
+    // Additional fallback: when on mobile, prefer explicit state from SearchManager
+    // or hidden inputs. Do not unconditionally assume notes on mobile as that
+    // causes folder searches to still highlight titles.
     var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (!isNotesActive && isMobile) {
-        // In mobile, if no specific type is detected, assume notes search for highlighting
-        isNotesActive = true;
+        try {
+            if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+                var sm = window.searchManager.getActiveSearchType(true);
+                if (sm === 'notes') {
+                    isNotesActive = true;
+                }
+            }
+            // Fallback to checking hidden inputs if SearchManager isn't present
+            if (!isNotesActive) {
+                var hiddenNotesMobile = document.getElementById('search-in-notes-mobile')?.value === '1';
+                if (hiddenNotesMobile) isNotesActive = true;
+            }
+        } catch (e) {
+            // ignore and remain conservative (don't assume notes)
+        }
     }
 
     if (!isNotesActive) {
@@ -80,6 +95,12 @@ function highlightInElement(element, searchWords) {
     
     // Special handling for input elements (like note titles)
     if (element.tagName === 'INPUT' && element.type === 'text') {
+        // Ensure the input is visible and rendered; if not, skip overlay logic
+        var elStyle = window.getComputedStyle(element);
+        var rects = element.getClientRects();
+        if (elStyle.display === 'none' || elStyle.visibility === 'hidden' || element.offsetWidth === 0 || rects.length === 0 || element.offsetParent === null) {
+            return 0; // no overlays for hidden inputs (visible heading will be highlighted instead)
+        }
         var inputValue = element.value;
         
         // Create a combined regex pattern for all search words
@@ -272,6 +293,10 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var inputStyle = window.getComputedStyle(inputElement);
     var paddingLeft = parseInt(inputStyle.paddingLeft) || 0;
     var borderLeft = parseInt(inputStyle.borderLeftWidth) || 0;
+    var borderTop = parseInt(inputStyle.borderTopWidth) || 0;
+    var paddingTop = parseInt(inputStyle.paddingTop) || 0;
+    var paddingBottom = parseInt(inputStyle.paddingBottom) || 0;
+    var borderBottom = parseInt(inputStyle.borderBottomWidth) || 0;
     
     // Get viewport scaling for mobile devices
     var viewport = document.querySelector('meta[name="viewport"]');
@@ -287,15 +312,92 @@ function positionOverlay(overlay, inputElement, offsetX, wordWidth) {
     var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     var scrollY = window.pageYOffset || document.documentElement.scrollTop;
     
+    // Position overlay to align with the input's content area (account for borders & padding)
+    // Use clientHeight so the overlay height matches the inner area where text is rendered
+    var contentTop = inputRect.top + scrollY + borderTop; // start after border
+    var overlayHeight = inputElement.clientHeight || (inputRect.height - borderTop - borderBottom);
+
+    // Try to align overlay to the text baseline by using the computed line-height
+    var computedLineHeight = parseFloat(inputStyle.lineHeight);
+    if (!computedLineHeight || isNaN(computedLineHeight)) {
+        computedLineHeight = parseFloat(inputStyle.fontSize) || overlayHeight;
+    }
+
+    // Clamp line height to available overlay height
+    var finalLineHeight = Math.min(computedLineHeight, overlayHeight);
+
+    // Center the overlay vertically on the text line inside the input
+    var topOffsetForText = Math.round((overlayHeight - finalLineHeight) / 2);
+    var overlayTop = contentTop + topOffsetForText;
+
     overlay.style.left = (inputRect.left + scrollX + paddingLeft + borderLeft + offsetX) + 'px';
-    overlay.style.top = (inputRect.top + scrollY) + 'px';
+    overlay.style.top = overlayTop + 'px';
     overlay.style.width = wordWidth + 'px';
-    overlay.style.height = inputRect.height + 'px';
-    overlay.style.lineHeight = inputRect.height + 'px';
+    overlay.style.height = finalLineHeight + 'px';
+    overlay.style.lineHeight = finalLineHeight + 'px';
     
     // Ensure overlay is visible on mobile
     overlay.style.zIndex = '1000';
     overlay.style.pointerEvents = 'none';
+}
+
+/**
+ * Measure the bounding rect of a substring inside a text input by creating
+ * a hidden mirror positioned over the real input. Returns {left, top, width, height}
+ * in viewport coordinates, or null if measurement failed.
+ */
+function measureWordRectInInput(inputElement, startIndex, word) {
+    try {
+        var inputRect = inputElement.getBoundingClientRect();
+        var style = window.getComputedStyle(inputElement);
+
+        var mirror = document.createElement('div');
+        mirror.style.position = 'absolute';
+    // Place mirror at the input's document coordinates (include page scroll)
+    mirror.style.left = (inputRect.left + (window.pageXOffset || document.documentElement.scrollLeft)) + 'px';
+    mirror.style.top = (inputRect.top + (window.pageYOffset || document.documentElement.scrollTop)) + 'px';
+        mirror.style.visibility = 'hidden';
+        mirror.style.whiteSpace = 'pre';
+        mirror.style.overflow = 'hidden';
+        mirror.style.boxSizing = style.boxSizing;
+    mirror.style.font = style.font;
+    mirror.style.fontFamily = style.fontFamily;
+    mirror.style.fontWeight = style.fontWeight;
+    mirror.style.fontStyle = style.fontStyle;
+    mirror.style.padding = style.padding;
+    mirror.style.border = style.border;
+    mirror.style.letterSpacing = style.letterSpacing;
+    mirror.style.wordSpacing = style.wordSpacing;
+    mirror.style.textTransform = style.textTransform;
+    mirror.style.textIndent = style.textIndent;
+    mirror.style.textAlign = style.textAlign;
+    mirror.style.width = inputRect.width + 'px';
+    mirror.style.height = inputRect.height + 'px';
+        mirror.style.lineHeight = style.lineHeight;
+
+        // Build nodes: before text, highlighted span, after text
+        var before = document.createTextNode(inputElement.value.substring(0, startIndex));
+        var span = document.createElement('span');
+        span.textContent = word;
+        span.style.display = 'inline-block';
+        // Ensure span has minimal styles to measure accurately
+        span.style.background = 'transparent';
+        var after = document.createTextNode(inputElement.value.substring(startIndex + word.length));
+
+        mirror.appendChild(before);
+        mirror.appendChild(span);
+        mirror.appendChild(after);
+
+        document.body.appendChild(mirror);
+
+        var rect = span.getBoundingClientRect();
+
+        document.body.removeChild(mirror);
+
+        return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    } catch (e) {
+        return null;
+    }
 }
 
 /**
@@ -312,24 +414,34 @@ function updateAllOverlayPositions() {
             var startIndex = parseInt(overlay.getAttribute('data-start-index'));
             var word = overlay.getAttribute('data-word');
             
-            // Recalculate position
-            var measurer = document.createElement('span');
-            measurer.style.position = 'absolute';
-            measurer.style.visibility = 'hidden';
-            measurer.style.whiteSpace = 'pre';
-            measurer.style.font = window.getComputedStyle(inputElement).font;
-            document.body.appendChild(measurer);
-            
-            var textBefore = inputElement.value.substring(0, startIndex);
-            measurer.textContent = textBefore;
-            var offsetX = measurer.offsetWidth;
-            
-            measurer.textContent = word;
-            var wordWidth = measurer.offsetWidth;
-            
-            document.body.removeChild(measurer);
-            
-            positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            // Use the centralized measurement helper to compute bounds for the word
+            var rect = measureWordRectInInput(inputElement, startIndex, word);
+            if (rect) {
+                // Convert rect.left/top (viewport coords) to offsets relative to input's content
+                var inputRect = inputElement.getBoundingClientRect();
+                var offsetX = rect.left - inputRect.left;
+                var wordWidth = rect.width;
+                positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            } else {
+                // Fallback to the older measurer technique if measurement failed
+                var measurer = document.createElement('span');
+                measurer.style.position = 'absolute';
+                measurer.style.visibility = 'hidden';
+                measurer.style.whiteSpace = 'pre';
+                measurer.style.font = window.getComputedStyle(inputElement).font;
+                document.body.appendChild(measurer);
+
+                var textBefore = inputElement.value.substring(0, startIndex);
+                measurer.textContent = textBefore;
+                var offsetX = measurer.offsetWidth;
+
+                measurer.textContent = word;
+                var wordWidth = measurer.offsetWidth;
+
+                document.body.removeChild(measurer);
+
+                positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            }
         } else {
             // Input element no longer exists, remove overlay
             overlay.remove();

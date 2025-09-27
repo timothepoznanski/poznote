@@ -1,0 +1,185 @@
+body {
+    background: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.settings-container {
+    max-width: 800px;
+    margin: 10px auto;
+    padding: 8px 12px;
+    display: block;
+}
+.back-link { display: inline-flex; margin-bottom: 10px; color: #007DB8; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.back-link:hover { color: #005a8a; }
+
+/* settings list: vertical simple rows */
+.settings-grid {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.settings-card {
+    background: transparent;
+    border-radius: 0;
+    padding: 12px 6px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    border-bottom: 1px solid #eef2f5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.settings-card:hover { background: rgba(15,23,42,0.02); }
+
+.settings-card-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+.settings-card-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.settings-card h3 { margin: 0; color: #1f2937; font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.ai-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+.ai-status.enabled { background: #dcfce7; color: #166534; }
+.ai-status.disabled { background: #fee2e2; color: #991b1b; }
+
+.fa-arrow-left-svg,
+.fa-arrow-left {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/arrow-left-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-user-svg,
+.fa-user {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/user-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-text-height-svg,
+.fa-text-height {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/text-height-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-smile-svg,
+.fa-smile {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    background-image: url('../images/icons-light-full.svg');
+    content: '';
+}
+
+.fa-calendar-alt-svg,
+.fa-calendar-alt,
+.fa-calendar {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/calendar-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-map-marker-alt-svg,
+.fa-map-marker-alt,
+.fa-map-marker {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/note-sticky-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-hashtag-svg,
+.fa-hashtag {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/hashtag-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+/* Button styles */
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+}

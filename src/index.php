@@ -11,29 +11,25 @@ requireAuth();
 ob_start();
 require_once 'config.php';
 require_once 'default_folder_settings.php';
+include 'functions.php';
 
 // Mobile detection by user agent (must be done BEFORE any output and never redefined)
-$is_mobile = false;
-if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $is_mobile = preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
-}
-
-include 'functions.php';
+$is_mobile = isMobileDevice();
 include 'db_connect.php';
 
-// Include les nouveaux fichiers modulaires
+// Include new modular files
 require_once 'page_init.php';
 require_once 'search_handler.php';
 require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
 
-// Initialisation des workspaces et labels
+// Initialization of workspaces and labels
 initializeWorkspacesAndLabels($con);
 
-// Initialisation des paramètres de recherche
+// Initialize search parameters
 $search_params = initializeSearchParams();
-extract($search_params); // Extrait les variables: $search, $tags_search, $note, etc.
+extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
@@ -48,7 +44,7 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Chargement des données de note
+// Load note data
 $note_data = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
 $default_note_folder = $note_data['default_note_folder'];
 $current_note_folder = $note_data['current_note_folder'];
@@ -62,7 +58,26 @@ $res_right = $note_data['res_right'];
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <?php include 'templates/head_includes.php'; ?>
+    <link type="text/css" rel="stylesheet" href="css/index.css"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
+    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
+    <script src="js/toolbar.js"></script>
+    <script src="js/note-loader-common.js"></script>
+    <script>
+        if (window.innerWidth <= 800 || /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent)) {
+            var mobileScript = document.createElement('script');
+            mobileScript.src = 'js/note-loader-mobile.js';
+            document.head.appendChild(mobileScript);
+        } else {
+            var desktopScript = document.createElement('script');
+            desktopScript.src = 'js/note-loader-desktop.js';
+            document.head.appendChild(desktopScript);
+        }
+    </script>
+    <script src="js/index-login-prompt.js"></script>
+    <script src="js/index-workspace-display.js"></script>
+    <script src="js/tasklist.js"></script>
 </head>
 
 <?php
@@ -154,6 +169,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         }
     };
     </script>
+
     <script>
     // Apply folder counts visibility based on settings stored in localStorage
     document.addEventListener('DOMContentLoaded', function() {
@@ -220,28 +236,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     </script>
 
     <div class="main-container">
+
     <script>
-    // Set workspace display map for JavaScript
-    window.workspaceDisplayMap = <?php
-        $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
-        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-    ?>;
+        // Set workspace display map for JavaScript
+        window.workspaceDisplayMap = <?php
+            $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
+            echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+        ?>;
     </script>
 
-    <!-- workspace selector removed (now shown under left header) -->
-
-
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     
     <!-- LEFT COLUMN -->	
     <div id="left_col">
-
-        <?php include 'templates/mobile_menu.php'; ?>
-
-        
-    <!-- MENU -->
-
-    <!-- Depending on the cases, we create the queries. -->  
         
     <?php
     // Construction des conditions de recherche sécurisées
@@ -254,10 +261,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
-    <!-- MENU -->
-
-    <?php include 'templates/desktop_menu.php'; ?>
-
+    <!-- MENU (Workspace name + search bar) left colum -->
+    <?php include 'menu_mobile.php'; ?>
+    <?php include 'menu_desktop.php'; ?>
         
     <script>
     // Set configuration variables for the main page
@@ -316,8 +322,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Get total notes count for folder opening logic
         $total_notes = getTotalNotesCount($con, $workspace_filter);
         
-        include 'templates/notes_list.php';
-                 
+        // Notes list left column
+        include 'notes_list.php';                 
     ?>
 
     </div>
@@ -336,7 +342,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fas fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>Note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -355,7 +361,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Folder item
         var folderItem = document.createElement('button');
         folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fas fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>Folder';
         folderItem.onclick = function() {
             newFolder();
             createMenu.remove();
@@ -364,15 +370,26 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Task list item
         var taskListItem = document.createElement('button');
         taskListItem.className = 'create-menu-item';
-        taskListItem.innerHTML = '<i class="fas fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
+        taskListItem.innerHTML = '<i class="fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
         taskListItem.onclick = function() {
             createTaskListNote();
+            createMenu.remove();
+        };
+
+        // Workspace item
+        var workspaceItem = document.createElement('button');
+            workspaceItem.className = 'create-menu-item';
+            workspaceItem.innerHTML = '<i class="fa-layer-group" style="margin-right: 10px; color: #007DB8;"></i>Workspace';
+        workspaceItem.onclick = function() {
+            // Navigate to the workspaces management page
+            window.location = 'workspaces.php';
             createMenu.remove();
         };
         
         createMenu.appendChild(noteItem);
         createMenu.appendChild(folderItem);
         createMenu.appendChild(taskListItem);
+    createMenu.appendChild(workspaceItem);
         
         var plusButton = document.querySelector('.sidebar-plus');
         if (plusButton && plusButton.parentNode) {
@@ -503,56 +520,61 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $home_button_class .= ' desktop-home-btn';
                 }
                 
-                // Use goBackToNoteList function for better mobile experience if no search parameters
-                if (empty($home_params)) {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fas fa-home"></i></button>';
+                // For mobile, prefer the client-side handler so it can preserve the active search/folder state
+                // For desktop with explicit home params, use the server-generated URL
+                if ($is_mobile) {
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 } else {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fas fa-home"></i></button>';
+                    if (empty($home_params)) {
+                        echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
+                    } else {
+                            echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'">' . "<i class=\"fa-home\"></i></button>";
+                    }
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)
                 $text_format_class = $is_mobile ? '' : ' text-format-btn';
                 $note_action_class = $is_mobile ? '' : ' note-action-btn';
-                echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fas fa-bold"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fas fa-italic"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fas fa-underline"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-strikethrough'.$text_format_class.'" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fas fa-strikethrough"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-link'.$text_format_class.'" title="Link" onclick="addLinkToNote()"><i class="fas fa-link"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-unlink'.$text_format_class.'" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fas fa-unlink"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-color'.$text_format_class.'" title="Text color" onclick="toggleRedColor()"><i class="fas fa-palette"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-highlight'.$text_format_class.'" title="Highlight" onclick="toggleYellowHighlight()"><i class="fas fa-fill-drip"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ul'.$text_format_class.'" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fas fa-list-ul"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ol'.$text_format_class.'" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fas fa-list-ol"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-text-height'.$text_format_class.'" title="Font size" onclick="changeFontSize()"><i class="fas fa-text-height"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fas fa-code"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fas fa-terminal"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fas fa-eraser"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-strikethrough'.$text_format_class.'" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-link'.$text_format_class.'" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-unlink'.$text_format_class.'" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fa-unlink"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-color'.$text_format_class.'" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-highlight'.$text_format_class.'" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-list-ul'.$text_format_class.'" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-list-ol'.$text_format_class.'" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-text-height'.$text_format_class.'" title="Font size" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
              
                 // Note action buttons (desktop only)
                     if (!$is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     // Save button first, then separator (minus) to match requested order
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                     // AI actions dropdown menu (only if AI is enabled)
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown">';
                         echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<i class="fa-align-left"></i>';
                         echo '<span>Summarize note</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-search"></i>';
+                        echo '<i class="fa-search"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-tags"></i>';
+                        echo '<i class="fa-tags"></i>';
                         echo '<span>AI tags</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fas fa-cog"></i>';
+                        echo '<i class="fa-cog"></i>';
                         echo '<span>AI settings</span>';
                         echo '</div>';
                         echo '</div>';
@@ -573,13 +595,11 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
-                    $star_class = 'far'; // Always outline
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
-                    
-                    echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Share / Download dropdown (export or public share)
                     echo '<div class="share-dropdown">';
@@ -595,10 +615,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class_extra.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" data-action="download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '<i class="fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
                     echo '<div class="share-menu-item" data-action="public" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -654,8 +674,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                 } else {
                     // Individual buttons for mobile (always visible)
                     // Calculate number of attachments for mobile button
@@ -669,28 +689,28 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Note action buttons 
                     // AI actions dropdown menu for mobile (only if AI is enabled)
-                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fas fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     // Save button first for mobile, then separator (minus)
-                    echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fas fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fas fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
                         echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-align-left"></i>';
+                        echo '<i class="fa-align-left"></i>';
                         echo '<span>Summarize note</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-search"></i>';
+                        echo '<i class="fa-search"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fas fa-tags"></i>';
+                        echo '<i class="fa-tags"></i>';
                         echo '<span>AI tags</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fas fa-cog"></i>';
+                        echo '<i class="fa-cog"></i>';
                         echo '<span>AI settings</span>';
                         echo '</div>';
                         echo '</div>';
@@ -699,13 +719,12 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     
                     // Favorites button with star icon
                     $is_favorite = $row['favorite'] ?? 0;
-                    $star_class = 'far'; // Always outline
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="'.$star_class.' fa-star star-icon"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fas fa-folder"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fas fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     // Mobile: use share dropdown as well (simpler menu)
                     echo '<div class="share-dropdown mobile">';
                     // Mobile: reflect shared state too
@@ -719,10 +738,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<button type="button" class="toolbar-btn btn-share'.$share_class_mobile.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<div class="share-menu" id="shareMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="share-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fas fa-download"></i><span>Download HTML</span>';
+                    echo '<i class="fa-download"></i><span>Download HTML</span>';
                     echo '</div>';
                     echo '<div class="share-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fas fa-link"></i><span>Share publicly (read-only)</span>';
+                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -773,18 +792,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fas fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fas fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                 }
                 
                 echo '</div>';
                 echo '</div>';
                 
-                // Tags only (folder selection removed)
+                // Tags container: keep a hidden input for JS but remove the visible icon/input.
+                // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                 echo '<div class="note-tags-row">';
-                echo '<span class="fa fa-tag icon_tag"></span>';
+                echo '<span class="fa-tag icon_tag"></span>';
                 echo '<span class="name_tags">'
-                    .'<input class="add-margin" size="70px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Add tags here" onfocus="updateidtags(this);" id="tags'.$row['id'].'" type="text" placeholder="Tags ?" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
+                    .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                 .'</span>';
                 echo '</div>';
                 
@@ -793,7 +813,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $attachments_data = json_decode($row['attachments'], true);
                     if (is_array($attachments_data) && !empty($attachments_data)) {
                         echo '<div class="note-attachments-row">';
-                        echo '<span class="fas fa-paperclip icon_attachment"></span>';
+                        echo '<span class="fa-paperclip icon_attachment"></span>';
                         echo '<span class="note-attachments-list">';
                         $attachment_links = [];
                         foreach ($attachments_data as $attachment) {
@@ -859,10 +879,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 
                 // Get font size from settings based on device
                 $font_size = '16';
-                $is_mobile = preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i', $_SERVER['HTTP_USER_AGENT']);
+                $is_mobile_for_font = isMobileDevice();
                 
                 try {
-                    $setting_key = $is_mobile ? 'note_font_size_mobile' : 'note_font_size_desktop';
+                    $setting_key = $is_mobile_for_font ? 'note_font_size_mobile' : 'note_font_size_desktop';
                     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
                     $stmt->execute([$setting_key]);
                     $font_size_value = $stmt->fetchColumn();
@@ -914,7 +934,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 </div>
                 <div id="aiSummaryError">
                     <div class="error-content">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
                         <p id="errorMessage"></p>
                     </div>
                 </div>
@@ -928,10 +948,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn">
-                    <i class="fas fa-copy"></i> Copy
+                    <i class="fa-copy"></i> Copy
                 </button>
                 <button id="regenerateSummaryBtn" class="btn btn-primary" onclick="regenerateCurrentSummary()">
-                    <i class="fas fa-redo"></i> Regenerate
+                    <i class="fa-redo"></i> Regenerate
                 </button>
                 <button class="btn btn-secondary" onclick="closeAISummaryModal()">Close</button>
             </div>
@@ -1037,5 +1057,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>
+<script src="js/copy-code-on-focus.js"></script>
 
 </html>

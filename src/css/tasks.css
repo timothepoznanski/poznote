@@ -1,5 +1,3 @@
-/* Task List Styles */
-
 .task-list-container {
     padding: 10px 0;
     font-family: inherit;
@@ -149,7 +147,6 @@
 .task-delete-btn {
     padding: 4px 8px;
     background: transparent;
-    color: #dc3545;
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -161,14 +158,12 @@
     justify-content: center;
 }
 
-.task-delete-btn:hover {
-    opacity: 1;
-    background: #ffebee;
-    color: #b71c1c;
+.task-delete-btn i {
+    font-size: 18px;
 }
 
-.task-delete-btn i {
-    font-size: 10px;
+.task-important-btn i {
+    font-size: 18px;
 }
 
 /* Important task styling */
@@ -185,7 +180,6 @@
 .task-important-btn {
     padding: 4px 8px;
     background: transparent;
-    color: #c62828;
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -196,77 +190,33 @@
     justify-content: center;
 }
 
-.task-important-btn:hover {
-    opacity: 1;
-    background: rgba(198,40,40,0.06);
+.task-icon-trash {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/trash-can-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.task-important-btn i { font-size: 12px; }
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-    .task-input-container {
-        gap: 6px;
-    }
-
-    .task-input {
-        padding: 6px 10px;
-        font-size: 16px; /* Prevent zoom on iOS */
-    }
-
-    .task-add-btn {
-        padding: 6px 10px;
-        min-width: 32px;
-    }
-
-    .task-item {
-        padding: 6px 10px;
-        gap: 8px;
-    }
-
-    .task-text {
-        font-size: 16px; /* Prevent zoom on iOS */
-    }
-
-    .task-edit-input {
-        font-size: 16px; /* Prevent zoom on iOS */
-    }
+.task-icon-star {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/star-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Dark mode support (if needed) */
-@media (prefers-color-scheme: dark) {
-    .task-input {
-        background: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
-    }
-
-    .task-input:focus {
-        border-color: #007DB8;
-    }
-
-    .task-item {
-        background: #1a202c;
-        border-color: #2d3748;
-    }
-
-    .task-item:hover {
-        background: #2d3748;
-        border-color: #4a5568;
-    }
-
-    .task-item.completed {
-        background: #1a4d3a;
-        border-color: #2d6b4f;
-    }
-
-    .task-text {
-        color: #e2e8f0;
-    }
-
-    .task-edit-input {
-        background: #2d3748;
-        border-color: #007DB8;
-        color: #e2e8f0;
-    }
+/* Red star icon for important tasks */
+.task-item.important .task-icon-star {
+  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(7466%) hue-rotate(344deg) brightness(93%) contrast(103%);
 }

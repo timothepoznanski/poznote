@@ -30,9 +30,6 @@ $workspace_filter = isset($_GET['workspace']) ? trim($_GET['workspace']) : '';
 $preserve_notes = !empty($_GET['preserve_notes']);
 $preserve_tags = !empty($_GET['preserve_tags']);
 
-// Mobile detection (simple version)
-$is_mobile = isMobile();
-
 try {
     // Build secure query for the specific note
     $where_conditions = ["trash = 0", "heading = ?"];

@@ -458,11 +458,19 @@ function showInputModal(title, placeholder, defaultValue, callback) {
     
     var titleElement = document.getElementById('inputModalTitle');
     var inputElement = document.getElementById('inputModalInput');
-    
+    var confirmBtn = document.getElementById('inputModalConfirmBtn');
+    var labelElem = document.getElementById('inputModalLabel');
+
     titleElement.textContent = title;
+    // Use placeholder as the field label when provided (eg. 'New folder name')
+    // if (labelElem) labelElem.textContent = (placeholder && placeholder.length) ? placeholder : title;
     inputElement.placeholder = placeholder || '';
     inputElement.value = defaultValue || '';
     inputModalCallback = callback;
+
+    // Optional confirm button text: 5th argument
+    var confirmText = arguments.length >= 5 ? arguments[4] : 'OK';
+    if (confirmBtn) confirmBtn.textContent = confirmText;
     
     modal.style.display = 'flex';
     setTimeout(function() {
@@ -478,11 +486,12 @@ function createInputModal() {
         '<h3 id="inputModalTitle">Title</h3>' +
         '</div>' +
         '<div class="modal-body">' +
+        '<label id="inputModalLabel" for="inputModalInput" style="display:block; margin-bottom:6px; font-weight:600;"></label>' +
         '<input type="text" id="inputModalInput" placeholder="Enter text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
         '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-secondary" onclick="closeInputModal()">Cancel</button>' +
-        '<button type="button" class="btn btn-primary" onclick="executeInputModalAction()">OK</button>' +
+        '<div class="modal-buttons">' +
+        '<button type="button" class="btn-cancel" onclick="closeInputModal()">Cancel</button>' +
+        '<button type="button" id="inputModalConfirmBtn" class="btn-primary" onclick="executeInputModalAction()">OK</button>' +
         '</div>' +
         '</div>' +
         '</div>';
@@ -550,16 +559,16 @@ function createLinkModal() {
         '<div class="modal-body">' +
         '<div style="margin-bottom: 10px;">' +
         '<label for="linkModalUrl" style="display: block; font-weight: bold; margin-bottom: 5px;">URL:</label>' +
-        '<input type="url" id="linkModalUrl" placeholder="https://example.com" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
+        '<input type="url" id="linkModalUrl" placeholder="https://example.com" />' +
         '</div>' +
         '<div>' +
         '<label for="linkModalText" style="display: block; font-weight: bold; margin-bottom: 5px;">Link text (optional):</label>' +
-        '<input type="text" id="linkModalText" placeholder="Displayed text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
+        '<input type="text" id="linkModalText" placeholder="Displayed text" />' +
         '</div>' +
         '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-secondary" id="linkModalCancel">Cancel</button>' +
-        '<button type="button" class="btn btn-primary" id="linkModalAdd">Add</button>' +
+    '<div class="modal-buttons">' +
+    '<button type="button" class="btn btn-cancel" id="linkModalCancel">Cancel</button>' +
+    '<button type="button" class="btn btn-primary" id="linkModalAdd">Add</button>' +
         '</div>' +
         '</div>' +
         '</div>';

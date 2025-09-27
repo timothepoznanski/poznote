@@ -97,6 +97,25 @@ function getAttachmentsRelativePath() {
 }
 
 /**
+ * Get the current workspace filter from GET/POST parameters
+ * @return string The workspace name, defaults to 'Poznote'
+ */
+function getWorkspaceFilter() {
+    return $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+}
+
+/**
+ * Detect if the current request is from a mobile device
+ * @return bool True if mobile device detected, false otherwise
+ */
+function isMobileDevice() {
+    if (!isset($_SERVER['HTTP_USER_AGENT'])) {
+        return false;
+    }
+    return preg_match('/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/', strtolower($_SERVER['HTTP_USER_AGENT'])) ? true : false;
+}
+
+/**
  * Check if AI features are enabled
  */
 function isAIEnabled() {

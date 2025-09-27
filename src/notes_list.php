@@ -21,7 +21,7 @@ try {
 
 echo "<div class='folder-header' data-folder='Trash'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fas fa-trash folder-icon'></i>";
+echo "<i class='fa-trash folder-icon'></i>";
 echo "<span class='folder-name'>Trash</span>";
 echo "<span class='folder-note-count' id='count-Trash'>(" . $trash_count . ")</span>";
 echo "</div></div>";
@@ -58,7 +58,7 @@ try {
 
 echo "<div class='folder-header' data-folder='Tags'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fas fa-tags folder-icon'></i>";
+echo "<i class='fa-tags folder-icon'></i>";
 echo "<span class='folder-name'>Tags</span>";
 echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
@@ -92,9 +92,9 @@ foreach($folders as $folderName => $notes) {
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
-            echo "<i class='far fa-star folder-icon'></i>";
+            echo "<i class='fa-star-light folder-icon'></i>";
         } else {
-            echo "<i class='fas $chevron_icon folder-icon'></i>";
+            echo "<i class='$chevron_icon folder-icon'></i>";
         }
         
         // Workspace-aware default folder handling in UI

@@ -1,0 +1,25 @@
+/* Styles for the public (shared) note view */
+body {
+    background: #f7f7f7;
+    font-family: 'Inter', sans-serif;
+}
+.public-note {
+    max-width: 900px;
+    margin: 18px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+}
+.public-note h1 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: #0f172a;
+}
+.public-note .meta {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+}
+.public-note .content { /* container for note HTML */ }
+.public-note img { max-width: 100%; height: auto; }

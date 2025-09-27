@@ -1,10 +1,3 @@
-<?php
-/**
- * Template for all modals in index.php
- * Expected variables: $defaultFolderName
- */
-?>
-
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
@@ -35,7 +28,6 @@
 <!-- Login Display Name Modal -->
 <div id="loginDisplayModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeLoginDisplayModal()">&times;</span>
         <h3>Login display name</h3>
         <p>Set the name shown on the login screen.</p>
         <input type="text" id="loginDisplayInput" placeholder="Display name" maxlength="255" />
@@ -51,7 +43,6 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Note Font Size</h2>
-            <span class="close" id="closeFontSizeModal">&times;</span>
         </div>
         <div class="modal-body">
             <p>Select the default font size for your notes:</p>
@@ -97,12 +88,13 @@
 <!-- Modal for creating new folder -->
 <div id="newFolderModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('newFolderModal')">&times;</span>
-        <h3>Create New Folder</h3>
-        <input type="text" id="newFolderName" placeholder="Folder name" maxlength="255" onkeypress="if(event.key==='Enter') createFolder()">
+        <h3>New Folder</h3>
+        <div class="modal-body" style="margin-bottom: 10px;">
+            <input type="text" id="newFolderName" placeholder="New folder name" maxlength="255" style="width:100%; padding:8px 12px; margin-bottom:0; border:1px solid #ddd; border-radius:4px; font-size:14px; font-family:'Inter',sans-serif; box-sizing:border-box;" onkeypress="if(event.key==='Enter') createFolder()">
+        </div>
         <div class="modal-buttons">
-            <button onclick="createFolder()">Create</button>
-            <button onclick="closeModal('newFolderModal')">Cancel</button>
+            <button type="button" class="btn-cancel" onclick="closeModal('newFolderModal')">Cancel</button>
+            <button type="button" class="btn-primary" onclick="createFolder()">Create</button>
         </div>
     </div>
 </div>
@@ -110,7 +102,6 @@
 <!-- Modal for moving note to folder -->
 <div id="moveNoteModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('moveNoteModal')">&times;</span>
         <h3>Change folder</h3>
         <p>Move "<span id="moveNoteTitle"></span>" to:</p>
         <select id="moveNoteFolder">
@@ -126,18 +117,18 @@
 <!-- Modal for moving note to folder from toolbar -->
 <div id="moveNoteFolderModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('moveNoteFolderModal')">&times;</span>
         <h3>Move Note to Folder</h3>
         
         <!-- Workspace selection -->
         <div class="form-group">
-            <label for="workspaceSelect">Workspace:</label>
+            <label for="workspaceSelect">Select Workspace destination:</label>
+            <br><br>
             <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
                 <!-- Workspaces will be loaded here -->
             </select>
         </div>
         
-        <p>Search or enter a folder name:</p>
+        <div>Search or enter a folder name:</div>
         
         <!-- Smart folder search/input -->
         <div class="folder-search-container">
@@ -177,7 +168,6 @@
 <!-- Modal for editing folder name -->
 <div id="editFolderModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('editFolderModal')">&times;</span>
         <h3>Rename Folder</h3>
         <input type="text" id="editFolderName" placeholder="New folder name" maxlength="255">
         <div class="modal-buttons">
@@ -199,46 +189,15 @@
     </div>
 </div>
 
-<!-- Modal for attachments -->
-<div id="attachmentModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('attachmentModal')">&times;</span>
-        <h3>Manage Attachments</h3>
-        <div class="attachment-upload">
-            <div class="file-input-container">
-                <label for="attachmentFile" class="file-input-label">
-                    Choose a file
-                    <input type="file" id="attachmentFile" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar" class="file-input-hidden">
-                </label>
-                <div id="acceptedTypes" class="accepted-types">Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)</div>
-            </div>
-            <div class="spacer-18"></div>
-            <div id="selectedFileName" class="selected-filename"></div>
-            <div class="upload-button-container">
-                <button onclick="uploadAttachment()">Upload File</button>
-            </div>
-            <div id="attachmentErrorMessage" class="modal-error-message"></div>
-        </div>
-        <div id="attachmentsList" class="attachments-list">
-            <!-- Attachments will be loaded here -->
-        </div>
-        <div class="modal-buttons">
-            <button onclick="closeModal('attachmentModal')">Close</button>
-        </div>
-    </div>
-</div>
-
 <!-- Modal for moving all files from one folder to another -->
 <div id="moveFolderFilesModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('moveFolderFilesModal')">&times;</span>
         <h3>Move All Files</h3>
         <p>Move all files from "<span id="sourceFolderName"></span>" to:</p>
         <select id="targetFolderSelect">
             <option value="">Select target folder...</option>
         </select>
         <div id="folderFilesCount" class="modal-info-message">
-            <i class="fas fa-info-circle"></i>
             <span id="filesCountText"></span>
         </div>
         <div class="modal-buttons">
@@ -246,5 +205,51 @@
             <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
         </div>
         <div id="moveFilesErrorMessage" class="modal-error-message"></div>
+    </div>
+</div>
+
+<!-- Move notes modal (for workspaces.php) -->
+<div id="moveNotesModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Move notes from <span id="moveSourceName"></span></h3>
+        <div class="form-group">
+            <label for="moveTargetSelect">Select target workspace</label>
+            <select id="moveTargetSelect">
+            </select>
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmMoveBtn" class="btn btn-primary">Move notes</button>
+            <button onclick="closeMoveModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rename modal (for workspaces.php) -->
+<div id="renameModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Rename workspace <span id="renameSource"></span></h3>
+        <div class="form-group">
+            <label for="renameNewName">New name</label>
+            <input id="renameNewName" type="text" />
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmRenameBtn" class="btn btn-primary">Rename</button>
+            <button onclick="closeRenameModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal (for workspaces.php) -->
+<div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Confirm delete workspace <span id="deleteWorkspaceName"></span></h3>
+        <p>Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.</p>
+        <div class="form-group">
+            <input id="confirmDeleteInput" type="text" placeholder="Type workspace name to confirm" />
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmDeleteBtn" class="btn btn-danger" disabled>Delete workspace</button>
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+        </div>
     </div>
 </div>

@@ -1,0 +1,368 @@
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    color: rgb(55, 53, 47);
+}
+
+body {
+    height: 100%;
+}
+
+/* Conteneur principal pour les pages de paramètres */
+.settings-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
+}
+
+/* Sections de paramètres */
+.settings-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 10px;
+}
+
+/* Groupes de formulaires */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Liste des espaces de travail */
+.workspace-list {
+    margin-top: 20px;
+}
+
+.workspace-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background-color: white;
+    transition: box-shadow 0.2s;
+}
+
+.workspace-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Colonnes de la liste des workspaces */
+.ws-col {
+    display: flex;
+    align-items: center;
+    /* padding: 0 10px; */
+}
+
+.ws-col-name {
+    flex: 2;
+    min-width: 200px;
+}
+
+.ws-col-action {
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 150px;
+}
+
+/* Bloc de nom du workspace */
+.ws-name-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.workspace-name-item {
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+}
+
+.workspace-count {
+    font-size: 12px;
+    color: #666;
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+/* Boutons d'action */
+.action-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 5px;
+}
+
+.action-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.btn-rename {
+    background-color: #ffc107;
+    color: white;
+    border-color: #ffc107;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-rename:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+.btn-delete-ws {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-delete-ws:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+
+/* Indicateur de chargement */
+.loading-workspaces {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px;
+}
+
+.loading-workspaces i {
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Message vide */
+.empty-workspaces {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+/* Statistiques des workspaces */
+.workspace-stats {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007DB8;
+    display: block;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Icon styles for attachments page */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 5px;
+}
+
+.btn-icon:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-download:hover {
+    color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-delete:hover {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.workspace-list .action-btn:active { transform: translateY(1px); }
+
+/* Disabled / grayed buttons */
+.btn[disabled], .btn.disabled {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    opacity: 0.95;
+}
+
+/* Ensure delete column has consistent spacing */
+.ws-col-delete { justify-content: center; }
+
+/* Lock icon for default workspace */
+.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
+
+/* Responsive: stack controls on small screens */
+@media (max-width: 600px) {
+    .workspace-list ul li {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 8px;
+        padding: 10px 6px;
+        border-bottom: 1px solid #eee;
+    }
+    .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ws-col-name { padding-left: 0; font-size: 1rem; }
+    .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
+    .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
+}
+
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #005a8a;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-warning {
+    background: #ffc107;
+    /* color: #212529; */
+}
+
+.btn-warning:hover {
+    background: #e0a800;
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.form-group input[type="text"], 
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px 40px 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}

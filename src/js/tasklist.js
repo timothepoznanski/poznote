@@ -26,6 +26,11 @@ function initializeTaskList(noteId, noteType) {
         }
     }
 
+    // Ensure all tasks have noteId set
+    tasks.forEach(task => {
+        if (!task.noteId) task.noteId = noteId;
+    });
+
     // Replace the contenteditable div with task list interface
     renderTaskList(noteId, tasks);
 }
@@ -41,11 +46,11 @@ function renderTaskList(noteId, tasks) {
           <input type="text" class="task-input" id="task-input-${noteId}"
               placeholder="Add new task..." maxlength="4000">
                 <button class="task-add-btn" onclick="addTask(${noteId})">
-                    <i class="fas fa-plus"></i>
+                    <i class="fa-plus"></i>
                 </button>
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
-                ${renderTasks(tasks)}
+                ${renderTasks(tasks, noteId)}
             </div>
         </div>
     `;
@@ -71,11 +76,11 @@ function renderTaskList(noteId, tasks) {
 }
 
 // Render individual tasks
-function renderTasks(tasks) {
+function renderTasks(tasks, noteId) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = task.important ? 'fas fa-star' : 'far fa-star';
+        const starClass = task.important ? 'task-icon-star' : 'task-icon-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         return `
@@ -86,7 +91,7 @@ function renderTasks(tasks) {
                 <i class="${starClass}"></i>
             </button>
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="fas fa-trash"></i>
+                <i class="task-icon-trash"></i>
             </button>
         </div>
         `;
@@ -127,7 +132,7 @@ function addTask(noteId) {
     // Re-render tasks
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
     if (tasksList) {
-        tasksList.innerHTML = renderTasks(tasks);
+        tasksList.innerHTML = renderTasks(tasks, noteId);
         // Re-enable DnD after DOM change
         enableDragAndDrop(noteId);
     }
@@ -314,7 +319,7 @@ function toggleImportant(taskId, noteId) {
     // Re-render tasks list
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
     if (tasksList) {
-        tasksList.innerHTML = renderTasks(tasks);
+        tasksList.innerHTML = renderTasks(tasks, noteId);
         // Re-enable DnD after reorder
         enableDragAndDrop(noteId);
     }
@@ -326,10 +331,10 @@ function toggleImportant(taskId, noteId) {
 function markNoteAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
     if (noteEntry) {
+        // Ensure noteid is set correctly for task lists
+        noteid = noteId;
         // Trigger the existing save mechanism
-        editedButNotSaved = 1;
-        updateident(noteEntry);
-        setSaveButtonRed(true);
+        updateNote();
     }
 }
 
@@ -400,6 +405,7 @@ function enableDragAndDrop(noteId) {
         try {
             const sortable = new Sortable(tasksList, {
                 animation: 150,
+                handle: '.task-text', // Only allow dragging by the task text
                 onEnd: function(evt) {
                     // sortable onEnd
 
@@ -477,7 +483,9 @@ function enableDragAndDrop(noteId) {
         }
 
         tasksList.addEventListener('dragstart', function(e) {
-            const item = e.target.closest('.task-item');
+            const textSpan = e.target.closest('.task-text');
+            if (!textSpan) return;
+            const item = textSpan.closest('.task-item');
             if (!item) return;
             draggedId = item.dataset.taskId;
             e.dataTransfer.effectAllowed = 'move';
@@ -538,7 +546,7 @@ function enableDragAndDrop(noteId) {
             // Re-render and re-enable handlers
             const listEl = document.getElementById(`tasks-list-${noteId}`);
             if (listEl) {
-                listEl.innerHTML = renderTasks(tasks);
+                listEl.innerHTML = renderTasks(tasks, noteId);
                 // allow tiny timeout to ensure DOM nodes are present
                 setTimeout(() => enableDragAndDrop(noteId), 0);
             }
@@ -562,8 +570,10 @@ function enableDragAndDrop(noteId) {
         function onPointerDown(e) {
             // Only left button or touch
             if (e.pointerType === 'mouse' && e.button !== 0) return;
-            const target = e.target.closest('.task-item');
-            if (!target) return;
+            const textSpan = e.target.closest('.task-text');
+            if (!textSpan) return;
+
+            const target = textSpan.closest('.task-item');
 
             // Prepare state
             pointerDragState = {
@@ -684,7 +694,7 @@ function enableDragAndDrop(noteId) {
                         noteEntry.dataset.tasks = JSON.stringify(newTasks);
                         const listEl = document.getElementById(`tasks-list-${state.noteId}`);
                         if (listEl) {
-                            listEl.innerHTML = renderTasks(newTasks);
+                            listEl.innerHTML = renderTasks(newTasks, state.noteId);
                             setTimeout(() => enableDragAndDrop(state.noteId), 0);
                         }
                         markNoteAsModified(state.noteId);

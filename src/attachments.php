@@ -37,15 +37,12 @@ if (!$note) {
 <head>
     <title>Manage Attachments - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/attachments.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fas fa-paperclip"></i> Manage Attachments</h1>
+        <h1>Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
     <a href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
@@ -56,11 +53,10 @@ if (!$note) {
 
         <!-- Upload Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-upload"></i> Upload New Attachment</h3>
+            <h3>Upload New Attachment</h3>
             
             <div class="attachment-upload-section">
                 <div class="form-group">
-                    <label for="attachmentFile">Choose File</label>
                     <input type="file" id="attachmentFile" class="file-input" onchange="showFileName()">
                     <div class="accepted-types">
                         Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)
@@ -69,7 +65,7 @@ if (!$note) {
                 </div>
                 
                 <button type="button" onclick="uploadAttachment(event)" class="btn btn-primary" id="uploadBtn" disabled>
-                    <i class="fas fa-upload"></i> Upload File
+                    Upload File
                 </button>
             </div>
             
@@ -83,10 +79,10 @@ if (!$note) {
 
         <!-- Attachments List Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-list"></i> Current Attachments</h3>
+            <h3>Current Attachments</h3>
             <div id="attachmentsList" class="attachments-display">
                 <div class="loading-attachments">
-                    <i class="fas fa-spinner fa-spin"></i> Loading attachments...
+                    Loading attachments...
                 </div>
             </div>
         </div>
@@ -124,7 +120,7 @@ if (!$note) {
                 else if (isPDF) iconType = 'file-pdf';
                 
                 let htmlContent = `<div class="selected-file-info">
-                    <i class="fas fa-${iconType}"></i> 
+                    
                     <span>${fileName} (${fileSize})</span>
                 </div>`;
                 
@@ -144,7 +140,6 @@ if (!$note) {
                     reader.onload = function(e) {
                         htmlContent += `<div class="pdf-preview">
                             <embed src="${e.target.result}" type="application/pdf" width="200" height="150" style="border-radius: 4px; margin-top: 10px;">
-                            <p style="font-size: 12px; color: #666; margin-top: 5px;">Aperçu PDF</p>
                         </div>`;
                         fileNameDiv.innerHTML = htmlContent;
                     };
@@ -267,7 +262,7 @@ if (!$note) {
             const container = document.getElementById('attachmentsList');
             
             if (attachments.length === 0) {
-                container.innerHTML = '<div class="no-attachments"><i class="fas fa-info-circle"></i> No attachments yet</div>';
+                container.innerHTML = '<div class="no-attachments">No attachments yet</div>';
                 return;
             }
             
@@ -290,12 +285,12 @@ if (!$note) {
                     previewContent = `<div class="pdf-thumbnail" onclick="previewPDF('${fileUrl}', '${fileName}')">
                         <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
                         <div class="pdf-overlay">
-                            <i class="fas fa-file-pdf"></i>
+                            
                             <span>PDF</span>
                         </div>
                     </div>`;
                 } else {
-                    previewContent = `<i class="fas fa-${getFileIcon(fileName)}"></i>`;
+                    previewContent = "";
                 }
                 
                 html += `
@@ -312,10 +307,19 @@ if (!$note) {
                         </div>
                         <div class="attachment-actions">
                             <button onclick="downloadAttachment('${attachment.id}')" class="btn-icon btn-download" title="Download">
-                                <i class="fas fa-download"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
                             </button>
                             <button onclick="deleteAttachment('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
-                                <i class="fas fa-trash"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3,6 5,6 21,6"></polyline>
+                                    <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -328,17 +332,17 @@ if (!$note) {
         function getFileIcon(fileName) {
             const ext = fileName.split('.').pop().toLowerCase();
             switch (ext) {
-                case 'pdf': return 'file-pdf';
+                case 'pdf': return 'file-lines-light-full.svg';
                 case 'doc':
-                case 'docx': return 'file-word';
+                case 'docx': return 'file-lines-light-full.svg';
                 case 'xls':
-                case 'xlsx': return 'file-excel';
+                case 'xlsx': return 'file-lines-light-full.svg';
                 case 'ppt':
-                case 'pptx': return 'file-powerpoint';
-                case 'txt': return 'file-alt';
+                case 'pptx': return 'file-lines-light-full.svg';
+                case 'txt': return 'file-lines-light-full.svg';
                 case 'zip':
-                case 'rar': return 'file-archive';
-                default: return 'file';
+                case 'rar': return 'file-lines-light-full.svg';
+                default: return 'file-lines-light-full.svg';
             }
         }
 
@@ -376,10 +380,10 @@ if (!$note) {
                 <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
                 <div class="pdf-preview-actions">
                     <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
-                        <i class="fas fa-external-link-alt"></i> Ouvrir dans un nouvel onglet
+                        Ouvrir dans un nouvel onglet
                     </button>
                     <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
-                        <i class="fas fa-download"></i> Télécharger
+                        Télécharger
                     </button>
                 </div>
             </div>
@@ -501,7 +505,7 @@ if (!$note) {
             if (type === 'success' && message === 'File uploaded successfully!') {
                 notification.textContent = message;
             } else {
-                notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+                notification.innerHTML = message;
             }
 
             const container = document.querySelector('.settings-container');

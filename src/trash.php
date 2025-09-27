@@ -25,7 +25,7 @@ function linkify_html($text) {
 }
 
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
-$pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
+$pageWorkspace = trim(getWorkspaceFilter());
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -34,12 +34,9 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 <title>Trash - Poznote</title>
-	<link type="text/css" rel="stylesheet" href="css/index.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modal.css"/>
-	<link rel="stylesheet" href="css/images.css" />
-	<link type="text/css" rel="stylesheet" href="css/index-mobile.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
-	<link type="text/css" rel="stylesheet" href="css/trash-mobile.css"/>
+	<link type="text/css" rel="stylesheet" href="css/trash_mobile.css"/>
 </head>
 <body class="trash-page">
 	<div class="trash-container">
@@ -49,7 +46,7 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 			<div class="trash-search-notice">
 				Results for "<?php echo htmlspecialchars($search); ?>"
 		<span class="trash-clear-search" onclick="window.location='trash.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>'">
-					<i class="fas fa-times"></i>
+					<i class="fa-times"></i>
 				</span>
 			</div>
 		<?php endif; ?>
@@ -67,12 +64,12 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 		</form>
 		
 		<div class="trash-buttons-container">
-			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
-				<i class="fas fa-arrow-circle-left trash-button-icon"></i>
-			</div>
-			<div class="trash-button trash-empty-button" id="emptyTrashBtn" title="Empty trash">
-				<i class="fa fa-trash-alt trash-button-icon"></i>
-			</div>
+			<button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
+				Back to notes
+			</button>
+			<button class="btn btn-danger" id="emptyTrashBtn" title="Empty trash">
+				Empty trash
+			</button>
 		</div>
 		
 		<div class="trash-content">
@@ -156,8 +153,8 @@ $pageWorkspace = trim($_GET['workspace'] ?? $_POST['workspace'] ?? '');
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="Restore this note" class="fa fa-trash-restore-alt icon_restore_trash" data-noteid="'.$id.'"></i>'
-					.'<i title="Delete permanently" class="fas fa-trash icon_trash_trash" data-noteid="'.$id.'"></i>'
+					.'<i title="Restore this note" class="fa-trash-restore-alt-svg" data-noteid="'.$id.'"></i>'
+					.'<i title="Delete permanently" class="fa-trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">Last modified on '.$updated.'</div>'
 					.'<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>'

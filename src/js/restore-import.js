@@ -57,10 +57,10 @@ function toggleAdvancedImport() {
     
     if (advancedOptions.style.display === 'none') {
         advancedOptions.style.display = 'block';
-        toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Advanced Import Options';
+        toggleButton.innerHTML = '<i class="fa-chevron-up"></i> Hide Advanced Import Options';
     } else {
         advancedOptions.style.display = 'none';
-        toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i> Show Advanced Import Options';
+        toggleButton.innerHTML = '<i class="fa-chevron-down"></i> Show Advanced Import Options';
     }
 }
 

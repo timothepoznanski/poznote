@@ -271,35 +271,33 @@ function createBackup() {
 <head>
     <title>Backup (Export) - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
+    <link rel="stylesheet" href="css/backup_export.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="backup-container">
-        <h1><i class="fas fa-upload"></i> Backup (Export)</h1>
+        <h1>Backup (Export)</h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
-        <a href="restore_import.php" class="btn btn-secondary">
-            Go to Restore (Import)
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
         </a>
 
     <br><br>
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3><i class="fas fa-archive"></i> Complete Backup</h3>
+            <h3>Complete Backup</h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                    <?php echo htmlspecialchars($message); ?>
                 </div>
             <?php endif; ?>
             <?php if (!empty($error)): ?>
                 <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                    <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>

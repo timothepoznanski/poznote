@@ -3,7 +3,7 @@
 function showAttachmentDialog(noteId) {
     var ws = selectedWorkspace || 'Poznote';
     var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
-    window.location.href = 'manage_attachments.php?note_id=' + noteId + wsParam;
+    window.location.href = 'attachments.php?note_id=' + noteId + wsParam;
 }
 
 function showAttachmentError(message) {
@@ -131,10 +131,10 @@ function displayAttachments(attachments) {
         html += '</div>';
         html += '<div class="attachment-actions">';
         html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="Download">';
-        html += '<i class="fas fa-download"></i>';
+        html += '<i class="fa-download"></i>';
         html += '</button>';
         html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Supprimer" class="delete-btn">';
-        html += '<i class="fas fa-trash"></i>';
+        html += '<i class="fa-trash"></i>';
         html += '</button>';
         html += '</div>';
         html += '</div>';

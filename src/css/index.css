@@ -63,37 +63,6 @@
     min-height: 1.5em;
 }
 
-/* (welcome page styles removed) */
-
-/* Workspace list alignment: use a fixed 4-column grid so action buttons align consistently */
-.workspace-list ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-}
-.workspace-list ul li {
-    display: grid;
-    /* Use 3 action columns now that the Select column was removed: name | rename | move | delete */
-    /* Fix name column width so action buttons have consistent space */
-    grid-template-columns: 220px repeat(3, 140px);
-    align-items: center;
-    gap: 18px; /* uniform spacing between action columns */
-    margin: 14px 0;
-    min-height: 56px;
-    justify-items: center; /* center items in their grid cells */
-}
-.workspace-name-item {
-    grid-column: 1;
-    /* padding-left: 8px; */
-    font-size: 1rem;
-}
-.ws-col { display: flex; align-items: center; }
-.ws-col-name { justify-content: flex-start; padding-left: 8px; justify-self: start; }
-.ws-col-select { justify-content: center; }
-.ws-col-action { justify-content: center; gap: 12px; }
-.ws-col-move { justify-content: center; }
-.ws-col-delete { justify-content: center; }
-
 /* Note list subline (created date & subheading) */
 .note-subline {
     font-size: 0.95em; /* slightly smaller than normal */
@@ -155,62 +124,6 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
     transition: transform 0.12s ease, box-shadow 0.12s ease;
     margin: 0; /* ensure uniform spacing controlled by gap on the container */
 }
-.workspace-list .action-btn:active { transform: translateY(1px); }
-
-/* Disabled / grayed buttons */
-.btn[disabled], .btn.disabled {
-    background: #e9ecef !important;
-    color: #6c757d !important;
-    border-color: #ddd !important;
-    cursor: not-allowed;
-    box-shadow: none !important;
-    opacity: 0.95;
-}
-
-/* Ensure delete column has consistent spacing */
-.ws-col-delete { justify-content: center; }
-
-/* Lock icon for default workspace */
-.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
-
-/* Responsive: stack controls on small screens */
-@media (max-width: 600px) {
-    .workspace-list ul li {
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-        gap: 8px;
-        padding: 10px 6px;
-        border-bottom: 1px solid #eee;
-    }
-    .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .ws-col-name { padding-left: 0; font-size: 1rem; }
-    .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
-    .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
-}
-.delete-form { margin: 0; }
-.delete-form .btn { margin: 0; }
-.workspace-list ul li > .ws-col .action-btn { margin: 0; }
-.workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
-.workspace-list .btn-danger:hover { background: #c43b3b; }
-/* Ensure destructive buttons inside modals are visually prominent */
-.modal .btn-danger {
-    background: #e04b4b;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-.modal .btn-danger:hover {
-    background: #c43b3b;
-}
-/* .btn-rename visibility controlled earlier */
-.workspace-list .btn-rename {
-    display: inline-flex;
-    background: #f0ad4e; /* orange */
-    color: #111;
-    border: none;
-}
-/* (welcome responsive styles removed) */
 
 @font-face {
     font-family: 'Inter';
@@ -422,13 +335,13 @@ a:active { color: #2E8CFA; } */
     color: #005a8a !important;
 }
 
-.btn-attachment.has-attachments i::before {
+.btn-attachment.has-attachments i {
     /* adjust icon tint to match the blue color */
     filter: none !important;
     color: #007DB8 !important;
 }
 
-.btn-attachment.has-attachments:hover i::before {
+.btn-attachment.has-attachments:hover i {
     filter: none !important;
     color: #005a8a !important;
 }
@@ -468,6 +381,10 @@ body {
     flex-shrink: 0;
 }
 
+#left_col::-webkit-scrollbar {
+    display: none;
+}
+
 /* Sidebar header and primary action */
 .sidebar-header {
     /* padding: 6px 0 14px 0; */
@@ -498,7 +415,7 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-plus { background: transparent; border: none; color: #007DB8; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
-.sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; }
+/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
 
 /* Align new note/folder rows with the search bar */
 .sidebar-newnote-row { padding: 6px 0 8px 0; }
@@ -575,7 +492,7 @@ body {
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
 
 /* Folder actions icons keep small size */
-.folder-actions i { margin-left: 8px; color:#6b7280; cursor:pointer; }
+.folder-actions i { margin-left: 18px; color:#6b7280; cursor:pointer; font-size: 1.0em; }
 .folder-actions i:hover { color:#374151; }
 
 
@@ -703,6 +620,11 @@ body {
 }
 .create-menu-item:hover { background: #f6fbff; }
 
+/* Enlarge icons in create menu */
+.create-menu-item i {
+    font-size: 16px;
+}
+
 /* LEFT HEADER */
 
 .left-header {
@@ -775,9 +697,6 @@ body {
     order: 2;
 }
 
-/* Color-mode: replace toolbar icons with inline color selectors */
-.note-edit-toolbar.color-mode .toolbar-btn { display: none !important; }
-
 .note-edit-toolbar::-webkit-scrollbar {
     display: none;
 }
@@ -792,92 +711,73 @@ body {
     border: none !important;
     border-radius: 5px;
     padding: 6px 8px;
-    font-size: 1.1em;
+    font-size: 1.3em;
     cursor: pointer;
     margin: 0 6px;
     transition: color 0.2s;
-    color: #007DB8;
     outline: none;
     flex-shrink: 0;
-    min-width: 36px;
-    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
 }
 
-.toolbar-btn i {
-    display: block;
-    text-align: center;
-    line-height: 1;
-}
-.toolbar-btn:hover, .toolbar-btn:focus {
-    background: transparent !important;
-    border: none !important;
-    color: #005a8a;
+@media (min-width: 801px) {
+    .btn-home {
+        display: none !important;
+    }
 }
 
-    /* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
-    .text-format-btn {
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        width: 0;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
-    }
-    
-    .text-format-btn.show-on-selection {
-        opacity: 1;
-        visibility: visible;
-        position: relative;
-        width: auto;
-        padding: 6px 8px;
-        margin: 0 2px;
-        transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
-    }
-    
-    /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
-    .note-action-btn {
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
-        width: auto;
-        padding: 6px 8px;
-        margin: 0 4px;
-    }
-    
-    /* Ajustement de la toolbar pour les écrans desktop */
-    .note-edit-toolbar {
-        gap: 2px;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .toolbar-btn {
-        margin: 0 6px;
-        padding: 6px 8px;
-        min-width: 36px;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-    
-    .note-action-btn.hide-on-selection {
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        width: 0;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-    }
+/* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
+.text-format-btn {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
+}
+
+.text-format-btn.show-on-selection {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    width: auto;
+    padding: 6px 8px;
+    margin: 0 2px;
+    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
+}
+
+/* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
+.note-action-btn {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    width: auto;
+    padding: 6px 8px;
+    margin: 0 4px;
+}
+
+/* Ajustement de la toolbar pour les écrans desktop */
+.note-edit-toolbar {
+    gap: 2px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.note-action-btn.hide-on-selection {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
 
 .dropdown-menu {
     position: absolute;
@@ -917,6 +817,74 @@ body {
     width: 16px;
     text-align: center;
     color: #007DB8;
+}
+
+.workspace-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    display: none;
+    margin-top: 4px;
+}
+
+.workspace-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+    /* font-size: 14px; */
+}
+
+.workspace-menu-item:last-child {
+    border-bottom: none;
+}
+
+.workspace-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.workspace-menu-item.current-workspace {
+    background-color: #e3f2fd;
+    font-weight: 600;
+    color: #007DB8;
+}
+
+.workspace-menu-item i {
+    margin-right: 8px;
+    /* width: 16px; */
+    text-align: center;
+    color: #666;
+}
+
+.workspace-menu-item.current-workspace i {
+    color: #007DB8;
+}
+
+.workspace-menu-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 4px 0;
+}
+
+/* Mobile workspace dropdown adjustments */
+@media (max-width: 768px) {
+    .workspace-menu {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        min-width: 180px;
+        margin-top: 4px;
+    }
 }
 
 .note-header-spacer {
@@ -1056,18 +1024,6 @@ a.links_arbo_left.selected-note {
     justify-content: center;
 }
 
-/* Ensure the actual FontAwesome icon inside the searchbar has a consistent size
-   different fa-* glyphs can appear visually different; normalize to 1em */
-.searchbar-icon i,
-.searchbar-icon .fas,
-.searchbar-icon .far,
-.searchbar-icon .fab,
-.searchbar-icon .fa {
-    font-size: 0.9em; /* slightly smaller icons */
-    line-height: 1;
-    display: inline-block;
-}
-
 /* Highlight a tag when it matches an active tag search */
 .tag-highlight {
     background: #fff3b0; /* soft yellow */
@@ -1173,18 +1129,6 @@ img {
 }
 
 /* Image menu styles (similar to settings menu) */
-
-
-
-
-
-
-
-
-
-
-
-/* Image menu styles (similar to settings menu) */
 .image-menu {
     position: absolute;
     background: white;
@@ -1227,9 +1171,6 @@ img {
 
 /* Mobile responsiveness for image modals */
 @media (max-width: 768px) {
-    
-    
-    
     
     .image-preview-content {
         max-width: 98%;
@@ -1316,14 +1257,14 @@ img {
 }
 
 .fa-tag.icon_tag {
-    font-size: 12px;
+    font-size: 18px;
     margin-right: 8px;
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
 }
 
-.fa-tag.icon_tag::before {
+.fa-tag.icon_tag {
     background-image: url('../images/tags-light-full.svg') !important;
 } 
 
@@ -1348,6 +1289,118 @@ img {
     margin: 8px 5px;
     font-family: 'Inter', sans-serif !important;
     font-size: 15px;
+}
+
+/* Editable tags styling */
+.editable-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 24px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px;
+    transition: border-color 0.2s ease;
+    overflow: visible;
+}
+
+.clickable-tag-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f4f8;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.clickable-tag-wrapper:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.clickable-tag {
+    color: #007DB8;
+    padding: 4px 8px 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.clickable-tag:hover {
+    color: #005a8a;
+    text-decoration: none;
+}
+
+.clickable-tag:visited {
+    color: #007DB8;
+}
+
+.clickable-tag:hover:visited {
+    color: #005a8a;
+}
+
+.tag-delete-button {
+    color: #94a3b8;
+    padding: 4px 6px 4px 2px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.tag-delete-button:hover {
+    color: #ef4444;
+}
+
+/* When a tag wrapper is highlighted, give the delete button a subtle yellow background and stronger contrast */
+.clickable-tag-wrapper.tag-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #fff3b0;
+}
+
+.clickable-tag-wrapper.tag-highlight .clickable-tag {
+    color: #2b2b2b;
+}
+
+.clickable-tag-wrapper.tag-highlight .tag-delete-button {
+    background: rgba(0,0,0,0.06);
+    border-radius: 4px;
+    color: #7a3b00;
+}
+
+.tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #37352F;
+    min-width: 60px;
+    max-width: 150px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    resize: none;
+}
+
+.tag-input::placeholder {
+    color: #bababa;
+    font-style: italic;
+}
+
+.tag-input:focus {
+    outline: none;
+    background: rgba(0, 125, 184, 0.1);
+    border-radius: 4px;
 }
 
 /* ATTACHMENTS ROW */
@@ -1619,7 +1672,14 @@ img {
 
 .share-menu-item:hover { background-color: #f8f9fa; color: #007DB8; }
 
-.share-menu-item i { margin-right: 10px; width: 16px; text-align: center; color: #007DB8; }
+.share-menu-item i { 
+    margin-right: 10px; 
+    width: 16px; 
+    text-align: center; 
+    color: #007DB8; 
+    width: 20px !important;
+    font-size: 18px !important;
+}
 
 .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
 
@@ -1638,6 +1698,7 @@ img {
         z-index: 20000 !important;
         box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
     }
+
 }
 
 
@@ -1945,69 +2006,51 @@ hr {
 }
 
 /* Quand save est modifié, il reste rouge même au hover/focus */
-.toolbar-btn.save-modified i.fas.fa-save {
+.toolbar-btn.save-modified i.fa-save {
     color: #e53935 !important;
 }
-.toolbar-btn.save-modified:hover i.fas.fa-save,
-.toolbar-btn.save-modified:focus i.fas.fa-save {
+.toolbar-btn.save-modified:hover i.fa-save,
+.toolbar-btn.save-modified:focus i.fa-save {
     color: #e53935 !important;
 }
-.toolbar-btn.save-modified i.fas.fa-save::before {
+.toolbar-btn.save-modified i.fa-save {
     filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
 }
-.toolbar-btn.save-modified:hover i.fas.fa-save::before,
-.toolbar-btn.save-modified:focus i.fas.fa-save::before {
+.toolbar-btn.save-modified:hover i.fa-save,
+.toolbar-btn.save-modified:focus i.fa-save {
     filter: brightness(0) saturate(100%) invert(35%) sepia(70%) saturate(4824%) hue-rotate(349deg) brightness(86%) contrast(89%) !important;
 }
 /* Pour l'icône save normale, couleur gris foncé par défaut */
-.toolbar-btn:not(.save-modified) i.fas.fa-save {
+.toolbar-btn:not(.save-modified) i.fa-save {
     color: inherit;
 }
-.toolbar-btn:not(.save-modified) i.fas.fa-save::before {
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
-}
-/* Effet de survol bleu pour l'icône save normale */
-.toolbar-btn:not(.save-modified):hover i.fas.fa-save::before,
-.toolbar-btn:not(.save-modified):focus i.fas.fa-save::before {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-}
-.toolbar-btn i.fas.fa-palette,
-.toolbar-btn i.fas.fa-fill-drip {
+
+.toolbar-btn i.fa-palette,
+.toolbar-btn i.fa-fill-drip {
     color: inherit !important;
 }
 
 /* Couleurs par défaut des icônes */
-.toolbar-btn i.fas.fa-palette {
+.toolbar-btn i.fa-palette {
     color: #ff2222;
 }
 
-.toolbar-btn i.fas.fa-fill-drip {
+.toolbar-btn i.fa-fill-drip {
     color: #ffe066;
 }
 
-.toolbar-btn:hover i.fas.fa-palette,
-.toolbar-btn:focus i.fas.fa-palette {
+.toolbar-btn:hover i.fa-palette,
+.toolbar-btn:focus i.fa-palette {
     color: #ff2222 !important;
 }
 
-.toolbar-btn:hover i.fas.fa-fill-drip,
-.toolbar-btn:focus i.fas.fa-fill-drip {
+.toolbar-btn:hover i.fa-fill-drip,
+.toolbar-btn:focus i.fa-fill-drip {
     color: #ffe066 !important;
 }
 
-.toolbar-btn.btn-ai i.fas.fa-robot {
+.toolbar-btn.btn-ai i.fa-robot {
     display: none;
-}
-
-.toolbar-btn.btn-ai .fa-robot-svg {
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%);
-}
-
-/* Effet de survol bleu pour l'icône IA */
-.toolbar-btn.btn-ai:hover .fa-robot-svg,
-.toolbar-btn.btn-ai:focus .fa-robot-svg {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-    transform: scale(1.3);
 }
 
 .toolbar-btn.btn-ai.loading .fa-robot-svg {
@@ -2084,7 +2127,7 @@ hr {
 }
 
 .folder-icon {
-    font-size: 13px;
+    font-size: 1.2em;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
@@ -2109,28 +2152,42 @@ hr {
 }
 
 .folder-actions {
-    opacity: 0;
+    /* Keep the actions container visible so a single button can be shown
+       even when other buttons are hidden. Individual icons are hidden by
+       default instead (see .folder-actions i below). */
+    opacity: 1;
     transition: opacity 0.2s;
     margin-left: auto;
     flex: 0 0 auto;
 }
 
-.folder-toggle:hover .folder-actions {
+/* Hide individual action icons by default to reproduce the previous
+   hover-to-show behaviour while allowing a specific icon to remain visible */
+.folder-actions i {
+    opacity: 0;
+    transition: opacity 0.12s ease-in-out, color 0.12s;
+    pointer-events: none;
+}
+
+/* Reveal icons on folder hover (except ones forced visible by other rules) */
+.folder-toggle:hover .folder-actions i {
     opacity: 1;
+    pointer-events: auto;
 }
 
 /* search-only hiding to avoid interfering with general hidden class */
 .search-hidden { display: none !important; }
 
 .folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn, .folder-move-files-btn {
-    font-size: 12px;
+    /* font-size: 1em; */
     color: #007DB8;
     margin-left: 8px;
     cursor: pointer;
-    padding: 4px;
+    /* padding: 4px; */
     border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
+    /* transition: background-color 0.2s, color 0.2s; */
 }
+
 
 .folder-search-btn {
     color: #007DB8; /* Blue by default (included in search) */
@@ -2139,6 +2196,22 @@ hr {
 .folder-search-btn.excluded {
     color: #dc3545; /* Red when excluded from search */
     position: relative;
+    /* Force visibility even when other icons are hidden */
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    /* Subtle filter to make the icon visually 'redder' and stand out */
+    filter: drop-shadow(0 0 4px rgba(220,53,69,0.25));
+}
+
+/* Extra-specific selector to override other rules that might hide icons */
+.folder-actions i.folder-search-btn.excluded,
+.folder-toggle .folder-actions i.folder-search-btn.excluded {
+    display: inline-block !important;
+    opacity: 1 !important;
+    color: #dc3545 !important;
+    pointer-events: auto !important;
+    z-index: 5 !important;
+    transform: translateZ(0); /* trigger GPU to avoid rendering glitches */
 }
 
 /* Add a diagonal line over excluded folder search buttons */
@@ -2155,43 +2228,49 @@ hr {
     z-index: 1;
 }
 
-.folder-search-btn:hover {
+/* Change button background color */
+/* .folder-search-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
-}
+} */
 
-.folder-search-btn.excluded:hover {
+/* Change button background color */
+/* .folder-search-btn.excluded:hover {
     background-color: rgba(220, 53, 69, 0.2);
-}
+} */
 
-.folder-edit-btn:hover {
+/* Change button background color */
+/* .folder-edit-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
-}
+} */
 
 /* Hide edit button for default folder to prevent renaming */
 .default-folder .folder-edit-btn { display: none !important; }
 
-.folder-delete-btn:hover {
+/* Change button background color */
+/* .folder-delete-btn:hover {
     background-color: rgba(220, 53, 69, 0.2);
     color: #dc3545;
-}
+} */
 
-.folder-empty-btn:hover {
+/* Change button background color */
+/* .folder-empty-btn:hover {
     background-color: rgba(255, 193, 7, 0.2);
     color: #ffc107;
-}
+} */
 
-.folder-move-files-btn:hover {
+/* Change button background color */
+/* .folder-move-files-btn:hover {
     background-color: rgba(0, 125, 184, 0.2);
     color: #007DB8;
-}
+} */
 
 .folder-content {
     margin-left: 29px;
-    margin-bottom: 5px; /* Réduction de l'espace sous chaque dossier */
+    margin-bottom: 5px; /* Reduce space below each folder */
 }
 
 .note-in-folder {
-    margin-bottom: 0px !important; /* Suppression de l'espace entre les notes */
+    margin-bottom: 0px !important; /* Remove space between notes */
     position: relative;
     display: flex !important;
     align-items: center !important;
@@ -2230,391 +2309,6 @@ hr {
 .note-in-folder a.links_arbo_left.dragging {
     opacity: 0.5;
     transform: rotate(2deg);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    /* Modal uses flex layout when opened via JS (display: flex set dynamically) */
-    align-items: flex-start; /* place modal content at the top when visible */
-    justify-content: center;
-    padding: 20px 16px 16px 16px; /* smaller top padding to move modals upward */
-    box-sizing: border-box;
-    overflow: auto;
-}
-
-.modal-content {
-    background-color: #fefefe;
-    padding: 20px;
-    border: none;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 480px;
-    margin: 0 auto; /* horizontal center; vertical spacing comes from .modal padding */
-    font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    box-sizing: border-box;
-    /* prevent inner elements from causing horizontal overflow */
-    overflow-x: hidden;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: rgb(55, 53, 47);
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.modal-content input, .modal-content select {
-    width: 100%;
-    padding: 8px 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
-}
-
-.modal-content input:focus, .modal-content select:focus {
-    outline: none;
-    border-color: #007DB8;
-}
-
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    flex-shrink: 0;
-    margin-top: auto;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-    /* allow buttons to wrap instead of forcing a horizontal scroll */
-    flex-wrap: wrap;
-}
-
-.modal-buttons button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    transition: background-color 0.2s;
-    /* allow buttons to shrink on narrow viewports */
-    flex: 0 1 auto;
-    min-width: 0;
-}
-
-/* Ensure buttons and form controls inside modals never exceed the modal width */
-.modal-content .btn,
-.modal-content button,
-.modal-content input,
-.modal-content select,
-.modal-content textarea {
-    max-width: 100% !important;
-    box-sizing: border-box;
-}
-
-.modal-buttons button:first-child {
-    background-color: #007DB8;
-    color: white;
-}
-
-.modal-buttons button:first-child:hover {
-    background-color: #005a8a;
-}
-
-.modal-buttons button:last-child {
-    background-color: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
-}
-
-.modal-buttons button:last-child:hover {
-    background-color: #e9ecef;
-}
-
-/* Respect explicit button classes for modals (take precedence over first/last child rules) */
-.modal-buttons button.btn-primary {
-    background-color: #007DB8;
-    color: white;
-    border: none;
-}
-.modal-buttons button.btn-primary:hover {
-    background-color: #005a8a;
-}
-.modal-buttons button.btn-cancel {
-    background-color: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
-}
-.modal-buttons button.btn-cancel:hover {
-    background-color: #e9ecef;
-}
-
-/* Note Info Modal Specific Styles */
-#noteInfoModal .modal-content {
-    max-width: 450px;
-    text-align: left;
-}
-
-#noteInfoModal .modal-content h3 {
-    color: #007DB8;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #007DB8;
-    padding-bottom: 10px;
-}
-
-#noteInfoModal .modal-content h3 i {
-    margin-right: 8px;
-}
-
-#noteInfoModal .info-row {
-    display: flex;
-    align-items: center;
-    margin: 15px 0;
-    padding: 8px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    border-left: 3px solid #007DB8;
-}
-
-#noteInfoModal .info-row strong {
-    min-width: 180px;
-    color: #333;
-    font-weight: 600;
-}
-
-#noteInfoModal .info-row strong i {
-    margin-right: 6px;
-    color: #007DB8;
-    width: 16px;
-    text-align: center;
-}
-
-#noteInfoModal .info-value {
-    color: #555;
-    font-family: monospace;
-    background-color: #fff;
-    padding: 4px 8px;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-    flex: 1;
-    margin-left: 10px;
-}
-
-/* Update Modal Specific Styles */
-#updateModal .modal-content {
-    text-align: center;
-    max-width: 500px;
-}
-
-#updateModal .modal-content h3 {
-    color: #007DB8;
-    margin-bottom: 20px;
-}
-
-#updateModal .modal-content p {
-    margin: 15px 0;
-    line-height: 1.5;
-    color: #555;
-}
-
-#updateModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
-    border: none !important;
-}
-
-#updateModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-}
-
-#updateModal .btn-update {
-    background-color: #007DB8 !important;
-    color: white !important;
-    border: none !important;
-}
-
-#updateModal .btn-update:hover {
-    background-color: #0056b3 !important;
-}
-
-/* Update Check Modal Specific Styles */
-#updateCheckModal .modal-content {
-    text-align: center;
-    max-width: 400px;
-}
-
-#updateCheckModal .modal-content h3 {
-    color: #007DB8;
-    margin-bottom: 20px;
-}
-
-#updateCheckModal .modal-content p {
-    margin: 15px 0;
-    line-height: 1.5;
-    color: #555;
-}
-
-/* Confirmation Modal Specific Styles */
-#confirmModal .modal-content {
-    text-align: center;
-    max-width: 500px;
-}
-
-#confirmModal .modal-content h3 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-#confirmModal .modal-content p {
-    margin: 15px 0;
-    line-height: 1.5;
-    color: #555;
-    font-size: 16px;
-}
-
-#confirmModal .btn-primary {
-    background-color: #007DB8 !important;
-    color: white !important;
-    border: none !important;
-}
-
-#confirmModal .btn-primary:hover {
-    background-color: #0056b3 !important;
-}
-
-/* Ensure danger variant inside confirmModal is strongly red (overrides primary rules) */
-#confirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-#confirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
-}
-
-/* Explicit rules for the confirm button to avoid style conflicts */
-#confirmModal #confirmButton.btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
-    border: none !important;
-}
-
-#confirmModal #confirmButton.btn-danger:hover {
-    background-color: #c43b3b !important;
-}
-
-#confirmModal #confirmButton.btn-primary {
-    background-color: #007DB8 !important;
-    color: #fff !important;
-    border: none !important;
-}
-
-#confirmModal #confirmButton.btn-primary:hover {
-    background-color: #0056b3 !important;
-}
-
-/* Delete Folder Modal: make Delete prominent red and Cancel gray */
-#deleteFolderModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
-    border: none !important;
-}
-
-#deleteFolderModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-}
-
-#deleteFolderModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-#deleteFolderModal .btn-danger:hover {
-    background-color: #c43b3b !important;
-}
-
-/* Permanently Delete Note Modal: make Delete red and Cancel gray */
-#deleteConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
-    border: none !important;
-}
-
-#deleteConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-}
-
-#deleteConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-#deleteConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
-}
-
-/* Empty Trash Modal: make Empty Trash red and Cancel gray */
-#emptyTrashConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
-    border: none !important;
-}
-
-#emptyTrashConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-}
-
-#emptyTrashConfirmModal .btn-danger {
-    background-color: #e04b4b !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-#emptyTrashConfirmModal .btn-danger:hover {
-    background-color: #c43b3b !important;
-}
-
-/* Restore Confirmation Modal: make Restore primary blue and Cancel gray */
-#restoreConfirmModal .btn-cancel {
-    background-color: #6c757d !important;
-    color: white !important;
-    border: none !important;
-}
-
-#restoreConfirmModal .btn-cancel:hover {
-    background-color: #5a6268 !important;
-}
-
-#restoreConfirmModal .btn-primary {
-    background-color: #007DB8 !important;
-    color: white !important;
-    border: none !important;
-}
-
-#restoreConfirmModal .btn-primary:hover {
-    background-color: #0056b3 !important;
 }
 
 .close {
@@ -2756,19 +2450,12 @@ hr {
     color: white;
 }
 
-.folder-option .folder-name {
-    flex: 1;
-    font-weight: 500;
+.folder-name {
+    color: rgb(55, 53, 47);
 }
 
-.folder-option .note-count {
-    color: #888;
-    font-size: 12px;
-    margin-left: 8px;
-}
-
-.folder-option.selected .note-count {
-    color: rgba(255, 255, 255, 0.8);
+.folder-note-count {
+    color: #6b7280;
 }
 
 /* Create folder option styling */
@@ -2793,324 +2480,795 @@ hr {
     color: #007DB8 !important;
 }
 
-.no-folders-found {
-    padding: 20px;
-    text-align: center;
-    color: #888;
-    font-style: italic;
+/* Search highlight styles */
+.search-highlight {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+    font-weight: normal !important; /* Normal weight, not bold */
+    font-family: inherit !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    border-radius: 2px;
+    padding: 1px 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+    display: inline !important;
+    line-height: inherit !important;
 }
 
-/* Update modal buttons for new design */
-#moveNoteFolderModal .modal-buttons {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 15px;
-    margin-top: auto;
+.search-highlight.current {
+    background-color: #ff6b35 !important;
+    color: white !important;
+    font-weight: normal !important;
+    animation: highlightPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Input highlight overlay for precise word highlighting in input elements */
+.input-highlight-overlay {
+    background-color: #ffff00 !important;
+    opacity: 0.7;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
+}
+
+/* Note Loading State Styles */
+.note-loading-state {
     display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-#moveNoteFolderModal .modal-buttons button:first-child {
-    background-color: #007DB8;
-    color: white;
-    flex: 1;
-}
-
-#moveNoteFolderModal .modal-buttons button:first-child:hover {
-    background-color: #005a8a;
-}
-
-#moveNoteFolderModal .modal-buttons button:nth-child(2) {
-    background-color: #28a745;
-    color: white;
-    flex: 1;
-}
-
-#moveNoteFolderModal .modal-buttons button:nth-child(2):hover {
-    background-color: #218838;
-}
-
-.modal-error-message {
-    text-align: center;
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 4px;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    display: none;
-}
-
-.unified-search-container {
-    width: 100%;
-    max-width: 600px;
-    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
     flex-direction: column;
-    align-items: center;
 }
 
-.search-options-container {
-    margin-top: 8px;
-    padding: 0;
-    animation: fadeIn 0.3s ease-out;
-    display: flex;
-    justify-content: center;
+.loading-spinner {
+    text-align: center;
+    color: #666;
 }
 
-.search-type-pills {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+.loading-spinner i {
+    font-size: 2em;
+    margin-bottom: 15px;
+    color: #007bff;
 }
 
-.search-pill {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 14px;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #6c757d;
-    font-size: 0.8em;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    outline: none;
-    position: relative;
-    min-height: 28px;
-    user-select: none;
-    opacity: 0.8;
+.loading-spinner p {
+    margin: 0;
+    font-size: 1.1em;
 }
 
-.search-pill:hover {
-    background: #e9ecef;
-    border-color: #007DB8;
-    color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
-    opacity: 1;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.search-pill:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
+.fa-spin {
+    animation: spin 2s linear infinite;
 }
 
-.search-pill.active {
-    background: #f8f9fa;
-    border-color: #007DB8;
-    color: #007DB8;
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1);
-    opacity: 1;
+/* Smooth transition for note selection */
+.links_arbo_left {
+    transition: background-color 0.2s ease, border-left 0.2s ease;
 }
 
-.search-pill.active:hover {
-    background: #e9ecef;
-    border-color: #007DB8;
-    color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15);
+.links_arbo_left.selected-note {
+    background-color: transparent !important;
+    border-left: none !important;
 }
 
-.search-pill.active:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1);
+/* Custom SVG icons for index.php */
+
+/* spin helper */
+.fa-spin { -webkit-animation: fa-spin 2s infinite linear; animation: fa-spin 2s infinite linear; }
+@-webkit-keyframes fa-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(359deg); } }
+@keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
+
+/* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
+.btn-attachment.has-attachments .fa-paperclip {
+  /* tint paperclip SVG to app blue */
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
+  background-image: url('../images/paperclip-light-full.svg') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  content: '' !important; /* swap pseudo-element to use background-image */
 }
 
-.search-pill i {
-    font-size: 0.75em;
+/* Blue color for favorite star when it's marked as favorite - #007DB8 */
+.btn-favorite.is-favorite .fa-star-light {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-.search-pill span {
-    font-size: 0.8em;
+/* Blue color when a note is shared publicly */
+.btn-share.is-shared .fa-square-share-nodes-svg {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.fa-robot-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/robot-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Force correct appearance for active search pills on ALL devices */
-.search-pill.active,
-body .search-pill.active,
-html .search-pill.active {
-    background: #f8f9fa !important;
-    background-color: #f8f9fa !important;
-    border-color: #007DB8 !important;
-    color: #007DB8 !important;
-    box-shadow: 0 1px 3px rgba(0, 125, 184, 0.1) !important;
-    opacity: 1 !important;
+.fa-square-share-nodes-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/square-share-nodes-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-pill.active:hover,
-body .search-pill.active:hover,
-html .search-pill.active:hover {
-    background: #e9ecef !important;
-    background-color: #e9ecef !important;
-    border-color: #007DB8 !important;
-    color: #007DB8 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.15) !important;
+.fa-smile {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  background-image: url('../images/icons-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-pill.active:active,
-body .search-pill.active:active,
-html .search-pill.active:active {
-    background: #e9ecef !important;
-    background-color: #e9ecef !important;
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 125, 184, 0.1) !important;
+.fa-folder {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/folder-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Legacy search-type-btn styles - keep for JS compatibility */
-.search-type-btn {
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #b0b0b0;
-    font-size: 0.85em;
-    min-width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.fa-folder-open {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/folder-open-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-type-btn:hover {
-    background: rgba(0, 125, 184, 0.1);
+.fa-edit {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/pen-to-square-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-type-btn:hover i {
-    color: #007DB8;
+.fa-download {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/download-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-type-btn.active i {
-    color: #007DB8;
+.fa-maximize {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/maximize-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-type-btn.active:hover i {
-    color: #007DB8;
+.fa-trash {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/trash-can-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.searchbar-row {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    position: relative;
+.fa-save {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/floppy-disk-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Search validation error styles */
-.search-validation-error {
-    background-color: #ffebee;
-    color: #d32f2f;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 0.85em;
-    margin: 8px 0 4px 0;
-    border-left: 3px solid #d32f2f;
-    animation: slideDown 0.3s ease-out;
+.fa-link {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/link-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.fa-unlink {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/link-slash-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-.search-type-btn-error {
-    animation: shake 0.5s ease-in-out;
-    border-color: #d32f2f !important;
-    background-color: #ffebee !important;
+.fa-paperclip {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/paperclip-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
+.fa-minus {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/minus-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* CACHER LES BARRES DE SCROLL */
-
-/* Cacher la barre de scroll pour Webkit browsers (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    display: none;
+.fa-info-circle {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/info-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Cacher la barre de scroll pour Firefox */
-* {
-    scrollbar-width: none;
+.fa-search {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/magnifying-glass-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Alternative pour cacher toutes les barres de scroll */
-html, body, #left_col {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+.fa-star-light {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/star-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
 }
 
-#right_col {
-    -ms-overflow-style: auto;  /* Internet Explorer 10+ */
-    scrollbar-width: auto;  /* Firefox */
+.fa-layer-group {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/layer-group-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-html::-webkit-scrollbar, 
-body::-webkit-scrollbar, 
-#left_col::-webkit-scrollbar {
-    display: none;
+.fa-cog {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/gear-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-#right_col::-webkit-scrollbar {
-    display: block;
-    width: 8px;
+.fa-eye {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/eye-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-#right_col::-webkit-scrollbar-track {
-    background: #f1f1f1;
+.fa-home {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/house-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-#right_col::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
+.fa-bold {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/bold-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transition: transform 0.2s ease;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-#right_col::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+.fa-bold:hover {
+  transform: scale(1.2);
+  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
 }
 
-/* Hide webkit search controls (native blue cross) for all search inputs */
-.searchbar-input::-webkit-search-decoration,
-.searchbar-input::-webkit-search-cancel-button,
-.searchbar-input::-webkit-search-results-button,
-.searchbar-input::-webkit-search-results-decoration {
-    -webkit-appearance: none;
-    display: none;
+.fa-italic {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/italic-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
-/* Also apply to inputs with search class */
-.search::-webkit-search-decoration,
-.search::-webkit-search-cancel-button,
-.search::-webkit-search-results-button,
-.search::-webkit-search-results-decoration {
-    -webkit-appearance: none;
-    display: none;
+.fa-underline {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/underline-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
+
+.fa-eraser {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/eraser-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-strikethrough {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/strikethrough-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-palette {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/palette-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-fill-drip {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/highlighter-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-list-ul {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/list-ul-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-list-ol {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/list-ol-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-text-height {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/text-height-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-code {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/code-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-terminal {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/terminal-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-tag {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/tag-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-tags {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/tags-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-sign-out-alt {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/right-from-bracket-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-sync-alt {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/rotate-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-github {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/github-brands-solid-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-globe {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/earth-americas-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-upload {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/upload-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-arrow-left {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/arrow-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-info {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/info-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-file-alt {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/file-lines-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-plus {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('../images/plus-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-calendar-alt {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/calendar-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-code-branch {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/code-branch-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-map-marker-alt {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/note-sticky-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-user {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/user-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-hashtag {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/hashtag-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-check-light-full {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/check-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-align-left {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/align-left-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-copy {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/copy-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 
 /* General rule for any input that might have search type */
 input[type="search"]::-webkit-search-decoration,
@@ -3337,13 +3495,18 @@ input[type="search"]::-webkit-search-results-decoration {
     color: white;
 }
 
-.folder-option-icon {
-    margin-right: 8px;
-    color: #6c757d;
-    font-size: 14px;
+.folder-option.selected:hover {
+    background-color: #005a8a;
 }
 
-.folder-option.selected .folder-option-icon {
+.folder-option i {
+    margin-right: 8px;
+    color: #666;
+    width: 16px;
+    text-align: center;
+}
+
+.folder-option.selected i {
     color: white;
 }
 
@@ -3359,477 +3522,84 @@ input[type="search"]::-webkit-search-results-decoration {
     background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%);
 }
 
-.create-folder-option .folder-option-icon {
+.create-folder-option .folder-name {
     color: #007DB8;
+    font-weight: 500;
 }
 
-.modal-error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
+.create-folder-option i {
+    color: #007DB8 !important;
+}
+
+/* Search validation error styles */
+.search-validation-error {
+    background-color: #ffebee;
+    color: #d32f2f;
+    padding: 8px 12px;
     border-radius: 4px;
-    margin-top: 10px;
-    border: 1px solid #f5c6cb;
+    font-size: 0.85em;
+    margin: 8px 0 4px 0;
+    border-left: 3px solid #d32f2f;
+    animation: slideDown 0.3s ease-out;
 }
 
-/* Search highlight styles */
-.search-highlight {
-    background-color: #ffff00 !important;
-    color: #000 !important;
-    font-weight: normal !important; /* Normal weight, not bold */
-    font-family: inherit !important;
-    font-style: normal !important;
-    text-decoration: none !important;
-    border-radius: 2px;
-    padding: 1px 2px;
-    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
-    display: inline !important;
-    line-height: inherit !important;
-}
-
-.search-highlight.current {
-    background-color: #ff6b35 !important;
-    color: white !important;
-    font-weight: normal !important;
-    animation: highlightPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes highlightPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-/* Input highlight overlay for precise word highlighting in input elements */
-.input-highlight-overlay {
-    background-color: #ffff00 !important;
-    opacity: 0.7;
-    border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
-}
-
-/* Note Loading State Styles */
-.note-loading-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 300px;
-    flex-direction: column;
-}
-
-.loading-spinner {
-    text-align: center;
-    color: #666;
-}
-
-.loading-spinner i {
-    font-size: 2em;
-    margin-bottom: 15px;
-    color: #007bff;
-}
-
-.loading-spinner p {
-    margin: 0;
-    font-size: 1.1em;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.fa-spin {
-    animation: spin 2s linear infinite;
-}
-
-/* Smooth transition for note selection */
-.links_arbo_left {
-    transition: background-color 0.2s ease, border-left 0.2s ease;
-}
-
-.links_arbo_left.selected-note {
-    background-color: transparent !important;
-    border-left: none !important;
-}
-
-/* Styles responsive pour les modals sur mobile */
-@media (max-width: 768px) {
-    .modal-content {
-    margin: 0 auto;
-    width: calc(100% - 40px);
-    max-width: 480px;
-    margin-left: 20px;
-    margin-right: 20px;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
-    
-    .modal-content.ai-summary-simple {
-        margin: 0 auto;
-        width: calc(100% - 30px);
-        margin-left: 15px;
-        margin-right: 15px;
-        max-width: 480px;
-    }
-    
-    /* Menu AI mobile avec positionnement adapté */
-    .ai-dropdown.mobile .ai-menu {
-        position: fixed !important;
-        top: 120px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        margin-top: 0 !important;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        z-index: 99999 !important;
-    }
-    
-    .note-loading-state {
-        height: 200px;
-    }
-    
-    .loading-spinner i {
-        font-size: 1.5em;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Editable tags styling */
-.editable-tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-    min-height: 24px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    padding: 4px;
-    transition: border-color 0.2s ease;
-    overflow: visible;
-}
-
-.clickable-tag-wrapper {
-    display: inline-flex;
-    align-items: center;
-    background: #f0f4f8;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-}
-
-.clickable-tag-wrapper:hover {
-    background: #e2e8f0;
-    border-color: #cbd5e1;
-}
-
-.clickable-tag {
-    color: #007DB8;
-    padding: 4px 8px 4px 8px;
-    font-size: 13px;
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: none;
-    line-height: 1.2;
-}
-
-.clickable-tag:hover {
-    color: #005a8a;
-    text-decoration: none;
-}
-
-.clickable-tag:visited {
-    color: #007DB8;
-}
-
-.clickable-tag:hover:visited {
-    color: #005a8a;
-}
-
-.tag-delete-button {
-    color: #94a3b8;
-    padding: 4px 6px 4px 2px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    line-height: 1;
-}
-
-.tag-delete-button:hover {
-    color: #ef4444;
-}
-
-/* When a tag wrapper is highlighted, give the delete button a subtle yellow background and stronger contrast */
-.clickable-tag-wrapper.tag-highlight {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 6px;
-    border-radius: 8px;
-    background: #fff3b0;
-}
-
-.clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: #2b2b2b;
-}
-
-.clickable-tag-wrapper.tag-highlight .tag-delete-button {
-    background: rgba(0,0,0,0.06);
-    border-radius: 4px;
-    color: #7a3b00;
-}
-
-.tag-input {
-    border: none;
-    outline: none;
+.search-type-btn {
     background: transparent;
-    padding: 4px 8px;
-    font-size: 13px;
-    font-family: 'Inter', sans-serif;
-    color: #37352F;
-    min-width: 60px;
-    max-width: 150px;
-    flex-shrink: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    resize: none;
-}
-
-.tag-input::placeholder {
-    color: #bababa;
-    font-style: italic;
-}
-
-.tag-input:focus {
-    outline: none;
-    background: rgba(0, 125, 184, 0.1);
+    border: none;
     border-radius: 4px;
-}
-
-/* Hide emoji icons site-wide when user disables them in settings */
-.emoji-hidden .emoji-icon {
-    display: none !important;
-}
-
-/* Also hide FontAwesome smile icons, emoji toolbar buttons and the emoji picker when disabled */
-.emoji-hidden .fa-smile,
-.emoji-hidden .btn-emoji,
-.emoji-hidden .btn-emoji i,
-.emoji-hidden .emoji-picker {
-    display: none !important;
-}
-
-/* Exception: keep the smile icon visible inside the Settings card (#emoji-icons-card) */
-.emoji-hidden #emoji-icons-card .fa-smile,
-.emoji-hidden #emoji-icons-card i {
-    display: inline-block !important;
-    color: inherit !important;
-}
-
-/* Hide original input when showing editable tags */
-.name_tags.showing-editable-tags > input {
-    display: none;
-}
-
-.name_tags.showing-editable-tags {
-    overflow: visible;
-    white-space: normal;
-}
-
-/* Move folder files modal styles */
-#moveFolderFilesModal .modal-content {
-    max-width: 500px;
-}
-
-#moveFolderFilesModal h3 {
-    color: #333;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #007DB8;
-    padding-bottom: 8px;
-}
-
-#moveFolderFilesModal p {
-    margin-bottom: 15px;
-    color: #666;
-}
-
-#moveFolderFilesModal #sourceFolderName {
-    font-weight: bold;
-    color: #007DB8;
-}
-
-#moveFolderFilesModal #targetFolderSelect {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    margin-bottom: 15px;
-    background: white;
-}
-
-#moveFolderFilesModal #targetFolderSelect:focus {
-    outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
-}
-
-.modal-info-message {
-    background: rgba(0, 125, 184, 0.1);
-    border: 1px solid rgba(0, 125, 184, 0.3);
-    border-radius: 6px;
-    padding: 10px;
-    margin: 15px 0;
-    color: #005a84;
-}
-
-.modal-info-message i {
-    margin-right: 8px;
-    color: #007DB8;
-}
-
-#moveFolderFilesModal .btn-primary:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-#moveFolderFilesModal .btn-primary:disabled:hover {
-    background-color: #ccc;
-}
-
-/* Ensure moveFolderFilesModal buttons use class-based coloring regardless of DOM order */
-#moveFolderFilesModal .modal-buttons {
-    justify-content: flex-end; /* keep buttons to the right */
-}
-
-#moveFolderFilesModal .modal-buttons .btn-cancel {
-    background-color: #f8f9fa !important;
-    color: #333 !important;
-    border: 1px solid #ddd !important;
-}
-
-#moveFolderFilesModal .modal-buttons .btn-cancel:hover {
-    background-color: #e9ecef !important;
-}
-
-#moveFolderFilesModal .modal-buttons .btn-primary {
-    background-color: #007DB8 !important;
-    color: #fff !important;
-}
-
-#moveFolderFilesModal .modal-buttons .btn-primary:hover {
-    background-color: #0056b3 !important;
-}
-
-/* Small workspace button near settings */
-
-/* Make the small workspace button use the same styling as other header icon buttons */
-.small-workspace-btn {
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #b0b0b0;
+    font-size: 0.85em;
+    min-width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    margin: 4px;
+}
+
+.search-type-btn:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.search-type-btn:hover i {
     color: #007DB8;
-    font-size: 16px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-    user-select: none;
 }
 
-.small-workspace-btn:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-    color: #005a8a;
+.search-type-btn.active i {
+    color: #007DB8;
 }
 
-.workspace-dropdown {
-    position: relative;
-    display: inline-block;
+.search-type-btn.active:hover i {
+    color: #007DB8;
 }
 
-.workspace-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 200px;
-    z-index: 1000;
-    display: none;
-    margin-top: 4px;
-}
-
-.workspace-menu-item {
-    padding: 12px 16px;
-    cursor: pointer;
+.searchbar-row {
     display: flex;
     align-items: center;
-    transition: background-color 0.2s;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
+    width: 100%;
+    position: relative;
 }
 
-.workspace-menu-item:last-child {
-    border-bottom: none;
+/* Apply default gray filter (rgb(55, 53, 47)) to all icons not on hover */
+[class*="fa-"] {
+  filter: brightness(0) saturate(100%) invert(21%) sepia(8%) saturate(1075%) hue-rotate(17deg) brightness(94%) contrast(89%);
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.workspace-menu-item:hover {
-    background-color: #f8f9fa;
+[class*="fa-"]:hover {
+  transform: scale(1.18);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
-
-.workspace-menu-item.current-workspace {
-    background-color: #e3f2fd;
-    font-weight: 600;
-    color: #007DB8;
-}
-
-.workspace-menu-item i {
-    margin-right: 8px;
-    width: 16px;
-    text-align: center;
-    color: #666;
-}
-
-.workspace-menu-item.current-workspace i {
-    color: #007DB8;
-}
-
-.workspace-menu-divider {
-    height: 1px;
-    background-color: #e0e0e0;
-    margin: 4px 0;
-}
-
-/* Mobile workspace dropdown adjustments */
-@media (max-width: 768px) {
-    .workspace-menu {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
-        min-width: 180px;
-        margin-top: 4px;
-    }
-}
-
-/* Desktop home button visibility control */
-.desktop-home-btn {
-    display: none !important;
-}
-
-/* Show home button on desktop when left column is hidden (small screens) */
-@media (max-width: 1024px) {
-    .desktop-home-btn {
-        display: flex !important;
-    }
-}
-
-/* Hide home button on very small screens where mobile layout takes over */
-@media (max-width: 768px) {
-    .desktop-home-btn {
-        display: none !important;
-    }
-}
-

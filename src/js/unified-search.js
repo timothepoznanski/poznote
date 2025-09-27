@@ -1,26 +1,20 @@
-/**
- * Optimized Unified Search - Phase 1: Basic refactoring and cleanup
- * 
- * Key improvements:
- * 1. Centralized state management with SearchManager class
- * 2. Unified mobile/desktop handling
- * 3. Reduced code duplication
- * 4. Cleaner separation of concerns
- */
 
 class SearchManager {
     constructor() {
-    // Debug logging disabled by default
-    this.debug = false;
-        this.searchTypes = ['notes', 'tags', 'folders'];
+    this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
+    // When set, skip restore from recent user toggle (ms since epoch).
+    this._suppressUntil = 0;
     // When set, skip restore from URL during initialization (used after AJAX)
     this.suppressURLRestore = false;
     // Focus handling after AJAX: when true, reinitializeAfterAjax will restore focus
     this.focusAfterAjax = false;
     this.focusCaretPos = null;
         this.eventHandlers = new Map();
+    // Track which handlers are attached to which DOM element to avoid
+    // attaching multiple handlers to the same icon element (desktop vs mobile)
+    this._iconElementMap = new WeakMap();
         
         // Initialize both desktop and mobile
         this.initializeSearch();
@@ -37,8 +31,7 @@ class SearchManager {
             searchInput: document.getElementById(`unified-search${suffix}`),
             buttons: {
                 notes: document.getElementById(`search-notes-btn${suffix}`),
-                tags: document.getElementById(`search-tags-btn${suffix}`),
-                folders: document.getElementById(`search-folders-btn${suffix}`)
+                tags: document.getElementById(`search-tags-btn${suffix}`)
             },
             hiddenInputs: {
                 // Separate the "flag" inputs (search-in-*) from the term-carrying hidden inputs
@@ -46,7 +39,7 @@ class SearchManager {
                 notesTerm: document.getElementById(`search-notes-hidden${suffix}`),
                 tagsFlag: document.getElementById(`search-in-tags${suffix}`),
                 tagsTerm: document.getElementById(`search-tags-hidden${suffix}`),
-                folders: document.getElementById(`search-in-folders${suffix}`)
+                // folders removed
             },
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
         };
@@ -111,7 +104,7 @@ class SearchManager {
     // Check URL preferences and explicit search params
     const preserveNotes = urlParams.get('preserve_notes') === '1';
     const preserveTags = urlParams.get('preserve_tags') === '1';
-    const preserveFolders = urlParams.get('preserve_folders') === '1';
+    const preserveFolders = false;
     const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
     const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
     // debug info removed
@@ -119,19 +112,17 @@ class SearchManager {
     // Check hidden field values: flags vs term-bearing inputs
     const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
     const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
-    const hasFoldersValue = elements.hiddenInputs.folders?.value === '1';
+    const hasFoldersValue = false;
         
-        // Determine active search type
+    // If a recent user toggle was performed, avoid restoring from URL
+    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+
+    // Determine active search type
         // Prefer explicit URL params (tags_search / search) if present
         if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
-        } else if (hasNotesSearchParam || preserveNotes || (preserveFolders ? false : hasFoldersValue)) {
-            // If notes param present or preserve_notes, choose notes; folders only if explicitly preserved or flagged
-            if (preserveFolders || hasFoldersValue) {
-                this.setActiveSearchType('folders', isMobile);
-            } else {
-                this.setActiveSearchType('notes', isMobile);
-            }
+        } else if (hasNotesSearchParam || preserveNotes) {
+            this.setActiveSearchType('notes', isMobile);
         } else {
             // Default to notes
             this.setActiveSearchType('notes', isMobile);
@@ -143,9 +134,19 @@ class SearchManager {
      */
     setActiveSearchType(searchType, isMobile) {
         if (!this.searchTypes.includes(searchType)) return;
+        // start tracing removed; keep behavior unchanged
         
         const elements = this.getElements(isMobile);
         
+        // If leaving a previous search type, clear highlights of that type
+        const prev = this.currentSearchType;
+        if (prev === 'notes' && searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
+            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+        }
+        if (prev === 'tags' && searchType !== 'tags' && typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+        }
+
         // Clear all active states
         this.searchTypes.forEach(type => {
             const button = elements.buttons[type];
@@ -160,11 +161,27 @@ class SearchManager {
             activeButton.classList.add('active');
         }
     // Persist state even if buttons are absent
-    const prev = this.currentSearchType;
     this.currentSearchType = searchType;
-    // debug info removed
-
+    // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
+    try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
+    // update UI
     this.updateInterface(isMobile);
+
+    // If switching into 'notes' search, (re-)apply highlights now that state is set
+    if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
+        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+    }
+    // If switching into 'tags' search, attempt to highlight matching tag UI elements
+    if (searchType === 'tags' && typeof window.highlightMatchingTags === 'function') {
+        try {
+            // Prefer hidden term if present, else visible input
+            var hiddenTerm = elements.hiddenInputs.tagsTerm?.value || '';
+            var visibleTerm = elements.searchInput?.value || '';
+            var term = hiddenTerm && hiddenTerm.trim() ? hiddenTerm.trim() : visibleTerm.trim();
+            // Call highlightMatchingTags immediately and ensure retries if tags are created asynchronously
+            window.highlightMatchingTags(term);
+        } catch (e) { /* ignore */ }
+    }
     }
 
     /**
@@ -233,9 +250,8 @@ class SearchManager {
         const activeType = this.getActiveSearchType(isMobile);
         
         const placeholders = {
-            notes: 'Search in contents and titles...',
-            tags: 'Search in one or more tags...',
-            folders: 'Filter folders...'
+            notes: 'Search for one or more words...',
+            tags: 'Search for one or more tags...'
         };
         
         if (elements.searchInput) {
@@ -262,12 +278,11 @@ class SearchManager {
 
         const activeType = this.getActiveSearchType(isMobile);
         const iconMap = {
-            notes: 'fas fa-file-alt',
-            tags: 'fas fa-tags',
-            folders: 'fas fa-folder'
+            notes: 'fa-file-alt',
+            tags: 'fa-tags'
         };
 
-        iconSpan.className = iconMap[activeType] || 'fas fa-search';
+        iconSpan.className = iconMap[activeType] || 'fa-search';
     }
 
     /**
@@ -345,23 +360,83 @@ class SearchManager {
         if (!iconWrapper) return;
 
         const handlerKey = `icon-${isMobile ? 'mobile' : 'desktop'}`;
-        const existingHandler = this.eventHandlers.get(handlerKey);
-        if (existingHandler) {
-            try { iconWrapper.removeEventListener('click', existingHandler); } catch (e) {}
+
+        // Ensure we don't leave multiple distinct handlers attached to the same
+        // DOM element (this can happen when desktop and mobile setup both
+        // resolve to the same icon node). Use a WeakMap from element -> Map
+        // of handlerKey->handler so we can remove previously-attached handlers
+        // before adding a new one.
+        let elementHandlers = this._iconElementMap.get(iconWrapper);
+        if (!elementHandlers) {
+            elementHandlers = new Map();
+            this._iconElementMap.set(iconWrapper, elementHandlers);
+        } else if (elementHandlers.size > 0) {
+            // Remove any handlers previously attached to this element to avoid
+            // duplicate execution. We also remove their entries from
+            // this.eventHandlers so the global registry stays consistent.
+            for (const [hk, fn] of elementHandlers.entries()) {
+                try { iconWrapper.removeEventListener('click', fn); } catch (e) {}
+                elementHandlers.delete(hk);
+                try { this.eventHandlers.delete(hk); } catch (e) {}
+            }
         }
 
         const handler = (e) => {
-            e.preventDefault();
-            // Cycle to next search type
-            const current = this.getActiveSearchType(isMobile);
-            const idx = this.searchTypes.indexOf(current);
-            const next = this.searchTypes[(idx + 1) % this.searchTypes.length];
+            // Prevent double execution: mark the event handled immediately
+            try {
+                if (e) {
+                    if (e._unifiedSearchHandled) return;
+                    e._unifiedSearchHandled = true;
+                }
+            } catch (err) {}
+            // Determine the actual view the click originated from. Use the
+            // event target's closest container to figure out whether this
+            // should be treated as a mobile or desktop toggle. This handles
+            // situations where both handlers were attached to the same DOM
+            // node or when containers exist but only one is active.
+            let effectiveIsMobile = isMobile;
+            try {
+                const node = (e.currentTarget || e.target);
+                if (node && typeof node.closest === 'function') {
+                    const mobileContainer = node.closest('.unified-search-container.mobile');
+                    if (mobileContainer && mobileContainer.offsetParent !== null) {
+                        effectiveIsMobile = true;
+                    } else {
+                        const desktopContainer = node.closest('.unified-search-container');
+                        if (desktopContainer && desktopContainer.offsetParent !== null) {
+                            effectiveIsMobile = false;
+                        }
+                    }
+                }
+            } catch (err) {
+                // ignore and fall back to provided isMobile
+            }
 
-            // Persist the new type and update UI
-            this.setActiveSearchType(next, isMobile);
+            e.preventDefault();
+            // Determine current type and a robust next type. When the
+            // visible "pills" (buttons) are absent (mobile compact UI),
+            // rely on a simple toggle between 'notes' and 'tags' so the
+            // icon always switches as the user expects.
+            const current = this.getActiveSearchType(effectiveIsMobile);
+            const elements = this.getElements(effectiveIsMobile);
+
+            let next;
+            const buttonsExist = Object.values(elements.buttons).some(b => b != null);
+            if (!buttonsExist && this.searchTypes.length === 2) {
+                // Simple toggle when no explicit buttons are present
+                next = (current === 'notes') ? 'tags' : 'notes';
+            } else {
+                const idx = this.searchTypes.indexOf(current);
+                next = this.searchTypes[(idx + 1) % this.searchTypes.length];
+            }
+
+            // Persist the new type and update UI. Record a short-lived user
+            // action so restore/reinit won't overwrite it. Use the effective
+            // view (mobile/desktop) we just detected.
+            try { this._suppressUntil = Date.now() + 250; } catch (e) {}
+            this.setActiveSearchType(next, effectiveIsMobile);
 
             // Trigger behavior similar to clicking the pill
-            const elements = this.getElements(isMobile);
             if (next === 'folders') {
                 const searchValue = elements.searchInput?.value.trim();
                 if (searchValue) this.filterFolders(searchValue, isMobile);
@@ -371,9 +446,12 @@ class SearchManager {
             } else {
                 elements.searchInput?.focus();
             }
+            // event already marked handled at start
         };
 
+        // Record handler in both registries and attach it once to the element.
         this.eventHandlers.set(handlerKey, handler);
+        elementHandlers.set(handlerKey, handler);
         iconWrapper.addEventListener('click', handler);
         // make it look clickable
         iconWrapper.style.cursor = 'pointer';
@@ -434,8 +512,8 @@ class SearchManager {
             return; // Already active, do nothing
         }
 
-        // Clear search highlights when switching away from notes
-        if (searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
+        // Clear search highlights when switching search types
+        if (typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
 
@@ -600,7 +678,6 @@ class SearchManager {
 
             // Reinitialize components
             this.reinitializeAfterAjax(searchState);
-            if (this.debug) console.debug('handleAjaxResponse done');
 
         } catch (error) {
             // Fallback to page reload
@@ -613,6 +690,18 @@ class SearchManager {
      */
     reinitializeAfterAjax(searchState) {
         try {
+            // Restore search state first (before reinitializing content)
+            if (searchState) {
+                try {
+                    this.restoreSearchState(searchState);
+                    // Ensure placeholders, icons and hidden inputs reflect restored state
+                    this.updateInterface(false);
+                    this.updateInterface(true);
+                } catch (e) {
+                    // ignore
+                }
+            }
+
             // Reinitialize other components
             if (typeof reinitializeClickableTagsAfterAjax === 'function') {
                 reinitializeClickableTagsAfterAjax();
@@ -633,22 +722,13 @@ class SearchManager {
                 this.suppressURLRestore = false;
             }
 
-            // Restore search state (force UI to reflect saved choice)
+            // Guard: reapply search state after a short delay in case other init code overrides
             if (searchState) {
-                try {
+                setTimeout(() => {
                     this.restoreSearchState(searchState);
-                    // Ensure placeholders, icons and hidden inputs reflect restored state
                     this.updateInterface(false);
                     this.updateInterface(true);
-                    // Guard: reapply after a short delay in case other init code overrides
-                    setTimeout(() => {
-                        this.restoreSearchState(searchState);
-                        this.updateInterface(false);
-                        this.updateInterface(true);
-                    }, 50);
-                } catch (e) {
-                    // ignore
-                }
+                }, 50);
             }
 
             // Restore focus/caret if requested. Try immediate, then retry after short delays
@@ -683,28 +763,49 @@ class SearchManager {
                 this.focusCaretPos = null;
             }
 
-            // Highlight search terms
+            // Highlight search terms according to the active type.
             setTimeout(() => {
-                if (typeof highlightSearchTerms === 'function') {
-                    highlightSearchTerms();
-                }
-                // If we're in tags search mode, also highlight matching tag UI elements
                 try {
-                    const activeType = this.getActiveSearchType();
-                    // diagnostic logs removed
-                    if (activeType === 'tags' && typeof window.highlightMatchingTags === 'function') {
-                        // Prefer hidden tags term if present, otherwise use visible search input
-                        const desktopElements = this.getElements(false);
-                        const mobileElements = this.getElements(true);
-                        const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
-                        const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
-                        const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
-                        window.highlightMatchingTags(term);
-                    } else if (typeof window.highlightMatchingTags === 'function') {
-                        // Clear any previous highlights when not in tags mode
-                        window.highlightMatchingTags('');
+                    // If a centralized helper exists, prefer it (it handles notes/tags/folders correctly)
+                    if (typeof applyHighlightsWithRetries === 'function') {
+                        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                        return;
                     }
-                } catch (e) { /* ignore */ }
+
+                    const activeType = this.getActiveSearchType();
+                    if (activeType === 'notes') {
+                        if (typeof highlightSearchTerms === 'function') {
+                            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+                        }
+                    } else if (activeType === 'tags') {
+                        if (typeof clearSearchHighlights === 'function') {
+                            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try {
+                                const desktopElements = this.getElements(false);
+                                const mobileElements = this.getElements(true);
+                                const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
+                                const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
+                                const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
+                                window.highlightMatchingTags(term);
+                            } catch (e) { /* ignore */ }
+                        }
+                    } else {
+                        // folders or unknown: clear any highlights
+                        if (typeof clearSearchHighlights === 'function') {
+                            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
             }, 150);
 
         } catch (error) {
@@ -765,6 +866,7 @@ class SearchManager {
      */
     restoreSearchState(state) {
     if (!state) return;
+    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
     // Restore desktop state immediately to avoid intermediate UI reset
     if (state.desktop.notes) this.setActiveSearchType('notes', false);
@@ -794,7 +896,18 @@ class SearchManager {
             const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
             if (buttonsExist) {
                 if (!hasActive) {
-                    this.setActiveSearchType('notes', isMobile);
+                    // Respect a recent user toggle: don't force state while suppression is active
+                    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+                    // Prefer the internal currentSearchType if possible so we don't
+                    // overwrite a recent user action when buttons exist but no
+                    // button is currently marked active (e.g. after AJAX DOM swaps).
+                    const preferred = this.currentSearchType || 'notes';
+                    if (elements.buttons[preferred]) {
+                        this.setActiveSearchType(preferred, isMobile);
+                    } else {
+                        // Fallback to notes if preferred button isn't present
+                        this.setActiveSearchType('notes', isMobile);
+                    }
                 }
             } else {
                 // No buttons: apply internal state (avoid forcing 'notes')
@@ -851,8 +964,6 @@ class SearchManager {
         // Set the appropriate preserve parameter based on active search type
         if (activeSearchType === 'tags') {
             newParams.set('preserve_tags', '1');
-        } else if (activeSearchType === 'folders') {
-            newParams.set('preserve_folders', '1');
         } else {
             // Default to notes or explicitly preserve notes
             newParams.set('preserve_notes', '1');

@@ -36,10 +36,8 @@ if (!$hasAttachments) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poznote - Attachments Export</title>
-        <link href="css/index.css" rel="stylesheet">
-        <link href="css/modal.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/images.css">
         <link rel="stylesheet" href="css/ai.css">
+        <link href="css/modals.css" rel="stylesheet">
     </head>
     <body class="ai-page">
         <div class="summary-page">
@@ -51,14 +49,14 @@ if (!$hasAttachments) {
             <div class="summary-content">
                 <div style="text-align: center;">
                     <div style="font-size: 48px; color: #6c757d; margin-bottom: 20px;">
-                        <i class="fas fa-paperclip"></i>
+                        <i class="fa-paperclip"></i>
                     </div>
                     <h2 style="color: #333; margin-bottom: 15px; font-size: 24px;">No attachments found</h2>
                     <p style="color: #666; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
                         There are currently no attachments in your notes.
                     </p>
                     <p style="color: #666; line-height: 1.6; margin-bottom: 0; font-size: 16px;">
-                        To add attachments to your notes, use the <strong><i class="fas fa-paperclip"></i></strong> button in the note editor.
+                        To add attachments to your notes, use the <strong><i class="fa-paperclip"></i></strong> button in the note editor.
                     </p>
                 </div>
             </div>
@@ -68,7 +66,7 @@ if (!$hasAttachments) {
                     Back to notes
                 </a>
                 <a href="backup_export.php" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Other export options
+                    <i class="fa-download"></i> Other export options
                 </a>
             </div>
         </div>

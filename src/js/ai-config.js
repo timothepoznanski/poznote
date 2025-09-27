@@ -12,10 +12,10 @@ function toggleApiKeyVisibility(fieldId) {
     
     if (input.type === 'password') {
         input.type = 'text';
-        button.className = 'fas fa-eye-slash';
+        button.className = 'fa-eye-slash';
     } else {
         input.type = 'password';
-        button.className = 'fas fa-eye';
+        button.className = 'fa-eye';
     }
 }
 
@@ -109,16 +109,16 @@ function testAIConnection() {
     .then(data => {
         if (data.success) {
             testResult.className = 'alert alert-success';
-            testResult.innerHTML = '<i class="fas fa-check-circle"></i> Connection successful! Using: ' + data.provider;
+            testResult.innerHTML = '<img src="images/check-light-full.svg" alt="Success" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> Connection successful! Using: ' + data.provider;
         } else {
             testResult.className = 'alert alert-danger';
-            testResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.error;
+            testResult.innerHTML = '<img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;"> ' + data.error;
         }
         testResult.style.display = 'block';
     })
     .catch(error => {
         testResult.className = 'alert alert-danger';
-        testResult.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Test failed: ' + error.message;
+        testResult.innerHTML = '<i class="fa-exclamation-triangle"></i> Test failed: ' + error.message;
         testResult.style.display = 'block';
     })
     .finally(() => {
@@ -128,10 +128,6 @@ function testAIConnection() {
     });
 }
 
-// Legacy function for backward compatibility
-function toggleApiKeyVisibility() {
-    toggleApiKeyVisibility('openai_api_key');
-}
 
 /**
  * Update saved configuration data attributes after successful save

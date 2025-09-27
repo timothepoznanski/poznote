@@ -84,4 +84,53 @@
         text-overflow: ellipsis !important;
         word-wrap: break-word !important;
     }
+    
+    /* Navigation buttons should be side by side on mobile */
+    .settings-container > a.btn-secondary {
+        width: auto !important;
+        max-width: calc(50% - 5px) !important;
+        margin-bottom: 10px !important;
+        margin-right: 10px !important;
+        display: inline-block !important;
+    }
+    
+    .settings-container > a.btn-secondary:last-of-type {
+        margin-right: 0 !important;
+    }
+}
+
+/* Icon styles for attachments page - Mobile */
+.btn-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important; /* Slightly larger on mobile for easier touch */
+    height: 36px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    background: white !important;
+    color: #666 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    margin-right: 8px !important; /* More spacing on mobile */
+}
+
+.btn-icon:hover {
+    background: #f8f9fa !important;
+    border-color: #bbb !important;
+}
+
+.btn-icon svg {
+    width: 18px !important; /* Slightly larger icons on mobile */
+    height: 18px !important;
+}
+
+.btn-download:hover {
+    color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+
+.btn-delete:hover {
+    color: #dc3545 !important;
+    border-color: #dc3545 !important;
 }

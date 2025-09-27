@@ -101,17 +101,7 @@ function performFavoriteToggle(noteId) {
             try {
                 var response = JSON.parse(xhr.responseText);
                 if (response.success) {
-                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');
-                    if (starIcon) {
-                        if (starIcon.classList.contains('fas')) {
-                            starIcon.classList.remove('fas');
-                            starIcon.classList.add('far');
-                        } else {
-                            starIcon.classList.remove('far');
-                            starIcon.classList.add('fas');
-                        }
-                    }
-                    
+                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');                    
                     editedButNotSaved = 0;
                     updateNoteEnCours = 0;
                     
@@ -1282,7 +1272,7 @@ function updateDropdown(matchingFolders, searchTerm) {
     if (!hasExactMatch && searchTerm.length > 0) {
         var createOption = document.createElement('div');
         createOption.className = 'folder-option create-option';
-        createOption.innerHTML = '<i class="fas fa-plus"></i> Create "' + searchTerm + '"';
+        createOption.innerHTML = '<i class="fa-plus"></i> Create "' + searchTerm + '"';
         createOption.onclick = function() { selectCreateFolder(searchTerm); };
         dropdown.appendChild(createOption);
     }

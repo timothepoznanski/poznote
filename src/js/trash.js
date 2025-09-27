@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Management of restore and permanent delete buttons
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('icon_restore_trash')) {
+        if (e.target.classList.contains('fa-trash-restore-alt-svg')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
             if (noteid) {
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        if (e.target.classList.contains('icon_trash_trash')) {
+        if (e.target.classList.contains('fa-trash')) {
             e.preventDefault();
             const noteid = e.target.getAttribute('data-noteid');
             if (noteid) {

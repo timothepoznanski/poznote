@@ -85,38 +85,37 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 <head>
     <title>Artificial Intelligence - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/database-backup.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body>
     <div class="settings-container">
-        <h1><i class="fa-robot-svg"></i> Artificial Intelligence</h1>
+    <h1 class="ai-header">Artificial Intelligence</h1>
         <p>Configure AI settings to enable automatic summarization and other intelligent features.</p>
     
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 Back to Notes
+            </a>
+            <a href="settings.php" class="btn btn-secondary">
+                Back to Settings
             </a>
 
         <br><br>
 
         <?php if ($message): ?>
             <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
         
         <?php if ($error): ?>
             <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
         
         <!-- AI Configuration Section -->
         <div class="settings-section">
-            <h3><i class="fas fa-key"></i> AI Configuration</h3>
+            <h3>AI Configuration</h3>
             <p>Configure your AI provider and API keys to use artificial intelligence features like automatic note summarization.</p>
             
             <form method="POST" id="ai-config-form">
@@ -148,7 +147,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                         <option value="fr" <?php echo $ai_language === 'fr' ? 'selected' : ''; ?>>Français</option>
                     </select>
                     <div class="help-text">
-                        <i class="fas fa-info-circle"></i> Choose the language for AI responses.
+                        Choose the language for AI responses.
                     </div>
                 </div>
                 
@@ -161,12 +160,15 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    id="openai_api_key" 
                                    name="openai_api_key" 
                                    value="<?php echo htmlspecialchars($openai_api_key); ?>" 
-                                   placeholder="sk-...">
+                                   placeholder="sk-..."
+                                   autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('openai_api_key')">
-                                <i class="fas fa-eye"></i>
+                                
                             </button>
                         </div>
-                        <!-- Help text for OpenAI API key removed as requested -->
+                        <div class="help-text">
+                            <a href="https://platform.openai.com/api-keys" target="_blank">Get an API key from OpenAI</a>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -192,13 +194,14 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                    id="mistral_api_key" 
                                    name="mistral_api_key" 
                                    value="<?php echo htmlspecialchars($mistral_api_key); ?>" 
-                                   placeholder="Enter your Mistral API key...">
+                                   placeholder="Enter your Mistral API key..."
+                                   autocomplete="new-password">
                             <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility('mistral_api_key')">
-                                <i class="fas fa-eye"></i>
+                                
                             </button>
                         </div>
                         <div class="help-text">
-                            <a href="https://console.mistral.ai/" target="_blank"><i class="fas fa-external-link-alt"></i> Get an API key from Mistral AI</a>
+                            <a href="https://console.mistral.ai/" target="_blank">Get an API key from Mistral AI</a>
                         </div>
                     </div>
                     
@@ -223,7 +226,7 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
             
             <!-- Test Connection Section (after save) -->
             <div class="test-section">
-                <p><i class="fas fa-info-circle"></i> Save your configuration first, then test the connection to verify it works.</p>
+                <p>Save your configuration first, then test the connection to verify it works.</p>
                 <button type="button" class="btn btn-secondary" onclick="testAIConnection()" id="test-connection-btn"
                         data-saved-provider="<?php echo htmlspecialchars($ai_provider); ?>"
                         data-saved-openai-model="<?php echo htmlspecialchars($openai_model); ?>"
@@ -236,8 +239,8 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
         
         <!-- AI Features Information -->
         <div class="warning">
-            <p><i class="fas fa-info-circle"></i> An internet connection and sufficient API credits are required to use these features.</p>
-            <p><i class="fas fa-shield-alt"></i> <strong>Privacy Notice:</strong> Note content will be sent to the selected AI provider's servers for processing. Please review their privacy policies: 
+            <p>An internet connection and sufficient API credits are required to use these features.</p>
+            <strong>Privacy Notice:</strong> Note content will be sent to the selected AI provider's servers for processing. Please review their privacy policies: 
                 <a href="https://openai.com/privacy/" target="_blank">OpenAI</a> | 
                 <a href="https://mistral.ai/terms/" target="_blank">Mistral AI</a>
             </p>

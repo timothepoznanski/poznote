@@ -116,6 +116,7 @@
     width: 100%;
 }
 
+
 /* Folder filter spacing on mobile */
 .folder-filter-container {
     margin-top: 10px !important;
@@ -133,68 +134,7 @@ html, body {
     overflow: hidden;
 }
 
-/* Ensure modals are centered and fit within mobile viewport */
-#moveNotesModal, #renameModal, #deleteModal, .modal {
-    display: none;
-}
-
-.modal {
-    /* place modal at the top center on mobile */
-    align-items: flex-start !important;
-    justify-content: center !important;
-    padding: 24px 12px 12px 12px !important;
-}
-
-.modal-content {
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 !important; /* vertical spacing provided by .modal padding */
-    box-sizing: border-box !important;
-}
-
-/* Make modal action buttons full-width on narrow screens to avoid overflow */
-@media (max-width: 420px) {
-    .modal-content .modal-buttons,
-    .modal-content .modal-buttons button {
-        width: 100% !important;
-    }
-    .modal-content .modal-buttons button {
-        display: block !important;
-        margin-bottom: 10px !important;
-    }
-}
-
-/* Exception for tags page */
-body.tags-page {
-    overflow: auto !important;
-    height: auto !important;
-    min-height: 100vh !important;
-}
-
-/* Exception for workspaces page - aggressive override */
-body.workspaces-page,
-html.workspaces-page {
-    overflow: auto !important;
-    overflow-y: scroll !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    position: static !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-/* More specific rule to target workspaces page by content */
-body {
-    &:has(.settings-container) {
-        overflow: auto !important;
-        overflow-y: scroll !important;
-        overflow-x: hidden !important;
-        height: auto !important;
-        min-height: 100vh !important;
-        position: static !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-}
+/* Modal-related mobile overrides removed and centralized in css/modals.css */
 
 /* Alternative approach - target by URL or JavaScript class addition */
 html {
@@ -206,10 +146,6 @@ body {
     flex-direction: unset !important;
     position: relative;
 }
-
-/* .note-header {
-  display: none !important;
-} */
 
 /* Mobile toolbar optimization */
 .note-edit-toolbar {
@@ -247,32 +183,6 @@ body {
     margin-bottom: 5px !important;
 }
 
-.toolbar-btn {
-    min-width: 40px !important;
-    min-height: 40px !important;
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
-    font-size: 1.0em !important;
-    border-radius: 6px !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    box-sizing: border-box !important;
-    background: transparent !important;
-    border: none !important;
-    color: #007DB8 !important;
-}
-
-.toolbar-btn:hover, .toolbar-btn:focus {
-    background: transparent !important;
-    border: none !important;
-    color: #005a8a !important;
-}
-
 /* Mobile responsive button management */
 /* Hide formatting buttons by default on mobile */
 .btn-bold, .btn-italic, .btn-underline, .btn-strikethrough,
@@ -282,12 +192,7 @@ body {
 }
 
 /* Always visible buttons on mobile */
-.btn-separator, .btn-save, .btn-ai, .btn-emoji {
-    display: flex !important;
-}
-
-/* Action buttons visible by default on mobile */
-.btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
+.btn-separator, .btn-save, .btn-ai, .btn-emoji, .btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
     display: flex !important;
 }
 
@@ -309,49 +214,6 @@ body {
     display: flex !important;
 }
 
-/* Color palette popup */
-.color-palette-popup {
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    border-radius: 6px;
-    background: transparent; /* keep background transparent so it blends with toolbar */
-    padding: 6px 8px;
-    z-index: 9999;
-    opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 160ms ease, transform 160ms ease;
-}
-.color-palette-popup.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-.color-palette-popup .color-grid {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 12px;
-    background: rgba(255,255,255,0.98);
-    border-radius: 10px;
-}
-.color-item {
-    width: 28px;
-    height: 16px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    display: inline-block;
-    box-sizing: border-box;
-}
-.color-item:focus {
-    outline: 2px solid #007DB8;
-}
-
-/* Visual thin baseline under the palette like the attachment */
-/* baseline removed - simplified palette */
-
-/* caret removed - popup has no arrow */
-
 /* Hide ALL action buttons when text is selected */
 .show-format-buttons .btn-separator,
 .show-format-buttons .btn-emoji,
@@ -364,27 +226,6 @@ body {
 .show-format-buttons .btn-info, 
 .show-format-buttons .btn-trash {
     display: none !important;
-}
-
-/* Styles pour les cases à cocher sur mobile */
-.noteentry label {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.noteentry label span[contenteditable="true"] {
-    outline: none !important;
-    border: none !important;
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    cursor: text !important;
-    font-size: 16px !important; /* Taille adaptée au mobile */
-    line-height: 1.4 !important;
-    white-space: nowrap !important;
-    display: inline-block !important;
-    min-width: 20px !important;
 }
 
 .noteentry label span[contenteditable="true"]:focus {
@@ -405,6 +246,14 @@ body {
 
 pre, code {
     font-size: 16px !important;
+}
+
+/* Ensure images in notes don't overflow on mobile */
+.noteentry img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 10px 0 !important;
 }
 
 /* Increase text size in left column on mobile */
@@ -565,54 +414,6 @@ a.links_arbo_left.selected-note {
     flex: 0 0 auto !important;
 }
 
-/* Mobile styles for folder search buttons */
-.folder-actions {
-    opacity: 0.7 !important; /* Slightly visible on mobile but not fully opaque */
-    transition: opacity 0.2s !important;
-}
-
-.folder-toggle:active .folder-actions,
-.folder-toggle:focus .folder-actions {
-    opacity: 1 !important; /* Full opacity when folder is tapped */
-}
-
-.folder-search-btn {
-    font-size: 12px !important; /* Match desktop size */
-    padding: 4px !important; /* Match desktop padding */
-    margin-left: 4px !important; /* Reduce margin for mobile */
-    touch-action: manipulation !important;
-}
-
-.folder-search-btn,
-.folder-edit-btn,
-.folder-delete-btn,
-.folder-empty-btn {
-    min-width: 28px !important; /* Smaller than before but still touch-friendly */
-    min-height: 28px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-}
-
-/* Mobile diagonal line for excluded folder search buttons */
-.folder-search-btn.excluded {
-    position: relative !important;
-}
-
-.folder-search-btn.excluded::after {
-    content: '' !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 80% !important;
-    height: 2px !important;
-    background-color: #dc3545 !important;
-    transform: translate(-50%, -50%) rotate(-45deg) !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-}
-
 .folder-content {
     margin-left: 16px !important;
     margin-bottom: 5px !important; /* Reduce spacing under mobile folders (12px → 5px) */
@@ -640,31 +441,31 @@ a.links_arbo_left.selected-note {
 }
 
 .folder-actions {
-    opacity: 1 !important; /* Always visible on mobile */
+    opacity: 1; /* Always visible on mobile */
 }
 
-.folder-edit-btn, .folder-delete-btn, .folder-empty-btn {
-    font-size: 14px !important;
-    padding: 8px !important;
+.folder-actions i {
+    margin-left: 12px !important;
 }
 
-/* MODAL MOBILE ADJUSTMENTS */
-
-.modal-content {
-    margin: 25% auto !important;
-    width: 280px !important;
-    max-width: 95% !important;
+/* Ensure excluded search icon is clearly visible and highlighted on mobile */
+.folder-search-btn.excluded {
+    color: #dc3545 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    filter: drop-shadow(0 0 4px rgba(220,53,69,0.25));
 }
 
-.modal-content input, .modal-content select {
-    font-size: 16px !important;
-    padding: 12px !important;
+/* extra-specific mobile selector */
+.folder-actions i.folder-search-btn.excluded,
+.folder-toggle .folder-actions i.folder-search-btn.excluded {
+    display: inline-block !important;
+    opacity: 1 !important;
+    color: #dc3545 !important;
+    pointer-events: auto !important;
 }
 
-.modal-buttons button {
-    padding: 12px 20px !important;
-    font-size: 16px !important;
-}
+/* Modal-related rules moved to css/modals.css */
 
 .folder-search-section {
     margin-bottom: 0px !important;
@@ -718,93 +519,11 @@ a.links_arbo_left.selected-note {
     font-size: 13px !important;
 }
 
-/* Modal error message styles for mobile */
-.modal-error-message {
-    text-align: center !important;
-    color: #dc3545 !important;
-    font-size: 15px !important;
-    margin-top: 15px !important;
-    padding: 12px !important;
-    border-radius: 8px !important;
-    background-color: #f8d7da !important;
-    border: 1px solid #f5c6cb !important;
-    display: none !important;
-    box-sizing: border-box !important;
-}
+/* Modal-related rules moved to css/modals.css */
 
 /* ATTACHMENT MOBILE STYLES */
 
-.attachment-modal .modal-content {
-    width: 90% !important;
-    max-width: 400px !important;
-    margin: 6% auto 0 auto !important;
-    max-height: 80vh !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
-}
-
-.attachment-upload {
-    flex-direction: column !important;
-    gap: 12px !important;
-}
-
-.attachment-upload input[type="file"] {
-    width: 100% !important;
-    padding: 12px !important;
-    font-size: 16px !important;
-    box-sizing: border-box !important;
-}
-
-.attachment-upload button {
-    width: 100% !important;
-    padding: 12px !important;
-    font-size: 16px !important;
-}
-
-.attachment-item {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-    padding: 12px !important;
-}
-
-.attachment-info {
-    width: 100% !important;
-    text-align: left !important;
-}
-
-.attachment-actions {
-    width: 100% !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-}
-
-.attachment-actions button {
-    flex: 1 !important;
-    padding: 8px 12px !important;
-    font-size: 14px !important;
-}
-
-.btn-attachment {
-    min-width: 40px !important;
-    min-height: 40px !important;
-    width: 40px !important;
-    height: 40px !important;
-    padding: 8px !important;
-    font-size: 1.1em !important;
-    border-radius: 6px !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    box-sizing: border-box !important;
-    background: transparent !important;
-    border: none !important;
-    color: #007DB8 !important;
-    cursor: pointer !important;
-}
+/* Attachment modal mobile rules moved to css/modals.css */
 
 .btn-attachment:hover, .btn-attachment:focus {
     background: rgba(0, 125, 184, 0.1) !important;
@@ -856,16 +575,16 @@ a.links_arbo_left.selected-note {
 }
 
 /* Attachment indicators on mobile (use app blue) */
-.btn-settings.has-attachments i::before,
-.btn-attachment.has-attachments i::before {
+.btn-settings.has-attachments i,
+.btn-attachment.has-attachments i {
     filter: none !important;
     color: #007DB8 !important;
 }
 
-.btn-settings.has-attachments:hover i::before,
-.btn-settings.has-attachments:focus i::before,
-.btn-attachment.has-attachments:hover i::before,
-.btn-attachment.has-attachments:focus i::before {
+.btn-settings.has-attachments:hover i,
+.btn-settings.has-attachments:focus i,
+.btn-attachment.has-attachments:hover i,
+.btn-attachment.has-attachments:focus i {
     filter: none !important;
     color: #005a8a !important;
 }
@@ -1115,230 +834,4 @@ input[type="search"]::-webkit-search-results-decoration {
     transform-origin: top left;
 }
 
-/* Modal IA adaptée pour mobile */
-#aiSummaryModal .modal-content {
-    max-width: 95% !important;
-    width: 95% !important;
-    max-height: 90vh !important;
-    margin: 5vh auto !important;
-}
-
-#aiSummaryModal .modal-body {
-    max-height: 60vh !important;
-    overflow-y: auto !important;
-}
-
-.ai-loading i.rotating {
-    font-size: 1.5em !important;
-}
-
-.summary-content #summaryText {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-}
-
-.modal-footer {
-    flex-direction: column-reverse !important;
-    gap: 10px !important;
-}
-
-.modal-footer .btn {
-    width: 100% !important;
-    justify-content: center !important;
-}
-
-/* Mobile editable tags adjustments */
-@media (max-width: 800px) {
-    .editable-tags-container {
-        padding: 3px !important;
-        gap: 4px !important;
-    }
-    
-    .clickable-tag {
-        font-size: 12px !important;
-        padding: 3px 6px 3px 6px !important;
-    }
-    
-    .tag-delete-button {
-        padding: 3px 5px 3px 2px !important;
-        font-size: 12px !important;
-    }
-    
-    .tag-input {
-        font-size: 12px !important;
-        padding: 3px 6px !important;
-        min-width: 60px !important;
-    }
-}
-
-/* WORKSPACES PAGE MOBILE STYLES */
-@media (max-width: 800px) {
-    .settings-container {
-        padding: 20px 15px !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        margin: 0 auto !important;
-    }
-    
-    .workspace-list {
-        margin-bottom: 30px !important;
-    }
-    
-    /* Ensure workspace buttons stack properly on mobile */
-    .workspace-list ul li {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 10px !important;
-        padding: 15px 0 !important;
-        border-bottom: 1px solid #e0e0e0 !important;
-    }
-    
-    .workspace-list .ws-col {
-        width: 100% !important;
-    }
-    
-    .workspace-list .ws-col-name {
-        margin-bottom: 8px !important;
-    }
-    
-    /* Make workspace buttons full width on mobile */
-    .workspace-list .btn {
-        width: 100% !important;
-        min-width: unset !important;
-        margin-bottom: 5px !important;
-        padding: 12px !important;
-        font-size: 14px !important;
-    }
-    
-    /* Create button row container for mobile */
-    .workspace-list .ws-col-action,
-    .workspace-list .ws-col-select,
-    .workspace-list .ws-col-move,
-    .workspace-list .ws-col-delete {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
-    }
-    
-    /* Workspace creation form on mobile */
-    #create-workspace-form {
-        margin-bottom: 30px !important;
-    }
-    
-    #create-workspace-form .form-group {
-        margin-bottom: 15px !important;
-    }
-    
-    #create-workspace-form input {
-        width: 100% !important;
-        padding: 12px !important;
-        font-size: 16px !important;
-        box-sizing: border-box !important;
-    }
-    
-    #create-workspace-form button {
-        width: 100% !important;
-        padding: 14px !important;
-        font-size: 16px !important;
-    }
-    
-    /* Modal adjustments for mobile */
-    #moveNotesModal .modal-content {
-        width: 90% !important;
-        max-width: 400px !important;
-        margin: 20px auto !important;
-    }
-    
-    #moveNotesModal select {
-        width: 100% !important;
-        padding: 12px !important;
-        font-size: 16px !important;
-        box-sizing: border-box !important;
-    }
-    
-    #moveNotesModal .btn {
-        width: 100% !important;
-        margin-bottom: 10px !important;
-        padding: 12px !important;
-    }
-    
-    /* Alert styling for mobile */
-    #topAlert, #ajaxAlert {
-        margin: 15px 0 !important;
-        padding: 15px !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
-    }
-    
-    /* Back to notes button mobile styling */
-    .btn-secondary {
-        width: 100% !important;
-        margin-bottom: 20px !important;
-        padding: 12px !important;
-        font-size: 16px !important;
-    }
-    
-    /* Headings mobile adjustment */
-    h1 {
-        font-size: 24px !important;
-        margin-bottom: 15px !important;
-    }
-    
-    h3 {
-        font-size: 18px !important;
-        /* margin-bottom: 12px !important; */
-    }
-    
-    /* Settings section spacing */
-    .settings-section {
-        margin-bottom: 30px !important;
-    }
-}
-
-/* Responsive design for mobile devices */
-/* Mobile search container styles removed - mobile search UI hidden */
-
-/* Styles pour les écrans petits/moyens (ordinateurs portables inclus) */
-@media (max-width: 1024px) {
-    /* Assure-toi que les filtres desktop sont centrés même sur les petits écrans */
-    .contains_forms_search {
-        padding: 0 15px;
-    }
-    
-    .unified-search-container {
-        max-width: 90%;
-    }
-    
-    .search-options-container {
-        margin-top: 10px;
-    }
-    
-    .search-type-pills {
-        justify-content: center;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-    
-    .search-pill {
-        font-size: 0.75em;
-        padding: 3px 8px;
-        min-height: 26px;
-    }
-}
-
-/* Styles pour les très petits écrans */
-@media (max-width: 480px) {
-    .unified-search-container {
-        max-width: 100%;
-    }
-    
-    .search-pill {
-        font-size: 0.7em;
-        padding: 2px 6px;
-        min-height: 24px;
-    }
-    
-    .search-pill span {
-        font-size: 0.75em;
-    }
-}
+/* AI modal & modal-footer mobile rules moved to css/modals.css */

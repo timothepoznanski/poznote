@@ -10,15 +10,12 @@ let notesWithClickableTags = new Set();
  * Initialize clickable tags system
  */
 function initializeClickableTags() {
-    // Convert tags to clickable format for all visible notes
-    const tagsRows = document.querySelectorAll('.note-tags-row');
-    
-    tagsRows.forEach((tagsRow) => {
-        const tagsInput = tagsRow.querySelector('input[id^="tags"]');
-        if (tagsInput) {
-            const noteId = tagsInput.id.replace('tags', '');
-            convertTagsToEditable(noteId);
-        }
+    // Convert tags to clickable format for all notes that have a tags input.
+    // Search for inputs with id starting with 'tags' so hidden inputs still initialize.
+    const tagsInputs = document.querySelectorAll('input[id^="tags"]');
+    tagsInputs.forEach((tagsInput) => {
+        const noteId = tagsInput.id.replace('tags', '');
+        convertTagsToEditable(noteId);
     });
 }
 
@@ -785,7 +782,7 @@ function saveTagsDirectly(noteId, tagsValue) {
 window.saveTagsDirectly = saveTagsDirectly;
 
 /**
- * Get excluded folders from localStorage (copied from listtags.js)
+ * Get excluded folders from localStorage (copied from list_tags.js)
  */
 function getExcludedFoldersFromLocalStorage() {
     const excludedFolders = [];
@@ -892,7 +889,7 @@ function redirectToTag(tag) {
                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
                                'Poznote';
         const wsParam = (currentWorkspace && currentWorkspace !== 'Poznote') ? '&workspace=' + encodeURIComponent(currentWorkspace) : '';
-        window.location.href = 'index.php?tags_search_from_list=' + encodeURIComponent(tag) + wsParam;
+    window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
     }
 }
 

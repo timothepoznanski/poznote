@@ -49,10 +49,8 @@ $is_generating = false;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content Verification - <?php echo htmlspecialchars($note_title); ?></title>
-    <link href="css/index.css" rel="stylesheet">
-    <link href="css/modal.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/images.css">
-    <link rel="stylesheet" href="css/ai.css">
+    <link rel="stylesheet" href="css/check_errors.css">
+    <link href="css/modals.css" rel="stylesheet">
 </head>
 <body class="ai-page">
     <div class="summary-page">
@@ -68,7 +66,7 @@ $is_generating = false;
             </div>
             <div id="summaryText" style="display: none;"></div>
             <div id="errorState" class="error-state" style="display: none;">
-                <i class="fas fa-exclamation-triangle"></i>
+                <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
                 <span id="errorMessage"></span>
             </div>
             <div id="initialState" style="text-align: center; color: #6c757d; font-style: italic;">
