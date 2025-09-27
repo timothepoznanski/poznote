@@ -47,7 +47,7 @@ include 'functions.php';
             </div>
 
             <div class="settings-card" id="emoji-icons-card">
-                <div class="settings-card-icon"><i class="fa-smile"></i></div>
+                <div class="settings-card-icon"><i class="fa-grin"></i></div>
                 <div class="settings-card-content">
                     <h3>Show Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
                 </div>

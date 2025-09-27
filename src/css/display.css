@@ -48,7 +48,7 @@ body {
     justify-content: center;
     flex-shrink: 0;
     color: #6b7280;
-    font-size: 1.1rem;
+    font-size: 2.2rem;
 }
 .settings-card-content {
     display: flex;
@@ -110,6 +110,19 @@ body {
     width: 0.9em;
     height: 0.9em;
     background-image: url('../images/icons-light-full.svg');
+    content: '';
+}
+
+.fa-grin {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    background-image: url('../images/face-smile-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
     content: '';
 }
 

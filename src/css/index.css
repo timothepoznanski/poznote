@@ -711,7 +711,7 @@ body {
     border: none !important;
     border-radius: 5px;
     padding: 6px 8px;
-    font-size: 1.3em;
+    font-size: 1.4em;
     cursor: pointer;
     margin: 0 6px;
     transition: color 0.2s;
@@ -2128,9 +2128,9 @@ hr {
 }
 
 .folder-icon {
-    font-size: 1.6em;
+    font-size: 1.2em;
     color: #b0b0b0;
-    margin-right: 2px;
+    margin-right: 8px;
     transition: transform 0.2s;
     width: 16px;
     align-content: center;
@@ -3154,8 +3154,8 @@ hr {
 
 .fa-plus {
   display: inline-block;
-  width: 1.2em;
-  height: 1.2em;
+  width: 1.4em;
+  height: 1.4em;
   background-image: url('../images/plus-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
