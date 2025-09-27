@@ -353,6 +353,9 @@ try {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
+        </a>
 
         <br><br>
 

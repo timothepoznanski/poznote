@@ -95,6 +95,9 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 Back to Notes
             </a>
+            <a href="settings.php" class="btn btn-secondary">
+                Back to Settings
+            </a>
 
         <br><br>
 
