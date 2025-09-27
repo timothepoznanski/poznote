@@ -511,19 +511,13 @@ function showUpdateCheckResult(title, message, type) {
     if (type === 'error') {
         if (titleElement) titleElement.style.color = '#e53935';
         if (statusElement) statusElement.style.color = '#e53935';
-        // Show buttons for errors
-        if (buttonsElement) buttonsElement.style.display = 'flex';
     } else if (type === 'success') {
         if (titleElement) titleElement.style.color = '#007DB8';
         if (statusElement) statusElement.style.color = '#007DB8';
-        // Hide buttons for success
-        if (buttonsElement) buttonsElement.style.display = 'none';
-        
-        // Auto-close after 3 seconds for success
-        setTimeout(function() {
-            closeUpdateCheckModal();
-        }, 3000);
     }
+    
+    // Always show close button
+    if (buttonsElement) buttonsElement.style.display = 'flex';
 }
 
 function hideUpdateBadge() {
