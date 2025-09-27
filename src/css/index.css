@@ -492,7 +492,7 @@ body {
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
 
 /* Folder actions icons keep small size */
-.folder-actions i { margin-left: 18px; color:#6b7280; cursor:pointer; font-size: 1.0em; }
+.folder-actions i { margin-left: 12px; color:#6b7280; cursor:pointer; font-size: 1.2em; }
 .folder-actions i:hover { color:#374151; }
 
 
@@ -622,7 +622,7 @@ body {
 
 /* Enlarge icons in create menu */
 .create-menu-item i {
-    font-size: 16px;
+    font-size: 20px;
 }
 
 /* LEFT HEADER */
@@ -2127,11 +2127,11 @@ hr {
 }
 
 .folder-icon {
-    font-size: 1.2em;
+    font-size: 1.6em;
     color: #b0b0b0;
-    margin-right: 8px;
+    margin-right: 2px;
     transition: transform 0.2s;
-    width: 12px;
+    width: 16px;
     align-content: center;
 }
 
