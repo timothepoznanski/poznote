@@ -1419,7 +1419,7 @@ img {
 }
 
 .fa-paperclip.icon_attachment {
-    font-size: 12px;
+    font-size: 18px; /* larger paperclip on index */
     margin-right: 8px;
     flex-shrink: 0;
     color: #007DB8;
@@ -1442,6 +1442,31 @@ img {
     display: inline-block;
     margin: 2px 4px 2px 8px; /* left margin to match tag spacing */
     word-break: break-word;
+}
+
+/* Make the button wrapper for the paperclip visually neutral so only the icon shows */
+.icon-attachment-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+}
+.icon-attachment-btn:focus {
+    outline: 2px solid rgba(0,125,184,0.25);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Keep paperclip smaller on narrow viewports to avoid layout issues */
+@media (max-width: 420px) {
+    .fa-paperclip.icon_attachment {
+        font-size: 14px;
+    }
 }
 
 .attachment-link:hover {

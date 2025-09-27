@@ -813,7 +813,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $attachments_data = json_decode($row['attachments'], true);
                     if (is_array($attachments_data) && !empty($attachments_data)) {
                         echo '<div class="note-attachments-row">';
-                        echo '<span class="fa-paperclip icon_attachment"></span>';
+                        // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
+                        echo '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
                         echo '<span class="note-attachments-list">';
                         $attachment_links = [];
                         foreach ($attachments_data as $attachment) {
