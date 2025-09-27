@@ -463,10 +463,8 @@ function importAttachmentsZip($uploadedFile) {
 <head>
     <title>Restore (Import) - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/restore_import.css">
-
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="backup-container">
@@ -475,8 +473,8 @@ function importAttachmentsZip($uploadedFile) {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
-        <a href="backup_export.php" class="btn btn-secondary">
-            Go to Backup (Export)
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
         </a>
         <br><br>
         

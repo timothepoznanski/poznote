@@ -92,7 +92,7 @@ foreach($folders as $folderName => $notes) {
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
-            echo "<i class='fa-star folder-icon'></i>";
+            echo "<i class='fa-star-light folder-icon'></i>";
         } else {
             echo "<i class='$chevron_icon folder-icon'></i>";
         }

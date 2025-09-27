@@ -49,9 +49,8 @@ $is_generating = false;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content Verification - <?php echo htmlspecialchars($note_title); ?></title>
-    <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/check_errors.css">
     <link href="css/modals.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">
     <div class="summary-page">

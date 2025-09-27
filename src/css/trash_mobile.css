@@ -89,9 +89,6 @@
         gap: 30px;
     }
     
-    .trash-button-icon {
-        font-size: 24px;
-    }
     
     .trash-content {
         padding: 10px;
@@ -114,6 +111,12 @@
         justify-content: flex-end;
         margin-bottom: 10px;
         gap: 15px;
+    }
+    
+    /* Larger trash action icons on mobile for better touch targets */
+    .fa-trash, .fa-trash-restore-alt-svg {
+        width: 1.5em !important;
+        height: 1.5em !important;
     }
     
     .css-title {

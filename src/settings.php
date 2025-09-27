@@ -16,20 +16,20 @@ include 'functions.php';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Settings - Poznote</title>
     <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 
 <body>
     <div class="settings-container">
         <br>
-        <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
-            <i class="fa-arrow-left"></i>
+        <a id="backToNotesLink" href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="btn btn-secondary">
             Back to Notes
         </a>
-        <br>
+        <br><br>
         
         <div class="settings-grid">
             <!-- Workspace Management -->
-            <div class="settings-card" onclick="window.location = 'manage_workspaces.php';">
+            <div class="settings-card" onclick="window.location = 'workspaces.php';">
                 <div class="settings-card-icon">
                     <i class="fa-layer-group"></i>
                 </div>
@@ -113,7 +113,7 @@ include 'functions.php';
     </div>
     
     <!-- For Update modal -->
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     
     <!-- Include JavaScript files -->
     <script src="js/globals.js"></script>

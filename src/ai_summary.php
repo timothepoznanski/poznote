@@ -50,9 +50,8 @@ $is_generating = false;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Summary - <?php echo htmlspecialchars($note_title); ?></title>
-    <link href="css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/ai_summary.css">
     <link href="css/modals.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/ai.css">
 </head>
 <body class="ai-page">
     <div class="summary-page">
@@ -101,6 +100,7 @@ $is_generating = false;
         var noteWorkspace = <?php echo $workspace ? json_encode($workspace) : 'undefined'; ?>;
     </script>
     <script src="js/ai-summary.js"></script>
+    <script src="js/copy-code-on-focus.js"></script>
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');

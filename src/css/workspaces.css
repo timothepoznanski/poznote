@@ -1,4 +1,25 @@
-/* Styles spécifiques pour la page manage_workspaces.php */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    color: rgb(55, 53, 47);
+}
+
+body {
+    height: 100%;
+}
 
 /* Conteneur principal pour les pages de paramètres */
 .settings-container {
@@ -60,7 +81,7 @@
 .ws-col {
     display: flex;
     align-items: center;
-    padding: 0 10px;
+    /* padding: 0 10px; */
 }
 
 .ws-col-name {
@@ -108,7 +129,7 @@
     border-radius: 3px;
     border: 1px solid #dee2e6;
     background-color: white;
-    color: #495057;
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.2s;
     margin-left: 5px;
@@ -121,8 +142,11 @@
 
 .btn-rename {
     background-color: #ffc107;
-    color: #212529;
+    color: white;
     border-color: #ffc107;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-rename:hover {
@@ -141,52 +165,6 @@
     border-color: #bd2130;
 }
 
-/* Modal de renommage */
-.rename-modal {
-    display: none;
-    position: fixed;
-    z-index: 1050;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
-}
-
-.rename-modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 6px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-}
-
-.rename-modal-content h3 {
-    margin-top: 0;
-    color: #333;
-}
-
-.rename-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.rename-form input {
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.rename-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
 
 /* Indicateur de chargement */
 .loading-workspaces {
@@ -286,4 +264,105 @@
 .btn-delete:hover {
     color: #dc3545;
     border-color: #dc3545;
+}
+
+.workspace-list .action-btn:active { transform: translateY(1px); }
+
+/* Disabled / grayed buttons */
+.btn[disabled], .btn.disabled {
+    background: #e9ecef !important;
+    color: #6c757d !important;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    opacity: 0.95;
+}
+
+/* Ensure delete column has consistent spacing */
+.ws-col-delete { justify-content: center; }
+
+/* Lock icon for default workspace */
+.locked-icon { color: #777; margin-left: 8px; font-size: 0.9rem; }
+
+/* Responsive: stack controls on small screens */
+@media (max-width: 600px) {
+    .workspace-list ul li {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 8px;
+        padding: 10px 6px;
+        border-bottom: 1px solid #eee;
+    }
+    .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ws-col-name { padding-left: 0; font-size: 1rem; }
+    .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
+    .workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
+}
+
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background: #007DB8;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #005a8a;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-warning {
+    background: #ffc107;
+    /* color: #212529; */
+}
+
+.btn-warning:hover {
+    background: #e0a800;
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.form-group input[type="text"], 
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px 40px 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
 }

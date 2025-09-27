@@ -59,6 +59,9 @@ $res_right = $note_data['res_right'];
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
+    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>
@@ -166,6 +169,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         }
     };
     </script>
+
     <script>
     // Apply folder counts visibility based on settings stored in localStorage
     document.addEventListener('DOMContentLoaded', function() {
@@ -232,28 +236,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     </script>
 
     <div class="main-container">
+
     <script>
-    // Set workspace display map for JavaScript
-    window.workspaceDisplayMap = <?php
-        $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
-        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-    ?>;
+        // Set workspace display map for JavaScript
+        window.workspaceDisplayMap = <?php
+            $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
+            echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+        ?>;
     </script>
 
-    <!-- workspace selector removed (now shown under left header) -->
-
-
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     
     <!-- LEFT COLUMN -->	
     <div id="left_col">
-
-        <?php include 'templates/mobile_menu.php'; ?>
-
-        
-    <!-- MENU -->
-
-    <!-- Depending on the cases, we create the queries. -->  
         
     <?php
     // Construction des conditions de recherche sécurisées
@@ -266,10 +261,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
-    <!-- MENU -->
-
-    <?php include 'templates/desktop_menu.php'; ?>
-
+    <!-- MENU (Workspace name + search bar) left colum -->
+    <?php include 'menu_mobile.php'; ?>
+    <?php include 'menu_desktop.php'; ?>
         
     <script>
     // Set configuration variables for the main page
@@ -328,8 +322,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Get total notes count for folder opening logic
         $total_notes = getTotalNotesCount($con, $workspace_filter);
         
-        include 'templates/notes_list.php';
-                 
+        // Notes list left column
+        include 'notes_list.php';                 
     ?>
 
     </div>
@@ -348,7 +342,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>New note';
+        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>Note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -367,7 +361,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         // Folder item
         var folderItem = document.createElement('button');
         folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>New folder';
+        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>Folder';
         folderItem.onclick = function() {
             newFolder();
             createMenu.remove();
@@ -381,10 +375,21 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             createTaskListNote();
             createMenu.remove();
         };
+
+        // Workspace item
+        var workspaceItem = document.createElement('button');
+            workspaceItem.className = 'create-menu-item';
+            workspaceItem.innerHTML = '<i class="fa-layer-group" style="margin-right: 10px; color: #007DB8;"></i>Workspace';
+        workspaceItem.onclick = function() {
+            // Navigate to the workspaces management page
+            window.location = 'workspaces.php';
+            createMenu.remove();
+        };
         
         createMenu.appendChild(noteItem);
         createMenu.appendChild(folderItem);
         createMenu.appendChild(taskListItem);
+    createMenu.appendChild(workspaceItem);
         
         var plusButton = document.querySelector('.sidebar-plus');
         if (plusButton && plusButton.parentNode) {
@@ -515,11 +520,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $home_button_class .= ' desktop-home-btn';
                 }
                 
-                // Use goBackToNoteList function for better mobile experience if no search parameters
-                if (empty($home_params)) {
+                // For mobile, prefer the client-side handler so it can preserve the active search/folder state
+                // For desktop with explicit home params, use the server-generated URL
+                if ($is_mobile) {
                     echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 } else {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'"><i class="fa-home"></i></button>';
+                    if (empty($home_params)) {
+                        echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
+                    } else {
+                            echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'">' . "<i class=\"fa-home\"></i></button>";
+                    }
                 }
                 
                 // Text formatting buttons (visible only during selection on desktop)
@@ -587,7 +597,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $is_favorite = $row['favorite'] ?? 0;
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star star-icon"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
@@ -711,7 +721,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $is_favorite = $row['favorite'] ?? 0;
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star star-icon"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
@@ -789,11 +799,12 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 echo '</div>';
                 echo '</div>';
                 
-                // Tags only (folder selection removed)
+                // Tags container: keep a hidden input for JS but remove the visible icon/input.
+                // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                 echo '<div class="note-tags-row">';
                 echo '<span class="fa-tag icon_tag"></span>';
                 echo '<span class="name_tags">'
-                    .'<input class="add-margin" size="70px" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Add tags here" onfocus="updateidtags(this);" id="tags'.$row['id'].'" type="text" placeholder="Tags ?" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
+                    .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                 .'</span>';
                 echo '</div>';
                 
@@ -1046,5 +1057,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>
+<script src="js/copy-code-on-focus.js"></script>
 
 </html>

@@ -1,7 +1,14 @@
 body {
     background: #f8f9fa;
     font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
 }
+
 .settings-container {
     max-width: 800px;
     margin: 10px auto;
@@ -108,19 +115,6 @@ body {
     color: #991b1b;
 }
 
-@media (max-width: 640px) {
-    .settings-container {
-        margin: 10px;
-        padding: 10px;
-    }
-    .settings-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
-}
-
-/* Icon sprites / replacements used across UI (copied from index.css)
-     Ensures settings page shows the same icons after head_includes.php removal */
-.fa-arrow-left-svg,
 .fa-arrow-left {
     display: inline-block;
     width: 1em;
@@ -134,7 +128,6 @@ body {
     content: '';
 }
 
-.fa-layer-group-svg,
 .fa-layer-group {
     display: inline-block;
     width: 1em;
@@ -149,12 +142,18 @@ body {
 }
 
 .fa-robot-svg {
-    width: 1.2em;
-    height: 1.2em;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
     background-image: url('../images/robot-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
 }
 
-.fa-upload-svg,
 .fa-upload {
     display: inline-block;
     width: 1em;
@@ -168,7 +167,6 @@ body {
     content: '';
 }
 
-.fa-download-svg,
 .fa-download {
     display: inline-block;
     width: 1em;
@@ -182,9 +180,7 @@ body {
     content: '';
 }
 
-.fa-file-alt-svg,
-.fa-file-alt,
-.fa-file-lines {
+.fa-file-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -197,9 +193,7 @@ body {
     content: '';
 }
 
-.fa-sync-alt-svg,
-.fa-sync-alt,
-.fa-rotate {
+.fa-sync-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -212,7 +206,6 @@ body {
     content: '';
 }
 
-.fa-globe-svg,
 .fa-globe {
     display: inline-block;
     width: 1em;
@@ -226,7 +219,6 @@ body {
     content: '';
 }
 
-.fa-info-svg,
 .fa-info {
     display: inline-block;
     width: 1em;
@@ -240,7 +232,6 @@ body {
     content: '';
 }
 
-.fa-code-branch-svg,
 .fa-code-branch {
     display: inline-block;
     width: 1em;
@@ -252,4 +243,31 @@ body {
     font-family: inherit !important;
     font-style: normal !important;
     content: '';
+}
+
+/* Button styles */
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
 }

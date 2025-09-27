@@ -23,8 +23,6 @@
         </div>
     </div>
 
-    <!-- CTA buttons moved to sidebar footer (index.php) -->
-
     <div class="contains_forms_search searchbar-desktop">
         <form id="unified-search-form" action="index.php" method="POST">
             <div class="unified-search-container">
@@ -42,9 +40,9 @@
                 <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
                 <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags && !$preserve_folders) ? '1' : ''); ?>">
+                <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
                 <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
-                <input type="hidden" id="search-in-folders" name="search_in_folders" value="<?php echo ($using_unified_search && !empty($_POST['search_in_folders']) && $_POST['search_in_folders'] === '1') || (!$using_unified_search && $preserve_folders) ? '1' : ''; ?>">
+                <!-- folder-based search via the unified search bar has been removed -->
             </div>
         </form>
     </div>

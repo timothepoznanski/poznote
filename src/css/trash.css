@@ -124,37 +124,45 @@ body.trash-page {
     margin: 20px 30px;
 }
 
-.trash-back-button,
-.trash-empty-button {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-
-.trash-back-button:hover,
-.trash-empty-button:hover .trash-button-icon.fa-trash-alt {
-    filter: brightness(0) saturate(100%) invert(78%) sepia(95%) saturate(1500%) hue-rotate(39deg) brightness(102%) contrast(105%) !important;
-}
-
-.trash-button-icon {
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
     text-align: center;
-    font-size: 20px;
-    color: #007DB8;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Override for custom SVG icons in trash buttons */
-.trash-empty-button .trash-button-icon.fa-trash-alt {
-    font-size: inherit !important;
-    color: inherit !important;
-    background-image: url('../images/broom-light-full.svg') !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-size: contain !important;
-    width: 1.2em !important;
-    height: 1.2em !important;
-    display: inline-block !important;
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%) !important;
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c43b3b;
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
 .trash-content {
@@ -194,39 +202,6 @@ body.trash-page {
     position: relative;
 }
 
-.icon_restore_trash {
-    margin: 0;
-}
-
-/* Override for custom SVG icons in trash */
-.trash-notecard .trash-action-icons .icon_trash_trash.fa-trash {
-    font-size: inherit !important;
-    color: inherit !important;
-    background-image: url('../images/trash-can-light-full.svg') !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-size: contain !important;
-    width: 1.2em !important;
-    height: 1.2em !important;
-    display: inline-block !important;
-    filter: brightness(0) saturate(100%) invert(20%) sepia(10%) saturate(1000%) hue-rotate(33deg) brightness(95%) contrast(95%) !important;
-}
-
-.icon_restore_trash:hover {
-    background-color: rgba(0, 128, 0, 0.1);
-    color: green;
-}
-
-/* .icon_trash_trash:hover {
-    background-color: rgba(255, 0, 0, 0.1);
-    color: red;
-} */
-
-/* Override hover for custom SVG icon */
-/* .trash-notecard .trash-action-icons .icon_trash_trash.fa-trash:hover {
-    filter: brightness(0) saturate(100%) invert(39%) sepia(95%) saturate(1500%) hue-rotate(0deg) brightness(102%) contrast(105%) !important;
-} */
-
 .trash-no-notes {
     text-align: center;
     color: #666;
@@ -244,8 +219,6 @@ body.trash-page {
     color: #007DB8;
 }
 
-/* Styles spécifiques aux actions de la page trash */
-
 .backbutton, .emptytrash {
     display: inline-block;
     width: 30px;
@@ -256,7 +229,6 @@ body.trash-page {
     font-size: 17px;
 }
 
-/* Search input styles for trash page */
 .searchtrash::-webkit-input-placeholder {
     color: white;
 }
@@ -292,23 +264,67 @@ body.trash-page {
     color: #d32f2f;
 }
 
-/* Override icon styles specifically for trash page */
-.fa-arrow-circle-left-svg,
-.fa-arrow-circle-left {
+.fa-arrow-circle-left  {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
     background-image: url('../images/arrow-left-light-full.svg') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
 }
 
-.fa-trash-alt-svg {
-  width: 0.85em !important;
-  height: 0.85em !important;
-  background-image: url('../images/broom-light-full.svg') !important;
+.trash-empty-button  {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/broom-light-full.svg') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
+.fa-trash {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    background-image: url('../images/trash-can-light-full.svg') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+    cursor: pointer;
+    transition: filter 0.1s ease;
+}
+
+.fa-trash:hover {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
 }
 
 .fa-trash-restore-alt-svg {
-  background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+    cursor: pointer;
+    transition: filter 0.2s ease;
 }
 
-.fa-trash-svg,
-.fa-trash {
-    background-image: url('../images/trash-can-light-full.svg') !important;
+.fa-trash-restore-alt-svg:hover {
+    filter: brightness(0) saturate(100%) invert(34%) sepia(86%) saturate(1352%) hue-rotate(100deg) brightness(92%) contrast(89%);
 }
+

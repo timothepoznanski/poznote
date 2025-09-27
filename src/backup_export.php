@@ -271,9 +271,8 @@ function createBackup() {
 <head>
     <title>Backup (Export) - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/backup_export.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="backup-container">
@@ -282,8 +281,8 @@ function createBackup() {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
-        <a href="restore_import.php" class="btn btn-secondary">
-            Go to Restore (Import)
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
         </a>
 
     <br><br>

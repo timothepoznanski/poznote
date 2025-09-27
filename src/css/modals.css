@@ -12,6 +12,11 @@
    1. BASE MODAL STYLES
    =========================================== */
 
+:root {
+    /* Central modal max width for ordinary dialogs. Tweak here to change all standard modals. */
+    --modal-max-width: 420px;
+}
+
 /* Base modal overlay and positioning */
 .modal {
     display: none;
@@ -43,11 +48,174 @@
     display: none;
 }
 
+.modal-error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    border: 1px solid #f5c6cb;
+}
+
 /* Modal base styles are defined below (responsive, centered) */
 .modal .form-group label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
+}
+
+/* Base modal content styles */
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: none;
+    border-radius: 8px;
+    width: 90%;
+    max-width: var(--modal-max-width);
+    margin: 0 auto; /* horizontal center; vertical spacing comes from .modal padding */
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-sizing: border-box;
+    /* prevent inner elements from causing horizontal overflow */
+    overflow-x: hidden;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: rgb(55, 53, 47);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-content input, .modal-content select {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-content input:focus, .modal-content select:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgba(224,224,224,0.9);
+    /* allow buttons to wrap instead of forcing a horizontal scroll */
+    flex-wrap: wrap;
+}
+
+.modal-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+    /* allow buttons to shrink on narrow viewports */
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* Ensure buttons and form controls inside modals never exceed the modal width */
+.modal-content .btn,
+.modal-content button,
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.modal-buttons button:first-child {
+    background-color: #007DB8;
+    color: white;
+}
+
+.modal-buttons button:first-child:hover {
+    background-color: #005a8a;
+}
+
+.modal-buttons button:last-child {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons button:last-child:hover {
+    background-color: #e9ecef;
+}
+
+/* Respect explicit button classes for modals (take precedence over first/last child rules) */
+.modal-buttons button.btn-primary {
+    background-color: #007DB8;
+    color: white;
+    border: none;
+}
+.modal-buttons button.btn-primary:hover {
+    background-color: #005a8a;
+}
+.modal-buttons button.btn-cancel {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+.modal-buttons button.btn-cancel:hover {
+    background-color: #e9ecef;
+}
+
+/* Specific rules for the dynamically-created input modal to ensure consistent styling */
+#inputModal .modal-content {
+    max-width: 420px;
+    padding: 18px;
+}
+
+#inputModal .modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+#inputModal .modal-body input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Ensure the buttons in the input modal appear inline on desktop */
+#inputModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#inputModal .modal-buttons .btn-cancel {
+    flex: 0 0 auto;
+}
+
+#inputModal .modal-buttons .btn-primary {
+    flex: 0 0 auto;
+}
+
+/* On small screens, fall back to stacked full-width buttons (mobile-friendly) */
+@media (max-width: 420px) {
+    #inputModal .modal-content { max-width: 95% !important; }
+    #inputModal .modal-buttons, #inputModal .modal-buttons button { width: 100% !important; display: block !important; }
 }
 
 /* ===========================================
@@ -63,6 +231,58 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+}
+
+/* Move Folder Files Modal */
+#moveFolderFilesModal .modal-content {
+    max-width: 420px;
+    padding: 18px;
+}
+
+#moveFolderFilesModal select#targetFolderSelect {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    margin: 10px 0 12px 0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#moveFolderFilesModal .modal-info-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    padding: 8px 0 0 0;
+    margin-top: 8px;
+}
+
+#moveFolderFilesModal .modal-info-message i {
+    color: #6b7280;
+}
+
+#moveFolderFilesModal .modal-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel {
+    min-width: 110px;
+}
+
+/* Error message styling (reuse modal-error-message but ensure visibility in this modal) */
+#moveFolderFilesModal .modal-error-message {
+    display: none;
+    margin-top: 10px;
+}
+
+@media (max-width: 420px) {
+    #moveFolderFilesModal .modal-content { max-width: 95% !important; }
+    #moveFolderFilesModal .modal-buttons, #moveFolderFilesModal .modal-buttons button { width: 100% !important; display: block !important; }
 }
 
 .font-size-controls {
@@ -132,13 +352,20 @@
 }
 
 #fontSizeModal #saveFontSizeBtn {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 14px !important;
+    border-radius: 4px !important;
 }
 
 #fontSizeModal #cancelFontSizeBtn {
     background-color: #f1f1f1;
     color: #333;
+}
+
+#fontSizeModal #saveFontSizeBtn:hover {
+    background-color: #005a8a !important;
 }
 
 
@@ -290,12 +517,13 @@
 }
 
 .link-modal-content {
-    background: #ffffff;
+    background: #fff;
     border-radius: 10px;
-    width: min(640px, 96%);
-    max-width: 640px;
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
     box-shadow: 0 12px 30px rgba(15,15,15,0.18);
-    padding: 14px 16px;
+    padding: 24px 32px 20px 32px;
     box-sizing: border-box;
 }
 
@@ -572,6 +800,30 @@
     margin-bottom: 20px;
 }
 
+/* ----------------------------------------
+   ALERTS - ensure top alert has styles
+   Some pages include attachments.css or ai.css which define .alert,
+   but others may not. Provide a minimal, high-specificity rule here
+   so showTopAlert and server-rendered #topAlert look consistent.
+   ---------------------------------------- */
+.alert {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
 .modal-content.ai-summary-always-buttons .ai-loading p {
     color: #666;
     font-style: italic;
@@ -690,9 +942,8 @@
     color: #333;
 }
 
-/* STANDARD MODALS - Consolidated from index.css */
 #noteInfoModal .modal-content {
-    max-width: 450px;
+    max-width: 420px;
     text-align: left;
 }
 
@@ -743,7 +994,7 @@
 
 #updateModal .modal-content {
     text-align: center;
-    max-width: 500px;
+    max-width: 420px;
 }
 
 #updateModal .modal-content h3 {
@@ -795,7 +1046,7 @@
 
 #confirmModal .modal-content {
     text-align: center;
-    max-width: 500px;
+    max-width: 420px;
 }
 
 #confirmModal .modal-content h3 {
@@ -874,6 +1125,91 @@
     background-color: #c43b3b !important;
 }
 
+/* Permanently Delete Note Modal: make Delete red and Cancel gray */
+#deleteConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#deleteConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#deleteConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#deleteConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#deleteConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Empty Trash Modal: make Empty Trash red and Cancel gray */
+#emptyTrashConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#emptyTrashConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#emptyTrashConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#emptyTrashConfirmModal .btn-danger {
+    background-color: #e04b4b !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+#emptyTrashConfirmModal .btn-danger:hover {
+    background-color: #c43b3b !important;
+}
+
+/* Restore Confirmation Modal: make Restore primary blue and Cancel gray */
+#restoreConfirmModal .btn-cancel {
+    background-color: #6c757d !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .modal-content {
+    max-width: 420px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#restoreConfirmModal .btn-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+#restoreConfirmModal .btn-primary {
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+}
+
+#restoreConfirmModal .btn-primary:hover {
+    background-color: #0056b3 !important;
+}
+
 /* ===========================================
    3. RESPONSIVE STYLES
    =========================================== */
@@ -895,4 +1231,276 @@
     .link-modal-btn {
         width: 100%;
     }
+}
+
+/* ==================================================
+   MOBILE OVERRIDES (moved from index_mobile.css)
+        width: 90%;
+        max-width: 500px;
+   Kept here to centralize all modal mobile rules
+   ================================================== */
+
+/* Ensure modals are centered and fit within very small mobile viewport */
+#moveNotesModal, #renameModal, #deleteModal, .modal {
+    display: none;
+}
+
+/* Keep modal padding slightly smaller on compact layouts but don't force mobile layout on desktop */
+.modal {
+    padding: 24px 12px 12px 12px;
+}
+
+/* Default modal content sizing - respect central modal max width and keep box-sizing */
+.modal-content {
+    max-width: var(--modal-max-width);
+    box-sizing: border-box;
+}
+
+/* Make modal action buttons full-width on narrow screens to avoid overflow */
+@media (max-width: 420px) {
+    .modal-content .modal-buttons,
+    .modal-content .modal-buttons button {
+        width: 100% !important;
+    }
+    .modal-content .modal-buttons button {
+        display: block !important;
+        margin-bottom: 10px !important;
+    }
+}
+
+/* Modal mobile adjustments (more specific mobile sizing) */
+.modal-content {
+    margin: 5% auto 0; /* vertical spacing for modals */
+    /* Ensure modal never exceeds viewport on small screens while respecting the global max width */
+    max-width: min(var(--modal-max-width), 95%);
+}
+
+.modal-content input, .modal-content select {
+    font-size: 16px !important;
+    padding: 12px !important;
+}
+
+.modal-buttons button {
+    padding: 12px 20px !important;
+    font-size: 16px !important;
+}
+
+.modal-error-message {
+    text-align: center !important;
+    color: #dc3545 !important;
+    font-size: 15px !important;
+    margin-top: 15px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    background-color: #f8d7da !important;
+    border: 1px solid #f5c6cb !important;
+    display: none !important;
+    box-sizing: border-box !important;
+}
+
+/* Attachment modal mobile sizing */
+.attachment-modal .modal-content {
+    width: 90% !important;
+    max-width: 400px !important;
+    margin: 6% auto 0 auto !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+.attachment-upload {
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.attachment-upload input[type="file"] {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+}
+
+.attachment-upload button {
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 16px !important;
+}
+
+.attachment-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 12px !important;
+}
+
+.attachment-info {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.attachment-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+}
+
+.attachment-actions button {
+    flex: 1 !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+}
+
+/* AI modal mobile adjustments moved here */
+#aiSummaryModal .modal-content {
+    max-width: 95% !important;
+    width: 95% !important;
+    max-height: 90vh !important;
+    margin: 5vh auto !important;
+}
+
+#aiSummaryModal .modal-body {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+}
+
+.ai-loading i.rotating {
+    font-size: 1.5em !important;
+}
+
+.summary-content #summaryText {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.modal-footer {
+    flex-direction: column-reverse !important;
+    gap: 10px !important;
+}
+
+.modal-footer .btn {
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+
+
+/* Modal de renommage - target both legacy .rename-modal and the actual #renameModal element */
+#renameModal.modal,
+.rename-modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure the rename modal's content uses the standard modal-content styling (but keep localized tweaks) */
+#renameModal .modal-content,
+.rename-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Move notes modal - ensure overlay and content styles apply to the actual element */
+#moveNotesModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5) !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile-specific positioning for move notes modal */
+@media (max-width: 768px) {
+    #moveNotesModal.modal {
+        align-items: center !important; /* Override mobile default of flex-start */
+        padding: 20px 12px !important;
+    }
+    
+    #moveNotesModal .modal-content {
+        margin: 0 auto !important; /* Remove top margin for proper centering */
+    }
+}
+
+#moveNotesModal .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.rename-modal-content h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.rename-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rename-form input {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.rename-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Style the dropdown in the Move notes modal on desktop */
+#moveNotesModal select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+    background-color: #fff;
+    color: #222;
+}
+
+.delete-form { margin: 0; }
+.delete-form .btn { margin: 0; }
+.workspace-list ul li > .ws-col .action-btn { margin: 0; }
+.workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
+.workspace-list .btn-danger:hover { background: #c43b3b; }
+/* Ensure destructive buttons inside modals are visually prominent */
+.modal .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+.modal .btn-danger:hover {
+    background: #c43b3b;
+}
+/* .btn-rename visibility controlled earlier */
+.workspace-list .btn-rename {
+    display: inline-flex;
+    background: #f0ad4e; /* orange */
+    border: none;
 }

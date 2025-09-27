@@ -84,6 +84,19 @@
         text-overflow: ellipsis !important;
         word-wrap: break-word !important;
     }
+    
+    /* Navigation buttons should be side by side on mobile */
+    .settings-container > a.btn-secondary {
+        width: auto !important;
+        max-width: calc(50% - 5px) !important;
+        margin-bottom: 10px !important;
+        margin-right: 10px !important;
+        display: inline-block !important;
+    }
+    
+    .settings-container > a.btn-secondary:last-of-type {
+        margin-right: 0 !important;
+    }
 }
 
 /* Icon styles for attachments page - Mobile */

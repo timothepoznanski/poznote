@@ -16,12 +16,12 @@ include 'functions.php';
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Display - Poznote</title>
     <link rel="stylesheet" href="css/display.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="settings-container">
         <br>
-        <a href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="back-link">
-            <i class="fa-arrow-left"></i>
+        <a id="backToNotesLink" href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="btn btn-secondary">
             Back to Notes
         </a>
         <br><br>
@@ -76,11 +76,12 @@ include 'functions.php';
         </div>
     </div>
 
-    <?php include 'templates/modals.php'; ?>
+    <?php include 'modals.php'; ?>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
+    <script src="js/copy-code-on-focus.js"></script>
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){

@@ -37,15 +37,13 @@ function initializeWorkspacesAndLabels($con) {
  */
 function initializeSearchParams() {
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
-    $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
+    $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? '';
     $note = $_GET['note'] ?? '';
     $folder_filter = $_GET['folder'] ?? '';
     
     // Handle search type preservation when clearing search
     $preserve_notes = isset($_GET['preserve_notes']) && $_GET['preserve_notes'] === '1';
     $preserve_tags = isset($_GET['preserve_tags']) && $_GET['preserve_tags'] === '1';
-    $preserve_folders = isset($_GET['preserve_folders']) && $_GET['preserve_folders'] === '1';
-    
     return [
         'search' => $search,
         'tags_search' => $tags_search,
@@ -53,8 +51,7 @@ function initializeSearchParams() {
         'folder_filter' => $folder_filter,
         'workspace_filter' => getWorkspaceFilter(),
         'preserve_notes' => $preserve_notes,
-        'preserve_tags' => $preserve_tags,
-        'preserve_folders' => $preserve_folders
+        'preserve_tags' => $preserve_tags
     ];
 }
 

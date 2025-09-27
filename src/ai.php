@@ -85,8 +85,6 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
 <head>
     <title>Artificial Intelligence - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/ai.css">
 </head>
 <body>
@@ -96,6 +94,9 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
     
             <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
                 Back to Notes
+            </a>
+            <a href="settings.php" class="btn btn-secondary">
+                Back to Settings
             </a>
 
         <br><br>
@@ -165,7 +166,9 @@ $ai_language = isset($settings['ai_language']) ? $settings['ai_language'] : 'en'
                                 
                             </button>
                         </div>
-                        <!-- Help text for OpenAI API key removed as requested -->
+                        <div class="help-text">
+                            <a href="https://platform.openai.com/api-keys" target="_blank">Get an API key from OpenAI</a>
+                        </div>
                     </div>
                     
                     <div class="form-group">

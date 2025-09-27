@@ -8,6 +8,125 @@ var currentLoadingNoteId = null;
 var isNoteLoading = false;
 
 /**
+ * Reapply search highlights with a couple of delayed retries to handle layout timing.
+ * Centralized helper to avoid duplicated code blocks across loaders.
+ */
+function applyHighlightsWithRetries() {
+    // Determine active search type (prefer SearchManager if available)
+    var activeType = null;
+    try {
+        var isMobile = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        // 1) Prefer SearchManager's mobile-aware state
+        if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+            activeType = window.searchManager.getActiveSearchType(!!isMobile) || null;
+        }
+        // 2) Fallback to URL params (tags_search / search) which reflect user-initiated searches
+        if (!activeType) {
+            try {
+                var urlParams = new URLSearchParams(window.location.search || '');
+                if (urlParams.get('tags_search')) activeType = 'tags';
+                else if (urlParams.get('search')) activeType = 'notes';
+            } catch (e) { /* ignore */ }
+        }
+        // 3) Finally infer from hidden inputs (mobile-aware)
+        if (!activeType) {
+            try {
+                var hiddenTags = (isMobile && document.getElementById('search-in-tags-mobile')?.value === '1') || (!isMobile && document.getElementById('search-in-tags')?.value === '1');
+                var hiddenNotes = (isMobile && document.getElementById('search-in-notes-mobile')?.value === '1') || (!isMobile && document.getElementById('search-in-notes')?.value === '1');
+                if (hiddenTags) activeType = 'tags';
+                else if (hiddenNotes) activeType = 'notes';
+            } catch (e) { /* ignore */ }
+        }
+
+        // No folder-specific fallbacks: only detect notes or tags searches.
+    } catch (e) { activeType = null; }
+
+    // Extra fallback: use globally recorded last active search type from SearchManager
+    if (!activeType && typeof window._lastActiveSearchType === 'string') {
+        activeType = window._lastActiveSearchType;
+    }
+
+    // folders search removed: always allow notes/tags highlight reapplication
+
+    // Reapply only the highlights relevant to the active search type
+    if (activeType === 'tags') {
+        // Clear any note content highlights so tags are the only visible highlights
+        if (typeof clearSearchHighlights === 'function') {
+            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try {
+                var desktopTagsTerm = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || '';
+                var mobileTagsTerm = (document.getElementById('search-tags-hidden-mobile') && document.getElementById('search-tags-hidden-mobile').value) || '';
+                var visible = (document.getElementById('unified-search') && document.getElementById('unified-search').value) || (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
+                var term = desktopTagsTerm && desktopTagsTerm.trim() ? desktopTagsTerm.trim() : (mobileTagsTerm && mobileTagsTerm.trim() ? mobileTagsTerm.trim() : visible.trim());
+                window.highlightMatchingTags(term);
+            } catch (e) { /* ignore */ }
+        }
+    } else if (activeType === 'notes') {
+        // Clear any tag UI highlights so notes highlights are the only visible highlights
+        if (typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+        }
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+    } else {
+        // Unknown active type: attempt to re-run both but prefer notes first
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags((document.getElementById('unified-search') && document.getElementById('unified-search').value) || ''); } catch (e) { /* ignore */ }
+        }
+    }
+
+    // Delayed retries to handle layout/async changes and overlay positioning
+    setTimeout(function() {
+        if (activeType === 'notes') {
+            if (typeof highlightSearchTerms === 'function') {
+                try { highlightSearchTerms(); } catch (e) {}
+            }
+        } else if (activeType === 'tags') {
+            // Clear any note highlights before highlighting tags
+            if (typeof clearSearchHighlights === 'function') {
+                try { clearSearchHighlights(); } catch (e) {}
+            }
+            if (typeof window.highlightMatchingTags === 'function') {
+                try {
+                    var term2 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                    window.highlightMatchingTags(term2);
+                } catch (e) { /* ignore */ }
+            }
+        }
+        if (typeof updateAllOverlayPositions === 'function') {
+            try { updateAllOverlayPositions(); } catch (e) {}
+        }
+    }, 100);
+    setTimeout(function() {
+        if (activeType === 'notes') {
+            if (typeof highlightSearchTerms === 'function') {
+                try { highlightSearchTerms(); } catch (e) {}
+            }
+        } else if (activeType === 'tags') {
+            // Clear any note highlights before highlighting tags
+            if (typeof clearSearchHighlights === 'function') {
+                try { clearSearchHighlights(); } catch (e) {}
+            }
+            if (typeof window.highlightMatchingTags === 'function') {
+                try {
+                    var term3 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                    window.highlightMatchingTags(term3);
+                } catch (e) { /* ignore */ }
+            }
+        }
+        if (typeof updateAllOverlayPositions === 'function') {
+            try { updateAllOverlayPositions(); } catch (e) {}
+        }
+    }, 300);
+}
+
+/**
  * Check if we're on mobile
  */
 function isMobileDevice() {
@@ -81,11 +200,23 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                                 // right_col found in response
                                 const currentRightColumn = document.getElementById('right_col');
                                     if (currentRightColumn) {
+                                    // Clear existing highlights first to avoid overlays being left over
+                                    if (typeof clearSearchHighlights === 'function') {
+                                        try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                                    }
+
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
                                     updateBrowserUrl(url, noteTitle);
                                     reinitializeNoteContent();
+
+                                    // Reapply highlights after content has been reinitialized.
+                                    // Use delayed calls to ensure layout has stabilized when switching notes.
+                                    if (typeof applyHighlightsWithRetries === 'function') {
+                                        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                                    }
+
                                     hideNoteLoadingState();
 
                                     // Apply selection after content is loaded and initialized
@@ -127,11 +258,14 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         xhr.onerror = function() {
             window.isLoadingNote = false;
             console.error('Network error during note loading');
-                                    console.error('Network error during note loading for', noteTitle);
             showNotificationPopup('Network error - please check your connection');
             hideNoteLoadingState();
             if (isMobileDevice()) {
                 document.body.classList.remove('note-open');
+                // Re-initialize search highlighting if in search mode
+                if (typeof applyHighlightsWithRetries === 'function' && isSearchMode) {
+                    try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                }
             }
         };
 
@@ -202,6 +336,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                         // Update the right column content
                         const currentRightColumn = document.getElementById('right_col');
                             if (currentRightColumn) {
+                            // Clear existing highlights first to avoid overlays being left over
+                            if (typeof clearSearchHighlights === 'function') {
+                                try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                            }
+
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
 
                             // Update URL before reinitializing so reinitializeNoteContent
@@ -210,6 +349,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
+
+                            // Reapply highlights after content initialization using centralized helper
+                            if (typeof applyHighlightsWithRetries === 'function') {
+                                try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                            }
 
                             // Hide loading state
                             hideNoteLoadingState();
@@ -318,15 +462,29 @@ function updateSelectedNote(clickedLink) {
         link.classList.remove('selected-note');
     });
 
-    // Add selected class to clicked note
+    // Add selected class to clicked note and all other instances of the same note
     if (clickedLink) {
-        clickedLink.classList.add('selected-note');
+        const noteId = clickedLink.getAttribute('data-note-id');
+        if (noteId) {
+            // Find all links with the same note ID (including in favorites)
+            document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
+                link.classList.add('selected-note');
+            });
+        } else {
+            // Fallback to the clicked link only if no data-note-id
+            clickedLink.classList.add('selected-note');
+        }
         
         // Ensure the selection persists by re-applying it after a short delay
         // This helps in case other scripts interfere with the selection
         setTimeout(() => {
-            if (clickedLink && !clickedLink.classList.contains('selected-note')) {
-                // re-applying selected-note if removed by other scripts
+            if (noteId) {
+                document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
+                    if (!link.classList.contains('selected-note')) {
+                        link.classList.add('selected-note');
+                    }
+                });
+            } else if (clickedLink && !clickedLink.classList.contains('selected-note')) {
                 clickedLink.classList.add('selected-note');
             }
         }, 50);
@@ -337,8 +495,28 @@ function updateSelectedNote(clickedLink) {
  * Update browser URL without reload
  */
 function updateBrowserUrl(url, noteTitle) {
-    const state = { noteTitle: noteTitle };
-    history.pushState(state, '', url);
+    try {
+        // Merge existing search params (search, tags_search, workspace) into the target URL
+        const currentParams = new URLSearchParams(window.location.search || '');
+    const preserveKeys = ['search', 'tags_search', 'workspace'];
+
+        const target = new URL(url, window.location.origin);
+        const targetParams = new URLSearchParams(target.search || '');
+
+        preserveKeys.forEach(k => {
+            const v = currentParams.get(k);
+            if (v && !targetParams.has(k)) {
+                targetParams.set(k, v);
+            }
+        });
+
+        target.search = targetParams.toString();
+        const state = { noteTitle: noteTitle };
+        history.pushState(state, '', target.toString());
+    } catch (e) {
+        const state = { noteTitle: noteTitle };
+        history.pushState(state, '', url);
+    }
 }
 
 /**
@@ -383,7 +561,7 @@ function handleImageClick(event) {
     menu.className = 'image-menu';
     menu.innerHTML = `
         <div class="image-menu-item" data-action="view-large">
-            <i class="fa-expand"></i>
+            <i class="fa-maximize"></i>
             View Large
         </div>
         <div class="image-menu-item" data-action="download">
@@ -533,9 +711,14 @@ function downloadImage(imageSrc) {
 function reinitializeNoteContent() {
     // Re-initialize any JavaScript components that might be in the loaded content
 
-    // Re-initialize search highlighting if in search mode
-    if (typeof highlightSearchTerms === 'function' && isSearchMode) {
-        setTimeout(highlightSearchTerms, 100);
+    // Re-initialize search highlighting if in search mode.
+    // Prefer the centralized helper which knows about notes/tags/folders.
+    if (isSearchMode) {
+        if (typeof applyHighlightsWithRetries === 'function') {
+            try { setTimeout(function() { try { applyHighlightsWithRetries(); } catch(e){} }, 60); } catch (e) {}
+        } else if (typeof highlightSearchTerms === 'function') {
+            setTimeout(highlightSearchTerms, 100);
+        }
     }
 
     // Re-initialize clickable tags
@@ -595,25 +778,22 @@ function reinitializeNoteContent() {
         const unifiedSearchParam = urlParams.get('unified_search');
         const isInSearchMode = searchParam || tagsSearchParam || unifiedSearchParam;
         
-        // Only add note-open class if we have a specific note selected AND we're not in search mode
-        if (noteParam && !isInSearchMode) {
-            // Make sure body has note-open class
+        // If a specific note is selected, open the note pane on mobile.
+        // Previously this avoided opening during search mode; that prevented selecting notes while searching.
+        if (noteParam) {
             if (!document.body.classList.contains('note-open')) {
                 document.body.classList.add('note-open');
             }
-            
             // Ensure right column is visible
             const rightColumn = document.getElementById('right_col');
             if (rightColumn) {
                 rightColumn.style.display = 'block';
             }
         } else {
-            // If no specific note is selected or we're in search mode, ensure left column is visible
+            // If no specific note is selected, show the list
             if (document.body.classList.contains('note-open')) {
                 document.body.classList.remove('note-open');
             }
-            
-            // Ensure left column is visible
             const leftColumn = document.getElementById('left_col');
             if (leftColumn) {
                 leftColumn.style.display = 'block';

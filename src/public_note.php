@@ -93,4 +93,5 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
         <div class="content"><?php echo $content; ?></div>
     </div>
 </body>
+<script src="js/copy-code-on-focus.js"></script>
 </html>
