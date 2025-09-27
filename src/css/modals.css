@@ -171,6 +171,48 @@
     background-color: #e9ecef;
 }
 
+/* Specific rules for the dynamically-created input modal to ensure consistent styling */
+#inputModal .modal-content {
+    max-width: 480px;
+    padding: 18px;
+}
+
+#inputModal .modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+#inputModal .modal-body input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Ensure the buttons in the input modal appear inline on desktop */
+#inputModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#inputModal .modal-buttons .btn-cancel {
+    flex: 0 0 auto;
+}
+
+#inputModal .modal-buttons .btn-primary {
+    flex: 0 0 auto;
+}
+
+/* On small screens, fall back to stacked full-width buttons (mobile-friendly) */
+@media (max-width: 420px) {
+    #inputModal .modal-content { max-width: 95% !important; }
+    #inputModal .modal-buttons, #inputModal .modal-buttons button { width: 100% !important; display: block !important; }
+}
+
 /* ===========================================
    2. SPECIFIC MODAL STYLES
    =========================================== */
@@ -1094,18 +1136,15 @@
     display: none;
 }
 
+/* Keep modal padding slightly smaller on compact layouts but don't force mobile layout on desktop */
 .modal {
-    /* place modal at the top center on mobile */
-    align-items: flex-start !important;
-    justify-content: center !important;
-    padding: 24px 12px 12px 12px !important;
+    padding: 24px 12px 12px 12px;
 }
 
+/* Default modal content sizing (allow larger width on desktop, constrained on small screens by media queries below) */
 .modal-content {
-    width: 100% !important;
-    max-width: 420px !important;
-    margin: 0 !important; /* vertical spacing provided by .modal padding */
-    box-sizing: border-box !important;
+    max-width: 720px;
+    box-sizing: border-box;
 }
 
 /* Make modal action buttons full-width on narrow screens to avoid overflow */

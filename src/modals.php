@@ -88,11 +88,13 @@
 <!-- Modal for creating new folder -->
 <div id="newFolderModal" class="modal">
     <div class="modal-content">
-        <h3>Create New Folder</h3>
-        <input type="text" id="newFolderName" placeholder="Folder name" maxlength="255" onkeypress="if(event.key==='Enter') createFolder()">
+        <h3>New Folder</h3>
+        <div class="modal-body" style="margin-bottom: 10px;">
+            <input type="text" id="newFolderName" placeholder="New folder name" maxlength="255" style="width:100%; padding:8px 12px; margin-bottom:0; border:1px solid #ddd; border-radius:4px; font-size:14px; font-family:'Inter',sans-serif; box-sizing:border-box;" onkeypress="if(event.key==='Enter') createFolder()">
+        </div>
         <div class="modal-buttons">
-            <button onclick="createFolder()">Create</button>
-            <button onclick="closeModal('newFolderModal')">Cancel</button>
+            <button type="button" class="btn-cancel" onclick="closeModal('newFolderModal')">Cancel</button>
+            <button type="button" class="btn-primary" onclick="createFolder()">Create</button>
         </div>
     </div>
 </div>
