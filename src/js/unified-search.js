@@ -175,6 +175,17 @@ class SearchManager {
     if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
         try { highlightSearchTerms(); } catch (e) { /* ignore */ }
     }
+    // If switching into 'tags' search, attempt to highlight matching tag UI elements
+    if (searchType === 'tags' && typeof window.highlightMatchingTags === 'function') {
+        try {
+            // Prefer hidden term if present, else visible input
+            var hiddenTerm = elements.hiddenInputs.tagsTerm?.value || '';
+            var visibleTerm = elements.searchInput?.value || '';
+            var term = hiddenTerm && hiddenTerm.trim() ? hiddenTerm.trim() : visibleTerm.trim();
+            // Call highlightMatchingTags immediately and ensure retries if tags are created asynchronously
+            window.highlightMatchingTags(term);
+        } catch (e) { /* ignore */ }
+    }
     }
 
     /**

@@ -112,7 +112,7 @@ function redirectToTagWithExclusions(tagEncoded) {
     } else {
         // No exclusions, use simple GET redirect
     const wsParam = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    window.location.href = 'index.php?tags_search_from_list=' + tagEncoded + wsParam;
+    window.location.href = 'index.php?tags_search=' + tagEncoded + wsParam;
     }
 }
 

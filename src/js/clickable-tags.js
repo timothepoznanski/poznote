@@ -889,7 +889,7 @@ function redirectToTag(tag) {
                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
                                'Poznote';
         const wsParam = (currentWorkspace && currentWorkspace !== 'Poznote') ? '&workspace=' + encodeURIComponent(currentWorkspace) : '';
-        window.location.href = 'index.php?tags_search_from_list=' + encodeURIComponent(tag) + wsParam;
+    window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
     }
 }
 

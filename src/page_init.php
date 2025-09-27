@@ -37,7 +37,7 @@ function initializeWorkspacesAndLabels($con) {
  */
 function initializeSearchParams() {
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
-    $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? $_GET['tags_search_from_list'] ?? '';
+    $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? '';
     $note = $_GET['note'] ?? '';
     $folder_filter = $_GET['folder'] ?? '';
     
