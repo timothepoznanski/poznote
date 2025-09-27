@@ -505,12 +505,13 @@
 }
 
 .link-modal-content {
-    background: #ffffff;
+    background: #fff;
     border-radius: 10px;
-    width: min(640px, 96%);
-    max-width: 640px;
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
     box-shadow: 0 12px 30px rgba(15,15,15,0.18);
-    padding: 14px 16px;
+    padding: 24px 32px 20px 32px;
     box-sizing: border-box;
 }
 
@@ -1095,6 +1096,12 @@
     border: none !important;
 }
 
+#deleteConfirmModal .modal-content {
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+}
+
 #deleteConfirmModal .btn-cancel:hover {
     background-color: #5a6268 !important;
 }
@@ -1118,6 +1125,12 @@
     border: none !important;
 }
 
+#emptyTrashConfirmModal .modal-content {
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+}
+
 #emptyTrashConfirmModal .btn-cancel:hover {
     background-color: #5a6268 !important;
 }
@@ -1139,6 +1152,12 @@
     background-color: #6c757d !important;
     color: white !important;
     border: none !important;
+}
+
+#restoreConfirmModal .modal-content {
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
 }
 
 #restoreConfirmModal .btn-cancel:hover {
@@ -1180,6 +1199,8 @@
 
 /* ==================================================
    MOBILE OVERRIDES (moved from index_mobile.css)
+        width: 90%;
+        max-width: 500px;
    Kept here to centralize all modal mobile rules
    ================================================== */
 

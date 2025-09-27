@@ -559,16 +559,16 @@ function createLinkModal() {
         '<div class="modal-body">' +
         '<div style="margin-bottom: 10px;">' +
         '<label for="linkModalUrl" style="display: block; font-weight: bold; margin-bottom: 5px;">URL:</label>' +
-        '<input type="url" id="linkModalUrl" placeholder="https://example.com" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
+        '<input type="url" id="linkModalUrl" placeholder="https://example.com" />' +
         '</div>' +
         '<div>' +
         '<label for="linkModalText" style="display: block; font-weight: bold; margin-bottom: 5px;">Link text (optional):</label>' +
-        '<input type="text" id="linkModalText" placeholder="Displayed text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
+        '<input type="text" id="linkModalText" placeholder="Displayed text" />' +
         '</div>' +
         '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-secondary" id="linkModalCancel">Cancel</button>' +
-        '<button type="button" class="btn btn-primary" id="linkModalAdd">Add</button>' +
+    '<div class="modal-buttons">' +
+    '<button type="button" class="btn btn-cancel" id="linkModalCancel">Cancel</button>' +
+    '<button type="button" class="btn btn-primary" id="linkModalAdd">Add</button>' +
         '</div>' +
         '</div>' +
         '</div>';
