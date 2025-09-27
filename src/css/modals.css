@@ -228,6 +228,59 @@
     gap: 12px;
 }
 
+/* Move Folder Files Modal */
+#moveFolderFilesModal .modal-content {
+    max-width: 480px;
+    padding: 18px;
+}
+
+#moveFolderFilesModal select#targetFolderSelect {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    margin: 10px 0 12px 0;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#moveFolderFilesModal .modal-info-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+}
+
+#moveFolderFilesModal .modal-info-message i {
+    color: #6b7280;
+}
+
+#moveFolderFilesModal .modal-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#moveFolderFilesModal .modal-buttons .btn-cancel {
+    min-width: 110px;
+}
+
+/* Error message styling (reuse modal-error-message but ensure visibility in this modal) */
+#moveFolderFilesModal .modal-error-message {
+    display: none;
+    margin-top: 10px;
+}
+
+@media (max-width: 420px) {
+    #moveFolderFilesModal .modal-content { max-width: 95% !important; }
+    #moveFolderFilesModal .modal-buttons, #moveFolderFilesModal .modal-buttons button { width: 100% !important; display: block !important; }
+}
+
 .font-size-controls {
     margin: 20px 0;
     display: flex;
@@ -1161,9 +1214,8 @@
 
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
-    margin: 5% auto 0 !important; /* Further reduced from 15% to 10% for higher positioning */
-    width: 280px !important;
-    max-width: 95% !important;
+    margin: 5% auto 0; /* vertical spacing for modals */
+    max-width: 95%;
 }
 
 .modal-content input, .modal-content select {
