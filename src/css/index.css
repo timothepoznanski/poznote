@@ -2039,12 +2039,12 @@ hr {
 /* Quand save est modifié, changer l'icône et la garder rouge */
 .toolbar-btn.save-modified i.fa-save {
     background-image: url('../images/save_running.svg') !important;
-    color: #e53935 !important;
+    filter: invert(13%) sepia(95%) saturate(7481%) hue-rotate(0deg) brightness(102%) contrast(107%);
 }
 .toolbar-btn.save-modified:hover i.fa-save,
 .toolbar-btn.save-modified:focus i.fa-save {
     background-image: url('../images/save_running.svg') !important;
-    color: #e53935 !important;
+    filter: invert(13%) sepia(95%) saturate(7481%) hue-rotate(0deg) brightness(102%) contrast(107%);
 }
 /* Pour l'icône save normale, couleur gris foncé par défaut */
 .toolbar-btn:not(.save-modified) i.fa-save {
@@ -2734,19 +2734,6 @@ hr {
   width: 1em;
   height: 1em;
   background-image: url('../images/floppy-disk-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-save-running {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/save_running.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
