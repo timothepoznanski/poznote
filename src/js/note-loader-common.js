@@ -12,49 +12,112 @@ var isNoteLoading = false;
  * Centralized helper to avoid duplicated code blocks across loaders.
  */
 function applyHighlightsWithRetries() {
-    // Re-run normal content/title highlights if available
-    if (typeof highlightSearchTerms === 'function') {
-        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+    // Determine active search type (prefer SearchManager if available)
+    var activeType = null;
+    try {
+        var isMobile = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        // 1) Prefer SearchManager's mobile-aware state
+        if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+            activeType = window.searchManager.getActiveSearchType(!!isMobile) || null;
+        }
+        // 2) Fallback to URL params (tags_search / search) which reflect user-initiated searches
+        if (!activeType) {
+            try {
+                var urlParams = new URLSearchParams(window.location.search || '');
+                if (urlParams.get('tags_search')) activeType = 'tags';
+                else if (urlParams.get('search')) activeType = 'notes';
+            } catch (e) { /* ignore */ }
+        }
+        // 3) Finally infer from hidden inputs (mobile-aware)
+        if (!activeType) {
+            try {
+                var hiddenTags = (isMobile && document.getElementById('search-in-tags-mobile')?.value === '1') || (!isMobile && document.getElementById('search-in-tags')?.value === '1');
+                var hiddenNotes = (isMobile && document.getElementById('search-in-notes-mobile')?.value === '1') || (!isMobile && document.getElementById('search-in-notes')?.value === '1');
+                if (hiddenTags) activeType = 'tags';
+                else if (hiddenNotes) activeType = 'notes';
+            } catch (e) { /* ignore */ }
+        }
+    } catch (e) { activeType = null; }
+
+    // Extra fallback: use globally recorded last active search type from SearchManager
+    if (!activeType && typeof window._lastActiveSearchType === 'string') {
+        activeType = window._lastActiveSearchType;
     }
 
-    // Re-run tag highlighting if available (use hidden input or visible search value)
-    if (typeof window.highlightMatchingTags === 'function') {
-        try {
-            var desktopTagsTerm = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || '';
-            var mobileTagsTerm = (document.getElementById('search-tags-hidden-mobile') && document.getElementById('search-tags-hidden-mobile').value) || '';
-            var visible = (document.getElementById('unified-search') && document.getElementById('unified-search').value) || (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
-            var term = desktopTagsTerm && desktopTagsTerm.trim() ? desktopTagsTerm.trim() : (mobileTagsTerm && mobileTagsTerm.trim() ? mobileTagsTerm.trim() : visible.trim());
-            window.highlightMatchingTags(term);
-        } catch (e) { /* ignore */ }
+    // Reapply only the highlights relevant to the active search type
+    if (activeType === 'tags') {
+        // Clear any note content highlights so tags are the only visible highlights
+        if (typeof clearSearchHighlights === 'function') {
+            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try {
+                var desktopTagsTerm = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || '';
+                var mobileTagsTerm = (document.getElementById('search-tags-hidden-mobile') && document.getElementById('search-tags-hidden-mobile').value) || '';
+                var visible = (document.getElementById('unified-search') && document.getElementById('unified-search').value) || (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
+                var term = desktopTagsTerm && desktopTagsTerm.trim() ? desktopTagsTerm.trim() : (mobileTagsTerm && mobileTagsTerm.trim() ? mobileTagsTerm.trim() : visible.trim());
+                window.highlightMatchingTags(term);
+            } catch (e) { /* ignore */ }
+        }
+    } else if (activeType === 'notes') {
+        // Clear any tag UI highlights so notes highlights are the only visible highlights
+        if (typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+        }
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+    } else {
+        // Unknown active type: attempt to re-run both but prefer notes first
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags((document.getElementById('unified-search') && document.getElementById('unified-search').value) || ''); } catch (e) { /* ignore */ }
+        }
     }
 
     // Delayed retries to handle layout/async changes and overlay positioning
     setTimeout(function() {
-        if (typeof highlightSearchTerms === 'function') {
-            try { highlightSearchTerms(); } catch (e) {}
+        if (activeType === 'notes') {
+            if (typeof highlightSearchTerms === 'function') {
+                try { highlightSearchTerms(); } catch (e) {}
+            }
+        } else if (activeType === 'tags') {
+            // Clear any note highlights before highlighting tags
+            if (typeof clearSearchHighlights === 'function') {
+                try { clearSearchHighlights(); } catch (e) {}
+            }
+            if (typeof window.highlightMatchingTags === 'function') {
+                try {
+                    var term2 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                    window.highlightMatchingTags(term2);
+                } catch (e) { /* ignore */ }
+            }
         }
         if (typeof updateAllOverlayPositions === 'function') {
             try { updateAllOverlayPositions(); } catch (e) {}
-        }
-        if (typeof window.highlightMatchingTags === 'function') {
-            try {
-                var term2 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
-                window.highlightMatchingTags(term2);
-            } catch (e) { /* ignore */ }
         }
     }, 100);
     setTimeout(function() {
-        if (typeof highlightSearchTerms === 'function') {
-            try { highlightSearchTerms(); } catch (e) {}
+        if (activeType === 'notes') {
+            if (typeof highlightSearchTerms === 'function') {
+                try { highlightSearchTerms(); } catch (e) {}
+            }
+        } else if (activeType === 'tags') {
+            // Clear any note highlights before highlighting tags
+            if (typeof clearSearchHighlights === 'function') {
+                try { clearSearchHighlights(); } catch (e) {}
+            }
+            if (typeof window.highlightMatchingTags === 'function') {
+                try {
+                    var term3 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                    window.highlightMatchingTags(term3);
+                } catch (e) { /* ignore */ }
+            }
         }
         if (typeof updateAllOverlayPositions === 'function') {
             try { updateAllOverlayPositions(); } catch (e) {}
-        }
-        if (typeof window.highlightMatchingTags === 'function') {
-            try {
-                var term3 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
-                window.highlightMatchingTags(term3);
-            } catch (e) { /* ignore */ }
         }
     }, 300);
 }
@@ -414,8 +477,28 @@ function updateSelectedNote(clickedLink) {
  * Update browser URL without reload
  */
 function updateBrowserUrl(url, noteTitle) {
-    const state = { noteTitle: noteTitle };
-    history.pushState(state, '', url);
+    try {
+        // Merge existing search params (search, tags_search, workspace) into the target URL
+        const currentParams = new URLSearchParams(window.location.search || '');
+        const preserveKeys = ['search', 'tags_search', 'workspace'];
+
+        const target = new URL(url, window.location.origin);
+        const targetParams = new URLSearchParams(target.search || '');
+
+        preserveKeys.forEach(k => {
+            const v = currentParams.get(k);
+            if (v && !targetParams.has(k)) {
+                targetParams.set(k, v);
+            }
+        });
+
+        target.search = targetParams.toString();
+        const state = { noteTitle: noteTitle };
+        history.pushState(state, '', target.toString());
+    } catch (e) {
+        const state = { noteTitle: noteTitle };
+        history.pushState(state, '', url);
+    }
 }
 
 /**
@@ -672,25 +755,22 @@ function reinitializeNoteContent() {
         const unifiedSearchParam = urlParams.get('unified_search');
         const isInSearchMode = searchParam || tagsSearchParam || unifiedSearchParam;
         
-        // Only add note-open class if we have a specific note selected AND we're not in search mode
-        if (noteParam && !isInSearchMode) {
-            // Make sure body has note-open class
+        // If a specific note is selected, open the note pane on mobile.
+        // Previously this avoided opening during search mode; that prevented selecting notes while searching.
+        if (noteParam) {
             if (!document.body.classList.contains('note-open')) {
                 document.body.classList.add('note-open');
             }
-            
             // Ensure right column is visible
             const rightColumn = document.getElementById('right_col');
             if (rightColumn) {
                 rightColumn.style.display = 'block';
             }
         } else {
-            // If no specific note is selected or we're in search mode, ensure left column is visible
+            // If no specific note is selected, show the list
             if (document.body.classList.contains('note-open')) {
                 document.body.classList.remove('note-open');
             }
-            
-            // Ensure left column is visible
             const leftColumn = document.getElementById('left_col');
             if (leftColumn) {
                 leftColumn.style.display = 'block';

@@ -146,10 +146,13 @@ class SearchManager {
         
         const elements = this.getElements(isMobile);
         
-        // If leaving 'notes' search, clear highlights immediately (titles and inputs)
+        // If leaving a previous search type, clear highlights of that type
         const prev = this.currentSearchType;
         if (prev === 'notes' && searchType !== 'notes' && typeof clearSearchHighlights === 'function') {
             try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+        }
+        if (prev === 'tags' && searchType !== 'tags' && typeof window.highlightMatchingTags === 'function') {
+            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
         }
 
         // Clear all active states
@@ -167,6 +170,8 @@ class SearchManager {
         }
     // Persist state even if buttons are absent
     this.currentSearchType = searchType;
+    // Expose last active search type globally for other modules (used by applyHighlightsWithRetries)
+    try { window._lastActiveSearchType = searchType; } catch (e) { /* ignore */ }
     // debug info removed
 
     this.updateInterface(isMobile);
