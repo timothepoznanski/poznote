@@ -462,15 +462,29 @@ function updateSelectedNote(clickedLink) {
         link.classList.remove('selected-note');
     });
 
-    // Add selected class to clicked note
+    // Add selected class to clicked note and all other instances of the same note
     if (clickedLink) {
-        clickedLink.classList.add('selected-note');
+        const noteId = clickedLink.getAttribute('data-note-id');
+        if (noteId) {
+            // Find all links with the same note ID (including in favorites)
+            document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
+                link.classList.add('selected-note');
+            });
+        } else {
+            // Fallback to the clicked link only if no data-note-id
+            clickedLink.classList.add('selected-note');
+        }
         
         // Ensure the selection persists by re-applying it after a short delay
         // This helps in case other scripts interfere with the selection
         setTimeout(() => {
-            if (clickedLink && !clickedLink.classList.contains('selected-note')) {
-                // re-applying selected-note if removed by other scripts
+            if (noteId) {
+                document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
+                    if (!link.classList.contains('selected-note')) {
+                        link.classList.add('selected-note');
+                    }
+                });
+            } else if (clickedLink && !clickedLink.classList.contains('selected-note')) {
                 clickedLink.classList.add('selected-note');
             }
         }, 50);

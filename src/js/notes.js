@@ -259,11 +259,11 @@ function updateNoteTitleInLeftColumn() {
         elementsToUpdate.push(noteLinksById[i]);
     }
     
-    // Method 2: selected note
+    // Method 2: selected notes (all instances of the same note)
     if (elementsToUpdate.length === 0) {
-        var selectedNote = document.querySelector('.links_arbo_left.selected-note');
-        if (selectedNote) {
-            elementsToUpdate.push(selectedNote);
+        var selectedNotes = document.querySelectorAll('.links_arbo_left.selected-note');
+        for (var i = 0; i < selectedNotes.length; i++) {
+            elementsToUpdate.push(selectedNotes[i]);
         }
     }
     
