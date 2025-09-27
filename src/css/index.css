@@ -17,6 +17,11 @@
     display: none !important;
 }
 
+/* Hide emoji buttons when emoji icons are disabled */
+.emoji-hidden .btn-emoji {
+    display: none !important;
+}
+
 /* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
 .folder-header {
     display: block;
