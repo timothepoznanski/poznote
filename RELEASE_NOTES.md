@@ -1,6 +1,7 @@
 # Poznote — Simplified release notes (User features only)
 
-2025-09-19 — Add release notes and link in settings 
+2025-09-27 — Add ability to copy code block to clipboard (Clic on the bloc for 2 seconds)
+2025-09-19 — Add release notes link in settings 
 2025-09-18 — Linkify URLs inside task text
 2025-09-17 — Implement drag & drop task reordering
 2025-09-16 — Implement public sharing
