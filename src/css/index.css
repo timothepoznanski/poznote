@@ -2152,15 +2152,27 @@ hr {
 }
 
 .folder-actions {
-    opacity: 0; /* Hide folder actions buttons by default */ 
+    /* Keep the actions container visible so a single button can be shown
+       even when other buttons are hidden. Individual icons are hidden by
+       default instead (see .folder-actions i below). */
+    opacity: 1;
     transition: opacity 0.2s;
     margin-left: auto;
     flex: 0 0 auto;
 }
 
-/* Make folder actions buttons visible when hover */
-.folder-toggle:hover .folder-actions {
+/* Hide individual action icons by default to reproduce the previous
+   hover-to-show behaviour while allowing a specific icon to remain visible */
+.folder-actions i {
+    opacity: 0;
+    transition: opacity 0.12s ease-in-out, color 0.12s;
+    pointer-events: none;
+}
+
+/* Reveal icons on folder hover (except ones forced visible by other rules) */
+.folder-toggle:hover .folder-actions i {
     opacity: 1;
+    pointer-events: auto;
 }
 
 /* search-only hiding to avoid interfering with general hidden class */
@@ -2176,6 +2188,7 @@ hr {
     /* transition: background-color 0.2s, color 0.2s; */
 }
 
+
 .folder-search-btn {
     color: #007DB8; /* Blue by default (included in search) */
 }
@@ -2183,6 +2196,22 @@ hr {
 .folder-search-btn.excluded {
     color: #dc3545; /* Red when excluded from search */
     position: relative;
+    /* Force visibility even when other icons are hidden */
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    /* Subtle filter to make the icon visually 'redder' and stand out */
+    filter: drop-shadow(0 0 4px rgba(220,53,69,0.25));
+}
+
+/* Extra-specific selector to override other rules that might hide icons */
+.folder-actions i.folder-search-btn.excluded,
+.folder-toggle .folder-actions i.folder-search-btn.excluded {
+    display: inline-block !important;
+    opacity: 1 !important;
+    color: #dc3545 !important;
+    pointer-events: auto !important;
+    z-index: 5 !important;
+    transform: translateZ(0); /* trigger GPU to avoid rendering glitches */
 }
 
 /* Add a diagonal line over excluded folder search buttons */
