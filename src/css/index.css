@@ -3309,6 +3309,20 @@ hr {
   content: '';
 }
 
+/* Use specific create folder icon */
+.create-menu-item .fa-folder {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/create_new_folder.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 /* General rule for any input that might have search type */
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
