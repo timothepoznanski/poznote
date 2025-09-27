@@ -2802,8 +2802,8 @@ hr {
 
 .fa-star-light {
     display: inline-block;
-    width: 1em;
-    height: 1em;
+    width: 1.2em;
+    height: 1.2em;
     background-image: url('../images/star-light-full.svg');
     background-repeat: no-repeat;
     background-position: center;
