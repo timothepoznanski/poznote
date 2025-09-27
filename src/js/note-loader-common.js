@@ -12,21 +12,51 @@ var isNoteLoading = false;
  * Centralized helper to avoid duplicated code blocks across loaders.
  */
 function applyHighlightsWithRetries() {
+    // Re-run normal content/title highlights if available
     if (typeof highlightSearchTerms === 'function') {
         try { highlightSearchTerms(); } catch (e) { /* ignore */ }
-        setTimeout(function() {
-            try { highlightSearchTerms(); } catch (e) {}
-            if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) {}
-            }
-        }, 100);
-        setTimeout(function() {
-            try { highlightSearchTerms(); } catch (e) {}
-            if (typeof updateAllOverlayPositions === 'function') {
-                try { updateAllOverlayPositions(); } catch (e) {}
-            }
-        }, 300);
     }
+
+    // Re-run tag highlighting if available (use hidden input or visible search value)
+    if (typeof window.highlightMatchingTags === 'function') {
+        try {
+            var desktopTagsTerm = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || '';
+            var mobileTagsTerm = (document.getElementById('search-tags-hidden-mobile') && document.getElementById('search-tags-hidden-mobile').value) || '';
+            var visible = (document.getElementById('unified-search') && document.getElementById('unified-search').value) || (document.getElementById('unified-search-mobile') && document.getElementById('unified-search-mobile').value) || '';
+            var term = desktopTagsTerm && desktopTagsTerm.trim() ? desktopTagsTerm.trim() : (mobileTagsTerm && mobileTagsTerm.trim() ? mobileTagsTerm.trim() : visible.trim());
+            window.highlightMatchingTags(term);
+        } catch (e) { /* ignore */ }
+    }
+
+    // Delayed retries to handle layout/async changes and overlay positioning
+    setTimeout(function() {
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) {}
+        }
+        if (typeof updateAllOverlayPositions === 'function') {
+            try { updateAllOverlayPositions(); } catch (e) {}
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try {
+                var term2 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                window.highlightMatchingTags(term2);
+            } catch (e) { /* ignore */ }
+        }
+    }, 100);
+    setTimeout(function() {
+        if (typeof highlightSearchTerms === 'function') {
+            try { highlightSearchTerms(); } catch (e) {}
+        }
+        if (typeof updateAllOverlayPositions === 'function') {
+            try { updateAllOverlayPositions(); } catch (e) {}
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            try {
+                var term3 = (document.getElementById('search-tags-hidden') && document.getElementById('search-tags-hidden').value) || (document.getElementById('unified-search') && document.getElementById('unified-search').value) || '';
+                window.highlightMatchingTags(term3);
+            } catch (e) { /* ignore */ }
+        }
+    }, 300);
 }
 
 /**
