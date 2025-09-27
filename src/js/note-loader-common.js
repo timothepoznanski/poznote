@@ -8,6 +8,28 @@ var currentLoadingNoteId = null;
 var isNoteLoading = false;
 
 /**
+ * Reapply search highlights with a couple of delayed retries to handle layout timing.
+ * Centralized helper to avoid duplicated code blocks across loaders.
+ */
+function applyHighlightsWithRetries() {
+    if (typeof highlightSearchTerms === 'function') {
+        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+        setTimeout(function() {
+            try { highlightSearchTerms(); } catch (e) {}
+            if (typeof updateAllOverlayPositions === 'function') {
+                try { updateAllOverlayPositions(); } catch (e) {}
+            }
+        }, 100);
+        setTimeout(function() {
+            try { highlightSearchTerms(); } catch (e) {}
+            if (typeof updateAllOverlayPositions === 'function') {
+                try { updateAllOverlayPositions(); } catch (e) {}
+            }
+        }, 300);
+    }
+}
+
+/**
  * Check if we're on mobile
  */
 function isMobileDevice() {
@@ -94,21 +116,8 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
 
                                     // Reapply highlights after content has been reinitialized.
                                     // Use delayed calls to ensure layout has stabilized when switching notes.
-                                    if (typeof highlightSearchTerms === 'function') {
-                                        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
-                                        // Re-run after short delays to handle any async layout changes
-                                        setTimeout(function() {
-                                            try { highlightSearchTerms(); } catch (e) {}
-                                            if (typeof updateAllOverlayPositions === 'function') {
-                                                try { updateAllOverlayPositions(); } catch (e) {}
-                                            }
-                                        }, 50);
-                                        setTimeout(function() {
-                                            try { highlightSearchTerms(); } catch (e) {}
-                                            if (typeof updateAllOverlayPositions === 'function') {
-                                                try { updateAllOverlayPositions(); } catch (e) {}
-                                            }
-                                        }, 300);
+                                    if (typeof applyHighlightsWithRetries === 'function') {
+                                        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                                     }
 
                                     hideNoteLoadingState();
@@ -152,11 +161,14 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         xhr.onerror = function() {
             window.isLoadingNote = false;
             console.error('Network error during note loading');
-                                    console.error('Network error during note loading for', noteTitle);
             showNotificationPopup('Network error - please check your connection');
             hideNoteLoadingState();
             if (isMobileDevice()) {
                 document.body.classList.remove('note-open');
+                // Re-initialize search highlighting if in search mode
+                if (typeof applyHighlightsWithRetries === 'function' && isSearchMode) {
+                    try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                }
             }
         };
 
@@ -241,21 +253,9 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
 
-                            // Reapply highlights after content initialization (delayed retries)
-                            if (typeof highlightSearchTerms === 'function') {
-                                try { highlightSearchTerms(); } catch (e) { /* ignore */ }
-                                setTimeout(function() {
-                                    try { highlightSearchTerms(); } catch (e) {}
-                                    if (typeof updateAllOverlayPositions === 'function') {
-                                        try { updateAllOverlayPositions(); } catch (e) {}
-                                    }
-                                }, 50);
-                                setTimeout(function() {
-                                    try { highlightSearchTerms(); } catch (e) {}
-                                    if (typeof updateAllOverlayPositions === 'function') {
-                                        try { updateAllOverlayPositions(); } catch (e) {}
-                                    }
-                                }, 300);
+                            // Reapply highlights after content initialization using centralized helper
+                            if (typeof applyHighlightsWithRetries === 'function') {
+                                try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                             }
 
                             // Hide loading state

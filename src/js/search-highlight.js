@@ -399,24 +399,34 @@ function updateAllOverlayPositions() {
             var startIndex = parseInt(overlay.getAttribute('data-start-index'));
             var word = overlay.getAttribute('data-word');
             
-            // Recalculate position
-            var measurer = document.createElement('span');
-            measurer.style.position = 'absolute';
-            measurer.style.visibility = 'hidden';
-            measurer.style.whiteSpace = 'pre';
-            measurer.style.font = window.getComputedStyle(inputElement).font;
-            document.body.appendChild(measurer);
-            
-            var textBefore = inputElement.value.substring(0, startIndex);
-            measurer.textContent = textBefore;
-            var offsetX = measurer.offsetWidth;
-            
-            measurer.textContent = word;
-            var wordWidth = measurer.offsetWidth;
-            
-            document.body.removeChild(measurer);
-            
-            positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            // Use the centralized measurement helper to compute bounds for the word
+            var rect = measureWordRectInInput(inputElement, startIndex, word);
+            if (rect) {
+                // Convert rect.left/top (viewport coords) to offsets relative to input's content
+                var inputRect = inputElement.getBoundingClientRect();
+                var offsetX = rect.left - inputRect.left;
+                var wordWidth = rect.width;
+                positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            } else {
+                // Fallback to the older measurer technique if measurement failed
+                var measurer = document.createElement('span');
+                measurer.style.position = 'absolute';
+                measurer.style.visibility = 'hidden';
+                measurer.style.whiteSpace = 'pre';
+                measurer.style.font = window.getComputedStyle(inputElement).font;
+                document.body.appendChild(measurer);
+
+                var textBefore = inputElement.value.substring(0, startIndex);
+                measurer.textContent = textBefore;
+                var offsetX = measurer.offsetWidth;
+
+                measurer.textContent = word;
+                var wordWidth = measurer.offsetWidth;
+
+                document.body.removeChild(measurer);
+
+                positionOverlay(overlay, inputElement, offsetX, wordWidth);
+            }
         } else {
             // Input element no longer exists, remove overlay
             overlay.remove();
