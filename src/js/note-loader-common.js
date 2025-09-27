@@ -37,11 +37,43 @@ function applyHighlightsWithRetries() {
                 else if (hiddenNotes) activeType = 'notes';
             } catch (e) { /* ignore */ }
         }
+
+        // 4) Mobile-folder-specific fallback: some mobile UIs don't include the
+        // `search-in-folders-mobile` hidden input. If a folder-search input is
+        // present and has a value, infer folders mode. Also respect preserve_folders
+        // URL param as an indicator of folder filtering.
+        if (!activeType) {
+            try {
+                var folderInput = document.getElementById('folderSearchInput');
+                if (folderInput && folderInput.value && folderInput.value.trim() !== '') {
+                    activeType = 'folders';
+                }
+            } catch (e) { /* ignore */ }
+        }
+        if (!activeType) {
+            try {
+                var _urlParams = new URLSearchParams(window.location.search || '');
+                if (_urlParams.get('preserve_folders') === '1') {
+                    activeType = 'folders';
+                }
+            } catch (e) { /* ignore */ }
+        }
     } catch (e) { activeType = null; }
 
     // Extra fallback: use globally recorded last active search type from SearchManager
     if (!activeType && typeof window._lastActiveSearchType === 'string') {
         activeType = window._lastActiveSearchType;
+    }
+
+    // If we're explicitly in folders search, do not reapply any highlights.
+    // Folder search is only meant to filter the list — it should not trigger
+    // tag/notes highlighting inside the opened note content.
+    if (activeType === 'folders') {
+        // Still update overlay positions in case some overlays remain, but skip highlights.
+        if (typeof updateAllOverlayPositions === 'function') {
+            try { updateAllOverlayPositions(); } catch (e) {}
+        }
+        return;
     }
 
     // Reapply only the highlights relevant to the active search type
@@ -693,9 +725,14 @@ function downloadImage(imageSrc) {
 function reinitializeNoteContent() {
     // Re-initialize any JavaScript components that might be in the loaded content
 
-    // Re-initialize search highlighting if in search mode
-    if (typeof highlightSearchTerms === 'function' && isSearchMode) {
-        setTimeout(highlightSearchTerms, 100);
+    // Re-initialize search highlighting if in search mode.
+    // Prefer the centralized helper which knows about notes/tags/folders.
+    if (isSearchMode) {
+        if (typeof applyHighlightsWithRetries === 'function') {
+            try { setTimeout(function() { try { applyHighlightsWithRetries(); } catch(e){} }, 60); } catch (e) {}
+        } else if (typeof highlightSearchTerms === 'function') {
+            setTimeout(highlightSearchTerms, 100);
+        }
     }
 
     // Re-initialize clickable tags

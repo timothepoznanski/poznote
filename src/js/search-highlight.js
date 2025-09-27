@@ -35,11 +35,26 @@ function highlightSearchTerms() {
         }
     }
     
-    // Additional fallback: if we're on mobile and no explicit search type is set, default to notes
+    // Additional fallback: when on mobile, prefer explicit state from SearchManager
+    // or hidden inputs. Do not unconditionally assume notes on mobile as that
+    // causes folder searches to still highlight titles.
     var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (!isNotesActive && isMobile) {
-        // In mobile, if no specific type is detected, assume notes search for highlighting
-        isNotesActive = true;
+        try {
+            if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+                var sm = window.searchManager.getActiveSearchType(true);
+                if (sm === 'notes') {
+                    isNotesActive = true;
+                }
+            }
+            // Fallback to checking hidden inputs if SearchManager isn't present
+            if (!isNotesActive) {
+                var hiddenNotesMobile = document.getElementById('search-in-notes-mobile')?.value === '1';
+                if (hiddenNotesMobile) isNotesActive = true;
+            }
+        } catch (e) {
+            // ignore and remain conservative (don't assume notes)
+        }
     }
 
     if (!isNotesActive) {

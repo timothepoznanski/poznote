@@ -635,6 +635,16 @@ function setupFolderSearchEvents() {
     var folderSearchInput = document.getElementById('folderSearchInput');
     if (folderSearchInput) {
         folderSearchInput.addEventListener('input', handleFolderSearch);
+        // When using the folder search input (especially on mobile where the
+        // search pills may be absent), ensure the SearchManager knows we're in
+        // folders mode so highlighting logic can avoid reapplying highlights.
+        folderSearchInput.addEventListener('input', function() {
+            try {
+                if (window.searchManager && typeof window.searchManager.setActiveSearchType === 'function') {
+                    window.searchManager.setActiveSearchType('folders', true);
+                }
+            } catch (e) { /* ignore */ }
+        });
         folderSearchInput.addEventListener('keydown', handleFolderKeydown);
     }
     

@@ -712,28 +712,49 @@ class SearchManager {
                 this.focusCaretPos = null;
             }
 
-            // Highlight search terms
+            // Highlight search terms according to the active type.
             setTimeout(() => {
-                if (typeof highlightSearchTerms === 'function') {
-                    highlightSearchTerms();
-                }
-                // If we're in tags search mode, also highlight matching tag UI elements
                 try {
-                    const activeType = this.getActiveSearchType();
-                    // diagnostic logs removed
-                    if (activeType === 'tags' && typeof window.highlightMatchingTags === 'function') {
-                        // Prefer hidden tags term if present, otherwise use visible search input
-                        const desktopElements = this.getElements(false);
-                        const mobileElements = this.getElements(true);
-                        const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
-                        const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
-                        const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
-                        window.highlightMatchingTags(term);
-                    } else if (typeof window.highlightMatchingTags === 'function') {
-                        // Clear any previous highlights when not in tags mode
-                        window.highlightMatchingTags('');
+                    // If a centralized helper exists, prefer it (it handles notes/tags/folders correctly)
+                    if (typeof applyHighlightsWithRetries === 'function') {
+                        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+                        return;
                     }
-                } catch (e) { /* ignore */ }
+
+                    const activeType = this.getActiveSearchType();
+                    if (activeType === 'notes') {
+                        if (typeof highlightSearchTerms === 'function') {
+                            try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+                        }
+                    } else if (activeType === 'tags') {
+                        if (typeof clearSearchHighlights === 'function') {
+                            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try {
+                                const desktopElements = this.getElements(false);
+                                const mobileElements = this.getElements(true);
+                                const hiddenTagsTerm = desktopElements.hiddenInputs.tagsTerm?.value || mobileElements.hiddenInputs.tagsTerm?.value || '';
+                                const visibleTerm = (desktopElements.searchInput && desktopElements.searchInput.value) || (mobileElements.searchInput && mobileElements.searchInput.value) || '';
+                                const term = hiddenTagsTerm && hiddenTagsTerm.trim() ? hiddenTagsTerm.trim() : visibleTerm.trim();
+                                window.highlightMatchingTags(term);
+                            } catch (e) { /* ignore */ }
+                        }
+                    } else {
+                        // folders or unknown: clear any highlights
+                        if (typeof clearSearchHighlights === 'function') {
+                            try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                        }
+                        if (typeof window.highlightMatchingTags === 'function') {
+                            try { window.highlightMatchingTags(''); } catch (e) { /* ignore */ }
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
             }, 150);
 
         } catch (error) {
