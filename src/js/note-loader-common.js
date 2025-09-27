@@ -81,11 +81,22 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                                 // right_col found in response
                                 const currentRightColumn = document.getElementById('right_col');
                                     if (currentRightColumn) {
+                                    // Clear existing highlights first to avoid overlays being left over
+                                    if (typeof clearSearchHighlights === 'function') {
+                                        try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                                    }
+
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
                                     updateBrowserUrl(url, noteTitle);
                                     reinitializeNoteContent();
+
+                                    // Reapply highlights after content has been reinitialized
+                                    if (typeof highlightSearchTerms === 'function') {
+                                        try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                                    }
+
                                     hideNoteLoadingState();
 
                                     // Apply selection after content is loaded and initialized
@@ -202,6 +213,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                         // Update the right column content
                         const currentRightColumn = document.getElementById('right_col');
                             if (currentRightColumn) {
+                            // Clear existing highlights first to avoid overlays being left over
+                            if (typeof clearSearchHighlights === 'function') {
+                                try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+                            }
+
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
 
                             // Update URL before reinitializing so reinitializeNoteContent
@@ -210,6 +226,11 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
+
+                            // Reapply highlights after content initialization
+                            if (typeof highlightSearchTerms === 'function') {
+                                try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                            }
 
                             // Hide loading state
                             hideNoteLoadingState();
