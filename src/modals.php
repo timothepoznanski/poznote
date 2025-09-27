@@ -1,10 +1,3 @@
-<?php
-/**
- * Template for all modals in index.php
- * Expected variables: $defaultFolderName
- */
-?>
-
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
