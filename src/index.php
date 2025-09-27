@@ -59,6 +59,7 @@ $res_right = $note_data['res_right'];
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
+    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
     <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
