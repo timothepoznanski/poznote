@@ -120,6 +120,34 @@ function performFavoriteToggle(noteId) {
     xhr.send('action=toggle_favorite&note_id=' + encodeURIComponent(noteId) + '&workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote'));
 }
 
+function duplicateNote(noteId) {
+    showNotificationPopup('Duplicating note...', 'info');
+    
+    fetch('api_duplicate_note.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ note_id: noteId })
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            showNotificationPopup('Note duplicated successfully', 'success');
+            // Reload the page to show the new note
+            setTimeout(function() {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotificationPopup('Error duplicating note: ' + (data.message || 'Unknown error'), 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error while duplicating note: ' + error.message, 'error');
+    });
+}
+
 // Folder management
 var currentFolderToDelete = null;
 

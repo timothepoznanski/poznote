@@ -27,6 +27,7 @@ window.updatenote = saveNoteToServer;
 window.saveFocusedNoteJS = saveNote;
 window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
+window.duplicateNote = duplicateNote;
 window.showNoteInfo = showNoteInfo;
 window.toggleNoteMenu = toggleNoteMenu;
 window.toggleWorkspaceMenu = toggleWorkspaceMenu;

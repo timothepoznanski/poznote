@@ -2638,6 +2638,19 @@ hr {
   content: '';
 }
 
+.fa-file-copy-svg {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  background-image: url('../images/file-copy.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 .fa-smile {
   display: inline-block;
   width: 0.9em;
