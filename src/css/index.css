@@ -2188,7 +2188,6 @@ hr {
     /* transition: background-color 0.2s, color 0.2s; */
 }
 
-
 .folder-search-btn {
     color: #007DB8; /* Blue by default (included in search) */
 }
@@ -3269,6 +3268,46 @@ hr {
   content: '';
 }
 
+.folder-delete-btn.fa-trash {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/folder_delete.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+/* Use specific folder move files icon */
+.folder-move-files-btn.fa-folder-open {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/drive_file_move.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+/* Use specific note move icon */
+.btn-folder .fa-folder {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/drive_file_move.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
 
 /* General rule for any input that might have search type */
 input[type="search"]::-webkit-search-decoration,
