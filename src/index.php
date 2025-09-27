@@ -724,6 +724,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     
+                    echo '<button type="button" class="toolbar-btn btn-duplicate" title="Duplicate note" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     // Mobile: use share dropdown as well (simpler menu)
