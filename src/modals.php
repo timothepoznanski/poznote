@@ -200,6 +200,10 @@
         <div id="folderFilesCount" class="modal-info-message">
             <span id="filesCountText"></span>
         </div>
+        <div class="modal-info-message" style="margin-top: 12px; font-size: 0.9em; color: #666;">
+            • To move a single note to another workspace, use the "Move note" button in the toolbar<br><br>
+            • To move all notes from one workspace to another, go to Settings → Workspaces<br><br>
+        </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')">Cancel</button>
             <button type="button" class="btn-primary" onclick="executeMoveAllFiles()">Move All Files</button>
