@@ -473,8 +473,8 @@ function importAttachmentsZip($uploadedFile) {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
-        <a href="backup_export.php" class="btn btn-secondary">
-            Go to Backup (Export)
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
         </a>
         <br><br>
         

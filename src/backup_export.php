@@ -281,8 +281,8 @@ function createBackup() {
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
-        <a href="restore_import.php" class="btn btn-secondary">
-            Go to Restore (Import)
+        <a href="settings.php" class="btn btn-secondary">
+            Back to Settings
         </a>
 
     <br><br>
