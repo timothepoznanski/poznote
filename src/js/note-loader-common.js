@@ -92,9 +92,23 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                                     updateBrowserUrl(url, noteTitle);
                                     reinitializeNoteContent();
 
-                                    // Reapply highlights after content has been reinitialized
+                                    // Reapply highlights after content has been reinitialized.
+                                    // Use delayed calls to ensure layout has stabilized when switching notes.
                                     if (typeof highlightSearchTerms === 'function') {
                                         try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                                        // Re-run after short delays to handle any async layout changes
+                                        setTimeout(function() {
+                                            try { highlightSearchTerms(); } catch (e) {}
+                                            if (typeof updateAllOverlayPositions === 'function') {
+                                                try { updateAllOverlayPositions(); } catch (e) {}
+                                            }
+                                        }, 50);
+                                        setTimeout(function() {
+                                            try { highlightSearchTerms(); } catch (e) {}
+                                            if (typeof updateAllOverlayPositions === 'function') {
+                                                try { updateAllOverlayPositions(); } catch (e) {}
+                                            }
+                                        }, 300);
                                     }
 
                                     hideNoteLoadingState();
@@ -227,9 +241,21 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
 
-                            // Reapply highlights after content initialization
+                            // Reapply highlights after content initialization (delayed retries)
                             if (typeof highlightSearchTerms === 'function') {
                                 try { highlightSearchTerms(); } catch (e) { /* ignore */ }
+                                setTimeout(function() {
+                                    try { highlightSearchTerms(); } catch (e) {}
+                                    if (typeof updateAllOverlayPositions === 'function') {
+                                        try { updateAllOverlayPositions(); } catch (e) {}
+                                    }
+                                }, 50);
+                                setTimeout(function() {
+                                    try { highlightSearchTerms(); } catch (e) {}
+                                    if (typeof updateAllOverlayPositions === 'function') {
+                                        try { updateAllOverlayPositions(); } catch (e) {}
+                                    }
+                                }, 300);
                             }
 
                             // Hide loading state
