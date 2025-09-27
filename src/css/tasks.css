@@ -61,7 +61,6 @@
 .task-item {
     display: flex;
     align-items: center;
-    gap: 10px;
     padding: 8px 12px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
@@ -159,11 +158,11 @@
 }
 
 .task-delete-btn i {
-    font-size: 18px;
+    font-size: 24px;
 }
 
 .task-important-btn i {
-    font-size: 18px;
+    font-size: 26px;
 }
 
 /* Important task styling */
