@@ -399,32 +399,27 @@ if (!$note) {
             window.open(`api_attachments.php?action=download&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`, '_blank');
         }
 
+        // NOTE: confirmation removed - delete immediately when called
         function deleteAttachment(attachmentId) {
-            showConfirmDialog(
-                'Are you sure you want to delete this attachment?',
-                function() {
-                    fetch('api_attachments.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showNotification('Attachment deleted successfully', 'success');
-                            loadAttachments(); // Reload the list
-                        } else {
-                            showNotification('Failed to delete attachment: ' + data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        showNotification('Error deleting attachment', 'error');
-                    });
+            fetch('api_attachments.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                null // onCancel callback
-            );
+                body: `action=delete&note_id=${noteId}&attachment_id=${attachmentId}${typeof noteWorkspace !== 'undefined' && noteWorkspace ? '&workspace=' + encodeURIComponent(noteWorkspace) : ''}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Attachment deleted successfully', 'success');
+                    loadAttachments(); // Reload the list
+                } else {
+                    showNotification('Failed to delete attachment: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('Error deleting attachment', 'error');
+            });
         }
 
         function formatFileSize(bytes) {

@@ -377,7 +377,9 @@ function createFolder() {
 }
 
 function confirmDeleteAttachment(callback) {
-    if (confirm('Do you really want to delete this attachment?')) {
+    // Confirmation removed: call the callback immediately to perform deletion
+    // (legacy compatibility wrapper)
+    if (typeof callback === 'function') {
         callback();
     }
 }

@@ -153,34 +153,33 @@ function downloadAttachment(attachmentId, noteId) {
 }
 
 function deleteAttachment(attachmentId) {
+    // NOTE: confirmation removed - delete immediately when called
     if (!currentNoteIdForAttachments) {
         showNotificationPopup('No note selected', 'error');
         return;
     }
+
+    var formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('note_id', currentNoteIdForAttachments);
+    formData.append('attachment_id', attachmentId);
     
-    if (confirm('Do you really want to delete this attachment?')) {
-        var formData = new FormData();
-        formData.append('action', 'delete');
-        formData.append('note_id', currentNoteIdForAttachments);
-        formData.append('attachment_id', attachmentId);
-        
-        fetch('api_attachments.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.success) {
-                loadAttachments(currentNoteIdForAttachments);
-                updateAttachmentCountInMenu(currentNoteIdForAttachments);
-            } else {
-                showNotificationPopup('Deletion failed: ' + data.message, 'error');
-            }
-        })
-        .catch(function(error) {
-            showNotificationPopup('Deletion failed', 'error');
-        });
-    }
+    fetch('api_attachments.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            loadAttachments(currentNoteIdForAttachments);
+            updateAttachmentCountInMenu(currentNoteIdForAttachments);
+        } else {
+            showNotificationPopup('Deletion failed: ' + data.message, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Deletion failed', 'error');
+    });
 }
 
 function updateAttachmentCountInMenu(noteId) {

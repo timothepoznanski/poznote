@@ -334,6 +334,20 @@ try {
         .workspace-list .btn { min-width: 110px; }
         /* Make disabled buttons visually consistent */
         .workspace-list .btn[disabled] { opacity: 0.65; }
+            /* Navigation buttons: on desktop we show them side-by-side; on mobile `workspaces_mobile.css` controls layout */
+            @media (min-width: 801px) {
+                .settings-container > a.btn-secondary {
+                    width: auto !important;
+                    max-width: calc(50% - 5px) !important;
+                    margin-bottom: 10px !important;
+                    margin-right: 10px !important;
+                    display: inline-block !important;
+                }
+
+                .settings-container > a.btn-secondary:last-of-type {
+                    margin-right: 0 !important;
+                }
+            }
         @media (max-width:720px) {
             .workspace-list ul li { flex-wrap: wrap; }
             .workspace-list .btn { min-width: 100px; }
