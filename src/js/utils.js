@@ -121,8 +121,6 @@ function performFavoriteToggle(noteId) {
 }
 
 function duplicateNote(noteId) {
-    showNotificationPopup('Duplicating note...', 'info');
-    
     fetch('api_duplicate_note.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,18 +131,17 @@ function duplicateNote(noteId) {
         return response.json();
     })
     .then(function(data) {
-        if (data.success) {
-            showNotificationPopup('Note duplicated successfully', 'success');
-            // Reload the page to show the new note
-            setTimeout(function() {
-                window.location.reload();
-            }, 1000);
+        if (data.success && data.id) {
+            // Stay on current note - just reload the page to refresh the list
+            window.location.reload();
         } else {
-            showNotificationPopup('Error duplicating note: ' + (data.message || 'Unknown error'), 'error');
+            // Fallback: reload the page
+            window.location.reload();
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Network error while duplicating note: ' + error.message, 'error');
+        // Silent error handling - reload the page
+        window.location.reload();
     });
 }
 
