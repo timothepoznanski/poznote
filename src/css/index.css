@@ -833,7 +833,7 @@ body {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 200px;
+    min-width: 180px;
     z-index: 1000;
     display: none;
     margin-top: 4px;
@@ -846,7 +846,7 @@ body {
     align-items: center;
     transition: background-color 0.2s;
     border-bottom: 1px solid #f0f0f0;
-    /* font-size: 14px; */
+    font-size: 14px;
 }
 
 .workspace-menu-item:last-child {
@@ -865,7 +865,7 @@ body {
 
 .workspace-menu-item i {
     margin-right: 8px;
-    font-size: 22px;
+    font-size: 20px;
     /* width: 16px; */
     text-align: center;
     color: #666;
