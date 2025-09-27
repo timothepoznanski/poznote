@@ -12,6 +12,11 @@
    1. BASE MODAL STYLES
    =========================================== */
 
+:root {
+    /* Central modal max width for ordinary dialogs. Tweak here to change all standard modals. */
+    --modal-max-width: 420px;
+}
+
 /* Base modal overlay and positioning */
 .modal {
     display: none;
@@ -66,7 +71,7 @@
     border: none;
     border-radius: 8px;
     width: 90%;
-    max-width: 480px;
+    max-width: var(--modal-max-width);
     margin: 0 auto; /* horizontal center; vertical spacing comes from .modal padding */
     font-family: 'Inter', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -105,14 +110,14 @@
     justify-content: flex-end;
     flex-shrink: 0;
     margin-top: auto;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(224,224,224,0.9);
     /* allow buttons to wrap instead of forcing a horizontal scroll */
     flex-wrap: wrap;
 }
 
 .modal-buttons button {
-    padding: 8px 16px;
+    padding: 8px 14px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -173,7 +178,7 @@
 
 /* Specific rules for the dynamically-created input modal to ensure consistent styling */
 #inputModal .modal-content {
-    max-width: 480px;
+    max-width: 420px;
     padding: 18px;
 }
 
@@ -230,7 +235,7 @@
 
 /* Move Folder Files Modal */
 #moveFolderFilesModal .modal-content {
-    max-width: 480px;
+    max-width: 420px;
     padding: 18px;
 }
 
@@ -347,13 +352,20 @@
 }
 
 #fontSizeModal #saveFontSizeBtn {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #007DB8 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 14px !important;
+    border-radius: 4px !important;
 }
 
 #fontSizeModal #cancelFontSizeBtn {
     background-color: #f1f1f1;
     color: #333;
+}
+
+#fontSizeModal #saveFontSizeBtn:hover {
+    background-color: #005a8a !important;
 }
 
 
@@ -507,7 +519,7 @@
 .link-modal-content {
     background: #fff;
     border-radius: 10px;
-    max-width: 500px;
+    max-width: 420px;
     width: 90%;
     margin: 0 auto;
     box-shadow: 0 12px 30px rgba(15,15,15,0.18);
@@ -907,7 +919,7 @@
 }
 
 #noteInfoModal .modal-content {
-    max-width: 450px;
+    max-width: 420px;
     text-align: left;
 }
 
@@ -958,7 +970,7 @@
 
 #updateModal .modal-content {
     text-align: center;
-    max-width: 500px;
+    max-width: 420px;
 }
 
 #updateModal .modal-content h3 {
@@ -1010,7 +1022,7 @@
 
 #confirmModal .modal-content {
     text-align: center;
-    max-width: 500px;
+    max-width: 420px;
 }
 
 #confirmModal .modal-content h3 {
@@ -1097,7 +1109,7 @@
 }
 
 #deleteConfirmModal .modal-content {
-    max-width: 500px;
+    max-width: 420px;
     width: 90%;
     margin: 0 auto;
 }
@@ -1126,7 +1138,7 @@
 }
 
 #emptyTrashConfirmModal .modal-content {
-    max-width: 500px;
+    max-width: 420px;
     width: 90%;
     margin: 0 auto;
 }
@@ -1155,7 +1167,7 @@
 }
 
 #restoreConfirmModal .modal-content {
-    max-width: 500px;
+    max-width: 420px;
     width: 90%;
     margin: 0 auto;
 }
@@ -1214,9 +1226,9 @@
     padding: 24px 12px 12px 12px;
 }
 
-/* Default modal content sizing (allow larger width on desktop, constrained on small screens by media queries below) */
+/* Default modal content sizing - respect central modal max width and keep box-sizing */
 .modal-content {
-    max-width: 720px;
+    max-width: var(--modal-max-width);
     box-sizing: border-box;
 }
 
@@ -1235,7 +1247,8 @@
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
     margin: 5% auto 0; /* vertical spacing for modals */
-    max-width: 95%;
+    /* Ensure modal never exceeds viewport on small screens while respecting the global max width */
+    max-width: min(var(--modal-max-width), 95%);
 }
 
 .modal-content input, .modal-content select {
