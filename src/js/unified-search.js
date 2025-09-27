@@ -1,17 +1,22 @@
 
 class SearchManager {
     constructor() {
-    // Debug logging enabled temporarily for troubleshooting; set to false to silence
+    // Debug logging enabled temporarily to trace search-type toggles
     this.debug = true; // set false after debugging
     this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
+    // When set, skip restore from recent user toggle (ms since epoch).
+    this._suppressUntil = 0;
     // When set, skip restore from URL during initialization (used after AJAX)
     this.suppressURLRestore = false;
     // Focus handling after AJAX: when true, reinitializeAfterAjax will restore focus
     this.focusAfterAjax = false;
     this.focusCaretPos = null;
         this.eventHandlers = new Map();
+    // Track which handlers are attached to which DOM element to avoid
+    // attaching multiple handlers to the same icon element (desktop vs mobile)
+    this._iconElementMap = new WeakMap();
         
         // Initialize both desktop and mobile
         this.initializeSearch();
@@ -111,7 +116,10 @@ class SearchManager {
     const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
     const hasFoldersValue = false;
         
-        // Determine active search type
+    // If a recent user toggle was performed, avoid restoring from URL
+    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+
+    // Determine active search type
         // Prefer explicit URL params (tags_search / search) if present
         if (hasTagsSearchParam || preserveTags || hasTagsFlag) {
             this.setActiveSearchType('tags', isMobile);
@@ -128,6 +136,14 @@ class SearchManager {
      */
     setActiveSearchType(searchType, isMobile) {
         if (!this.searchTypes.includes(searchType)) return;
+        if (this.debug && console && console.debug) {
+            console.debug('setActiveSearchType start', { searchType, isMobile, prev: this.currentSearchType });
+            // Log a short stack trace so we can see who called this
+            try {
+                const stack = new Error().stack;
+                console.debug('setActiveSearchType caller stack', stack);
+            } catch (e) { /* ignore */ }
+        }
         
         const elements = this.getElements(isMobile);
         
@@ -160,6 +176,8 @@ class SearchManager {
     // debug info removed
 
     this.updateInterface(isMobile);
+
+    if (this.debug && console && console.debug) console.debug('setActiveSearchType end', { new: this.currentSearchType });
 
     // If switching into 'notes' search, (re-)apply highlights now that state is set
     if (searchType === 'notes' && typeof highlightSearchTerms === 'function') {
@@ -354,34 +372,65 @@ class SearchManager {
         if (!iconWrapper) return;
 
         const handlerKey = `icon-${isMobile ? 'mobile' : 'desktop'}`;
-        const existingHandler = this.eventHandlers.get(handlerKey);
-        if (existingHandler) {
-            try { iconWrapper.removeEventListener('click', existingHandler); } catch (e) {}
+
+        // Ensure we don't leave multiple distinct handlers attached to the same
+        // DOM element (this can happen when desktop and mobile setup both
+        // resolve to the same icon node). Use a WeakMap from element -> Map
+        // of handlerKey->handler so we can remove previously-attached handlers
+        // before adding a new one.
+        let elementHandlers = this._iconElementMap.get(iconWrapper);
+        if (!elementHandlers) {
+            elementHandlers = new Map();
+            this._iconElementMap.set(iconWrapper, elementHandlers);
+        } else if (elementHandlers.size > 0) {
+            // Remove any handlers previously attached to this element to avoid
+            // duplicate execution. We also remove their entries from
+            // this.eventHandlers so the global registry stays consistent.
+            for (const [hk, fn] of elementHandlers.entries()) {
+                try { iconWrapper.removeEventListener('click', fn); } catch (e) {}
+                elementHandlers.delete(hk);
+                try { this.eventHandlers.delete(hk); } catch (e) {}
+            }
         }
 
         const handler = (e) => {
-            // Prevent double execution if a delegate already handled this event
+            // Prevent double execution: mark the event handled immediately
             try {
-                if (e && e._unifiedSearchHandled) return;
+                if (e) {
+                    if (e._unifiedSearchHandled) return;
+                    e._unifiedSearchHandled = true;
+                }
             } catch (err) {}
-            // Diagnostic logging to ensure handler runs when user clicks the icon
+            // Determine the actual view the click originated from. Use the
+            // event target's closest container to figure out whether this
+            // should be treated as a mobile or desktop toggle. This handles
+            // situations where both handlers were attached to the same DOM
+            // node or when containers exist but only one is active.
+            let effectiveIsMobile = isMobile;
             try {
-                if (this.debug && console && console.debug) {
-                    const current = this.getActiveSearchType(isMobile);
-                    const elements = this.getElements(isMobile);
-                    const buttonsExist = Object.values(elements.buttons).some(b => b != null);
-                    console.debug('unified-search: icon click', { isMobile, current, buttonsExist });
+                const node = (e.currentTarget || e.target);
+                if (node && typeof node.closest === 'function') {
+                    const mobileContainer = node.closest('.unified-search-container.mobile');
+                    if (mobileContainer && mobileContainer.offsetParent !== null) {
+                        effectiveIsMobile = true;
+                    } else {
+                        const desktopContainer = node.closest('.unified-search-container');
+                        if (desktopContainer && desktopContainer.offsetParent !== null) {
+                            effectiveIsMobile = false;
+                        }
+                    }
                 }
             } catch (err) {
-                try { console.debug && console.debug('unified-search: debug error', err); } catch (e) {}
+                // ignore and fall back to provided isMobile
             }
+
             e.preventDefault();
             // Determine current type and a robust next type. When the
             // visible "pills" (buttons) are absent (mobile compact UI),
             // rely on a simple toggle between 'notes' and 'tags' so the
             // icon always switches as the user expects.
-            const current = this.getActiveSearchType(isMobile);
-            const elements = this.getElements(isMobile);
+            const current = this.getActiveSearchType(effectiveIsMobile);
+            const elements = this.getElements(effectiveIsMobile);
 
             let next;
             const buttonsExist = Object.values(elements.buttons).some(b => b != null);
@@ -393,8 +442,11 @@ class SearchManager {
                 next = this.searchTypes[(idx + 1) % this.searchTypes.length];
             }
 
-            // Persist the new type and update UI
-            this.setActiveSearchType(next, isMobile);
+            // Persist the new type and update UI. Record a short-lived user
+            // action so restore/reinit won't overwrite it. Use the effective
+            // view (mobile/desktop) we just detected.
+            try { this._suppressUntil = Date.now() + 250; } catch (e) {}
+            this.setActiveSearchType(next, effectiveIsMobile);
 
             // Trigger behavior similar to clicking the pill
             if (next === 'folders') {
@@ -406,42 +458,13 @@ class SearchManager {
             } else {
                 elements.searchInput?.focus();
             }
-            // mark the event as handled so duplicate listeners/delegates don't re-run
-            try { if (e) e._unifiedSearchHandled = true; } catch (err) {}
+            // event already marked handled at start
         };
 
-    this.eventHandlers.set(handlerKey, handler);
-    iconWrapper.addEventListener('click', handler);
-    // mark the wrapper to aid DOM inspection during debugging
-    try { iconWrapper.setAttribute('data-unified-search-listener', '1'); } catch (e) {}
-        // Also attach to the inner span (icon) as a fallback
-        try {
-            const innerIcon = iconWrapper.querySelector('span');
-            if (innerIcon && innerIcon !== iconWrapper) {
-                try { innerIcon.removeEventListener('click', handler); } catch (e) {}
-                innerIcon.addEventListener('click', handler);
-            }
-        } catch (e) { /* ignore */ }
-        // Add a document-level delegated fallback so clicks are captured
-        const delegateKey = `icon-delegate-${isMobile ? 'mobile' : 'desktop'}`;
-        const existingDelegate = this.eventHandlers.get(delegateKey);
-        if (existingDelegate) {
-            try { document.removeEventListener('click', existingDelegate, true); } catch (e) {}
-        }
-        const delegate = (ev) => {
-            try {
-                // Use strict matching: desktop should not match the mobile container and vice-versa.
-                const sel = isMobile ? '.unified-search-container.mobile .searchbar-icon' : '.unified-search-container:not(.mobile) .searchbar-icon';
-                if (ev.target && ev.target.closest && ev.target.closest(sel)) {
-                    if (this.debug && console && console.debug) console.debug('unified-search: delegated icon click detected', { isMobile });
-                    // call the same handler
-                    handler(ev);
-                }
-            } catch (e) { /* ignore */ }
-        };
-        this.eventHandlers.set(delegateKey, delegate);
-        // Capture phase ensures we see the click before other handlers possibly stop propagation
-        document.addEventListener('click', delegate, true);
+        // Record handler in both registries and attach it once to the element.
+        this.eventHandlers.set(handlerKey, handler);
+        elementHandlers.set(handlerKey, handler);
+        iconWrapper.addEventListener('click', handler);
         // make it look clickable
         iconWrapper.style.cursor = 'pointer';
     }
@@ -856,6 +879,7 @@ class SearchManager {
      */
     restoreSearchState(state) {
     if (!state) return;
+    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
     // Restore desktop state immediately to avoid intermediate UI reset
     if (state.desktop.notes) this.setActiveSearchType('notes', false);
@@ -885,7 +909,18 @@ class SearchManager {
             const buttonsExist = Object.values(elements.buttons).some(b => b !== null && b !== undefined);
             if (buttonsExist) {
                 if (!hasActive) {
-                    this.setActiveSearchType('notes', isMobile);
+                    // Respect a recent user toggle: don't force state while suppression is active
+                    if (this._suppressUntil && Date.now() < this._suppressUntil) return;
+                    // Prefer the internal currentSearchType if possible so we don't
+                    // overwrite a recent user action when buttons exist but no
+                    // button is currently marked active (e.g. after AJAX DOM swaps).
+                    const preferred = this.currentSearchType || 'notes';
+                    if (elements.buttons[preferred]) {
+                        this.setActiveSearchType(preferred, isMobile);
+                    } else {
+                        // Fallback to notes if preferred button isn't present
+                        this.setActiveSearchType('notes', isMobile);
+                    }
                 }
             } else {
                 // No buttons: apply internal state (avoid forcing 'notes')
