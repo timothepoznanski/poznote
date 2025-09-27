@@ -38,7 +38,7 @@ if (!$note) {
     <title>Manage Attachments - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/attachments.css">
-    <!-- <link rel="stylesheet" href="css/modals.css"> -->
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="settings-container">
@@ -313,7 +313,7 @@ if (!$note) {
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                             </button>
-                            <button onclick="deleteAttachment('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
+                            <button onclick="showDeleteAttachmentConfirm('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3,6 5,6 21,6"></polyline>
                                     <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
@@ -422,6 +422,56 @@ if (!$note) {
             });
         }
 
+        // Attachment delete confirmation (reuses the same modal style as trash.php)
+        let currentAttachmentIdForAction = null;
+
+        function showDeleteAttachmentConfirm(attachmentId) {
+            currentAttachmentIdForAction = attachmentId;
+            const modal = document.getElementById('deleteAttachmentConfirmModal');
+            console.log('showDeleteAttachmentConfirm called for', attachmentId);
+            if (modal) {
+                // Force display and stacking to avoid CSS conflicts from other stylesheets
+                modal.style.display = 'flex';
+                modal.style.zIndex = '30000';
+                modal.style.pointerEvents = 'auto';
+                const content = modal.querySelector('.modal-content');
+                if (content) {
+                    content.style.zIndex = '30001';
+                }
+
+                // Close when clicking outside the modal content
+                function overlayClickHandler(e) {
+                    if (e.target === modal) {
+                        closeDeleteAttachmentConfirmModal();
+                    }
+                }
+
+                // Remove any previous listener to avoid duplicates
+                modal.removeEventListener('click', modal.__overlayHandler || overlayClickHandler);
+                modal.__overlayHandler = overlayClickHandler;
+                modal.addEventListener('click', modal.__overlayHandler);
+            }
+        }
+
+        function closeDeleteAttachmentConfirmModal() {
+            const modal = document.getElementById('deleteAttachmentConfirmModal');
+            if (modal) modal.style.display = 'none';
+            currentAttachmentIdForAction = null;
+        }
+
+        function executeDeleteAttachment() {
+            if (currentAttachmentIdForAction) {
+                deleteAttachment(currentAttachmentIdForAction);
+            }
+            closeDeleteAttachmentConfirmModal();
+        }
+
+        // Expose functions to global scope for inline onclick handlers
+        window.showDeleteAttachmentConfirm = showDeleteAttachmentConfirm;
+        window.closeDeleteAttachmentConfirmModal = closeDeleteAttachmentConfirmModal;
+        window.executeDeleteAttachment = executeDeleteAttachment;
+        window.deleteAttachment = deleteAttachment;
+
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -527,5 +577,17 @@ if (!$note) {
             // ignore storage errors
         }
     </script>
+    
+    <!-- Delete Attachment Confirmation Modal -->
+    <div id="deleteAttachmentConfirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Attachment</h3>
+            <p>Do you want to delete this attachment? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeDeleteAttachmentConfirmModal()">Cancel</button>
+                <button type="button" class="btn-danger" onclick="executeDeleteAttachment()">Delete</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

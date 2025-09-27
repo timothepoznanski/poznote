@@ -463,48 +463,34 @@ body {
 }
 
 .btn-icon {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 6px;
-
-    /* Icônes dans les titres principaux */
-    .settings-container h1 img,
-    .settings-section h3 img {
-        /* width: 28px;
-        height: 28px; */
-        margin-right: 10px;
-        vertical-align: middle;
-    }
-
-    /* Icônes dans les boutons principaux */
-    .btn img {
-        /* width: 20px;
-        height: 20px; */
-        margin-right: 8px;
-        vertical-align: middle;
-    }
-
-    /* Icônes dans les boutons d'action (download/delete) */
-    .btn-icon img {
-        /* width: 18px;
-        height: 18px; */
-        vertical-align: middle;
-    }
-
-    /* Icônes dans les vignettes d'attachement */
-    .attachment-icon img,
-    .attachment-thumbnail {
-        width: 48px !important;
-        height: 48px !important;
-        max-width: 48px;
-        max-height: 48px;
-    }
-    /* display: flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-    font-size: 14px; */
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    /* do NOT force a transparent background here; specific action classes set backgrounds */
+    font-size: 14px !important;
+    flex: 0 0 auto !important; /* prevent flex children from growing */
+}
+
+/* Keep icon SVGs centered and constrained */
+.btn-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle !important;
+}
+
+/* Ensure thumbnails use the intended size */
+.attachment-icon img,
+.attachment-thumbnail {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
 }
 
 .btn-download {
@@ -520,6 +506,17 @@ body {
 .btn-delete {
     background: #dc3545;
     color: white;
+}
+
+/* Ensure action icon buttons keep their background/color even if other rules apply */
+.btn-icon.btn-download {
+    background: #28a745 !important;
+    color: #fff !important;
+}
+
+.btn-icon.btn-delete {
+    background: #dc3545 !important;
+    color: #fff !important;
 }
 
 .btn-delete:hover {
@@ -564,6 +561,39 @@ body {
     text-decoration: none;
     transform: translateY(-1px);
 }
+
+/* Danger/primary buttons used in modals */
+.btn-danger {
+    background: #dc3545 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* Prevent modal global rules from making .btn-icon full width */
+.modal .btn-icon {
+    /* Keep size constraints for icon buttons inside modals, but don't override colors */
+    display: inline-flex !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+}
+
+/* Ensure attachment action buttons never stretch inside their container */
+.attachment-actions .btn-icon {
+    flex: 0 0 auto !important;
+}
+
+/* For the delete confirmation modal: prefer auto-sized buttons on desktop, keep full-width on narrow viewports (mobile) */
+@media (min-width: 421px) {
+    #deleteAttachmentConfirmModal .modal-buttons button {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 8px 14px !important;
+    }
+}
+
+/* On very small screens, modal buttons remain full width as in modals.css (no override) */
 
 /* Ensure 'Back to Notes' link in settings-container looks like a button */
 .settings-container > a.btn-secondary {

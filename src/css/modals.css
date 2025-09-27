@@ -1339,7 +1339,7 @@
 }
 
 .attachment-actions {
-    width: 100% !important;
+    /* width: 100% !important; */
     justify-content: space-between !important;
     gap: 8px !important;
 }
