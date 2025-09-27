@@ -403,7 +403,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         var menu = document.getElementById('header-create-menu');
         var plusBtn = document.querySelector('.sidebar-plus');
         if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
-            menu.classList.add('hidden');
+            menu.remove();
             plusBtn.setAttribute('aria-expanded', 'false');
         }
     });
