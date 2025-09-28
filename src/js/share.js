@@ -257,7 +257,11 @@ function showShareModal(url, options) {
     // Remove the dividing line above buttons for this share modal
     buttonsDiv.style.borderTop = 'none';
 
-    // Create Cancel and Open buttons. User requested Cancel and Open swapped and colored.
+    // Get options
+    const noteId = options && options.noteId ? options.noteId : null;
+    const isShared = options && options.shared ? true : false;
+
+    // Create Cancel button. Always present.
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn-cancel';
@@ -269,71 +273,71 @@ function showShareModal(url, options) {
     cancelBtn.onclick = function() { closeModal('shareModal'); };
     buttonsDiv.appendChild(cancelBtn);
 
-    // Open button: opens the URL in a new tab (keeps modal open)
-    const openBtn = document.createElement('button');
-    openBtn.type = 'button';
-    openBtn.className = 'btn-open';
-    openBtn.textContent = 'Open';
-    // green styling for open
-    openBtn.style.background = '#28a745';
-    openBtn.style.color = '#ffffff';
-    openBtn.style.border = 'none';
-    openBtn.onclick = function(ev) {
-        try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-        // Read the current URL from the modal each time so Renew updates are respected
-        try {
-            const urlEl = document.getElementById('shareModalUrl');
-            const currentUrl = urlEl ? urlEl.textContent : url;
-            if (currentUrl) {
-                window.open(currentUrl, '_blank', 'noopener');
-            }
-        } catch (e) {
-            // fallback to original captured url
-            if (url) window.open(url, '_blank', 'noopener');
-        }
-    };
-    buttonsDiv.appendChild(openBtn);
-
-    const copyBtn = document.createElement('button');
-    copyBtn.type = 'button';
-    copyBtn.className = 'btn-primary';
-    copyBtn.textContent = 'Copy';
-    copyBtn.onclick = async function(ev) {
-        // Prevent clicks from bubbling to global handlers
-        try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-
-        // Try to copy the URL, then close the modal. Do NOT change the button text.
-        try {
-            // Copy from the div's text content (non-selectable but programmatically copyable)
-            await navigator.clipboard.writeText(urlDiv.textContent);
-            closeModal('shareModal');
-        } catch (e) {
-            // Fallback: create a temporary textarea, select and execCommand, then remove it
+    // Conditionally add buttons based on share status
+    if (isShared) {
+        // If shared, show Open, Copy, Revoke, Renew
+        // Open button: opens the URL in a new tab (keeps modal open)
+        const openBtn = document.createElement('button');
+        openBtn.type = 'button';
+        openBtn.className = 'btn-open';
+        openBtn.textContent = 'Open';
+        // green styling for open
+        openBtn.style.background = '#28a745';
+        openBtn.style.color = '#ffffff';
+        openBtn.style.border = 'none';
+        openBtn.onclick = function(ev) {
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            // Read the current URL from the modal each time so Renew updates are respected
             try {
-                const ta = document.createElement('textarea');
-                ta.value = urlDiv.textContent;
-                // Ensure off-screen and not visible
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                closeModal('shareModal');
-            } catch (err) {
-                // As last resort, show the prompt then close
-                window.prompt('Copy this URL', urlDiv.textContent);
-                closeModal('shareModal');
+                const urlEl = document.getElementById('shareModalUrl');
+                const currentUrl = urlEl ? urlEl.textContent : url;
+                if (currentUrl) {
+                    window.open(currentUrl, '_blank', 'noopener');
+                }
+            } catch (e) {
+                // fallback to original captured url
+                if (url) window.open(url, '_blank', 'noopener');
             }
-        }
-    };
-    buttonsDiv.appendChild(copyBtn);
+        };
+        buttonsDiv.appendChild(openBtn);
 
-    // Add Revoke and Renew buttons when options.noteId provided
-    const noteId = options && options.noteId ? options.noteId : null;
-    const isShared = options && options.shared ? true : false;
-    if (noteId) {
-        if (isShared) {
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'btn-primary';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = async function(ev) {
+            // Prevent clicks from bubbling to global handlers
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+
+            // Try to copy the URL, then close the modal. Do NOT change the button text.
+            try {
+                // Copy from the div's text content (non-selectable but programmatically copyable)
+                await navigator.clipboard.writeText(urlDiv.textContent);
+                closeModal('shareModal');
+            } catch (e) {
+                // Fallback: create a temporary textarea, select and execCommand, then remove it
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = urlDiv.textContent;
+                    // Ensure off-screen and not visible
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    closeModal('shareModal');
+                } catch (err) {
+                    // As last resort, show the prompt then close
+                    window.prompt('Copy this URL', urlDiv.textContent);
+                    closeModal('shareModal');
+                }
+            }
+        };
+        buttonsDiv.appendChild(copyBtn);
+
+        // Add Revoke and Renew buttons when options.noteId provided and shared
+        if (noteId) {
             const revokeBtn = document.createElement('button');
             revokeBtn.type = 'button';
             revokeBtn.className = 'btn-revoke';
@@ -368,58 +372,59 @@ function showShareModal(url, options) {
             }
         };
             buttonsDiv.appendChild(revokeBtn);
-        }
-    const renewBtn = document.createElement('button');
-        renewBtn.type = 'button';
-        renewBtn.className = 'btn-renew';
-        renewBtn.textContent = 'Renew';
-        renewBtn.style.background = '#007DB8';
-        renewBtn.style.color = '#ffffff';
-        renewBtn.style.border = 'none';
-        renewBtn.onclick = async function(ev) {
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-            try {
-                const resp = await fetch('api_share_note.php', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ note_id: noteId, action: 'renew' })
-                });
-                if (resp.ok) {
-                    const ct = resp.headers.get('content-type') || '';
-                    if (ct.indexOf('application/json') !== -1) {
-                        const j = await resp.json();
-                        if (j && j.url) {
-                            // Update displayed URL but keep modal open
-                            const urlDivEl = document.getElementById('shareModalUrl');
-                            if (urlDivEl) urlDivEl.textContent = j.url;
-                            markShareIconShared(noteId, true);
-                            // If Open/Copy were disabled because there was no URL, re-enable them
-                            try {
-                                if (openBtn) { openBtn.disabled = false; openBtn.style.opacity = ''; }
-                                if (copyBtn) { copyBtn.disabled = false; copyBtn.style.opacity = ''; }
-                            } catch (e) {
-                                // ignore
+
+            const renewBtn = document.createElement('button');
+            renewBtn.type = 'button';
+            renewBtn.className = 'btn-renew';
+            renewBtn.textContent = 'Renew';
+            renewBtn.style.background = '#007DB8';
+            renewBtn.style.color = '#ffffff';
+            renewBtn.style.border = 'none';
+            renewBtn.onclick = async function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                try {
+                    const resp = await fetch('api_share_note.php', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ note_id: noteId, action: 'renew' })
+                    });
+                    if (resp.ok) {
+                        const ct = resp.headers.get('content-type') || '';
+                        if (ct.indexOf('application/json') !== -1) {
+                            const j = await resp.json();
+                            if (j && j.url) {
+                                // Update displayed URL but keep modal open
+                                const urlDivEl = document.getElementById('shareModalUrl');
+                                if (urlDivEl) urlDivEl.textContent = j.url;
+                                markShareIconShared(noteId, true);
                             }
                         }
+                    } else {
+                        showNotificationPopup && showNotificationPopup('Failed to renew share', 'error');
                     }
-                } else {
-                    showNotificationPopup && showNotificationPopup('Failed to renew share', 'error');
+                } catch (e) {
+                    showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
                 }
-            } catch (e) {
-                showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
-            }
-        };
-        buttonsDiv.appendChild(renewBtn);
+            };
+            buttonsDiv.appendChild(renewBtn);
+        }
+    } else {
+        // If not shared, show Create button
+        const createBtn = document.createElement('button');
+        createBtn.type = 'button';
+        createBtn.className = 'btn-create-share';
+        createBtn.textContent = 'Create url';
+        createBtn.style.background = '#28a745';
+        createBtn.style.color = '#ffffff';
+        createBtn.style.border = 'none';
+        createBtn.onclick = function() { createPublicShare(noteId); };
+        buttonsDiv.appendChild(createBtn);
     }
 
-    // If there's no URL provided, disable Open and Copy buttons and show placeholder text
+    // If there's no URL provided, show placeholder text
     if (!url) {
-        openBtn.disabled = true;
-        copyBtn.disabled = true;
         urlDiv.textContent = '(No public link yet)';
-        openBtn.style.opacity = '0.6';
-        copyBtn.style.opacity = '0.6';
     }
 
     content.appendChild(buttonsDiv);
@@ -466,23 +471,7 @@ async function openPublicShareModal(noteId) {
         showShareModal(info.url, { noteId: noteId, shared: true });
     } else {
         // Show modal with no url and a Create button
-        // Build a minimal modal that uses createPublicShare when user wants to create
-        // Reuse showShareModal by passing empty URL and the noteId; create button will call createPublicShare
         showShareModal('', { noteId: noteId, shared: false });
-        // Add a Create button to the modal
-        const modal = document.getElementById('shareModal');
-        if (modal) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn-create-share';
-            btn.textContent = 'Create share';
-            btn.style.background = '#28a745';
-            btn.style.color = '#ffffff';
-            btn.style.border = 'none';
-            btn.onclick = function() { createPublicShare(noteId); };
-            const btns = modal.querySelector('.modal-buttons');
-            if (btns) btns.appendChild(btn);
-        }
     }
 }
 
