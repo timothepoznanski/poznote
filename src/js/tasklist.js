@@ -87,6 +87,9 @@ function renderTasks(tasks, noteId) {
         <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
+            <div class="task-drag-handle" title="Drag to reorder">
+                <i class="fa-menu-vert-svg"></i>
+            </div>
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
@@ -405,7 +408,7 @@ function enableDragAndDrop(noteId) {
         try {
             const sortable = new Sortable(tasksList, {
                 animation: 150,
-                handle: '.task-text', // Only allow dragging by the task text
+                handle: '.task-drag-handle', // Only allow dragging by the hamburger handle
                 onEnd: function(evt) {
                     // sortable onEnd
 
@@ -483,9 +486,9 @@ function enableDragAndDrop(noteId) {
         }
 
         tasksList.addEventListener('dragstart', function(e) {
-            const textSpan = e.target.closest('.task-text');
-            if (!textSpan) return;
-            const item = textSpan.closest('.task-item');
+            const dragHandle = e.target.closest('.task-drag-handle');
+            if (!dragHandle) return;
+            const item = dragHandle.closest('.task-item');
             if (!item) return;
             draggedId = item.dataset.taskId;
             e.dataTransfer.effectAllowed = 'move';
@@ -570,10 +573,10 @@ function enableDragAndDrop(noteId) {
         function onPointerDown(e) {
             // Only left button or touch
             if (e.pointerType === 'mouse' && e.button !== 0) return;
-            const textSpan = e.target.closest('.task-text');
-            if (!textSpan) return;
+            const dragHandle = e.target.closest('.task-drag-handle');
+            if (!dragHandle) return;
 
-            const target = textSpan.closest('.task-item');
+            const target = dragHandle.closest('.task-item');
 
             // Prepare state
             pointerDragState = {

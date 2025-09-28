@@ -68,6 +68,29 @@
     transition: all 0.2s ease;
 }
 
+.task-drag-handle {
+    cursor: grab;
+    color: #999;
+    font-size: 12px;
+    margin-right: 8px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+}
+
+.task-drag-handle:hover {
+    color: #666;
+    background: rgba(0,0,0,0.05);
+}
+
+.task-drag-handle:active {
+    cursor: grabbing;
+}
+
 .task-item:hover {
     background: #f5f5f5;
     border-color: #ccc;
