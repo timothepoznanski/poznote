@@ -2309,6 +2309,14 @@ hr {
     pointer-events: auto;
 }
 
+/* More specific selector to ensure actions are visible even if other rules
+   target the same elements. Placed after the default rules so it wins by
+   cascade without relying on !important. */
+body.folder-actions-always-visible .folder-toggle .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* search-only hiding to avoid interfering with general hidden class */
 .search-hidden { display: none !important; }
 
