@@ -467,8 +467,10 @@ function updateSelectedNote(clickedLink) {
         const noteId = clickedLink.getAttribute('data-note-id');
         if (noteId) {
             // Find all links with the same note ID (including in favorites)
-            document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
-                link.classList.add('selected-note');
+            document.querySelectorAll('.links_arbo_left').forEach(link => {
+                if (link.getAttribute('data-note-id') === noteId) {
+                    link.classList.add('selected-note');
+                }
             });
         } else {
             // Fallback to the clicked link only if no data-note-id
@@ -479,8 +481,8 @@ function updateSelectedNote(clickedLink) {
         // This helps in case other scripts interfere with the selection
         setTimeout(() => {
             if (noteId) {
-                document.querySelectorAll('.links_arbo_left[data-note-id="' + noteId + '"]').forEach(link => {
-                    if (!link.classList.contains('selected-note')) {
+                document.querySelectorAll('.links_arbo_left').forEach(link => {
+                    if (link.getAttribute('data-note-id') === noteId && !link.classList.contains('selected-note')) {
                         link.classList.add('selected-note');
                     }
                 });
