@@ -45,9 +45,6 @@ function renderTaskList(noteId, tasks) {
             <div class="task-input-container">
           <input type="text" class="task-input" id="task-input-${noteId}"
               placeholder="Add new task..." maxlength="4000">
-                <button class="task-add-btn" onclick="addTask(${noteId})">
-                    <i class="fa-plus"></i>
-                </button>
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}

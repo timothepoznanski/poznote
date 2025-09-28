@@ -66,6 +66,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-top: 15px;
 }
 
 .task-item {
@@ -253,4 +254,5 @@
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star {
   filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(7466%) hue-rotate(344deg) brightness(93%) contrast(103%);
+}
 }
