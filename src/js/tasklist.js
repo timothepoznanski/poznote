@@ -80,19 +80,31 @@ function renderTasks(tasks, noteId) {
         const starClass = task.important ? 'task-icon-star' : 'task-icon-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
-        return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
-            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
-            <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
+        
+        // Conditional buttons based on completion status
+        let buttonsHtml = '';
+        if (task.completed) {
+            // Completed tasks: only show delete button
+            buttonsHtml = `
+            <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
+                <i class="task-icon-trash"></i>
+            </button>`;
+        } else {
+            // Incomplete tasks: show favorite and drag buttons
+            buttonsHtml = `
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
             <div class="task-drag-handle" title="Drag to reorder">
                 <i class="fa-menu-vert-svg"></i>
-            </div>
-            <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="task-icon-trash"></i>
-            </button>
+            </div>`;
+        }
+        
+        return `
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
+            <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
+            ${buttonsHtml}
         </div>
         `;
     }).join('');
@@ -160,12 +172,32 @@ function toggleTask(taskId, noteId) {
     if (taskIndex === -1) return;
 
     tasks[taskIndex].completed = !tasks[taskIndex].completed;
+    
+    // Sort tasks: important (incomplete) first, then normal (incomplete), then completed last
+    tasks.sort((a, b) => {
+        // Completed tasks always go to the bottom
+        if (a.completed && !b.completed) return 1;
+        if (!a.completed && b.completed) return -1;
+        
+        // Among incomplete tasks, important ones go first
+        if (!a.completed && !b.completed) {
+            if ((a.important ? 1 : 0) !== (b.important ? 1 : 0)) {
+                return (b.important ? 1 : 0) - (a.important ? 1 : 0);
+            }
+        }
+        
+        // Keep relative order for same priority tasks
+        return 0;
+    });
+    
     noteEntry.dataset.tasks = JSON.stringify(tasks);
 
-    // Update UI
-    const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
-    if (taskItem) {
-        taskItem.classList.toggle('completed');
+    // Re-render tasks list with new order
+    const tasksList = document.getElementById(`tasks-list-${noteId}`);
+    if (tasksList) {
+        tasksList.innerHTML = renderTasks(tasks, noteId);
+        // Re-enable DnD after reorder
+        enableDragAndDrop(noteId);
     }
 
     markNoteAsModified(noteId);
