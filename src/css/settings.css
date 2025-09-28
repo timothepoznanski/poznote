@@ -100,17 +100,17 @@ body {
 .back-link:hover {
     color: #005a8a;
 }
-.ai-status {
+.setting-status {
     font-size: 0.75rem;
     padding: 2px 6px;
     border-radius: 4px;
     margin-left: 8px;
 }
-.ai-status.enabled {
+.setting-status.enabled {
     background: #dcfce7;
     color: #166534;
 }
-.ai-status.disabled {
+.setting-status.disabled {
     background: #fee2e2;
     color: #991b1b;
 }

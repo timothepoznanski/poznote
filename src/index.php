@@ -92,6 +92,10 @@ try {
     $stmt->execute(['show_note_subheading']);
     $v2 = $stmt->fetchColumn();
     if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
+
+    $stmt->execute(['show_folder_actions']);
+    $v3 = $stmt->fetchColumn();
+    if ($v3 === '1' || $v3 === 'true') $extra_body_classes .= ' folder-actions-always-visible';
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -477,6 +481,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     } catch (Exception $e) {
                         $is_shared = false;
                     }
+                    // Ensure a share-related CSS class is always defined for both desktop and mobile UI
+                    $share_class = $is_shared ? ' is-shared' : '';
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];

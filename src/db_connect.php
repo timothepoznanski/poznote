@@ -64,7 +64,8 @@ try {
         workspace TEXT DEFAULT "Poznote",
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )');
-    
+
+
     // Ensure unique folder names per workspace
     $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace ON folders(name, workspace)');
 

@@ -58,11 +58,10 @@ body {
 }
 .settings-card h3 { margin: 0; color: #1f2937; font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.ai-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
-.ai-status.enabled { background: #dcfce7; color: #166534; }
-.ai-status.disabled { background: #fee2e2; color: #991b1b; }
+.setting-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; }
+.setting-status.enabled { background: #dcfce7; color: #166534; }
+.setting-status.disabled { background: #fee2e2; color: #991b1b; }
 
-.fa-arrow-left-svg,
 .fa-arrow-left {
     display: inline-block;
     width: 1em;
@@ -76,7 +75,6 @@ body {
     content: '';
 }
 
-.fa-user-svg,
 .fa-user {
     display: inline-block;
     width: 1em;
@@ -90,7 +88,6 @@ body {
     content: '';
 }
 
-.fa-text-height-svg,
 .fa-text-height {
     display: inline-block;
     width: 1em;
@@ -104,7 +101,6 @@ body {
     content: '';
 }
 
-.fa-smile-svg,
 .fa-smile {
     display: inline-block;
     width: 0.9em;
@@ -126,9 +122,7 @@ body {
     content: '';
 }
 
-.fa-calendar-alt-svg,
-.fa-calendar-alt,
-.fa-calendar {
+.fa-calendar-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -141,9 +135,7 @@ body {
     content: '';
 }
 
-.fa-map-marker-alt-svg,
-.fa-map-marker-alt,
-.fa-map-marker {
+.fa-map-marker-alt {
     display: inline-block;
     width: 1em;
     height: 1em;
@@ -156,7 +148,6 @@ body {
     content: '';
 }
 
-.fa-hashtag-svg,
 .fa-hashtag {
     display: inline-block;
     width: 1em;
@@ -168,6 +159,19 @@ body {
     font-family: inherit !important;
     font-style: normal !important;
     content: '';
+}
+
+.fa-folder-open {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/folder-open-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
 }
 
 /* Button styles */
@@ -196,3 +200,4 @@ body {
     text-decoration: none;
     transform: translateY(-1px);
 }
+

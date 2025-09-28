@@ -49,28 +49,35 @@ include 'functions.php';
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon"><i class="fa-grin"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Emoji Icons <span id="emoji-icons-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Emoji Icons <span id="emoji-icons-status" class="setting-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="show-created-card">
                 <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Note Creation Date <span id="show-created-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Note Creation Date <span id="show-created-status" class="setting-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="show-subheading-card">
                 <div class="settings-card-icon"><i class="fa-map-marker-alt"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Note Subheading <span id="show-subheading-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Note Subheading <span id="show-subheading-status" class="setting-status disabled">disabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Folders Notes Counts <span id="folder-counts-status" class="ai-status disabled">disabled</span></h3>
+                    <h3>Show Folders Notes Counts <span id="folder-counts-status" class="setting-status disabled">disabled</span></h3>
+                </div>
+            </div>
+
+            <div class="settings-card" id="folder-actions-card">
+                <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
+                <div class="settings-card-content">
+                    <h3>Show Folder Actions <span id="folder-actions-status" class="setting-status disabled">disabled</span></h3>
                 </div>
             </div>
         </div>
@@ -92,7 +99,7 @@ include 'functions.php';
             var form = new FormData(); form.append('action','get'); form.append('key','emoji_icons_enabled');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
                 var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusEmoji){ statusEmoji.textContent = enabled ? 'enabled' : 'disabled'; statusEmoji.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled'); }
+                if(statusEmoji){ statusEmoji.textContent = enabled ? 'enabled' : 'disabled'; statusEmoji.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
                 if(enabled) document.body.classList.remove('emoji-hidden'); else document.body.classList.add('emoji-hidden');
             }).catch(()=>{});
         }
@@ -110,23 +117,45 @@ include 'functions.php';
         // Show created
         var cardCreated = document.getElementById('show-created-card');
         var statusCreated = document.getElementById('show-created-status');
-        function refreshCreated(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_created'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusCreated){ statusCreated.textContent = enabled ? 'enabled' : 'disabled'; statusCreated.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
+        function refreshCreated(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_created'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusCreated){ statusCreated.textContent = enabled ? 'enabled' : 'disabled'; statusCreated.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
         if(cardCreated){ cardCreated.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_created'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_created'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshCreated(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshCreated();
 
         // Subheading
         var cardSub = document.getElementById('show-subheading-card');
         var statusSub = document.getElementById('show-subheading-status');
-        function refreshSub(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusSub){ statusSub.textContent = enabled ? 'enabled' : 'disabled'; statusSub.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
+        function refreshSub(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusSub){ statusSub.textContent = enabled ? 'enabled' : 'disabled'; statusSub.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
         if(cardSub){ cardSub.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_subheading'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshSub(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshSub();
 
         // Folder counts (localStorage)
         var cardFolder = document.getElementById('folder-counts-card');
         var statusFolder = document.getElementById('folder-counts-status');
-        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'ai-status ' + (enabled ? 'enabled' : 'disabled'); } }catch(e){} }
+        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); } }catch(e){} }
         if(cardFolder){ cardFolder.addEventListener('click', function(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var currently = raw === null ? true : (raw === 'true'); var toSet = !currently; localStorage.setItem('showFolderNoteCounts', toSet); refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){console.error(e);} }); }
         refreshFolder();
+
+        // Folder actions always visible
+        var cardFolderActions = document.getElementById('folder-actions-card');
+        var statusFolderActions = document.getElementById('folder-actions-status');
+        function refreshFolderActions(){
+            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var enabled = j && j.success && (j.value==='1' || j.value==='true');
+                if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'enabled' : 'disabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
+                if(enabled) document.body.classList.add('folder-actions-always-visible'); else document.body.classList.remove('folder-actions-always-visible');
+            }).catch(()=>{});
+        }
+        if(cardFolderActions){ cardFolderActions.addEventListener('click', function(){
+            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                var toSet = currently ? '0' : '1';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_folder_actions'); setForm.append('value', toSet);
+                return fetch('api_settings.php',{method:'POST',body:setForm});
+            }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
+        }); }
+        refreshFolderActions();
     })();
     </script>
 </body>

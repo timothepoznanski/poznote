@@ -536,6 +536,13 @@ function handleDeleteButtonClick(e) {
                     showAjaxAlert('Workspace deleted successfully', 'success');
                     // Close modal
                     try { closeDeleteModal(); } catch(e) {}
+                    // If the deleted workspace was the one stored in localStorage, clear it so other pages don't link to a removed workspace
+                    try {
+                        var stored = localStorage.getItem('poznote_selected_workspace');
+                        if (stored && stored === workspaceName) {
+                            localStorage.setItem('poznote_selected_workspace', 'Poznote');
+                        }
+                    } catch (e) {}
                     // Reload page to show updated workspace list
                     setTimeout(function() {
                         window.location.reload();
