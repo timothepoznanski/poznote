@@ -2853,19 +2853,6 @@ hr {
   content: '';
 }
 
-.fa-share {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/share.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
 .fa-link {
   display: inline-block;
   width: 1em;

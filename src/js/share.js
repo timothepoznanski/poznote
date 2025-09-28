@@ -491,14 +491,14 @@ function markShareIconShared(noteId, shared) {
     try {
         const sel = document.querySelectorAll('.btn-share');
         sel.forEach(btn => {
-            // Buttons generated include onclick with the note id; check data in onclick or nearby menu id
-            const menuId = 'shareMenu-' + noteId;
-            const mobileMenuId = 'shareMenuMobile-' + noteId;
-            const parent = btn.parentElement || btn.parentNode;
-            if (!parent) return;
-            // If this button's associated menu matches, toggle class
-            if (parent.querySelector && (parent.querySelector('#' + menuId) || parent.querySelector('#' + mobileMenuId))) {
-                if (shared) btn.classList.add('is-shared'); else btn.classList.remove('is-shared');
+            // Check if this button's onclick contains the noteId
+            const onclick = btn.getAttribute('onclick') || '';
+            if (onclick.includes("openPublicShareModal('" + noteId + "')")) {
+                if (shared) {
+                    btn.classList.add('is-shared');
+                } else {
+                    btn.classList.remove('is-shared');
+                }
             }
         });
     } catch (e) {
