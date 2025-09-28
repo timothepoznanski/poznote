@@ -302,6 +302,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 </head>
 <body>
     <div class="info-page">
+        <h1 style="text-align: center; margin-bottom: 20px; color: #333; font-size: 24px;">Note Information</h1>
         
         <div class="info-content">
             <div class="info-row">

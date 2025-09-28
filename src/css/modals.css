@@ -1504,3 +1504,8 @@
     background: #f0ad4e; /* orange */
     border: none;
 }
+
+/* Share modal specific styles - make it wider to fit all buttons on one line */
+#shareModal .modal-content {
+    max-width: 600px;
+}

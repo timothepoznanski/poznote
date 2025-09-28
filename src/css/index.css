@@ -1643,9 +1643,10 @@ img {
 
 .ai-menu-item i {
     margin-right: 10px;
-    width: 16px;
+    width: 20px;
     text-align: center;
     color: #007DB8;
+    font-size: 20px;
 }
 
 /* Mobile AI dropdown adjustments */
@@ -1777,6 +1778,11 @@ img {
     color: #007DB8; 
     width: 24px !important;
     font-size: 20px !important;
+}
+
+/* Make delete icon red in actions menu */
+.actions-menu-item .fa-trash {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
 }
 
 .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; }
@@ -2839,6 +2845,19 @@ hr {
   width: 1em;
   height: 1em;
   background-image: url('../images/floppy-disk-light-full.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-share {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/share.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

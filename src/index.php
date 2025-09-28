@@ -563,7 +563,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize note</span>';
+                        echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-search"></i>';
@@ -598,6 +598,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Generate dates safely for JavaScript with robust encoding
@@ -664,9 +665,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
                     echo '<i class="fa-download"></i><span>Download</span>';
                     echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-link"></i><span>Share</span>';
-                    echo '</div>';
                     echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
                     echo '<i class="fa-trash"></i><span>Delete</span>';
                     echo '</div>';
@@ -698,7 +696,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize note</span>';
+                        echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-search"></i>';
@@ -721,6 +719,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                    
+                    echo '<button type="button" class="toolbar-btn btn-share" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
@@ -782,9 +782,6 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '</div>';
                     echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
                     echo '<i class="fa-download"></i><span>Download</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-link"></i><span>Share</span>';
                     echo '</div>';
                     echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
                     echo '<i class="fa-trash"></i><span>Delete</span>';
