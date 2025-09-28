@@ -474,12 +474,30 @@ try {
             document.addEventListener('click', handleSelectButtonClick);
             document.addEventListener('click', handleDeleteButtonClick);
 
-            // Update back link with stored workspace
+            // Update back link with stored workspace, but only if that workspace is present in the displayed list.
             try {
                 var stored = localStorage.getItem('poznote_selected_workspace');
                 var a = document.getElementById('backToNotesLink');
                 if (a && stored) {
-                    a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+                    // Check displayed workspaces on the page to ensure the stored value still exists
+                    var exists = false;
+                    try {
+                        var items = document.querySelectorAll('.workspace-name-item');
+                        for (var i = 0; i < items.length; i++) {
+                            if (items[i].textContent.trim() === stored) { exists = true; break; }
+                        }
+                    } catch (e) {
+                        // if DOM query fails, be conservative and assume exists = false
+                        exists = false;
+                    }
+
+                    if (exists) {
+                        a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+                    } else {
+                        // Clean up stale selection and default to Poznote
+                        try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
+                        a.setAttribute('href', 'index.php?workspace=Poznote');
+                    }
                 }
             } catch(e) {}
         });
