@@ -45,7 +45,7 @@ include 'functions.php';
                 </div>
                 <div class="settings-card-content">
                     <h3>AI Settings
-                        <?php echo isAIEnabled() ? '<span class="ai-status enabled">enabled</span>' : '<span class="ai-status disabled">disabled</span>'; ?>
+                        <?php echo isAIEnabled() ? '<span class="setting-status enabled">enabled</span>' : '<span class="setting-status disabled">disabled</span>'; ?>
                     </h3>
                 </div>
             </div>
@@ -155,7 +155,7 @@ include 'functions.php';
             const badge = document.getElementById('folder-counts-status');
             if (badge) {
                 badge.textContent = isEnabled ? 'enabled' : 'disabled';
-                badge.className = 'ai-status ' + (isEnabled ? 'enabled' : 'disabled');
+                badge.className = 'setting-status ' + (isEnabled ? 'enabled' : 'disabled');
             }
         }
         

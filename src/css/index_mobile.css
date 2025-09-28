@@ -450,6 +450,12 @@ a.links_arbo_left.selected-note {
     margin-left: 12px !important;
 }
 
+/* On mobile, actions are always visible by default, but can be overridden */
+.folder-actions-always-visible .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Ensure excluded search icon is clearly visible and highlighted on mobile */
 .folder-search-btn.excluded {
     color: #dc3545 !important;

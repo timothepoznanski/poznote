@@ -1589,17 +1589,17 @@ img {
     color: #007DB8;
 }
 
-.settings-menu-item .ai-status {
+.settings-menu-item .setting-status {
     margin-left: 8px;
     /* font-size: 0.85em; */
     vertical-align: baseline;
 }
 
-.settings-menu-item .ai-status.enabled {
+.settings-menu-item .setting-status.enabled {
     color: #28a745;
 }
 
-.settings-menu-item .ai-status.disabled {
+.settings-menu-item .setting-status.disabled {
     color: #dc3545;
 }
 
@@ -2264,16 +2264,21 @@ hr {
     flex: 0 0 auto;
 }
 
-/* Hide individual action icons by default to reproduce the previous
-   hover-to-show behaviour while allowing a specific icon to remain visible */
+/* Hide individual action icons by default (show on hover) */
 .folder-actions i {
     opacity: 0;
     transition: opacity 0.12s ease-in-out, color 0.12s;
     pointer-events: none;
 }
 
-/* Reveal icons on folder hover (except ones forced visible by other rules) */
+/* Reveal icons on folder hover by default */
 .folder-toggle:hover .folder-actions i {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* When folder actions are set to always visible, show them always */
+.folder-actions-always-visible .folder-actions i {
     opacity: 1;
     pointer-events: auto;
 }

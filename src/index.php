@@ -92,6 +92,10 @@ try {
     $stmt->execute(['show_note_subheading']);
     $v2 = $stmt->fetchColumn();
     if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
+
+    $stmt->execute(['show_folder_actions']);
+    $v3 = $stmt->fetchColumn();
+    if ($v3 === '1' || $v3 === 'true') $extra_body_classes .= ' folder-actions-always-visible';
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
