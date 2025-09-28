@@ -481,6 +481,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     } catch (Exception $e) {
                         $is_shared = false;
                     }
+                    // Ensure a share-related CSS class is always defined for both desktop and mobile UI
+                    $share_class = $is_shared ? ' is-shared' : '';
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];
