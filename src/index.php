@@ -566,7 +566,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-search"></i>';
+                        echo '<i class="fa-check-light-full"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
@@ -699,7 +699,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-search"></i>';
+                        echo '<i class="fa-check-light-full"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
