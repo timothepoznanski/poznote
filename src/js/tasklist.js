@@ -87,12 +87,12 @@ function renderTasks(tasks, noteId) {
         <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="true">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
-            <div class="task-drag-handle" title="Drag to reorder">
-                <i class="fa-menu-vert-svg"></i>
-            </div>
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
+            <div class="task-drag-handle" title="Drag to reorder">
+                <i class="fa-menu-vert-svg"></i>
+            </div>
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="task-icon-trash"></i>
             </button>

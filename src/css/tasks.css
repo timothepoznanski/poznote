@@ -1,9 +1,19 @@
 .task-list-container {
     padding: 10px 0;
     font-family: inherit;
-}
-
-.task-input-container {
+.task-drag-handle {
+    cursor: grab;
+    color: #999;
+    font-size: 12px;
+    margin-left: 4px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+}-container {
     display: flex;
     gap: 8px;
     margin-bottom: 15px;
@@ -71,8 +81,9 @@
 .task-drag-handle {
     cursor: grab;
     color: #999;
-    font-size: 12px;
-    margin-right: 8px;
+    font-size: 18px;
+    margin-right: 2px;
+    margin-left: 2px;
     padding: 2px 4px;
     border-radius: 2px;
     transition: all 0.2s ease;
