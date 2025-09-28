@@ -799,7 +799,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 // Tags container: keep a hidden input for JS but remove the visible icon/input.
                 // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                 echo '<div class="note-tags-row">';
-                echo '<span class="fa-tag icon_tag"></span>';
+                echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
                 echo '<span class="name_tags">'
                     .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                 .'</span>';

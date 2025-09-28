@@ -1268,6 +1268,11 @@ img {
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
+    cursor: pointer;
+}
+
+.fa-tag.icon_tag:hover {
+    opacity: 0.7;
 }
 
 .fa-tag.icon_tag {
@@ -2712,8 +2717,8 @@ hr {
 
 .fa-file-copy-svg {
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 0.8em;
+  height: 0.8em;
   background-image: url('../images/file-copy.svg');
   background-repeat: no-repeat;
   background-position: center;
