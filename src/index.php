@@ -468,6 +468,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
                 
+                    // Check if note is shared
+                    $is_shared = false;
+                    try {
+                        $stmt_shared = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
+                        $stmt_shared->execute([$row['id']]);
+                        $is_shared = $stmt_shared->fetchColumn() !== false;
+                    } catch (Exception $e) {
+                        $is_shared = false;
+                    }
+                
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];
                     // Ensure we have a safe JSON-encoded title for JavaScript (used by both desktop and mobile)
@@ -598,7 +608,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    $share_class = $is_shared ? ' is-shared' : '';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Generate dates safely for JavaScript with robust encoding
@@ -720,7 +731,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-share" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
@@ -1056,28 +1067,5 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <script src="js/ai.js"></script>
 <?php endif; ?>
 <script src="js/copy-code-on-focus.js"></script>
-
-<script>
-// Initialize share icon states after page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Check share status for all visible share buttons
-    const shareButtons = document.querySelectorAll('.btn-share');
-    shareButtons.forEach(async function(btn) {
-        const onclick = btn.getAttribute('onclick') || '';
-        const match = onclick.match(/openPublicShareModal\('([^']+)'\)/);
-        if (match && match[1]) {
-            const noteId = match[1];
-            try {
-                const shareInfo = await getPublicShare(noteId);
-                if (shareInfo.shared) {
-                    btn.classList.add('is-shared');
-                }
-            } catch (e) {
-                // Ignore errors during initialization
-            }
-        }
-    });
-});
-</script>
 
 </html>

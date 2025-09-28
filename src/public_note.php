@@ -22,7 +22,7 @@ try {
 
     $note_id = $row['note_id'];
 
-    $stmt = $con->prepare('SELECT heading, entry, created, updated FROM entries WHERE id = ?');
+    $stmt = $con->prepare('SELECT heading, entry, created, updated, type FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$note) {
@@ -47,7 +47,28 @@ if (is_readable($htmlFile)) {
     $content = $note['entry'] ?? '';
 }
 
-// Rewrite relative attachment URLs to absolute URLs so images load for anonymous users
+// If this is a tasklist type, try to parse the stored JSON and render a readable task list
+if (isset($note['type']) && $note['type'] === 'tasklist') {
+    $decoded = json_decode($content, true);
+    if (is_array($decoded)) {
+        $tasksHtml = '<div class="task-list-container">';
+        $tasksHtml .= '<div class="tasks-list">';
+        foreach ($decoded as $task) {
+            $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
+            $completed = !empty($task['completed']) ? ' completed' : '';
+            $checked = !empty($task['completed']) ? ' checked' : '';
+            $tasksHtml .= '<div class="task-item'.$completed.'">';
+            $tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
+            $tasksHtml .= '<span class="task-text">'.$text.'</span>';
+            $tasksHtml .= '</div>';
+        }
+        $tasksHtml .= '</div></div>';
+        $content = $tasksHtml;
+    } else {
+        // If JSON parse fails, escape raw content
+        $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>';
+    }
+}
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 // If the app is in a subdirectory, ensure the base includes the script dir
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
@@ -86,6 +107,7 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
     <link rel="stylesheet" href="css/public_note.css">
+    <link rel="stylesheet" href="css/tasks.css">
 </head>
 <body>
     <div class="public-note">
