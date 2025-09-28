@@ -1732,6 +1732,72 @@ img {
 
 }
 
+/* Actions dropdown styles */
+.actions-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.actions-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 140px;
+    padding: 8px 0;
+    margin-top: 5px;
+    display: none;
+}
+
+.actions-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.actions-menu-item:last-child { border-bottom: none; }
+
+.actions-menu-item:hover { background-color: #f8f9fa; color: #007DB8; }
+
+.actions-menu-item i { 
+    margin-right: 10px; 
+    width: 16px; 
+    text-align: center; 
+    color: #007DB8; 
+    width: 24px !important;
+    font-size: 20px !important;
+}
+
+.actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; }
+
+/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
+   Use fixed positioning for the mobile actions menu so it sits above the layout and
+   remains visible even when parent elements hide overflow. It will be centered
+   horizontally by default and placed slightly above the bottom toolbar. */
+@media (max-width: 900px) {
+    .actions-dropdown.mobile .actions-menu {
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 64px !important; /* above the toolbar */
+        top: auto !important;
+        margin-top: 0 !important;
+        z-index: 20000 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+    }
+}
+
 
 .icon_trash {
     color: #007DB8;
@@ -2640,9 +2706,35 @@ hr {
 
 .fa-file-copy-svg {
   display: inline-block;
-  width: 0.8em;
-  height: 0.8em;
+  width: 1em;
+  height: 1em;
   background-image: url('../images/file-copy.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-menu-vert-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/menu-vert.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+.fa-drive-file-move-svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/drive_file_move.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

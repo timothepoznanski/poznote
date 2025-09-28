@@ -200,6 +200,13 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// Close actions menu when clicking elsewhere
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.actions-dropdown')) {
+        closeActionsMenu();
+    }
+});
+
 // Show a simple modal with the public URL and Copy / Cancel buttons (English)
 // showShareModal can accept either just url or (url, options)
 // options: { noteId: string, shared: boolean }
@@ -502,3 +509,143 @@ function markShareIconShared(noteId, shared) {
 window.getPublicShare = getPublicShare;
 window.openPublicShareModal = openPublicShareModal;
 window.markShareIconShared = markShareIconShared;
+
+// Actions menu functionality
+let currentActionsMenuNoteId = null;
+let isActionsMenuOpen = false;
+
+function toggleActionsMenu(event, noteId, filename, titleJson) {
+    if (event) event.stopPropagation();
+    currentActionsMenuNoteId = noteId;
+
+    // Close other menus (guard with typeof to avoid ReferenceError if not present)
+    if (typeof closeAIMenu === 'function') closeAIMenu();
+    if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
+    if (typeof closeShareMenu === 'function') closeShareMenu();
+
+    // Find the menu elements specific to this note
+    const desktop = document.getElementById('actionsMenu-' + noteId);
+    const mobile = document.getElementById('actionsMenuMobile-' + noteId);
+    const activeMenu = desktop || mobile;
+
+    if (!activeMenu) return;
+
+    if (isActionsMenuOpen && currentActionsMenuNoteId === noteId) {
+        closeActionsMenu();
+        return;
+    }
+
+    // Close any other actions menus first and clear their inline positioning
+    const all = document.querySelectorAll('.actions-menu');
+    all.forEach(el => {
+        el.style.display = 'none';
+        // remove any inline positioning we may have added earlier
+        el.style.removeProperty('position');
+        el.style.removeProperty('left');
+        el.style.removeProperty('right');
+        el.style.removeProperty('top');
+        el.style.removeProperty('bottom');
+        el.style.removeProperty('transform');
+        el.style.removeProperty('margin-top');
+        el.style.removeProperty('z-index');
+        el.style.removeProperty('box-shadow');
+    });
+
+    // Show the active menu
+    activeMenu.style.display = 'block';
+
+    // If this actions dropdown is inside a mobile container, position it near the button
+    try {
+        // Find the triggering button: prefer the event target's closest element with data-note-id
+        let triggerBtn = null;
+        if (event && event.target) triggerBtn = event.target.closest('.btn-actions');
+        if (!triggerBtn) triggerBtn = document.querySelector('.btn-actions');
+
+        const isMobileDropdown = !!triggerBtn && !!triggerBtn.closest && triggerBtn.closest('.actions-dropdown') && triggerBtn.closest('.actions-dropdown').classList.contains('mobile');
+
+        if (isMobileDropdown && triggerBtn) {
+            // Force fixed positioning placed near the button. Use important priority to override stylesheet !important rules.
+            const rect = triggerBtn.getBoundingClientRect();
+
+            // Make menu invisible but displayed to measure height
+            activeMenu.style.visibility = 'hidden';
+            activeMenu.style.display = 'block';
+
+            // Ensure any previous important declarations are cleared
+            activeMenu.style.removeProperty('position');
+            activeMenu.style.removeProperty('left');
+            activeMenu.style.removeProperty('top');
+            activeMenu.style.removeProperty('bottom');
+            activeMenu.style.removeProperty('transform');
+
+            // Apply fixed positioning with important priority
+            activeMenu.style.setProperty('position', 'fixed', 'important');
+            // center horizontally on the button
+            const centerX = rect.left + rect.width / 2;
+            activeMenu.style.setProperty('left', centerX + 'px', 'important');
+            activeMenu.style.setProperty('transform', 'translateX(-50%)', 'important');
+            activeMenu.style.setProperty('margin-top', '0', 'important');
+            activeMenu.style.setProperty('z-index', '20000', 'important');
+            activeMenu.style.setProperty('box-shadow', '0 8px 24px rgba(0,0,0,0.18)', 'important');
+
+            // Compute space and place above by default
+            const menuHeight = activeMenu.getBoundingClientRect().height || activeMenu.offsetHeight || 0;
+            const spaceAbove = rect.top;
+            const spaceBelow = window.innerHeight - rect.bottom;
+            let topPos = rect.top - menuHeight - 8; // 8px gap
+            if (topPos < 8 && spaceBelow > spaceAbove) {
+                // Not enough space above -> place below the button
+                topPos = rect.bottom + 8;
+            }
+            activeMenu.style.setProperty('top', Math.max(8, topPos) + 'px', 'important');
+            // ensure bottom is unset
+            activeMenu.style.setProperty('bottom', 'auto', 'important');
+
+            // restore visibility
+            activeMenu.style.visibility = '';
+        } else {
+            // Desktop/default behavior: ensure menu is positioned by CSS (absolute)
+            // Remove any leftover important positioning
+            activeMenu.style.removeProperty('position');
+            activeMenu.style.removeProperty('left');
+            activeMenu.style.removeProperty('top');
+            activeMenu.style.removeProperty('bottom');
+            activeMenu.style.removeProperty('transform');
+            activeMenu.style.removeProperty('margin-top');
+            activeMenu.style.removeProperty('z-index');
+            activeMenu.style.removeProperty('box-shadow');
+        }
+    } catch (e) {
+        // ignore positioning errors
+    }
+
+    isActionsMenuOpen = true;
+}
+
+function closeActionsMenu() {
+    // Hide all actions menus
+    const all = document.querySelectorAll('.actions-menu');
+    all.forEach(el => {
+        el.style.display = 'none';
+        // Remove any inline styles we added for mobile positioning (including important ones)
+        try {
+            el.style.removeProperty('position');
+            el.style.removeProperty('left');
+            el.style.removeProperty('right');
+            el.style.removeProperty('top');
+            el.style.removeProperty('bottom');
+            el.style.removeProperty('transform');
+            el.style.removeProperty('margin-top');
+            el.style.removeProperty('z-index');
+            el.style.removeProperty('box-shadow');
+            el.style.visibility = '';
+        } catch (e) {
+            // ignore
+        }
+    });
+    isActionsMenuOpen = false;
+    currentActionsMenuNoteId = null;
+}
+
+window.toggleActionsMenu = toggleActionsMenu;
+window.closeActionsMenu = closeActionsMenu;
