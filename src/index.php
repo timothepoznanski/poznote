@@ -563,10 +563,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<div class="ai-menu" id="aiMenu">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize note</span>';
+                        echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-search"></i>';
+                        echo '<i class="fa-check-light-full"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
@@ -592,37 +592,14 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                             $attachments_count = count($attachments_data);
                         }
                     }
+                        // Définir les variables favorites pour éviter l'erreur
+                        $is_favorite = $row['favorite'] ?? 0;
+                        $favorite_class = $is_favorite ? ' is-favorite' : '';
+                        $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     
-                    // Favorites button with star icon
-                    $is_favorite = $row['favorite'] ?? 0;
-                    $favorite_class = $is_favorite ? ' is-favorite' : '';
-                    $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-duplicate'.$note_action_class.'" title="Duplicate note" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-folder'.$note_action_class.'" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
-                    
-                    // Share / Download dropdown (export or public share)
-                    echo '<div class="share-dropdown">';
-                    // Check if note is already shared to add visual indicator
-                    $is_shared = false;
-                    try {
-                        $stmt2 = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
-                        $stmt2->execute([$row['id']]);
-                        $is_shared = (bool)$stmt2->fetchColumn();
-                    } catch (Exception $e) { /* ignore */ }
-
-                    $share_class_extra = $is_shared ? ' is-shared' : '';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class_extra.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
-                    echo '<div class="share-menu" id="shareMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
-                    echo '<div class="share-menu-item" data-action="download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fa-download"></i><span>Download HTML</span>';
-                    echo '</div>';
-                    echo '<div class="share-menu-item" data-action="public" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
                     
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -675,8 +652,27 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info'.$note_action_class.'" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
+                    // Actions dropdown (duplicate, move, download, share publicly, delete, info)
+                    echo '<div class="actions-dropdown">';
+                    echo '<button type="button" class="toolbar-btn btn-actions'.$note_action_class.'" title="Actions" onclick="toggleActionsMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-menu-vert-svg"></i></button>';
+                    echo '<div class="actions-menu" id="actionsMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
+                    echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="showMoveFolderDialog(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-drive-file-move-svg"></i><span>Move</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
+                    echo '<i class="fa-download"></i><span>Download</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-trash"></i><span>Delete</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.'); closeActionsMenu();">';
+                    echo '<i class="fa-info-circle"></i><span>Information</span>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                 } else {
                     // Individual buttons for mobile (always visible)
                     // Calculate number of attachments for mobile button
@@ -700,10 +696,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize note</span>';
+                        echo '<span>Summarize</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-search"></i>';
+                        echo '<i class="fa-check-light-full"></i>';
                         echo '<span>Check content</span>';
                         echo '</div>';
                         echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
@@ -724,29 +720,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-duplicate" title="Duplicate note" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-folder" title="Move to folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-folder"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
-                    // Mobile: use share dropdown as well (simpler menu)
-                    echo '<div class="share-dropdown mobile">';
-                    // Mobile: reflect shared state too
-                    $is_shared_mobile = false;
-                    try {
-                        $stmt3 = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? LIMIT 1');
-                        $stmt3->execute([$row['id']]);
-                        $is_shared_mobile = (bool)$stmt3->fetchColumn();
-                    } catch (Exception $e) { /* ignore */ }
-                    $share_class_mobile = $is_shared_mobile ? ' is-shared' : '';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$share_class_mobile.'" data-note-id="'.htmlspecialchars($row['id'], ENT_QUOTES).'" title="Share / Export" onclick="toggleShareMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-square-share-nodes-svg"></i></button>';
-                    echo '<div class="share-menu" id="shareMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
-                    echo '<div class="share-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeShareMenu();">';
-                    echo '<i class="fa-download"></i><span>Download HTML</span>';
-                    echo '</div>';
-                    echo '<div class="share-menu-item" onclick="openPublicShareModal(\''.$row['id'].'\'); closeShareMenu();">';
-                    echo '<i class="fa-link"></i><span>Share publicly (read-only)</span>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
                     
                     // Generate dates safely for JavaScript (same logic as desktop)
                     $created_raw = $row['created'] ?? '';
@@ -794,8 +770,27 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    echo '<button type="button" class="toolbar-btn btn-info" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
+                    // Actions dropdown for mobile
+                    echo '<div class="actions-dropdown mobile">';
+                    echo '<button type="button" class="toolbar-btn btn-actions" title="Actions" onclick="toggleActionsMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-menu-vert-svg"></i></button>';
+                    echo '<div class="actions-menu" id="actionsMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
+                    echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="showMoveFolderDialog(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-drive-file-move-svg"></i><span>Move</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
+                    echo '<i class="fa-download"></i><span>Download</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
+                    echo '<i class="fa-trash"></i><span>Delete</span>';
+                    echo '</div>';
+                    echo '<div class="actions-menu-item" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.'); closeActionsMenu();">';
+                    echo '<i class="fa-info-circle"></i><span>Information</span>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                 }
                 
                 echo '</div>';
@@ -804,7 +799,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 // Tags container: keep a hidden input for JS but remove the visible icon/input.
                 // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                 echo '<div class="note-tags-row">';
-                echo '<span class="fa-tag icon_tag"></span>';
+                echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
                 echo '<span class="name_tags">'
                     .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                 .'</span>';
@@ -1061,5 +1056,28 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 <script src="js/ai.js"></script>
 <?php endif; ?>
 <script src="js/copy-code-on-focus.js"></script>
+
+<script>
+// Initialize share icon states after page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check share status for all visible share buttons
+    const shareButtons = document.querySelectorAll('.btn-share');
+    shareButtons.forEach(async function(btn) {
+        const onclick = btn.getAttribute('onclick') || '';
+        const match = onclick.match(/openPublicShareModal\('([^']+)'\)/);
+        if (match && match[1]) {
+            const noteId = match[1];
+            try {
+                const shareInfo = await getPublicShare(noteId);
+                if (shareInfo.shared) {
+                    btn.classList.add('is-shared');
+                }
+            } catch (e) {
+                // Ignore errors during initialization
+            }
+        }
+    });
+});
+</script>
 
 </html>

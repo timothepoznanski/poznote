@@ -151,7 +151,7 @@ body {
 .note-edit-toolbar {
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
+    /* gap: 6px !important; */
     justify-content: center !important;
     padding: 8px !important;
     width: 100% !important;
