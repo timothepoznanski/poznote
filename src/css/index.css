@@ -482,6 +482,32 @@ body {
 .folder-note-count { color:#6b7280; margin-left:6px; font-weight:400; }
 .hide-folder-counts .folder-note-count { display: none; }
 
+/* When folder counts are globally hidden, reveal them when the user hovers the folder
+   or focuses it via keyboard for accessibility. Use opacity + transform for a smooth
+   unobtrusive transition rather than abruptly toggling display. */
+.hide-folder-counts .folder-note-count {
+    /* keep them removed from layout by default */
+    display: inline-block; /* ensure inline layout for transition */
+    opacity: 0;
+    transform: translateY(-2px) scale(0.98);
+    transition: opacity 120ms ease, transform 120ms ease;
+    pointer-events: none; /* avoid interfering with folder clicks */
+}
+.hide-folder-counts .folder-toggle:hover .folder-note-count,
+.hide-folder-counts .folder-toggle:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:focus-within .folder-note-count,
+.hide-folder-counts .folder-header:hover .folder-note-count {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* For keyboard-only users, provide a visible focus outline on the folder-toggle */
+.hide-folder-counts .folder-toggle:focus-within {
+    outline: 2px solid rgba(59,130,246,0.18);
+    border-radius: 6px;
+}
+
 /* Folder content / notes styling */
 .note-in-folder { padding-left: 26px; display:block; }
 .links_arbo_left { padding: 8px 10px; margin: 4px 0; }
