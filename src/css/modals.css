@@ -932,10 +932,6 @@
     box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
 }
 
-#moveNoteFolderModal .form-group {
-    /* margin-bottom: 20px; */
-}
-
 #moveNoteFolderModal .form-group label {
     display: block;
     margin-bottom: 6px;
