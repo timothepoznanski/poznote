@@ -1268,6 +1268,99 @@
     }
 }
 
+/* Make Delete workspace modal actions equal width and inline side-by-side */
+#deleteModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#deleteModal .modal-buttons button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px; /* fixed width so both buttons are identical */
+    height: 40px; /* fixed height for consistent appearance */
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#deleteModal .modal-buttons .btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+#deleteModal .modal-buttons .btn-cancel,
+#deleteModal .modal-buttons .btn-secondary {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+/* Apply the same sizing and inline layout to rename and move-notes modals */
+#renameModal .modal-buttons,
+#moveNotesModal .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#renameModal .modal-buttons button,
+#moveNotesModal .modal-buttons button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+#renameModal .modal-buttons .btn-primary,
+#moveNotesModal .modal-buttons .btn-primary {
+    background-color: #007DB8;
+    color: white;
+    border: none;
+}
+
+#renameModal .modal-buttons .btn-secondary,
+#moveNotesModal .modal-buttons .btn-secondary,
+#renameModal .modal-buttons .btn-cancel,
+#moveNotesModal .modal-buttons .btn-cancel {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+/* Some modals use a plain div (no .modal-buttons class). Ensure the direct
+   action buttons in those modals also get consistent sizing. */
+#deleteModal .modal-content > div > button,
+#renameModal .modal-content > div > button,
+#moveNotesModal .modal-content > div > button {
+    padding: 8px 14px;
+    font-size: 14px;
+    width: 150px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+/* Keep the destructive/primary visual treatments */
+#deleteModal .modal-content > div > button.btn-danger,
+#renameModal .modal-content > div > button.btn-primary,
+#moveNotesModal .modal-content > div > button.btn-primary {
+    border: none;
+}
+
+#deleteModal .modal-content > div > button:disabled {
+    /* ensure disabled Delete button keeps same sizing but appears disabled */
+    cursor: not-allowed;
+    opacity: 0.95;
+}
+
 /* Modal mobile adjustments (more specific mobile sizing) */
 .modal-content {
     margin: 5% auto 0; /* vertical spacing for modals */
