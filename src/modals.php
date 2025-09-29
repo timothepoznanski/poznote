@@ -42,26 +42,16 @@
 <div id="fontSizeModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Note Font Size</h2>
+            <h2>Note Content Font Size</h2>
         </div>
         <div class="modal-body">
             <p>Select the default font size for your notes:</p>
             <div class="font-size-controls">
                 <div class="font-size-section">
-                    <h3>Desktop View</h3>
-                    <label for="fontSizeDesktopInput">Font size for desktop (px):</label>
-                    <input type="number" id="fontSizeDesktopInput" min="10" max="32" step="1" value="16">
+                    <label for="fontSizeInput">Font size (px):</label>
+                    <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="16">
                     <div class="font-size-preview">
-                        <p id="fontSizeDesktopPreview">This is a preview text for desktop view</p>
-                    </div>
-                </div>
-
-                <div class="font-size-section">
-                    <h3>Mobile View</h3>
-                    <label for="fontSizeMobileInput">Font size for mobile (px):</label>
-                    <input type="number" id="fontSizeMobileInput" min="10" max="32" step="1" value="16">
-                    <div class="font-size-preview">
-                        <p id="fontSizeMobilePreview">This is a preview text for mobile view</p>
+                        <p id="fontSizePreview">This is a preview text</p>
                     </div>
                 </div>
             </div>
@@ -122,7 +112,6 @@
         <!-- Workspace selection -->
         <div class="form-group">
             <label for="workspaceSelect">Select Workspace destination:</label>
-            <br><br>
         <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
                 <!-- Workspaces will be loaded here -->
             </select>

@@ -42,7 +42,7 @@ include 'functions.php';
                     <i class="fa-text-height"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Note Font Size</h3>
+                    <h3>Note Content Font Size</h3>
                 </div>
             </div>
 
@@ -70,14 +70,14 @@ include 'functions.php';
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Folders Notes Counts <span id="folder-counts-status" class="setting-status disabled">disabled</span></h3>
+                    <h3>Hide Folders Notes Counts <span id="folder-counts-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="folder-actions-card">
                 <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Folder Actions <span id="folder-actions-status" class="setting-status disabled">disabled</span></h3>
+                    <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
         </div>
@@ -128,30 +128,44 @@ include 'functions.php';
         if(cardSub){ cardSub.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_subheading'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshSub(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshSub();
 
-        // Folder counts (localStorage)
+        // Folder counts (database)
         var cardFolder = document.getElementById('folder-counts-card');
         var statusFolder = document.getElementById('folder-counts-status');
-        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); } }catch(e){} }
-        if(cardFolder){ cardFolder.addEventListener('click', function(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var currently = raw === null ? true : (raw === 'true'); var toSet = !currently; localStorage.setItem('showFolderNoteCounts', toSet); refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){console.error(e);} }); }
+        function refreshFolder(){
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_counts');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
+                if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
+            }).catch(()=>{});
+        }
+        if(cardFolder){ cardFolder.addEventListener('click', function(){
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_counts');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
+                var toSet = currently ? '0' : '1';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','hide_folder_counts'); setForm.append('value', toSet);
+                return fetch('api_settings.php',{method:'POST',body:setForm});
+            }).then(function(){ refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
+        }); }
         refreshFolder();
 
-        // Folder actions always visible
+        // Folder actions (database)
         var cardFolderActions = document.getElementById('folder-actions-card');
         var statusFolderActions = document.getElementById('folder-actions-status');
         function refreshFolderActions(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_actions');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true');
+                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
                 if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'enabled' : 'disabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-                if(enabled) document.body.classList.add('folder-actions-always-visible'); else document.body.classList.remove('folder-actions-always-visible');
+                if(enabled) document.body.classList.remove('folder-actions-always-visible'); else document.body.classList.add('folder-actions-always-visible');
             }).catch(()=>{});
         }
         if(cardFolderActions){ cardFolderActions.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_actions');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
                 var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_folder_actions'); setForm.append('value', toSet);
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','hide_folder_actions'); setForm.append('value', toSet);
                 return fetch('api_settings.php',{method:'POST',body:setForm});
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }

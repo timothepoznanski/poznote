@@ -92,9 +92,13 @@ try {
     $v2 = $stmt->fetchColumn();
     if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
 
-    $stmt->execute(['show_folder_actions']);
+    $stmt->execute(['hide_folder_actions']);
     $v3 = $stmt->fetchColumn();
-    if ($v3 === '1' || $v3 === 'true') $extra_body_classes .= ' folder-actions-always-visible';
+    if ($v3 === '0' || $v3 === 'false') $extra_body_classes .= ' folder-actions-always-visible';
+
+    $stmt->execute(['hide_folder_counts']);
+    $v4 = $stmt->fetchColumn();
+    if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -174,20 +178,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     </script>
 
     <script>
-    // Apply folder counts visibility based on settings stored in localStorage
+    // Restore folder states from localStorage
     document.addEventListener('DOMContentLoaded', function() {
-        try {
-            var showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
-            if (!showCounts) {
-                document.body.classList.add('hide-folder-counts');
-            } else {
-                document.body.classList.remove('hide-folder-counts');
-            }
-        } catch (e) {
-            // Ignore localStorage access errors
-        }
-        
-        // Restore folder states from localStorage
         try {
             var folderContents = document.querySelectorAll('.folder-content');
             for (var i = 0; i < folderContents.length; i++) {
@@ -891,14 +883,12 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '</div>';
                 }
                 
-                // Get font size from settings based on device
+                // Get font size from settings
                 $font_size = '16';
-                $is_mobile_for_font = isMobileDevice();
                 
                 try {
-                    $setting_key = $is_mobile_for_font ? 'note_font_size_mobile' : 'note_font_size_desktop';
                     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute([$setting_key]);
+                    $stmt->execute(['note_font_size']);
                     $font_size_value = $stmt->fetchColumn();
                     if ($font_size_value !== false) {
                         $font_size = $font_size_value;
