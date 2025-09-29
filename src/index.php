@@ -815,7 +815,7 @@ $using_unified_search = handleUnifiedSearch();
         }
         
         function openNoteInfoEdit(noteId) {
-            var url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
+            var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
             if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
                 url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
             }
@@ -828,7 +828,7 @@ $using_unified_search = handleUnifiedSearch();
 <script>
     // Ensure this function is defined globally so inline onclick handlers can call it even when AI modal block isn't rendered
     function openNoteInfoEdit(noteId) {
-        var url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
+        var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
         if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
             url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
         }

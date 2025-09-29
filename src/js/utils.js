@@ -12,7 +12,7 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
     
     try {
         var wsParam = selectedWorkspace ? ('&workspace=' + encodeURIComponent(selectedWorkspace)) : '';
-        var url = 'note_info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
+        var url = 'info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
         window.location.href = url;
     } catch (error) {
         alert('Error displaying information: ' + error.message);
