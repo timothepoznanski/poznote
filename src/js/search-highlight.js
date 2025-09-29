@@ -38,7 +38,8 @@ function highlightSearchTerms() {
     // Additional fallback: when on mobile, prefer explicit state from SearchManager
     // or hidden inputs. Do not unconditionally assume notes on mobile as that
     // causes folder searches to still highlight titles.
-    var isMobile = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    // Use CSS breakpoint (800px) for mobile detection to match responsive styles
+    var isMobile = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) || window.innerWidth <= 800;
     if (!isNotesActive && isMobile) {
         try {
             if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {

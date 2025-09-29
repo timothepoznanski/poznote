@@ -3,18 +3,8 @@
  * Handles click events and desktop-specific interactions
  */
 
-/**
- * Initialize desktop click handlers for note links
- * Note: Click handling is now done via onclick attributes in HTML
- * This function is kept for compatibility but doesn't add event listeners
- */
 function initializeDesktopClickHandlers() {
-    if (isMobileDevice()) {
-        return; // Skip if mobile
-    }
-
-    // Click handlers are now managed via onclick attributes in the template
-    // This function is kept for backwards compatibility
+    if (isMobileDevice()) return;
 }
 
 /**

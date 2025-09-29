@@ -155,12 +155,6 @@ function saveFontSize() {
     });
 }
 
-// Function to check if we're on a mobile device
-function isMobileDevice() {
-    return (window.innerWidth <= 800 || 
-            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-}
-
 // Function to apply font size to all note editors
 function applyFontSizeToNotes() {
     // Apply to the current note editor if it exists

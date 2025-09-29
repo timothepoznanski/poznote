@@ -144,6 +144,17 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
   font-style: normal;
 }
 
+/* Responsive helpers: show/hide elements based on 800px breakpoint */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+@media (max-width: 800px) {
+        .desktop-only { display: none !important; }
+        .mobile-only { display: block !important; }
+        /* Ensure left column collapses on small screens if needed */
+        .left_col { display: block; }
+}
+
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     color: rgb(55, 53, 47);

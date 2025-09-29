@@ -13,8 +13,6 @@ require_once 'config.php';
 require_once 'default_folder_settings.php';
 include 'functions.php';
 
-// Mobile detection by user agent (must be done BEFORE any output and never redefined)
-$is_mobile = isMobileDevice();
 include 'db_connect.php';
 
 // Include new modular files
@@ -37,17 +35,19 @@ $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 $defaultFolderName = getDefaultFolderName($workspace_filter);
 
  
+// Load note-related data (res_right, default/current note folders)
+// Ensure these variables exist for included templates
+$note_load_result = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
+$default_note_folder = $note_load_result['default_note_folder'] ?? null;
+$current_note_folder = $note_load_result['current_note_folder'] ?? null;
+$res_right = $note_load_result['res_right'] ?? null;
+
 
 // Handle unified search
 $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
-// Load note data
-$note_data = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
-$default_note_folder = $note_data['default_note_folder'];
-$current_note_folder = $note_data['current_note_folder'];
-$res_right = $note_data['res_right'];
 ?>
 
 <html>
@@ -64,7 +64,8 @@ $res_right = $note_data['res_right'];
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>
-        if (window.innerWidth <= 800 || /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent)) {
+        var isNarrowViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        if (isNarrowViewport) {
             var mobileScript = document.createElement('script');
             mobileScript.src = 'js/note-loader-mobile.js';
             document.head.appendChild(mobileScript);
@@ -73,167 +74,23 @@ $res_right = $note_data['res_right'];
             desktopScript.src = 'js/note-loader-desktop.js';
             document.head.appendChild(desktopScript);
         }
-    </script>
-    <script src="js/index-login-prompt.js"></script>
-    <script src="js/index-workspace-display.js"></script>
-    <script src="js/tasklist.js"></script>
-</head>
 
-<?php
-// Read settings to control body classes (so settings toggles affect index display on reload)
-$extra_body_classes = '';
-try {
-    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-    $stmt->execute(['show_note_created']);
-    $v1 = $stmt->fetchColumn();
-    if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
-
-    $stmt->execute(['show_note_subheading']);
-    $v2 = $stmt->fetchColumn();
-    if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
-
-    $stmt->execute(['hide_folder_actions']);
-    $v3 = $stmt->fetchColumn();
-    if ($v3 === '0' || $v3 === 'false') $extra_body_classes .= ' folder-actions-always-visible';
-
-    $stmt->execute(['hide_folder_counts']);
-    $v4 = $stmt->fetchColumn();
-    if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
-} catch (Exception $e) {
-    // ignore errors and continue without extra classes
-}
-
-// Preserve existing note-open class for mobile when needed
-$note_open_class = ($is_mobile && $note != '') ? 'note-open' : '';
-// Combine classes
-$body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_body_classes);
-?>
-
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
-    <!-- Debug console info removed in production -->
-    <script>
-    // Global error handler to catch all JavaScript errors
-    window.addEventListener('error', function(event) {
-        console.error('JavaScript Error caught:', {
-            message: event.message,
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno,
-            error: event.error,
-            stack: event.error ? event.error.stack : 'No stack trace available'
-        });
-        
-        // Store in sessionStorage for inspection
-        try {
-            const errorInfo = {
-                timestamp: new Date().toISOString(),
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                stack: event.error ? event.error.stack : 'No stack trace'
-            };
-            sessionStorage.setItem('lastJSError', JSON.stringify(errorInfo));
-        } catch (e) {
-            // Ignore storage errors
-        }
-    });
-    
-    // Catch unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(event) {
-        console.error('Unhandled Promise Rejection:', event.reason);
-        try {
-            const errorInfo = {
-                timestamp: new Date().toISOString(),
-                type: 'Promise Rejection',
-                reason: event.reason.toString(),
-                stack: event.reason.stack || 'No stack trace'
-            };
-            sessionStorage.setItem('lastPromiseError', JSON.stringify(errorInfo));
-        } catch (e) {
-            // Ignore storage errors
-        }
-    });
-    
-    // Helper function to check last errors (callable from console)
-    window.checkLastErrors = function() {
-        try {
-            const lastJSError = sessionStorage.getItem('lastJSError');
-            const lastPromiseError = sessionStorage.getItem('lastPromiseError');
-            
-            if (lastJSError) {
-                console.log('Last JavaScript Error:', JSON.parse(lastJSError));
-            }
-            if (lastPromiseError) {
-                console.log('Last Promise Error:', JSON.parse(lastPromiseError));
-            }
-            
-            if (!lastJSError && !lastPromiseError) {
-                console.log('No recent errors found.');
-            }
-        } catch (e) {
-            console.log('Error checking stored errors:', e);
-        }
-    };
-    </script>
-
-    <script>
-    // Restore folder states from localStorage
-    document.addEventListener('DOMContentLoaded', function() {
         try {
             var folderContents = document.querySelectorAll('.folder-content');
             for (var i = 0; i < folderContents.length; i++) {
                 var content = folderContents[i];
                 var folderId = content.id;
                 var savedState = localStorage.getItem('folder_' + folderId);
-                
+
                 if (savedState === 'closed') {
-                    // Close folder
-                    content.style.display = 'none';
-                    var toggle = content.parentElement.querySelector('.folder-toggle');
-                    if (toggle) {
-                        // Do not change the icon for the Favorites pseudo-folder
-                        var folderHeader = content.parentElement;
-                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
-                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
-                        if (folderNameText !== 'Favorites') {
-                            var icon = toggle.querySelector('.folder-icon');
-                            if (icon) {
-                                icon.classList.remove('fa-folder-open');
-                                icon.classList.add('fa-folder');
-                            }
-                        }
-                    }
-                } else if (savedState === 'open') {
-                    // Open folder
-                    content.style.display = 'block';
-                    var toggle = content.parentElement.querySelector('.folder-toggle');
-                    if (toggle) {
-                        // Do not change the icon for the Favorites pseudo-folder
-                        var folderHeader = content.parentElement;
-                        var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
-                        var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
-                        if (folderNameText !== 'Favorites') {
-                            var icon = toggle.querySelector('.folder-icon');
-                            if (icon) {
-                                icon.classList.remove('fa-folder');
-                                icon.classList.add('fa-folder-open');
-                            }
-                        }
-                    }
+                    // add a closed class so CSS can hide it; existing code expects this state
+                    content.classList.add('closed');
                 }
-                // If no saved state, keep the default state determined by PHP
             }
         } catch (e) {
-            // Ignore localStorage access errors
+            // ignore errors during initial folder state restoration
         }
-    });
-    </script>
 
-    <div class="main-container">
-
-    <script>
-        // Set workspace display map for JavaScript
         window.workspaceDisplayMap = <?php
             $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
             echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
@@ -256,9 +113,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
-    <!-- MENU (Workspace name + search bar) left colum -->
-    <?php include 'menu_mobile.php'; ?>
-    <?php include 'menu_desktop.php'; ?>
+    <!-- MENU (Workspace name + search bar) left column - consolidated -->
+    <?php include 'menu.php'; ?>
         
     <script>
     // Set configuration variables for the main page
@@ -444,10 +300,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     window.createTaskListNote = createTaskListNote;
     </script>
     
-    <!-- RESIZE HANDLE (Desktop only) -->
-    <?php if (!$is_mobile): ?>
     <div class="resize-handle" id="resizeHandle"></div>
-    <?php endif; ?>
     
     <!-- RIGHT COLUMN -->	
     <div id="right_col">
@@ -521,27 +374,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $home_url .= '?' . implode('&', $home_params);
                 }
                 
-                // Home button - visible on mobile and desktop when left column is hidden
-                $home_button_class = 'toolbar-btn btn-home';
-                if (!$is_mobile) {
-                    $home_button_class .= ' desktop-home-btn';
-                }
-                
-                // For mobile, prefer the client-side handler so it can preserve the active search/folder state
-                // For desktop with explicit home params, use the server-generated URL
-                if ($is_mobile) {
+                $home_button_class = 'toolbar-btn btn-home desktop-home-btn';
+                if (empty($home_params)) {
                     echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 } else {
-                    if (empty($home_params)) {
-                        echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
-                    } else {
-                            echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . htmlspecialchars($home_url, ENT_QUOTES) . '\'">' . "<i class=\"fa-home\"></i></button>";
-                    }
+                    $safe_home_url = htmlspecialchars($home_url, ENT_QUOTES);
+                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . $safe_home_url . '\'"><i class="fa-home"></i></button>';
                 }
+                // mobile-only home button
+                echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 
                 // Text formatting buttons (visible only during selection on desktop)
-                $text_format_class = $is_mobile ? '' : ' text-format-btn';
-                $note_action_class = $is_mobile ? '' : ' note-action-btn';
+                $text_format_class = ' text-format-btn';
+                $note_action_class = ' note-action-btn';
                 echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
@@ -557,57 +402,49 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
              
-                // Note action buttons (desktop only)
-                    if (!$is_mobile) {
-                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                    // Save button first, then separator (minus) to match requested order
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    // AI actions dropdown menu (only if AI is enabled)
-                    if (isAIEnabled()) {
-                        echo '<div class="ai-dropdown">';
-                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
-                        echo '<div class="ai-menu" id="aiMenu">';
-                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-check-light-full"></i>';
-                        echo '<span>Check content</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-tags"></i>';
-                        echo '<span>AI tags</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fa-cog"></i>';
-                        echo '<span>AI settings</span>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</div>';
-                    }
+                echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn desktop-only" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-save note-action-btn desktop-only" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-separator note-action-btn desktop-only" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
+                if (isAIEnabled()) {
+                    echo '<div class="ai-dropdown desktop-only">';
+                    echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
+                    echo '<div class="ai-menu" id="aiMenu">';
+                    echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
+                    echo '<i class="fa-align-left"></i>';
+                    echo '<span>Summarize</span>';
+                    echo '</div>';
+                    echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
+                    echo '<i class="fa-check-light-full"></i>';
+                    echo '<span>Check content</span>';
+                    echo '</div>';
+                    echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
+                    echo '<i class="fa-tags"></i>';
+                    echo '<span>AI tags</span>';
+                    echo '</div>';
+                    echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
+                    echo '<i class="fa-cog"></i>';
+                    echo '<span>AI settings</span>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                 }
                 
-                // Note action buttons (desktop only, replace dropdown menu)
-                if (!$is_mobile) {
-                    // Calculate number of attachments to determine button color
-                    $attachments_count = 0;
-                    if (!empty($row['attachments'])) {
-                        $attachments_data = json_decode($row['attachments'], true);
-                        if (is_array($attachments_data)) {
-                            $attachments_count = count($attachments_data);
-                        }
+                // Favorite / Share / Attachment buttons (desktop-only)
+                $attachments_count = 0;
+                if (!empty($row['attachments'])) {
+                    $attachments_data = json_decode($row['attachments'], true);
+                    if (is_array($attachments_data)) {
+                        $attachments_count = count($attachments_data);
                     }
-                        // Définir les variables favorites pour éviter l'erreur
-                        $is_favorite = $row['favorite'] ?? 0;
-                        $favorite_class = $is_favorite ? ' is-favorite' : '';
-                        $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                    $share_class = $is_shared ? ' is-shared' : '';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                }
+                $is_favorite = $row['favorite'] ?? 0;
+                $favorite_class = $is_favorite ? ' is-favorite' : '';
+                $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
+
+                echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.' desktop-only" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                $share_class = $is_shared ? ' is-shared' : '';
+                echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.' desktop-only" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').' desktop-only" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -660,9 +497,11 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    // Actions dropdown (duplicate, move, download, share publicly, delete, info)
-                    echo '<div class="actions-dropdown">';
-                    echo '<button type="button" class="toolbar-btn btn-actions'.$note_action_class.'" title="Actions" onclick="toggleActionsMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-menu-vert-svg"></i></button>';
+                    // Actions: always render both desktop dropdown and mobile buttons
+                    // Desktop actions dropdown
+                    echo '<div class="actions-dropdown desktop-only">';
+                    $actions_onclick = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
+                    echo '<button type="button" class="toolbar-btn btn-actions'.$note_action_class.'" title="Actions" onclick="' . $actions_onclick . '"><i class="fa-menu-vert-svg"></i></button>';
                     echo '<div class="actions-menu" id="actionsMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
                     echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
@@ -681,8 +520,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
-                } else {
-                    // Individual buttons for mobile (always visible)
+
+                    // Mobile: individual action buttons and mobile dropdown
                     // Calculate number of attachments for mobile button
                     $attachments_count = 0;
                     if (!empty($row['attachments'])) {
@@ -691,16 +530,16 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                             $attachments_count = count($attachments_data);
                         }
                     }
-                    
-                    // Note action buttons 
-                    // AI actions dropdown menu for mobile (only if AI is enabled)
+
+                    // Mobile buttons
+                    echo '<div class="mobile-actions mobile-only">';
                     echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                    // Save button first for mobile, then separator (minus)
                     echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                     if (isAIEnabled()) {
                         echo '<div class="ai-dropdown mobile">';
-                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
+                        $ai_onclick_mobile = "toggleAIMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "')";
+                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="' . $ai_onclick_mobile . '"><i class="fa-robot-svg"></i></button>';
                         echo '<div class="ai-menu" id="aiMenuMobile">';
                         echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                         echo '<i class="fa-align-left"></i>';
@@ -721,66 +560,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                         echo '</div>';
                         echo '</div>';
                     }
-                    
-                    // Favorites button with star icon
+
+                    // Favorites / Share / Attachments
                     $is_favorite = $row['favorite'] ?? 0;
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
                     echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                    
                     echo '<button type="button" class="toolbar-btn btn-share'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
-                    
                     echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
-                    
-                    // Generate dates safely for JavaScript (same logic as desktop)
-                    $created_raw = $row['created'] ?? '';
-                    $updated_raw = $row['updated'] ?? '';
-                    
-                    $created_clean = trim($created_raw);
-                    $updated_clean = trim($updated_raw);
-                    
-                    $created_timestamp = strtotime($created_clean);
-                    $updated_timestamp = strtotime($updated_clean);
-                    
-                    $final_created = $created_timestamp ? date('Y-m-d H:i:s', $created_timestamp) : date('Y-m-d H:i:s');
-                    $final_updated = $updated_timestamp ? date('Y-m-d H:i:s', $updated_timestamp) : date('Y-m-d H:i:s');
-                    
-                    $created_json = json_encode($final_created, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    $updated_json = json_encode($final_updated, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    
-                    if ($created_json === false) $created_json = '"' . date('Y-m-d H:i:s') . '"';
-                    if ($updated_json === false) $updated_json = '"' . date('Y-m-d H:i:s') . '"';
-                    
-                    // Escape quotes for HTML attributes (mobile version)
-                    $created_json_escaped = htmlspecialchars($created_json, ENT_QUOTES);
-                    $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
-                    
-                    // Prepare additional data for note info (mobile)
-                    $folder_name = $row['folder'] ?? $defaultFolderName;
-                    $is_favorite = intval($row['favorite'] ?? 0);
-                    $tags_data = $row['tags'] ?? '';
-                    
-                    // Encode additional data safely for JavaScript
-                    $folder_json = json_encode($folder_name, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    $favorite_json = json_encode($is_favorite, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    $tags_json = json_encode($tags_data, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
-                    
-                    // Safety checks
-                    if ($folder_json === false) $folder_json = '"' . $defaultFolderName . '"';
-                    if ($favorite_json === false) $favorite_json = '0';
-                    if ($tags_json === false) $tags_json = '""';
-                    if ($attachments_count_json === false) $attachments_count_json = '0';
-                    
-                    // Escape for HTML attributes
-                    $folder_json_escaped = htmlspecialchars($folder_json, ENT_QUOTES);
-                    $favorite_json_escaped = htmlspecialchars($favorite_json, ENT_QUOTES);
-                    $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
-                    $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
-                    
-                    // Actions dropdown for mobile
+
+                    // Mobile actions dropdown
                     echo '<div class="actions-dropdown mobile">';
-                    echo '<button type="button" class="toolbar-btn btn-actions" title="Actions" onclick="toggleActionsMenu(event, \''.$row['id'].'\', \''.htmlspecialchars($filename, ENT_QUOTES).'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-menu-vert-svg"></i></button>';
+                    $actions_onclick_mobile = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
+                    echo '<button type="button" class="toolbar-btn btn-actions" title="Actions" onclick="' . $actions_onclick_mobile . '"><i class="fa-menu-vert-svg"></i></button>';
                     echo '<div class="actions-menu" id="actionsMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
                     echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
@@ -799,7 +591,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
-                }
+
+                    echo '</div>';
+                    echo '</div>';
                 
                 echo '</div>';
                 echo '</div>';

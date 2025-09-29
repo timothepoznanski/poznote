@@ -127,17 +127,6 @@ function applyHighlightsWithRetries() {
 }
 
 /**
- * Check if we're on mobile
- */
-function isMobileDevice() {
-    // Check both window width and user agent for better mobile detection
-    const isMobileWidth = window.innerWidth <= 800;
-    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
-
-    return isMobileWidth || isMobileUserAgent;
-}
-
-/**
  * Find note link by title (robust method that handles quotes and special characters)
  */
 function findNoteLinkByTitle(noteTitle) {
