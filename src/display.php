@@ -70,14 +70,14 @@ include 'functions.php';
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Folders Notes Counts <span id="folder-counts-status" class="setting-status disabled">disabled</span></h3>
+                    <h3>Hide Folders Notes Counts <span id="folder-counts-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="folder-actions-card">
                 <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Folder Actions <span id="folder-actions-status" class="setting-status disabled">disabled</span></h3>
+                    <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
         </div>
@@ -131,7 +131,7 @@ include 'functions.php';
         // Folder counts (localStorage)
         var cardFolder = document.getElementById('folder-counts-card');
         var statusFolder = document.getElementById('folder-counts-status');
-        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); } }catch(e){} }
+        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'disabled' : 'enabled'; statusFolder.className = 'setting-status ' + (enabled ? 'disabled' : 'enabled'); } }catch(e){} }
         if(cardFolder){ cardFolder.addEventListener('click', function(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var currently = raw === null ? true : (raw === 'true'); var toSet = !currently; localStorage.setItem('showFolderNoteCounts', toSet); refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){console.error(e);} }); }
         refreshFolder();
 
@@ -142,8 +142,8 @@ include 'functions.php';
             var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
                 var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'enabled' : 'disabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-                if(enabled) document.body.classList.add('folder-actions-always-visible'); else document.body.classList.remove('folder-actions-always-visible');
+                if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'disabled' : 'enabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'disabled' : 'enabled'); }
+                if(enabled) document.body.classList.remove('folder-actions-always-visible'); else document.body.classList.add('folder-actions-always-visible');
             }).catch(()=>{});
         }
         if(cardFolderActions){ cardFolderActions.addEventListener('click', function(){
