@@ -122,7 +122,6 @@
         <!-- Workspace selection -->
         <div class="form-group">
             <label for="workspaceSelect">Select Workspace destination:</label>
-            <br><br>
         <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
                 <!-- Workspaces will be loaded here -->
             </select>
