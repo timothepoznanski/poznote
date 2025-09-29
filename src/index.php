@@ -94,7 +94,11 @@ try {
 
     $stmt->execute(['show_folder_actions']);
     $v3 = $stmt->fetchColumn();
-    if ($v3 === '1' || $v3 === 'true') $extra_body_classes .= ' folder-actions-always-visible';
+    if ($v3 === '0' || $v3 === 'false' || $v3 === null) $extra_body_classes .= ' folder-actions-always-visible';
+
+    $stmt->execute(['hide_folder_counts']);
+    $v4 = $stmt->fetchColumn();
+    if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -174,20 +178,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     </script>
 
     <script>
-    // Apply folder counts visibility based on settings stored in localStorage
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            var showCounts = localStorage.getItem('showFolderNoteCounts') === 'true';
-            if (!showCounts) {
-                document.body.classList.add('hide-folder-counts');
-            } else {
-                document.body.classList.remove('hide-folder-counts');
-            }
-        } catch (e) {
-            // Ignore localStorage access errors
-        }
-        
-        // Restore folder states from localStorage
+    // Restore folder states from localStorage
         try {
             var folderContents = document.querySelectorAll('.folder-content');
             for (var i = 0; i < folderContents.length; i++) {

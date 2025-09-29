@@ -128,11 +128,25 @@ include 'functions.php';
         if(cardSub){ cardSub.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_subheading'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshSub(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshSub();
 
-        // Folder counts (localStorage)
+        // Folder counts (database)
         var cardFolder = document.getElementById('folder-counts-card');
         var statusFolder = document.getElementById('folder-counts-status');
-        function refreshFolder(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var enabled = raw === null ? true : (raw === 'true'); if(statusFolder){ statusFolder.textContent = enabled ? 'disabled' : 'enabled'; statusFolder.className = 'setting-status ' + (enabled ? 'disabled' : 'enabled'); } }catch(e){} }
-        if(cardFolder){ cardFolder.addEventListener('click', function(){ try{ var raw = localStorage.getItem('showFolderNoteCounts'); var currently = raw === null ? true : (raw === 'true'); var toSet = !currently; localStorage.setItem('showFolderNoteCounts', toSet); refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){console.error(e);} }); }
+        function refreshFolder(){
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_counts');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
+                if(statusFolder){ statusFolder.textContent = enabled ? 'enabled' : 'disabled'; statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
+            }).catch(()=>{});
+        }
+        if(cardFolder){ cardFolder.addEventListener('click', function(){
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_counts');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
+                var toSet = currently ? '0' : '1';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','hide_folder_counts'); setForm.append('value', toSet);
+                return fetch('api_settings.php',{method:'POST',body:setForm});
+            }).then(function(){ refreshFolder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
+        }); }
         refreshFolder();
 
         // Folder actions always visible
