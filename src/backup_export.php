@@ -246,6 +246,13 @@ function createCompleteBackup() {
     
     // Send file to browser
     if (file_exists($zipFileName) && filesize($zipFileName) > 0) {
+        // If a download token was provided by the client, set a cookie with that token so
+        // the page JS can detect when the download starts and hide the spinner.
+        // This must be done before any output is sent.
+        if (isset($_POST['download_token']) && !empty($_POST['download_token'])) {
+            // Cookie will be session cookie and valid for path '/'
+            setcookie('poznote_download_token', $_POST['download_token'], 0, '/');
+        }
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename="poznote_complete_backup_' . date('Y-m-d_H-i-s') . '.zip"');
         header('Content-Length: ' . filesize($zipFileName));
@@ -306,11 +313,17 @@ function createBackup() {
                 <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li><br>
             </ul>
             
-            <form method="post">
+            <form id="completeBackupForm" method="post">
                 <input type="hidden" name="action" value="complete_backup">
-                <button type="submit" class="btn btn-primary">
-                    <span>Download Complete Backup (ZIP)
+                <button id="completeBackupBtn" type="submit" class="btn btn-primary">
+                    <span>Download Complete Backup (ZIP)</span>
                 </button>
+                <!-- Spinner shown while creating ZIP/download is in progress -->
+                <div id="backupSpinner" class="backup-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                    <div class="spinner-circle" aria-hidden="true"></div>
+                    <span class="sr-only">Preparing backup...</span>
+                    <span class="backup-spinner-text">Preparing backup... This may take a few moments.</span>
+                </div>
             </form>
         </div>
         

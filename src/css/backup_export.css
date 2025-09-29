@@ -105,3 +105,38 @@ body {
 .btn:hover {
     opacity: 0.8;
 }
+
+/* Backup spinner styles */
+.backup-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 12px;
+}
+
+.spinner-circle {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0.08);
+    border-top-color: #007cba;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.backup-spinner-text {
+    font-size: 13px;
+    color: #333;
+}
+
+.sr-only { /* accessible text for screen readers */
+    position: absolute !important;
+    height: 1px; width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
