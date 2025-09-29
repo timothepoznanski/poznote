@@ -883,14 +883,12 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                     echo '</div>';
                 }
                 
-                // Get font size from settings based on device
+                // Get font size from settings
                 $font_size = '16';
-                $is_mobile_for_font = isMobileDevice();
                 
                 try {
-                    $setting_key = $is_mobile_for_font ? 'note_font_size_mobile' : 'note_font_size_desktop';
                     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute([$setting_key]);
+                    $stmt->execute(['note_font_size']);
                     $font_size_value = $stmt->fetchColumn();
                     if ($font_size_value !== false) {
                         $font_size = $font_size_value;

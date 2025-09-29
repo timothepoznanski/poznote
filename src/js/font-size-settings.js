@@ -11,13 +11,12 @@ function showNoteFontSizePrompt() {
     
     // Get modal elements
     const modal = document.getElementById('fontSizeModal');
-    const fontSizeDesktopInput = document.getElementById('fontSizeDesktopInput');
-    const fontSizeMobileInput = document.getElementById('fontSizeMobileInput');
+    const fontSizeInput = document.getElementById('fontSizeInput');
     const closeFontSizeBtn = document.getElementById('closeFontSizeModal');
     const cancelFontSizeBtn = document.getElementById('cancelFontSizeBtn');
     const saveFontSizeBtn = document.getElementById('saveFontSizeBtn');
     
-    if (!modal || !fontSizeDesktopInput || !fontSizeMobileInput) {
+    if (!modal || !fontSizeInput) {
         return;
     }
     
@@ -34,20 +33,16 @@ function showNoteFontSizePrompt() {
             saveFontSizeBtn.addEventListener('click', saveFontSize);
         }
         
-        // Font size input change events
-        fontSizeDesktopInput.addEventListener('input', function() {
-            updateFontSizePreview('desktop');
-        });
-        
-        fontSizeMobileInput.addEventListener('input', function() {
-            updateFontSizePreview('mobile');
+        // Font size input change event
+        fontSizeInput.addEventListener('input', function() {
+            updateFontSizePreview();
         });
         
         // Mark as initialized
         modal.setAttribute('data-initialized', 'true');
     }
     
-    // Load current font size settings from server
+    // Load current font size settings
     loadCurrentFontSizes();
     
     // Show modal
@@ -72,34 +67,24 @@ function safeShowNotification(message, type) {
 }
 
 // Function to update preview text with selected font size
-function updateFontSizePreview(type) {
-    if (type === 'desktop') {
-        const fontSizeInput = document.getElementById('fontSizeDesktopInput');
-        const fontSizePreview = document.getElementById('fontSizeDesktopPreview');
-        
-        if (fontSizeInput && fontSizePreview) {
-            const fontSize = fontSizeInput.value;
-            fontSizePreview.style.fontSize = fontSize + 'px';
-        }
-    } else if (type === 'mobile') {
-        const fontSizeInput = document.getElementById('fontSizeMobileInput');
-        const fontSizePreview = document.getElementById('fontSizeMobilePreview');
-        
-        if (fontSizeInput && fontSizePreview) {
-            const fontSize = fontSizeInput.value;
-            fontSizePreview.style.fontSize = fontSize + 'px';
-        }
+function updateFontSizePreview() {
+    const fontSizeInput = document.getElementById('fontSizeInput');
+    const fontSizePreview = document.getElementById('fontSizePreview');
+    
+    if (fontSizeInput && fontSizePreview) {
+        const fontSize = fontSizeInput.value;
+        fontSizePreview.style.fontSize = fontSize + 'px';
     }
 }
 
 // Function to load current font size settings
 function loadCurrentFontSizes() {
-    // Load desktop font size
+    // Load font size
     fetch('api_settings.php', { 
         method: 'POST', 
         credentials: 'same-origin', 
         headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: 'action=get&key=note_font_size_desktop' 
+        body: 'action=get&key=note_font_size' 
     })
     .then(function(response) {
         if (!response.ok) {
@@ -110,43 +95,13 @@ function loadCurrentFontSizes() {
     .then(function(data) {
         if (data && data.success) {
             // Set input value
-            const fontSizeDesktopInput = document.getElementById('fontSizeDesktopInput');
-            if (fontSizeDesktopInput) {
+            const fontSizeInput = document.getElementById('fontSizeInput');
+            if (fontSizeInput) {
                 // Default to 16px if not set
-                fontSizeDesktopInput.value = data.value || '16';
+                fontSizeInput.value = data.value || '16';
                 
                 // Update preview
-                updateFontSizePreview('desktop');
-            }
-        }
-    })
-    .catch(function(error) {
-        // Silently fail, no need to show errors for font size loading
-    });
-    
-    // Load mobile font size
-    fetch('api_settings.php', { 
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: 'action=get&key=note_font_size_mobile' 
-    })
-    .then(function(response) {
-        if (!response.ok) {
-            return null;
-        }
-        return response.json();
-    })
-    .then(function(data) {
-        if (data && data.success) {
-            // Set input value
-            const fontSizeMobileInput = document.getElementById('fontSizeMobileInput');
-            if (fontSizeMobileInput) {
-                // Default to 16px if not set
-                fontSizeMobileInput.value = data.value || '16';
-                
-                // Update preview
-                updateFontSizePreview('mobile');
+                updateFontSizePreview();
             }
         }
     })
@@ -157,70 +112,47 @@ function loadCurrentFontSizes() {
 
 // Function to save font size settings
 function saveFontSize() {
-    const fontSizeDesktopInput = document.getElementById('fontSizeDesktopInput');
-    const fontSizeMobileInput = document.getElementById('fontSizeMobileInput');
+    const fontSizeInput = document.getElementById('fontSizeInput');
     
-    if (!fontSizeDesktopInput || !fontSizeMobileInput) {
+    if (!fontSizeInput) {
         return;
     }
     
-    const fontSizeDesktop = fontSizeDesktopInput.value;
-    const fontSizeMobile = fontSizeMobileInput.value;
+    const fontSize = fontSizeInput.value;
     
-    // Validate desktop input (ensure it's between 10 and 32)
-    if (fontSizeDesktop < 10 || fontSizeDesktop > 32) {
-        safeShowNotification('Desktop font size must be between 10 and 32 pixels', 'error');
+    // Validate input (ensure it's between 10 and 32)
+    if (fontSize < 10 || fontSize > 32) {
+        safeShowNotification('Font size must be between 10 and 32 pixels', 'error');
         return;
     }
     
-    // Validate mobile input (ensure it's between 10 and 32)
-    if (fontSizeMobile < 10 || fontSizeMobile > 32) {
-        safeShowNotification('Mobile font size must be between 10 and 32 pixels', 'error');
-        return;
-    }
-    
-    // Save desktop setting to server
-    const desktopPromise = fetch('api_settings.php', { 
+    // Save setting to server
+    fetch('api_settings.php', { 
         method: 'POST', 
         credentials: 'same-origin', 
         headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: `action=set&key=note_font_size_desktop&value=${fontSizeDesktop}` 
-    });
-    
-    // Save mobile setting to server
-    const mobilePromise = fetch('api_settings.php', { 
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: `action=set&key=note_font_size_mobile&value=${fontSizeMobile}` 
-    });
-    
-    // Wait for both promises to resolve
-    Promise.all([desktopPromise, mobilePromise])
-        .then(function(responses) {
-            // Check if both responses are ok
-            if (responses[0].ok && responses[1].ok) {
-                return Promise.all([responses[0].json(), responses[1].json()]);
-            } else {
-                throw new Error('Error saving font sizes');
-            }
-        })
-        .then(function(data) {
-            if (data[0].success && data[1].success) {
-                // Close modal
-                closeFontSizeModal();
-                
-                // Apply font size to current note based on device type
-                applyFontSizeToNotes();
-                
-                // Notification supprimée comme demandé
-            } else {
-                safeShowNotification('Error saving font size settings', 'error');
-            }
-        })
-        .catch(function(error) {
+        body: `action=set&key=note_font_size&value=${fontSize}` 
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Close modal
+            closeFontSizeModal();
+            
+            // Apply font size to current note
+            applyFontSizeToNotes();
+        } else {
             safeShowNotification('Error saving font size settings', 'error');
-        });
+        }
+    })
+    .catch(function(error) {
+        safeShowNotification('Error saving font size settings', 'error');
+    });
 }
 
 // Function to check if we're on a mobile device
@@ -237,28 +169,27 @@ function applyFontSizeToNotes() {
         return;
     }
     
-    // Check if we're on mobile or desktop
-    const isMobile = isMobileDevice();
-    const settingKey = isMobile ? 'note_font_size_mobile' : 'note_font_size_desktop';
-    
-    // Get the appropriate font size from settings
+    // Get the font size from settings
     fetch('api_settings.php', { 
         method: 'POST', 
         credentials: 'same-origin', 
         headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: `action=get&key=${settingKey}` 
+        body: 'action=get&key=note_font_size' 
     })
     .then(function(response) {
-        if (!response.ok) return null;
+        if (!response.ok) {
+            return null;
+        }
         return response.json();
     })
     .then(function(data) {
         if (data && data.success && data.value) {
+            // Apply font size to the note editor
             noteEditor.style.fontSize = data.value + 'px';
         }
     })
     .catch(function(error) {
-        // Silently fail when loading stored font size
+        // Silently fail
     });
 }
 

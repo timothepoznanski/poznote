@@ -98,8 +98,7 @@ try {
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_enabled', '1')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_language', 'en')");
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_desktop', '16')");
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size_mobile', '16')");
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '16')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
     // Controls to show/hide metadata under note title in notes list (enabled by default)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");

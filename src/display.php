@@ -42,7 +42,7 @@ include 'functions.php';
                     <i class="fa-text-height"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Note Font Size</h3>
+                    <h3>Note Content Font Size</h3>
                 </div>
             </div>
 
