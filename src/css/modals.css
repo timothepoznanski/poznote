@@ -239,7 +239,7 @@
     padding: 18px;
 }
 
-#moveFolderFilesModal select#targetFolderSelect {
+#moveFolderFilesModal select#moveFolderFilesTargetSelect {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -923,6 +923,7 @@
     background: white;
     font-size: 14px;
     margin-bottom: 16px;
+    margin-top: 16px;
 }
 
 .workspace-select:focus {
@@ -932,7 +933,7 @@
 }
 
 #moveNoteFolderModal .form-group {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 #moveNoteFolderModal .form-group label {

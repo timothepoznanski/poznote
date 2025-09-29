@@ -12,40 +12,6 @@ $search_params = [];
 // Respect optional workspace parameter to scope tags
 $workspace = $_GET['workspace'] ?? $_POST['workspace'] ?? null;
 
-// Get excluded folders from POST (if coming from a form submission)
-$excluded_folders = [];
-if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
-    $excluded_folders = json_decode($_POST['excluded_folders'], true);
-    if (!is_array($excluded_folders)) {
-        $excluded_folders = [];
-    }
-}
-
-// Apply folder exclusions
-if (!empty($excluded_folders)) {
-    $exclude_placeholders = [];
-    $exclude_favorite = false;
-    
-    foreach ($excluded_folders as $excludedFolder) {
-        if ($excludedFolder === 'Favorites') {
-            $exclude_favorite = true;
-        } else {
-            $exclude_placeholders[] = "?";
-            $search_params[] = $excludedFolder;
-        }
-    }
-    
-    // Add folder exclusion condition
-    if (!empty($exclude_placeholders)) {
-        $where_conditions[] = "(folder IS NULL OR folder NOT IN (" . implode(", ", $exclude_placeholders) . "))";
-    }
-    
-    // Add favorite exclusion condition
-    if ($exclude_favorite) {
-        $where_conditions[] = "(favorite IS NULL OR favorite != 1)";
-    }
-}
-
 $where_clause = implode(" AND ", $where_conditions);
 
 // Execute query with proper parameters
@@ -90,7 +56,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 </head>
-<body class="tags-page"<?php echo !empty($excluded_folders) ? ' data-has-exclusions="true"' : ''; ?>>
+<body class="tags-page">
 	<div class="tags-container">
 		<div class="trash-buttons-container">
 			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
@@ -99,13 +65,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 			<h1 class="tags-header">Tags</h1>
 		</div>
 		
-		<!-- Show excluded folders info if any -->
-		<?php if (!empty($excluded_folders)): ?>
-		<div class="excluded-folders-info" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 8px 12px; margin-bottom: 15px; font-size: 0.9em;">
-			<i class="fa-info-circle" style="color: #856404; margin-right: 5px;"></i>
-			<strong>Folder exclusions active:</strong> <?php echo htmlspecialchars(implode(', ', $excluded_folders)); ?>
-		</div>
-		<?php endif; ?>
+        
 		
 		<form class="tags-search-form">
 			<input 
@@ -118,7 +78,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		</form>
 		
 		<div class="tags-info">
-			There are <?php echo $count_tags; ?> tags total<?php echo !empty($excluded_folders) ? ' (excluding filtered folders)' : ''; ?>
+			There are <?php echo $count_tags; ?> tags total
 		</div>
 		
 		<div class="tags-grid" id="tagsList">
@@ -129,7 +89,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 			foreach($tags_list as $tag) {
 				if (!empty(trim($tag))) {
 					$tag_encoded = urlencode($tag);
-					echo '<div class="tag-item" onclick="redirectToTagWithExclusions(\'' . htmlspecialchars($tag_encoded, ENT_QUOTES) . '\')">
+					echo '<div class="tag-item" onclick="redirectToTag(\'' . htmlspecialchars($tag_encoded, ENT_QUOTES) . '\')">
 						<div class="tag-name">'.htmlspecialchars($tag).'</div>
 					</div>';
 				}

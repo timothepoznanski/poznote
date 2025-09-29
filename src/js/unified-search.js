@@ -572,7 +572,6 @@ class SearchManager {
     }
     this.updateHiddenInputs(isMobile);
     this.hideSpecialFolders(isMobile);
-    this.addExcludedFoldersToForm(elements.form, isMobile);
     this.performAjaxSearch(elements.form, isMobile);
     }
 
@@ -1026,47 +1025,7 @@ class SearchManager {
         this.performAjaxSearch(elements.form, isMobile);
     }
 
-    /**
-     * Add excluded folders to form
-     */
-    addExcludedFoldersToForm(form, isMobile) {
-        const excludedFolders = this.getExcludedFoldersFromLocalStorage();
-        
-        if (excludedFolders.length > 0) {
-            // Remove existing input
-            const existingInput = form.querySelector('input[name="excluded_folders"]');
-            if (existingInput) {
-                existingInput.remove();
-            }
-            
-            // Add new input
-            const excludedInput = document.createElement('input');
-            excludedInput.type = 'hidden';
-            excludedInput.name = 'excluded_folders';
-            excludedInput.value = JSON.stringify(excludedFolders);
-            form.appendChild(excludedInput);
-        }
-    }
-
-    /**
-     * Get excluded folders from localStorage
-     */
-    getExcludedFoldersFromLocalStorage() {
-        const excludedFolders = [];
-        
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('folder_search_')) {
-                const state = localStorage.getItem(key);
-                if (state === 'excluded') {
-                    const folderName = key.substring('folder_search_'.length);
-                    excludedFolders.push(folderName);
-                }
-            }
-        }
-        
-        return excludedFolders;
-    }
+    
 
     /**
      * Show validation error

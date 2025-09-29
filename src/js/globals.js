@@ -11,8 +11,6 @@ var currentNoteIdForAttachments = null;
 
 // Variables for moving notes to folders
 var allFolders = [];
-var selectedFolderOption = null;
-var highlightedIndex = -1;
 
 // Utility functions for global variables
 function getDefaultFolderName() {

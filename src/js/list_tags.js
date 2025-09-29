@@ -15,106 +15,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle excluded folders on page load
-    handleExcludedFoldersOnLoad();
+    
 });
 
-function handleExcludedFoldersOnLoad() {
-    // Check if we need to submit the form with excluded folders to refresh tags
-    const excludedFolders = getExcludedFoldersFromLocalStorage();
-    
-    // Instead of auto-submitting, check if we already have the right data
-    // Only submit if URL doesn't contain any POST data indication
-    if (excludedFolders.length > 0 && !document.body.dataset.hasExclusions) {
-        // Add a small delay to ensure the page is fully loaded
-        setTimeout(function() {
-            // Create and submit a form to refresh the page with folder exclusions
-            const form = document.createElement('form');
-            form.method = 'POST';
-            // If the page provided a workspace variable, include it in the form action
-            if (typeof pageWorkspace !== 'undefined' && pageWorkspace) {
-                form.action = 'list_tags.php?workspace=' + encodeURIComponent(pageWorkspace);
-            } else {
-                form.action = 'list_tags.php';
-            }
-            
-            const excludedInput = document.createElement('input');
-            excludedInput.type = 'hidden';
-            excludedInput.name = 'excluded_folders';
-            excludedInput.value = JSON.stringify(excludedFolders);
-            form.appendChild(excludedInput);
-            
-            document.body.appendChild(form);
-            form.submit();
-        }, 100);
-    }
-}
-
-function getExcludedFoldersFromLocalStorage() {
-    const excludedFolders = [];
-    
-    // Read excluded folders from localStorage
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('folder_search_')) {
-            const state = localStorage.getItem(key);
-            if (state === 'excluded') {
-                const folderName = key.substring('folder_search_'.length);
-                excludedFolders.push(folderName);
-            }
-        }
-    }
-    
-    return excludedFolders;
-}
-
-function redirectToTagWithExclusions(tagEncoded) {
-    const excludedFolders = getExcludedFoldersFromLocalStorage();
-    
-    if (excludedFolders.length > 0) {
-        // Create a form to post the tag search with excluded folders
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'index.php';
-        
-        // Add tag search parameter
-        const tagInput = document.createElement('input');
-        tagInput.type = 'hidden';
-        tagInput.name = 'tags_search';
-        tagInput.value = decodeURIComponent(tagEncoded);
-        form.appendChild(tagInput);
-        
-        // Add search type parameters
-        const searchInTagsInput = document.createElement('input');
-        searchInTagsInput.type = 'hidden';
-        searchInTagsInput.name = 'search_in_tags';
-        searchInTagsInput.value = '1';
-        form.appendChild(searchInTagsInput);
-        
-        // Add excluded folders
-        const excludedInput = document.createElement('input');
-        excludedInput.type = 'hidden';
-        excludedInput.name = 'excluded_folders';
-        excludedInput.value = JSON.stringify(excludedFolders);
-        form.appendChild(excludedInput);
-
-        // Include workspace if provided on the page
-        if (typeof pageWorkspace !== 'undefined' && pageWorkspace) {
-            const wsInput = document.createElement('input');
-            wsInput.type = 'hidden';
-            wsInput.name = 'workspace';
-            wsInput.value = pageWorkspace;
-            form.appendChild(wsInput);
-        }
-        
-        document.body.appendChild(form);
-        form.submit();
-    } else {
-        // No exclusions, use simple GET redirect
-    const wsParam = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    window.location.href = 'index.php?tags_search=' + tagEncoded + wsParam;
-    }
-}
+// folder-exclusion logic removed from tags page
 
 function filterTags() {
     const input = document.getElementById('tagsSearchInput');

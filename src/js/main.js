@@ -15,10 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize text selection handling for formatting
     initTextSelectionHandlers();
     
-    // Initialize folder filter states with a small delay to ensure the DOM is ready
-    setTimeout(function() {
-        initializeFolderSearchFilters();
-    }, 100);
+    
 });
 
 // Global functions available for HTML (compatibility)
@@ -55,8 +52,7 @@ window.closeLoginDisplayModal = closeLoginDisplayModal;
 window.checkForUpdates = checkForUpdates;
 window.highlightSearchTerms = highlightSearchTerms;
 window.clearSearchHighlights = clearSearchHighlights;
-window.initializeFolderSearchFilters = initializeFolderSearchFilters;
-window.toggleFolderSearchFilter = toggleFolderSearchFilter;
+ 
 window.showMoveFolderFilesDialog = showMoveFolderFilesDialog;
 window.executeMoveAllFiles = executeMoveAllFiles;
 window.populateTargetFolderDropdown = populateTargetFolderDropdown;
@@ -73,12 +69,7 @@ window.showLinkModal = showLinkModal;
 window.closeLinkModal = closeLinkModal;
 window.executeLinkModalAction = executeLinkModalAction;
 window.showMoveFolderDialog = showMoveFolderDialog;
-window.loadRecentFolders = loadRecentFolders;
-window.selectRecentFolder = selectRecentFolder;
-window.selectFolderForMove = selectFolderForMove;
 window.moveNoteToFolder = moveNoteToFolder;
-window.handleFolderSearch = handleFolderSearch;
-window.executeFolderAction = executeFolderAction;
 window.showUpdateInstructions = showUpdateInstructions;
 window.closeUpdateModal = closeUpdateModal;
 window.closeUpdateCheckModal = closeUpdateCheckModal;

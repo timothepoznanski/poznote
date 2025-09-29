@@ -25,8 +25,7 @@ function initializeEventListeners() {
     // Warning before page close
     setupPageUnloadWarning();
     
-    // Events for folder search (note movement)
-    setupFolderSearchEvents();
+    
 }
 
 function setupNoteEditingEvents() {
@@ -742,76 +741,7 @@ function initTextSelectionHandlers() {
     });
 }
 
-function setupFolderSearchEvents() {
-    // Events for folder search in move modal
-    var folderSearchInput = document.getElementById('folderSearchInput');
-    if (folderSearchInput) {
-        folderSearchInput.addEventListener('input', handleFolderSearch);
-        // When using the folder search input (especially on mobile where the
-        // search pills may be absent), ensure the SearchManager knows we're in
-        // folders mode so highlighting logic can avoid reapplying highlights.
-        folderSearchInput.addEventListener('input', function() {
-            try {
-                if (window.searchManager && typeof window.searchManager.setActiveSearchType === 'function') {
-                    window.searchManager.setActiveSearchType('folders', true);
-                }
-            } catch (e) { /* ignore */ }
-        });
-        folderSearchInput.addEventListener('keydown', handleFolderKeydown);
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        var dropdown = document.getElementById('folderDropdown');
-        var input = document.getElementById('folderSearchInput');
-        
-        if (dropdown && input && !dropdown.contains(event.target) && !input.contains(event.target)) {
-            dropdown.classList.remove('show');
-            highlightedIndex = -1;
-        }
-    });
-}
-
-function handleFolderKeydown(event) {
-    var dropdown = document.getElementById('folderDropdown');
-    var options = dropdown.querySelectorAll('.folder-option');
-    
-    if (!dropdown.classList.contains('show') || options.length === 0) {
-        return;
-    }
-    
-    switch(event.key) {
-        case 'ArrowDown':
-            event.preventDefault();
-            highlightedIndex = Math.min(highlightedIndex + 1, options.length - 1);
-            updateHighlight(options);
-            break;
-        case 'ArrowUp':
-            event.preventDefault();
-            highlightedIndex = Math.max(highlightedIndex - 1, 0);
-            updateHighlight(options);
-            break;
-        case 'Enter':
-            event.preventDefault();
-            if (highlightedIndex >= 0 && options[highlightedIndex]) {
-                options[highlightedIndex].click();
-            }
-            break;
-        case 'Escape':
-            dropdown.classList.remove('show');
-            highlightedIndex = -1;
-            break;
-    }
-}
-
-function updateHighlight(options) {
-    for (var i = 0; i < options.length; i++) {
-        options[i].classList.remove('highlighted');
-    }
-    if (highlightedIndex >= 0 && options[highlightedIndex]) {
-        options[highlightedIndex].classList.add('highlighted');
-    }
-}
+ 
 
 // Expose updateNote globally for use in other modules
 window.updateNote = updateNote;

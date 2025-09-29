@@ -543,6 +543,28 @@ function handleDeleteButtonClick(e) {
                             localStorage.setItem('poznote_selected_workspace', 'Poznote');
                         }
                     } catch (e) {}
+                    // Additionally clean any folder-related localStorage keys left by this workspace
+                    try {
+                        // Remove keys by prefix
+                        var keysToRemove = [];
+                        try {
+                            try { console.debug && console.debug('workspaces: starting aggressive localStorage scan'); } catch(e){}
+                            for (var i = 0; i < localStorage.length; i++) {
+                                var key = localStorage.key(i);
+                                if (!key) continue;
+                                    if (key.indexOf('folder_') === 0) {
+                                    keysToRemove.push(key);
+                                }
+                            }
+                            try { console.debug && console.debug('workspaces: keys to remove', keysToRemove); } catch(e){}
+                        } catch(e) { keysToRemove = []; }
+
+                        for (var j = 0; j < keysToRemove.length; j++) {
+                            try { localStorage.removeItem(keysToRemove[j]); } catch(e) {}
+                        }
+                        try { console.debug && console.debug('workspaces: aggressive cleanup complete'); } catch(e){}
+
+                    } catch(e) {}
                     // Reload page to show updated workspace list
                     setTimeout(function() {
                         window.location.reload();

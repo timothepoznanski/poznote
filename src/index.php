@@ -36,8 +36,7 @@ $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
 
-// Handle folder exclusions from search
-$excluded_folders = handleExcludedFolders();
+ 
 
 // Handle unified search
 $using_unified_search = handleUnifiedSearch();
@@ -256,7 +255,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         
     <?php
     // Construction des conditions de recherche sécurisées
-    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $excluded_folders);
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter);
     $where_clause = $search_conditions['where_clause'];
     $search_params = $search_conditions['search_params'];
     

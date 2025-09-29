@@ -259,7 +259,35 @@ function executeDeleteFolderOperation(folderName) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            // Folder deleted successfully - no notification needed
+            // Folder deleted successfully - remove any localStorage state for this folder
+            try {
+                // Find the folder header matching the deleted folder name and remove the stored open/closed state
+                var headers = document.querySelectorAll('.folder-header');
+                for (var i = 0; i < headers.length; i++) {
+                    var h = headers[i];
+                    try {
+                        var df = h.getAttribute('data-folder');
+                        if (df === folderName) {
+                            var content = h.querySelector('.folder-content');
+                            if (content && content.id) {
+                                try { 
+                                    localStorage.removeItem('folder_' + content.id);
+                                    try { console.debug && console.debug('localStorage: removed folder_' + content.id); } catch(e){}
+                                } catch (e) { /* ignore storage errors */ }
+                            }
+                            break;
+                        }
+                    } catch (e) {
+                        // ignore per-header errors
+                    }
+                }
+                // Also remove any saved folder search/filter state for this folder name
+                
+            } catch (e) {
+                // ignore any errors while trying to clean localStorage
+            }
+
+            // Reload to update UI
             window.location.reload();
         } else {
             showNotificationPopup('Error: ' + data.error, 'error');
@@ -369,6 +397,29 @@ function deleteCurrentWorkspace() {
                     localStorage.setItem('poznote_selected_workspace', 'Poznote'); 
                 } catch(e) {}
                 
+                // Clean up localStorage entries related to folders that belonged to the deleted workspace
+                try {
+                    // Remove per-folder open/closed state and folder-specific search keys
+                    var headers = document.querySelectorAll('.folder-header');
+                    var foldersToRemove = [];
+                    for (var i = 0; i < headers.length; i++) {
+                        try {
+                            var df = headers[i].getAttribute('data-folder');
+                            // If the folder header is tied to the workspace being deleted, collect it
+                            if (df) {
+                                foldersToRemove.push(df);
+                                var content = headers[i].querySelector('.folder-content');
+                                if (content && content.id) {
+                                    try { localStorage.removeItem('folder_' + content.id); } catch(e) {}
+                                }
+                                
+                            }
+                        } catch(e) {}
+                    }
+
+                    
+                } catch(e) {}
+
                 // Remove option from selector
                 for (var i = 0; i < sel.options.length; i++) {
                     if (sel.options[i].value === name) {
@@ -378,6 +429,27 @@ function deleteCurrentWorkspace() {
                 }
                 sel.value = 'Poznote';
                 
+                // Aggressive cleanup: remove any localStorage keys related to folders
+                try {
+                    var keysToDelete = [];
+                    try {
+                        try { console.debug && console.debug('workspace delete: starting aggressive localStorage scan'); } catch(e){}
+                        for (var i = 0; i < localStorage.length; i++) {
+                            var key = localStorage.key(i);
+                            if (!key) continue;
+                            if (key.indexOf('folder_') === 0) {
+                                keysToDelete.push(key);
+                            }
+                        }
+                        try { console.debug && console.debug('workspace delete: keys to delete', keysToDelete); } catch(e){}
+                    } catch(e) { keysToDelete = []; }
+
+                    for (var k = 0; k < keysToDelete.length; k++) {
+                        try { localStorage.removeItem(keysToDelete[k]); } catch(e) {}
+                    }
+                    try { console.debug && console.debug('workspace delete: aggressive localStorage cleanup done'); } catch(e){}
+                } catch(e) {}
+
                 var url = new URL(window.location.href);
                 url.searchParams.set('workspace', 'Poznote');
                 window.location.href = url.toString();
@@ -552,88 +624,7 @@ function hideUpdateBadge() {
     }
 }
 
-// Advanced folder management functions
-
-function initializeFolderSearchFilters() {
-    var folderSearchBtns = document.querySelectorAll('.folder-search-btn');
-    if (folderSearchBtns.length === 0) {
-        // If buttons are not yet in DOM, try again later
-        setTimeout(function() {
-            initializeFolderSearchFilters();
-        }, 100);
-        return;
-    }
-    
-    for (var i = 0; i < folderSearchBtns.length; i++) {
-        var btn = folderSearchBtns[i];
-        var folderName = btn.getAttribute('data-folder');
-        var isExcluded = getFolderSearchState(folderName) === 'excluded';
-        
-        if (isExcluded) {
-            btn.classList.add('excluded');
-            btn.title = 'Include in search (currently excluded)';
-        } else {
-            btn.classList.remove('excluded');
-            btn.title = 'Exclude from search (currently included)';
-        }
-    }
-}
-
-function toggleFolderSearchFilter(folderName) {
-    var btn = document.querySelector('.folder-search-btn[data-folder="' + folderName + '"]');
-    if (!btn) return;
-    
-    var isCurrentlyExcluded = btn.classList.contains('excluded');
-    
-    if (isCurrentlyExcluded) {
-        // Switch to included (blue)
-        btn.classList.remove('excluded');
-        btn.title = 'Exclude from search (currently included)';
-        setFolderSearchState(folderName, 'included');
-    } else {
-        // Switch to excluded (red)
-        btn.classList.add('excluded');
-        btn.title = 'Include in search (currently excluded)';
-        setFolderSearchState(folderName, 'excluded');
-    }
-    
-    // If we're currently in search mode, refresh search results
-    var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
-    var currentSearch = searchInput ? searchInput.value.trim() : '';
-    
-    if (currentSearch) {
-        // Trigger a new search to apply the filter
-        setTimeout(function() {
-            performFilteredSearch();
-        }, 100);
-    }
-}
-
-function getFolderSearchState(folderName) {
-    var key = 'folder_search_' + folderName;
-    return localStorage.getItem(key) || 'included'; // Default to included
-}
-
-function setFolderSearchState(folderName, state) {
-    var key = 'folder_search_' + folderName;
-    localStorage.setItem(key, state);
-}
-
-function performFilteredSearch() {
-    var searchInput = document.getElementById('unified-search') || document.getElementById('unified-search-mobile');
-    if (!searchInput || !searchInput.value.trim()) return;
-    
-    // Simply trigger the form submission - the excluded folders will be added by the unified search system
-    var form = document.getElementById('unified-search-form') || document.getElementById('unified-search-form-mobile');
-    if (form) {
-        // Create a fake submit event to trigger the unified search handler
-        var submitEvent = new Event('submit', {
-            bubbles: true,
-            cancelable: true
-        });
-        form.dispatchEvent(submitEvent);
-    }
-}
+ 
 
 function showMoveFolderFilesDialog(sourceFolderName) {
     document.getElementById('sourceFolderName').textContent = sourceFolderName;
@@ -673,8 +664,11 @@ function showMoveFolderFilesDialog(sourceFolderName) {
     document.getElementById('moveFolderFilesModal').style.display = 'block';
 }
 
-function populateTargetFolderDropdown(excludeFolderName) {
-    var select = document.getElementById('targetFolderSelect');
+function populateTargetFolderDropdown(excludeFolderName, selectId) {
+    // selectId allows populating different modals' select elements
+    selectId = selectId || 'moveFolderFilesTargetSelect';
+    var select = document.getElementById(selectId);
+    if (!select) return;
     select.innerHTML = '<option value="">Select target folder...</option>';
     
     // Get all folders
@@ -698,16 +692,41 @@ function populateTargetFolderDropdown(excludeFolderName) {
                     select.appendChild(option);
                 }
             }
+            // After populating options, if there is at least one real option, select the first one
+            try {
+                var firstRealIndex = null;
+                for (var oi = 0; oi < select.options.length; oi++) {
+                    if (select.options[oi].value && select.options[oi].value !== '') { firstRealIndex = oi; break; }
+                }
+                if (firstRealIndex !== null) {
+                    select.selectedIndex = firstRealIndex;
+                    // Trigger change so any handlers (e.g., enabling Move button) run
+                    select.dispatchEvent(new Event('change'));
+                }
+            } catch (e) {}
         }
     })
     .catch(function(error) {
         showNotificationPopup('Error loading folders: ' + error, 'error');
     });
+
+    // If this dropdown is used for the 'move note' modal, wire change handler to enable the Move button
+    try {
+        select.addEventListener('change', function() {
+            // When a selection exists, treat as exact match and enable Move
+            updateMoveButton(this.value || '', !!this.value);
+        });
+
+        // Initialize button state based on any pre-selected value (most likely none)
+        updateMoveButton(select.value || '', !!select.value);
+    } catch (e) {
+        // ignore if updateMoveButton is not available in this context
+    }
 }
 
 function executeMoveAllFiles() {
     var sourceFolderName = document.getElementById('sourceFolderName').textContent;
-    var targetFolderName = document.getElementById('targetFolderSelect').value;
+    var targetFolderName = document.getElementById('moveFolderFilesTargetSelect').value;
     
     if (!targetFolderName) {
         showNotificationPopup('Please select a target folder', 'error');
@@ -814,7 +833,7 @@ function saveFolderName() {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            // Clean localStorage entries for the old folder name and update recent folders
+            // Clean localStorage entries for the old folder name
             cleanupRenamedFolderInLocalStorage(oldName, newName);
             closeModal('editFolderModal');
             // Folder renamed successfully - no notification needed
@@ -831,35 +850,10 @@ function saveFolderName() {
 function cleanupRenamedFolderInLocalStorage(oldName, newName) {
     if (!oldName || !newName || oldName === newName) return;
     
-    // Update folder search filter key
-    var oldSearchKey = 'folder_search_' + oldName;
-    var newSearchKey = 'folder_search_' + newName;
-    var searchState = localStorage.getItem(oldSearchKey);
-    if (searchState !== null) {
-        localStorage.setItem(newSearchKey, searchState);
-        localStorage.removeItem(oldSearchKey);
-    }
     
-    // Update recent folders
-    var recentFolders = getRecentFolders();
-    var updatedRecentFolders = [];
-    for (var i = 0; i < recentFolders.length; i++) {
-        if (recentFolders[i] === oldName) {
-            updatedRecentFolders.push(newName);
-        } else {
-            updatedRecentFolders.push(recentFolders[i]);
-        }
-    }
-    localStorage.setItem('poznote_recent_folders', JSON.stringify(updatedRecentFolders));
 }
 
-function getRecentFolders() {
-    try {
-        return JSON.parse(localStorage.getItem('poznote_recent_folders') || '[]');
-    } catch (e) {
-        return [];
-    }
-}
+ 
 
 // Fonction de gestion des dossiers (icône dossier ouvert/fermé)
 function toggleFolder(folderId) {
@@ -1018,27 +1012,19 @@ function loadFoldersForMoveModal(currentFolder) {
                 }
             }
             
-            // Load recent folders
-            loadRecentFolders(currentFolder);
             
-            // Reset the interface
-            var input = document.getElementById('folderSearchInput');
-            var dropdown = document.getElementById('folderDropdown');
             
-            input.value = '';
-            dropdown.classList.remove('show');
-            dropdown.innerHTML = '';
-            
-            selectedFolderOption = null;
-            highlightedIndex = -1;
-            
+            // Reset the interface: clear move button state and errors
             updateMoveButton('');
             hideMoveFolderError();
             
-            // Show the modal and focus on input
+            // Populate and show the modal; focus the select if present
             document.getElementById('moveNoteFolderModal').style.display = 'flex';
+            // Populate the specific select inside move-note-folder modal
+            populateTargetFolderDropdown(currentFolder, 'moveNoteTargetSelect');
             setTimeout(function() {
-                input.focus();
+                var select = document.getElementById('moveNoteTargetSelect');
+                if (select) select.focus();
             }, 100);
         }
     })
@@ -1052,17 +1038,7 @@ function onWorkspaceChange() {
     var selectedWorkspace = document.getElementById('workspaceSelect').value;
     var currentFolder = null; // We don't exclude any folder when changing workspace
     
-    // Clear the current folder search
-    var input = document.getElementById('folderSearchInput');
-    var dropdown = document.getElementById('folderDropdown');
-    
-    input.value = '';
-    dropdown.classList.remove('show');
-    dropdown.innerHTML = '';
-    
-    selectedFolderOption = null;
-    highlightedIndex = -1;
-    
+    // Clear the move modal state
     updateMoveButton('');
     hideMoveFolderError();
     
@@ -1083,12 +1059,7 @@ function onWorkspaceChange() {
             // Store all folders for the new workspace
             allFolders = data.folders || [];
             
-            // Clear and reload recent folders section for the new workspace
-            var recentFoldersList = document.getElementById('recentFoldersList');
-            var recentFoldersSection = document.getElementById('recentFoldersSection');
             
-            // Get recent folders (this function should work across workspaces)
-            loadRecentFolders(currentFolder);
             
             console.log('Loaded ' + allFolders.length + ' folders for workspace: ' + selectedWorkspace);
         }
@@ -1098,49 +1069,7 @@ function onWorkspaceChange() {
     });
 }
 
-function loadRecentFolders(currentFolder) {
-    var recentFolders = getRecentFolders();
-    var recentFoldersList = document.getElementById('recentFoldersList');
-    var recentFoldersSection = document.getElementById('recentFoldersSection');
-    
-    // Filter out the current folder
-    var availableRecent = [];
-    for (var i = 0; i < recentFolders.length; i++) {
-        if (recentFolders[i] !== currentFolder) {
-            availableRecent.push(recentFolders[i]);
-        }
-    }
-    
-    if (availableRecent.length === 0) {
-        recentFoldersSection.style.display = 'none';
-        return;
-    }
-    
-    recentFoldersSection.style.display = 'block';
-    recentFoldersList.innerHTML = '';
-    
-    for (var i = 0; i < availableRecent.length; i++) {
-        var folder = availableRecent[i];
-        var folderItem = document.createElement('div');
-        folderItem.className = 'recent-folder-item';
-        folderItem.innerHTML = '<span class="recent-folder-icon">📁</span><span>' + folder + '</span>';
-        folderItem.onclick = (function(folderName) {
-            return function() { selectRecentFolder(folderName); };
-        })(folder);
-        recentFoldersList.appendChild(folderItem);
-    }
-}
-
-function selectRecentFolder(folderName) {
-    var input = document.getElementById('folderSearchInput');
-    var dropdown = document.getElementById('folderDropdown');
-    
-    input.value = folderName;
-    selectedFolderOption = folderName;
-    dropdown.classList.remove('show');
-    updateMoveButton(folderName, true);
-    hideMoveFolderError();
-}
+ 
 
 function updateMoveButton(searchTerm, exactMatch) {
     if (exactMatch === undefined) exactMatch = false;
@@ -1158,39 +1087,25 @@ function updateMoveButton(searchTerm, exactMatch) {
     }
 }
 
-function selectFolderForMove(folderName) {
-    var input = document.getElementById('folderSearchInput');
-    var dropdown = document.getElementById('folderDropdown');
-    
-    input.value = folderName;
-    selectedFolderOption = folderName;
-    dropdown.classList.remove('show');
-    updateMoveButton(folderName, true);
-    hideMoveFolderError();
-}
-
-function selectCreateFolder(folderName) {
-    selectedFolderOption = folderName;
-    document.getElementById('folderDropdown').classList.remove('show');
-    updateMoveButton(folderName, false);
-    hideMoveFolderError();
-}
-
 function moveNoteToFolder() {
     var noteId = document.getElementById('moveNoteFolderModal').dataset.noteId;
-    var targetFolder = selectedFolderOption || document.getElementById('folderSearchInput').value;
-    
-    if (!targetFolder) {
-        showMoveFolderError('Please select or enter a folder name');
+    // Prefer explicit select dropdown if present (from move files modal). Fallback to old input if still present.
+    var select = document.getElementById('moveNoteTargetSelect');
+    var targetFolder = '';
+    if (select && select.value) {
+        targetFolder = select.value;
+    } else {
+        // No select available or no value selected — require explicit selection
+        showMoveFolderError('Please select a target folder');
         return;
     }
-    
+
     var params = new URLSearchParams({
         action: 'move_to',
         note_id: noteId,
         folder: targetFolder
     });
-    
+
     fetch("folder_operations.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
@@ -1226,177 +1141,10 @@ function hideMoveFolderError() {
     }
 }
 
-function handleFolderSearch() {
-    var input = document.getElementById('folderSearchInput');
-    var dropdown = document.getElementById('folderDropdown');
-    var searchTerm = input.value.trim();
-    
-    if (searchTerm.length === 0) {
-        dropdown.classList.remove('show');
-        updateMoveButton('');
-        return;
-    }
-    
-    // Filter folders that match the search term
-    var matchingFolders = [];
-    for (var i = 0; i < allFolders.length; i++) {
-        if (allFolders[i].toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-            matchingFolders.push(allFolders[i]);
-        }
-    }
-    
-    // Update dropdown content
-    updateDropdown(matchingFolders, searchTerm);
-    
-    // Update button text based on exact match
-    var exactMatch = null;
-    for (var i = 0; i < allFolders.length; i++) {
-        if (allFolders[i].toLowerCase() === searchTerm.toLowerCase()) {
-            exactMatch = allFolders[i];
-            break;
-        }
-    }
-    
-    updateMoveButton(searchTerm, exactMatch ? true : false);
-    
-    // Show dropdown if there are matches or if we want to show create option
-    dropdown.classList.add('show');
-}
+ 
 
-function updateDropdown(matchingFolders, searchTerm) {
-    var dropdown = document.getElementById('folderDropdown');
-    dropdown.innerHTML = '';
-    highlightedIndex = -1;
-    selectedFolderOption = null;
-    
-    // Show matching folders
-    for (var i = 0; i < matchingFolders.length; i++) {
-        var folder = matchingFolders[i];
-        var option = document.createElement('div');
-        option.className = 'folder-option';
-        option.textContent = folder;
-        option.onclick = (function(folderName) {
-            return function() { selectFolderForMove(folderName); };
-        })(folder);
-        dropdown.appendChild(option);
-    }
-    
-    // Show create option if no exact match
-    var hasExactMatch = false;
-    for (var i = 0; i < matchingFolders.length; i++) {
-        if (matchingFolders[i].toLowerCase() === searchTerm.toLowerCase()) {
-            hasExactMatch = true;
-            break;
-        }
-    }
-    
-    if (!hasExactMatch && searchTerm.length > 0) {
-        var createOption = document.createElement('div');
-        createOption.className = 'folder-option create-option';
-        createOption.innerHTML = '<i class="fa-plus"></i> Create "' + searchTerm + '"';
-        createOption.onclick = function() { selectCreateFolder(searchTerm); };
-        dropdown.appendChild(createOption);
-    }
-}
+// executeFolderAction removed
 
-function addToRecentFolders(folderName) {
-    var recentFolders = getRecentFolders();
-    
-    // Remove if already exists
-    var filtered = [];
-    for (var i = 0; i < recentFolders.length; i++) {
-        if (recentFolders[i] !== folderName) {
-            filtered.push(recentFolders[i]);
-        }
-    }
-    
-    // Add to beginning
-    filtered.unshift(folderName);
-    
-    // Keep only last 2
-    if (filtered.length > 2) {
-        filtered = filtered.slice(0, 2);
-    }
-    
-    // Save to localStorage
-    localStorage.setItem('poznote_recent_folders', JSON.stringify(filtered));
-}
-
-function executeFolderAction() {
-    // Check if a valid note is selected
-    if (!noteid || noteid == -1 || noteid == '' || noteid == null || noteid === undefined) {
-        showNotificationPopup('Please select a note first before moving it to a folder.');
-        return;
-    }
-    
-    var searchTerm = document.getElementById('folderSearchInput').value.trim();
-    
-    if (!searchTerm) {
-        showMoveFolderError('Please enter a folder name');
-        return;
-    }
-    
-    var folderToMoveTo = selectedFolderOption || searchTerm;
-    var selectedWorkspace = document.getElementById('workspaceSelect').value;
-    
-    var params = new URLSearchParams({
-        action: 'move_to',
-        note_id: noteid,
-        folder: folderToMoveTo,
-        workspace: selectedWorkspace
-    });
-    
-    fetch("folder_operations.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: params.toString()
-    })
-    .then(function(response) { 
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-        }
-        return response.text(); // Get text first to debug if needed
-    })
-    .then(function(text) {
-        try {
-            var data = JSON.parse(text);
-            if (data && data.success) {
-                // Add to recent folders
-                addToRecentFolders(folderToMoveTo);
-                
-                try { closeModal('moveNoteFolderModal'); } catch(e) {}
-                try { closeModal('moveNoteModal'); } catch(e) {}
-                
-                // If moved to different workspace, redirect to that workspace
-                if (data.old_workspace !== data.new_workspace) {
-                    // Update the global workspace variable and interface immediately
-                    selectedWorkspace = selectedWorkspace;
-                    updateWorkspaceNameInHeaders(selectedWorkspace);
-                    try { 
-                        localStorage.setItem('poznote_selected_workspace', selectedWorkspace); 
-                    } catch(e) {}
-                    
-                    setTimeout(function() {
-                        var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace);
-                        window.location.href = wsRedirect;
-                    }, 200);
-                } else {
-                    location.reload();
-                }
-            } else {
-                var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-                showNotificationPopup('Error: ' + err, 'error');
-            }
-        } catch (parseError) {
-            console.error('JSON Parse Error:', parseError);
-            console.error('Response text:', text);
-            showNotificationPopup('Error: Invalid server response', 'error');
-        }
-    })
-    .catch(function(error) {
-        showNotificationPopup('Error moving note: ' + error, 'error');
-    });
-}
 
 // Function to download a file
 function downloadFile(url, filename) {

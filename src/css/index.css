@@ -2320,64 +2320,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 /* search-only hiding to avoid interfering with general hidden class */
 .search-hidden { display: none !important; }
 
-.folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-search-btn, .folder-move-files-btn {
-    /* font-size: 1em; */
+.folder-edit-btn, .folder-delete-btn, .folder-empty-btn, .folder-move-files-btn {
     color: #007DB8;
     margin-left: 8px;
     cursor: pointer;
-    /* padding: 4px; */
     border-radius: 4px;
-    /* transition: background-color 0.2s, color 0.2s; */
 }
 
-.folder-search-btn {
-    color: #007DB8; /* Blue by default (included in search) */
-}
 
-.folder-search-btn.excluded {
-    color: #dc3545; /* Red when excluded from search */
-    position: relative;
-    /* Force visibility even when other icons are hidden */
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    /* Subtle filter to make the icon visually 'redder' and stand out */
-    filter: drop-shadow(0 0 4px rgba(220,53,69,0.25));
-}
-
-/* Extra-specific selector to override other rules that might hide icons */
-.folder-actions i.folder-search-btn.excluded,
-.folder-toggle .folder-actions i.folder-search-btn.excluded {
-    display: inline-block !important;
-    opacity: 1 !important;
-    color: #dc3545 !important;
-    pointer-events: auto !important;
-    z-index: 5 !important;
-    transform: translateZ(0); /* trigger GPU to avoid rendering glitches */
-}
-
-/* Add a diagonal line over excluded folder search buttons */
-.folder-search-btn.excluded::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80%;
-    height: 2px;
-    background-color: #dc3545;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Change button background color */
-/* .folder-search-btn:hover {
-    background-color: rgba(0, 125, 184, 0.2);
-} */
-
-/* Change button background color */
-/* .folder-search-btn.excluded:hover {
-    background-color: rgba(220, 53, 69, 0.2);
-} */
 
 /* Change button background color */
 /* .folder-edit-btn:hover {
@@ -2500,26 +2450,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     width: 12px;
 }
 
-.folder-search-section {
-    margin-bottom: 0px;
-}
-
-.folder-search-section input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
-    transition: border-color 0.2s;
-}
-
-.folder-search-section input:focus {
-    outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
-}
+ 
 
 .suggested-folder-option {
     display: inline-flex;
@@ -3616,104 +3547,7 @@ input[type="search"]::-webkit-search-results-decoration {
     }
 }
 
-/* Smart folder search styling */
-.folder-search-container {
-    position: relative;
-    margin: 15px 0 20px 0;
-}
 
-.folder-search-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: white;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.folder-search-input:focus {
-    outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
-}
-
-.recent-folders-section {
-    margin-top: 12px;
-    margin-bottom: 15px;
-}
-
-.recent-folders-label {
-    font-size: 12px;
-    color: #6c757d;
-    margin-bottom: 6px;
-    font-weight: 500;
-}
-
-.recent-folders-list {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.recent-folder-item {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1px solid #dee2e6;
-    border-radius: 16px;
-    font-size: 13px;
-    color: #495057;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.recent-folder-item:hover {
-    background: linear-gradient(135deg, #007DB8 0%, #0056b3 100%);
-    color: white;
-    border-color: #007DB8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 125, 184, 0.2);
-}
-
-.recent-folder-icon {
-    margin-right: 6px;
-    font-size: 11px;
-}
-
-.recent-folder-item:hover .recent-folder-icon {
-    color: white;
-}
-
-.folder-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
-}
-
-.folder-dropdown.show {
-    display: block;
-}
-
-.folder-option {
-    padding: 10px 16px;
-    cursor: pointer;
-    border-bottom: 1px solid #f1f3f4;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-}
 
 .folder-option:last-child {
     border-bottom: none;
