@@ -137,14 +137,6 @@ function handleUpload() {
     $unique_filename = uniqid() . '_' . time() . '.' . $file_extension;
     $file_path = $attachments_dir . '/' . $unique_filename;
     
-    // Validate file type (basic security)
-    $allowed_types = ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'zip', 'rar'];
-    if (!in_array(strtolower($file_extension), $allowed_types)) {
-        error_log("Upload failed: File type not allowed: $file_extension");
-        echo json_encode(['success' => false, 'message' => 'File type not allowed']);
-        return;
-    }
-    
     // Check if source file exists and is readable
     if (!is_uploaded_file($file['tmp_name'])) {
         error_log("Upload failed: Invalid uploaded file: " . $file['tmp_name']);

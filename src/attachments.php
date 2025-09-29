@@ -59,7 +59,7 @@ if (!$note) {
                 <div class="form-group">
                     <input type="file" id="attachmentFile" class="file-input" onchange="showFileName()">
                     <div class="accepted-types">
-                        Accepted: pdf, doc, docx, txt, jpg, jpeg, png, gif, zip, rar (max 200MB)
+                        All file types accepted (max 200MB)
                     </div>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
