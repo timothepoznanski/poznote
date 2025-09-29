@@ -1268,6 +1268,33 @@
     }
 }
 
+/* Mobile-specific overrides for workspace modals that had fixed desktop widths.
+   Ensure buttons stack full-width and keep accessible height on small screens. */
+@media (max-width: 420px) {
+    /* target both .modal-buttons and plain div wrappers */
+    #deleteModal .modal-buttons button,
+    #deleteModal .modal-content > div > button,
+    #renameModal .modal-buttons button,
+    #renameModal .modal-content > div > button,
+    #moveNotesModal .modal-buttons button,
+    #moveNotesModal .modal-content > div > button {
+        width: 100% !important;
+        height: 44px !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Ensure modal button containers use column layout on mobile */
+    #deleteModal .modal-buttons,
+    #renameModal .modal-buttons,
+    #moveNotesModal .modal-buttons {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+}
+
 /* Make Delete workspace modal actions equal width and inline side-by-side */
 #deleteModal .modal-buttons {
     display: flex;
