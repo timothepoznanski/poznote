@@ -92,9 +92,9 @@ try {
     $v2 = $stmt->fetchColumn();
     if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
 
-    $stmt->execute(['show_folder_actions']);
+    $stmt->execute(['hide_folder_actions']);
     $v3 = $stmt->fetchColumn();
-    if ($v3 === '0' || $v3 === 'false' || $v3 === null) $extra_body_classes .= ' folder-actions-always-visible';
+    if ($v3 === '0' || $v3 === 'false') $extra_body_classes .= ' folder-actions-always-visible';
 
     $stmt->execute(['hide_folder_counts']);
     $v4 = $stmt->fetchColumn();
@@ -179,6 +179,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 
     <script>
     // Restore folder states from localStorage
+    document.addEventListener('DOMContentLoaded', function() {
         try {
             var folderContents = document.querySelectorAll('.folder-content');
             for (var i = 0; i < folderContents.length; i++) {

@@ -149,23 +149,23 @@ include 'functions.php';
         }); }
         refreshFolder();
 
-        // Folder actions always visible
+        // Folder actions (database)
         var cardFolderActions = document.getElementById('folder-actions-card');
         var statusFolderActions = document.getElementById('folder-actions-status');
         function refreshFolderActions(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_actions');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'disabled' : 'enabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'disabled' : 'enabled'); }
+                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
+                if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'enabled' : 'disabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
                 if(enabled) document.body.classList.remove('folder-actions-always-visible'); else document.body.classList.add('folder-actions-always-visible');
             }).catch(()=>{});
         }
         if(cardFolderActions){ cardFolderActions.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_folder_actions');
+            var form = new FormData(); form.append('action','get'); form.append('key','hide_folder_actions');
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
                 var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_folder_actions'); setForm.append('value', toSet);
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','hide_folder_actions'); setForm.append('value', toSet);
                 return fetch('api_settings.php',{method:'POST',body:setForm});
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
