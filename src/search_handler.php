@@ -36,7 +36,7 @@ function handleUnifiedSearch() {
 /**
  * Construit les conditions de recherche sécurisées
  */
-function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $excluded_folders) {
+function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter) {
     $where_conditions = ["trash = 0"];
     $search_params = [];
     
@@ -99,31 +99,7 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         $search_params[] = $workspace_filter;
     }
     
-    // Exclude folders from search if specified
-    if (!empty($excluded_folders)) {
-        $exclude_placeholders = [];
-        $exclude_favorite = false;
-        
-        foreach ($excluded_folders as $excludedFolder) {
-            if ($excludedFolder === 'Favorites') {
-                // For Favorites, exclude favorite notes
-                $exclude_favorite = true;
-            } else {
-                $exclude_placeholders[] = "?";
-                $search_params[] = $excludedFolder;
-            }
-        }
-        
-        // Add folder exclusion condition
-        if (!empty($exclude_placeholders)) {
-            $where_conditions[] = "(folder IS NULL OR folder NOT IN (" . implode(", ", $exclude_placeholders) . "))";
-        }
-        
-        // Add favorite exclusion condition
-        if ($exclude_favorite) {
-            $where_conditions[] = "(favorite IS NULL OR favorite != 1)";
-        }
-    }
+    
     
     $where_clause = implode(" AND ", $where_conditions);
     
@@ -136,13 +112,3 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
 /**
  * Traite les dossiers exclus de la recherche
  */
-function handleExcludedFolders() {
-    $excluded_folders = [];
-    if (isset($_POST['excluded_folders']) && !empty($_POST['excluded_folders'])) {
-        $excluded_folders = json_decode($_POST['excluded_folders'], true);
-        if (!is_array($excluded_folders)) {
-            $excluded_folders = [];
-        }
-    }
-    return $excluded_folders;
-}

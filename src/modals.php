@@ -123,39 +123,23 @@
         <div class="form-group">
             <label for="workspaceSelect">Select Workspace destination:</label>
             <br><br>
-            <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
+        <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
                 <!-- Workspaces will be loaded here -->
             </select>
         </div>
         
-        <div>Search or enter a folder name:</div>
-        
-        <!-- Smart folder search/input -->
-        <div class="folder-search-container">
-            <input type="text" id="folderSearchInput" class="folder-search-input" 
-                   placeholder="Type to search folders or create new..." 
-                   autocomplete="off" maxlength="255"
-                   oninput="handleFolderSearch()" 
-                   onkeydown="handleFolderKeydown(event)">
-            
-            <!-- Recent folders -->
-            <div id="recentFoldersSection" class="recent-folders-section">
-                <div class="recent-folders-label">Recent folders:</div>
-                <div id="recentFoldersList" class="recent-folders-list">
-                    <!-- Recent folders will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Dropdown with matching folders -->
-            <div id="folderDropdown" class="folder-dropdown">
-                <!-- Matching folders will appear here -->
-            </div>
+        <div>Select target folder:</div>
+
+        <div class="form-group">
+            <select id="moveNoteTargetSelect" class="workspace-select">
+                <!-- Options will be populated dynamically -->
+            </select>
         </div>
         
         <!-- Action buttons -->
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeModal('moveNoteFolderModal')">Cancel</button>
-            <button type="button" id="moveActionButton" class="btn-primary" onclick="executeFolderAction()">Move</button>
+            <button type="button" id="moveActionButton" class="btn-primary" onclick="moveNoteToFolder()">Move</button>
         </div>
         
         <!-- Error message display -->
@@ -194,7 +178,7 @@
     <div class="modal-content">
         <h3>Move All Files</h3>
         <p>Move all files from "<span id="sourceFolderName"></span>" to:</p>
-        <select id="targetFolderSelect">
+        <select id="moveFolderFilesTargetSelect">
             <option value="">Select target folder...</option>
         </select>
         <div id="folderFilesCount" class="modal-info-message">

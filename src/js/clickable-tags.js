@@ -784,23 +784,7 @@ window.saveTagsDirectly = saveTagsDirectly;
 /**
  * Get excluded folders from localStorage (copied from list_tags.js)
  */
-function getExcludedFoldersFromLocalStorage() {
-    const excludedFolders = [];
-    
-    // Read excluded folders from localStorage
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('folder_search_')) {
-            const state = localStorage.getItem(key);
-            if (state === 'excluded') {
-                const folderName = key.substring('folder_search_'.length);
-                excludedFolders.push(folderName);
-            }
-        }
-    }
-    
-    return excludedFolders;
-}
+ 
 
 /**
  * Setup handlers (minimal now since we use inline editing)
@@ -838,59 +822,12 @@ if (document.readyState !== 'loading') {
  * Redirect to notes with specific tag
  */
 function redirectToTag(tag) {
-    const excludedFolders = getExcludedFoldersFromLocalStorage();
-
-    if (excludedFolders.length > 0) {
-        // Create a form to post the tag search with excluded folders
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'index.php';
-
-        // Add tag search parameter
-        const tagInput = document.createElement('input');
-        tagInput.type = 'hidden';
-        tagInput.name = 'tags_search';
-        tagInput.value = tag;
-        form.appendChild(tagInput);
-
-        // Add search type parameters
-        const searchInTagsInput = document.createElement('input');
-        searchInTagsInput.type = 'hidden';
-        searchInTagsInput.name = 'search_in_tags';
-        searchInTagsInput.value = '1';
-        form.appendChild(searchInTagsInput);
-
-        // Add excluded folders
-        const excludedInput = document.createElement('input');
-        excludedInput.type = 'hidden';
-        excludedInput.name = 'excluded_folders';
-        excludedInput.value = JSON.stringify(excludedFolders);
-        form.appendChild(excludedInput);
-
-        // Include current workspace
-        const currentWorkspace = new URLSearchParams(window.location.search).get('workspace') ||
-                               (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
-                               (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                               'Poznote';
-        if (currentWorkspace && currentWorkspace !== 'Poznote') {
-            const wsInput = document.createElement('input');
-            wsInput.type = 'hidden';
-            wsInput.name = 'workspace';
-            wsInput.value = currentWorkspace;
-            form.appendChild(wsInput);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-    } else {
-        // No exclusions, use simple GET redirect
-        const currentWorkspace = new URLSearchParams(window.location.search).get('workspace') ||
-                               (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
-                               (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                               'Poznote';
-        const wsParam = (currentWorkspace && currentWorkspace !== 'Poznote') ? '&workspace=' + encodeURIComponent(currentWorkspace) : '';
+    const currentWorkspace = new URLSearchParams(window.location.search).get('workspace') ||
+                           (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
+                           (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
+                           'Poznote';
+    const wsParam = (currentWorkspace && currentWorkspace !== 'Poznote') ? '&workspace=' + encodeURIComponent(currentWorkspace) : '';
     window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
-    }
 }
 
 // Make functions available globally for use by other scripts

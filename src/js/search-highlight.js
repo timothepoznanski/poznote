@@ -210,9 +210,7 @@ function clearSearchHighlights() {
     
     // Restore folder filter state after clearing search
     setTimeout(function() {
-        if (typeof initializeFolderSearchFilters === 'function') {
-            initializeFolderSearchFilters();
-        }
+        
     }, 200);
 }
 

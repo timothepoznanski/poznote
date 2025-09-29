@@ -309,7 +309,7 @@ switch($action) {
     $defaultFolderName = getDefaultFolderName($workspace);
         $suggestedFolders = [$defaultFolderName]; // Always include default folder first
         
-        // Add recent folders
+        
         while($row = $recentResult->fetch(PDO::FETCH_ASSOC)) {
             if (!isDefaultFolder($row['folder'], $workspace) && !in_array($row['folder'], $suggestedFolders)) {
                 $suggestedFolders[] = $row['folder'];

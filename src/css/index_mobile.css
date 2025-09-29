@@ -456,36 +456,7 @@ a.links_arbo_left.selected-note {
     pointer-events: auto;
 }
 
-/* Ensure excluded search icon is clearly visible and highlighted on mobile */
-.folder-search-btn.excluded {
-    color: #dc3545 !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    filter: drop-shadow(0 0 4px rgba(220,53,69,0.25));
-}
-
-/* extra-specific mobile selector */
-.folder-actions i.folder-search-btn.excluded,
-.folder-toggle .folder-actions i.folder-search-btn.excluded {
-    display: inline-block !important;
-    opacity: 1 !important;
-    color: #dc3545 !important;
-    pointer-events: auto !important;
-}
-
-/* Modal-related rules moved to css/modals.css */
-
-.folder-search-section {
-    margin-bottom: 0px !important;
-}
-
-.folder-search-section input {
-    font-size: 16px !important;
-    padding: 14px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    border-radius: 8px !important;
-}
+ 
 
 .suggested-folder-option {
     padding: 10px 16px !important;
