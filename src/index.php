@@ -60,7 +60,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">  <!-- Until screen size 800px we apply mobile css -->
+    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>
@@ -700,7 +700,7 @@ $using_unified_search = handleUnifiedSearch();
                 
                 // Initialize task list if this is a task list
                 if ($note_type === 'tasklist') {
-                    echo '<script>initializeTaskList('.$row['id'].', "'.$note_type.'");</script>';
+                    echo '<script>if (typeof initializeTaskList === \'function\') { setTimeout(function() { initializeTaskList('.$row['id'].', "'.$note_type.'"); }, 100); }</script>';
                 }
             }
         } else {
@@ -855,6 +855,7 @@ $using_unified_search = handleUnifiedSearch();
 <?php if (isAIEnabled()): ?>
 <script src="js/ai.js"></script>
 <?php endif; ?>
+<script src="js/tasklist.js"></script>
 <script src="js/copy-code-on-focus.js"></script>
 
 </html>
