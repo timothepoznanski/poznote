@@ -304,18 +304,13 @@ $using_unified_search = handleUnifiedSearch();
     
     <!-- RIGHT COLUMN -->	
     <div id="right_col">
-    
-        <!-- Search bar removed from right column (desktop) -->
-        
+            
         <?php        
-            
-            // Right-side list based on the query created earlier //		
-            
+                        
             // Check if we should display a note or nothing
             if ($res_right && $res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
-                
                     // Check if note is shared
                     $is_shared = false;
                     try {
@@ -344,11 +339,9 @@ $using_unified_search = handleUnifiedSearch();
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                     }
                
-           
                 // Harmonized desktop/mobile display:
                 echo '<div id="note'.$row['id'].'" class="notecard">';
                 echo '<div class="innernote">';
-                // Ligne 1 : barre d’édition centrée (plus de date)
                 echo '<div class="note-header">';
                 // Formatting buttons (hidden by default on mobile, visible during selection)
                 echo '<div class="note-edit-toolbar">';
