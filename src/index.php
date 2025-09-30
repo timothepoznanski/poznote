@@ -193,7 +193,7 @@ $using_unified_search = handleUnifiedSearch();
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt" style="margin-right: 10px; color: #007DB8;"></i>Note';
+        noteItem.innerHTML = '<i class="fa-file-alt"></i>Note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -212,7 +212,7 @@ $using_unified_search = handleUnifiedSearch();
         // Folder item
         var folderItem = document.createElement('button');
         folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fa-folder" style="margin-right: 10px; color: #007DB8;"></i>Folder';
+        folderItem.innerHTML = '<i class="fa-folder"></i>Folder';
         folderItem.onclick = function() {
             newFolder();
             createMenu.remove();
@@ -221,7 +221,7 @@ $using_unified_search = handleUnifiedSearch();
         // Task list item
         var taskListItem = document.createElement('button');
         taskListItem.className = 'create-menu-item';
-        taskListItem.innerHTML = '<i class="fa-list-ul" style="margin-right: 10px; color: #007DB8;"></i>Task list';
+        taskListItem.innerHTML = '<i class="fa-list-ul"></i>Task list';
         taskListItem.onclick = function() {
             createTaskListNote();
             createMenu.remove();
@@ -230,7 +230,7 @@ $using_unified_search = handleUnifiedSearch();
         // Workspace item
         var workspaceItem = document.createElement('button');
             workspaceItem.className = 'create-menu-item';
-            workspaceItem.innerHTML = '<i class="fa-layer-group" style="margin-right: 10px; color: #007DB8;"></i>Workspace';
+            workspaceItem.innerHTML = '<i class="fa-layer-group"></i>Workspace';
         workspaceItem.onclick = function() {
             // Navigate to the workspaces management page
             window.location = 'workspaces.php';

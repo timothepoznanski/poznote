@@ -651,6 +651,8 @@ body {
 /* Enlarge icons in create menu */
 .create-menu-item i {
     font-size: 20px;
+    margin-right: 10px;
+    color: #007DB8;
 }
 
 /* LEFT HEADER */
