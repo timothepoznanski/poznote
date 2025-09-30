@@ -60,14 +60,7 @@ function updateMobileDesktopAria() {
     try {
         var mq = window.matchMedia && window.matchMedia('(max-width: 800px)');
         var mobileActive = mq ? mq.matches : (window.innerWidth <= 800);
-        var desktopEls = document.querySelectorAll('.desktop-only');
-        var mobileEls = document.querySelectorAll('.mobile-only');
-        for (var i = 0; i < desktopEls.length; i++) {
-            desktopEls[i].setAttribute('aria-hidden', mobileActive ? 'true' : 'false');
-        }
-        for (var j = 0; j < mobileEls.length; j++) {
-            mobileEls[j].setAttribute('aria-hidden', mobileActive ? 'false' : 'true');
-        }
+        // Note: aria-hidden is not set for desktop-only/mobile-only since CSS display handles visibility
     } catch (e) {
         // ignore
     }

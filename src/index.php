@@ -333,10 +333,12 @@ $using_unified_search = handleUnifiedSearch();
                     
                     if ($note_type === 'tasklist') {
                         // For task list notes, use the database content (JSON) instead of HTML file
-                        $entryfinal = $row['entry'] ?? '';
+                        $entryfinal = '';
+                        $tasklist_json = htmlspecialchars($row['entry'] ?? '', ENT_QUOTES);
                     } else {
                         // For regular notes, use the HTML file content
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        $tasklist_json = '';
                     }
                
                 // Harmonized desktop/mobile display:
@@ -388,13 +390,13 @@ $using_unified_search = handleUnifiedSearch();
                 echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                 echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
              
-                echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn desktop-only" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-save note-action-btn desktop-only" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-separator note-action-btn desktop-only" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-emoji'.$note_action_class.'" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-save'.$note_action_class.'" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-separator'.$note_action_class.'" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                 if (isAIEnabled()) {
-                    echo '<div class="ai-dropdown desktop-only">';
-                    echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
-                    echo '<div class="ai-menu" id="aiMenu">';
+                    echo '<div class="ai-dropdown">';
+                    echo '<button type="button" class="toolbar-btn btn-ai'.$note_action_class.'" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
+                    echo '<div class="ai-menu" id="aiMenu-'.$row['id'].'">';
                     echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
                     echo '<i class="fa-align-left"></i>';
                     echo '<span>Summarize</span>';
@@ -415,7 +417,7 @@ $using_unified_search = handleUnifiedSearch();
                     echo '</div>';
                 }
                 
-                // Favorite / Share / Attachment buttons (desktop-only)
+                // Favorite / Share / Attachment buttons
                 $attachments_count = 0;
                 if (!empty($row['attachments'])) {
                     $attachments_data = json_decode($row['attachments'], true);
@@ -427,10 +429,10 @@ $using_unified_search = handleUnifiedSearch();
                 $favorite_class = $is_favorite ? ' is-favorite' : '';
                 $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
 
-                echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.' desktop-only" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                 $share_class = $is_shared ? ' is-shared' : '';
-                echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.' desktop-only" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').' desktop-only" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -483,9 +485,8 @@ $using_unified_search = handleUnifiedSearch();
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    // Actions: always render both desktop dropdown and mobile buttons
-                    // Desktop actions dropdown
-                    echo '<div class="actions-dropdown desktop-only">';
+                    // Actions dropdown
+                    echo '<div class="actions-dropdown">';
                     $actions_onclick = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
                     echo '<button type="button" class="toolbar-btn btn-actions'.$note_action_class.'" title="Actions" onclick="' . $actions_onclick . '"><i class="fa-menu-vert-svg"></i></button>';
                     echo '<div class="actions-menu" id="actionsMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
@@ -507,78 +508,6 @@ $using_unified_search = handleUnifiedSearch();
                     echo '</div>';
                     echo '</div>';
 
-                    // Mobile: individual action buttons and mobile dropdown
-                    // Calculate number of attachments for mobile button
-                    $attachments_count = 0;
-                    if (!empty($row['attachments'])) {
-                        $attachments_data = json_decode($row['attachments'], true);
-                        if (is_array($attachments_data)) {
-                            $attachments_count = count($attachments_data);
-                        }
-                    }
-
-                    // Mobile buttons
-                    echo '<div class="mobile-actions mobile-only">';
-                    echo '<button type="button" class="toolbar-btn btn-emoji" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-save" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    if (isAIEnabled()) {
-                        echo '<div class="ai-dropdown mobile">';
-                        $ai_onclick_mobile = "toggleAIMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "')";
-                        echo '<button type="button" class="toolbar-btn btn-ai" title="AI actions" onclick="' . $ai_onclick_mobile . '"><i class="fa-robot-svg"></i></button>';
-                        echo '<div class="ai-menu" id="aiMenuMobile">';
-                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-check-light-full"></i>';
-                        echo '<span>Check content</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-tags"></i>';
-                        echo '<span>AI tags</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fa-cog"></i>';
-                        echo '<span>AI settings</span>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</div>';
-                    }
-
-                    // Favorites / Share / Attachments
-                    $is_favorite = $row['favorite'] ?? 0;
-                    $favorite_class = $is_favorite ? ' is-favorite' : '';
-                    $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-                    echo '<button type="button" class="toolbar-btn btn-favorite'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-share'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-attachment'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
-
-                    // Mobile actions dropdown
-                    echo '<div class="actions-dropdown mobile">';
-                    $actions_onclick_mobile = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
-                    echo '<button type="button" class="toolbar-btn btn-actions" title="Actions" onclick="' . $actions_onclick_mobile . '"><i class="fa-menu-vert-svg"></i></button>';
-                    echo '<div class="actions-menu" id="actionsMenuMobile-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
-                    echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="showMoveFolderDialog(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-drive-file-move-svg"></i><span>Move</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
-                    echo '<i class="fa-download"></i><span>Download</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-trash"></i><span>Delete</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.'); closeActionsMenu();">';
-                    echo '<i class="fa-info-circle"></i><span>Information</span>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
-
-                    echo '</div>';
                     echo '</div>';
                 
                 echo '</div>';
@@ -679,7 +608,8 @@ $using_unified_search = handleUnifiedSearch();
                 
                 // Note content with font size style
                 $note_type = $row['type'] ?? 'note';
-                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'">'.$entryfinal.'</div>';
+                $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
+                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$entryfinal.'</div>';
                 echo '<div class="note-bottom-space"></div>';
                 echo '</div>';
                 echo '</div>';

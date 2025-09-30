@@ -12,6 +12,16 @@
     overflow-x: hidden !important; /* Hide horizontal scrollbar */
 }
 
+/* Show mobile-only elements on mobile */
+.mobile-only {
+    display: block !important;
+}
+
+/* Hide desktop-only elements on mobile */
+.desktop-only {
+    display: none !important;
+}
+
 /* Hide resize handle on mobile */
 .resize-handle {
     display: none !important;

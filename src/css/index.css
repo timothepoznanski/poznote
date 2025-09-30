@@ -146,12 +146,14 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
 
 /* Responsive helpers: show/hide toolbar elements mobile   */
 
-.desktop-only { 
-    display: initial; 
+/* Show desktop-only elements on mobile */
+.desktop-only {
+    display: block !important;
 }
 
-.mobile-only { 
-    display: none; 
+/* Hide mobile-only elements on mobile */
+.mobile-only {
+    display: none !important;
 }
 
 html, body {
@@ -444,7 +446,7 @@ body {
     height: 40px; /* enforce same height as search */
 }
 .btn-new-note i { font-size: 16px; color: #fff; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
-.btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
+/* .btn-new-note.mobile { padding: 10px; font-size: 0.95rem; } */
 .btn-new-note:hover { filter: brightness(0.96); }
 
 .btn-new-folder {
@@ -853,7 +855,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background-color: #fff;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 180px;
@@ -1071,10 +1073,10 @@ a.links_arbo_left.selected-note {
 }
 
 /* Folder filter clear buttons (hidden by default) */
-#folder-filter-clear-mobile,
+/* #folder-filter-clear-mobile,
 #folder-filter-clear-desktop {
     display: none;
-}
+} */
 
 .searchbar-clear {
     position: absolute;
@@ -1195,12 +1197,12 @@ img {
 }
 
 /* Update status styling */
-#update-status, #update-status-mobile {
+/* #update-status, #mobileupdate-status- {
     display: block;
     margin-top: 2px;
     font-size: 0.75em;
     line-height: 1.2;
-}
+} */
 
 /* Keyframe animations */
 @keyframes slideInRight {
@@ -1645,15 +1647,15 @@ img {
 }
 
 /* Mobile AI dropdown adjustments */
-.ai-dropdown.mobile .ai-menu {
+/* .ai-dropdown.mobile .ai-menu {
     min-width: 140px;
     padding: 6px 0;
-}
+} */
 
-.ai-dropdown.mobile .ai-menu-item {
+/* .ai-dropdown.mobile .ai-menu-item {
     padding: 8px 12px;
     font-size: 13px;
-}
+} */
 
 .search:focus{
     border-bottom: 1px solid #32a1ce;
@@ -1708,7 +1710,7 @@ img {
     font-size: 18px !important;
 }
 
-.share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
+/* .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; } */
 
 /* Actions dropdown styles */
 .actions-dropdown {
@@ -1762,7 +1764,7 @@ img {
     filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
 }
 
-.actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; }
+/* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
 
 .icon_trash {
     color: #007DB8;
