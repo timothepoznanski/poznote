@@ -249,8 +249,7 @@ function toggleAIMenu(event, noteId) {
     if (settingsMenuMobile) settingsMenuMobile.style.display = 'none';
     
     // Handle the AI menu
-    const aiMenu = document.getElementById('aiMenu');
-    const aiMenuMobile = document.getElementById('aiMenuMobile');
+    const aiMenu = document.getElementById('aiMenu-' + noteId);
     
     if (isAIMenuOpen) {
         closeAIMenu();
@@ -274,7 +273,7 @@ function toggleAIMenu(event, noteId) {
     });
     
     // Determine which menu to use based on platform
-    const activeMenu = aiMenu || aiMenuMobile;
+    const activeMenu = aiMenu;
     if (!activeMenu) return;
     
     // Show the active menu
@@ -292,7 +291,7 @@ function toggleAIMenu(event, noteId) {
                 // Check if this button's associated menu matches
                 const parent = btn.parentElement || btn.parentNode;
                 if (!parent) continue;
-                if (parent.querySelector && (parent.querySelector('#aiMenu') || parent.querySelector('#aiMenuMobile'))) {
+                if (parent.querySelector && parent.querySelector('#aiMenu-' + noteId)) {
                     triggerBtn = btn;
                     break;
                 }
@@ -364,10 +363,7 @@ function toggleAIMenu(event, noteId) {
  * Closes the AI menu
  */
 function closeAIMenu() {
-    const aiMenu = document.getElementById('aiMenu');
-    const aiMenuMobile = document.getElementById('aiMenuMobile');
-    
-    const all = [aiMenu, aiMenuMobile].filter(el => el);
+    const all = document.querySelectorAll('.ai-menu');
     all.forEach(el => {
         el.style.display = 'none';
         // Remove any inline styles we added for mobile positioning (including important ones)
