@@ -498,4 +498,4 @@ body {
 .ws-col { width: 100%; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .ws-col-name { padding-left: 0; font-size: 1rem; }
 .ws-col-action, .ws-col-move, .ws-col-delete { justify-content: flex-start; }
-.workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }Bon 
+.workspace-list .action-btn { min-width: 100px; padding: 8px 10px; font-size: 0.95rem; }
