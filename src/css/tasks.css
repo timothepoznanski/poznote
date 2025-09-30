@@ -120,7 +120,11 @@
 }
 
 .task-item.dragging {
-    opacity: 0.6;
+    opacity: 0.5;
+    /* transform: rotate(3deg) scale(1.05); */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    border: 4px solid #007DB8 !important;
 }
 
 /* Placeholder used for touch drag-and-drop */

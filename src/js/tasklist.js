@@ -441,7 +441,13 @@ function enableDragAndDrop(noteId) {
             const sortable = new Sortable(tasksList, {
                 animation: 150,
                 handle: '.task-drag-handle', // Only allow dragging by the hamburger handle
+                onStart: function(evt) {
+                    // Add dragging class for visual feedback
+                    evt.item.classList.add('dragging');
+                },
                 onEnd: function(evt) {
+                    // Remove dragging class
+                    evt.item.classList.remove('dragging');
                     // sortable onEnd
 
                     const noteEntry = document.getElementById('entry' + noteId);
