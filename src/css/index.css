@@ -146,9 +146,13 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
 
 /* Responsive helpers: show/hide toolbar elements mobile   */
 
-.desktop-only { display: initial; }
-.mobile-only { display: none; }
+.desktop-only { 
+    display: initial; 
+}
 
+.mobile-only { 
+    display: none; 
+}
 
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
