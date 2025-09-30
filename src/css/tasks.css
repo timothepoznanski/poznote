@@ -13,16 +13,17 @@
     align-items: center;
     justify-content: center;
     min-width: 16px;
-}-container {
-    display: flex;
-    gap: 8px;
+
+}
+    .task-input-container {
+    position: relative;
     margin-bottom: 15px;
     align-items: center;
 }
 
 .task-input {
-    flex: 1;
-    padding: 8px 12px;
+    width: 100%;
+    padding: 8px 40px 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
@@ -38,10 +39,14 @@
 }
 
 .task-add-btn {
-    padding: 8px 12px;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 4px;
     background: transparent;
     color: #666;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
@@ -49,12 +54,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
+    min-width: 20px;
+    min-height: 20px;
 }
 
 .task-add-btn:hover {
     background: #f5f5f5;
-    border-color: #ccc;
     color: #333;
 }
 
@@ -254,5 +259,4 @@
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star {
   filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(7466%) hue-rotate(344deg) brightness(93%) contrast(103%);
-}
 }

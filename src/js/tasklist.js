@@ -45,6 +45,9 @@ function renderTaskList(noteId, tasks) {
             <div class="task-input-container">
           <input type="text" class="task-input" id="task-input-${noteId}"
               placeholder="Add new task..." maxlength="4000">
+          <button class="task-add-btn" onclick="addTask(${noteId})" title="Add task">
+            <i class="fa fa-plus"></i>
+          </button>
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}
@@ -365,8 +368,8 @@ function markNoteAsModified(noteId) {
     if (noteEntry) {
         // Ensure noteid is set correctly for task lists
         noteid = noteId;
-        // Trigger the existing save mechanism
-        updateNote();
+        // Trigger immediate save for task actions
+        saveNoteToServer();
     }
 }
 
