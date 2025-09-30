@@ -367,10 +367,7 @@ $using_unified_search = handleUnifiedSearch();
                     $home_url .= '?' . implode('&', $home_params);
                 }
                 
-                $home_button_class = 'toolbar-btn btn-home desktop-home-btn';
-                $safe_home_url = htmlspecialchars($home_url, ENT_QUOTES);
-                echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
-                // mobile-only home button
+               // mobile-only home button
                 echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 
                 // Text formatting buttons (visible only during selection on desktop)
