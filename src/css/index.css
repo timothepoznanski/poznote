@@ -765,13 +765,7 @@ body {
     text-align: center;
 }
 
-@media (min-width: 801px) {
-    .btn-home {
-        display: none !important;
-    }
-}
-
-/* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
+/* Text formatting buttons: hidden by default, visible on selection */
 .text-format-btn {
     opacity: 0;
     visibility: hidden;
@@ -918,17 +912,7 @@ body {
     margin: 4px 0;
 }
 
-/* Mobile workspace dropdown adjustments */
-@media (max-width: 768px) {
-    .workspace-menu {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
-        min-width: 180px;
-        margin-top: 4px;
-    }
-}
+
 
 .note-header-spacer {
     width: 100%;
@@ -1521,8 +1505,6 @@ img {
 }
 
 /* MENU LEFT */
-
-/* .containbuttons removed (mobile buttons moved to sidebar footer) */
 
 .newbutton[style], .list_tags[style] {
     text-align: center;

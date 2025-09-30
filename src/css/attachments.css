@@ -584,17 +584,6 @@ body {
     flex: 0 0 auto !important;
 }
 
-/* For the delete confirmation modal: prefer auto-sized buttons on desktop, keep full-width on narrow viewports (mobile) */
-@media (min-width: 421px) {
-    #deleteAttachmentConfirmModal .modal-buttons button {
-        width: auto !important;
-        min-width: 0 !important;
-        padding: 8px 14px !important;
-    }
-}
-
-/* On very small screens, modal buttons remain full width as in modals.css (no override) */
-
 /* Ensure 'Back to Notes' link in settings-container looks like a button */
 .settings-container > a.btn-secondary {
     display: inline-flex;

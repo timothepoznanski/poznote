@@ -746,4 +746,18 @@ input[type="search"]::-webkit-search-results-decoration {
     transform-origin: top left;
 }
 
-/* AI modal & modal-footer mobile rules moved to css/modals.css */
+.btn-home {
+    display: flex !important;
+}
+
+/* Mobile workspace dropdown adjustments */
+@media (max-width: 768px) {
+    .workspace-menu {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        min-width: 180px;
+        margin-top: 4px;
+    }
+}
