@@ -368,12 +368,8 @@ $using_unified_search = handleUnifiedSearch();
                 }
                 
                 $home_button_class = 'toolbar-btn btn-home desktop-home-btn';
-                if (empty($home_params)) {
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
-                } else {
-                    $safe_home_url = htmlspecialchars($home_url, ENT_QUOTES);
-                    echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="window.location.href=\'' . $safe_home_url . '\'"><i class="fa-home"></i></button>';
-                }
+                $safe_home_url = htmlspecialchars($home_url, ENT_QUOTES);
+                echo '<button type="button" class="' . $home_button_class . '" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 // mobile-only home button
                 echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
                 

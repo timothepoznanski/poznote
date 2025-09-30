@@ -129,76 +129,81 @@ window.goBackToNoteList = function() {
 
         // Reset loading state to ensure next note click works
         window.isLoadingNote = false;
-
-        // Update URL to remove note parameter while preserving search-related params
-        const url = new URL(window.location);
-        // Remove note param
-        url.searchParams.delete('note');
-
-        // Preserve relevant search params if present in current location so SearchManager
-        // can restore the correct active type on the list view. We'll copy any of these
-        // from the current location (they may already be present) to be safe.
-    const preserveKeys = ['search', 'tags_search', 'unified_search', 'workspace'];
-        const currentParams = new URLSearchParams(window.location.search || '');
-
-        // Detect active search type on mobile; prefer SearchManager if available
-        let activeMobileType = null;
-        try {
-            if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
-                activeMobileType = window.searchManager.getActiveSearchType(true);
-            }
-        } catch (e) {
-            activeMobileType = null;
-        }
-
-        // If we couldn't determine type from SearchManager, fall back to URL flags
-        if (!activeMobileType) {
-            if (currentParams.get('preserve_tags') === '1' || currentParams.get('search_in_tags') === '1') {
-                activeMobileType = 'tags';
-            } else if (currentParams.get('preserve_notes') === '1' || currentParams.get('search')) {
-                activeMobileType = 'notes';
-            }
-        }
-
-    // Copy relevant params but normalize preserve flags according to activeMobileType (notes or tags only)
-        preserveKeys.forEach(k => {
-            const v = currentParams.get(k);
-            if (v && v !== '') {
-                url.searchParams.set(k, v);
-            }
-        });
-
-        // Normalize preserve flags according to activeMobileType (notes or tags only)
-        if (activeMobileType === 'tags') {
-            url.searchParams.set('preserve_tags', '1');
-            url.searchParams.delete('preserve_notes');
-        } else if (activeMobileType === 'notes') {
-            url.searchParams.set('preserve_notes', '1');
-            url.searchParams.delete('preserve_tags');
-        }
-
-        // Clean workspace param if default
-        if (!url.searchParams.get('workspace')) {
-            const currentWorkspace = selectedWorkspace || window.selectedWorkspace;
-            if (!currentWorkspace || currentWorkspace === 'Poznote') {
-                url.searchParams.delete('workspace');
-            }
-        }
-
-        // Clear any lingering highlights (titles, inputs, tags) when returning to list
-        try {
-            if (typeof clearSearchHighlights === 'function') {
-                clearSearchHighlights();
-            }
-            if (typeof window.highlightMatchingTags === 'function') {
-                // clear tag highlights
-                window.highlightMatchingTags('');
-            }
-        } catch (e) { /* ignore */ }
-
-        history.pushState({}, '', url.toString());
     }
-};
+
+    // Update URL to remove note parameter while preserving search-related params
+    const url = new URL(window.location);
+    // Remove note param
+    url.searchParams.delete('note');
+
+    // Preserve relevant search params if present in current location so SearchManager
+    // can restore the correct active type on the list view. We'll copy any of these
+    // from the current location (they may already be present) to be safe.
+    const preserveKeys = ['search', 'tags_search', 'unified_search', 'workspace'];
+    const currentParams = new URLSearchParams(window.location.search || '');
+
+    // Detect active search type; prefer SearchManager if available
+    let activeType = null;
+    try {
+        if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
+            activeType = window.searchManager.getActiveSearchType(true);
+        }
+    } catch (e) {
+        activeType = null;
+    }
+
+    // If we couldn't determine type from SearchManager, fall back to URL flags
+    if (!activeType) {
+        if (currentParams.get('preserve_tags') === '1' || currentParams.get('search_in_tags') === '1') {
+            activeType = 'tags';
+        } else if (currentParams.get('preserve_notes') === '1' || currentParams.get('search')) {
+            activeType = 'notes';
+        }
+    }
+
+    // Copy relevant params but normalize preserve flags according to activeType (notes or tags only)
+    preserveKeys.forEach(k => {
+        const v = currentParams.get(k);
+        if (v && v !== '') {
+            url.searchParams.set(k, v);
+        }
+    });
+
+    // Normalize preserve flags according to activeType (notes or tags only)
+    if (activeType === 'tags') {
+        url.searchParams.set('preserve_tags', '1');
+        url.searchParams.delete('preserve_notes');
+    } else if (activeType === 'notes') {
+        url.searchParams.set('preserve_notes', '1');
+        url.searchParams.delete('preserve_tags');
+    }
+
+    // Clean workspace param if default
+    if (!url.searchParams.get('workspace')) {
+        const currentWorkspace = selectedWorkspace || window.selectedWorkspace;
+        if (!currentWorkspace || currentWorkspace === 'Poznote') {
+            url.searchParams.delete('workspace');
+        }
+    }
+
+    // Clear any lingering highlights (titles, inputs, tags) when returning to list
+    try {
+        if (typeof clearSearchHighlights === 'function') {
+            clearSearchHighlights();
+        }
+        if (typeof window.highlightMatchingTags === 'function') {
+            // clear tag highlights
+            window.highlightMatchingTags('');
+        }
+    } catch (e) { /* ignore */ }
+
+    // On mobile, use pushState; on desktop, use location.href to navigate
+    if (window.matchMedia('(max-width: 800px)').matches) {
+        history.pushState({}, '', url.toString());
+    } else {
+        window.location.href = url.toString();
+    }
+};;
 
 /**
  * Initialize note loading system for mobile
