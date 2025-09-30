@@ -750,14 +750,76 @@ input[type="search"]::-webkit-search-results-decoration {
     display: flex !important;
 }
 
-/* Mobile workspace dropdown adjustments */
-@media (max-width: 768px) {
-    .workspace-menu {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
-        min-width: 180px;
-        margin-top: 4px;
-    }
+.font-size-popup {
+    right: 0;
+    left: 8px;
+    min-width: 150px;
+}
+
+.image-preview-content {
+    max-width: 98%;
+    max-height: 98%;
+}
+
+.image-preview-close {
+    top: -40px;
+    font-size: 32px;
+}
+
+.fa-paperclip.icon_attachment {
+    font-size: 14px;
+}
+
+/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
+   Use fixed positioning for the mobile share menu so it sits above the layout and
+   remains visible even when parent elements hide overflow. It will be centered
+   horizontally by default and placed slightly above the bottom toolbar. */
+
+.share-dropdown.mobile .share-menu {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 64px !important; /* above the toolbar */
+    top: auto !important;
+    margin-top: 0 !important;
+    z-index: 20000 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+}
+
+/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
+   Use fixed positioning for the mobile actions menu so it sits above the layout and
+   remains visible even when parent elements hide overflow. It will be centered
+   horizontally by default and placed slightly above the bottom toolbar. */
+.actions-dropdown.mobile .actions-menu {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 64px !important; /* above the toolbar */
+    top: auto !important;
+    margin-top: 0 !important;
+    z-index: 20000 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
+}
+
+/* Mobile responsive styles for emoji picker */
+.emoji-picker {
+    width: 300px !important;
+    max-height: 350px !important;
+    padding: 8px !important;
+}
+
+.emoji-grid {
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    padding: 3px 12px !important;
+}
+
+.emoji-item {
+    font-size: 16px !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+
+.emoji-category {
+    padding: 10px 0 !important;
 }

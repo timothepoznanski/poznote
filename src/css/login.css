@@ -203,7 +203,7 @@ input[type="password"]::placeholder {
 }
 
 /* Responsive Design */
-@media (max-width: 480px) {
+@media (max-width: 800px) {
     body {
         padding: 16px;
     }

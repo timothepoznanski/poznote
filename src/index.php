@@ -60,7 +60,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
+    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">  <!-- Until screen size 800px we apply mobile css -->
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script>

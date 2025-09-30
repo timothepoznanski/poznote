@@ -144,16 +144,11 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
   font-style: normal;
 }
 
-/* Responsive helpers: show/hide elements based on 800px breakpoint */
-.desktop-only { display: block; }
+/* Responsive helpers: show/hide toolbar elements mobile   */
+
+.desktop-only { display: initial; }
 .mobile-only { display: none; }
 
-@media (max-width: 800px) {
-        .desktop-only { display: none !important; }
-        .mobile-only { display: block !important; }
-        /* Ensure left column collapses on small screens if needed */
-        .left_col { display: block; }
-}
 
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -323,15 +318,6 @@ a:active { color: #2E8CFA; } */
 .font-size-popup .size-5 { font-size: 1.5rem; }
 .font-size-popup .size-6 { font-size: 2rem; }
 .font-size-popup .size-7 { font-size: 3rem; line-height: 1; padding: 2px 6px; }
-
-/* Ensure popup does not overflow toolbar area on small screens */
-@media (max-width: 720px) {
-    .font-size-popup {
-        right: 0;
-        left: 8px;
-        min-width: 150px;
-    }
-}
 
 .btn-settings {
     position: relative;
@@ -1196,20 +1182,6 @@ img {
     color: #007DB8;
 }
 
-/* Mobile responsiveness for image modals */
-@media (max-width: 768px) {
-    
-    .image-preview-content {
-        max-width: 98%;
-        max-height: 98%;
-    }
-    
-    .image-preview-close {
-        top: -40px;
-        font-size: 32px;
-    }
-}
-
 /* UPDATE NOTIFICATION STYLES */
 
 .settings-menu-item {
@@ -1488,13 +1460,6 @@ img {
     border-radius: 4px;
 }
 
-/* Keep paperclip smaller on narrow viewports to avoid layout issues */
-@media (max-width: 420px) {
-    .fa-paperclip.icon_attachment {
-        font-size: 14px;
-    }
-}
-
 .attachment-link:hover {
     color: #005a8b !important;
     text-decoration: underline;
@@ -1739,24 +1704,6 @@ img {
 
 .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
 
-/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
-   Use fixed positioning for the mobile share menu so it sits above the layout and
-   remains visible even when parent elements hide overflow. It will be centered
-   horizontally by default and placed slightly above the bottom toolbar. */
-@media (max-width: 900px) {
-    .share-dropdown.mobile .share-menu {
-        position: fixed !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 64px !important; /* above the toolbar */
-        top: auto !important;
-        margin-top: 0 !important;
-        z-index: 20000 !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
-    }
-
-}
-
 /* Actions dropdown styles */
 .actions-dropdown {
     position: relative;
@@ -1810,24 +1757,6 @@ img {
 }
 
 .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; }
-
-/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
-   Use fixed positioning for the mobile actions menu so it sits above the layout and
-   remains visible even when parent elements hide overflow. It will be centered
-   horizontally by default and placed slightly above the bottom toolbar. */
-@media (max-width: 900px) {
-    .actions-dropdown.mobile .actions-menu {
-        position: fixed !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 64px !important; /* above the toolbar */
-        top: auto !important;
-        margin-top: 0 !important;
-        z-index: 20000 !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
-    }
-}
-
 
 .icon_trash {
     color: #007DB8;
@@ -3514,33 +3443,6 @@ input[type="search"]::-webkit-search-results-decoration {
 .emoji-picker::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-
-/* Mobile responsive styles for emoji picker */
-@media (max-width: 800px) {
-    .emoji-picker {
-        width: 300px !important;
-        max-height: 350px !important;
-        padding: 8px !important;
-    }
-    
-    .emoji-grid {
-        grid-template-columns: repeat(7, 1fr) !important;
-        gap: 8px !important;
-        padding: 3px 12px !important;
-    }
-    
-    .emoji-item {
-        font-size: 16px !important;
-        width: 28px !important;
-        height: 28px !important;
-    }
-    
-    .emoji-category {
-        padding: 10px 0 !important;
-    }
-}
-
-
 
 .folder-option:last-child {
     border-bottom: none;
