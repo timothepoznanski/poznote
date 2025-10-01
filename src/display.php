@@ -33,7 +33,7 @@ include 'functions.php';
                     <i class="fa-user"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Login Display Name</h3>
+                    <h3>Login Display Name <span id="login-display-badge" class="setting-status">loading...</span></h3>
                 </div>
             </div>
 
@@ -42,14 +42,14 @@ include 'functions.php';
                     <i class="fa-text-height"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Note Content Font Size</h3>
+                    <h3>Note Content Font Size <span id="font-size-badge" class="setting-status">loading...</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
                 <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
                 <div class="settings-card-content">
-                    <h3>Note sort order</h3>
+                    <h3>Note sort order <span id="note-sort-badge" class="setting-status">loading...</span></h3>
                 </div>
             </div>
 
@@ -206,9 +206,14 @@ include 'functions.php';
                 for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { selected = radios[i].value; break; } }
                 if (!selected) selected = 'updated_desc';
                 var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', selected);
-                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ try{ closeModal('noteSortModal'); }catch(e){}; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
-                    // Also reload this page to reflect save
-                    setTimeout(function(){ window.location.reload(); }, 80);
+                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ 
+                    try{ closeModal('noteSortModal'); }catch(e){}; 
+                    try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
+                    
+                    // Refresh the note sort badge
+                    if (typeof window.refreshNoteSortBadge === 'function') {
+                        window.refreshNoteSortBadge();
+                    }
                 }).catch(function(){ alert('Error saving preference'); });
             });
         }
@@ -237,6 +242,97 @@ include 'functions.php';
         }); }
 
         refreshSort();
+    })();
+    </script>
+    <script>
+    // Load and display current values in badges
+    (function(){
+        // Function to get setting value from API
+        function getSetting(key, callback) {
+            var form = new FormData();
+            form.append('action', 'get');
+            form.append('key', key);
+            fetch('api_settings.php', {method: 'POST', body: form})
+                .then(r => r.json())
+                .then(j => {
+                    if (j && j.success) {
+                        callback(j.value);
+                    } else {
+                        callback(null);
+                    }
+                })
+                .catch(() => callback(null));
+        }
+
+        // Load Login Display Name
+        function refreshLoginDisplayBadge() {
+            getSetting('login_display_name', function(value) {
+                var badge = document.getElementById('login-display-badge');
+                if (badge) {
+                    if (value && value.trim()) {
+                        badge.textContent = value.trim();
+                        badge.className = 'setting-status enabled';
+                    } else {
+                        badge.textContent = 'non défini';
+                        badge.className = 'setting-status disabled';
+                    }
+                }
+            });
+        }
+
+        // Load Font Size
+        function refreshFontSizeBadge() {
+            getSetting('note_font_size', function(value) {
+                var badge = document.getElementById('font-size-badge');
+                if (badge) {
+                    if (value && value.trim()) {
+                        badge.textContent = value + 'px';
+                        badge.className = 'setting-status enabled';
+                    } else {
+                        badge.textContent = 'default (16px)';
+                        badge.className = 'setting-status disabled';
+                    }
+                }
+            });
+        }
+
+        // Load Note Sort Order
+        function refreshNoteSortBadge() {
+            getSetting('note_list_sort', function(value) {
+                var badge = document.getElementById('note-sort-badge');
+                if (badge) {
+                    var sortValue = value || 'updated_desc';
+                    var sortLabel = 'Last modified'; // default
+                    
+                    switch(sortValue) {
+                        case 'updated_desc':
+                            sortLabel = 'Last modified';
+                            break;
+                        case 'created_desc':
+                            sortLabel = 'Last created';
+                            break;
+                        case 'heading_asc':
+                            sortLabel = 'Alphabetical';
+                            break;
+                        default:
+                            sortLabel = 'Last modified'; // fallback to Last modified instead of raw value
+                            break;
+                    }
+                    
+                    badge.textContent = sortLabel;
+                    badge.className = 'setting-status enabled';
+                }
+            });
+        }
+
+        // Load all badges on page load
+        refreshLoginDisplayBadge();
+        refreshFontSizeBadge();
+        refreshNoteSortBadge();
+        
+        // Make refresh functions available globally
+        window.refreshFontSizeBadge = refreshFontSizeBadge;
+        window.refreshNoteSortBadge = refreshNoteSortBadge;
     })();
     </script>
 </body>

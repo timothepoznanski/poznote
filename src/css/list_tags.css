@@ -27,8 +27,8 @@ html.tags-page {
     overflow: auto;
 }
 
-/* Back button styles reused from trash.css to match appearance */
-.trash-buttons-container {
+/* Button styles reused from trash.css to match appearance */
+.tags-buttons-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -45,9 +45,33 @@ html.tags-page {
     font-weight: 500;
 }
 
-.trash-back-button {
+/* Button styles matching trash.css */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
     position: absolute;
     left: 0;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
 }
 
 .tags-search-form {
