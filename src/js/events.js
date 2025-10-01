@@ -38,9 +38,18 @@ function setupNoteEditingEvents() {
         });
     }
     
-        // Special handling for tags with the space bar
+    // Special handling for tags with the space bar
     document.body.addEventListener('keydown', function(e) {
         handleTagsKeydown(e);
+    });
+    
+    // Special handling for title blur and keydown events (Enter/Escape)
+    document.body.addEventListener('blur', function(e) {
+        handleTitleBlur(e);
+    }, true); // Use capture phase to ensure we catch the event
+    
+    document.body.addEventListener('keydown', function(e) {
+        handleTitleKeydown(e);
     });
 }
 
@@ -68,10 +77,14 @@ function handleNoteEditEvent(e) {
             return;
         }
         
-        // Process note fields
+        // Ignore title fields - they are handled separately on blur/Enter/Escape only
         if (target.classList.contains('css-title') ||
-            (target.id && target.id.startsWith('inp')) ||
-            (target.id && target.id.startsWith('tags'))) {
+            (target.id && target.id.startsWith('inp'))) {
+            return;
+        }
+        
+        // Process other note fields (tags, etc.)
+        if (target.id && target.id.startsWith('tags')) {
             if (updateNoteEnCours == 1) {
                 showNotificationPopup("Save in progress...");
             } else {
@@ -112,6 +125,70 @@ function handleTagsKeydown(e) {
                 
                 updateNote();
             }
+        }
+    }
+}
+
+function handleTitleBlur(e) {
+    var target = e.target;
+    
+    // Check if this is a title input field
+    if (target.tagName === 'INPUT' && 
+        (target.classList.contains('css-title') || 
+         (target.id && target.id.startsWith('inp')))) {
+        
+        // Ignore if this is a search field
+        if (target.classList.contains('searchbar') ||
+            target.id === 'search' ||
+            target.classList.contains('searchtrash') ||
+            target.id === 'myInputFiltrerTags') {
+            return;
+        }
+        
+        // Save immediately when losing focus
+        if (updateNoteEnCours == 1) {
+            // If save is already in progress, we'll let it complete
+            return;
+        }
+        
+        // Set the note ID from the input ID
+        updateidhead(target);
+        saveNoteToServer();
+    }
+}
+
+function handleTitleKeydown(e) {
+    var target = e.target;
+    
+    // Check if this is a title input field
+    if (target.tagName === 'INPUT' && 
+        (target.classList.contains('css-title') || 
+         (target.id && target.id.startsWith('inp')))) {
+        
+        // Ignore if this is a search field
+        if (target.classList.contains('searchbar') ||
+            target.id === 'search' ||
+            target.classList.contains('searchtrash') ||
+            target.id === 'myInputFiltrerTags') {
+            return;
+        }
+        
+        // Handle Enter and Escape keys
+        if (e.key === 'Enter' || e.key === 'Escape') {
+            e.preventDefault();
+            
+            // Blur the input to trigger save
+            target.blur();
+            
+            // Save immediately 
+            if (updateNoteEnCours == 1) {
+                // If save is already in progress, we'll let it complete
+                return;
+            }
+            
+            // Set the note ID from the input ID
+            updateidhead(target);
+            saveNoteToServer();
         }
     }
 }
