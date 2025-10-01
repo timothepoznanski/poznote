@@ -87,8 +87,8 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
         // If a specific note is selected, show that note instead of the most recent one
         if (!empty($note)) {
             // Build query to show the selected note if it matches search criteria
-            $where_clause_with_note = $where_clause . " AND heading = ?";
-            $search_params_with_note = array_merge($search_params, [$note]);
+            $where_clause_with_note = $where_clause . " AND id = ?";
+            $search_params_with_note = array_merge($search_params, [intval($note)]);
             
             $query_right_with_note = "SELECT * FROM entries WHERE $where_clause_with_note LIMIT 1";
             
