@@ -46,6 +46,13 @@ include 'functions.php';
                 </div>
             </div>
 
+            <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
+                <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
+                <div class="settings-card-content">
+                    <h3>Note sort order</h3>
+                </div>
+            </div>
+
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon"><i class="fa-grin"></i></div>
                 <div class="settings-card-content">
@@ -80,6 +87,7 @@ include 'functions.php';
                     <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -170,6 +178,65 @@ include 'functions.php';
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
+    })();
+    </script>
+    <script>
+    // Modal-based note sort handlers
+    function openNoteSortModal() {
+        var modal = document.getElementById('noteSortModal');
+        if (!modal) return;
+        // Load current preference
+        var form = new FormData(); form.append('action','get'); form.append('key','note_list_sort');
+        fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+            var v = j && j.success ? j.value : 'updated_desc';
+            var radios = document.getElementsByName('noteSort');
+            for (var i = 0; i < radios.length; i++) {
+                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
+            }
+            modal.style.display = 'flex';
+        }).catch(function(){ modal.style.display = 'flex'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        var saveBtn = document.getElementById('saveNoteSortModalBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function(){
+                var radios = document.getElementsByName('noteSort');
+                var selected = null;
+                for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { selected = radios[i].value; break; } }
+                if (!selected) selected = 'updated_desc';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', selected);
+                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ try{ closeModal('noteSortModal'); }catch(e){}; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
+                    // Also reload this page to reflect save
+                    setTimeout(function(){ window.location.reload(); }, 80);
+                }).catch(function(){ alert('Error saving preference'); });
+            });
+        }
+    });
+    </script>
+    <script>
+    // Note sort preference
+    (function(){
+        var select = document.getElementById('noteSortSelect');
+        var btn = document.getElementById('saveNoteSortBtn');
+        var status = document.getElementById('note-sort-status');
+
+        function refreshSort(){
+            var form = new FormData(); form.append('action','get'); form.append('key','note_list_sort');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var v = j && j.success ? j.value : '';
+                if(v && select){ try{ select.value = v; }catch(e){} }
+                if(status) status.textContent = '';
+            }).catch(()=>{});
+        }
+
+        if(btn){ btn.addEventListener('click', function(){
+            var toSet = select ? select.value : 'updated_desc';
+            var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', toSet);
+            fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ if(status) status.textContent = 'saved'; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){} }).catch(function(){ if(status) status.textContent = 'error'; });
+        }); }
+
+        refreshSort();
     })();
     </script>
 </body>

@@ -99,7 +99,36 @@ try {
         $params[] = $folder;
     }
     
-    $sql .= " ORDER BY folder, updated DESC";
+    // Sorting: accept explicit 'sort' parameter (GET or POST) but map to safe clauses
+    $sort = $_GET['sort'] ?? $_POST['sort'] ?? null;
+    $order_by = "folder, updated DESC"; // default
+    if ($sort) {
+        // whitelist allowed values
+        $allowed = [
+            'updated_desc' => 'folder, updated DESC',
+            'created_desc' => 'folder, created DESC',
+            'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
+        ];
+        if (isset($allowed[$sort])) {
+            $order_by = $allowed[$sort];
+        }
+    }
+
+    // If no explicit sort provided, try loading saved preference from settings table
+    if (!$sort) {
+        try {
+            $stmtPref = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmtPref->execute(['note_list_sort']);
+            $pref = $stmtPref->fetchColumn();
+            if ($pref && isset($allowed[$pref])) {
+                $order_by = $allowed[$pref];
+            }
+        } catch (Exception $e) {
+            // ignore preference load errors, keep default
+        }
+    }
+
+    $sql .= " ORDER BY " . $order_by;
     
     $stmt = $con->prepare($sql);
     $stmt->execute($params);

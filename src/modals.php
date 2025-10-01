@@ -230,3 +230,22 @@
         </div>
     </div>
 </div>
+
+<!-- Note sort order modal -->
+<div id="noteSortModal" class="modal">
+    <div class="modal-content">
+        <h3>Note sort order</h3>
+        <div class="modal-body">
+            <p>Choose how notes are ordered in the notes list:</p>
+            <div style="margin-top:8px;">
+                <label><input type="radio" name="noteSort" value="updated_desc"> Last modified</label>
+                <label><input type="radio" name="noteSort" value="created_desc"> Last created</label>
+                <label><input type="radio" name="noteSort" value="heading_asc"> Alphabetical</label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('noteSortModal')">Cancel</button>
+            <button type="button" class="btn-primary" id="saveNoteSortModalBtn">Save</button>
+        </div>
+    </div>
+</div>
