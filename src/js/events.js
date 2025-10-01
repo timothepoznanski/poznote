@@ -574,6 +574,7 @@ function initTextSelectionHandlers() {
                 // Mobile handling
                 var textFormatButtons = document.querySelectorAll('.toolbar-btn.btn-bold, .toolbar-btn.btn-italic, .toolbar-btn.btn-underline, .toolbar-btn.btn-strikethrough, .toolbar-btn.btn-link, .toolbar-btn.btn-unlink, .toolbar-btn.btn-color, .toolbar-btn.btn-highlight, .toolbar-btn.btn-list-ul, .toolbar-btn.btn-list-ol, .toolbar-btn.btn-text-height, .toolbar-btn.btn-code, .toolbar-btn.btn-inline-code, .toolbar-btn.btn-eraser');
                 var actionsButton = document.querySelector('.toolbar-btn.btn-actions');
+                var homeButton = document.querySelector('.toolbar-btn.btn-home');
                 
                 // Check if the selection contains text
                 if (selection && selection.toString().trim().length > 0) {
@@ -645,10 +646,14 @@ function initTextSelectionHandlers() {
                     if (!isTitleOrTagField && editableElement) {
                         // Text selected in an editable area: show formatting buttons, hide actions button
                         for (var i = 0; i < textFormatButtons.length; i++) {
-                            textFormatButtons[i].style.display = '';
+                            textFormatButtons[i].style.display = 'flex';
                         }
                         if (actionsButton) {
                             actionsButton.style.display = 'none';
+                        }
+                        // Always keep home button visible on mobile
+                        if (homeButton) {
+                            homeButton.style.display = 'flex';
                         }
                     } else {
                         // Text selected but not in an editable area: hide everything
@@ -658,6 +663,10 @@ function initTextSelectionHandlers() {
                         if (actionsButton) {
                             actionsButton.style.display = 'none';
                         }
+                        // Always keep home button visible on mobile
+                        if (homeButton) {
+                            homeButton.style.display = 'flex';
+                        }
                     }
                 } else {
                     // No text selection: hide formatting buttons, show actions button
@@ -665,7 +674,11 @@ function initTextSelectionHandlers() {
                         textFormatButtons[i].style.display = 'none';
                     }
                     if (actionsButton) {
-                        actionsButton.style.display = '';
+                        actionsButton.style.display = 'flex';
+                    }
+                    // Always keep home button visible on mobile
+                    if (homeButton) {
+                        homeButton.style.display = 'flex';
                     }
                 }
             } else {
