@@ -100,6 +100,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	</div>
 	
 	<script src="js/list_tags.js"></script>
+	<script src="js/clickable-tags.js"></script>
 	<script>
 		// Expose current workspace to the tags page JS so redirects include it
 		var pageWorkspace = <?php echo $workspace !== null ? json_encode($workspace) : 'undefined'; ?>;

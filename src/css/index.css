@@ -398,9 +398,15 @@ body {
     box-sizing: border-box;
     background: #FFFFFF;
     flex-shrink: 0;
+    /* Hide scrollbars but keep scroll functionality for all screen sizes */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
+#left_col::-webkit-scrollbar {
+    display: none;
+}
 
 
 
@@ -2268,6 +2274,34 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     .folder-toggle:hover .folder-actions i {
         opacity: 1 !important;
         pointer-events: auto !important;
+    }
+    
+    /* Prevent folder headers from being highlighted when clicking on notes in mobile */
+    .folder-header.selected-folder,
+    .folder-header.selected,
+    .folder-header:active,
+    .folder-header:focus {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    /* Force remove any possible folder selection styles */
+    .folder-toggle.selected,
+    .folder-toggle:active,
+    .folder-toggle:focus {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    /* Ensure only notes get the selection highlight in mobile */
+    .links_arbo_left.selected-note {
+        background-color: rgba(11, 77, 166, 0.1) !important;
+        border-radius: 4px !important;
+        color: #0b4da6 !important;
     }
 }
 
