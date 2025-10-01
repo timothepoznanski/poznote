@@ -410,7 +410,7 @@ $body_classes = trim($extra_body_classes);
                 if(res.status === 1) {
                     window.scrollTo(0, 0);
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + encodeURIComponent(res.heading);
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id;
                 } else {
                     showNotificationPopup(res.error || 'Error creating task list', 'error');
                 }

@@ -15,7 +15,7 @@ function initializeNoteLoaderDesktop() {
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
-        if (event.state && event.state.noteTitle) {
+        if (event.state && event.state.noteId) {
             loadNoteFromUrl(window.location.href);
         } else {
             // If no state (going back to list), handle desktop view

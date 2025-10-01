@@ -106,7 +106,7 @@ function generateFolderActions($folderName, $workspace_filter) {
 /**
  * Génère le lien pour une note en préservant l'état de recherche
  */
-function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_heading) {
+function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id) {
     $params = [];
     if (!empty($search)) $params[] = 'search=' . urlencode($search);
     if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
@@ -114,7 +114,7 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
     if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
     if ($preserve_notes) $params[] = 'preserve_notes=1';
     if ($preserve_tags) $params[] = 'preserve_tags=1';
-    $params[] = 'note=' . urlencode($note_heading);
+    $params[] = 'note=' . intval($note_id);
     
     return 'index.php?' . implode('&', $params);
 }

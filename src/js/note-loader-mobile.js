@@ -52,9 +52,9 @@ function initializeMobileTouchHandlers() {
         e.stopPropagation();
 
         var url = link.getAttribute('href');
-        var noteTitle = link.getAttribute('data-note-id');
+        var noteId = link.getAttribute('data-note-id');
         // Call loader with the event so it can prevent default if needed
-        loadNoteDirectly(url, noteTitle, e);
+        loadNoteDirectly(url, noteId, e);
     }
 
     // Attach capture listener once
@@ -80,7 +80,7 @@ function handleMobileTouchStart(event) {
 function handleMobileTouchEnd(event) {
     const link = this;
     const url = link.getAttribute('href');
-    const noteTitle = link.querySelector('.note-title')?.textContent?.trim() || link.textContent.trim();
+    const noteId = link.getAttribute('data-note-id');
 
     // Prevent default to avoid navigation
     event.preventDefault();
@@ -96,7 +96,7 @@ function handleMobileTouchEnd(event) {
     // Validate tap: reasonable duration, no significant movement
     if (touchDuration > 50 && touchDuration < 1000 && !hasMoved && !this.touchHandled) {
     this.touchHandled = true; // Mark as handled
-        loadNoteDirectly(url, noteTitle);
+        loadNoteDirectly(url, noteId);
     }
 
     return false;
@@ -213,7 +213,7 @@ function initializeNoteLoaderMobile() {
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
-        if (event.state && event.state.noteTitle) {
+        if (event.state && event.state.noteId) {
             loadNoteFromUrl(window.location.href);
         } else {
             // If no state (going back to list), handle mobile view

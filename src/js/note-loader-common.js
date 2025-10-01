@@ -129,10 +129,10 @@ function applyHighlightsWithRetries() {
 /**
  * Find note link by title (robust method that handles quotes and special characters)
  */
-function findNoteLinkByTitle(noteTitle) {
+function findNoteLinkById(noteId) {
     const noteLinks = document.querySelectorAll('a.links_arbo_left[data-note-id]');
     for (let link of noteLinks) {
-        if (link.getAttribute('data-note-id') === noteTitle) {
+        if (link.getAttribute('data-note-id') === String(noteId)) {
             return link;
         }
     }
@@ -142,7 +142,7 @@ function findNoteLinkByTitle(noteTitle) {
 /**
  * Direct note loading function called from onclick
  */
-window.loadNoteDirectly = function(url, noteTitle, event) {
+window.loadNoteDirectly = function(url, noteId, event) {
     try {
     // loadNoteDirectly start
         // Prevent default link behavior
@@ -158,7 +158,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         window.isLoadingNote = true;
 
         // Find the clicked link to update selection using robust method
-        const clickedLink = findNoteLinkByTitle(noteTitle);
+        const clickedLink = findNoteLinkById(noteId);
         
         // Show loading state immediately
         showNoteLoadingState();
@@ -197,7 +197,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
-                                    updateBrowserUrl(url, noteTitle);
+                                    updateBrowserUrl(url, noteId);
                                     reinitializeNoteContent();
 
                                     // Reapply highlights after content has been reinitialized.
@@ -288,13 +288,13 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
 /**
  * Load note via AJAX (legacy function)
  */
-function loadNoteViaAjax(url, noteTitle, clickedLink) {
+function loadNoteViaAjax(url, noteId, clickedLink) {
     if (isNoteLoading) {
         return; // Prevent multiple simultaneous requests
     }
 
     isNoteLoading = true;
-    currentLoadingNoteId = noteTitle;
+    currentLoadingNoteId = noteId;
 
     // Update UI to show loading state
     showNoteLoadingState();
@@ -334,7 +334,7 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
 
                             // Update URL before reinitializing so reinitializeNoteContent
                             // can detect the 'note' param and keep the right column visible
-                            updateBrowserUrl(url, noteTitle);
+                            updateBrowserUrl(url, noteId);
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
@@ -405,13 +405,13 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
  */
 function loadNoteFromUrl(url) {
     const urlParams = new URLSearchParams(new URL(url).search);
-    const noteTitle = urlParams.get('note');
+    const noteId = urlParams.get('note');
 
-    if (noteTitle) {
+    if (noteId) {
         // Find the corresponding note link using robust method
-        const noteLink = findNoteLinkByTitle(noteTitle);
+        const noteLink = findNoteLinkById(noteId);
         if (noteLink) {
-            loadNoteViaAjax(url, noteTitle, noteLink);
+            loadNoteViaAjax(url, noteId, noteLink);
         }
     }
 }
@@ -485,7 +485,7 @@ function updateSelectedNote(clickedLink) {
 /**
  * Update browser URL without reload
  */
-function updateBrowserUrl(url, noteTitle) {
+function updateBrowserUrl(url, noteId) {
     try {
         // Merge existing search params (search, tags_search, workspace) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
@@ -502,10 +502,10 @@ function updateBrowserUrl(url, noteTitle) {
         });
 
         target.search = targetParams.toString();
-        const state = { noteTitle: noteTitle };
+        const state = { noteId: noteId };
         history.pushState(state, '', target.toString());
     } catch (e) {
-        const state = { noteTitle: noteTitle };
+        const state = { noteId: noteId };
         history.pushState(state, '', url);
     }
 }
