@@ -1,7 +1,7 @@
 
 class SearchManager {
     constructor() {
-    this.searchTypes = ['notes', 'tags'];
+        this.searchTypes = ['notes', 'tags'];
         this.isMobile = false;
         this.currentSearchType = 'notes';
     // When set, skip restore from recent user toggle (ms since epoch).
@@ -101,18 +101,15 @@ class SearchManager {
         const urlParams = new URLSearchParams(window.location.search);
         const elements = this.getElements(isMobile);
         
-    // Check URL preferences and explicit search params
-    const preserveNotes = urlParams.get('preserve_notes') === '1';
-    const preserveTags = urlParams.get('preserve_tags') === '1';
-    const preserveFolders = false;
-    const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
-    const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
-    // debug info removed
+        // Check URL preferences and explicit search params
+        const preserveNotes = urlParams.get('preserve_notes') === '1';
+        const preserveTags = urlParams.get('preserve_tags') === '1';
+        const hasTagsSearchParam = urlParams.get('tags_search') && urlParams.get('tags_search').trim() !== '';
+        const hasNotesSearchParam = urlParams.get('search') && urlParams.get('search').trim() !== '';
         
-    // Check hidden field values: flags vs term-bearing inputs
-    const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
-    const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
-    const hasFoldersValue = false;
+        // Check hidden field values: flags vs term-bearing inputs
+        const hasNotesFlag = elements.hiddenInputs.notesFlag?.value === '1';
+        const hasTagsFlag = elements.hiddenInputs.tagsFlag?.value === '1';
         
     // If a recent user toggle was performed, avoid restoring from URL
     if (this._suppressUntil && Date.now() < this._suppressUntil) return;
@@ -327,9 +324,6 @@ class SearchManager {
         if (elements.hiddenInputs.tagsFlag) {
             elements.hiddenInputs.tagsFlag.value = activeType === 'tags' ? '1' : '';
         }
-        if (elements.hiddenInputs.folders) {
-            elements.hiddenInputs.folders.value = activeType === 'folders' ? '1' : '';
-        }
     }
 
     /**
@@ -437,12 +431,10 @@ class SearchManager {
             this.setActiveSearchType(next, effectiveIsMobile);
 
             // Trigger behavior similar to clicking the pill
-            if (next === 'folders') {
-                const searchValue = elements.searchInput?.value.trim();
-                if (searchValue) this.filterFolders(searchValue, isMobile);
-                elements.searchInput?.focus();
-            } else if (elements.searchInput?.value.trim()) {
-                this.submitSearchWithExcludedFolders(isMobile);
+            if (elements.searchInput?.value.trim()) {
+                this.updateHiddenInputs(effectiveIsMobile);
+                this.hideSpecialFolders(effectiveIsMobile);
+                this.performAjaxSearch(elements.form, effectiveIsMobile);
             } else {
                 elements.searchInput?.focus();
             }
@@ -519,16 +511,12 @@ class SearchManager {
 
         this.setActiveSearchType(searchType, isMobile);
 
-        // Handle special cases
-        if (searchType === 'folders') {
-            const searchValue = elements.searchInput?.value.trim();
-            if (searchValue) {
-                this.filterFolders(searchValue, isMobile);
-            }
-            elements.searchInput?.focus();
-        } else if (elements.searchInput?.value.trim()) {
+        // Handle search if there's content
+        if (elements.searchInput?.value.trim()) {
             // Auto-search if there's content
-            this.submitSearchWithExcludedFolders(isMobile);
+            this.updateHiddenInputs(isMobile);
+            this.hideSpecialFolders(isMobile);
+            this.performAjaxSearch(elements.form, isMobile);
         } else {
             elements.searchInput?.focus();
         }
@@ -543,12 +531,6 @@ class SearchManager {
         const elements = this.getElements(isMobile);
         const searchValue = elements.searchInput?.value.trim() || '';
         const activeType = this.getActiveSearchType(isMobile);
-
-        // Handle different search types
-        if (activeType === 'folders') {
-            this.filterFolders(searchValue, isMobile);
-            return;
-        }
 
         if (!searchValue) {
             this.clearSearch();
@@ -794,7 +776,7 @@ class SearchManager {
                             } catch (e) { /* ignore */ }
                         }
                     } else {
-                        // folders or unknown: clear any highlights
+                        // unknown: clear any highlights
                         if (typeof clearSearchHighlights === 'function') {
                             try { clearSearchHighlights(); } catch (e) { /* ignore */ }
                         }
@@ -826,19 +808,16 @@ class SearchManager {
 
         const desktopState = {
             notes: false,
-            tags: false,
-            folders: false
+            tags: false
         };
         const mobileState = {
             notes: false,
-            tags: false,
-            folders: false
+            tags: false
         };
 
         if (desktopButtonsExist) {
             desktopState.notes = desktopElements.buttons.notes?.classList.contains('active') || false;
             desktopState.tags = desktopElements.buttons.tags?.classList.contains('active') || false;
-            desktopState.folders = desktopElements.buttons.folders?.classList.contains('active') || false;
         } else {
             // Fallback to internal state
             const t = this.currentSearchType || 'notes';
@@ -848,7 +827,6 @@ class SearchManager {
         if (mobileButtonsExist) {
             mobileState.notes = mobileElements.buttons.notes?.classList.contains('active') || false;
             mobileState.tags = mobileElements.buttons.tags?.classList.contains('active') || false;
-            mobileState.folders = mobileElements.buttons.folders?.classList.contains('active') || false;
         } else {
             const t = this.currentSearchType || 'notes';
             mobileState[t] = true;
@@ -867,15 +845,13 @@ class SearchManager {
     if (!state) return;
     if (this._suppressUntil && Date.now() < this._suppressUntil) return;
 
-    // Restore desktop state immediately to avoid intermediate UI reset
-    if (state.desktop.notes) this.setActiveSearchType('notes', false);
-    else if (state.desktop.tags) this.setActiveSearchType('tags', false);
-    else if (state.desktop.folders) this.setActiveSearchType('folders', false);
+        // Restore desktop state immediately to avoid intermediate UI reset
+        if (state.desktop.notes) this.setActiveSearchType('notes', false);
+        else if (state.desktop.tags) this.setActiveSearchType('tags', false);
 
-    // Restore mobile state immediately
-    if (state.mobile.notes) this.setActiveSearchType('notes', true);
-    else if (state.mobile.tags) this.setActiveSearchType('tags', true);
-    else if (state.mobile.folders) this.setActiveSearchType('folders', true);
+        // Restore mobile state immediately
+        if (state.mobile.notes) this.setActiveSearchType('notes', true);
+        else if (state.mobile.tags) this.setActiveSearchType('tags', true);
 
     this.ensureAtLeastOneButtonActive();
     }
@@ -970,59 +946,6 @@ class SearchManager {
 
         const newUrl = 'index.php' + (newParams.toString() ? '?' + newParams.toString() : '');
         window.location.href = newUrl;
-    }
-
-    /**
-     * Filter folders
-     */
-    filterFolders(filterValue, isMobile) {
-        const normalizedFilter = filterValue.toLowerCase().trim();
-        const folderHeaders = document.querySelectorAll('.folder-header');
-
-        folderHeaders.forEach(folderHeader => {
-            const folderName = folderHeader.getAttribute('data-folder');
-            if (!folderName) return;
-
-            const matches = folderName.toLowerCase().includes(normalizedFilter);
-            
-            if (matches || !filterValue) {
-                folderHeader.classList.remove('hidden');
-            } else {
-                folderHeader.classList.add('hidden');
-                
-                // Hide folder content
-                const folderToggle = folderHeader.querySelector('[data-folder-id]');
-                if (folderToggle) {
-                    const folderId = folderToggle.getAttribute('data-folder-id');
-                    const folderContent = document.getElementById(folderId);
-                    if (folderContent) {
-                        folderContent.classList.add('hidden');
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Submit search with excluded folders
-     */
-    submitSearchWithExcludedFolders(isMobile) {
-        const elements = this.getElements(isMobile);
-        if (!elements.form) return;
-
-    this.addExcludedFoldersToForm(elements.form, isMobile);
-    this.updateHiddenInputs(isMobile);
-    // Hide special folders now so they won't appear while AJAX completes
-    this.hideSpecialFolders(isMobile);
-        
-        const formData = new FormData(elements.form);
-        const params = new URLSearchParams();
-        for (const [key, value] of formData.entries()) {
-            params.append(key, value);
-        }
-
-        const searchState = this.saveCurrentSearchState();
-        this.performAjaxSearch(elements.form, isMobile);
     }
 
     

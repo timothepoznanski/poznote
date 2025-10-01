@@ -62,6 +62,37 @@ $using_unified_search = handleUnifiedSearch();
     <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
+    <script>
+    var isNarrowViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+    
+    // Safe handler for mobile home button - available immediately
+    function handleMobileHomeClick() {
+        if (typeof window.goBackToNoteList === 'function') {
+            window.goBackToNoteList();
+        } else {
+            // Fallback behavior if the main function isn't loaded yet
+            console.warn('goBackToNoteList not yet loaded, using fallback');
+            if (window.matchMedia('(max-width: 800px)').matches) {
+                document.body.classList.remove('note-open');
+                window.isLoadingNote = false;
+            }
+            const url = new URL(window.location);
+            url.searchParams.delete('note');
+            window.history.pushState({}, '', url);
+        }
+        
+        if (isNarrowViewport) {
+            var mobileScript = document.createElement('script');
+            mobileScript.src = 'js/note-loader-mobile.js';
+            document.head.appendChild(mobileScript);
+        } else {
+            var desktopScript = document.createElement('script');
+            desktopScript.src = 'js/note-loader-desktop.js';
+            document.head.appendChild(desktopScript);
+        }
+    }
+    </script>
+
 </head>
 
 <?php
