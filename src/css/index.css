@@ -3589,3 +3589,12 @@ input[type="search"]::-webkit-search-results-decoration {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
+
+/* Mobile responsive styles */
+@media (max-width: 800px) {
+    #left_col {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+    }
+}

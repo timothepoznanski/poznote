@@ -59,39 +59,9 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link rel="stylesheet" href="css/index_mobile.css" media="(max-width: 800px)">
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
-    <script>
-    var isNarrowViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
-    
-    // Safe handler for mobile home button - available immediately
-    function handleMobileHomeClick() {
-        if (typeof window.goBackToNoteList === 'function') {
-            window.goBackToNoteList();
-        } else {
-            // Fallback behavior if the main function isn't loaded yet
-            console.warn('goBackToNoteList not yet loaded, using fallback');
-            if (window.matchMedia('(max-width: 800px)').matches) {
-                document.body.classList.remove('note-open');
-                window.isLoadingNote = false;
-            }
-            const url = new URL(window.location);
-            url.searchParams.delete('note');
-            window.history.pushState({}, '', url);
-        }
-        
-        if (isNarrowViewport) {
-            var mobileScript = document.createElement('script');
-            mobileScript.src = 'js/note-loader-mobile.js';
-            document.head.appendChild(mobileScript);
-        } else {
-            var desktopScript = document.createElement('script');
-            desktopScript.src = 'js/note-loader-desktop.js';
-            document.head.appendChild(desktopScript);
-        }
-    }
-    </script>
+    <script src="js/note-loader-desktop.js"></script>
 
 </head>
 
@@ -274,11 +244,10 @@ $body_classes = trim($extra_body_classes);
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
             </div>
 
-            <div class="workspace-menu desktop-only" id="workspaceMenu"></div>
-            <div class="workspace-menu mobile-only" id="workspaceMenuMobile"></div>
+            <div class="workspace-menu" id="workspaceMenu"></div>
         </div>
 
-        <div class="contains_forms_search searchbar-desktop desktop-only">
+        <div class="contains_forms_search">
             <form id="unified-search-form" action="index.php" method="POST">
                 <div class="unified-search-container">
                     <div class="searchbar-row searchbar-icon-row">
@@ -295,25 +264,6 @@ $body_classes = trim($extra_body_classes);
                     <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
                     <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
                     <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
-                </div>
-            </form>
-        </div>
-
-        <div class="contains_forms_search mobile-search-container mobile-only">
-            <form id="unified-search-form-mobile" action="index.php" method="POST">
-                <div class="unified-search-container mobile">
-                    <div class="searchbar-row searchbar-icon-row">
-                        <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                            <span class="searchbar-icon"><span class="fa-search"></span></span>
-                            <?php if (!empty($search) || !empty($tags_search)): ?>
-                                <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-tags-hidden-mobile" name="search_tags_hidden_mobile" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
                 </div>
             </form>
         </div>
@@ -526,12 +476,12 @@ $body_classes = trim($extra_body_classes);
                     } catch (Exception $e) {
                         $is_shared = false;
                     }
-                    // Ensure a share-related CSS class is always defined for both desktop and mobile UI
+                    // Check if note is shared for CSS class
                     $share_class = $is_shared ? ' is-shared' : '';
                 
                     $filename = getEntriesRelativePath() . $row["id"] . ".html";
                     $title = $row['heading'];
-                    // Ensure we have a safe JSON-encoded title for JavaScript (used by both desktop and mobile)
+                    // Ensure we have a safe JSON-encoded title for JavaScript
                     $title_safe = $title ?? 'Note';
                     $title_json = json_encode($title_safe, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     if ($title_json === false) $title_json = '"Note"';
@@ -547,7 +497,7 @@ $body_classes = trim($extra_body_classes);
                         $tasklist_json = '';
                     }
                
-                    // Harmonized desktop/mobile display:
+                    // Note display
                     echo '<div id="note'.$row['id'].'" class="notecard">';
                     echo '<div class="innernote">';
                     echo '<div class="note-header">';
@@ -576,10 +526,7 @@ $body_classes = trim($extra_body_classes);
                         $home_url .= '?' . implode('&', $home_params);
                     }
                 
-                    // mobile-only home button
-                    echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="handleMobileHomeClick()"><i class="fa-home"></i></button>';
-                    
-                    // Text formatting buttons (visible only during selection on desktop)
+                    // Text formatting buttons
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
@@ -910,8 +857,6 @@ $body_classes = trim($extra_body_classes);
             cancelBtn.style.display = 'inline-block';
             input.focus();
             input.select();
-            // on mobile, scroll into view
-            try { input.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e){}
         }
 
         function cancelSubheadingInline(noteId) {

@@ -723,14 +723,14 @@ function reinitializeNoteContent() {
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
 
-    // Focus on the note content if it exists
-    const noteContent = document.querySelector('[contenteditable="true"]');
+    // Focus on the note content if it exists - DISABLED
+    // const noteContent = document.querySelector('[contenteditable="true"]');
     // Only focus the note content when not in search mode; otherwise keep focus in the search input
-    if (noteContent && !isSearchMode) {
-        setTimeout(() => {
-            noteContent.focus();
-        }, 100);
-    }
+    // if (noteContent && !isSearchMode) {
+    //     setTimeout(() => {
+    //         noteContent.focus();
+    //     }, 100);
+    // }
 
     // If the loaded note(s) include any tasklist entries, initialize them so the JSON content
     // is replaced with the interactive task list UI when notes are loaded via AJAX.
