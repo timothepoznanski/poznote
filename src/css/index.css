@@ -534,6 +534,13 @@ body {
 .links_arbo_left { padding: 8px 10px; margin: 4px 0; }
 .links_arbo_left .note-title { font-weight: 500; color: #1f2937; }
 
+/* Hover effect: blue and bold title when hovering over a note */
+.links_arbo_left:hover .note-title {
+    color: #0b4da6 !important;
+    font-weight: 600 !important;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
 /* Selected note style matching light blue band from screenshot */
 .links_arbo_left.selected-note {
     background-color: transparent; /* remove blue background */
