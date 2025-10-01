@@ -206,9 +206,14 @@ include 'functions.php';
                 for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { selected = radios[i].value; break; } }
                 if (!selected) selected = 'updated_desc';
                 var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', selected);
-                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ try{ closeModal('noteSortModal'); }catch(e){}; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
-                    // Also reload this page to reflect save
-                    setTimeout(function(){ window.location.reload(); }, 80);
+                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ 
+                    try{ closeModal('noteSortModal'); }catch(e){}; 
+                    try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
+                    
+                    // Refresh the note sort badge
+                    if (typeof window.refreshNoteSortBadge === 'function') {
+                        window.refreshNoteSortBadge();
+                    }
                 }).catch(function(){ alert('Error saving preference'); });
             });
         }
