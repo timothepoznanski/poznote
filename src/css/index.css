@@ -575,11 +575,6 @@ body {
     display: none; /* deprecated: use unified create button */
 }
 
-/* Unified create button */
-.create-dropdown {
-    position: relative;
-    width: 100%;
-}
 .btn-create {
     width: 100%;
     height: 40px;
