@@ -260,62 +260,6 @@ $body_classes = trim($extra_body_classes);
     $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
-    
-    <!-- MENU RIGHT COLUMN -->	 
-    <div class="sidebar-header">
-        <div class="sidebar-title-row">
-            <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
-                <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
-                <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
-            </div>
-            <div class="sidebar-title-actions">
-                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
-            </div>
-
-            <div class="workspace-menu desktop-only" id="workspaceMenu"></div>
-            <div class="workspace-menu mobile-only" id="workspaceMenuMobile"></div>
-        </div>
-
-        <div class="contains_forms_search searchbar-desktop desktop-only">
-            <form id="unified-search-form" action="index.php" method="POST">
-                <div class="unified-search-container">
-                    <div class="searchbar-row searchbar-icon-row">
-                        <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                            <span class="searchbar-icon"><span class="fa-search"></span></span>
-                            <?php if (!empty($search) || !empty($tags_search)): ?>
-                                <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
-                    <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
-                </div>
-            </form>
-        </div>
-
-        <div class="contains_forms_search mobile-search-container mobile-only">
-            <form id="unified-search-form-mobile" action="index.php" method="POST">
-                <div class="unified-search-container mobile">
-                    <div class="searchbar-row searchbar-icon-row">
-                        <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search-mobile" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                            <span class="searchbar-icon"><span class="fa-search"></span></span>
-                            <?php if (!empty($search) || !empty($tags_search)): ?>
-                                <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <input type="hidden" id="search-notes-hidden-mobile" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-tags-hidden-mobile" name="search_tags_hidden_mobile" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                </div>
-            </form>
-        </div>
-    </div>
         
     <script>
     // Set configuration variables for the main page
@@ -545,99 +489,99 @@ $body_classes = trim($extra_body_classes);
                         $tasklist_json = '';
                     }
                
-                // Harmonized desktop/mobile display:
-                echo '<div id="note'.$row['id'].'" class="notecard">';
-                echo '<div class="innernote">';
-                echo '<div class="note-header">';
-                // Formatting buttons (hidden by default on mobile, visible during selection)
-                echo '<div class="note-edit-toolbar">';
-                // Build home URL with search preservation
-                $home_url = 'index.php';
-                $home_params = [];
-                if (!empty($search)) {
-                    $home_params[] = 'search=' . urlencode($search);
-                    $home_params[] = 'preserve_notes=1';
-                }
-                if (!empty($tags_search)) {
-                    $home_params[] = 'tags_search=' . urlencode($tags_search);
-                    $home_params[] = 'preserve_tags=1';
-                }
-                if (!empty($folder_filter)) {
-                    $home_params[] = 'folder=' . urlencode($folder_filter);
-                }
-                // Always preserve workspace if it's not the default
-                if (!empty($workspace_filter) && $workspace_filter !== 'Poznote') {
-                    $home_params[] = 'workspace=' . urlencode($workspace_filter);
-                }
-                if (!empty($home_params)) {
-                    $home_url .= '?' . implode('&', $home_params);
-                }
-                
-               // mobile-only home button
-                echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="handleMobileHomeClick()"><i class="fa-home"></i></button>';
-                
-                // Text formatting buttons (visible only during selection on desktop)
-                $text_format_class = ' text-format-btn';
-                $note_action_class = ' note-action-btn';
-                echo '<button type="button" class="toolbar-btn btn-bold'.$text_format_class.'" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-italic'.$text_format_class.'" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-underline'.$text_format_class.'" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-strikethrough'.$text_format_class.'" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-link'.$text_format_class.'" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-unlink'.$text_format_class.'" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fa-unlink"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-color'.$text_format_class.'" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-highlight'.$text_format_class.'" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ul'.$text_format_class.'" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-list-ol'.$text_format_class.'" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-text-height'.$text_format_class.'" title="Font size" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-code'.$text_format_class.'" title="Code block" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-inline-code'.$text_format_class.'" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-eraser'.$text_format_class.'" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
-             
-                echo '<button type="button" class="toolbar-btn btn-emoji'.$note_action_class.'" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-save'.$note_action_class.'" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-separator'.$note_action_class.'" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                if (isAIEnabled()) {
-                    echo '<div class="ai-dropdown">';
-                    echo '<button type="button" class="toolbar-btn btn-ai'.$note_action_class.'" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
-                    echo '<div class="ai-menu" id="aiMenu-'.$row['id'].'">';
-                    echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                    echo '<i class="fa-align-left"></i>';
-                    echo '<span>Summarize</span>';
-                    echo '</div>';
-                    echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                    echo '<i class="fa-check-light-full"></i>';
-                    echo '<span>Check content</span>';
-                    echo '</div>';
-                    echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                    echo '<i class="fa-tags"></i>';
-                    echo '<span>AI tags</span>';
-                    echo '</div>';
-                    echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                    echo '<i class="fa-cog"></i>';
-                    echo '<span>AI settings</span>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';
-                }
-                
-                // Favorite / Share / Attachment buttons
-                $attachments_count = 0;
-                if (!empty($row['attachments'])) {
-                    $attachments_data = json_decode($row['attachments'], true);
-                    if (is_array($attachments_data)) {
-                        $attachments_count = count($attachments_data);
-                    }
-                }
-                $is_favorite = $row['favorite'] ?? 0;
-                $favorite_class = $is_favorite ? ' is-favorite' : '';
-                $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
-
-                echo '<button type="button" class="toolbar-btn btn-favorite'.$note_action_class.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
-                $share_class = $is_shared ? ' is-shared' : '';
-                echo '<button type="button" class="toolbar-btn btn-share'.$note_action_class.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
-                echo '<button type="button" class="toolbar-btn btn-attachment'.$note_action_class.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                    // Harmonized desktop/mobile display:
+                    echo '<div id="note'.$row['id'].'" class="notecard">';
+                    echo '<div class="innernote">';
+                    echo '<div class="note-header">';
+                    echo '<div class="note-edit-toolbar">';
                     
+                    // Build home URL with search preservation
+                    $home_url = 'index.php';
+                    $home_params = [];
+                    if (!empty($search)) {
+                        $home_params[] = 'search=' . urlencode($search);
+                        $home_params[] = 'preserve_notes=1';
+                    }
+                    if (!empty($tags_search)) {
+                        $home_params[] = 'tags_search=' . urlencode($tags_search);
+                        $home_params[] = 'preserve_tags=1';
+                    }
+                    if (!empty($folder_filter)) {
+                        $home_params[] = 'folder=' . urlencode($folder_filter);
+                    }
+
+                    // Always preserve workspace if it's not the default
+                    if (!empty($workspace_filter) && $workspace_filter !== 'Poznote') {
+                        $home_params[] = 'workspace=' . urlencode($workspace_filter);
+                    }
+                    if (!empty($home_params)) {
+                        $home_url .= '?' . implode('&', $home_params);
+                    }
+                
+                    // mobile-only home button
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="handleMobileHomeClick()"><i class="fa-home"></i></button>';
+                    
+                    // Text formatting buttons (visible only during selection on desktop)
+                    echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-unlink text-format-btn" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fa-unlink"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="Font size" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="Code block" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
+                
+                    echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
+                    if (isAIEnabled()) {
+                        echo '<div class="ai-dropdown">';
+                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
+                        echo '<div class="ai-menu" id="aiMenu-'.$row['id'].'">';
+                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fa-align-left"></i>';
+                        echo '<span>Summarize</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fa-check-light-full"></i>';
+                        echo '<span>Check content</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
+                        echo '<i class="fa-tags"></i>';
+                        echo '<span>AI tags</span>';
+                        echo '</div>';
+                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
+                        echo '<i class="fa-cog"></i>';
+                        echo '<span>AI settings</span>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                
+                    // Favorite / Share / Attachment buttons
+                    $attachments_count = 0;
+                    if (!empty($row['attachments'])) {
+                        $attachments_data = json_decode($row['attachments'], true);
+                        if (is_array($attachments_data)) {
+                            $attachments_count = count($attachments_data);
+                        }
+                    }
+                
+                    $is_favorite = $row['favorite'] ?? 0;
+                    $favorite_class = $is_favorite ? ' is-favorite' : '';
+                    $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
+
+                    echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                    $share_class = $is_shared ? ' is-shared' : '';
+                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                        
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
                     $updated_raw = $row['updated'] ?? '';
@@ -691,13 +635,13 @@ $body_classes = trim($extra_body_classes);
                     
                     // Trash button in toolbar (if enabled)
                     if ($show_trash_button) {
-                        echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                     }
 
                     // Actions dropdown
                     echo '<div class="actions-dropdown">';
                     $actions_onclick = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
-                    echo '<button type="button" class="toolbar-btn btn-actions'.$note_action_class.'" title="Actions" onclick="' . $actions_onclick . '"><i class="fa-menu-vert-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-actions note-action-btn" title="Actions" onclick="' . $actions_onclick . '"><i class="fa-menu-vert-svg"></i></button>';
                     echo '<div class="actions-menu" id="actionsMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
                     echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
                     echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
@@ -718,132 +662,133 @@ $body_classes = trim($extra_body_classes);
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';                
-                echo '</div>';
-                echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
                 
-                // Tags container: keep a hidden input for JS but remove the visible icon/input.
-                // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
-                echo '<div class="note-tags-row">';
-                echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
-                echo '<span class="name_tags">'
-                    .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
-                .'</span>';
-                echo '</div>';
+                    // Tags container: keep a hidden input for JS but remove the visible icon/input.
+                    // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
+                    echo '<div class="note-tags-row">';
+                    echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
+                    echo '<span class="name_tags">'
+                        .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
+                    .'</span>';
+                    echo '</div>';
                 
-                // Display attachments directly in the note if they exist
-                if (!empty($row['attachments'])) {
-                    $attachments_data = json_decode($row['attachments'], true);
-                    if (is_array($attachments_data) && !empty($attachments_data)) {
-                        echo '<div class="note-attachments-row">';
-                        // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                        echo '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
-                        echo '<span class="note-attachments-list">';
-                        $attachment_links = [];
-                        foreach ($attachments_data as $attachment) {
-                            if (isset($attachment['id']) && isset($attachment['original_filename'])) {
-                                $safe_filename = htmlspecialchars($attachment['original_filename'], ENT_QUOTES);
-                                $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="Download '.$safe_filename.'">'.$safe_filename.'</a>';
+                    // Display attachments directly in the note if they exist
+                    if (!empty($row['attachments'])) {
+                        $attachments_data = json_decode($row['attachments'], true);
+                        if (is_array($attachments_data) && !empty($attachments_data)) {
+                            echo '<div class="note-attachments-row">';
+                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
+                            echo '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
+                            echo '<span class="note-attachments-list">';
+                            $attachment_links = [];
+                            foreach ($attachments_data as $attachment) {
+                                if (isset($attachment['id']) && isset($attachment['original_filename'])) {
+                                    $safe_filename = htmlspecialchars($attachment['original_filename'], ENT_QUOTES);
+                                    $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="Download '.$safe_filename.'">'.$safe_filename.'</a>';
+                                }
+                            }
+                            echo implode(' ', $attachment_links);
+                            echo '</span>';
+                            echo '</div>';
+                        }
+                    }
+                    
+                    // Hidden folder value for the note
+                    echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
+                    // Title
+                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
+                    // Subline: creation date and location (visible when enabled in settings)
+                    $created_display = '';
+                    if (!empty($row['created'])) {
+                        try {
+                            $dt = new DateTime($row['created']);
+                            $created_display = $dt->format('d/m/Y H:i');
+                        } catch (Exception $e) {
+                            $created_display = '';
+                        }
+                    }
+                
+                    // Prepare subheading/location display (prefer explicit subheading, fallback to location)
+                    $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES);
+
+                    // Determine whether we actually need to render the subline block.
+                    $show_created_setting = false;
+                    $show_subheading_setting = false;
+                    try {
+                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                        $stmt->execute(['show_note_created']);
+                        $v1 = $stmt->fetchColumn();
+                        if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
+
+                        $stmt->execute(['show_note_subheading']);
+                        $v2 = $stmt->fetchColumn();
+                        if ($v2 === '1' || $v2 === 'true') $show_subheading_setting = true;
+                    } catch (Exception $e) {
+                        // keep defaults (false) on error
+                    }
+
+                    $has_created = !empty($created_display) && $show_created_setting;
+                    $has_subheading = !empty($subheading_display) && $show_subheading_setting;
+
+                    // Show the subline if either setting is enabled, even if data is empty
+                    if ($show_created_setting || $show_subheading_setting) {
+                        echo '<div class="note-subline">';
+                        echo '<span class="note-sub-created">' . ($has_created ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
+                        if ($has_created && $show_subheading_setting) echo ' <span class="note-sub-sep">-</span> ';
+                        // Subheading display with inline editing elements
+                        // Render subheading as plain text (clickable, but not styled as a blue link)
+                        if ($show_subheading_setting) {
+                            if ($has_subheading) {
+                                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . $subheading_display . '</span>';
+                            } else {
+                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>Add subheading here</em></span>';
                             }
                         }
-                        echo implode(' ', $attachment_links);
-                        echo '</span>';
+                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
+                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
+                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
                         echo '</div>';
                     }
-                }
                 
-                // Hidden folder value for the note
-                echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
-                // Title
-                echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'Untitled note'), ENT_QUOTES).'"/></h4>';
-                // Subline: creation date and location (visible when enabled in settings)
-                $created_display = '';
-                if (!empty($row['created'])) {
+                    // Get font size from settings
+                    $font_size = '16';
+                    
                     try {
-                        $dt = new DateTime($row['created']);
-                        $created_display = $dt->format('d/m/Y H:i');
-                    } catch (Exception $e) {
-                        $created_display = '';
-                    }
-                }
-                // Prepare subheading/location display (prefer explicit subheading, fallback to location)
-                $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES);
-
-                // Determine whether we actually need to render the subline block.
-                $show_created_setting = false;
-                $show_subheading_setting = false;
-                try {
-                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute(['show_note_created']);
-                    $v1 = $stmt->fetchColumn();
-                    if ($v1 === '1' || $v1 === 'true') $show_created_setting = true;
-
-                    $stmt->execute(['show_note_subheading']);
-                    $v2 = $stmt->fetchColumn();
-                    if ($v2 === '1' || $v2 === 'true') $show_subheading_setting = true;
-                } catch (Exception $e) {
-                    // keep defaults (false) on error
-                }
-
-                $has_created = !empty($created_display) && $show_created_setting;
-                $has_subheading = !empty($subheading_display) && $show_subheading_setting;
-
-                // Show the subline if either setting is enabled, even if data is empty
-                if ($show_created_setting || $show_subheading_setting) {
-                    echo '<div class="note-subline">';
-                    echo '<span class="note-sub-created">' . ($has_created ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
-                    if ($has_created && $show_subheading_setting) echo ' <span class="note-sub-sep">-</span> ';
-                    // Subheading display with inline editing elements
-                    // Render subheading as plain text (clickable, but not styled as a blue link)
-                    if ($show_subheading_setting) {
-                        if ($has_subheading) {
-                            echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . $subheading_display . '</span>';
-                        } else {
-                            echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>Add subheading here</em></span>';
+                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                        $stmt->execute(['note_font_size']);
+                        $font_size_value = $stmt->fetchColumn();
+                        if ($font_size_value !== false) {
+                            $font_size = $font_size_value;
                         }
+                    } catch (Exception $e) {
+                        // Use default if error
                     }
-                    echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
-                    echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
-                    echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
+                    
+                    // Note content with font size style
+                    $note_type = $row['type'] ?? 'note';
+                    $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$entryfinal.'</div>';
+                    echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
-                }
-                
-                // Get font size from settings
-                $font_size = '16';
-                
-                try {
-                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute(['note_font_size']);
-                    $font_size_value = $stmt->fetchColumn();
-                    if ($font_size_value !== false) {
-                        $font_size = $font_size_value;
+                    echo '</div>';
+                    
+                    // Collect tasklist IDs for later initialization
+                    if ($note_type === 'tasklist') {
+                        $tasklist_ids[] = $row['id'];
                     }
-                } catch (Exception $e) {
-                    // Use default if error
                 }
-                
-                // Note content with font size style
-                $note_type = $row['type'] ?? 'note';
-                $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
-                echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$entryfinal.'</div>';
-                echo '<div class="note-bottom-space"></div>';
-                echo '</div>';
-                echo '</div>';
-                
-                // Collect tasklist IDs for later initialization
-                if ($note_type === 'tasklist') {
-                    $tasklist_ids[] = $row['id'];
-                }
-            }
-        } else {
-            // Check if we're in search mode (search or tags search active)
-            $is_search_active = !empty($search) || !empty($tags_search);
-            
-            if ($is_search_active) {
-                // intentionally left blank: no search results
             } else {
-                // intentionally left blank: no notes to display
+                // Check if we're in search mode (search or tags search active)
+                $is_search_active = !empty($search) || !empty($tags_search);
+                
+                if ($is_search_active) {
+                    // intentionally left blank: no search results
+                } else {
+                    // intentionally left blank: no notes to display
+                }
             }
-        }
         ?>        
     </div>
     
