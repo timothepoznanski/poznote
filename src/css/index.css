@@ -2126,6 +2126,16 @@ hr {
     animation: rotate 1s linear infinite;
 }
 
+/* Trash button in toolbar - make it red/orange */
+.toolbar-btn.btn-trash i.fa-trash {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
+}
+
+.toolbar-btn.btn-trash:hover i.fa-trash,
+.toolbar-btn.btn-trash:focus i.fa-trash {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(100%) saturate(7135%) hue-rotate(0deg) brightness(107%) contrast(116%);
+}
+
 @keyframes rotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }

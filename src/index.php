@@ -96,6 +96,10 @@ try {
     $stmt->execute(['hide_folder_counts']);
     $v4 = $stmt->fetchColumn();
     if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
+
+    $stmt->execute(['show_trash_button']);
+    $show_trash_button = $stmt->fetchColumn();
+    $show_trash_button = ($show_trash_button === '1' || $show_trash_button === 'true');
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -614,6 +618,11 @@ $body_classes = trim($extra_body_classes);
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
+                    // Trash button in toolbar (if enabled)
+                    if ($show_trash_button) {
+                        echo '<button type="button" class="toolbar-btn btn-trash'.$note_action_class.'" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
+                    }
+
                     // Actions dropdown
                     echo '<div class="actions-dropdown">';
                     $actions_onclick = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
@@ -628,9 +637,11 @@ $body_classes = trim($extra_body_classes);
                     echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
                     echo '<i class="fa-download"></i><span>Download</span>';
                     echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-trash"></i><span>Delete</span>';
-                    echo '</div>';
+                    if (!$show_trash_button) {
+                        echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
+                        echo '<i class="fa-trash"></i><span>Delete</span>';
+                        echo '</div>';
+                    }
                     echo '<div class="actions-menu-item" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.'); closeActionsMenu();">';
                     echo '<i class="fa-info-circle"></i><span>Information</span>';
                     echo '</div>';
