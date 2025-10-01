@@ -200,6 +200,14 @@ window.loadNoteDirectly = function(url, noteId, event) {
                                     updateBrowserUrl(url, noteId);
                                     reinitializeNoteContent();
 
+                                    // Auto-scroll to right column on mobile after note is loaded
+                                    // But only if we actually have a noteId (i.e., a specific note was clicked)
+                                    if (window.innerWidth <= 800 && noteId && typeof scrollToRightColumn === 'function') {
+                                        setTimeout(() => {
+                                            scrollToRightColumn();
+                                        }, 100);
+                                    }
+
                                     // Reapply highlights after content has been reinitialized.
                                     // Use delayed calls to ensure layout has stabilized when switching notes.
                                     if (typeof applyHighlightsWithRetries === 'function') {

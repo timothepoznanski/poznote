@@ -974,7 +974,22 @@ function scrollToLeftColumn() {
 
 
 
-// Auto-scroll to right column when clicking on a note title on mobile
+// Auto-scroll to right column when a note is loaded on mobile
+function checkAndScrollToNote() {
+    const isMobile = window.innerWidth <= 800;
+    if (isMobile) {
+        // Check if there's a note parameter in the URL or if a note is displayed
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasNoteParam = urlParams.has('note');
+        const hasNoteContent = document.querySelector('#right_col .notecard');
+        
+        if (hasNoteParam || hasNoteContent) {
+            scrollToRightColumn();
+        }
+    }
+}
+
+// Auto-scroll to right column when clicking on any element that loads a note
 function handleNoteClick(event) {
     const isMobile = window.innerWidth <= 800;
     if (isMobile) {
@@ -985,11 +1000,23 @@ function handleNoteClick(event) {
     }
 }
 
-// Add click listeners to all note links
+// Add click listeners to all note-related elements
 function initializeNoteClickHandlers() {
-    const noteLinks = document.querySelectorAll('a.links_arbo_left');
-    noteLinks.forEach(link => {
-        link.addEventListener('click', handleNoteClick);
+    // Listen for clicks on note links and elements that might load notes
+    const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
+    noteElements.forEach(element => {
+        element.addEventListener('click', handleNoteClick);
+    });
+    
+    // Also listen for general clicks that might trigger note loading
+    document.addEventListener('click', function(e) {
+        // Check if the clicked element or its parent might load a note
+        // But exclude buttons that don't actually load notes (favorites, delete, etc.)
+        const target = e.target.closest('a[href*="note="], .links_arbo_left, .note-title, .note-link');
+        if (target && window.innerWidth <= 800) {
+            // Only for actual note loading links, not action buttons
+            setTimeout(checkAndScrollToNote, 150);
+        }
     });
 }
 
