@@ -64,6 +64,24 @@ $using_unified_search = handleUnifiedSearch();
     <script src="js/note-loader-common.js"></script>
     <script>
         var isNarrowViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        
+        // Safe handler for mobile home button - available immediately
+        function handleMobileHomeClick() {
+            if (typeof window.goBackToNoteList === 'function') {
+                window.goBackToNoteList();
+            } else {
+                // Fallback behavior if the main function isn't loaded yet
+                console.warn('goBackToNoteList not yet loaded, using fallback');
+                if (window.matchMedia('(max-width: 800px)').matches) {
+                    document.body.classList.remove('note-open');
+                    window.isLoadingNote = false;
+                }
+                const url = new URL(window.location);
+                url.searchParams.delete('note');
+                window.history.pushState({}, '', url);
+            }
+        }
+        
         if (isNarrowViewport) {
             var mobileScript = document.createElement('script');
             mobileScript.src = 'js/note-loader-mobile.js';
@@ -503,7 +521,7 @@ $body_classes = trim($extra_body_classes);
                 }
                 
                // mobile-only home button
-                echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="goBackToNoteList()"><i class="fa-home"></i></button>';
+                echo '<button type="button" class="toolbar-btn btn-home mobile-only" title="Home" onclick="handleMobileHomeClick()"><i class="fa-home"></i></button>';
                 
                 // Text formatting buttons (visible only during selection on desktop)
                 $text_format_class = ' text-format-btn';
