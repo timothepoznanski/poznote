@@ -46,6 +46,13 @@ include 'functions.php';
                 </div>
             </div>
 
+            <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
+                <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
+                <div class="settings-card-content">
+                    <h3>Note sort order</h3>
+                </div>
+            </div>
+
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon"><i class="fa-grin"></i></div>
                 <div class="settings-card-content">
@@ -81,12 +88,6 @@ include 'functions.php';
                 </div>
             </div>
 
-            <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
-                <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
-                <div class="settings-card-content">
-                    <h3>Note sort order</h3>
-                </div>
-            </div>
         </div>
     </div>
 
