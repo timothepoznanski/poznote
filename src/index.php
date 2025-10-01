@@ -75,6 +75,127 @@ $using_unified_search = handleUnifiedSearch();
             document.head.appendChild(desktopScript);
         }
 
+
+<?php
+// Read settings to control body classes (so settings toggles affect index display on reload)
+$extra_body_classes = '';
+try {
+    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmt->execute(['show_note_created']);
+    $v1 = $stmt->fetchColumn();
+    if ($v1 === '1' || $v1 === 'true') $extra_body_classes .= ' show-note-created';
+
+    $stmt->execute(['show_note_subheading']);
+    $v2 = $stmt->fetchColumn();
+    if ($v2 === '1' || $v2 === 'true') $extra_body_classes .= ' show-note-subheading';
+
+    $stmt->execute(['hide_folder_actions']);
+    $v3 = $stmt->fetchColumn();
+    if ($v3 === '0' || $v3 === 'false') $extra_body_classes .= ' folder-actions-always-visible';
+
+    $stmt->execute(['hide_folder_counts']);
+    $v4 = $stmt->fetchColumn();
+    if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
+} catch (Exception $e) {
+    // ignore errors and continue without extra classes
+}
+
+// Load note list sort preference to affect server-side note listing
+$note_list_order_by = 'folder, updated DESC';
+try {
+    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmt->execute(['note_list_sort']);
+    $pref = $stmt->fetchColumn();
+    $allowed_sorts = [
+        'updated_desc' => 'folder, updated DESC',
+        'created_desc' => 'folder, created DESC',
+        'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
+    ];
+    if ($pref && isset($allowed_sorts[$pref])) {
+        $note_list_order_by = $allowed_sorts[$pref];
+    }
+} catch (Exception $e) {
+    // ignore and keep default
+}
+
+// Preserve existing note-open class for mobile when needed
+$note_open_class = ($is_mobile && $note != '') ? 'note-open' : '';
+// Combine classes
+$body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_body_classes);
+?>
+
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
+    <!-- Debug console info removed in production -->
+    <script>
+    // Global error handler to catch all JavaScript errors
+    window.addEventListener('error', function(event) {
+        console.error('JavaScript Error caught:', {
+            message: event.message,
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            error: event.error,
+            stack: event.error ? event.error.stack : 'No stack trace available'
+        });
+        
+        // Store in sessionStorage for inspection
+        try {
+            const errorInfo = {
+                timestamp: new Date().toISOString(),
+                message: event.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                stack: event.error ? event.error.stack : 'No stack trace'
+            };
+            sessionStorage.setItem('lastJSError', JSON.stringify(errorInfo));
+        } catch (e) {
+            // Ignore storage errors
+        }
+    });
+    
+    // Catch unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled Promise Rejection:', event.reason);
+        try {
+            const errorInfo = {
+                timestamp: new Date().toISOString(),
+                type: 'Promise Rejection',
+                reason: event.reason.toString(),
+                stack: event.reason.stack || 'No stack trace'
+            };
+            sessionStorage.setItem('lastPromiseError', JSON.stringify(errorInfo));
+        } catch (e) {
+            // Ignore storage errors
+        }
+    });
+    
+    // Helper function to check last errors (callable from console)
+    window.checkLastErrors = function() {
+        try {
+            const lastJSError = sessionStorage.getItem('lastJSError');
+            const lastPromiseError = sessionStorage.getItem('lastPromiseError');
+            
+            if (lastJSError) {
+                console.log('Last JavaScript Error:', JSON.parse(lastJSError));
+            }
+            if (lastPromiseError) {
+                console.log('Last Promise Error:', JSON.parse(lastPromiseError));
+            }
+            
+            if (!lastJSError && !lastPromiseError) {
+                console.log('No recent errors found.');
+            }
+        } catch (e) {
+            console.log('Error checking stored errors:', e);
+        }
+    };
+    </script>
+
+    <script>
+    // Restore folder states from localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+
         try {
             var folderContents = document.querySelectorAll('.folder-content');
             for (var i = 0; i < folderContents.length; i++) {
@@ -109,7 +230,7 @@ $using_unified_search = handleUnifiedSearch();
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
+    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     

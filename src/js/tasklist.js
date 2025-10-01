@@ -36,7 +36,7 @@ function renderTaskList(noteId, tasks) {
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
           <input type="text" class="task-input" id="task-input-${noteId}"
-              placeholder="Add new task..." maxlength="4000">
+              placeholder="Write a new task and press enter to add it to the list..." maxlength="4000">
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}
@@ -76,11 +76,14 @@ function renderTasks(tasks, noteId) {
         // Conditional buttons based on completion status
         let buttonsHtml = '';
         if (task.completed) {
-            // Completed tasks: only show delete button
+            // Completed tasks: show delete and drag buttons
             buttonsHtml = `
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="task-icon-trash"></i>
-            </button>`;
+            </button>
+            <div class="task-drag-handle" title="Drag to reorder">
+                <i class="fa-menu-vert-svg"></i>
+            </div>`;
         } else {
             // Incomplete tasks: show favorite and drag buttons
             buttonsHtml = `
@@ -357,8 +360,8 @@ function markNoteAsModified(noteId) {
     if (noteEntry) {
         // Ensure noteid is set correctly for task lists
         noteid = noteId;
-        // Trigger the existing save mechanism
-        updateNote();
+        // Trigger immediate save for task actions
+        saveNoteToServer();
     }
 }
 
@@ -430,7 +433,13 @@ function enableDragAndDrop(noteId) {
             const sortable = new Sortable(tasksList, {
                 animation: 150,
                 handle: '.task-drag-handle', // Only allow dragging by the hamburger handle
+                onStart: function(evt) {
+                    // Add dragging class for visual feedback
+                    evt.item.classList.add('dragging');
+                },
                 onEnd: function(evt) {
+                    // Remove dragging class
+                    evt.item.classList.remove('dragging');
                     // sortable onEnd
 
                     const noteEntry = document.getElementById('entry' + noteId);

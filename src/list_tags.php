@@ -58,10 +58,10 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 </head>
 <body class="tags-page">
 	<div class="tags-container">
-		<div class="trash-buttons-container">
-			<div class="trash-button trash-back-button" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
-				<i class="fa-arrow-circle-left trash-button-icon"></i>
-			</div>
+		<div class="tags-buttons-container">
+			<button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
+				Back to notes
+			</button>
 			<h1 class="tags-header">Tags</h1>
 		</div>
 		

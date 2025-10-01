@@ -763,12 +763,12 @@ body {
 .text-format-btn {
     opacity: 0;
     visibility: hidden;
-    position: absolute;
+    position: relative;
     width: 0;
     padding: 0;
     margin: 0;
     overflow: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0.2s;
+    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
 }
 
 .text-format-btn.show-on-selection {
@@ -778,14 +778,14 @@ body {
     width: auto;
     padding: 6px 8px;
     margin: 0 2px;
-    transition: opacity 0.2s ease, visibility 0.2s ease, position 0s ease 0s;
+    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
 }
 
 /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
 .note-action-btn {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
     width: auto;
     padding: 6px 8px;
     margin: 0 4px;
@@ -802,11 +802,12 @@ body {
 .note-action-btn.hide-on-selection {
     opacity: 0;
     visibility: hidden;
-    position: absolute;
+    position: relative;
     width: 0;
     padding: 0;
     margin: 0;
     overflow: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
 }
 
 .dropdown-menu {

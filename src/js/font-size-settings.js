@@ -70,10 +70,20 @@ function safeShowNotification(message, type) {
 function updateFontSizePreview() {
     const fontSizeInput = document.getElementById('fontSizeInput');
     const fontSizePreview = document.getElementById('fontSizePreview');
+    const defaultInfo = document.getElementById('defaultFontSizeInfo');
     
     if (fontSizeInput && fontSizePreview) {
         const fontSize = fontSizeInput.value;
         fontSizePreview.style.fontSize = fontSize + 'px';
+        
+        // Show/hide default info based on value
+        if (defaultInfo) {
+            if (fontSize == 16) {
+                defaultInfo.style.display = 'block';
+            } else {
+                defaultInfo.style.display = 'none';
+            }
+        }
     }
 }
 
@@ -146,6 +156,11 @@ function saveFontSize() {
             
             // Apply font size to current note
             applyFontSizeToNotes();
+            
+            // Refresh the font size badge if the function exists (on display.php page)
+            if (typeof window.refreshFontSizeBadge === 'function') {
+                window.refreshFontSizeBadge();
+            }
         } else {
             safeShowNotification('Error saving font size settings', 'error');
         }
