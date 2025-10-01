@@ -81,19 +81,10 @@ include 'functions.php';
                 </div>
             </div>
 
-            <div class="settings-card" id="note-sort-card">
-                <div class="settings-card-icon"><i class="fa-sort"></i></div>
+            <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
+                <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
                 <div class="settings-card-content">
                     <h3>Note sort order</h3>
-                    <div style="margin-top:8px">
-                        <select id="noteSortSelect">
-                            <option value="updated_desc">Last modified</option>
-                            <option value="created_desc">Last created</option>
-                            <option value="heading_asc">Alphabetical</option>
-                        </select>
-                        <button id="saveNoteSortBtn" class="btn btn-primary" style="margin-left:8px">Save</button>
-                        <span id="note-sort-status" class="setting-status" style="margin-left:8px"></span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -187,6 +178,40 @@ include 'functions.php';
         }); }
         refreshFolderActions();
     })();
+    </script>
+    <script>
+    // Modal-based note sort handlers
+    function openNoteSortModal() {
+        var modal = document.getElementById('noteSortModal');
+        if (!modal) return;
+        // Load current preference
+        var form = new FormData(); form.append('action','get'); form.append('key','note_list_sort');
+        fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+            var v = j && j.success ? j.value : 'updated_desc';
+            var radios = document.getElementsByName('noteSort');
+            for (var i = 0; i < radios.length; i++) {
+                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
+            }
+            modal.style.display = 'flex';
+        }).catch(function(){ modal.style.display = 'flex'; });
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        var saveBtn = document.getElementById('saveNoteSortModalBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function(){
+                var radios = document.getElementsByName('noteSort');
+                var selected = null;
+                for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { selected = radios[i].value; break; } }
+                if (!selected) selected = 'updated_desc';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', selected);
+                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ try{ closeModal('noteSortModal'); }catch(e){}; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){}; // reload main if open
+                    // Also reload this page to reflect save
+                    setTimeout(function(){ window.location.reload(); }, 80);
+                }).catch(function(){ alert('Error saving preference'); });
+            });
+        }
+    });
     </script>
     <script>
     // Note sort preference
