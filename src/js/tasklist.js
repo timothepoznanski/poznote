@@ -87,11 +87,14 @@ function renderTasks(tasks, noteId) {
         // Conditional buttons based on completion status
         let buttonsHtml = '';
         if (task.completed) {
-            // Completed tasks: only show delete button
+            // Completed tasks: show delete and drag buttons
             buttonsHtml = `
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="task-icon-trash"></i>
-            </button>`;
+            </button>
+            <div class="task-drag-handle" title="Drag to reorder">
+                <i class="fa-menu-vert-svg"></i>
+            </div>`;
         } else {
             // Incomplete tasks: show favorite and drag buttons
             buttonsHtml = `
