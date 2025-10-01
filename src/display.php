@@ -80,6 +80,22 @@ include 'functions.php';
                     <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
+
+            <div class="settings-card" id="note-sort-card">
+                <div class="settings-card-icon"><i class="fa-sort"></i></div>
+                <div class="settings-card-content">
+                    <h3>Note sort order</h3>
+                    <div style="margin-top:8px">
+                        <select id="noteSortSelect">
+                            <option value="updated_desc">Last modified</option>
+                            <option value="created_desc">Last created</option>
+                            <option value="heading_asc">Alphabetical</option>
+                        </select>
+                        <button id="saveNoteSortBtn" class="btn btn-primary" style="margin-left:8px">Save</button>
+                        <span id="note-sort-status" class="setting-status" style="margin-left:8px"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -170,6 +186,31 @@ include 'functions.php';
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
+    })();
+    </script>
+    <script>
+    // Note sort preference
+    (function(){
+        var select = document.getElementById('noteSortSelect');
+        var btn = document.getElementById('saveNoteSortBtn');
+        var status = document.getElementById('note-sort-status');
+
+        function refreshSort(){
+            var form = new FormData(); form.append('action','get'); form.append('key','note_list_sort');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var v = j && j.success ? j.value : '';
+                if(v && select){ try{ select.value = v; }catch(e){} }
+                if(status) status.textContent = '';
+            }).catch(()=>{});
+        }
+
+        if(btn){ btn.addEventListener('click', function(){
+            var toSet = select ? select.value : 'updated_desc';
+            var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','note_list_sort'); setForm.append('value', toSet);
+            fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ if(status) status.textContent = 'saved'; try{ if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }catch(e){} }).catch(function(){ if(status) status.textContent = 'error'; });
+        }); }
+
+        refreshSort();
     })();
     </script>
 </body>

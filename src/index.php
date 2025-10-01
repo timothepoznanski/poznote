@@ -103,6 +103,24 @@ try {
     // ignore errors and continue without extra classes
 }
 
+// Load note list sort preference to affect server-side note listing
+$note_list_order_by = 'folder, updated DESC';
+try {
+    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmt->execute(['note_list_sort']);
+    $pref = $stmt->fetchColumn();
+    $allowed_sorts = [
+        'updated_desc' => 'folder, updated DESC',
+        'created_desc' => 'folder, created DESC',
+        'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
+    ];
+    if ($pref && isset($allowed_sorts[$pref])) {
+        $note_list_order_by = $allowed_sorts[$pref];
+    }
+} catch (Exception $e) {
+    // ignore and keep default
+}
+
 // Preserve existing note-open class for mobile when needed
 $note_open_class = ($is_mobile && $note != '') ? 'note-open' : '';
 // Combine classes
@@ -252,7 +270,7 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY folder, updated DESC";
+    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
     
