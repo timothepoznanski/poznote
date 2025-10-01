@@ -635,10 +635,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<i class="fa-info-circle"></i><span>Information</span>';
                     echo '</div>';
                     echo '</div>';
-                    echo '</div>';
-
-                    echo '</div>';
-                
+                    echo '</div>';                
                 echo '</div>';
                 echo '</div>';
                 
