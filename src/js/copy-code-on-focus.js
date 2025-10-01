@@ -142,16 +142,58 @@
     var longPressTimer = null;
     var longPressElement = null;
     var LONG_PRESS_MS = 1000;
+    var pointerStartX = 0;
+    var pointerStartY = 0;
+    var isSelecting = false;
 
     function startLongPress(e) {
         if (e.button && e.button !== 0) return; // ignore non-primary
         var target = e.target || e.srcElement;
         var codeEl = getCodeContainer(target);
         if (!codeEl) return;
+        
+        // Check if there's already text selected in the code block
+        var selection = window.getSelection();
+        if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+            var range = selection.getRangeAt(0);
+            var selectionContainer = range.commonAncestorContainer;
+            // Check if the selection is within our code element
+            var selectionElement = selectionContainer.nodeType === 3 ? selectionContainer.parentElement : selectionContainer;
+            if (codeEl.contains(selectionElement)) {
+                return; // Don't start long press if there's already a selection in the code block
+            }
+        }
+        
+        // Store pointer position to detect movement (selection)
+        pointerStartX = e.clientX;
+        pointerStartY = e.clientY;
+        isSelecting = false;
+        
         // store element and start timer
         longPressElement = codeEl;
         if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
         longPressTimer = setTimeout(function () {
+            // Only perform copy if we're not in the middle of selecting text
+            if (isSelecting) {
+                longPressElement = null;
+                longPressTimer = null;
+                return;
+            }
+            
+            // Double-check if a text selection has been made during the long press
+            var selection = window.getSelection();
+            if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                var range = selection.getRangeAt(0);
+                var selectionContainer = range.commonAncestorContainer;
+                var selectionElement = selectionContainer.nodeType === 3 ? selectionContainer.parentElement : selectionContainer;
+                if (longPressElement.contains(selectionElement)) {
+                    // User has selected text in the code block, don't copy the whole block
+                    longPressElement = null;
+                    longPressTimer = null;
+                    return;
+                }
+            }
+            
             // perform copy
             var text = normalizeCodeText(longPressElement);
             if (!text) { longPressElement = null; longPressTimer = null; return; }
@@ -172,15 +214,32 @@
         }, LONG_PRESS_MS);
     }
 
+    function handlePointerMove(e) {
+        if (!longPressTimer || !longPressElement) return;
+        
+        // Calculate movement distance
+        var deltaX = Math.abs(e.clientX - pointerStartX);
+        var deltaY = Math.abs(e.clientY - pointerStartY);
+        
+        // If there's significant movement, consider it a selection gesture
+        if (deltaX > 5 || deltaY > 5) {
+            isSelecting = true;
+            // Cancel the long press timer since user is selecting text
+            cancelLongPress();
+        }
+    }
+
     function cancelLongPress() {
         if (longPressTimer) {
             clearTimeout(longPressTimer);
             longPressTimer = null;
             longPressElement = null;
         }
+        isSelecting = false;
     }
 
     document.addEventListener('pointerdown', startLongPress, true);
+    document.addEventListener('pointermove', handlePointerMove, true);
     document.addEventListener('pointerup', cancelLongPress, true);
     document.addEventListener('pointercancel', cancelLongPress, true);
     document.addEventListener('pointerleave', cancelLongPress, true);
