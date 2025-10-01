@@ -3597,4 +3597,8 @@ input[type="search"]::-webkit-search-results-decoration {
         max-width: 100vw !important;
         min-width: 100vw !important;
     }
+    
+    .resize-handle {
+        display: none !important;
+    }
 }
