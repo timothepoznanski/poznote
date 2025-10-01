@@ -184,11 +184,17 @@ function displayWorkspaceMenu(menu, workspaces) {
     
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
-    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'display.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
+    
+    // Get current note parameter to preserve it
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentNote = urlParams.get('note');
+    const noteParam = currentNote ? '&note=' + encodeURIComponent(currentNote) : '';
+    
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'display.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\') + \'' + noteParam + '\';">';
     menuHtml += '<i class="fa-eye"></i>';
     menuHtml += '<span>Display</span>';
     menuHtml += '</div>';
-    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'settings.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\');">';
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'settings.php?workspace=\' + encodeURIComponent(selectedWorkspace || \'Poznote\') + \'' + noteParam + '\';">';
     menuHtml += '<i class="fa-cog"></i>';
     menuHtml += '<span>Settings</span>';
     menuHtml += '</div>';

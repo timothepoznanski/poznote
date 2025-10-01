@@ -12,16 +12,17 @@ function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
     $current_note_folder = null;
     
     if($note != '') {
-        // If the note is not empty, it means we have just clicked on a note.
-        $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note, $workspace_filter, $workspace_filter]);
+        // If the note is not empty, it means we have just clicked on a note (now using ID)
+        $note_id = intval($note);
+        $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace_filter, $workspace_filter]);
         $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($note_data) {
             $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
             // Prepare result for right column (ensure it's in the workspace)
-            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt_right->execute([$note, $workspace_filter, $workspace_filter]);
+            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt_right->execute([$note_id, $workspace_filter, $workspace_filter]);
             $res_right = $stmt_right;
         } else {
             // If the requested note doesn't exist, display the last updated note

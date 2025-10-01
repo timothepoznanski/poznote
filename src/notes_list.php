@@ -115,10 +115,10 @@ foreach($folders as $folderName => $notes) {
     
     // Display notes in folder
     foreach($notes as $row1) {
-        $isSelected = ($note === $row1["heading"]) ? 'selected-note' : '';
+        $isSelected = ($note == $row1["id"]) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["heading"]);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
         
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
@@ -132,9 +132,9 @@ foreach($folders as $folderName => $notes) {
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
         
         // Detect if mobile (simple server-side detection)
-        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $jsEscapedHeading, event);'";
+        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $escapedHeading . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

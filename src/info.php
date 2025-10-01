@@ -172,7 +172,14 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
         </div>
 
         <div class="action-buttons">
-            <?php $close_href = 'index.php' . ($workspace ? '?workspace=' . urlencode($workspace) : ''); ?>
+            <?php 
+                $close_params = [];
+                if ($workspace) $close_params[] = 'workspace=' . urlencode($workspace);
+                if ($note_id) {
+                    $close_params[] = 'note=' . intval($note_id);
+                }
+                $close_href = 'index.php' . (!empty($close_params) ? '?' . implode('&', $close_params) : '');
+            ?>
             <a href="<?php echo $close_href; ?>" class="btn btn-secondary">Close</a>
         </div>
     </div>
