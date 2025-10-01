@@ -115,6 +115,15 @@ body:not(.show-note-subheading) .subheading-link { display: none; }
 /* Hide separator when created date is not shown */
 body:not(.show-note-created) .note-sub-sep { display: none; }
 
+/* Subheading placeholder styling */
+.subheading-placeholder {
+    color: #9ca3af;
+    opacity: 0.7;
+}
+.subheading-placeholder:hover {
+    opacity: 1;
+}
+
 /* Right-column title spacing adjustments */
 .innernote h4 { margin: 0 0 8px 0; }
 .innernote h4 .css-title { width: 100%; box-sizing: border-box; }
@@ -1854,7 +1863,7 @@ textarea:focus{
 
 .noteentry{
     padding: 0;
-    padding-top: 8px; 
+    /* padding-top: 8px;  */
     width:100%;
     border: 0 none white;
     overflow-wrap: break-word;
