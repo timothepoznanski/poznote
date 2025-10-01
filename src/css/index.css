@@ -3590,9 +3590,10 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Hide mobile nav buttons on desktop by default */
+/* Hide mobile elements on desktop */
 @media (min-width: 801px) {
-    .mobile-nav-button {
+    .mobile-nav-button,
+    .mobile-home-btn {
         display: none !important;
     }
 }
@@ -3647,40 +3648,12 @@ input[type="search"]::-webkit-search-results-decoration {
         margin-right: 2% !important;
     }
     
-    /* Mobile navigation buttons */
-    .mobile-nav-button {
-        position: fixed !important;
-        bottom: 20px !important;
-        width: 50px !important;
-        height: 50px !important;
-        background: #007bff !important;
-        border: none !important;
-        border-radius: 50% !important;
-        color: white !important;
-        font-size: 20px !important;
-        cursor: pointer !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-        z-index: 1000 !important;
-        display: none;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .mobile-nav-button.show {
+    /* Mobile home button in toolbar */
+    .mobile-home-btn {
         display: flex !important;
+        order: -1 !important; /* Put it first in the toolbar */
+        margin-right: 10px !important; /* Add some spacing after it */
     }
     
-    .mobile-nav-button.left {
-        left: 20px !important;
-    }
-    
-    .mobile-nav-button:hover {
-        background: #0056b3 !important;
-        transform: scale(1.1) !important;
-    }
-    
-    .mobile-nav-button:active {
-        transform: scale(0.95) !important;
-    }
+
 }

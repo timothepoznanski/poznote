@@ -1029,12 +1029,6 @@ function clearUnifiedSearch() {
     }
 }
 
-function goHomeWithSearch() {
-    if (searchManager) {
-        searchManager.clearSearch();
-    }
-}
-
 // Global functions for external scripts
 window.saveCurrentSearchState = function() {
     return searchManager ? searchManager.saveCurrentSearchState() : null;

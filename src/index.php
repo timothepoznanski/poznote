@@ -456,10 +456,7 @@ $body_classes = trim($extra_body_classes);
     
     <div class="resize-handle" id="resizeHandle"></div>
     
-    <!-- Mobile navigation button -->
-    <button class="mobile-nav-button left" id="mobileNavButtonLeft" onclick="scrollToLeftColumn()" title="Back to notes">
-        <i class="fa-arrow-left"></i>
-    </button>
+
     
     <!-- RIGHT COLUMN -->	
     <div id="right_col">
@@ -531,6 +528,9 @@ $body_classes = trim($extra_body_classes);
                         $home_url .= '?' . implode('&', $home_params);
                     }
                 
+                    // Home button (mobile only)
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="Back to notes" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
+                    
                     // Text formatting buttons
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
@@ -972,31 +972,7 @@ function scrollToLeftColumn() {
     }
 }
 
-// Show/hide mobile nav button based on scroll position and screen size
-function updateMobileNavButtons() {
-    const leftButton = document.getElementById('mobileNavButtonLeft');
-    const isMobile = window.innerWidth <= 800;
-    
-    if (!leftButton) return;
-    
-    if (isMobile) {
-        const scrollLeft = document.body.scrollLeft || document.documentElement.scrollLeft;
-        const leftCol = document.getElementById('left_col');
-        const leftColWidth = leftCol ? leftCol.offsetWidth : 0;
-        
-        // Show left button only when in right column
-        if (scrollLeft >= leftColWidth / 2) {
-            // In right column - show left arrow button
-            leftButton.classList.add('show');
-        } else {
-            // In left column - hide button (click on note will scroll right)
-            leftButton.classList.remove('show');
-        }
-    } else {
-        // Desktop - hide button
-        leftButton.classList.remove('show');
-    }
-}
+
 
 // Auto-scroll to right column when clicking on a note title on mobile
 function handleNoteClick(event) {
@@ -1018,10 +994,7 @@ function initializeNoteClickHandlers() {
 }
 
 // Event listeners
-window.addEventListener('scroll', updateMobileNavButtons);
-window.addEventListener('resize', updateMobileNavButtons);
 document.addEventListener('DOMContentLoaded', function() {
-    updateMobileNavButtons();
     initializeNoteClickHandlers();
 });
 </script>
