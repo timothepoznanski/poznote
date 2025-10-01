@@ -277,14 +277,14 @@ include 'functions.php';
 
         // Load Font Size
         function refreshFontSizeBadge() {
-            getSetting('note_content_font_size', function(value) {
+            getSetting('note_font_size', function(value) {
                 var badge = document.getElementById('font-size-badge');
                 if (badge) {
                     if (value && value.trim()) {
                         badge.textContent = value + 'px';
                         badge.className = 'setting-status enabled';
                     } else {
-                        badge.textContent = 'défaut';
+                        badge.textContent = 'default (16px)';
                         badge.className = 'setting-status disabled';
                     }
                 }
@@ -324,6 +324,10 @@ include 'functions.php';
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        
+        // Make refresh functions available globally
+        window.refreshFontSizeBadge = refreshFontSizeBadge;
+        window.refreshNoteSortBadge = refreshNoteSortBadge;
     })();
     </script>
 </body>
