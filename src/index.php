@@ -34,7 +34,6 @@ $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
 
- 
 // Load note-related data (res_right, default/current note folders)
 // Ensure these variables exist for included templates
 $note_load_result = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
@@ -74,7 +73,8 @@ $using_unified_search = handleUnifiedSearch();
             desktopScript.src = 'js/note-loader-desktop.js';
             document.head.appendChild(desktopScript);
         }
-
+    </script>
+</head>
 
 <?php
 // Read settings to control body classes (so settings toggles affect index display on reload)
@@ -118,10 +118,8 @@ try {
     // ignore and keep default
 }
 
-// Preserve existing note-open class for mobile when needed
-$note_open_class = ($is_mobile && $note != '') ? 'note-open' : '';
-// Combine classes
-$body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_body_classes);
+// Set body classes
+$body_classes = trim($extra_body_classes);
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
@@ -137,6 +135,11 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
             error: event.error,
             stack: event.error ? event.error.stack : 'No stack trace available'
         });
+        
+        // Specific handling for syntax errors that might prevent settings from working
+        if (event.message.includes('Unexpected end of input') || event.message.includes('SyntaxError')) {
+            console.warn('Syntax error detected - this may prevent display settings from working properly');
+        }
         
         // Store in sessionStorage for inspection
         try {
@@ -214,8 +217,10 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
 
         window.workspaceDisplayMap = <?php
             $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
-            echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+            $json_output = json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+            echo $json_output ?: '{}';
         ?>;
+    });
     </script>
 
     <?php include 'modals.php'; ?>
@@ -242,14 +247,15 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
     window.currentNoteFolder = <?php 
         if ($note != '' && empty($search) && empty($tags_search)) {
-            echo json_encode($current_note_folder ?? $defaultFolderName);
-        } else if ($default_note_folder && empty($search) && empty($tags_search)) {
+            $folder_value = $current_note_folder ?? $defaultFolderName ?? 'Default';
+            echo json_encode($folder_value);
+        } else if (isset($default_note_folder) && $default_note_folder && empty($search) && empty($tags_search)) {
             echo json_encode($default_note_folder);
         } else {
             echo 'null';
         }
     ?>;
-    window.selectedWorkspace = <?php echo json_encode($workspace_filter); ?>;
+    window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>;
     </script>
                     
     <?php
@@ -702,7 +708,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 $has_created = !empty($created_display) && $show_created_setting;
                 $has_subheading = !empty($subheading_display) && $show_subheading_setting;
 
-                if ($has_created || $has_subheading) {
+                // Show the subline if either setting is enabled, even if data is empty
+                if ($show_created_setting || $show_subheading_setting) {
                     echo '<div class="note-subline">';
                     echo '<span class="note-sub-created">' . ($has_created ? htmlspecialchars($created_display, ENT_QUOTES) : '') . '</span>';
                     if ($has_created && $has_subheading) echo ' <span class="note-sub-sep">-</span> ';
