@@ -10,7 +10,7 @@ function initializeTaskList(noteId, noteType) {
     // Get existing tasks from the data attribute or initialize empty array
     let tasks = [];
     const tasklistJson = noteEntry.dataset.tasklistJson;
-    if (tasklistJson) {
+    if (tasklistJson && tasklistJson.trim() !== '') {
         try {
             tasks = JSON.parse(tasklistJson);
         } catch (e) {

@@ -427,6 +427,8 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
     <div id="right_col">
             
         <?php        
+            // Array to collect tasklist IDs for initialization
+            $tasklist_ids = [];
                         
             // Check if we should display a note or nothing
             if ($res_right && $res_right) {
@@ -735,9 +737,9 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
                 echo '</div>';
                 echo '</div>';
                 
-                // Initialize task list if this is a task list
+                // Collect tasklist IDs for later initialization
                 if ($note_type === 'tasklist') {
-                    echo '<script>if (typeof initializeTaskList === \'function\') { setTimeout(function() { initializeTaskList('.$row['id'].', "'.$note_type.'"); }, 100); }</script>';
+                    $tasklist_ids[] = $row['id'];
                 }
             }
         } else {
@@ -752,6 +754,19 @@ $body_classes = trim(($note_open_class ? $note_open_class : '') . ' ' . $extra_b
         }
         ?>        
     </div>
+    
+    <?php if (!empty($tasklist_ids)): ?>
+    <!-- Initialize all tasklists -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initializeTaskList === 'function') {
+            <?php foreach ($tasklist_ids as $tasklist_id): ?>
+            initializeTaskList(<?php echo $tasklist_id; ?>, 'tasklist');
+            <?php endforeach; ?>
+        }
+    });
+    </script>
+    <?php endif; ?>
         
     </div>  <!-- Close main-container -->
     
