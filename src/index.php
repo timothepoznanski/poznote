@@ -828,13 +828,6 @@ $body_classes = trim($extra_body_classes);
                     </div>
                 </div>
             </div>
-            <!-- Sidebar footer: CTA buttons are rendered here so they're at the bottom of the left column -->
-            <div class="sidebar-footer">
-                <div class="sidebar-footer-inner">
-                    <button class="btn-new-note" id="btn-new-note">New note</button>
-                    <button class="btn-new-folder" id="btn-new-folder">New folder</button>
-                </div>
-            </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn">
                     <i class="fa-copy"></i> Copy

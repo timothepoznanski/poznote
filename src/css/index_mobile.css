@@ -27,45 +27,6 @@
     display: none !important;
 }
 
-/* Mobile: ensure footer CTA buttons are full-width and stacked */
-.sidebar-footer {
-    padding: 10px 12px 10px 44px !important;
-    font-size: 16px !important;
-    color: #6c7580 !important;
-    caret-color: #6c7580 !important;
-    border-radius: 8px !important;
-    border: 1px solid #ccc !important;
-    background: #f6f7f9 !important;
-    height: 40px !important;
-    box-sizing: border-box !important;
-    box-shadow: 0 0 0 1px #e6e6e6 !important;
-    transition: border-color 0.18s, box-shadow 0.18s !important;
-    outline: none !important;
-.sidebar-footer .btn-new-note, .sidebar-footer .btn-new-folder {
-    display: none; /* deprecated */
-}
-    color: #6c7580 !important;
-    opacity: 1;
-    font-size: 16px !important;
-.create-dropdown {
-    width: 100%;
-}
-    border-color: #b0b3b8 !important;
-    box-shadow: 0 0 0 2px #d3d6db !important;
-    outline: none !important;
-    border-radius: 8px !important;
-    background: #007DB8 !important;
-    color: #fff !important;
-    border: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    font-size: 1rem !important;
-    padding: 8px 12px !important;
-    box-sizing: border-box !important;
-    cursor: pointer !important;
-}
 #header-create-menu {
     position: absolute;
     top: 100%;
@@ -144,7 +105,6 @@ html, body {
     overflow: hidden;
 }
 
-/* Modal-related mobile overrides removed and centralized in css/modals.css */
 
 /* Alternative approach - target by URL or JavaScript class addition */
 html {
