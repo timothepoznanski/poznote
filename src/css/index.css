@@ -765,24 +765,17 @@ body {
 
 /* Text formatting buttons: hidden by default, visible on selection */
 .text-format-btn {
-    opacity: 0;
-    visibility: hidden;
-    position: relative;
-    width: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
+    display: none;
 }
 
 .text-format-btn.show-on-selection {
+    display: inline-block;
     opacity: 1;
     visibility: visible;
     position: relative;
     width: auto;
     padding: 6px 8px;
     margin: 0 2px;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
 }
 
 /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
@@ -3652,7 +3645,6 @@ input[type="search"]::-webkit-search-results-decoration {
     .mobile-home-btn {
         display: flex !important;
         order: -1 !important; /* Put it first in the toolbar */
-        margin-right: 10px !important; /* Add some spacing after it */
     }
     
 
