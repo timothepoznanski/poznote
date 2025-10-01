@@ -570,118 +570,6 @@ function initTextSelectionHandlers() {
         selectionTimeout = setTimeout(function() {
             var selection = window.getSelection();
             
-            if (isMobile) {
-                // Mobile handling
-                var textFormatButtons = document.querySelectorAll('.toolbar-btn.btn-bold, .toolbar-btn.btn-italic, .toolbar-btn.btn-underline, .toolbar-btn.btn-strikethrough, .toolbar-btn.btn-link, .toolbar-btn.btn-unlink, .toolbar-btn.btn-color, .toolbar-btn.btn-highlight, .toolbar-btn.btn-list-ul, .toolbar-btn.btn-list-ol, .toolbar-btn.btn-text-height, .toolbar-btn.btn-code, .toolbar-btn.btn-inline-code, .toolbar-btn.btn-eraser');
-                var actionsButton = document.querySelector('.toolbar-btn.btn-actions');
-                var homeButton = document.querySelector('.toolbar-btn.btn-home');
-                
-                // Check if the selection contains text
-                if (selection && selection.toString().trim().length > 0) {
-                    var range = selection.getRangeAt(0);
-                    var container = range.commonAncestorContainer;
-                    
-                    // Improve detection of editable area
-                    var currentElement = container.nodeType === 3 ? container.parentElement : container; // Node.TEXT_NODE
-                    var editableElement = null;
-                    
-                    // Go up the DOM tree to find an editable area
-                    var isTitleOrTagField = false;
-                    while (currentElement && currentElement !== document.body) {
-                        
-                        // Check the current element and its direct children for title/tag fields
-                        function checkElementAndChildren(element) {
-                            // Check the element itself
-                            if (element.classList && 
-                                (element.classList.contains('css-title') || 
-                                 element.classList.contains('add-margin') ||
-                                 (element.id && (element.id.indexOf('inp') === 0 || element.id.indexOf('tags') === 0)))) {
-                                return true;
-                            }
-                            
-                            // Check direct children (for the case <h4><input class="css-title"...></h4>)
-                            if (element.children) {
-                                for (var i = 0; i < element.children.length; i++) {
-                                    var child = element.children[i];
-                                    if (child.classList && 
-                                        (child.classList.contains('css-title') || 
-                                         child.classList.contains('add-margin') ||
-                                         (child.id && (child.id.indexOf('inp') === 0 || child.id.indexOf('tags') === 0)))) {
-                                        return true;
-                                    }
-                                }
-                            }
-                            return false;
-                        }
-                        
-                        if (checkElementAndChildren(currentElement)) {
-                            isTitleOrTagField = true;
-                            break;
-                        }
-                        // If selection is inside a task list, treat it as non-editable for formatting
-                        try {
-                            if (currentElement && currentElement.closest && currentElement.closest('.task-list-container, .tasks-list, .task-item, .task-text')) {
-                                // Consider as not editable so formatting buttons won't appear
-                                editableElement = null;
-                                isTitleOrTagField = true;
-                                break;
-                            }
-                        } catch (err) {}
-                        // Treat selection inside the note metadata subline as title-like (do not toggle toolbar)
-                        if (currentElement.classList && currentElement.classList.contains('note-subline')) {
-                            isTitleOrTagField = true;
-                            break;
-                        }
-                        if (currentElement.classList && currentElement.classList.contains('noteentry')) {
-                            editableElement = currentElement;
-                            break;
-                        }
-                        if (currentElement.contentEditable === 'true') {
-                            editableElement = currentElement;
-                            break;
-                        }
-                        currentElement = currentElement.parentElement;
-                    }
-                    
-                    if (!isTitleOrTagField && editableElement) {
-                        // Text selected in an editable area: show formatting buttons, hide actions button
-                        for (var i = 0; i < textFormatButtons.length; i++) {
-                            textFormatButtons[i].style.display = 'flex';
-                        }
-                        if (actionsButton) {
-                            actionsButton.style.display = 'none';
-                        }
-                        // Always keep home button visible on mobile
-                        if (homeButton) {
-                            homeButton.style.display = 'flex';
-                        }
-                    } else {
-                        // Text selected but not in an editable area: hide everything
-                        for (var i = 0; i < textFormatButtons.length; i++) {
-                            textFormatButtons[i].style.display = 'none';
-                        }
-                        if (actionsButton) {
-                            actionsButton.style.display = 'none';
-                        }
-                        // Always keep home button visible on mobile
-                        if (homeButton) {
-                            homeButton.style.display = 'flex';
-                        }
-                    }
-                } else {
-                    // No text selection: hide formatting buttons, show actions button
-                    for (var i = 0; i < textFormatButtons.length; i++) {
-                        textFormatButtons[i].style.display = 'none';
-                    }
-                    if (actionsButton) {
-                        actionsButton.style.display = 'flex';
-                    }
-                    // Always keep home button visible on mobile
-                    if (homeButton) {
-                        homeButton.style.display = 'flex';
-                    }
-                }
-            } else {
                 // Desktop handling (existing code)
                 var textFormatButtons = document.querySelectorAll('.text-format-btn');
                 var noteActionButtons = document.querySelectorAll('.note-action-btn');
@@ -697,7 +585,7 @@ function initTextSelectionHandlers() {
                     
                     // Go up the DOM tree to find an editable area
                     var isTitleOrTagField = false;
-                        while (currentElement && currentElement !== document.body) {
+                    while (currentElement && currentElement !== document.body) {
                         
                         // Check the current element and its direct children for title/tag fields
                         function checkElementAndChildren(element) {
@@ -787,7 +675,7 @@ function initTextSelectionHandlers() {
                         noteActionButtons[i].classList.remove('hide-on-selection');
                     }
                 }
-            }
+            
         }, 50); // Short delay to avoid too frequent calls
     }
     
@@ -799,39 +687,7 @@ function initTextSelectionHandlers() {
         // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
-    
-    // Handle window resizing
-    window.addEventListener('resize', function() {
-        var wasMobile = isMobile;
-        isMobile = window.innerWidth <= 800;
-        if (wasMobile !== isMobile) {
-            // If switching between mobile and desktop mode, reset button state
-            if (isMobile) {
-                // Switching to mobile: hide formatting buttons, show actions button
-                var textFormatButtons = document.querySelectorAll('.toolbar-btn.btn-bold, .toolbar-btn.btn-italic, .toolbar-btn.btn-underline, .toolbar-btn.btn-strikethrough, .toolbar-btn.btn-link, .toolbar-btn.btn-unlink, .toolbar-btn.btn-color, .toolbar-btn.btn-highlight, .toolbar-btn.btn-list-ul, .toolbar-btn.btn-list-ol, .toolbar-btn.btn-text-height, .toolbar-btn.btn-code, .toolbar-btn.btn-inline-code, .toolbar-btn.btn-eraser');
-                var actionsButton = document.querySelector('.toolbar-btn.btn-actions');
-                for (var i = 0; i < textFormatButtons.length; i++) {
-                    textFormatButtons[i].style.display = 'none';
-                }
-                if (actionsButton) {
-                    actionsButton.style.display = '';
-                }
-            } else {
-                // Switching to desktop: reset classes
-                var textFormatButtons = document.querySelectorAll('.text-format-btn');
-                var noteActionButtons = document.querySelectorAll('.note-action-btn');
-                for (var i = 0; i < textFormatButtons.length; i++) {
-                    textFormatButtons[i].classList.remove('show-on-selection');
-                }
-                for (var i = 0; i < noteActionButtons.length; i++) {
-                    noteActionButtons[i].classList.remove('hide-on-selection');
-                }
-            }
-        }
-    });
 }
-
- 
 
 // Expose updateNote globally for use in other modules
 window.updateNote = updateNote;

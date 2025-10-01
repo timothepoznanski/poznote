@@ -97,14 +97,12 @@
     margin-bottom: 0 !important;
 }
 
-
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
-
 
 /* Alternative approach - target by URL or JavaScript class addition */
 html {
@@ -151,53 +149,6 @@ body {
 .note-attachments-row {
     margin-top: 10px !important;
     margin-bottom: 5px !important;
-}
-
-/* Mobile responsive button management */
-/* Hide formatting buttons by default on mobile */
-.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough,
-.btn-link, .btn-unlink, .btn-color, .btn-highlight,
-.btn-list-ul, .btn-list-ol, .btn-text-height, .btn-code, .btn-inline-code, .btn-eraser {
-    display: none !important;
-}
-
-/* Always visible buttons on mobile */
-.btn-separator, .btn-save, .btn-ai, .btn-emoji, .btn-favorite, .btn-folder, .btn-attachment, .btn-download, .btn-info, .btn-trash {
-    display: flex !important;
-}
-
-/* When text is selected: show formatting buttons and hide action buttons */
-.show-format-buttons .btn-bold, 
-.show-format-buttons .btn-italic, 
-.show-format-buttons .btn-underline, 
-.show-format-buttons .btn-strikethrough,
-.show-format-buttons .btn-link, 
-.show-format-buttons .btn-unlink, 
-.show-format-buttons .btn-color, 
-.show-format-buttons .btn-highlight,
-.show-format-buttons .btn-list-ul, 
-.show-format-buttons .btn-list-ol, 
-.show-format-buttons .btn-text-height, 
-.show-format-buttons .btn-code, 
-.show-format-buttons .btn-inline-code,
-.show-format-buttons .btn-eraser {
-    display: flex !important;
-}
-
-/* Hide ALL action buttons when text is selected */
-.show-format-buttons .btn-separator,
-.show-format-buttons .btn-emoji,
-.show-format-buttons .btn-save,
-.show-format-buttons .btn-ai,
-.show-format-buttons .btn-favorite, 
-.show-format-buttons .btn-duplicate,
-.show-format-buttons .btn-share,
-.show-format-buttons .btn-folder, 
-.show-format-buttons .btn-attachment, 
-.show-format-buttons .btn-download, 
-.show-format-buttons .btn-info, 
-.show-format-buttons .btn-trash {
-    display: none !important;
 }
 
 .noteentry label span[contenteditable="true"]:focus {
@@ -714,10 +665,6 @@ input[type="search"]::-webkit-search-results-decoration {
     z-index: 1000 !important;
     /* Ensure it works with mobile zoom */
     transform-origin: top left;
-}
-
-.btn-home {
-    display: flex !important;
 }
 
 .font-size-popup {
