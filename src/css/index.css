@@ -2304,11 +2304,30 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
         outline: none !important;
     }
     
-    /* Ensure only notes get the selection highlight in mobile */
-    .links_arbo_left.selected-note {
-        background-color: rgba(11, 77, 166, 0.1) !important;
-        border-radius: 4px !important;
-        color: #0b4da6 !important;
+    /* Remove all selection highlights on mobile for notes */
+    .links_arbo_left.selected-note,
+    .links_arbo_left:hover,
+    .links_arbo_left:active,
+    .links_arbo_left:focus {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* Prevent any native mobile touch highlighting */
+    .links_arbo_left,
+    .folder-header,
+    .folder-toggle {
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        touch-action: manipulation !important;
     }
 }
 
