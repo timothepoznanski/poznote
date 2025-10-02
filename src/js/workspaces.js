@@ -106,7 +106,7 @@ function toggleWorkspaceMenu(event) {
     
     // Use a more flexible mobile detection
     // Determine mobile/compact layout purely from the CSS breakpoint.
-    var isMobile = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) || window.innerWidth <= 800;
+    var isMobile = isMobileDevice();
     var preferredMenu = isMobile ? mobileMenu : desktopMenu;
     var menu = preferredMenu || mobileMenu || desktopMenu;
     

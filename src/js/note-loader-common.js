@@ -15,10 +15,10 @@ function applyHighlightsWithRetries() {
     // Determine active search type (prefer SearchManager if available)
     var activeType = null;
     try {
-        var isMobile = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        var isMobile = isMobileDevice();
         // 1) Prefer SearchManager's mobile-aware state
         if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
-            activeType = window.searchManager.getActiveSearchType(!!isMobile) || null;
+            activeType = window.searchManager.getActiveSearchType(isMobile) || null;
         }
         // 2) Fallback to URL params (tags_search / search) which reflect user-initiated searches
         if (!activeType) {
@@ -202,7 +202,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
 
                                     // Auto-scroll to right column on mobile after note is loaded
                                     // But only if we actually have a noteId (i.e., a specific note was clicked)
-                                    if (window.innerWidth <= 800 && noteId && typeof scrollToRightColumn === 'function') {
+                                    if (isMobileDevice() && noteId && typeof scrollToRightColumn === 'function') {
                                         setTimeout(() => {
                                             scrollToRightColumn();
                                         }, 100);

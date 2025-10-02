@@ -62,7 +62,6 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
-    <script src="js/note-loader-desktop.js"></script>
 
 </head>
 

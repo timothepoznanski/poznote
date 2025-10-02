@@ -561,7 +561,7 @@ function saveFocusedNoteJS() {
 // Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
     // Check if we're in desktop mode
-    var isMobile = window.innerWidth <= 800;
+    var isMobile = isMobileDevice();
     
     var selectionTimeout;
     

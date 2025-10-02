@@ -35,26 +35,16 @@ function highlightSearchTerms() {
         }
     }
     
-    // Additional fallback: when on mobile, prefer explicit state from SearchManager
-    // or hidden inputs. Do not unconditionally assume notes on mobile as that
-    // causes folder searches to still highlight titles.
-    // Use CSS breakpoint (800px) for mobile detection to match responsive styles
-    var isMobile = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) || window.innerWidth <= 800;
-    if (!isNotesActive && isMobile) {
+    // Fallback: check hidden inputs for mobile search state
+    if (!isNotesActive) {
         try {
-            if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
-                var sm = window.searchManager.getActiveSearchType(true);
-                if (sm === 'notes') {
-                    isNotesActive = true;
-                }
-            }
-            // Fallback to checking hidden inputs if SearchManager isn't present
-            if (!isNotesActive) {
-                var hiddenNotesMobile = document.getElementById('search-in-notes-mobile')?.value === '1';
-                if (hiddenNotesMobile) isNotesActive = true;
+            var hiddenNotesDesktop = document.getElementById('search-in-notes')?.value === '1';
+            var hiddenNotesMobile = document.getElementById('search-in-notes-mobile')?.value === '1';
+            if (hiddenNotesDesktop || hiddenNotesMobile) {
+                isNotesActive = true;
             }
         } catch (e) {
-            // ignore and remain conservative (don't assume notes)
+            // ignore and remain conservative
         }
     }
 

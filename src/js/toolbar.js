@@ -641,7 +641,7 @@ function toggleEmojiPicker() {
     const rect = emojiBtn.getBoundingClientRect();
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    const isMobile = windowWidth <= 800;
+    const isMobile = isMobileDevice();
     
     // Picker dimensions according to screen
     const pickerWidth = isMobile ? Math.min(300, windowWidth - 40) : 360;
