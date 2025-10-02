@@ -57,6 +57,7 @@ $using_unified_search = handleUnifiedSearch();
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
+    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
     <script src="js/toolbar.js"></script>

@@ -153,17 +153,6 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
   font-style: normal;
 }
 
-/* Responsive helpers: show/hide toolbar elements mobile   */
-
-/* Show desktop-only elements on mobile */
-.desktop-only {
-    display: block !important;
-}
-
-/* Hide mobile-only elements on mobile */
-.mobile-only {
-    display: none !important;
-}
 
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -2271,65 +2260,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     pointer-events: auto;
 }
 
-/* Force folder actions to be visible on mobile regardless of hide_folder_actions setting */
-@media (max-width: 800px) {
-    .folder-toggle .folder-actions i {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-    
-    .folder-toggle:hover .folder-actions i {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-    
-    /* Prevent folder headers from being highlighted when clicking on notes in mobile */
-    .folder-header.selected-folder,
-    .folder-header.selected,
-    .folder-header:active,
-    .folder-header:focus {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    /* Force remove any possible folder selection styles */
-    .folder-toggle.selected,
-    .folder-toggle:active,
-    .folder-toggle:focus {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
-    
-    /* Remove all selection highlights on mobile for notes */
-    .links_arbo_left.selected-note,
-    .links_arbo_left:hover,
-    .links_arbo_left:active,
-    .links_arbo_left:focus {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-        -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-        touch-action: manipulation !important;
-    }
-    
-    /* Prevent any native mobile touch highlighting */
-    .links_arbo_left,
-    .folder-header,
-    .folder-toggle {
-        -webkit-tap-highlight-color: transparent !important;
-        -webkit-touch-callout: none !important;
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
-        touch-action: manipulation !important;
-    }
-}
+
 
 /* search-only hiding to avoid interfering with general hidden class */
 .search-hidden { display: none !important; }
@@ -3659,75 +3590,5 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Hide mobile elements on desktop */
-@media (min-width: 801px) {
-    .mobile-nav-button,
-    .mobile-home-btn {
-        display: none !important;
-    }
-}
 
-/* Mobile responsive styles */
-@media (max-width: 800px) {
-    body {
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        -ms-overflow-style: none !important;  /* IE and Edge */
-        scrollbar-width: none !important;  /* Firefox */
-    }
-    
-    body::-webkit-scrollbar {
-        display: none !important;  /* Chrome, Safari and Opera */
-    }
-    
-    #left_col {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 100% !important;
-        flex-shrink: 0 !important;
-        -ms-overflow-style: none !important;  /* IE and Edge */
-        scrollbar-width: none !important;  /* Firefox */
-        overflow: -moz-scrollbars-none !important;  /* Firefox legacy */
-        overflow-y: auto !important;
-    }
-    
-    #right_col {
-        width: 100% !important;
-        min-width: 100% !important;
-        flex-shrink: 0 !important;
-        overflow-y: auto !important;
-    }
 
-    
-    .resize-handle {
-        display: none !important;
-    }
-    
-    /* Hide scrollbar on mobile - comprehensive approach */
-    #left_col::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        background: transparent !important;
-    }
-    
-    #left_col::-webkit-scrollbar-track {
-        display: none !important;
-    }
-    
-    #left_col::-webkit-scrollbar-thumb {
-        display: none !important;
-    }
-    
-    .notecard {
-        margin-left: 3% !important;
-        margin-right: 2% !important;
-    }
-    
-    /* Mobile home button in toolbar */
-    .mobile-home-btn {
-        display: flex !important;
-        order: -1 !important; /* Put it first in the toolbar */
-    }
-    
-
-}
