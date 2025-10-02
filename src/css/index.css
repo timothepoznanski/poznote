@@ -17,6 +17,11 @@
     display: none !important;
 }
 
+/* Hide mobile-only elements on desktop */
+.mobile-home-btn {
+    display: none !important;
+}
+
 /* Hide emoji buttons when emoji icons are disabled */
 .emoji-hidden .btn-emoji {
     display: none !important;
