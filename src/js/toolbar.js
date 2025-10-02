@@ -641,7 +641,7 @@ function toggleEmojiPicker() {
     const rect = emojiBtn.getBoundingClientRect();
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    const isMobile = windowWidth <= 800;
+    const isMobile = isMobileDevice();
     
     // Picker dimensions according to screen
     const pickerWidth = isMobile ? Math.min(300, windowWidth - 40) : 360;
@@ -725,160 +725,84 @@ function insertEmoji(emoji) {
 // Ensure functions are available in global scope
 window.insertSeparator = insertSeparator;
 
-// ==============================================
-// MOBILE TOOLBAR BEHAVIOR (conditional display)
-// ==============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if on mobile
-    const isMobile = window.innerWidth <= 800;
+// Link insertion functionality
+function addLinkToNote() {
+  try {
+    const sel = window.getSelection();
+    const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+    const selectedText = hasSelection ? sel.toString() : '';
     
-    if (!isMobile) return; // Don't execute this script on desktop
-    
-    let selectionTimer;
-    
-    // Function to show/hide formatting buttons
-    function toggleFormatButtons() {
-        const selection = window.getSelection();
-        const toolbar = document.querySelector('.note-edit-toolbar');
-    // If selection is inside a task list, do not show the note-edit toolbar
-    if (selection && selection.rangeCount > 0) {
-      try {
-        const range = selection.getRangeAt(0);
-        let container = range.commonAncestorContainer;
-        if (container && container.nodeType === 3) container = container.parentElement;
-        if (container && container.closest && container.closest('.task-list-container, .tasks-list, .task-item, .task-text')) {
-          if (toolbar) toolbar.classList.remove('show-format-buttons');
-          return;
-        }
-      } catch (e) {
-        // ignore errors and fall back to default behavior
-      }
-    }
-
-    if (selection.toString().length > 0) {
-      // Text is selected, show formatting buttons
-      if (toolbar) {
-        toolbar.classList.add('show-format-buttons');
-      }
+    // Save the current selection before opening modal to preserve it
+    if (hasSelection) {
+      window.savedLinkRange = sel.getRangeAt(0).cloneRange();
     } else {
-      // No selection, hide formatting buttons
-      if (toolbar) {
-        toolbar.classList.remove('show-format-buttons');
-      }
-    }
+      window.savedLinkRange = null;
     }
     
-    // Listen to selection events
-    document.addEventListener('selectionchange', function() {
-        // Use timer to avoid too many calls
-        clearTimeout(selectionTimer);
-        selectionTimer = setTimeout(toggleFormatButtons, 100);
-    });
-    
-    // Also listen to clicks on editable elements
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.noteentry')) {
-            setTimeout(toggleFormatButtons, 100);
-        }
-    });
-    
-    // Listen to touch events for mobile
-    document.addEventListener('touchend', function(e) {
-        if (e.target.closest('.noteentry')) {
-            setTimeout(toggleFormatButtons, 150);
-        }
-    });
-    
-    // Hide buttons when clicking outside a note
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.notecard')) {
-            const toolbar = document.querySelector('.note-edit-toolbar');
-            if (toolbar) {
-                toolbar.classList.remove('show-format-buttons');
-            }
-        }
-    });
-});
-
-    // Link insertion functionality
-    function addLinkToNote() {
-      try {
+    showLinkModal('https://', selectedText, function(url, text) {
+      if (!url) return;
+      
+      // Create the link element
+      const a = document.createElement('a');
+      a.href = url;
+      a.textContent = text;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      
+      if (window.savedLinkRange) {
+        // Restore the saved selection and replace it with the link
         const sel = window.getSelection();
-        const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
-        const selectedText = hasSelection ? sel.toString() : '';
+        sel.removeAllRanges();
+        sel.addRange(window.savedLinkRange);
         
-        // Save the current selection before opening modal to preserve it
-        if (hasSelection) {
-          window.savedLinkRange = sel.getRangeAt(0).cloneRange();
+        // Replace the selected text with the link
+        window.savedLinkRange.deleteContents();
+        window.savedLinkRange.insertNode(a);
+        
+        // Clear selection and position cursor after the link
+        sel.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.setStartAfter(a);
+        newRange.setEndAfter(a);
+        sel.addRange(newRange);
+      } else {
+        // No saved selection, insert at current cursor position or end of editor
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          range.insertNode(a);
+          // Position cursor after the link
+          range.setStartAfter(a);
+          range.setEndAfter(a);
+          sel.removeAllRanges();
+          sel.addRange(range);
         } else {
-          window.savedLinkRange = null;
-        }
-        
-        showLinkModal('https://', selectedText, function(url, text) {
-          if (!url) return;
-          
-          // Create the link element
-          const a = document.createElement('a');
-          a.href = url;
-          a.textContent = text;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          
-          if (window.savedLinkRange) {
-            // Restore the saved selection and replace it with the link
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(window.savedLinkRange);
-            
-            // Replace the selected text with the link
-            window.savedLinkRange.deleteContents();
-            window.savedLinkRange.insertNode(a);
-            
-            // Clear selection and position cursor after the link
-            sel.removeAllRanges();
-            const newRange = document.createRange();
-            newRange.setStartAfter(a);
-            newRange.setEndAfter(a);
-            sel.addRange(newRange);
-          } else {
-            // No saved selection, insert at current cursor position or end of editor
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-              const range = sel.getRangeAt(0);
-              range.insertNode(a);
-              // Position cursor after the link
-              range.setStartAfter(a);
-              range.setEndAfter(a);
-              sel.removeAllRanges();
-              sel.addRange(range);
-            } else {
-              // Fallback: append to editor
-              const noteentry = document.querySelector('.noteentry');
-              if (noteentry) {
-                noteentry.appendChild(a);
-              }
-            }
-          }
-          
-          // Save the note automatically
+          // Fallback: append to editor
           const noteentry = document.querySelector('.noteentry');
-          if (noteentry && typeof window.updatenote === 'function') {
-            window.updatenote();
+          if (noteentry) {
+            noteentry.appendChild(a);
           }
-          
-          // Clean up saved range
-          window.savedLinkRange = null;
-        });
-      } catch (err) {
-        console.error('Error in addLinkToNote:', err);
+        }
       }
-    }
+      
+      // Save the note automatically
+      const noteentry = document.querySelector('.noteentry');
+      if (noteentry && typeof window.updatenote === 'function') {
+        window.updatenote();
+      }
+      
+      // Clean up saved range
+      window.savedLinkRange = null;
+    });
+  } catch (err) {
+    console.error('Error in addLinkToNote:', err);
+  }
+}
 
-    function createLinkFromModal() {
-      // Backwards-compatible stub: fallback to addLinkToNote behaviour
-      return addLinkToNote();
-    }
+function createLinkFromModal() {
+  // Backwards-compatible stub: fallback to addLinkToNote behaviour
+  return addLinkToNote();
+}
 
 // Ensure all toolbar functions are available in global scope
 window.addLinkToNote = addLinkToNote;

@@ -105,9 +105,12 @@ try {
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored && stored !== 'Poznote') {
-            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-        }
+        var currentNoteId = <?php echo json_encode($note_id); ?>;
+        var workspace = stored && stored !== 'Poznote' ? stored : 'Poznote';
+        
+        var url = 'index.php?note=' + currentNoteId + '&workspace=' + encodeURIComponent(workspace);
+        var a = document.getElementById('backToNotesLink'); 
+        if (a) a.setAttribute('href', url);
     } catch(e){} })();
     </script>
 </body>

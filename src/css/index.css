@@ -106,14 +106,23 @@
 .note-subline .note-sub-sep { margin: 0 6px; color: #cbd5e1; }
 
 /* When enabled via settings, show the created and/or location pieces */
-body.show-note-created .note-subline { display: inline-block; }
+body.show-note-created .note-subline,
 body.show-note-subheading .note-subline { display: inline-block; }
 
 /* If only one piece is enabled, ensure spacing is correct */
 body:not(.show-note-created) .note-sub-created { display: none; }
-body:not(.show-note-subheading) .note-sub-subheading { display: none; }
+body:not(.show-note-subheading) .subheading-link { display: none; }
 /* Hide separator when created date is not shown */
 body:not(.show-note-created) .note-sub-sep { display: none; }
+
+/* Subheading placeholder styling */
+.subheading-placeholder {
+    color: #9ca3af;
+    opacity: 0.7;
+}
+.subheading-placeholder:hover {
+    opacity: 1;
+}
 
 /* Right-column title spacing adjustments */
 .innernote h4 { margin: 0 0 8px 0; }
@@ -144,9 +153,11 @@ body:not(.show-note-created) .note-sub-sep { display: none; }
   font-style: normal;
 }
 
+
 html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     color: rgb(55, 53, 47);
+    overflow-x: hidden;
 }
 
 body {
@@ -313,15 +324,6 @@ a:active { color: #2E8CFA; } */
 .font-size-popup .size-6 { font-size: 2rem; }
 .font-size-popup .size-7 { font-size: 3rem; line-height: 1; padding: 2px 6px; }
 
-/* Ensure popup does not overflow toolbar area on small screens */
-@media (max-width: 720px) {
-    .font-size-popup {
-        right: 0;
-        left: 8px;
-        min-width: 150px;
-    }
-}
-
 .btn-settings {
     position: relative;
 }
@@ -363,6 +365,7 @@ body {
     flex-direction: row;
     height: 100vh;
     margin: 0;
+    overflow-x: hidden !important;
     min-width: 0;
     min-height: 0;
 }
@@ -384,11 +387,18 @@ body {
     box-sizing: border-box;
     background: #FFFFFF;
     flex-shrink: 0;
+    /* Hide scrollbars but keep scroll functionality for all screen sizes */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
 #left_col::-webkit-scrollbar {
     display: none;
 }
+
+
+
 
 /* Sidebar header and primary action */
 .sidebar-header {
@@ -443,7 +453,7 @@ body {
     height: 40px; /* enforce same height as search */
 }
 .btn-new-note i { font-size: 16px; color: #fff; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
-.btn-new-note.mobile { padding: 10px; font-size: 0.95rem; }
+/* .btn-new-note.mobile { padding: 10px; font-size: 0.95rem; } */
 .btn-new-note:hover { filter: brightness(0.96); }
 
 .btn-new-folder {
@@ -513,6 +523,13 @@ body {
 .links_arbo_left { padding: 8px 10px; margin: 4px 0; }
 .links_arbo_left .note-title { font-weight: 500; color: #1f2937; }
 
+/* Hover effect: blue and bold title when hovering over a note */
+.links_arbo_left:hover .note-title {
+    color: #0b4da6 !important;
+    font-weight: 600 !important;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
 /* Selected note style matching light blue band from screenshot */
 .links_arbo_left.selected-note {
     background-color: transparent; /* remove blue background */
@@ -563,11 +580,6 @@ body {
     display: none; /* deprecated: use unified create button */
 }
 
-/* Unified create button */
-.create-dropdown {
-    position: relative;
-    width: 100%;
-}
 .btn-create {
     width: 100%;
     height: 40px;
@@ -654,6 +666,8 @@ body {
 /* Enlarge icons in create menu */
 .create-menu-item i {
     font-size: 20px;
+    margin-right: 10px;
+    color: #007DB8;
 }
 
 /* LEFT HEADER */
@@ -741,7 +755,7 @@ body {
     background: transparent !important;
     border: none !important;
     border-radius: 5px;
-    padding: 6px 8px;
+    /* padding: 6px 8px; */
     font-size: 1.4em;
     cursor: pointer;
     margin: 0 6px;
@@ -754,32 +768,19 @@ body {
     text-align: center;
 }
 
-@media (min-width: 801px) {
-    .btn-home {
-        display: none !important;
-    }
-}
-
-/* Boutons de formatage de texte : cachés par défaut, visibles lors de sélection */
+/* Text formatting buttons: hidden by default, visible on selection */
 .text-format-btn {
-    opacity: 0;
-    visibility: hidden;
-    position: relative;
-    width: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
+    display: none;
 }
 
 .text-format-btn.show-on-selection {
+    display: inline-block;
     opacity: 1;
     visibility: visible;
     position: relative;
     width: auto;
     padding: 6px 8px;
     margin: 0 2px;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
 }
 
 /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
@@ -857,7 +858,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background-color: #fff;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 180px;
@@ -908,17 +909,7 @@ body {
     margin: 4px 0;
 }
 
-/* Mobile workspace dropdown adjustments */
-@media (max-width: 768px) {
-    .workspace-menu {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
-        min-width: 180px;
-        margin-top: 4px;
-    }
-}
+
 
 .note-header-spacer {
     width: 100%;
@@ -1085,10 +1076,10 @@ a.links_arbo_left.selected-note {
 }
 
 /* Folder filter clear buttons (hidden by default) */
-#folder-filter-clear-mobile,
+/* #folder-filter-clear-mobile,
 #folder-filter-clear-desktop {
     display: none;
-}
+} */
 
 .searchbar-clear {
     position: absolute;
@@ -1202,20 +1193,6 @@ img {
     color: #007DB8;
 }
 
-/* Mobile responsiveness for image modals */
-@media (max-width: 768px) {
-    
-    .image-preview-content {
-        max-width: 98%;
-        max-height: 98%;
-    }
-    
-    .image-preview-close {
-        top: -40px;
-        font-size: 32px;
-    }
-}
-
 /* UPDATE NOTIFICATION STYLES */
 
 .settings-menu-item {
@@ -1223,12 +1200,12 @@ img {
 }
 
 /* Update status styling */
-#update-status, #update-status-mobile {
+/* #update-status, #mobileupdate-status- {
     display: block;
     margin-top: 2px;
     font-size: 0.75em;
     line-height: 1.2;
-}
+} */
 
 /* Keyframe animations */
 @keyframes slideInRight {
@@ -1494,13 +1471,6 @@ img {
     border-radius: 4px;
 }
 
-/* Keep paperclip smaller on narrow viewports to avoid layout issues */
-@media (max-width: 420px) {
-    .fa-paperclip.icon_attachment {
-        font-size: 14px;
-    }
-}
-
 .attachment-link:hover {
     color: #005a8b !important;
     text-decoration: underline;
@@ -1511,8 +1481,6 @@ img {
 }
 
 /* MENU LEFT */
-
-/* .containbuttons removed (mobile buttons moved to sidebar footer) */
 
 .newbutton[style], .list_tags[style] {
     text-align: center;
@@ -1682,15 +1650,15 @@ img {
 }
 
 /* Mobile AI dropdown adjustments */
-.ai-dropdown.mobile .ai-menu {
+/* .ai-dropdown.mobile .ai-menu {
     min-width: 140px;
     padding: 6px 0;
-}
+} */
 
-.ai-dropdown.mobile .ai-menu-item {
+/* .ai-dropdown.mobile .ai-menu-item {
     padding: 8px 12px;
     font-size: 13px;
-}
+} */
 
 .search:focus{
     border-bottom: 1px solid #32a1ce;
@@ -1745,25 +1713,7 @@ img {
     font-size: 18px !important;
 }
 
-.share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; }
-
-/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
-   Use fixed positioning for the mobile share menu so it sits above the layout and
-   remains visible even when parent elements hide overflow. It will be centered
-   horizontally by default and placed slightly above the bottom toolbar. */
-@media (max-width: 900px) {
-    .share-dropdown.mobile .share-menu {
-        position: fixed !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 64px !important; /* above the toolbar */
-        top: auto !important;
-        margin-top: 0 !important;
-        z-index: 20000 !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
-    }
-
-}
+/* .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; } */
 
 /* Actions dropdown styles */
 .actions-dropdown {
@@ -1817,25 +1767,7 @@ img {
     filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
 }
 
-.actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; }
-
-/* Mobile: ensure dropdowns aren't clipped by parent containers with overflow:hidden.
-   Use fixed positioning for the mobile actions menu so it sits above the layout and
-   remains visible even when parent elements hide overflow. It will be centered
-   horizontally by default and placed slightly above the bottom toolbar. */
-@media (max-width: 900px) {
-    .actions-dropdown.mobile .actions-menu {
-        position: fixed !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        bottom: 64px !important; /* above the toolbar */
-        top: auto !important;
-        margin-top: 0 !important;
-        z-index: 20000 !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.18) !important;
-    }
-}
-
+/* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
 
 .icon_trash {
     color: #007DB8;
@@ -1924,7 +1856,7 @@ textarea:focus{
 
 .noteentry{
     padding: 0;
-    padding-top: 8px; 
+    /* padding-top: 8px;  */
     width:100%;
     border: 0 none white;
     overflow-wrap: break-word;
@@ -2187,6 +2119,16 @@ hr {
     animation: rotate 1s linear infinite;
 }
 
+/* Trash button in toolbar - make it red/orange */
+.toolbar-btn.btn-trash i.fa-trash {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
+}
+
+.toolbar-btn.btn-trash:hover i.fa-trash,
+.toolbar-btn.btn-trash:focus i.fa-trash {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(100%) saturate(7135%) hue-rotate(0deg) brightness(107%) contrast(116%);
+}
+
 @keyframes rotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
@@ -2317,6 +2259,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     opacity: 1;
     pointer-events: auto;
 }
+
+
 
 /* search-only hiding to avoid interfering with general hidden class */
 .search-hidden { display: none !important; }
@@ -3523,33 +3467,6 @@ input[type="search"]::-webkit-search-results-decoration {
     background: #a8a8a8;
 }
 
-/* Mobile responsive styles for emoji picker */
-@media (max-width: 800px) {
-    .emoji-picker {
-        width: 300px !important;
-        max-height: 350px !important;
-        padding: 8px !important;
-    }
-    
-    .emoji-grid {
-        grid-template-columns: repeat(7, 1fr) !important;
-        gap: 8px !important;
-        padding: 3px 12px !important;
-    }
-    
-    .emoji-item {
-        font-size: 16px !important;
-        width: 28px !important;
-        height: 28px !important;
-    }
-    
-    .emoji-category {
-        padding: 10px 0 !important;
-    }
-}
-
-
-
 .folder-option:last-child {
     border-bottom: none;
 }
@@ -3672,3 +3589,6 @@ input[type="search"]::-webkit-search-results-decoration {
   transform: scale(1.18);
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
+
+
+

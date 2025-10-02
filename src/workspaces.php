@@ -309,8 +309,6 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
-    <!-- Use existing mobile stylesheet for manage workspaces -->
-    <link rel="stylesheet" href="css/workspaces_mobile.css" media="(max-width: 800px)">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -334,28 +332,6 @@ try {
         .workspace-list .btn { min-width: 110px; }
         /* Make disabled buttons visually consistent */
         .workspace-list .btn[disabled] { opacity: 0.65; }
-            /* Navigation buttons: on desktop we show them side-by-side; on mobile `workspaces_mobile.css` controls layout */
-            @media (min-width: 801px) {
-                .settings-container > a.btn-secondary {
-                    width: auto !important;
-                    max-width: calc(50% - 5px) !important;
-                    margin-bottom: 10px !important;
-                    margin-right: 10px !important;
-                    display: inline-block !important;
-                }
-
-                .settings-container > a.btn-secondary:last-of-type {
-                    margin-right: 0 !important;
-                }
-            }
-        @media (max-width:720px) {
-            .workspace-list ul li { flex-wrap: wrap; }
-            .workspace-list .btn { min-width: 100px; }
-            /* Allow buttons inside modals or narrow containers to shrink */
-            .modal .workspace-list .btn,
-            .modal .workspace-list .action-btn,
-            .modal .btn { min-width: 0 !important; max-width: 100% !important; }
-        }
     </style>
     
 </head>

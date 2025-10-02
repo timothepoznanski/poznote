@@ -45,7 +45,15 @@ if (!$note) {
         <h1>Manage Attachments</h1>
         <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
-    <a id="backToNotesLink" href="index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>" class="btn btn-secondary">
+        <?php 
+            $back_params = [];
+            if ($workspace) $back_params[] = 'workspace=' . urlencode($workspace);
+            if ($note_id) {
+                $back_params[] = 'note=' . intval($note_id);
+            }
+            $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
+        ?>
+    <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             Back to Notes
         </a>
 
@@ -571,7 +579,14 @@ if (!$note) {
             var stored = localStorage.getItem('poznote_selected_workspace');
             if (stored && stored !== 'Poznote') {
                 var a = document.getElementById('backToNotesLink');
-                if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+                if (a) {
+                    var params = [];
+                    params.push('workspace=' + encodeURIComponent(stored));
+                    <?php if ($note_id): ?>
+                    params.push('note=<?php echo intval($note_id); ?>');
+                    <?php endif; ?>
+                    a.setAttribute('href', 'index.php?' + params.join('&'));
+                }
             }
         } catch (e) {
             // ignore storage errors

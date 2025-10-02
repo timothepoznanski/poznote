@@ -36,7 +36,6 @@ $pageWorkspace = trim(getWorkspaceFilter());
 <title>Trash - Poznote</title>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
-	<link type="text/css" rel="stylesheet" href="css/trash_mobile.css"/>
 </head>
 <body class="trash-page">
 	<div class="trash-container">

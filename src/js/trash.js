@@ -241,7 +241,7 @@ window.addEventListener('click', function(event) {
 });
 
 // Mobile optimization: scroll management
-if (window.innerWidth <= 800) {
+if (isMobileDevice()) {
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
 }

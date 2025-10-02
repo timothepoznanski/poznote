@@ -48,3 +48,28 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(function(){});
     } catch(e){}
 });
+
+// Centralized mobile detection: use CSS breakpoint (max-width: 800px)
+function isMobileDevice() {
+    if (window.matchMedia) return window.matchMedia('(max-width: 800px)').matches;
+    return window.innerWidth <= 800;
+}
+
+// Accessibility: set aria-hidden on desktop/mobile variants so assistive tech ignores hidden parts
+function updateMobileDesktopAria() {
+    try {
+        var mq = window.matchMedia && window.matchMedia('(max-width: 800px)');
+        var mobileActive = mq ? mq.matches : (window.innerWidth <= 800);
+        // Note: aria-hidden is not set for desktop-only/mobile-only since CSS display handles visibility
+    } catch (e) {
+        // ignore
+    }
+}
+
+// Initialize on DOMContentLoaded and update on resize
+document.addEventListener('DOMContentLoaded', updateMobileDesktopAria);
+window.addEventListener('resize', function() {
+    // throttle simple: run after short timeout
+    clearTimeout(window._poznoteAriaTimeout);
+    window._poznoteAriaTimeout = setTimeout(updateMobileDesktopAria, 120);
+});

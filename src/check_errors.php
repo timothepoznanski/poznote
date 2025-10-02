@@ -101,9 +101,12 @@ $is_generating = false;
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored && stored !== 'Poznote') {
-            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-        }
+        var noteId = <?php echo json_encode($note_id); ?>;
+        var workspace = stored && stored !== 'Poznote' ? stored : 'Poznote';
+        
+        var url = 'index.php?note=' + noteId + '&workspace=' + encodeURIComponent(workspace);
+        var a = document.getElementById('backToNotesLink'); 
+        if (a) a.setAttribute('href', url);
     } catch(e){} })();
     </script>
 </body>
