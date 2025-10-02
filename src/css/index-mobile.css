@@ -15,8 +15,7 @@
 
 /* Hide mobile elements on desktop */
 
-.mobile-nav-button,
-.mobile-home-btn {
+.mobile-nav-button {
     display: none !important;
 }
 
