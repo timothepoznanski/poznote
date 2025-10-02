@@ -6,6 +6,16 @@ require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
 
+// Include page initialization
+require_once 'page_init.php';
+
+// Initialize search parameters
+$search_params = initializeSearchParams();
+extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
+
+// Preserve note parameter if provided (now using ID)
+$note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
+
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +31,15 @@ include 'functions.php';
 <body>
     <div class="settings-container">
         <br>
-        <a id="backToNotesLink" href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="btn btn-secondary">
+        <?php 
+            $back_params = [];
+            $back_params[] = 'workspace=' . urlencode(getWorkspaceFilter());
+            if ($note_id) {
+                $back_params[] = 'note=' . intval($note_id);
+            }
+            $back_href = 'index.php?' . implode('&', $back_params);
+        ?>
+        <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             Back to Notes
         </a>
         <br><br>
@@ -85,6 +103,13 @@ include 'functions.php';
                 <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
                 <div class="settings-card-content">
                     <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
+                </div>
+            </div>
+
+            <div class="settings-card" id="show-trash-button-card">
+                <div class="settings-card-icon"><i class="fa-trash"></i></div>
+                <div class="settings-card-content">
+                    <h3>Show Trash Button in Toolbar <span id="show-trash-button-status" class="setting-status disabled">disabled</span></h3>
                 </div>
             </div>
 
@@ -178,6 +203,27 @@ include 'functions.php';
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
+
+        // Show trash button (database)
+        var cardTrashButton = document.getElementById('show-trash-button-card');
+        var statusTrashButton = document.getElementById('show-trash-button-status');
+        function refreshTrashButton(){
+            var form = new FormData(); form.append('action','get'); form.append('key','show_trash_button');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var enabled = j && j.success && (j.value==='1' || j.value==='true');
+                if(statusTrashButton){ statusTrashButton.textContent = enabled ? 'enabled' : 'disabled'; statusTrashButton.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
+            }).catch(()=>{});
+        }
+        if(cardTrashButton){ cardTrashButton.addEventListener('click', function(){
+            var form = new FormData(); form.append('action','get'); form.append('key','show_trash_button');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                var toSet = currently ? '0' : '1';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_trash_button'); setForm.append('value', toSet);
+                return fetch('api_settings.php',{method:'POST',body:setForm});
+            }).then(function(){ refreshTrashButton(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
+        }); }
+        refreshTrashButton();
     })();
     </script>
     <script>

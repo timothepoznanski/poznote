@@ -153,3 +153,16 @@ html.tags-page {
     background: #f9f9f9;
     border-radius: 12px;
 }
+
+/* Mobile styles */
+@media (max-width: 800px) {
+    /* Hide the "Back to notes" button on mobile */
+    .tags-buttons-container .btn[title="Back to notes"] {
+        display: none !important;
+    }
+    
+    /* Center the header when button is hidden */
+    .tags-buttons-container {
+        justify-content: center !important;
+    }
+}

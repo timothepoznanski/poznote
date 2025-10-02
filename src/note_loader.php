@@ -12,16 +12,17 @@ function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
     $current_note_folder = null;
     
     if($note != '') {
-        // If the note is not empty, it means we have just clicked on a note.
-        $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note, $workspace_filter, $workspace_filter]);
+        // If the note is not empty, it means we have just clicked on a note (now using ID)
+        $note_id = intval($note);
+        $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$note_id, $workspace_filter, $workspace_filter]);
         $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($note_data) {
             $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
             // Prepare result for right column (ensure it's in the workspace)
-            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt_right->execute([$note, $workspace_filter, $workspace_filter]);
+            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt_right->execute([$note_id, $workspace_filter, $workspace_filter]);
             $res_right = $stmt_right;
         } else {
             // If the requested note doesn't exist, display the last updated note
@@ -86,8 +87,8 @@ function prepareSearchResults($con, $is_search_mode, $note, $where_clause, $sear
         // If a specific note is selected, show that note instead of the most recent one
         if (!empty($note)) {
             // Build query to show the selected note if it matches search criteria
-            $where_clause_with_note = $where_clause . " AND heading = ?";
-            $search_params_with_note = array_merge($search_params, [$note]);
+            $where_clause_with_note = $where_clause . " AND id = ?";
+            $search_params_with_note = array_merge($search_params, [intval($note)]);
             
             $query_right_with_note = "SELECT * FROM entries WHERE $where_clause_with_note LIMIT 1";
             

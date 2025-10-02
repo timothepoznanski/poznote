@@ -6,6 +6,16 @@ require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
 
+// Include page initialization
+require_once 'page_init.php';
+
+// Initialize search parameters
+$search_params = initializeSearchParams();
+extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
+
+// Preserve note parameter if provided (now using ID)
+$note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
+
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +32,15 @@ include 'functions.php';
 <body>
     <div class="settings-container">
         <br>
-        <a id="backToNotesLink" href="index.php?workspace=<?php echo urlencode(getWorkspaceFilter()); ?>" class="btn btn-secondary">
+        <?php 
+            $back_params = [];
+            $back_params[] = 'workspace=' . urlencode(getWorkspaceFilter());
+            if ($note_id) {
+                $back_params[] = 'note=' . intval($note_id);
+            }
+            $back_href = 'index.php?' . implode('&', $back_params);
+        ?>
+        <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             Back to Notes
         </a>
         <br><br>

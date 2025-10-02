@@ -124,7 +124,7 @@ try {
 
 // If we get here and it's not AJAX, redirect to main index
 if (!$is_ajax) {
-    $redirect_url = 'index.php?note=' . urlencode($note);
+    $redirect_url = 'index.php?note=' . intval($note);
     if (!empty($search)) $redirect_url .= '&search=' . urlencode($search);
     if (!empty($tags_search)) $redirect_url .= '&tags_search=' . urlencode($tags_search);
     if (!empty($folder_filter)) $redirect_url .= '&folder=' . urlencode($folder_filter);

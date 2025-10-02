@@ -1,0 +1,139 @@
+/**
+ * CSS Mobile Styles for Poznote
+ * Contains all mobile-specific styles (max-width: 800px)
+ * Extracted from index.css for better organization
+ */
+
+/* Responsive helpers: show/hide elements on mobile */
+.desktop-only {
+    display: block !important;
+}
+
+.mobile-only {
+    display: none !important;
+}
+
+/* Hide mobile elements on desktop */
+
+.mobile-nav-button,
+.mobile-home-btn {
+    display: none !important;
+}
+
+/* Force folder actions to be visible on mobile regardless of hide_folder_actions setting */
+
+.folder-toggle .folder-actions i {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.folder-toggle:hover .folder-actions i {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Prevent folder headers from being highlighted when clicking on notes in mobile */
+.folder-header.selected-folder,
+.folder-header.selected,
+.folder-header:active,
+.folder-header:focus {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Force remove any possible folder selection styles */
+.folder-toggle.selected,
+.folder-toggle:active,
+.folder-toggle:focus {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Remove all selection highlights on mobile for notes */
+.links_arbo_left.selected-note,
+.links_arbo_left:hover,
+.links_arbo_left:active,
+.links_arbo_left:focus {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    touch-action: manipulation !important;
+}
+
+/* Prevent any native mobile touch highlighting */
+.links_arbo_left,
+.folder-header,
+.folder-toggle {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    touch-action: manipulation !important;
+}
+
+body {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
+
+body::-webkit-scrollbar {
+    display: none !important;  /* Chrome, Safari and Opera */
+}
+
+#left_col {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    flex-shrink: 0 !important;
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+    overflow: -moz-scrollbars-none !important;  /* Firefox legacy */
+    overflow-y: auto !important;
+}
+
+#right_col {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex-shrink: 0 !important;
+    overflow-y: auto !important;
+}
+
+.resize-handle {
+    display: none !important;
+}
+
+/* Hide scrollbar on mobile - comprehensive approach */
+#left_col::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    background: transparent !important;
+}
+
+#left_col::-webkit-scrollbar-track {
+    display: none !important;
+}
+
+#left_col::-webkit-scrollbar-thumb {
+    display: none !important;
+}
+
+.notecard {
+    margin-left: 3% !important;
+    margin-right: 2% !important;
+}
+
+/* Mobile home button in toolbar */
+.mobile-home-btn {
+    display: flex !important;
+    order: -1 !important; /* Put it first in the toolbar */
+}

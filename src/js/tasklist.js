@@ -7,22 +7,14 @@ function initializeTaskList(noteId, noteType) {
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
-    // Get existing tasks from the note content or initialize empty array
+    // Get existing tasks from the data attribute or initialize empty array
     let tasks = [];
-    try {
-        const content = noteEntry.textContent || noteEntry.innerHTML || '';
-        if (content.trim()) {
-            tasks = JSON.parse(content.trim());
-        }
-    } catch (e) {
-        // If content is not valid JSON, try to parse as simple text tasks
-        const content = noteEntry.textContent || noteEntry.innerHTML || '';
-        if (content.trim()) {
-            tasks = content.split('\n').filter(task => task.trim()).map(task => ({
-                id: Date.now() + Math.random(),
-                text: task.replace(/^[-*]\s*/, '').trim(),
-                completed: false
-            }));
+    const tasklistJson = noteEntry.dataset.tasklistJson;
+    if (tasklistJson && tasklistJson.trim() !== '') {
+        try {
+            tasks = JSON.parse(tasklistJson);
+        } catch (e) {
+            console.error('Failed to parse tasklist JSON:', e);
         }
     }
 

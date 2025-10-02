@@ -584,17 +584,6 @@ body {
     flex: 0 0 auto !important;
 }
 
-/* For the delete confirmation modal: prefer auto-sized buttons on desktop, keep full-width on narrow viewports (mobile) */
-@media (min-width: 421px) {
-    #deleteAttachmentConfirmModal .modal-buttons button {
-        width: auto !important;
-        min-width: 0 !important;
-        padding: 8px 14px !important;
-    }
-}
-
-/* On very small screens, modal buttons remain full width as in modals.css (no override) */
-
 /* Ensure 'Back to Notes' link in settings-container looks like a button */
 .settings-container > a.btn-secondary {
     display: inline-flex;
@@ -748,7 +737,7 @@ body {
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .settings-container {
         margin: 10px;
         padding: 15px;
@@ -787,7 +776,7 @@ body {
         gap: 4px;
     }
 
-    /* Attachment / toolbar mobile rules moved from index_mobile.css */
+    /* Mobile attachment display rules */
     .note-attachments-row {
         margin-top: 10px !important;
         margin-bottom: 5px !important;
@@ -846,9 +835,7 @@ body {
         filter: none !important;
         color: #005a8a !important;
     }
-}
 
-@media (max-width: 480px) {
     .attachment-card {
         padding: 10px;
     }

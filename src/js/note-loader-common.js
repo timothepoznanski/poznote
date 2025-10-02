@@ -15,10 +15,10 @@ function applyHighlightsWithRetries() {
     // Determine active search type (prefer SearchManager if available)
     var activeType = null;
     try {
-        var isMobile = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        var isMobile = isMobileDevice();
         // 1) Prefer SearchManager's mobile-aware state
         if (window.searchManager && typeof window.searchManager.getActiveSearchType === 'function') {
-            activeType = window.searchManager.getActiveSearchType(!!isMobile) || null;
+            activeType = window.searchManager.getActiveSearchType(isMobile) || null;
         }
         // 2) Fallback to URL params (tags_search / search) which reflect user-initiated searches
         if (!activeType) {
@@ -127,23 +127,12 @@ function applyHighlightsWithRetries() {
 }
 
 /**
- * Check if we're on mobile
- */
-function isMobileDevice() {
-    // Check both window width and user agent for better mobile detection
-    const isMobileWidth = window.innerWidth <= 800;
-    const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
-
-    return isMobileWidth || isMobileUserAgent;
-}
-
-/**
  * Find note link by title (robust method that handles quotes and special characters)
  */
-function findNoteLinkByTitle(noteTitle) {
+function findNoteLinkById(noteId) {
     const noteLinks = document.querySelectorAll('a.links_arbo_left[data-note-id]');
     for (let link of noteLinks) {
-        if (link.getAttribute('data-note-id') === noteTitle) {
+        if (link.getAttribute('data-note-id') === String(noteId)) {
             return link;
         }
     }
@@ -153,7 +142,7 @@ function findNoteLinkByTitle(noteTitle) {
 /**
  * Direct note loading function called from onclick
  */
-window.loadNoteDirectly = function(url, noteTitle, event) {
+window.loadNoteDirectly = function(url, noteId, event) {
     try {
     // loadNoteDirectly start
         // Prevent default link behavior
@@ -169,7 +158,7 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
         window.isLoadingNote = true;
 
         // Find the clicked link to update selection using robust method
-        const clickedLink = findNoteLinkByTitle(noteTitle);
+        const clickedLink = findNoteLinkById(noteId);
         
         // Show loading state immediately
         showNoteLoadingState();
@@ -208,8 +197,16 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
-                                    updateBrowserUrl(url, noteTitle);
+                                    updateBrowserUrl(url, noteId);
                                     reinitializeNoteContent();
+
+                                    // Auto-scroll to right column on mobile after note is loaded
+                                    // But only if we actually have a noteId (i.e., a specific note was clicked)
+                                    if (isMobileDevice() && noteId && typeof scrollToRightColumn === 'function') {
+                                        setTimeout(() => {
+                                            scrollToRightColumn();
+                                        }, 100);
+                                    }
 
                                     // Reapply highlights after content has been reinitialized.
                                     // Use delayed calls to ensure layout has stabilized when switching notes.
@@ -299,13 +296,13 @@ window.loadNoteDirectly = function(url, noteTitle, event) {
 /**
  * Load note via AJAX (legacy function)
  */
-function loadNoteViaAjax(url, noteTitle, clickedLink) {
+function loadNoteViaAjax(url, noteId, clickedLink) {
     if (isNoteLoading) {
         return; // Prevent multiple simultaneous requests
     }
 
     isNoteLoading = true;
-    currentLoadingNoteId = noteTitle;
+    currentLoadingNoteId = noteId;
 
     // Update UI to show loading state
     showNoteLoadingState();
@@ -345,7 +342,7 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
 
                             // Update URL before reinitializing so reinitializeNoteContent
                             // can detect the 'note' param and keep the right column visible
-                            updateBrowserUrl(url, noteTitle);
+                            updateBrowserUrl(url, noteId);
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
@@ -416,13 +413,13 @@ function loadNoteViaAjax(url, noteTitle, clickedLink) {
  */
 function loadNoteFromUrl(url) {
     const urlParams = new URLSearchParams(new URL(url).search);
-    const noteTitle = urlParams.get('note');
+    const noteId = urlParams.get('note');
 
-    if (noteTitle) {
+    if (noteId) {
         // Find the corresponding note link using robust method
-        const noteLink = findNoteLinkByTitle(noteTitle);
+        const noteLink = findNoteLinkById(noteId);
         if (noteLink) {
-            loadNoteViaAjax(url, noteTitle, noteLink);
+            loadNoteViaAjax(url, noteId, noteLink);
         }
     }
 }
@@ -496,7 +493,7 @@ function updateSelectedNote(clickedLink) {
 /**
  * Update browser URL without reload
  */
-function updateBrowserUrl(url, noteTitle) {
+function updateBrowserUrl(url, noteId) {
     try {
         // Merge existing search params (search, tags_search, workspace) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
@@ -513,10 +510,10 @@ function updateBrowserUrl(url, noteTitle) {
         });
 
         target.search = targetParams.toString();
-        const state = { noteTitle: noteTitle };
+        const state = { noteId: noteId };
         history.pushState(state, '', target.toString());
     } catch (e) {
-        const state = { noteTitle: noteTitle };
+        const state = { noteId: noteId };
         history.pushState(state, '', url);
     }
 }
@@ -734,14 +731,14 @@ function reinitializeNoteContent() {
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
 
-    // Focus on the note content if it exists
-    const noteContent = document.querySelector('[contenteditable="true"]');
+    // Focus on the note content if it exists - DISABLED
+    // const noteContent = document.querySelector('[contenteditable="true"]');
     // Only focus the note content when not in search mode; otherwise keep focus in the search input
-    if (noteContent && !isSearchMode) {
-        setTimeout(() => {
-            noteContent.focus();
-        }, 100);
-    }
+    // if (noteContent && !isSearchMode) {
+    //     setTimeout(() => {
+    //         noteContent.focus();
+    //     }, 100);
+    // }
 
     // If the loaded note(s) include any tasklist entries, initialize them so the JSON content
     // is replaced with the interactive task list UI when notes are loaded via AJAX.

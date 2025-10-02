@@ -182,7 +182,7 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
     .ai-page {
         padding: 15px;
     }
