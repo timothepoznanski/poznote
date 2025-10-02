@@ -151,6 +151,22 @@ window.loadNoteDirectly = function(url, noteId, event) {
             event.stopPropagation();
         }
         
+        // Check for unsaved changes before navigating
+        if (typeof editedButNotSaved !== 'undefined' && editedButNotSaved === 1 &&
+            typeof updateNoteEnCours !== 'undefined' && updateNoteEnCours === 0 &&
+            typeof noteid !== 'undefined' && noteid !== -1 && noteid !== 'search') {
+            
+            var confirmationMessage = 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment changer de note sans sauvegarder ?';
+
+            if (!confirm(confirmationMessage)) {
+                return false;
+            }
+            
+            // User confirmed - reset the unsaved changes flag and update note ID
+            editedButNotSaved = 0;
+            noteid = noteId;
+        }
+        
         // Prevent multiple simultaneous loads
         if (window.isLoadingNote) {
             return false;
