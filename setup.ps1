@@ -45,139 +45,13 @@ REQUIREMENTS:
 "@ -ForegroundColor $Colors.White
 }
 
-# Check Docker installation and status
-function Test-DockerInstallation {
-    try {
-        Write-Status "Checking if Docker is installed..."
-        $dockerVersion = & docker --version 2>&1
-        if ($LASTEXITCODE -ne 0) { 
-            Write-Error "Docker is not installed or not accessible."
-            Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
-            Write-Host "Error details: $dockerVersion" -ForegroundColor $Colors.Red
-            return $false
-        }
-        Write-Success "Docker is installed: $dockerVersion"
-        return $true
-    }
-    catch {
-        Write-Error "Failed to check Docker installation."
-        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
-        Write-Host "Please install Docker Desktop for Windows from: https://docs.docker.com/desktop/windows/" -ForegroundColor $Colors.Yellow
-        return $false
-    }
-}
 
-function Test-DockerRunning {
-    try {
-        Write-Status "Checking if Docker Desktop is running..."
-        $dockerInfo = & docker info 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            # Some Docker Desktop setups surface a non-fatal warning like:
-            # "WARNING: DOCKER_INSECURE_NO_IPTABLES_RAW is set"
-            # Treat that specific message as a warning and continue, otherwise fail.
-            if ($dockerInfo -match 'DOCKER_INSECURE_NO_IPTABLES_RAW') {
-                Write-Warning "Docker returned a known warning: DOCKER_INSECURE_NO_IPTABLES_RAW. Continuing, but please ensure Docker Desktop is running correctly."
-            } else {
-                Write-Error "Docker Desktop is not running."
-                Write-Host "Please start Docker Desktop and wait for it to be ready, then run this script again." -ForegroundColor $Colors.Yellow
-                Write-Host "Docker info error: $dockerInfo" -ForegroundColor $Colors.Red
-                return $false
-            }
-        }
-        
-        # Verify Docker functionality
-        Write-Status "Verifying Docker daemon functionality..."
-        $testOutput = & docker ps 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Docker daemon is not responding properly."
-            Write-Host "Please make sure Docker Desktop is fully started and try again." -ForegroundColor $Colors.Yellow
-            Write-Host "Docker ps error: $testOutput" -ForegroundColor $Colors.Red
-            return $false
-        }
-        
-        Write-Success "Docker Desktop is running and functional"
-        return $true
-    }
-    catch {
-        $errMsg = $_.Exception.Message
-        # Treat the known DOCKER_INSECURE_NO_IPTABLES_RAW warning as non-fatal and continue
-        if ($errMsg -and $errMsg -match 'DOCKER_INSECURE_NO_IPTABLES_RAW') {
-            Write-Warning "Docker info produced a known warning: DOCKER_INSECURE_NO_IPTABLES_RAW. Continuing, but please ensure Docker Desktop is running correctly."
-            # Try to verify docker using 'docker ps' as fallback
-            try {
-                $testOutput = & docker ps 2>&1
-                if ($LASTEXITCODE -ne 0) {
-                    Write-Error "Docker daemon is not responding properly." 
-                    Write-Host "Please make sure Docker Desktop is fully started and try again." -ForegroundColor $Colors.Yellow
-                    Write-Host "Docker ps error: $testOutput" -ForegroundColor $Colors.Red
-                    return $false
-                }
-                Write-Success "Docker Desktop is running and functional"
-                return $true
-            }
-            catch {
-                Write-Error "Failed to verify Docker daemon after warning: $($_.Exception.Message)"
-                Write-Host "Please make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
-                return $false
-            }
-        }
 
-        Write-Error "Failed to check Docker Desktop status."
-        Write-Host "Error details: $errMsg" -ForegroundColor $Colors.Red
-        Write-Host "Please make sure Docker Desktop is running and try again." -ForegroundColor $Colors.Yellow
-        return $false
-    }
-}
 
-function Test-DockerCompose {
-    try {
-        Write-Status "Checking Docker Compose availability..."
-        $composeVersion = & docker compose version 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Status "Modern 'docker compose' not found, trying legacy 'docker-compose'..."
-            $composeVersion = & docker-compose --version 2>&1
-            if ($LASTEXITCODE -ne 0) { 
-                Write-Error "Docker Compose is not available."
-                Write-Host "Neither 'docker compose' nor 'docker-compose' commands work." -ForegroundColor $Colors.Red
-                Write-Host "Please make sure Docker Desktop is properly installed with Compose plugin." -ForegroundColor $Colors.Yellow
-                Write-Host "Error details: $composeVersion" -ForegroundColor $Colors.Red
-                return $false
-            } else {
-                Write-Warning "Using legacy docker-compose command"
-            }
-        }
-        Write-Success "Docker Compose is available: $composeVersion"
-        return $true
-    }
-    catch {
-        Write-Error "Failed to check Docker Compose."
-        Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor $Colors.Red
-        Write-Host "Please make sure Docker Desktop is properly installed with Compose plugin." -ForegroundColor $Colors.Yellow
-        return $false
-    }
-}
 
-function Test-Docker {
-    Write-Status "Performing Docker environment checks..."
-    
-    # Check Docker installation
-    if (-not (Test-DockerInstallation)) { 
-        return $false 
-    }
-    
-    # Check if Docker Desktop is running
-    if (-not (Test-DockerRunning)) { 
-        return $false 
-    }
-    
-    # Check Docker Compose
-    if (-not (Test-DockerCompose)) { 
-        return $false 
-    }
-    
-    Write-Success "All Docker components are ready!"
-    return $true
-}
+
+
+
 
 # Check if this is an existing installation
 function Test-ExistingInstallation {
@@ -530,9 +404,6 @@ echo "Auto-updated version to: $NEW_VERSION"
 
 # Main installation function
 function Install-Poznote {
-    # Check Docker first
-    Write-Status "Verifying Docker installation and status..."
-    if (-not (Test-Docker)) { exit 1 }
     
     # Check if this is an existing installation
     $isExisting = Test-ExistingInstallation

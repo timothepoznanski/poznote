@@ -53,63 +53,31 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 <summary><strong>🪟 Windows Installation</strong></summary>
 <br>
 
-1. Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5&viewFallbackFrom=powershell-7&WT.mc_id=THOMASMAURER-blog-thmaure)
-2. Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+#### Step 1: Prerequisite
 
-#### Step 1: Choose your instance name
+Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-Copy this command and run it in Powershell 7 to choose your instance name. It will validate the name and check for Docker conflicts. Leave the Powershell window open after 
+#### Step 2: Install Poznote
 
 ```powershell
-
-function Test-DockerConflict($name) {
-    return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0
-}
-
 do {
-    $instanceName = Read-Host "Choose an instance name (poznote, poznote-tom, poznote-alice, my-notes, etc.) [poznote]"
-    if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
-    if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
-        Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
+    $n = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
+    if ([string]::IsNullOrWhiteSpace($n)) { $n = "poznote" }
+    if (-not ($n -cmatch "^[a-z0-9_-]+$")) {
+        Write-Host "Name must contain only lowercase, numbers, underscores, hyphens and no spaces."
         continue
     }
-    if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
-        continue
-    }
-    if (Test-Path $instanceName) {
-        Write-Host "Folder '$instanceName' already exists!" -ForegroundColor Yellow
+    if (Test-Path $n) {
+        Write-Host "Folder '$n' already exists!"
         continue
     }
     break
 } while ($true)
 
-$INSTANCE_NAME = $instanceName
-Write-Host "Using instance name: $INSTANCE_NAME"
+git clone https://github.com/timothepoznanski/poznote.git $n
+Set-Location $n
+powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 ```
-
-#### Step 2: Clone the repository and navigate to the directory
-
-In the same powershell session, copy this command and run it in Powershell 7 to choose your instance name. It will validate the name and check for Docker conflicts.
-
-```powershell
-# Clone the repository with your chosen instance name
-git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
-
-# Navigate to the cloned directory
-cd $INSTANCE_NAME
-```
-
-#### Step 3: Run the setup script
-
-```powershell
-# Run the interactive setup script
-.\setup.ps1
-```
-
-#### Step 4: Access Your Instance
-
-After installation, access Poznote at: `http://localhost:8041`
 
 </details>
 
@@ -172,7 +140,7 @@ bash setup.sh
 
 #### Step 4: Access Your Instance
 
-After installation, access Poznote at: `http://localhost:8041`
+After installation, access Poznote at: `http://localhost:YOUR-PORT`
 
 </details>
 
