@@ -110,10 +110,10 @@ cd $INSTANCE_NAME
 After installation, access Poznote at: `http://localhost:8041`
 
 
-### Linux Installation (Bash)
+### Linux Installation
 
-1. Install Docker Engine: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
-2. Install Docker Compose: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 
 #### Step 1: Choose your instance name
 
