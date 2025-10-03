@@ -52,6 +52,7 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 <details>
 <summary><strong>🪟 Windows Installation</strong></summary>
 
+
 1. Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5&viewFallbackFrom=powershell-7&WT.mc_id=THOMASMAURER-blog-thmaure)
 2. Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
