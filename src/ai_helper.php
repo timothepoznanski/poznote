@@ -26,7 +26,7 @@ class AIHelper {
             $provider = self::getProvider($database);
             
             if ($provider === null) {
-                return ['enabled' => false, 'error' => 'AI features are disabled or not configured'];
+                return ['enabled' => false, 'error' => 'AI features are disabled or not configured. See settings to enable.'];
             }
             
             return ['enabled' => true, 'provider' => $provider->getProviderName()];

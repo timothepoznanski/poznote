@@ -47,82 +47,49 @@ Check out the Poznote website for a video demonstration!
 
 ## Installation
 
-Poznote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
+Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
-- **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux)
-- **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
+<details>
+<summary><strong>🪟 Windows Installation</strong></summary>
+<br>
 
----
+#### Step 1: Prerequisite
 
-### 🪟 Windows Prerequisites
+Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-1. **PowerShell 7**: [Download PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
-2. **Docker Desktop**: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
+#### Step 2: Install Poznote
 
----
-
-### 🐧 Linux Prerequisites
-
-1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
-2. **Docker Compose**: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
-
----
-
-## 🚀 Quick Start (Poznote installation)
-
-**Once Docker is installed, copy and paste the command for your system:**
-
-### 🪟 Windows Installation (Powershell 7)
-
-#### Step 1: Choose your instance name
 ```powershell
-# Run this interactive script to choose your instance name
-# It will validate the name and check for Docker conflicts
-
-function Test-DockerConflict($name) {
-    return (docker ps -a --format "{{.Names}}" | Select-String "^${name}-webserver-1$").Count -eq 0
-}
-
 do {
-    $instanceName = Read-Host "Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]"
-    if ([string]::IsNullOrWhiteSpace($instanceName)) { $instanceName = "poznote" }
-    if (-not ($instanceName -cmatch "^[a-z0-9_-]+$")) {
-        Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces." -ForegroundColor Yellow
+    $n = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
+    if ([string]::IsNullOrWhiteSpace($n)) { $n = "poznote" }
+    if (-not ($n -cmatch "^[a-z0-9_-]+$")) {
+        Write-Host "Name must contain only lowercase, numbers, underscores, hyphens and no spaces."
         continue
     }
-    if (-not (Test-DockerConflict $instanceName)) {
-        Write-Host "Docker container '${instanceName}-webserver-1' already exists!" -ForegroundColor Yellow
-        continue
-    }
-    if (Test-Path $instanceName) {
-        Write-Host "Folder '$instanceName' already exists!" -ForegroundColor Yellow
+    if (Test-Path $n) {
+        Write-Host "Folder '$n' already exists!"
         continue
     }
     break
 } while ($true)
 
-$INSTANCE_NAME = $instanceName
-Write-Host "Using instance name: $INSTANCE_NAME"
+git clone https://github.com/timothepoznanski/poznote.git $n
+Set-Location $n
+powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 ```
 
-#### Step 2: Clone the repository and navigate to the directory
-```powershell
-# Clone the repository with your chosen instance name
-git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
+</details>
 
-# Navigate to the cloned directory
-cd $INSTANCE_NAME
-```
+<details>
+<summary><strong>🐧 Linux Installation</strong></summary>
+<br>
 
-#### Step 3: Run the setup script
-```powershell
-# Run the interactive setup script
-.\setup.ps1
-```
-
-### 🐧 Linux Installation (Bash)
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 
 #### Step 1: Choose your instance name
+
 ```bash
 # Run this interactive script to choose your instance name
 # It will validate the name and check for Docker conflicts
@@ -155,6 +122,7 @@ echo "Using instance name: $INSTANCE_NAME"
 ```
 
 #### Step 2: Clone the repository and navigate to the directory
+
 ```bash
 # Clone the repository with your chosen instance name
 git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
@@ -164,12 +132,17 @@ cd "$INSTANCE_NAME"
 ```
 
 #### Step 3: Run the setup script
+
 ```bash
 # Run the interactive setup script
 bash setup.sh
 ```
 
----
+#### Step 4: Access Your Instance
+
+After installation, access Poznote at: `http://localhost:YOUR-PORT`
+
+</details>
 
 ## Access Your Instance
 
