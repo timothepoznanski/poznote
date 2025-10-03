@@ -109,9 +109,9 @@ function Test-PasswordSecurity {
     if ($hasError) {
         Write-Host ""
         Write-Host "Password requirements:" -ForegroundColor Blue
-        Write-Host "  - Minimum 8 characters" -ForegroundColor White
-        Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
-        Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host "  - Minimum 8 characters"
+        Write-Host "  - Mix of letters and numbers recommended"
+        Write-Host "  - Allowed special characters: @ - _ . , ! *"
         Write-Host ""
         return $false
     }
@@ -275,8 +275,8 @@ function Reconfigure-Poznote {
     
     Write-Host ""
     Write-Status "Password requirements:"
-    Write-Host "  - Minimum 8 characters" -ForegroundColor White
-    Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
+    Write-Host "  - Minimum 8 characters"
+    Write-Host "  - Mix of letters and numbers recommended"
     Write-Host "  - Allowed special characters: @ - _ . , ! *"
     Write-Host ""
     
@@ -507,8 +507,8 @@ function Install-Poznote {
         
         Write-Host ""
         Write-Status "Password requirements:"
-        Write-Host " - Minimum 8 characters" -ForegroundColor White
-        Write-Host " - Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host " - Minimum 8 characters"
+        Write-Host " - Mix of letters and numbers recommended"
         Write-Host " - Allowed special characters: @ - _ . , ! *"
         Write-Host ""
         
