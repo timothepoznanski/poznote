@@ -572,7 +572,7 @@ function Install-Poznote {
     }
     catch {
         $err = $_.Exception.Message
-        Write-Warning "Command attempted: docker compose (via plugin)."
+        Write-Warning "Command attempted: docker compose."
         Write-Warning "docker compose command failed: $err"
     }
         
