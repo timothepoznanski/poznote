@@ -58,7 +58,7 @@ Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-i
 
 #### Step 2: Install Poznote
 
-Paste the following block commands into Powershell console:
+Open Powershell where you want to install Poznote and paste the following block of commands into it:
 
 ```powershell
 do {
@@ -69,7 +69,7 @@ do {
         continue
     }
     if (Test-Path $n) {
-        Write-Host "Folder '$n' already exists!"
+        Write-Host "Folder '$n' already exists here!"
         continue
     }
     break
