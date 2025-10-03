@@ -245,6 +245,19 @@ body {
     content: '';
 }
 
+.fa-coffee {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('../images/coffee.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
 /* Button styles */
 .btn {
     padding: 12px 25px;

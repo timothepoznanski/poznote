@@ -127,6 +127,16 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <h3>About Poznote</h3>
                 </div>
             </div>
+
+            <!-- Support Developer -->
+            <div class="settings-card" onclick="window.open('https://ko-fi.com/timothepoznanski', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-coffee"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Support Developer</h3>
+                </div>
+            </div>
         </div>
     </div>
     
