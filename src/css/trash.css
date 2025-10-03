@@ -48,7 +48,7 @@ body.trash-page html::-webkit-scrollbar-thumb:hover {
 }
 
 body.trash-page {
-    background: #f5f5f5;
+    /* background: #f5f5f5; */
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
