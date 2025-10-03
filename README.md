@@ -54,25 +54,21 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 ---
 
-### 🪟 Windows Prerequisites
+### Windows Prerequisites
 
 1. **PowerShell 7**: [Download PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
 2. **Docker Desktop**: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ---
 
-### 🐧 Linux Prerequisites
+### Linux Prerequisites
 
 1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
 2. **Docker Compose**: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
 
 ---
 
-## 🚀 Quick Start (Poznote installation)
-
-**Once Docker is installed, copy and paste the command for your system:**
-
-### 🪟 Windows Installation (Powershell 7)
+### Windows Installation (Powershell 7)
 
 #### Step 1: Choose your instance name
 ```powershell
@@ -120,7 +116,7 @@ cd $INSTANCE_NAME
 .\setup.ps1
 ```
 
-### 🐧 Linux Installation (Bash)
+### Linux Installation (Bash)
 
 #### Step 1: Choose your instance name
 ```bash
