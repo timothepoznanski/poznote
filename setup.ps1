@@ -202,30 +202,14 @@ function Update-DockerContainer {
     
     # Try docker compose, fallback to docker-compose
     $composeCmd = "docker compose"
-    try {
-        if ($ProjectName) {
-            $output = & docker compose -p $ProjectName down 2>&1
-        } else {
-            $output = & docker compose down 2>&1
-        }
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "docker compose down failed, trying docker-compose..."
-            $composeCmd = "docker-compose"
-            if ($ProjectName) {
-                & docker-compose -p $ProjectName down 2>&1
-            } else {
-                & docker-compose down 2>&1
-            }
-        }
+
+    if ($ProjectName) {
+        $output = & docker compose -p $ProjectName down 2>&1
+    } else {
+        $output = & docker compose down 2>&1
     }
-    catch {
-        Write-Warning "docker compose not available, using docker-compose..."
-        $composeCmd = "docker-compose"
-        if ($ProjectName) {
-            & docker-compose -p $ProjectName down 2>&1
-        } else {
-            & docker-compose down 2>&1
-        }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "docker compose failed..."
     }
     
     Write-Status "Pulling latest images..."
@@ -497,8 +481,6 @@ function Install-Poznote {
         Write-Host "If you used the PowerShell command from the README, please use the updated version that validates names before cloning." -ForegroundColor $Colors.Blue
         exit 1
     }
-    
-    Write-Host ""
 
     # Check if .env already exists
     if (Test-Path ".env") {
@@ -542,9 +524,9 @@ function Install-Poznote {
         
         Write-Host ""
         Write-Status "Password requirements:"
-        Write-Host "  - Minimum 8 characters" -ForegroundColor White
-        Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
-        Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+        Write-Host " - Minimum 8 characters" -ForegroundColor White
+        Write-Host " - Mix of letters and numbers recommended" -ForegroundColor White
+        Write-Host " - Allowed special characters: @ - _ . , ! *"
         Write-Host ""
         
         $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $templateConfig["POZNOTE_PASSWORD"] $false
