@@ -1,9 +1,9 @@
 # Poznote
 
-<a href="https://www.docker.com/" target="_blank">![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)</a>
+[![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
-<a href="https://www.php.net/" target="_blank">![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)</a>
-<a href="https://www.sqlite.org/" target="_blank">![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)</a>
+[![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
 A powerful note-taking application that puts you in complete control of your data. Poznote can be installed locally on your computer or on a remote server to access your notes from your phone or your computer web browser.
 
@@ -43,7 +43,7 @@ A powerful note-taking application that puts you in complete control of your dat
 
 Check out the Poznote website for a video demonstration!
 
-🔗 **<a href="https://poznote.com/" target="_blank">Visit Poznote Website</a>**
+🔗 **[Visit Poznote Website](https://poznote.com/)**
 
 ## Installation
 
@@ -53,8 +53,8 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 <summary><strong>🪟 Windows Installation</strong></summary>
 <br>
 
-1. Install <a href="https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5&viewFallbackFrom=powershell-7&WT.mc_id=THOMASMAURER-blog-thmaure" target="_blank">PowerShell 7</a>
-2. Install <a href="https://docs.docker.com/desktop/setup/install/windows-install/" target="_blank">Docker Desktop</a>
+1. Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5&viewFallbackFrom=powershell-7&WT.mc_id=THOMASMAURER-blog-thmaure)
+2. Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
 #### Step 1: Choose your instance name
 
@@ -117,8 +117,8 @@ After installation, access Poznote at: `http://localhost:8041`
 <summary><strong>🐧 Linux Installation</strong></summary>
 <br>
 
-1. Install <a href="https://docs.docker.com/engine/install/" target="_blank">Docker engine</a>
-2. Install <a href="https://docs.docker.com/compose/install/" target="_blank">Docker Compose</a>
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 
 #### Step 1: Choose your instance name
 
@@ -328,8 +328,8 @@ Poznote includes powerful AI capabilities powered by **OpenAI** or **Mistral AI*
 ### Setup AI Features
 
 1. **Choose your AI Provider**
-   - **OpenAI**: Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
-   - **Mistral AI**: Visit <a href="https://console.mistral.ai/" target="_blank">Mistral Console</a>
+   - **OpenAI**: Visit [OpenAI Platform](https://platform.openai.com/api-keys)
+   - **Mistral AI**: Visit [Mistral Console](https://console.mistral.ai/)
    - Create an account or sign in
    - Generate a new API key
 
@@ -357,8 +357,8 @@ Poznote includes powerful AI capabilities powered by **OpenAI** or **Mistral AI*
 
 When AI features are enabled:
 - Note content is sent to your chosen AI provider's servers for processing
-- **OpenAI**: Data is processed according to <a href="https://openai.com/privacy/" target="_blank">OpenAI's privacy policy</a>
-- **Mistral AI**: Data is processed according to <a href="https://mistral.ai/terms/" target="_blank">Mistral AI's terms of service</a>
+- **OpenAI**: Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
+- **Mistral AI**: Data is processed according to [Mistral AI's terms of service](https://mistral.ai/terms/)
 - You can disable AI features at any time in settings
 
 ## API Documentation
