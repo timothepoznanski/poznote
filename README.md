@@ -52,23 +52,12 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 - **Run locally** on your computer using Docker Desktop (Windows) or Docker Engine (Linux)
 - **Deploy on a server** to access your notes from anywhere - phone, tablet, or any web browser
 
----
-
 ### Windows Prerequisites
+
+### Windows Installation (Powershell 7)
 
 1. **PowerShell 7**: [Download PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
 2. **Docker Desktop**: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
----
-
-### Linux Prerequisites
-
-1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
-2. **Docker Compose**: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
-
----
-
-### Windows Installation (Powershell 7)
 
 #### Step 1: Choose your instance name
 ```powershell
@@ -102,6 +91,7 @@ Write-Host "Using instance name: $INSTANCE_NAME"
 ```
 
 #### Step 2: Clone the repository and navigate to the directory
+
 ```powershell
 # Clone the repository with your chosen instance name
 git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
@@ -111,14 +101,24 @@ cd $INSTANCE_NAME
 ```
 
 #### Step 3: Run the setup script
+
 ```powershell
 # Run the interactive setup script
 .\setup.ps1
 ```
 
+#### Step 4: Access Your Instance
+
+After installation, access Poznote at: `http://localhost:8041`
+
+
 ### Linux Installation (Bash)
 
+1. **Docker Engine**: Install Docker for your distribution ([official guide](https://docs.docker.com/engine/install/))
+2. **Docker Compose**: Install Docker Compose ([official guide](https://docs.docker.com/compose/install/))
+
 #### Step 1: Choose your instance name
+
 ```bash
 # Run this interactive script to choose your instance name
 # It will validate the name and check for Docker conflicts
@@ -151,6 +151,7 @@ echo "Using instance name: $INSTANCE_NAME"
 ```
 
 #### Step 2: Clone the repository and navigate to the directory
+
 ```bash
 # Clone the repository with your chosen instance name
 git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
@@ -160,24 +161,16 @@ cd "$INSTANCE_NAME"
 ```
 
 #### Step 3: Run the setup script
+
 ```bash
 # Run the interactive setup script
 bash setup.sh
 ```
 
----
+#### Step 4: Access Your Instance
 
-## Access Your Instance
+After installation, access Poznote at: `http://localhost:8041`
 
-After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
-
-where YOUR_SERVER depends on your environment:
-
-- localhost
-- Your server's IP address
-- Your domain name
-
-The setup script will display the exact URL and credentials.
 
 ## Workspaces
 
