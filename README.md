@@ -68,11 +68,6 @@ do {
         Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
         continue
     }
-    $containerExists = (docker ps -a --format "{{.Names}}" | Select-String "^${n}-webserver-1$").Count -gt 0
-    if ($containerExists) {
-        Write-Host "Docker container '${n}-webserver-1' already exists!"
-        continue
-    }
     if (Test-Path $n) {
         Write-Host "Folder '$n' already exists!"
         continue
