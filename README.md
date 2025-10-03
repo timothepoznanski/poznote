@@ -114,7 +114,8 @@ After installation, access Poznote at: `http://localhost:8041`
 </details>
 
 
-### Linux Installation
+<details>
+<summary><strong>🐧 Linux Installation</strong></summary>
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
@@ -172,6 +173,8 @@ bash setup.sh
 #### Step 4: Access Your Instance
 
 After installation, access Poznote at: `http://localhost:8041`
+
+</details>
 
 
 ## Workspaces
