@@ -200,9 +200,6 @@ function Update-DockerContainer {
     $projectArg = if ($ProjectName) { "-p `"$ProjectName`"" } else { "" }
     Write-Status "Stopping existing container..."
     
-    # Try docker compose, fallback to docker-compose
-    $composeCmd = "docker compose"
-
     if ($ProjectName) {
         $output = & docker compose -p $ProjectName down 2>&1
     } else {
@@ -214,18 +211,11 @@ function Update-DockerContainer {
     
     Write-Status "Pulling latest images..."
     try {
-        if ($composeCmd -eq "docker compose") {
-            if ($ProjectName) {
-                $pullOutput = docker compose -p $ProjectName pull 2>&1
-            } else {
-                $pullOutput = docker compose pull 2>&1
-            }
+       
+        if ($ProjectName) {
+            $pullOutput = docker compose -p $ProjectName pull 2>&1
         } else {
-            if ($ProjectName) {
-                $pullOutput = docker-compose -p $ProjectName pull 2>&1
-            } else {
-                $pullOutput = docker-compose pull 2>&1
-            }
+            $pullOutput = docker compose pull 2>&1
         }
     }
     catch {
@@ -234,18 +224,11 @@ function Update-DockerContainer {
     
     Write-Status "Building and starting updated container..."
     try {
-        if ($composeCmd -eq "docker compose") {
-            if ($ProjectName) {
-                $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
-            } else {
-                $buildOutput = docker compose up -d --build --force-recreate 2>&1
-            }
+     
+        if ($ProjectName) {
+            $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
         } else {
-            if ($ProjectName) {
-                $buildOutput = docker-compose -p $ProjectName up -d --build --force-recreate 2>&1
-            } else {
-                $buildOutput = docker-compose up -d --build --force-recreate 2>&1
-            }
+            $buildOutput = docker compose up -d --build --force-recreate 2>&1
         }
         
         if ($LASTEXITCODE -eq 0) {
@@ -294,7 +277,7 @@ function Reconfigure-Poznote {
     Write-Status "Password requirements:"
     Write-Host "  - Minimum 8 characters" -ForegroundColor White
     Write-Host "  - Mix of letters and numbers recommended" -ForegroundColor White
-    Write-Host "  - Allowed special characters: @ - _ . , ! *" -ForegroundColor Green
+    Write-Host "  - Allowed special characters: @ - _ . , ! *"
     Write-Host ""
     
     $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $existingConfig['POZNOTE_PASSWORD'] $true
@@ -571,7 +554,6 @@ function Install-Poznote {
     $success = $false
     
     try {
-        Write-Status "Attempting to start with 'docker compose'..."
         if ($INSTANCE_NAME) {
             $cmdInfo = "docker compose -p $INSTANCE_NAME up -d --build"
             $output = & docker compose -p $INSTANCE_NAME up -d --build 2>&1
@@ -586,79 +568,24 @@ function Install-Poznote {
             Write-Warning "Command attempted: $cmdInfo"
             Write-Warning "docker compose returned a non-zero exit code. Showing output:"
             Write-Host $output -ForegroundColor $Colors.Red
-            Write-Status "Will try legacy 'docker-compose' as a fallback. If that also fails, run 'docker compose up --build' manually to see full logs."
         }
     }
     catch {
         $err = $_.Exception.Message
         Write-Warning "Command attempted: docker compose (via plugin)."
         Write-Warning "docker compose command failed: $err"
-        Write-Status "Will try legacy 'docker-compose' as a fallback. If that also fails, run 'docker compose up --build' manually to see full logs."
     }
-    
+        
+    # Sometimes compose returns warnings/non-zero codes while still starting containers.
     if (-not $success) {
-        try {
-            Write-Status "Attempting to start with 'docker-compose' (legacy)..."
-            if ($INSTANCE_NAME) {
-                $cmdInfoLegacy = "docker-compose -p $INSTANCE_NAME up -d --build"
-                $output = & docker-compose -p $INSTANCE_NAME up -d --build 2>&1
-            } else {
-                $cmdInfoLegacy = "docker-compose up -d --build"
-                $output = & docker-compose up -d --build 2>&1
-            }
-            if ($LASTEXITCODE -eq 0) {
-                $dockerComposeCmd = "docker-compose"
-                $success = $true
-            } else {
-                Write-Warning "Command attempted: $cmdInfoLegacy"
-                Write-Error "docker-compose returned a non-zero exit code. Showing output:"
-                Write-Host $output -ForegroundColor $Colors.Red
-                Write-Host "To inspect the error in detail, run one of these commands manually in this folder:" -ForegroundColor $Colors.Yellow
-                Write-Host "  docker compose -p $INSTANCE_NAME up --build" -ForegroundColor $Colors.White
-                Write-Host "  docker-compose -p $INSTANCE_NAME up --build" -ForegroundColor $Colors.White
-            }
-        }
-        catch {
-            $err = $_.Exception.Message
-            Write-Warning "Command attempted: docker-compose (legacy)."
-            Write-Error "docker-compose command failed: $err"
+        Write-Status "Checking if containers are actually running despite non-zero exit codes..."
+        $psOutput = & docker compose -p $INSTANCE_NAME ps -q 2>$null
+        if ($LASTEXITCODE -eq 0 -and $psOutput) {
+            Write-Warning "Compose returned non-zero, but containers are running. Treating as success."
+            $success = $true
+        } else {
+            Write-Warning "There is a unknown problem with docker compose execution..."
             $success = $false
-        }
-    }
-    
-    # If both compose attempts failed (non-zero exit), try a defensive check:
-    # sometimes compose returns warnings/non-zero codes while still starting containers.
-    if (-not $success) {
-        try {
-            Write-Status "Checking if containers are actually running despite non-zero exit codes..."
-            if ($INSTANCE_NAME) {
-                $psOutput = & docker compose -p $INSTANCE_NAME ps -q 2>$null
-                if ($LASTEXITCODE -eq 0 -and $psOutput) {
-                    Write-Warning "Compose returned non-zero, but containers are running. Treating as success."
-                    $success = $true
-                    $dockerComposeCmd = "docker compose"
-                    $output = $psOutput
-                } else {
-                    $psLegacy = & docker-compose -p $INSTANCE_NAME ps -q 2>$null
-                    if ($LASTEXITCODE -eq 0 -and $psLegacy) {
-                        Write-Warning "Legacy docker-compose returned non-zero, but containers are running. Treating as success."
-                        $success = $true
-                        $dockerComposeCmd = "docker-compose"
-                        $output = $psLegacy
-                    }
-                }
-            } else {
-                # No instance name: try a generic docker ps check for poznote containers
-                $psGeneric = & docker ps --filter "name=poznote" -q 2>$null
-                if ($LASTEXITCODE -eq 0 -and $psGeneric) {
-                    Write-Warning "Containers matching 'poznote' are running. Treating as success."
-                    $success = $true
-                    $output = $psGeneric
-                }
-            }
-        }
-        catch {
-            # ignore and fall through to original error handling
         }
     }
 
