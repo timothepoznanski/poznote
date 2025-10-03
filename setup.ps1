@@ -709,15 +709,7 @@ function Install-Poznote {
     
         Write-Host ""
     } else {
-        Write-Error "Failed to start Poznote. Please check the error messages above."
-        Write-Host "Error Output:" -ForegroundColor $Colors.Red
-        Write-Host "$output" -ForegroundColor $Colors.Red
-        Write-Host ""
-        Write-Host "Common solutions:" -ForegroundColor $Colors.Yellow
-        Write-Host "  - Make sure Docker Desktop is running and ready"
-        Write-Host "  - Try running 'docker info' to verify Docker is accessible"
-        Write-Host "  - Restart Docker Desktop if needed"
-        Write-Host "  - Check that no other services are using the ports (8040, 3306)"
+        Write-Error "Failed to start Poznote. Check the error messages above and ensure Docker Desktop is running."
         exit 1
     }
 }

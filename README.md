@@ -51,13 +51,14 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 <details>
 <summary><strong>🪟 Windows Installation</strong></summary>
-<br>
 
 #### Step 1: Prerequisite
 
-Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
 #### Step 2: Install Poznote
+
+Open Powershell where you want to install Poznote, paste and run the following block of commands:
 
 ```powershell
 do {
@@ -68,7 +69,7 @@ do {
         continue
     }
     if (Test-Path $n) {
-        Write-Host "Folder '$n' already exists!"
+        Write-Host "Folder '$n' already exists here!"
         continue
     }
     break
@@ -77,13 +78,13 @@ do {
 git clone https://github.com/timothepoznanski/poznote.git $n
 Set-Location $n
 powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
+
 ```
 
 </details>
 
 <details>
 <summary><strong>🐧 Linux Installation</strong></summary>
-<br>
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
