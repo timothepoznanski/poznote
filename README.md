@@ -78,6 +78,7 @@ do {
 git clone https://github.com/timothepoznanski/poznote.git $n
 Set-Location $n
 powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
+
 ```
 
 </details>
