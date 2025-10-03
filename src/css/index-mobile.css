@@ -136,3 +136,27 @@ body::-webkit-scrollbar {
     display: flex !important;
     order: -1 !important; /* Put it first in the toolbar */
 }
+
+.emoji-picker {
+    width: 95vw;
+    max-width: 280px;
+    max-height: 50vh;
+    padding: 12px;
+}
+
+.emoji-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 5px 2px;
+}
+
+.emoji-item {
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+}
+
+.emoji-category {
+    padding: 10px 0;
+}
+

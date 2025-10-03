@@ -3402,11 +3402,11 @@ input[type="search"]::-webkit-search-results-decoration {
     position: fixed;
     background: white;
     border: 1px solid #ddd;
-    border-radius: 12px;
+    /* border-radius: 12px; */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     width: 360px;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
@@ -3436,7 +3436,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .emoji-item {
     font-size: 18px;
     width: 30px;
-    height: 30px;
+    /* height: 30px; */
     display: flex;
     align-items: center;
     justify-content: center;
