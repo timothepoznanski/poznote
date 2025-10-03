@@ -54,11 +54,11 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 #### Step 1: Prerequisite
 
-Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+Install ans start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
 #### Step 2: Install Poznote
 
-Open Powershell where you want to install Poznote and paste the following block of commands into it:
+Open Powershell where you want to install Poznote, paste the following block of commands into it and execute:
 
 ```powershell
 do {
