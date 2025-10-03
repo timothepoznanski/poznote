@@ -51,7 +51,6 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 <details>
 <summary><strong>🪟 Windows Installation</strong></summary>
-<br>
 
 #### Step 1: Prerequisite
 
