@@ -49,9 +49,6 @@ Check out the Poznote website for a video demonstration!
 
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
-- **Deploy on your computer** to access your notes only from this device
-- **Deploy on a linux server** to access your notes from anywhere
-
 <details>
 <summary><strong>🪟 Windows Installation</strong></summary>
 
