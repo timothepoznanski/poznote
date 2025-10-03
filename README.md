@@ -47,15 +47,15 @@ Check out the Poznote website for a video demonstration!
 
 ## Installation
 
-Poznote runs in a Docker container, making it incredibly easy to deploy anywhere. You can:
+Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
 - **Deploy on your computer** to access your notes only from this device
 - **Deploy on a linux server** to access your notes from anywhere
 
-### Windows Installation (Powershell 7)
+### Windows Installation
 
-1. Install PowerShell 7: [Download PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
-2. Install Docker Desktop: [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
+1. Install [PowerShell 7](https://github.com/PowerShell/PowerShell/releases/latest)
+2. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 #### Step 1: Choose your instance name
 ```powershell
