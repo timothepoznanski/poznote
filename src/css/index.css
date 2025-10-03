@@ -434,6 +434,8 @@ body {
 .sidebar-title[role="button"] { cursor: pointer; }
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
+.sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-plus { background: transparent; border: none; color: #007DB8; font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 /* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
 
