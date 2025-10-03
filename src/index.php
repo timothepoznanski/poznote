@@ -241,6 +241,8 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
+                <button class="sidebar-display" onclick="window.location.href='display.php';" title="Display"><i class="fa-eye"></i></button>
+                <button class="sidebar-settings" onclick="window.location.href='settings.php';" title="Settings"><i class="fa-cog"></i></button>
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
             </div>
 

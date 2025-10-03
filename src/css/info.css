@@ -10,6 +10,23 @@ body {
     margin: 0 auto;
 }
 
+/* Button container styles similar to list_tags.css */
+.info-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.titre-info {
+    text-align: center;
+    /* margin-bottom: 20px; */
+    color: #333;
+    font-size: 24px;
+}
+
 .info-content {
     background: white;
     border-radius: 4px;
@@ -158,6 +175,7 @@ body {
     opacity: 1;
     background-color: #e9ecef;
 }
+
 /* Make subheading appear clickable (blue) but not underlined */
 #subheading-display {
     color: #007DB8;
@@ -199,4 +217,14 @@ body {
     }
     .btn-save, .btn-cancel { padding: 8px 14px; }
     #edit-subheading-btn { margin-left: 0; }
+
+     /* Hide the "Back to notes" button on mobile */
+    .info-buttons-container .btn[title="Back to notes"] {
+        display: none !important;
+    }
+    
+    /* Center the header when button is hidden */
+    .info-buttons-container {
+        justify-content: center;
+    }
 }

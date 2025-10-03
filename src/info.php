@@ -99,7 +99,9 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 </head>
 <body>
     <div class="info-page">
-        <h1 style="text-align: center; margin-bottom: 20px; color: #333; font-size: 24px;">Note Information</h1>
+        <div class="info-buttons-container">
+            <span class=titre-info>Note Information</span>
+        </div>
         
         <div class="info-content">
             <div class="info-row">
@@ -169,18 +171,6 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
                 <div class="info-label">Full Path:</div>
                 <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
             </div>
-        </div>
-
-        <div class="action-buttons">
-            <?php 
-                $close_params = [];
-                if ($workspace) $close_params[] = 'workspace=' . urlencode($workspace);
-                if ($note_id) {
-                    $close_params[] = 'note=' . intval($note_id);
-                }
-                $close_href = 'index.php' . (!empty($close_params) ? '?' . implode('&', $close_params) : '');
-            ?>
-            <a href="<?php echo $close_href; ?>" class="btn btn-secondary">Close</a>
         </div>
     </div>
 
