@@ -58,6 +58,8 @@ Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-i
 
 #### Step 2: Install Poznote
 
+Paste the following block commands into Powershell console:
+
 ```powershell
 do {
     $n = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
@@ -82,7 +84,6 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 
 <details>
 <summary><strong>🐧 Linux Installation</strong></summary>
-<br>
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
