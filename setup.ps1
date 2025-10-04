@@ -50,7 +50,8 @@ function Test-Docker {
     try {
         $null = docker ps 2>$null
     } catch {
-        Write-Warning "Docker may not be installed or running. Please ensure Docker Desktop is installed and started."
+        Write-Error "Docker may not be installed or running. Please check Docker Desktop and rerun this setup script."
+        exit 1
     }
 }
 
