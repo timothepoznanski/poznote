@@ -14,10 +14,10 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Workspaces](#workspaces)
-- [Multiple Instances](#multiple-instances)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
 - [Update Application](#update-application)
+- [Multiple Instances](#multiple-instances)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [AI Features](#ai-features)
@@ -141,6 +141,32 @@ and where YOUR_PORT depends on your port choice (see your .env file).
 
 The setup script will display the exact URL and credentials.
 
+## Change Settings
+
+To change your username, password, or port:
+
+**Linux:**
+```bash
+./setup.sh
+```
+
+**Windows:**
+```powershell
+powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
+```
+
+Select option 2 (Change settings) from the menu. The script will preserve all your data.
+
+## Reset Password
+
+If you've forgotten your password, run the setup script and select "Change settings".
+
+## Update Application
+
+You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
+
+To update Poznote to the latest version, run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+
 ## Workspaces
 
 Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
@@ -165,32 +191,6 @@ Server: my-server.com
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
-
-## Change Settings
-
-To change your username, password, or port:
-
-**Linux:**
-```bash
-./setup.sh
-```
-
-**Windows:**
-```powershell
-.\setup.ps1
-```
-
-Select option 2 (Change settings) from the menu. The script will preserve all your data.
-
-## Reset Password
-
-If you've forgotten your password, run the setup script and select "Change settings".
-
-## Update Application
-
-You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
-
-To update Poznote to the latest version, run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
 
 ## Backup and Restore
 
