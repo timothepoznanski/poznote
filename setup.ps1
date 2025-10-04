@@ -31,17 +31,7 @@ REQUIREMENTS:
 "@ -ForegroundColor $Colors.White
 }
 
-# Test Docker
-function Test-Docker {
-    Write-Status "Checking Docker..."
-    try {
-        $null = docker ps 2>$null
-        Write-Success "Docker is running"
-    } catch {
-        Write-Error "Docker may not be installed or running. Please check Docker Desktop and rerun this setup script."
-        exit 1
-    }
-}
+
 
 
 
@@ -550,8 +540,6 @@ function Show-MainMenu {
 if ($Help) { Show-Help; exit 0 }
 
 try {
-    Test-Docker
-    
     if (Test-ExistingInstallation) {
         $config = Get-ExistingConfig
         

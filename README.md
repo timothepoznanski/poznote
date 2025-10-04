@@ -61,6 +61,8 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell where you want to install Poznote, paste and run the following block of commands:
 
 ```powershell
+try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; exit 1 }
+
 do {
     $instance = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
     if ([string]::IsNullOrWhiteSpace($instance)) { $instance = "poznote" }
@@ -70,6 +72,11 @@ do {
     }
     break
 } while ($true)
+
+if (docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instance-webserver-1$" }) {
+    Write-Host "Container '$instance-webserver-1' already exists. Please choose a different instance name." -ForegroundColor Red
+    exit 1
+}
 
 git clone https://github.com/timothepoznanski/poznote.git $instance
 Set-Location $instance
@@ -90,6 +97,8 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 #### Step 2: Install Poznote
 
 ```bash
+docker ps >/dev/null 2>&1 || { echo "Please start Docker"; exit 1; }
+
 while true; do
     read -p "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]: " instance
     instance=${instance:-poznote}
@@ -99,6 +108,11 @@ while true; do
     fi
     break
 done
+
+if docker ps -a --format "{{.Names}}" | grep -q "^$instance-webserver-1$"; then
+    echo "Container '$instance-webserver-1' already exists. Please choose a different instance name."
+    exit 1
+fi
 git clone https://github.com/timothepoznanski/poznote.git "$instance"
 cd "$instance"
 bash setup.sh
