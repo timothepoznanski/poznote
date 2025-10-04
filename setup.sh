@@ -138,7 +138,8 @@ reconfigure_poznote() {
 # Check Docker accessibility
 check_docker() {
     if ! docker ps > /dev/null 2>&1; then
-        print_warning "Docker may not be installed or running. Please ensure Docker is installed and started."
+        print_error "Docker may not be installed or running. Please check Docker and rerun this setup script."
+        exit 1
     fi
 }
 
