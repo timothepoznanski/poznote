@@ -232,20 +232,25 @@ function Update-DockerContainer {
     
     Write-Status "Pulling latest images..."
     try {
-       
         if ($ProjectName) {
             $pullOutput = docker compose -p $ProjectName pull 2>&1
         } else {
             $pullOutput = docker compose pull 2>&1
         }
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Image pull failed, but continuing with build..."
+            Write-Host "Pull output:" -ForegroundColor $Colors.Yellow
+            Write-Host $pullOutput -ForegroundColor $Colors.Gray
+        }
     }
     catch {
         Write-Warning "Image pull failed, but continuing with build..."
+        Write-Host "Pull error: $($_.Exception.Message)" -ForegroundColor $Colors.Yellow
     }
     
     Write-Status "Building and starting updated container..."
     try {
-     
         if ($ProjectName) {
             $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
         } else {
@@ -254,14 +259,21 @@ function Update-DockerContainer {
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Container updated successfully!"
-            return $composeCmd
+            return $true
         } else {
-            throw "Failed to update container: $buildOutput"
+            Write-Error "Docker compose failed with exit code: $LASTEXITCODE"
+            Write-Host "Docker output:" -ForegroundColor $Colors.Red
+            Write-Host $buildOutput -ForegroundColor $Colors.Gray
+            throw "Container update failed"
         }
     }
     catch {
         Write-Error "Exception during container update: $($_.Exception.Message)"
-        throw "Failed to update container: $($_.Exception.Message)"
+        if ($buildOutput) {
+            Write-Host "Docker output:" -ForegroundColor $Colors.Red
+            Write-Host $buildOutput -ForegroundColor $Colors.Gray
+        }
+        throw "Container update failed: $($_.Exception.Message)"
     }
 }
 
