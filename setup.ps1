@@ -1,5 +1,5 @@
 # Poznote Setup Script for Windows (PowerShell)
-# This script automates the installation and update process for Poznote
+# Simple and clear installation and update process
 
 param([switch]$Help)
 
@@ -16,49 +16,36 @@ function Write-Success { param($Message); Write-Host "[SUCCESS] $Message" -Foreg
 function Write-Warning { param($Message); Write-Host "[WARNING] $Message" -ForegroundColor $Colors.Yellow }
 function Write-Error { param($Message); Write-Host "[ERROR] $Message" -ForegroundColor $Colors.Red }
 
-# Help function
+# Show help
 function Show-Help {
     Write-Host @"
 Poznote Setup Script for Windows
 
 USAGE:
-    .\setup.ps1 [OPTIONS]
-
-OPTIONS:
-    -Help        Show this help message
-
-EXAMPLES:
-    .\setup.ps1  Interactive menu for installation, update, or configuration
-
-FEATURES:
-    - Automatic detection of existing installations
-    - Interactive menu with options:
-      - New installation (fresh setup)
-      - Update application (get latest code)
-      - Change settings (password/port/name etc.)
-    - Configuration preservation during updates
+    .\setup.ps1         Interactive installation/update
+    .\setup.ps1 -Help   Show this help
 
 REQUIREMENTS:
     - Docker Desktop for Windows
-    - PowerShell 5.1 or later
 
 "@ -ForegroundColor $Colors.White
 }
 
-# Check Docker accessibility
+# Test Docker
 function Test-Docker {
+    Write-Status "Checking Docker..."
     try {
         $null = docker ps 2>$null
+        Write-Success "Docker is running"
     } catch {
         Write-Error "Docker may not be installed or running. Please check Docker Desktop and rerun this setup script."
         exit 1
     }
 }
 
-# Check for existing containers with similar names
+# Check for existing containers
 function Test-ExistingContainers {
     $instanceName = Split-Path -Leaf (Get-Location)
-    
     $existingContainers = docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instanceName-" }
     
     if ($existingContainers) {
@@ -74,139 +61,62 @@ function Test-ExistingContainers {
     }
 }
 
-# Check if this is an existing installation
+# Check if existing installation
 function Test-ExistingInstallation {
-    # Installation is detected if .env file exists
     return Test-Path ".env"
 }
 
-# Load environment configuration
-function Get-ExistingEnvConfig {
-    if (-not (Test-Path ".env")) { return @{} }
-    
-    $envVars = @{}
-    Get-Content ".env" | ForEach-Object {
-        if ($_ -match '^([^#][^=]+)=(.*)$') {
-            $envVars[$matches[1]] = $matches[2]
-        }
-    }
-    return $envVars
-}
-
-# Get user input with default value
+# Get user input with default
 function Get-UserInput {
     param([string]$Prompt, [string]$Default)
-    $input = Read-Host "$Prompt [$Default]"
+    $input = Read-Host "$Prompt"
     if ([string]::IsNullOrWhiteSpace($input)) { return $Default }
     return $input
 }
 
-# Validate password for security and compatibility
-function Test-PasswordSecurity {
+# Validate password
+function Test-Password {
     param([string]$Password)
-    
-    $hasError = $false
-    
-    # Check minimum length
     if ($Password.Length -lt 8) {
         Write-Warning "Password must be at least 8 characters long."
-        $hasError = $true
-    }
-    
-    # Check for forbidden characters
-    $forbiddenChars = '[$`"''\\|&;<>(){}[\]~#%=?+ ]'
-    if ($Password -match $forbiddenChars) {
-        Write-Warning "Password contains forbidden characters."
-        $hasError = $true
-    }
-    
-    # Check if password is too simple
-    if ($Password -match '^[a-zA-Z]+$' -or $Password -match '^[0-9]+$') {
-        Write-Warning "Password should contain a mix of letters and numbers for better security."
-        $hasError = $true
-    }
-    
-    # Show rules if there's an error
-    if ($hasError) {
-        Write-Host ""
-        Write-Host "Password requirements:" -ForegroundColor Blue
-        Write-Host "  - Minimum 8 characters"
-        Write-Host "  - Mix of letters and numbers recommended"
-        Write-Host "  - Allowed special characters: @ - _ . , ! *"
-        Write-Host ""
         return $false
     }
-    
     return $true
 }
 
-# Get password with validation
-function Get-SecurePassword {
-    param([string]$Prompt, [string]$Default, [bool]$AllowEmpty = $false)
-    
-    while ($true) {
-        $password = Get-UserInput $Prompt $Default
-        
-        if ([string]::IsNullOrWhiteSpace($password) -and $AllowEmpty) {
-            return $Default
-        }
-        
-        if (Test-PasswordSecurity $password) {
-            return $password
-        }
-        
-        Write-Host "Please try again with a valid password." -ForegroundColor Yellow
-    }
-}
-
-# Check if port is already in use
+# Check if port is available
 function Test-PortAvailable {
     param([int]$Port)
     try {
-        # Use a completely silent method
-        $listener = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners()
-        $portInUse = $listener | Where-Object { $_.Port -eq $Port }
-        return $null -eq $portInUse
-    }
-    catch {
-        try {
-            # Alternative silent method using TcpClient
-            $client = New-Object System.Net.Sockets.TcpClient
-            $result = $client.BeginConnect("localhost", $Port, $null, $null)
-            $success = $result.AsyncWaitHandle.WaitOne(100) -and $client.Connected
-            $client.Close()
-            return -not $success
-        }
-        catch {
-            # If all else fails, assume port is available
-            return $true
-        }
+        $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Any, $Port)
+        $listener.Start()
+        $listener.Stop()
+        return $true
+    } catch {
+        return $false
     }
 }
 
-# Get and validate port with availability check
-function Get-PortWithValidation {
+# Get valid port
+function Get-ValidPort {
     param([string]$Prompt, [string]$Default, [string]$CurrentPort = $null)
     
     while ($true) {
         $portInput = Get-UserInput $Prompt $Default
-        
-        # Validate port is numeric and in valid range
         $port = 0
+        
         if (-not [int]::TryParse($portInput, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
-            Write-Warning "Invalid port number '$portInput'. Please enter a port between 1 and 65535."
+            Write-Warning "Invalid port. Please enter a port between 1 and 65535."
             continue
         }
         
-        # Skip availability check if this is the current port (for reconfiguration)
+        # Skip check if it's the current port
         if ($CurrentPort -and $port.ToString() -eq $CurrentPort) {
             return $port.ToString()
         }
         
-        # Check if port is available
         if (-not (Test-PortAvailable -Port $port)) {
             Write-Warning "Port $port is already in use. Please choose a different port."
-            Write-Status "Tip: For multiple instances on the same server, use different ports (e.g., 8040, 8041, 8042)."
             continue
         }
         
@@ -214,454 +124,320 @@ function Get-PortWithValidation {
     }
 }
 
-# Manage Docker container
-function Update-DockerContainer {
-    param([string]$ProjectName = $null)
+# Create .env file
+function New-EnvFile {
+    param($Username, $Password, $Port)
     
-    Write-Status "Stopping existing container..."
+    $envContent = @"
+POZNOTE_USERNAME=$Username
+POZNOTE_PASSWORD=$Password
+HTTP_WEB_PORT=$Port
+"@
     
-    if ($ProjectName) {
-        $downOutput = docker compose -p $ProjectName down 2>&1
+    $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
+    Write-Success ".env file created successfully!"
+}
+
+# Load existing config
+function Get-ExistingConfig {
+    $config = @{}
+    if (Test-Path ".env") {
+        try {
+            Get-Content ".env" | ForEach-Object {
+                if ($_ -match "^([^=]+)=(.*)$") {
+                    $key = $matches[1].Trim()
+                    $value = $matches[2].Trim()
+                    if (-not [string]::IsNullOrWhiteSpace($key) -and -not [string]::IsNullOrWhiteSpace($value)) {
+                        $config[$key] = $value
+                    }
+                }
+            }
+        }
+        catch {
+            Write-Warning "Could not read .env file properly. It may be corrupted."
+        }
+    }
+    return $config
+}
+
+# Start Docker containers
+function Start-DockerContainers {
+    param([string]$InstanceName)
+    
+    Write-Status "Starting Poznote with Docker Compose..."
+    
+    try {
+        if ($InstanceName) {
+            $output = docker compose -p $InstanceName up -d --build 2>&1
+        } else {
+            $output = docker compose up -d --build 2>&1
+        }
+        
+        # Wait for containers to start
+        Write-Status "Waiting for services to start..."
+        Start-Sleep -Seconds 15
+        
+        # Check if containers are running
+        if ($InstanceName) {
+            $status = docker compose -p $InstanceName ps 2>$null
+        } else {
+            $status = docker compose ps 2>$null
+        }
+        
+        if ($status -match "Up") {
+            Write-Success "Poznote started successfully!"
+            return $true
+        } else {
+            Write-Error "Failed to start Poznote containers"
+            Write-Host "Container status:" -ForegroundColor $Colors.Gray
+            Write-Host $status -ForegroundColor $Colors.Gray
+            Write-Host "Docker output:" -ForegroundColor $Colors.Gray
+            Write-Host $output -ForegroundColor $Colors.Gray
+            return $false
+        }
+    }
+    catch {
+        Write-Error "Docker command failed: $($_.Exception.Message)"
+        if ($output) {
+            Write-Host "Docker output:" -ForegroundColor $Colors.Gray
+            Write-Host $output -ForegroundColor $Colors.Gray
+        }
+        return $false
+    }
+}
+
+# Update containers
+function Update-DockerContainers {
+    param([string]$InstanceName)
+    
+    Write-Status "Stopping existing containers..."
+    if ($InstanceName) {
+        docker compose -p $InstanceName down 2>&1 | Out-Null
     } else {
-        $downOutput = docker compose down 2>&1
+        docker compose down 2>&1 | Out-Null
     }
     
     Write-Status "Pulling latest images..."
-    try {
-        if ($ProjectName) {
-            $pullOutput = docker compose -p $ProjectName pull 2>&1
-        } else {
-            $pullOutput = docker compose pull 2>&1
-        }
-        
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "Image pull failed, but continuing with build..."
-            Write-Host "Pull output:" -ForegroundColor $Colors.Yellow
-            Write-Host $pullOutput -ForegroundColor $Colors.Gray
-        }
-    }
-    catch {
-        Write-Warning "Image pull failed, but continuing with build..."
-        Write-Host "Pull error: $($_.Exception.Message)" -ForegroundColor $Colors.Yellow
-    }
-    
-    Write-Status "Building and starting updated container..."
-    
-    if ($ProjectName) {
-        $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
+    if ($InstanceName) {
+        docker compose -p $InstanceName pull 2>&1 | Out-Null
     } else {
-        $buildOutput = docker compose up -d --build --force-recreate 2>&1
+        docker compose pull 2>&1 | Out-Null
     }
     
-    # Wait for services to start
-    Write-Status "Waiting for services to start..."
-    Start-Sleep -Seconds 10
-    
-    # Check if container is actually running
+    Write-Status "Building and starting updated containers..."
+    return Start-DockerContainers -InstanceName $InstanceName
+}
+
+# Pull latest code
+function Update-Code {
+    Write-Status "Pulling latest changes from repository..."
     try {
-        if ($ProjectName) {
-            $runningContainers = docker compose -p $ProjectName ps --format "{{.State}}" 2>$null
-        } else {
-            $runningContainers = docker compose ps --format "{{.State}}" 2>$null
-        }
-        
-        if ($runningContainers -contains "running") {
-            Write-Success "Container updated successfully!"
+        $gitOutput = git pull origin main 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "Successfully pulled latest changes"
             return $true
         } else {
-            Write-Error "Container is not running after update"
-            Write-Host "Build output:" -ForegroundColor $Colors.Yellow
-            Write-Host $buildOutput -ForegroundColor $Colors.Gray
-            throw "Container failed to start"
+            Write-Error "Git pull failed"
+            Write-Host "Git output:" -ForegroundColor $Colors.Gray
+            Write-Host $gitOutput -ForegroundColor $Colors.Gray
+            return $false
         }
-    }
-    catch {
-        Write-Error "Failed to check container status: $($_.Exception.Message)"
-        Write-Host "Build output:" -ForegroundColor $Colors.Yellow
-        Write-Host $buildOutput -ForegroundColor $Colors.Gray
-        throw "Container update verification failed"
+    } catch {
+        Write-Error "Failed to pull latest changes: $($_.Exception.Message)"
+        return $false
     }
 }
 
-# Reconfigure existing installation
-function Reconfigure-Poznote {
-    Write-Host @"
-
-    Poznote Configuration Update
-
-"@ -ForegroundColor $Colors.Blue
-
-    if (-not (Test-Path ".env")) {
-        Write-Error "No existing configuration found (.env file missing)."
-        Write-Host "Please run the installation first: .\setup.ps1" -ForegroundColor $Colors.Yellow
-        exit 1
-    }
-
-    $existingConfig = Get-ExistingEnvConfig
+# New installation
+function New-Installation {
+    Write-Host "Poznote Installation" -ForegroundColor $Colors.Blue
+    Write-Host ""
     
-    Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
-    Write-Host "  - URL: " -NoNewline -ForegroundColor $Colors.White
-    Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-    Write-Host "  - Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-    Write-Host "  - Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  - Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    $instanceName = Split-Path -Leaf (Get-Location)
+    Write-Status "Using instance name: $instanceName"
     
-
-    Write-Host "`nUpdate your configuration:`n" -ForegroundColor $Colors.Green
-
-    # Get new values
-    $POZNOTE_USERNAME = Get-UserInput "Username" $existingConfig['POZNOTE_USERNAME']
+    Write-Status "Creating .env configuration file..."
+    Write-Host ""
+    Write-Host "Please configure your Poznote installation:" -ForegroundColor $Colors.Green
+    Write-Host ""
+    
+    # Get configuration
+    $username = Get-UserInput "Username [admin]" "admin"
     
     Write-Host ""
     Write-Status "Password requirements:"
-    Write-Host "  - Minimum 8 characters"
-    Write-Host "  - Mix of letters and numbers recommended"
-    Write-Host "  - Allowed special characters: @ - _ . , ! *"
+    Write-Host " - Minimum 8 characters" -ForegroundColor $Colors.Gray
+    Write-Host " - Mix of letters and numbers recommended" -ForegroundColor $Colors.Gray
     Write-Host ""
     
-    $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $existingConfig['POZNOTE_PASSWORD'] $true
-    $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port (current: $($existingConfig['HTTP_WEB_PORT']), press Enter to keep or enter new)" $existingConfig['HTTP_WEB_PORT'] $existingConfig['HTTP_WEB_PORT']
+    while ($true) {
+        $password = Get-UserInput "Poznote Password [admin123]" "admin123"
+        if (Test-Password $password) { break }
+    }
     
-
-    if ($POZNOTE_PASSWORD -eq "admin123") {
+    $port = Get-ValidPort "Web Server Port [8040]" "8040"
+    
+    if ($password -eq "admin123") {
         Write-Warning "You are using the default password! Please change it for production use."
     }
-
-    # Update .env file using template
-    if (Test-Path ".env.template") {
-        Copy-Item ".env.template" ".env" -Force
-        $envContent = Get-Content ".env" -Raw
-        $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
-        $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
-        $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
     
-        
-        $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
-        Write-Success "Configuration updated from template successfully!"
-    }
-
-    # Restart container
-    Write-Status "Restarting Poznote with new configuration..."
+    # Create configuration
+    New-EnvFile -Username $username -Password $password -Port $port
     
-    try {
-        $stopOutput = docker compose down 2>&1
-        $startOutput = docker compose up -d 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            Write-Success "Poznote restarted successfully with new configuration!`n"
-            
-            Write-Host @"
-"@ -ForegroundColor $Colors.Green
-            
-            Write-Host "Your Poznote configuration has been updated!`n" -ForegroundColor $Colors.Green
-            Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "http://localhost:$HTTP_WEB_PORT" -ForegroundColor $Colors.Green
-            Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "$POZNOTE_USERNAME" -ForegroundColor $Colors.Yellow
-            Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "$POZNOTE_PASSWORD" -ForegroundColor $Colors.Yellow
-            
-        } else {
-            Write-Error "Failed to restart Poznote."
-            exit 1
-        }
-    }
-    catch {
-        Write-Error "Failed to restart Poznote: $($_.Exception.Message)"
-        exit 1
-    }
-}
-
-# Function to install Git pre-commit hook for automatic versioning
-function Install-GitHook {
-    Write-Status "Installing Git pre-commit hook for automatic versioning..."
-    
-    try {
-        # Create the hook content
-        $hookContent = @'
-#!/bin/bash
-
-# Pre-commit hook to automatically update version.txt
-# This runs locally before each commit
-
-# Get the directory of the repository
-REPO_DIR=$(git rev-parse --show-toplevel)
-
-# Generate new version in format YYMMDDHHmm
-NEW_VERSION=$(date +%y%m%d%H%M)
-
-# Update version.txt
-echo $NEW_VERSION > "$REPO_DIR/src/version.txt"
-
-# Add version.txt to the commit
-git add "$REPO_DIR/src/version.txt"
-
-echo "Auto-updated version to: $NEW_VERSION"
-'@
-        
-        # Create the hook file
-        $hookContent | Out-File -FilePath ".git/hooks/pre-commit" -Encoding ASCII -NoNewline
-        
-        Write-Success "Git pre-commit hook installed successfully."
-    }
-    catch {
-        Write-Warning "Could not install Git hook: $($_.Exception.Message)"
-    }
-}
-
-# Main installation function
-function Install-Poznote {
-    # Check Docker installation and accessibility
-    Test-Docker
-    Test-ExistingContainers
-    
-    # Check if this is an existing installation
-    $isExisting = Test-ExistingInstallation
-    
-    if ($isExisting) {
-        # Existing installation - show menu
-        Write-Host "Poznote Installation Manager" -ForegroundColor $Colors.Blue
-        
-        $existingConfig = Get-ExistingEnvConfig
-        
-        if ($existingConfig.Count -gt 0) {
-            Write-Host "`nCurrent configuration:`n" -ForegroundColor $Colors.Blue
-            Write-Host "  - URL: " -NoNewline -ForegroundColor $Colors.White
-            Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-            Write-Host "  - Username: $($existingConfig['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-            Write-Host "  - Password: $($existingConfig['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  - Port: $($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
-            
-        }
-        
-        Write-Host "`nWhat would you like to do?`n" -ForegroundColor $Colors.Green
-    Write-Host "  1. Update application (get latest code)" -ForegroundColor $Colors.White
-    Write-Host "  2. Change settings (login/password/port)" -ForegroundColor $Colors.White
-    Write-Host "  3. Cancel" -ForegroundColor $Colors.Gray
-        
-        do {
-            $choice = Read-Host "`nPlease select an option (1-3)"
-            switch ($choice) {
-                "1" {
-                    Write-Host ""
-                    Write-Status "Starting application update..."
-                    Write-Status "Pulling latest changes from repository..."
-                    try {
-                        Write-Host ""
-                        $gitOutput = git pull origin main
-                        Write-Host ""
-                        if ($LASTEXITCODE -eq 0) {
-                            Write-Success "Successfully pulled latest changes"
-                        } else {
-                            Write-Warning "Git pull completed with warnings, but continuing..."
-                        }
-                    }
-                    catch {
-                        Write-Warning "Git pull failed, but continuing with local files."
-                    }
-                    
-                    Write-Status "Preserving existing configuration..."
-                    
-                    try {
-                        $composeCmd = Update-DockerContainer
-                        
-                        # Install Git hook for automatic versioning
-                        Install-GitHook
-                        
-                        Write-Host "Update Complete!" -ForegroundColor $Colors.Green
-                        
-                        Write-Host "Your Poznote installation has been updated successfully!" -ForegroundColor $Colors.Green
-                        Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
-                        Write-Host "http://localhost:$($existingConfig['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-                        Write-Host ""
-                        exit 0
-                    }
-                    catch {
-                        Write-Error "Update failed: $($_.Exception.Message)"
-                        exit 1
-                    }
-                }
-                "2" { Reconfigure-Poznote; exit 0 }
-                "3" { Write-Status "Operation cancelled."; exit 0 }
-                default { Write-Warning "Invalid choice. Please select 1, 2, or 3." }
-            }
-        } while ($true)
-        
-        return
-    }
-    
-    # Fresh installation
-    Write-Host "Poznote Installation Script" -ForegroundColor $Colors.Green
-
-    # Get instance name first
-    $INSTANCE_NAME = Split-Path -Leaf (Get-Location)
-    Write-Status "Using instance name: $INSTANCE_NAME"
-    
-    # Validate instance name for Docker compatibility
-    if ($INSTANCE_NAME -cnotmatch "^[a-z0-9_-]+$") {
-        Write-Warning "Instance name '$INSTANCE_NAME' contains invalid characters."
-        Write-Host "Docker project names must contain only lowercase letters, numbers, underscores, and hyphens." -ForegroundColor $Colors.Yellow
-        Write-Host "Please rename your folder to use only lowercase letters, numbers, _ and - characters." -ForegroundColor $Colors.Yellow
-        Write-Host "Example: rename 'MyPoznote' to 'my-poznote' or 'mypoznote'" -ForegroundColor $Colors.Yellow
-        Write-Host ""
-        Write-Host "If you used the PowerShell command from the README, please use the updated version that validates names before cloning." -ForegroundColor $Colors.Blue
-        exit 1
-    }
-
-    # Check if .env already exists
-    if (Test-Path ".env") {
-        Write-Warning ".env file already exists!"
-        $overwrite = Read-Host "Do you want to overwrite it? (y/N)"
-        if ($overwrite -notmatch '^[Yy]$') {
-            Write-Status "Using existing .env file..."
-            $continue = Read-Host "Do you want to continue with Docker setup? (Y/n)"
-            if ($continue -match '^[Nn]$') {
-                Write-Status "Installation cancelled."
-                exit 0
-            }
-            $skipEnvCreation = $true
-        } else {
-            Remove-Item ".env" -Force
-            Write-Status "Existing .env file removed."
-        }
-    }
-    
-    # Create .env file if needed
-    if (-not $skipEnvCreation -and -not (Test-Path ".env")) {
-        Write-Status "Creating .env configuration file..."
-        
-        if (-not (Test-Path ".env.template")) {
-            Write-Error "Template file .env.template not found!"
-            exit 1
-        }
-        
-        # Load defaults from template
-        $templateConfig = @{}
-        Get-Content ".env.template" | ForEach-Object {
-            if ($_ -match '^([^#][^=]+)=(.*)$') {
-                $templateConfig[$matches[1]] = $matches[2]
-            }
-        }
-        
-        Write-Host "`nPlease configure your Poznote installation:`n" -ForegroundColor $Colors.Blue
-        
-        # Get configuration
-        $POZNOTE_USERNAME = Get-UserInput "Username" $templateConfig["POZNOTE_USERNAME"]
-        
-        Write-Host ""
-        Write-Status "Password requirements:"
-        Write-Host " - Minimum 8 characters"
-        Write-Host " - Mix of letters and numbers recommended"
-        Write-Host " - Allowed special characters: @ - _ . , ! *"
-        Write-Host ""
-        
-        $POZNOTE_PASSWORD = Get-SecurePassword "Poznote Password" $templateConfig["POZNOTE_PASSWORD"] $false
-        $HTTP_WEB_PORT = Get-PortWithValidation "Web Server Port" $templateConfig["HTTP_WEB_PORT"]
-    
-        
-        if ($POZNOTE_PASSWORD -eq "admin123") {
-            Write-Warning "You are using the default password! Please change it for production use."
-        }
-        
-        # Create .env file
-        Copy-Item ".env.template" ".env" -Force
-        $envContent = Get-Content ".env" -Raw
-        $envContent = $envContent -replace "(?m)^POZNOTE_USERNAME=.*", "POZNOTE_USERNAME=$POZNOTE_USERNAME"
-        $envContent = $envContent -replace "(?m)^POZNOTE_PASSWORD=.*", "POZNOTE_PASSWORD=$POZNOTE_PASSWORD"
-        $envContent = $envContent -replace "(?m)^HTTP_WEB_PORT=.*", "HTTP_WEB_PORT=$HTTP_WEB_PORT"
-    
-        $envContent | Out-File -FilePath ".env" -Encoding UTF8 -NoNewline
-        Write-Success ".env file created from template successfully!"
-    }
-
-    # Create necessary directories for fresh installation
+    # Create data directories
     Write-Status "Creating data directories..."
-    if (-not (Test-Path "data")) {
-        New-Item -ItemType Directory -Path "data" -Force | Out-Null
-    }
-    if (-not (Test-Path "data\entries")) {
-        New-Item -ItemType Directory -Path "data\entries" -Force | Out-Null
-    }
-    if (-not (Test-Path "data\database")) {
-        New-Item -ItemType Directory -Path "data\database" -Force | Out-Null
-    }
-    if (-not (Test-Path "data\attachments")) {
-        New-Item -ItemType Directory -Path "data\attachments" -Force | Out-Null
+    @("data", "data/database", "data/entries", "data/attachments") | ForEach-Object {
+        if (-not (Test-Path $_)) { New-Item -Path $_ -ItemType Directory -Force | Out-Null }
     }
     Write-Success "Data directories created"
-
-    # Start Docker container
-    Write-Status "Starting Poznote with Docker Compose..."
     
-    $dockerComposeCmd = ""
-    $success = $false
+    # Start containers
+    if (Start-DockerContainers -InstanceName $instanceName) {
+        Write-Host ""
+        Write-Success "Poznote has been installed successfully!"
+        Write-Host ""
+        Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "http://localhost:$port" -ForegroundColor $Colors.Green
+        Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "$username" -ForegroundColor $Colors.Yellow
+        Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "$password" -ForegroundColor $Colors.Yellow
+        Write-Host ""
+    } else {
+        Write-Error "Installation failed. Please check Docker Desktop is running and try again."
+        exit 1
+    }
+}
+
+# Update existing installation
+function Update-Installation {
+    $config = Get-ExistingConfig
+    
+    # Validate configuration
+    if (-not $config['HTTP_WEB_PORT'] -or -not $config['POZNOTE_USERNAME'] -or -not $config['POZNOTE_PASSWORD']) {
+        Write-Error "Configuration file is incomplete or corrupted. Please run a new installation."
+        exit 1
+    }
+    
+    Write-Host "Poznote Update" -ForegroundColor $Colors.Blue
+    Write-Host ""
+    Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
+    Write-Host "  - URL: http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+    Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host ""
+    
+    $instanceName = Split-Path -Leaf (Get-Location)
+    
+    if (-not (Update-Code)) {
+        Write-Error "Failed to update code"
+        exit 1
+    }
+    
+    Write-Status "Preserving existing configuration..."
+    
+    if (Update-DockerContainers -InstanceName $instanceName) {
+        Write-Host ""
+        Write-Success "Poznote has been updated successfully!"
+        Write-Host ""
+        Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
+        Write-Host "http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
+        Write-Host ""
+    } else {
+        Write-Error "Update failed. Please check the logs above."
+        exit 1
+    }
+}
+
+# Change settings
+function Update-Settings {
+    $config = Get-ExistingConfig
+    
+    # Validate configuration
+    if (-not $config['HTTP_WEB_PORT'] -or -not $config['POZNOTE_USERNAME'] -or -not $config['POZNOTE_PASSWORD']) {
+        Write-Error "Configuration file is incomplete or corrupted. Please run a new installation."
+        exit 1
+    }
+    
+    Write-Host "Poznote Configuration Update" -ForegroundColor $Colors.Blue
+    Write-Host ""
+    Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
+    Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+    Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  - Port: $($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    Write-Host ""
+    Write-Host "Update your configuration:" -ForegroundColor $Colors.Green
+    Write-Host ""
+    
+    # Get new values
+    $username = Get-UserInput "Username [$($config['POZNOTE_USERNAME'])]" $config['POZNOTE_USERNAME']
+    
+    while ($true) {
+        $password = Get-UserInput "Password [$($config['POZNOTE_PASSWORD'])]" $config['POZNOTE_PASSWORD']
+        if (Test-Password $password) { break }
+    }
+    
+    $port = Get-ValidPort "Web Server Port [$($config['HTTP_WEB_PORT'])]" $config['HTTP_WEB_PORT'] $config['HTTP_WEB_PORT']
+    
+    # Update configuration
+    New-EnvFile -Username $username -Password $password -Port $port
+    
+    # Restart containers with new configuration
+    $instanceName = Split-Path -Leaf (Get-Location)
+    Write-Status "Restarting containers with new configuration..."
     
     try {
-        if ($INSTANCE_NAME) {
-            $cmdInfo = "docker compose -p $INSTANCE_NAME up -d --build"
-            $output = & docker compose -p $INSTANCE_NAME up -d --build 2>&1
+        # Stop containers
+        if ($instanceName) {
+            docker compose -p $instanceName down 2>&1 | Out-Null
         } else {
-            $cmdInfo = "docker compose up -d --build"
-            $output = & docker compose up -d --build 2>&1
+            docker compose down 2>&1 | Out-Null
         }
-        if ($LASTEXITCODE -eq 0) {
-            $dockerComposeCmd = "docker compose"
-            $success = $true
+        
+        Start-Sleep -Seconds 5
+        
+        # Start with new configuration
+        if (Start-DockerContainers -InstanceName $instanceName) {
+            Write-Host ""
+            Write-Success "Configuration updated successfully!"
+            Write-Host ""
+            Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
+            Write-Host "http://localhost:$port" -ForegroundColor $Colors.Green
+            Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
+            Write-Host "$username" -ForegroundColor $Colors.Yellow
+            Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
+            Write-Host "$password" -ForegroundColor $Colors.Yellow
+            Write-Host ""
         } else {
-            Write-Warning "Command attempted: $cmdInfo"
-            Write-Warning "docker compose returned a non-zero exit code. Showing output:"
-            Write-Host $output -ForegroundColor $Colors.Red
+            Write-Error "Failed to restart containers with new configuration"
+            exit 1
         }
     }
     catch {
-        $err = $_.Exception.Message
-        Write-Warning "Command attempted: docker compose."
-        Write-Warning "docker compose command failed: $err"
-    }
-        
-    # Sometimes compose returns warnings/non-zero codes while still starting containers.
-    if (-not $success) {
-        Write-Status "Checking if containers are actually running despite non-zero exit codes..."
-        $psOutput = & docker compose -p $INSTANCE_NAME ps -q 2>$null
-        if ($LASTEXITCODE -eq 0 -and $psOutput) {
-            Write-Warning "Compose returned non-zero, but containers are running. Treating as success."
-            $success = $true
-        } else {
-            Write-Warning "There is a unknown problem with docker compose execution..."
-            $success = $false
-        }
-    }
-
-    if ($success) {
-        Write-Success "Poznote has been started successfully!`n"
-        
-        # Install Git hook for automatic versioning
-        Install-GitHook
-        
-        Write-Host @"
-"@ -ForegroundColor $Colors.Green
-        
-        # Use the variables directly instead of reading from file
-        # Fallback to reading from .env if variables are not set
-        if (-not $POZNOTE_USERNAME -or -not $POZNOTE_PASSWORD -or -not $HTTP_WEB_PORT) {
-            $envVars = Get-ExistingEnvConfig
-        }
-        
-        $finalUsername = if ($POZNOTE_USERNAME) { $POZNOTE_USERNAME } else { $envVars['POZNOTE_USERNAME'] }
-        $finalPassword = if ($POZNOTE_PASSWORD) { $POZNOTE_PASSWORD } else { $envVars['POZNOTE_PASSWORD'] }
-        $finalPort = if ($HTTP_WEB_PORT) { $HTTP_WEB_PORT } else { $envVars['HTTP_WEB_PORT'] }
-    $finalAppName = 'Poznote'
-        
-        Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "http://localhost:$finalPort" -ForegroundColor $Colors.Green
-        Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$finalUsername" -ForegroundColor $Colors.Yellow
-        Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$finalPassword" -ForegroundColor $Colors.Yellow
-    
-        Write-Host ""
-    } else {
-        Write-Error "Failed to start Poznote. Check the error messages above and ensure Docker Desktop is running."
+        Write-Error "Failed to restart containers: $($_.Exception.Message)"
         exit 1
+    }
+}
+
+# Main menu for existing installations
+function Show-MainMenu {
+    while ($true) {
+        Write-Host ""
+        Write-Host "What would you like to do?" -ForegroundColor $Colors.Green
+        Write-Host ""
+        Write-Host "  1. Update application (get latest code)" -ForegroundColor $Colors.White
+        Write-Host "  2. Change settings (login/password/port)" -ForegroundColor $Colors.White
+        Write-Host "  3. Cancel" -ForegroundColor $Colors.Gray
+        Write-Host ""
+        
+        $choice = Read-Host "Please select an option (1-3)"
+        
+        switch ($choice) {
+            "1" { Update-Installation; return }
+            "2" { Update-Settings; return }
+            "3" { Write-Status "Operation cancelled."; exit 0 }
+            default { Write-Warning "Invalid choice. Please select 1, 2, or 3." }
+        }
     }
 }
 
@@ -669,9 +445,34 @@ function Install-Poznote {
 if ($Help) { Show-Help; exit 0 }
 
 try {
-    Install-Poznote
+    Test-Docker
+    Test-ExistingContainers
+    
+    if (Test-ExistingInstallation) {
+        $config = Get-ExistingConfig
+        Write-Host "Poznote Installation Manager" -ForegroundColor $Colors.Blue
+        
+        # Check if configuration is valid
+        if ($config.Count -gt 0 -and $config['HTTP_WEB_PORT'] -and $config['POZNOTE_USERNAME'] -and $config['POZNOTE_PASSWORD']) {
+            Write-Host ""
+            Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
+            Write-Host ""
+            Write-Host "  - URL: http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+            Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+            Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+            Write-Host "  - Port: $($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+            
+            Show-MainMenu
+        } else {
+            Write-Warning "Existing .env file found but configuration is incomplete or corrupted."
+            Write-Status "Starting fresh installation..."
+            New-Installation
+        }
+    } else {
+        New-Installation
+    }
 }
 catch {
-    Write-Error "Installation failed: $($_.Exception.Message)"
+    Write-Error "Setup failed: $($_.Exception.Message)"
     exit 1
 }
