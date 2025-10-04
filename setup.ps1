@@ -248,6 +248,16 @@ function Start-DockerContainers {
 function Update-DockerContainers {
     param([string]$InstanceName)
     
+    # Check if port is available before updating (user might have changed port in .env)
+    $config = Get-ExistingConfig
+    if ($config['HTTP_WEB_PORT']) {
+        $port = [int]$config['HTTP_WEB_PORT']
+        if (-not (Test-PortAvailable -Port $port)) {
+            Write-Error "Port $port is already in use. Please check your .env file and choose a different port."
+            return $false
+        }
+    }
+    
     Write-Status "Stopping existing containers..."
     try {
         if ($InstanceName) {
@@ -464,6 +474,13 @@ function Update-Settings {
     
     # Update configuration
     New-EnvFile -Username $username -Password $password -Port $port
+    
+    # Check if new port is available before restarting
+    $portInt = [int]$port
+    if (-not (Test-PortAvailable -Port $portInt)) {
+        Write-Error "Port $port is already in use. Please choose a different port."
+        exit 1
+    }
     
     # Restart containers with new configuration
     $instanceName = Split-Path -Leaf (Get-Location)
