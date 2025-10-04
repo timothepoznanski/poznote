@@ -138,6 +138,16 @@ function Get-ExistingConfig {
 function Start-DockerContainers {
     param([string]$InstanceName)
     
+    # Check if port is available before starting
+    $config = Get-ExistingConfig
+    if ($config['HTTP_WEB_PORT']) {
+        $port = [int]$config['HTTP_WEB_PORT']
+        if (-not (Test-PortAvailable -Port $port)) {
+            Write-Error "Port $port is already in use. Please check your .env file and choose a different port."
+            return $false
+        }
+    }
+    
     Write-Status "Starting Poznote with Docker Compose..."
     
     try {
@@ -167,10 +177,6 @@ function Start-DockerContainers {
         
         if ($process.ExitCode -ne 0) {
             Write-Error "Docker compose failed (exit code: $($process.ExitCode))"
-            if ($output) {
-                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-                Write-Host $output -ForegroundColor $Colors.Gray
-            }
             return $false
         }
         
@@ -225,23 +231,6 @@ function Start-DockerContainers {
         } else {
             Write-Error "Failed to start Poznote containers within timeout (5 minutes)"
             
-            # Show final status
-            try {
-                if ($InstanceName) {
-                    $status = docker compose -p $InstanceName ps 2>$null
-                } else {
-                    $status = docker compose ps 2>$null
-                }
-                Write-Host "Container status:" -ForegroundColor $Colors.Gray
-                Write-Host $status -ForegroundColor $Colors.Gray
-            } catch {
-                Write-Warning "Could not get container status"
-            }
-            
-            if ($output) {
-                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-                Write-Host $output -ForegroundColor $Colors.Gray
-            }
             return $false
         }
     }
@@ -402,7 +391,7 @@ function New-Installation {
         Write-Host "$password" -ForegroundColor $Colors.Yellow
         Write-Host ""
     } else {
-        Write-Error "Installation failed. Please check Docker Desktop is running and try again."
+        Write-Error "Installation failed. Please check the error message above for details."
         exit 1
     }
 }
