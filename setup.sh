@@ -135,13 +135,7 @@ reconfigure_poznote() {
 
 # Check Docker installation
 
-# Check Docker accessibility
-check_docker() {
-    if ! docker ps > /dev/null 2>&1; then
-        print_error "Docker may not be installed or running. Please check Docker and rerun this setup script."
-        exit 1
-    fi
-}
+
 
 # Check for existing containers with similar names
 check_existing_containers() {
@@ -549,8 +543,7 @@ main() {
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
     
-    # Check Docker installation and accessibility
-    check_docker
+    # Check for existing containers
     check_existing_containers
     
     if check_existing_installation; then
