@@ -64,7 +64,7 @@ Open Powershell where you want to install Poznote, paste and run the following b
 try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; exit 1 }
 
 do {
-    $instance = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
+    $instance = Read-Host "`nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]"
     if ([string]::IsNullOrWhiteSpace($instance)) { $instance = "poznote" }
     if (-not ($instance -cmatch "^[a-z0-9_-]+$")) {
         Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
@@ -95,6 +95,8 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 
 #### Step 2: Install Poznote
+
+Open a terminal where you want to install Poznote, paste and run the following block of commands:
 
 ```bash
 docker ps >/dev/null 2>&1 || { echo "Please start Docker"; exit 1; }
