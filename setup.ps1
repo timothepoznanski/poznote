@@ -211,17 +211,27 @@ function Update-DockerContainers {
     param([string]$InstanceName)
     
     Write-Status "Stopping existing containers..."
-    if ($InstanceName) {
-        docker compose -p $InstanceName down 2>&1 | Out-Null
-    } else {
-        docker compose down 2>&1 | Out-Null
+    try {
+        if ($InstanceName) {
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "-p", $InstanceName, "down" -Wait -NoNewWindow
+        } else {
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "down" -Wait -NoNewWindow
+        }
+    } catch {
+        # Continue even if stop fails (containers might not be running)
+        Write-Warning "Could not stop containers, continuing anyway..."
     }
     
     Write-Status "Pulling latest images..."
-    if ($InstanceName) {
-        docker compose -p $InstanceName pull 2>&1 | Out-Null
-    } else {
-        docker compose pull 2>&1 | Out-Null
+    try {
+        if ($InstanceName) {
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "-p", $InstanceName, "pull" -Wait -NoNewWindow
+        } else {
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "pull" -Wait -NoNewWindow
+        }
+    } catch {
+        # Continue even if pull fails (images might be up to date)
+        Write-Warning "Could not pull images, continuing with build..."
     }
     
     Write-Status "Building and starting updated containers..."
