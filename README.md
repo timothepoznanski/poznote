@@ -61,7 +61,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell where you want to install Poznote, paste and run the following block of commands:
 
 ```powershell
-try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; return }
+docker ps >$null 2>&1; if ($LASTEXITCODE -ne 0) { Write-Host "Please start Docker Desktop" -ForegroundColor Red; return }
 
 do {
     $instance = Read-Host "`nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]"
