@@ -142,10 +142,12 @@ function Start-DockerContainers {
     $config = Get-ExistingConfig
     if ($config['HTTP_WEB_PORT']) {
         $port = [int]$config['HTTP_WEB_PORT']
+        Write-Status "Checking if port $port is available..."
         if (-not (Test-PortAvailable -Port $port)) {
             Write-Error "Port $port is already in use. Please check your .env file and choose a different port."
             return $false
         }
+        Write-Status "Port $port is available"
     }
     
     Write-Status "Starting Poznote with Docker Compose..."
@@ -252,10 +254,12 @@ function Update-DockerContainers {
     $config = Get-ExistingConfig
     if ($config['HTTP_WEB_PORT']) {
         $port = [int]$config['HTTP_WEB_PORT']
+        Write-Status "Checking if port $port is available..."
         if (-not (Test-PortAvailable -Port $port)) {
             Write-Error "Port $port is already in use. Please check your .env file and choose a different port."
             return $false
         }
+        Write-Status "Port $port is available"
     }
     
     Write-Status "Stopping existing containers..."
@@ -477,10 +481,12 @@ function Update-Settings {
     
     # Check if new port is available before restarting
     $portInt = [int]$port
+    Write-Status "Checking if new port $port is available..."
     if (-not (Test-PortAvailable -Port $portInt)) {
         Write-Error "Port $port is already in use. Please choose a different port."
         exit 1
     }
+    Write-Status "Port $port is available"
     
     # Restart containers with new configuration
     $instanceName = Split-Path -Leaf (Get-Location)
