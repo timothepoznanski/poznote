@@ -202,26 +202,72 @@ function Start-DockerContainers {
         
         # Wait for containers to start
         Write-Status "Waiting for services to start..."
-        Start-Sleep -Seconds 15
         
-        # Check if containers are running
-        if ($InstanceName) {
-            $status = docker compose -p $InstanceName ps 2>$null
-        } else {
-            $status = docker compose ps 2>$null
+        $maxAttempts = 60  # Maximum 5 minutes (60 * 5 seconds)
+        $attempt = 0
+        $containersReady = $false
+        
+        while ($attempt -lt $maxAttempts -and -not $containersReady) {
+            Start-Sleep -Seconds 5
+            $attempt++
+            
+            try {
+                if ($InstanceName) {
+                    $status = docker compose -p $InstanceName ps 2>$null
+                } else {
+                    $status = docker compose ps 2>$null
+                }
+                
+                # Check if all containers are running (Up status)
+                if ($status -match "Up" -and $status -notmatch "Exit") {
+                    # Additional check: make sure web server is responding
+                    try {
+                        # Try to get the port from .env file
+                        $config = Get-ExistingConfig
+                        $port = if ($config['HTTP_WEB_PORT']) { $config['HTTP_WEB_PORT'] } else { "8040" }
+                        
+                        $response = Invoke-WebRequest -Uri "http://localhost:$port" -TimeoutSec 3 -UseBasicParsing -ErrorAction SilentlyContinue
+                        if ($response.StatusCode -eq 200) {
+                            $containersReady = $true
+                            Write-Success "Poznote started successfully and is responding!"
+                        } else {
+                            Write-Host "." -NoNewline -ForegroundColor $Colors.Gray
+                        }
+                    } catch {
+                        Write-Host "." -NoNewline -ForegroundColor $Colors.Gray
+                    }
+                } else {
+                    Write-Host "." -NoNewline -ForegroundColor $Colors.Gray
+                }
+            } catch {
+                Write-Host "." -NoNewline -ForegroundColor $Colors.Gray
+            }
         }
         
-        if ($status -match "Up") {
-            Write-Success "Poznote started successfully!"
+        Write-Host "" # New line after dots
+        
+        if ($containersReady) {
             if ($output) {
                 Write-Host "Docker output:" -ForegroundColor $Colors.Gray
                 Write-Host $output -ForegroundColor $Colors.Gray
             }
             return $true
         } else {
-            Write-Error "Failed to start Poznote containers"
-            Write-Host "Container status:" -ForegroundColor $Colors.Gray
-            Write-Host $status -ForegroundColor $Colors.Gray
+            Write-Error "Failed to start Poznote containers within timeout (5 minutes)"
+            
+            # Show final status
+            try {
+                if ($InstanceName) {
+                    $status = docker compose -p $InstanceName ps 2>$null
+                } else {
+                    $status = docker compose ps 2>$null
+                }
+                Write-Host "Container status:" -ForegroundColor $Colors.Gray
+                Write-Host $status -ForegroundColor $Colors.Gray
+            } catch {
+                Write-Warning "Could not get container status"
+            }
+            
             if ($output) {
                 Write-Host "Docker output:" -ForegroundColor $Colors.Gray
                 Write-Host $output -ForegroundColor $Colors.Gray
