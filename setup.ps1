@@ -245,22 +245,43 @@ function Update-Code {
     
     try {
         Write-Status "Executing: git pull origin main"
-        $gitOutput = git pull origin main 2>&1 | Out-String
         
-        if ($LASTEXITCODE -eq 0) {
+        # Execute git pull and capture both stdout and stderr separately
+        $gitProcess = Start-Process -FilePath "git" -ArgumentList "pull", "origin", "main" -PassThru -Wait -NoNewWindow -RedirectStandardOutput "temp_git_out.txt" -RedirectStandardError "temp_git_err.txt"
+        
+        $stdout = ""
+        $stderr = ""
+        
+        if (Test-Path "temp_git_out.txt") {
+            $stdout = Get-Content "temp_git_out.txt" -Raw
+            Remove-Item "temp_git_out.txt" -Force
+        }
+        
+        if (Test-Path "temp_git_err.txt") {
+            $stderr = Get-Content "temp_git_err.txt" -Raw
+            Remove-Item "temp_git_err.txt" -Force
+        }
+        
+        $gitOutput = ($stdout + $stderr).Trim()
+        
+        if ($gitProcess.ExitCode -eq 0) {
             Write-Success "Successfully pulled latest changes"
-            if ($gitOutput -and $gitOutput.Trim()) {
+            if ($gitOutput) {
                 Write-Host "Git output:" -ForegroundColor $Colors.Gray
-                Write-Host $gitOutput.Trim() -ForegroundColor $Colors.Gray
+                Write-Host $gitOutput -ForegroundColor $Colors.Gray
             }
             return $true
         } else {
-            Write-Error "Git pull failed (exit code: $LASTEXITCODE)"
-            Write-Host "Full Git output:" -ForegroundColor $Colors.Red
+            Write-Error "Git pull failed (exit code: $($gitProcess.ExitCode))"
+            Write-Host "Git output:" -ForegroundColor $Colors.Red
             Write-Host $gitOutput -ForegroundColor $Colors.Gray
             return $false
         }
     } catch {
+        # Clean up temp files if they exist
+        if (Test-Path "temp_git_out.txt") { Remove-Item "temp_git_out.txt" -Force }
+        if (Test-Path "temp_git_err.txt") { Remove-Item "temp_git_err.txt" -Force }
+        
         Write-Error "Failed to execute git pull: $($_.Exception.Message)"
         return $false
     }
