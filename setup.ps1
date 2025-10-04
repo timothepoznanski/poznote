@@ -247,10 +247,6 @@ function Start-DockerContainers {
         Write-Host "" # New line after dots
         
         if ($containersReady) {
-            if ($output) {
-                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-                Write-Host $output -ForegroundColor $Colors.Gray
-            }
             return $true
         } else {
             Write-Error "Failed to start Poznote containers within timeout (5 minutes)"
@@ -467,9 +463,6 @@ function Update-Installation {
     if (Update-DockerContainers -InstanceName $instanceName) {
         Write-Host ""
         Write-Success "Poznote has been updated successfully!"
-        Write-Host ""
-        Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
         Write-Host ""
     } else {
         Write-Error "Update failed. Please check the logs above."
