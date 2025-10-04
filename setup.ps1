@@ -248,16 +248,23 @@ function Start-DockerContainers {
 function Update-DockerContainers {
     param([string]$InstanceName)
     
-    # Check if port is available before updating (user might have changed port in .env)
+    # Check if port is available before updating (only if port changed)
     $config = Get-ExistingConfig
     if ($config['HTTP_WEB_PORT']) {
-        $port = [int]$config['HTTP_WEB_PORT']
-        Write-Status "Checking if port $port is available..."
-        if (-not (Test-PortAvailable -Port $port)) {
-            Write-Error "Port $port is already in use. Please check your .env file and choose a different port."
-            return $false
+        $currentPort = [int]$config['HTTP_WEB_PORT']
+        # Note: For updates, we assume the current port is OK since it's the same configuration
+        # Only check availability if this is a new installation (no existing containers)
+        $instanceName = if ($InstanceName) { $InstanceName } else { Split-Path -Leaf (Get-Location) }
+        $existingContainer = docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instanceName-webserver-1$" }
+        
+        if (-not $existingContainer) {
+            Write-Status "Checking if port $currentPort is available..."
+            if (-not (Test-PortAvailable -Port $currentPort)) {
+                Write-Error "Port $currentPort is already in use. Please check your .env file and choose a different port."
+                return $false
+            }
+            Write-Status "Port $currentPort is available"
         }
-        Write-Status "Port $port is available"
     }
     
     Write-Status "Stopping existing containers..."
@@ -476,14 +483,18 @@ function Update-Settings {
     # Update configuration
     New-EnvFile -Username $username -Password $password -Port $port
     
-    # Check if new port is available before restarting
-    $portInt = [int]$port
-    Write-Status "Checking if new port $port is available..."
-    if (-not (Test-PortAvailable -Port $portInt)) {
-        Write-Error "Port $port is already in use. Please choose a different port."
-        exit 1
+    # Check if new port is available before restarting (only if port changed)
+    if ($port -ne $config['HTTP_WEB_PORT']) {
+        $portInt = [int]$port
+        Write-Status "Checking if new port $port is available..."
+        if (-not (Test-PortAvailable -Port $portInt)) {
+            Write-Error "Port $port is already in use. Please choose a different port."
+            exit 1
+        }
+        Write-Status "Port $port is available"
+    } else {
+        Write-Status "Using existing port $port (no change)"
     }
-    Write-Status "Port $port is available"
     
     # Restart containers with new configuration
     $instanceName = Split-Path -Leaf (Get-Location)
