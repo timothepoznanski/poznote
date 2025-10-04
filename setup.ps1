@@ -167,10 +167,37 @@ function Start-DockerContainers {
     Write-Status "Starting Poznote with Docker Compose..."
     
     try {
+        Write-Status "Building and starting containers..."
+        
         if ($InstanceName) {
-            $output = docker compose -p $InstanceName up -d --build 2>&1
+            $process = Start-Process -FilePath "docker" -ArgumentList "compose", "-p", $InstanceName, "up", "-d", "--build" -PassThru -Wait -NoNewWindow -RedirectStandardOutput "temp_docker_out.txt" -RedirectStandardError "temp_docker_err.txt"
         } else {
-            $output = docker compose up -d --build 2>&1
+            $process = Start-Process -FilePath "docker" -ArgumentList "compose", "up", "-d", "--build" -PassThru -Wait -NoNewWindow -RedirectStandardOutput "temp_docker_out.txt" -RedirectStandardError "temp_docker_err.txt"
+        }
+        
+        # Capture output
+        $stdout = ""
+        $stderr = ""
+        
+        if (Test-Path "temp_docker_out.txt") {
+            $stdout = Get-Content "temp_docker_out.txt" -Raw
+            Remove-Item "temp_docker_out.txt" -Force
+        }
+        
+        if (Test-Path "temp_docker_err.txt") {
+            $stderr = Get-Content "temp_docker_err.txt" -Raw
+            Remove-Item "temp_docker_err.txt" -Force
+        }
+        
+        $output = ($stdout + $stderr).Trim()
+        
+        if ($process.ExitCode -ne 0) {
+            Write-Error "Docker compose failed (exit code: $($process.ExitCode))"
+            if ($output) {
+                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
+                Write-Host $output -ForegroundColor $Colors.Gray
+            }
+            return $false
         }
         
         # Wait for containers to start
@@ -186,22 +213,28 @@ function Start-DockerContainers {
         
         if ($status -match "Up") {
             Write-Success "Poznote started successfully!"
+            if ($output) {
+                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
+                Write-Host $output -ForegroundColor $Colors.Gray
+            }
             return $true
         } else {
             Write-Error "Failed to start Poznote containers"
             Write-Host "Container status:" -ForegroundColor $Colors.Gray
             Write-Host $status -ForegroundColor $Colors.Gray
-            Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-            Write-Host $output -ForegroundColor $Colors.Gray
+            if ($output) {
+                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
+                Write-Host $output -ForegroundColor $Colors.Gray
+            }
             return $false
         }
     }
     catch {
-        Write-Error "Docker command failed: $($_.Exception.Message)"
-        if ($output) {
-            Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-            Write-Host $output -ForegroundColor $Colors.Gray
-        }
+        # Clean up temp files if they exist
+        if (Test-Path "temp_docker_out.txt") { Remove-Item "temp_docker_out.txt" -Force }
+        if (Test-Path "temp_docker_err.txt") { Remove-Item "temp_docker_err.txt" -Force }
+        
+        Write-Error "Failed to execute docker compose: $($_.Exception.Message)"
         return $false
     }
 }
@@ -437,10 +470,11 @@ function Update-Settings {
     
     try {
         # Stop containers
+        Write-Status "Stopping existing containers..."
         if ($instanceName) {
-            docker compose -p $instanceName down 2>&1 | Out-Null
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "-p", $instanceName, "down" -Wait -NoNewWindow
         } else {
-            docker compose down 2>&1 | Out-Null
+            $null = Start-Process -FilePath "docker" -ArgumentList "compose", "down" -Wait -NoNewWindow
         }
         
         Start-Sleep -Seconds 5
