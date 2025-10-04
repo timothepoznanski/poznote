@@ -62,14 +62,14 @@ Open Powershell where you want to install Poznote, paste and run the following b
 
 ```powershell
 do {
-    $n = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
-    if ([string]::IsNullOrWhiteSpace($n)) { $n = "poznote" }
-    if (-not ($n -cmatch "^[a-z0-9_-]+$")) {
+    $instance = Read-Host "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]"
+    if ([string]::IsNullOrWhiteSpace($instance)) { $instance = "poznote" }
+    if (-not ($instance -cmatch "^[a-z0-9_-]+$")) {
         Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
         continue
     }
-    if (Test-Path $n) {
-        Write-Host "Folder '$n' already exists!"
+    if (Test-Path $instance) {
+        Write-Host "Folder '$instance' already exists!"
         continue
     }
     break
@@ -86,62 +86,32 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 <details>
 <summary><strong>🐧 Linux Installation</strong></summary>
 
+#### Step 1: Prerequisite
+
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 
-#### Step 1: Choose your instance name
+#### Step 2: Install Poznote
 
 ```bash
-# Run this interactive script to choose your instance name
-# It will validate the name and check for Docker conflicts
-
-check_conflicts() {
-    local name="$1"
-    if docker ps -a --format "{{.Names}}" | grep -q "^${name}-webserver-1$"; then
-        echo "Docker container '${name}-webserver-1' already exists!"
-        return 1
-    fi
-    return 0
-}
-
 while true; do
-    read -p "Choose an instance name (poznote-tom, poznote-alice, my-notes, etc.) [poznote]: " instanceName
-    instanceName=${instanceName:-poznote}
-    if [[ "$instanceName" =~ ^[a-z0-9_-]+$ ]] && check_conflicts "$instanceName" && [ ! -d "$instanceName" ]; then
-        INSTANCE_NAME="$instanceName"
-        break
-    else
-        if [[ ! "$instanceName" =~ ^[a-z0-9_-]+$ ]]; then
-            echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
-        elif [ -d "$instanceName" ]; then
-            echo "Folder '$instanceName' already exists!"
-        fi
+    read -p "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]: " instance
+    instance=${instance:-poznote}
+    if [[ ! "$instance" =~ ^[a-z0-9_-]+$ ]]; then
+        echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
+        continue
     fi
+    if [ -d "$instance" ]; then
+        echo "Folder '$instance' already exists!"
+        continue
+    fi
+    break
 done
-
-echo "Using instance name: $INSTANCE_NAME"
-```
-
-#### Step 2: Clone the repository and navigate to the directory
-
-```bash
-# Clone the repository with your chosen instance name
-git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
-
-# Navigate to the cloned directory
-cd "$INSTANCE_NAME"
-```
-
-#### Step 3: Run the setup script
-
-```bash
-# Run the interactive setup script
+git clone https://github.com/timothepoznanski/poznote.git "$instance"
+cd "$instance"
 bash setup.sh
+
 ```
-
-#### Step 4: Access Your Instance
-
-After installation, access Poznote at: `http://localhost:YOUR-PORT`
 
 </details>
 
@@ -155,53 +125,17 @@ where YOUR_SERVER depends on your environment:
 - Your server's IP address
 - Your domain name
 
+and where YOUR_PORT depends on your port choice (see your .env file).
+
 The setup script will display the exact URL and credentials.
 
 ## Workspaces
 
 Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
 
-### What are Workspaces?
-
-- **🔀 Separate environments** - Each workspace contains its own notes, tags, and folders
-- **⚡ Easy switching** - Use the workspace selector to switch between environments instantly
-- **🏷️ Independent organization** - Tags and folders are unique to each workspace
-
-### Common Use Cases
-
-- **📝 Personal vs Work** - Separate professional and personal notes
-- **🎓 Projects** - Organize by client, course, or research topic
-- **🗂️ Archive** - Keep active and archived notes separate
-
-### Managing Workspaces
-
-**Access:** Go to **Settings → Manage Workspaces**
-
-**Basic Operations:**
-- **Create:** Enter a name and click "Create"
-- **Switch:** Use the workspace selector at the top of the interface
-- **Rename/Move/Delete:** Use the buttons in workspace management
-
-⚠️ **Note:** The default "Poznote" workspace cannot be deleted and contains any pre-existing notes.
-
-### How to Switch Workspaces
-
-To switch between workspaces:
-1. **Click on the workspace name** displayed at the top of the interface
-2. **Select your target workspace** from the dropdown menu that appears
-3. The interface will automatically reload and display notes from the selected workspace
-
-💡 **Tip:** The current workspace name is always visible at the top of the page, making it easy to know which environment you're working in.
-
 ## Multiple Instances
 
 You can run multiple isolated Poznote instances on the same server. Simply run the setup script multiple times with different instance names and ports.
-
-Each instance will have:
-- Separate Docker containers
-- Independent data storage
-- Different ports
-- Isolated configurations
 
 ### Example: Tom and Alice instances on the same server
 
@@ -219,8 +153,6 @@ Server: my-server.com
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
-
-For deployments on different servers, you only need to run the setup script to update configuration (no need for different instance names or ports).
 
 ## Change Settings
 
@@ -252,7 +184,7 @@ To update Poznote to the latest version, run the setup script and select "Update
 
 Poznote includes built-in backup (export) and restoration (import) functionality accessible through Settings.
 
-**📦Complete Backup**
+**Complete Backup**
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
 
@@ -260,7 +192,7 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
-**🔄 Complete Restore** 
+**Complete Restore** 
 
 Upload the complete backup ZIP to restore everything:
 
@@ -283,52 +215,15 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 Poznote includes powerful AI capabilities powered by **OpenAI** or **Mistral AI** to enhance your note-taking experience. These features are optional and require an API key from your chosen provider.
 
-### Supported AI Providers
-
-- **🤖 OpenAI** - GPT-4o, GPT-4 Turbo, GPT-3.5 Turbo (Recommended for quality)
-- **🚀 Mistral AI** - Mistral Large, Medium, Small, Open Mistral (European alternative)
-
 ### Available AI Features
 
-- **🤖 AI Summary** - Generate intelligent summaries of your notes for quick understanding
-- **🏷️ Auto Tags** - Automatically generate relevant tags based on note content
-- **🔍 Check Faults** - Verify consistency, logic, and grammar in your notes
-
-### Setup AI Features
-
-1. **Choose your AI Provider**
-   - **OpenAI**: Visit [OpenAI Platform](https://platform.openai.com/api-keys)
-   - **Mistral AI**: Visit [Mistral Console](https://console.mistral.ai/)
-   - Create an account or sign in
-   - Generate a new API key
-
-2. **Configure Poznote**
-   - Go to **Settings → AI Settings** in your Poznote interface
-   - Enable AI features by checking the box
-   - Select your preferred AI provider
-   - Enter your API key
-   - Choose your desired model
-   - Test the connection using the "Test Connection" button
-   - Save the configuration
-
-3. **Start Using AI Features**
-   - Open any note and look for AI buttons in the toolbar
-   - Use **AI Summary** to generate note summaries
-   - Use **Auto Tags** to suggest relevant tags
-   - Use **Correct Faults** to fix grammar and style issues
-
-### Requirements
-
-- ✅ Active internet connection
-- ✅ Valid API key (OpenAI or Mistral AI)
+- **AI Summary** - Generate intelligent summaries of your notes for quick understanding.
+- **Auto Tags** - Automatically generate relevant tags based on note content.
+- **Check Content** - Analyzes note content to detect factual errors, logical inconsistencies, and contradictions while deliberately ignoring spelling and grammar issues.
 
 ### Privacy & Data
 
-When AI features are enabled:
-- Note content is sent to your chosen AI provider's servers for processing
-- **OpenAI**: Data is processed according to [OpenAI's privacy policy](https://openai.com/privacy/)
-- **Mistral AI**: Data is processed according to [Mistral AI's terms of service](https://mistral.ai/terms/)
-- You can disable AI features at any time in settings
+⚠️ Note: Enabling AI features sends your data to the chosen AI provider’s servers (OpenAI or Mistral). You can disable these features anytime in settings.
 
 ## API Documentation
 
@@ -340,6 +235,7 @@ Poznote provides a REST API for programmatic access to notes and folders.
  - [Create Note](#create-note)
  - [Create Task List](#create-task-list)
  - [Update Task List](#update-task-list)
+ - [Update Note](#update-note)
  - [Create Folder](#create-folder)
  - [Move Note](#move-note)
  - [Delete Note](#delete-note)
@@ -452,9 +348,18 @@ Example `entrycontent` structure (JSON array of tasks):
 #### Update Task List
 
 ```bash
-curl -X POST http://localhost:8040/update_note.php \
+curl -X POST http://localhost:8040/api_update_note.php \
   -u 'username:password' \
-  -d 'id=123&heading=Shopping%20list&entry=&entrycontent=%5B%7B%22id%22%3A1690000000000%2C%22text%22%3A%22Buy%20bread%22%2C%22completed%22%3Afalse%2C%22important%22%3Afalse%7D%5D&workspace=MyWorkspace'
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "123",
+    "heading": "Shopping list",
+    "entry": "",
+    "entrycontent": "[ { \"id\":1690000000000, \"text\":\"Buy bread\", \"completed\":false, \"important\":false } ]",
+    "tags": "shopping,urgent",
+    "folder": "Home",
+    "workspace": "MyWorkspace"
+  }'
 ```
 
 **Parameters:**
@@ -468,7 +373,7 @@ curl -X POST http://localhost:8040/update_note.php \
 
 ---
 
-#### Update Note (JSON API)
+#### Update Note
 
 ```bash
 curl -X POST http://localhost:8040/api_update_note.php \
@@ -476,20 +381,20 @@ curl -X POST http://localhost:8040/api_update_note.php \
   -H "Content-Type: application/json" \
   -d '{
     "id": "123",
-    "heading": "Shopping list",
-    "entry": "",
-    "entrycontent": "[ { \"id\":1690000000000, \"text\":\"Buy milk\", \"completed\":false } ]",
-    "tags": "shopping,urgent",
-    "folder": "Home",
+    "heading": "Meeting Notes",
+    "entry": "Discussed the new project timeline and key deliverables.",
+    "entrycontent": "Discussed the new project timeline and key deliverables.",
+    "tags": "meeting,work,project",
+    "folder": "Work",
     "workspace": "MyWorkspace"
   }'
 ```
 
-Parameters:
+**Parameters:**
 - `id` (string|number) - **Required** - The note id to update
 - `heading` (string) - **Required** - The note title
-- `entry` (string) - *Optional* - HTML content (for compatibility; usually empty for tasklist)
-- `entrycontent` (string) - *Optional* - JSON string containing tasklist data or other structured content
+- `entry` (string) - *Optional* - HTML content that will be saved to the note's HTML file
+- `entrycontent` (string) - *Optional* - Plain text content that will be saved to the database
 - `tags` (string) - *Optional* - Comma-separated tags
 - `folder` (string) - *Optional* - Folder name (if provided, must exist in the workspace or as an existing entry folder)
 - `workspace` (string) - *Optional* - Workspace name
