@@ -218,16 +218,12 @@ function Get-PortWithValidation {
 function Update-DockerContainer {
     param([string]$ProjectName = $null)
     
-    $projectArg = if ($ProjectName) { "-p `"$ProjectName`"" } else { "" }
     Write-Status "Stopping existing container..."
     
     if ($ProjectName) {
-        $output = & docker compose -p $ProjectName down 2>&1
+        $null = & docker compose -p $ProjectName down 2>&1
     } else {
-        $output = & docker compose down 2>&1
-    }
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "docker compose failed..."
+        $null = & docker compose down 2>&1
     }
     
     Write-Status "Pulling latest images..."
