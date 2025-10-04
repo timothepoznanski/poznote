@@ -43,23 +43,7 @@ function Test-Docker {
     }
 }
 
-# Check for existing containers
-function Test-ExistingContainers {
-    $instanceName = Split-Path -Leaf (Get-Location)
-    $existingContainers = docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instanceName-" }
-    
-    if ($existingContainers) {
-        Write-Warning "Container with name '$instanceName' already exists!"
-        Write-Status "Existing containers:"
-        docker ps -a --format "table {{.Names}}`t{{.Status}}" | Where-Object { $_ -match "^$instanceName-" }
-        Write-Host ""
-        $continue = Read-Host "Do you want to continue anyway? (y/N)"
-        if ($continue -notmatch "^[Yy]$") {
-            Write-Status "Installation cancelled."
-            exit 0
-        }
-    }
-}
+
 
 # Check if existing installation
 function Test-ExistingInstallation {
@@ -568,7 +552,6 @@ if ($Help) { Show-Help; exit 0 }
 
 try {
     Test-Docker
-    Test-ExistingContainers
     
     if (Test-ExistingInstallation) {
         $config = Get-ExistingConfig
