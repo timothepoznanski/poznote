@@ -61,7 +61,6 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell where you want to install Poznote, paste and run the following block of commands:
 
 ```powershell
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { Write-Host "Please install Docker Desktop" -ForegroundColor Red; return }
 try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; return }
 
 do {
@@ -100,10 +99,7 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 Open a terminal where you want to install Poznote, paste and run the following block of commands:
 
 ```bash
-if ! docker ps >/dev/null 2>&1; then
-    echo "Please start Docker"
-    return
-fi
+if ! docker ps >/dev/null 2>&1; then echo "Please start Docker"; return; fi
 
 while true; do
     read -p "\nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]: " instance
