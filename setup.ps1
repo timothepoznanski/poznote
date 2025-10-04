@@ -445,7 +445,6 @@ function Update-Installation {
     Write-Status "Preserving existing configuration..."
     
     if (Update-DockerContainers -InstanceName $instanceName) {
-        Write-Host ""
         Write-Success "Poznote has been updated successfully!"
         Write-Host ""
     } else {
@@ -555,7 +554,6 @@ try {
     
     if (Test-ExistingInstallation) {
         $config = Get-ExistingConfig
-        Write-Host "Poznote Installation Manager" -ForegroundColor $Colors.Blue
         
         # Check if configuration is valid
         if ($config.Count -gt 0 -and $config['HTTP_WEB_PORT'] -and $config['POZNOTE_USERNAME'] -and $config['POZNOTE_PASSWORD']) {
