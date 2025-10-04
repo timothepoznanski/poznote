@@ -68,15 +68,11 @@ do {
         Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
         continue
     }
-    if (Test-Path $instance) {
-        Write-Host "Folder '$instance' already exists!"
-        continue
-    }
     break
 } while ($true)
 
-git clone https://github.com/timothepoznanski/poznote.git $n
-Set-Location $n
+git clone https://github.com/timothepoznanski/poznote.git $instance
+Set-Location $instance
 powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 
 ```
@@ -99,10 +95,6 @@ while true; do
     instance=${instance:-poznote}
     if [[ ! "$instance" =~ ^[a-z0-9_-]+$ ]]; then
         echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
-        continue
-    fi
-    if [ -d "$instance" ]; then
-        echo "Folder '$instance' already exists!"
         continue
     fi
     break

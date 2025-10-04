@@ -45,6 +45,34 @@ REQUIREMENTS:
 "@ -ForegroundColor $Colors.White
 }
 
+# Check Docker accessibility
+function Test-Docker {
+    try {
+        $null = docker ps 2>$null
+    } catch {
+        Write-Warning "Docker may not be installed or running. Please ensure Docker Desktop is installed and started."
+    }
+}
+
+# Check for existing containers with similar names
+function Test-ExistingContainers {
+    $instanceName = Split-Path -Leaf (Get-Location)
+    
+    $existingContainers = docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instanceName-" }
+    
+    if ($existingContainers) {
+        Write-Warning "Container with name '$instanceName' already exists!"
+        Write-Status "Existing containers:"
+        docker ps -a --format "table {{.Names}}`t{{.Status}}" | Where-Object { $_ -match "^$instanceName-" }
+        Write-Host ""
+        $continue = Read-Host "Do you want to continue anyway? (y/N)"
+        if ($continue -notmatch "^[Yy]$") {
+            Write-Status "Installation cancelled."
+            exit 0
+        }
+    }
+}
+
 # Check if this is an existing installation
 function Test-ExistingInstallation {
     # Installation is detected if .env file exists
@@ -363,6 +391,9 @@ echo "Auto-updated version to: $NEW_VERSION"
 
 # Main installation function
 function Install-Poznote {
+    # Check Docker installation and accessibility
+    Test-Docker
+    Test-ExistingContainers
     
     # Check if this is an existing installation
     $isExisting = Test-ExistingInstallation
