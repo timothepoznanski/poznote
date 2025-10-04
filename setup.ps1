@@ -221,9 +221,9 @@ function Update-DockerContainer {
     Write-Status "Stopping existing container..."
     
     if ($ProjectName) {
-        $null = & docker compose -p $ProjectName down 2>&1
+        $downOutput = docker compose -p $ProjectName down 2>&1
     } else {
-        $null = & docker compose down 2>&1
+        $downOutput = docker compose down 2>&1
     }
     
     Write-Status "Pulling latest images..."
