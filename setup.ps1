@@ -246,30 +246,40 @@ function Update-DockerContainer {
     }
     
     Write-Status "Building and starting updated container..."
+    
+    if ($ProjectName) {
+        $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
+    } else {
+        $buildOutput = docker compose up -d --build --force-recreate 2>&1
+    }
+    
+    # Wait for services to start
+    Write-Status "Waiting for services to start..."
+    Start-Sleep -Seconds 10
+    
+    # Check if container is actually running
     try {
         if ($ProjectName) {
-            $buildOutput = docker compose -p $ProjectName up -d --build --force-recreate 2>&1
+            $runningContainers = docker compose -p $ProjectName ps --format "{{.State}}" 2>$null
         } else {
-            $buildOutput = docker compose up -d --build --force-recreate 2>&1
+            $runningContainers = docker compose ps --format "{{.State}}" 2>$null
         }
         
-        if ($LASTEXITCODE -eq 0) {
+        if ($runningContainers -contains "running") {
             Write-Success "Container updated successfully!"
             return $true
         } else {
-            Write-Error "Docker compose failed with exit code: $LASTEXITCODE"
-            Write-Host "Docker output:" -ForegroundColor $Colors.Red
+            Write-Error "Container is not running after update"
+            Write-Host "Build output:" -ForegroundColor $Colors.Yellow
             Write-Host $buildOutput -ForegroundColor $Colors.Gray
-            throw "Container update failed"
+            throw "Container failed to start"
         }
     }
     catch {
-        Write-Error "Exception during container update: $($_.Exception.Message)"
-        if ($buildOutput) {
-            Write-Host "Docker output:" -ForegroundColor $Colors.Red
-            Write-Host $buildOutput -ForegroundColor $Colors.Gray
-        }
-        throw "Container update failed: $($_.Exception.Message)"
+        Write-Error "Failed to check container status: $($_.Exception.Message)"
+        Write-Host "Build output:" -ForegroundColor $Colors.Yellow
+        Write-Host $buildOutput -ForegroundColor $Colors.Gray
+        throw "Container update verification failed"
     }
 }
 
