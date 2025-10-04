@@ -231,19 +231,37 @@ function Update-DockerContainers {
 # Pull latest code
 function Update-Code {
     Write-Status "Pulling latest changes from repository..."
+    
+    # Check git status first
     try {
-        $gitOutput = git pull origin main 2>&1
+        $gitStatus = git status --porcelain 2>&1
+        if ($gitStatus) {
+            Write-Warning "There are uncommitted changes in the repository:"
+            Write-Host $gitStatus -ForegroundColor $Colors.Yellow
+        }
+    } catch {
+        # Ignore status check errors
+    }
+    
+    try {
+        Write-Status "Executing: git pull origin main"
+        $gitOutput = git pull origin main 2>&1 | Out-String
+        
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Successfully pulled latest changes"
+            if ($gitOutput -and $gitOutput.Trim()) {
+                Write-Host "Git output:" -ForegroundColor $Colors.Gray
+                Write-Host $gitOutput.Trim() -ForegroundColor $Colors.Gray
+            }
             return $true
         } else {
-            Write-Error "Git pull failed"
-            Write-Host "Git output:" -ForegroundColor $Colors.Gray
+            Write-Error "Git pull failed (exit code: $LASTEXITCODE)"
+            Write-Host "Full Git output:" -ForegroundColor $Colors.Red
             Write-Host $gitOutput -ForegroundColor $Colors.Gray
             return $false
         }
     } catch {
-        Write-Error "Failed to pull latest changes: $($_.Exception.Message)"
+        Write-Error "Failed to execute git pull: $($_.Exception.Message)"
         return $false
     }
 }
