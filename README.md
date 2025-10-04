@@ -61,7 +61,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell where you want to install Poznote, paste and run the following block of commands:
 
 ```powershell
-try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; exit 1 }
+try { docker ps >$null } catch { Write-Host "Please start Docker Desktop" -ForegroundColor Red; return }
 
 do {
     $instance = Read-Host "`nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]"
@@ -75,7 +75,7 @@ do {
 
 if (docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instance-webserver-1$" }) {
     Write-Host "Container '$instance-webserver-1' already exists. Please choose a different instance name." -ForegroundColor Red
-    exit 1
+    return
 }
 
 git clone https://github.com/timothepoznanski/poznote.git $instance
@@ -99,10 +99,10 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 Open a terminal where you want to install Poznote, paste and run the following block of commands:
 
 ```bash
-docker ps >/dev/null 2>&1 || { echo "Please start Docker"; exit 1; }
+if ! docker ps >/dev/null 2>&1; then echo "Please start Docker"; return; fi
 
 while true; do
-    read -p "Choose an instance name (poznote-tom, my-notes, etc.) [poznote]: " instance
+    read -p "\nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]: " instance
     instance=${instance:-poznote}
     if [[ ! "$instance" =~ ^[a-z0-9_-]+$ ]]; then
         echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
@@ -113,7 +113,7 @@ done
 
 if docker ps -a --format "{{.Names}}" | grep -q "^$instance-webserver-1$"; then
     echo "Container '$instance-webserver-1' already exists. Please choose a different instance name."
-    exit 1
+    return
 fi
 git clone https://github.com/timothepoznanski/poznote.git "$instance"
 cd "$instance"
