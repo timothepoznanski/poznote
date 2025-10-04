@@ -68,7 +68,6 @@ EOF
 
 # Reconfigure existing installation
 reconfigure_poznote() {
-    echo -e "${BLUE}\nPoznote Configuration Update\n${NC}"
 
     if [ ! -f ".env" ]; then
         print_error "No existing configuration found (.env file missing)."
@@ -120,7 +119,6 @@ reconfigure_poznote() {
     manage_container "restart"
     
     echo -e "\n${GREEN}Configuration Update Complete!${NC}"
-    echo -e "${GREEN}Your Poznote configuration has been updated!${NC}\n"
                 
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"

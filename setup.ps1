@@ -62,10 +62,8 @@ function Test-Password {
 function Test-PortAvailable {
     param([int]$Port)
     try {
-        $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Any, $Port)
-        $listener.Start()
-        $listener.Stop()
-        return $true
+        $connections = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
+        return -not $connections
     } catch {
         return $false
     }
@@ -456,7 +454,6 @@ function Update-Settings {
         exit 1
     }
     
-    Write-Host "Poznote Configuration Update" -ForegroundColor $Colors.Blue
     Write-Host ""
     Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
     Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
