@@ -45,14 +45,6 @@ REQUIREMENTS:
 "@ -ForegroundColor $Colors.White
 }
 
-
-
-
-
-
-
-
-
 # Check if this is an existing installation
 function Test-ExistingInstallation {
     # Installation is detected if .env file exists
