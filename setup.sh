@@ -135,32 +135,29 @@ reconfigure_poznote() {
 
 # Check Docker installation
 
-# Check Docker installation and accessibility
+# Check Docker accessibility
 check_docker() {
-    if ! command -v docker &> /dev/null; then
-        print_error "Docker is not installed. Please install Docker first."
-        echo "Visit: https://docs.docker.com/get-docker/"
-        exit 1
+    if ! docker ps > /dev/null 2>&1; then
+        print_warning "Docker may not be installed or running. Please ensure Docker is installed and started."
     fi
+}
+
+# Check for existing containers with similar names
+check_existing_containers() {
+    local instance_name=$(basename "$(pwd)")
     
-    if ! command -v docker compose &> /dev/null; then
-        print_error "Docker Compose is not installed. Please install Docker Compose first."
-        echo "Visit: https://docs.docker.com/compose/install/"
-        exit 1
-    fi
-    
-    # Check if Docker daemon is running and accessible
-    if ! docker info &> /dev/null; then
-        print_error "Cannot access Docker daemon. This could mean:"
-        echo "  1. Docker service is not running"
-        echo "  2. Docker daemon is not responding"
-        echo "  3. You may need to start Docker using your system's service manager"
+    if docker ps -a --format "{{.Names}}" | grep -q "^$instance_name-"; then
+        print_warning "Container with name '$instance_name' already exists!"
+        print_status "Existing containers:"
+        docker ps -a --format "table {{.Names}}\t{{.Status}}" | grep "^$instance_name-" || true
         echo
-        print_status "Please ensure Docker is running and accessible, then try again."
-        exit 1
+        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_status "Installation cancelled."
+            exit 0
+        fi
     fi
-    
-    print_success "Docker is installed, running, and accessible"
 }
 
 # Check if Poznote is already installed
@@ -553,6 +550,7 @@ main() {
     
     # Check Docker installation and accessibility
     check_docker
+    check_existing_containers
     
     if check_existing_installation; then
         # Existing installation - show menu        
