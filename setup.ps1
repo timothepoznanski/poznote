@@ -43,23 +43,7 @@ function Test-Docker {
     }
 }
 
-# Check for existing containers
-function Test-ExistingContainers {
-    $instanceName = Split-Path -Leaf (Get-Location)
-    $existingContainers = docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instanceName-" }
-    
-    if ($existingContainers) {
-        Write-Warning "Container with name '$instanceName' already exists!"
-        Write-Status "Existing containers:"
-        docker ps -a --format "table {{.Names}}`t{{.Status}}" | Where-Object { $_ -match "^$instanceName-" }
-        Write-Host ""
-        $continue = Read-Host "Do you want to continue anyway? (y/N)"
-        if ($continue -notmatch "^[Yy]$") {
-            Write-Status "Installation cancelled."
-            exit 0
-        }
-    }
-}
+
 
 # Check if existing installation
 function Test-ExistingInstallation {
@@ -247,10 +231,6 @@ function Start-DockerContainers {
         Write-Host "" # New line after dots
         
         if ($containersReady) {
-            if ($output) {
-                Write-Host "Docker output:" -ForegroundColor $Colors.Gray
-                Write-Host $output -ForegroundColor $Colors.Gray
-            }
             return $true
         } else {
             Write-Error "Failed to start Poznote containers within timeout (5 minutes)"
@@ -468,9 +448,6 @@ function Update-Installation {
         Write-Host ""
         Write-Success "Poznote has been updated successfully!"
         Write-Host ""
-        Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.Green
-        Write-Host ""
     } else {
         Write-Error "Update failed. Please check the logs above."
         exit 1
@@ -575,7 +552,6 @@ if ($Help) { Show-Help; exit 0 }
 
 try {
     Test-Docker
-    Test-ExistingContainers
     
     if (Test-ExistingInstallation) {
         $config = Get-ExistingConfig
