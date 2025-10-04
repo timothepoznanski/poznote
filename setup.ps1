@@ -355,10 +355,7 @@ function Update-Code {
 }
 
 # New installation
-function New-Installation {
-    Write-Host "Poznote Installation" -ForegroundColor $Colors.Blue
-    Write-Host ""
-    
+function New-Installation {   
     $instanceName = Split-Path -Leaf (Get-Location)
     Write-Status "Using instance name: $instanceName"
     
