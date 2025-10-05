@@ -190,14 +190,14 @@ and where YOUR_PORT depends on your port choice (see your .env file).
 
 1. Stop the container:
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 2. Edit your `.env` file
 
 3. Restart the container:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 ## Forgot your password
