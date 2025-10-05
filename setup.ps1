@@ -22,6 +22,7 @@ function Show-CurrentConfiguration {
     
     Write-Host ""
     Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
+    Write-Host ""
     Write-Host "  - URL: http://localhost:$($Config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
     Write-Host "  - Username: $($Config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
     Write-Host "  - Password: $($Config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
@@ -467,7 +468,6 @@ function Update-Settings {
     
     Show-CurrentConfiguration -Config $config
     Write-Host "Update your configuration:" -ForegroundColor $Colors.Green
-    Write-Host ""
     Write-Host ""
     
     # Get new values
