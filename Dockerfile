@@ -17,6 +17,7 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY php.ini /usr/local/etc/php/
 
 # Note: Source files are mounted as volumes, not copied
+# 
 
 # Create directory for data volume (entries and attachments are inside data/)
 RUN mkdir -p /var/www/html/data 

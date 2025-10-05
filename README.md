@@ -153,7 +153,7 @@ New-Item -ItemType Directory -Path data\database -Force
 ```
 
 
-**docker-compose.yml**
+**docker-compose.hub.yml**
 ```yaml
 services:
   # WEB
@@ -225,7 +225,7 @@ Select option 2 (Change settings) from the menu. The script will preserve all yo
    docker-compose down
    ```
 
-2. **Edit your `docker-compose.yml`**
+2. **Edit your `docker-compose.hub.yml`**
 
 3. **Restart the container:**
    ```bash

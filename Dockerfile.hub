@@ -1,4 +1,4 @@
-# Production Dockerfile for Poznote
+# Dockerfile for Poznote to create image for Docker Hub
 FROM php:8.3.23-apache-bullseye
 
 # Install necessary dependencies
@@ -31,10 +31,8 @@ EXPOSE 80
 # Set working directory
 WORKDIR /var/www/html
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html/data && \
-    chmod -R 775 /var/www/html/data && \
-    chmod 755 /var/www/html
-
 # Start Apache in foreground
+# Note: This CMD is overridden by docker-compose.yml's command directive when using docker-compose.
+# It starts Apache in foreground mode to keep the container running, as Docker requires a foreground process.
+# In case someone wants to run this Dockerfile directly without docker-compose, this CMD ensures Apache starts correctly.
 CMD ["apache2-foreground"]
