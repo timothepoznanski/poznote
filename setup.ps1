@@ -16,6 +16,19 @@ function Write-Success { param($Message); Write-Host "[SUCCESS] $Message" -Foreg
 function Write-Warning { param($Message); Write-Host "[WARNING] $Message" -ForegroundColor $Colors.Yellow }
 function Write-Error { param($Message); Write-Host "[ERROR] $Message" -ForegroundColor $Colors.Red }
 
+# Show current configuration
+function Show-CurrentConfiguration {
+    param($Config)
+    
+    Write-Host ""
+    Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
+    Write-Host "  - URL: http://localhost:$($Config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    Write-Host "  - Username: $($Config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
+    Write-Host "  - Password: $($Config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
+    Write-Host "  - Port: $($Config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
+    Write-Host ""
+}
+
 # Show help
 function Show-Help {
     Write-Host @"
@@ -426,12 +439,7 @@ function Update-Installation {
     }
     
     Write-Host "Poznote Update" -ForegroundColor $Colors.Blue
-    Write-Host ""
-    Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
-    Write-Host "  - URL: http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
-    Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-    Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host ""
+    Show-CurrentConfiguration -Config $config
     
     $instanceName = Split-Path -Leaf (Get-Location)
     
@@ -461,12 +469,7 @@ function Update-Settings {
         exit 1
     }
     
-    Write-Host ""
-    Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
-    Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-    Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-    Write-Host "  - Port: $($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
-    Write-Host ""
+    Show-CurrentConfiguration -Config $config
     Write-Host "Update your configuration:" -ForegroundColor $Colors.Green
     Write-Host ""
     
@@ -565,14 +568,7 @@ try {
         
         # Check if configuration is valid
         if ($config.Count -gt 0 -and $config['HTTP_WEB_PORT'] -and $config['POZNOTE_USERNAME'] -and $config['POZNOTE_PASSWORD']) {
-            Write-Host ""
-            Write-Host "Current configuration:" -ForegroundColor $Colors.Blue
-            Write-Host ""
-            Write-Host "  - URL: http://localhost:$($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
-            Write-Host "  - Username: $($config['POZNOTE_USERNAME'])" -ForegroundColor $Colors.White
-            Write-Host "  - Password: $($config['POZNOTE_PASSWORD'])" -ForegroundColor $Colors.White
-            Write-Host "  - Port: $($config['HTTP_WEB_PORT'])" -ForegroundColor $Colors.White
-            
+            Show-CurrentConfiguration -Config $config
             Show-MainMenu
         } else {
             Write-Warning "Existing .env file found but configuration is incomplete or corrupted."
