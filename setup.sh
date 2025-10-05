@@ -526,7 +526,8 @@ main() {
         # Existing installation - show menu        
         load_env_config
         
-        if [ -n "$HTTP_WEB_PORT" ]; then
+        # Always show configuration if .env exists
+        if [ -f ".env" ]; then
             echo ""
             echo "Current configuration:"
             echo ""
