@@ -220,28 +220,12 @@ Select option 2 (Change settings) from the menu. The script will preserve all yo
 
 **Docker Hub Deployment:**
 
-When using the Docker Hub image, you can change your username, password, or port by modifying the `docker-compose.yml` file:
-
 1. **Stop the container:**
    ```bash
    docker-compose down
    ```
 
-2. **Edit your `docker-compose.yml`:**
-   ```yaml
-   services:
-     webserver:
-       image: timpoz/poznote:latest
-       restart: always
-       environment:
-         POZNOTE_USERNAME: new_username
-         POZNOTE_PASSWORD: new_password
-         HTTP_WEB_PORT: new_port
-       ports:
-         - "new_port:80"  # Update this too
-       volumes:
-         - ./data:/var/www/html/data
-   ```
+2. **Edit your `docker-compose.yml`**
 
 3. **Restart the container:**
    ```bash
