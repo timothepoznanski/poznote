@@ -148,8 +148,17 @@ chmod 755 data
 
 **Windows (PowerShell):**
 ```powershell
+**Windows (Command Prompt):**
+```cmd
+mkdir data\database
+icacls data /grant "Users:(OI)(CI)F" /T
+```
+
+**Windows (PowerShell):**
+```powershell
 New-Item -ItemType Directory -Path data\database -Force
-icacls data /grant Users:(OI)(CI)F /T
+icacls data /grant 'Users:(OI)(CI)F' /T
+```
 ```
 
 **docker-compose.yml**
