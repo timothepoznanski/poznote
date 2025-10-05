@@ -35,8 +35,8 @@ function Show-Help {
 Poznote Setup Script for Windows
 
 USAGE:
-    .\setup.ps1         Interactive installation/update
-    .\setup.ps1 -Help   Show this help
+    powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"         Interactive installation/update
+    powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1" -Help   Show this help
 
 REQUIREMENTS:
     - Docker Desktop for Windows
