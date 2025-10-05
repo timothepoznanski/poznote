@@ -241,8 +241,8 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-display" onclick="window.location.href='display.php';" title="Display"><i class="fa-eye"></i></button>
-                <button class="sidebar-settings" onclick="window.location.href='settings.php';" title="Settings"><i class="fa-cog"></i></button>
+                <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
+                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings"><i class="fa-cog"></i></button>
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
             </div>
 
@@ -924,6 +924,31 @@ $body_classes = trim($extra_body_classes);
         if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
             url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
         }
+        window.location.href = url;
+    }
+    
+    // Navigate to display.php or settings.php with current workspace and note parameters
+    function navigateToDisplayOrSettings(page) {
+        var url = page;
+        var params = [];
+        
+        // Add workspace parameter if selected
+        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+            params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
+        }
+        
+        // Add note parameter if currently viewing a note
+        var urlParams = new URLSearchParams(window.location.search);
+        var noteId = urlParams.get('note');
+        if (noteId) {
+            params.push('note=' + encodeURIComponent(noteId));
+        }
+        
+        // Build final URL
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
         window.location.href = url;
     }
 </script>
