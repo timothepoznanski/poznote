@@ -44,10 +44,6 @@ REQUIREMENTS:
 "@ -ForegroundColor $Colors.White
 }
 
-
-
-
-
 # Check if existing installation
 function Test-ExistingInstallation {
     return Test-Path ".env"
@@ -411,14 +407,14 @@ function New-Installation {
     if (Start-DockerContainers -InstanceName $instanceName) {
         Write-Host ""
         Write-Success "Poznote has been installed successfully!"
-        Write-Host ""
-        Write-Host "Access your Poznote instance at: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "http://localhost:$port" -ForegroundColor $Colors.Green
-        Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$username" -ForegroundColor $Colors.Yellow
-        Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
-        Write-Host "$password" -ForegroundColor $Colors.Yellow
-        Write-Host ""
+        
+        # Show current configuration
+        $config = @{
+            'HTTP_WEB_PORT' = $port
+            'POZNOTE_USERNAME' = $username
+            'POZNOTE_PASSWORD' = $password
+        }
+        Show-CurrentConfiguration -Config $config
         Write-Status "To update Poznote or change settings, run setup script again with :"
         Write-Status "powershell -ExecutionPolicy Bypass -NoProfile -File `".\setup.ps1`""
         Write-Host ""
@@ -472,6 +468,7 @@ function Update-Settings {
     Show-CurrentConfiguration -Config $config
     Write-Host "Update your configuration:" -ForegroundColor $Colors.Green
     Write-Host ""
+    Write-Host ""
     
     # Get new values
     $username = Get-UserInput "Username [$($config['POZNOTE_USERNAME'])]" $config['POZNOTE_USERNAME']
@@ -518,14 +515,14 @@ function Update-Settings {
         if (Start-DockerContainers -InstanceName $instanceName) {
             Write-Host ""
             Write-Success "Configuration updated successfully!"
-            Write-Host ""
-            Write-Host "Access your instance at: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "http://localhost:$port" -ForegroundColor $Colors.Green
-            Write-Host "Username: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "$username" -ForegroundColor $Colors.Yellow
-            Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
-            Write-Host "$password" -ForegroundColor $Colors.Yellow
-            Write-Host ""
+            
+            # Show current configuration
+            $config = @{
+                'HTTP_WEB_PORT' = $port
+                'POZNOTE_USERNAME' = $username
+                'POZNOTE_PASSWORD' = $password
+            }
+            Show-CurrentConfiguration -Config $config
         } else {
             Write-Error "Failed to restart containers with new configuration"
             exit 1
