@@ -526,19 +526,23 @@ main() {
         # Existing installation - show menu        
         load_env_config
         
-        if [ -n "$HTTP_WEB_PORT" ]; then
-            echo -e "\n${BLUE}Current configuration:\n${NC}"
-            echo -e "  • URL: http://your-server:${HTTP_WEB_PORT}"
-            echo -e "  • Username: ${POZNOTE_USERNAME}"
-            echo -e "  • Password: ${POZNOTE_PASSWORD}"
-            echo -e "  • Port: ${HTTP_WEB_PORT}"
-                
+        # Always show configuration if .env exists
+        if [ -f ".env" ]; then
+            echo ""
+            echo "Current configuration:"
+            echo ""
+            echo "  - URL: http://localhost:${HTTP_WEB_PORT}"
+            echo "  - Username: ${POZNOTE_USERNAME}"
+            echo "  - Password: ${POZNOTE_PASSWORD}"
+            echo "  - Port: ${HTTP_WEB_PORT}"
         fi
         
-        echo -e "\n${GREEN}What would you like to do?${NC}\n"
-        echo -e "  1) Update application (get latest code)"
-    echo -e "  2) Change settings (login/password/port)"
-        echo -e "  3) Cancel"
+        echo ""
+        echo "What would you like to do?"
+        echo ""
+        echo "  1. Update application (get latest code)"
+        echo "  2. Change settings (login/password/port)"
+        echo "  3. Cancel"
         
         while true; do
             echo
