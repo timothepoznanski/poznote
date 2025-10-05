@@ -88,16 +88,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
-            <!-- Release Notes -->
-            <div class="settings-card" onclick="window.open('https://raw.githubusercontent.com/timothepoznanski/poznote/main/RELEASE_NOTES.md', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fa-file-alt"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Release Notes</h3>
-                </div>
-            </div>
-
             <!-- Updates -->
             <div class="settings-card" onclick="checkForUpdates();">
                 <div class="settings-card-icon">
@@ -201,7 +191,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         // Set workspace context for JavaScript functions
         window.selectedWorkspace = <?php echo json_encode(getWorkspaceFilter()); ?>;
         
-        // Release Notes now open on GitHub (no local modal)
     </script>
 </body>
 </html>
