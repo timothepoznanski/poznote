@@ -172,7 +172,7 @@ services:
     command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
 
-**.env** (optional, for environment variables)
+**.env**
 ```
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
