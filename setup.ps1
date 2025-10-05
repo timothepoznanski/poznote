@@ -514,7 +514,6 @@ function Update-Settings {
         
         # Start with new configuration
         if (Start-DockerContainers -InstanceName $instanceName) {
-            Write-Host ""
             Write-Success "Configuration updated successfully!"
             
             # Show current configuration
@@ -538,7 +537,6 @@ function Update-Settings {
 # Main menu for existing installations
 function Show-MainMenu {
     while ($true) {
-        Write-Host ""
         Write-Host "What would you like to do?" -ForegroundColor $Colors.Green
         Write-Host ""
         Write-Host "  1. Update application (get latest code)" -ForegroundColor $Colors.White
