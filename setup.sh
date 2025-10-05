@@ -119,9 +119,10 @@ reconfigure_poznote() {
     manage_container "restart"
     
     echo -e "\n${GREEN}Configuration Update Complete!${NC}"
-                
+    echo -e "${BLUE}URL: ${YELLOW}http://your-server:${HTTP_WEB_PORT}${NC}"
     echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
     echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
+    echo -e "${BLUE}Port: ${YELLOW}$HTTP_WEB_PORT${NC}"
     
     echo
     
