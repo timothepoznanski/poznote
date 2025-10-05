@@ -143,7 +143,6 @@ Create a directory for your Poznote instance and create the following files:
 **Linux (Bash):**
 ```bash
 mkdir -p data/database
-chmod 755 data
 
 ```
 
@@ -157,17 +156,20 @@ New-Item -ItemType Directory -Path data\database -Force
 **docker-compose.yml**
 ```yaml
 services:
+  # WEB
   webserver:
     image: timpoz/poznote:latest
     restart: always
     environment:
-      POZNOTE_USERNAME: your_username
-      POZNOTE_PASSWORD: your_password
-      HTTP_WEB_PORT: 8040
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
     ports:
-      - "8040:80"
+      - "${HTTP_WEB_PORT}:80"
     volumes:
-      - ./data:/var/www/html/data
+      - "./data:/var/www/html/data"
+    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
 
 **.env** (optional, for environment variables)
