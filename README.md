@@ -140,7 +140,7 @@ Create a directory for your Poznote instance and create the following files:
 
 **Prepare the data directory:**
 
-**Linux/macOS:**
+**Linux:**
 ```bash
 mkdir -p data/database
 chmod 755 data
