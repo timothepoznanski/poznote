@@ -16,7 +16,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Workspaces](#workspaces)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
-- [Update Application](#update-application)
+- [Update Application to the latest version](#update-application)
 - [Multiple Instances](#multiple-instances)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
@@ -127,6 +127,67 @@ fi
 
 </details>
 
+<details>
+<summary><strong>🐳 Docker Hub Deployment</strong></summary>
+
+#### Step 1: Prerequisite
+
+Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### Step 2: Deploy Poznote
+
+Create a directory for your Poznote instance and create the following files:
+
+**Prepare the data directory:**
+
+**Linux (Bash):**
+```bash
+mkdir -p data/database
+
+```
+
+**Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Path data\database -Force
+
+```
+
+
+**docker-compose.hub.yml**
+```yaml
+services:
+  # WEB
+  webserver:
+    image: timpoz/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+```
+
+**.env**
+```
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_password
+HTTP_WEB_PORT=8040
+```
+
+#### Step 3: Start Poznote
+
+```bash
+docker-compose up -d
+```
+
+
+</details>
+
 ## Access Your Instance
 
 After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
@@ -157,15 +218,37 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 
 Select option 2 (Change settings) from the menu. The script will preserve all your data.
 
+**Docker Hub Deployment:**
+
+1. **Stop the container:**
+   ```bash
+   docker-compose down
+   ```
+
+2. **Edit your `docker-compose.hub.yml`**
+
+3. **Restart the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
 ## Reset Password
 
-If you've forgotten your password, run the setup script and select "Change settings".
+If you've forgotten your password, see the "Change Settings" section above.
 
-## Update Application
+## Update Application to the latest version
 
 You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
 
-To update Poznote to the latest version, run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+To update Poznote to the latest version: 
+
+**Windows/Linux:**
+
+- Run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+
+**Docker Hub Deployment:**
+
+- WORK IN PROGRESS
 
 ## Workspaces
 

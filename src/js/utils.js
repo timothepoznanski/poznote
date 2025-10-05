@@ -463,22 +463,8 @@ function deleteCurrentWorkspace() {
     }
 }
 
-// Compatibility functions (legacy)
-function toggleToolbarMenu(noteId) {
-    // Use the new function
-    toggleNoteMenu(noteId);
-}
-
 function createFolder() {
     newFolder();
-}
-
-function confirmDeleteAttachment(callback) {
-    // Confirmation removed: call the callback immediately to perform deletion
-    // (legacy compatibility wrapper)
-    if (typeof callback === 'function') {
-        callback();
-    }
 }
 
 // Update management
