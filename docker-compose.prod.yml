@@ -13,4 +13,4 @@ services:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "mkdir -p /var/www/html/data/database && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+    command: /bin/sh -c "mkdir -p /var/www/html/data/database && apache2-foreground"
