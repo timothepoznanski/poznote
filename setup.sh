@@ -133,26 +133,6 @@ reconfigure_poznote() {
 
 # Check Docker installation
 
-
-
-# Check for existing containers with similar names
-check_existing_containers() {
-    local instance_name=$(basename "$(pwd)")
-    
-    if docker ps -a --format "{{.Names}}" | grep -q "^$instance_name-"; then
-        print_warning "Container with name '$instance_name' already exists!"
-        print_status "Existing containers:"
-        docker ps -a --format "table {{.Names}}\t{{.Status}}" | grep "^$instance_name-" || true
-        echo
-        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            print_status "Installation cancelled."
-            exit 0
-        fi
-    fi
-}
-
 # Check if Poznote is already installed
 check_existing_installation() {
     # Installation is detected if .env file exists
@@ -541,9 +521,6 @@ main() {
         "") ;; # No arguments, proceed normally
         *) print_error "Unknown option: $1"; echo "Use --help for usage information."; exit 1 ;;
     esac
-    
-    # Check for existing containers
-    check_existing_containers
     
     if check_existing_installation; then
         # Existing installation - show menu        
