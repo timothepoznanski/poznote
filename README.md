@@ -162,6 +162,8 @@ Start Poznote:
 docker-compose up -d
 ```
 
+</details>
+
 ## Access Your Instance
 
 After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
