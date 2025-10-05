@@ -106,7 +106,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
-docker-compose up -d
+docker compose up -d
 ```
 
 </details>
@@ -167,7 +167,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 </details>
