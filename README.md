@@ -64,7 +64,11 @@ Open Powershell and run the following commands:
 
 ```powershell
 mkdir poznote  # or another name if you want several Poznote instances running on the same server
+```
+```powershell
 cd poznote
+```
+```powershell
 notepad docker-compose.yml
 ```
 
@@ -121,7 +125,11 @@ Open a Terminal and run the following commands:
 
 ```bash
 mkdir poznote  # or another name if you want several Poznote instances running on the same server
+```
+```bash
 cd poznote
+```
+```bash
 vi docker-compose.yml
 ```
 
