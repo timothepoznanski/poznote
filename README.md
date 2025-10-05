@@ -64,7 +64,11 @@ Open Powershell and run the following commands:
 
 ```powershell
 mkdir poznote  # or another name if you want several Poznote instances running on the same server
+```
+```powershell
 cd poznote
+```
+```powershell
 notepad docker-compose.yml
 ```
 
@@ -121,7 +125,11 @@ Open a Terminal and run the following commands:
 
 ```bash
 mkdir poznote  # or another name if you want several Poznote instances running on the same server
+```
+```bash
 cd poznote
+```
+```bash
 vi docker-compose.yml
 ```
 
@@ -180,14 +188,14 @@ and where YOUR_PORT depends on your port choice (see your .env file).
 
  If you need to change your login, password or port:
 
-1. **Stop the container:**
+1. Stop the container:
    ```bash
    docker-compose down
    ```
 
 2. Edit your `.env` file
 
-3. **Restart the container:**
+3. Restart the container:
    ```bash
    docker-compose up -d
    ```
