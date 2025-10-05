@@ -417,7 +417,8 @@ function New-Installation {
         }
         Show-CurrentConfiguration -Config $config
         Write-Status "To update Poznote or change settings, run setup script again with :"
-        Write-Status "powershell -ExecutionPolicy Bypass -NoProfile -File `".\setup.ps1`""
+        Write-Host ""
+        Write-Host "powershell -ExecutionPolicy Bypass -NoProfile -File `".\setup.ps1`""
         Write-Host ""
     } else {
         Write-Error "Installation failed. Please check the error message above for details."
