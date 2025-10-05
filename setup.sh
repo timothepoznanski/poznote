@@ -426,15 +426,50 @@ manage_container() {
             ;;
     esac
     
-    # Wait for services
+    # Wait for services with advanced checking
     print_status "Waiting for services to start..."
-    sleep 15
     
-    # Check if container is running
-    if docker compose -p "$project_name" ps | grep -q "Up"; then
-        print_success "Poznote container is running"
-    else
-        print_error "Failed to start container"
+    local max_attempts=30  # Maximum 1 minute (30 * 2 seconds)
+    local attempt=0
+    local containers_ready=false
+    
+    while [ $attempt -lt $max_attempts ] && [ "$containers_ready" = false ]; do
+        sleep 2
+        attempt=$((attempt + 1))
+        
+        # Check if containers are running
+        if docker compose -p "$project_name" ps 2>/dev/null | grep -q "Up" && ! docker compose -p "$project_name" ps 2>/dev/null | grep -q "Exit"; then
+            # Additional check: make sure web server is responding
+            if command -v curl &> /dev/null; then
+                if curl -s --connect-timeout 3 "http://localhost:${HTTP_WEB_PORT}" >/dev/null 2>&1; then
+                    containers_ready=true
+                    echo # New line after dots
+                    print_success "Poznote started successfully and is responding!"
+                else
+                    printf "."
+                fi
+            elif command -v wget &> /dev/null; then
+                if wget -q --timeout=3 --tries=1 "http://localhost:${HTTP_WEB_PORT}" -O /dev/null 2>/dev/null; then
+                    containers_ready=true
+                    echo # New line after dots
+                    print_success "Poznote started successfully and is responding!"
+                else
+                    printf "."
+                fi
+            else
+                # If no HTTP client available, just check container status
+                containers_ready=true
+                echo # New line after dots
+                print_success "Poznote container is running"
+            fi
+        else
+            printf "."
+        fi
+    done
+    
+    if [ "$containers_ready" = false ]; then
+        echo # New line after dots
+        print_error "Failed to start Poznote containers within timeout (1 minute)"
         docker compose -p "$project_name" logs
         exit 1
     fi
