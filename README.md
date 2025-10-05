@@ -188,14 +188,16 @@ and where YOUR_PORT depends on your port choice (see your .env file).
 
  If you need to change your login, password or port:
 
-1. Stop the container:
+1. Navigate to your Poznote directory
+
+2. Stop the container:
    ```bash
    docker compose down
    ```
 
-2. Edit your `.env` file
+3. Edit your `.env` file
 
-3. Restart the container:
+4. Restart the container:
    ```bash
    docker compose up -d
    ```
@@ -210,7 +212,22 @@ You can check if your application is up to date directly from the Poznote interf
 
 To update Poznote to the latest version: 
 
-/!\ WORK IN PROGRESS
+1. Navigate to your Poznote directory
+
+2. Stop the container:
+   ```bash
+   docker compose down
+   ```
+
+3. Pull the latest image
+  ```bash
+   docker compose pull
+   ```
+
+4. Restart the container:
+   ```bash
+   docker compose up -d
+   ```
 
 ## Workspaces
 
