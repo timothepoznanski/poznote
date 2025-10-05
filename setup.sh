@@ -250,7 +250,7 @@ get_port_with_validation() {
             else
                 echo -e "${YELLOW}[WARNING]${NC} Port $port is already in use." >&2
             fi
-            echo -e "${BLUE}[INFO]${NC} Please choose a different port (e.g., 8041, 8042, 8043)." >&2
+            echo -e "${BLUE}[INFO]${NC} Please choose a different port." >&2
             first_attempt=false
             continue
         fi
@@ -477,7 +477,8 @@ show_info() {
     
     if [ "$is_update" != "true" ]; then
         echo
-        print_status "To update Poznote or change settings, run setup script again"
+        print_status "To update Poznote or change settings, run setup script again with:"
+        print_status "./setup.sh"
         echo
     fi
 }

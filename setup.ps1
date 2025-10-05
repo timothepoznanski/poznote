@@ -406,6 +406,9 @@ function New-Installation {
         Write-Host "Password: " -NoNewline -ForegroundColor $Colors.Blue
         Write-Host "$password" -ForegroundColor $Colors.Yellow
         Write-Host ""
+        Write-Status "To update Poznote or change settings, run setup script again with :"
+        Write-Status "powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1""
+        Write-Host ""
     } else {
         Write-Error "Installation failed. Please check the error message above for details."
         exit 1
