@@ -140,7 +140,7 @@ Create a directory for your Poznote instance and create the following files:
 
 **Prepare the data directory:**
 
-**Linux:**
+**Linux (Bash):**
 ```bash
 mkdir -p data/database
 chmod 755 data
@@ -150,9 +150,9 @@ chmod 755 data
 **Windows (PowerShell):**
 ```powershell
 New-Item -ItemType Directory -Path data\database -Force
-icacls data /grant 'Users:(OI)(CI)F' /T
 
 ```
+
 
 **docker-compose.yml**
 ```yaml
