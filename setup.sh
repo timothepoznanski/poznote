@@ -66,6 +66,15 @@ SETUP INFO:
 EOF
 }
 
+# Function to display current configuration consistently
+show_current_configuration() {
+    echo -e "\n${BLUE}Current configuration:\n${NC}"
+    echo -e "  • URL: http://your-server:${HTTP_WEB_PORT}"
+    echo -e "  • Username: ${POZNOTE_USERNAME}"
+    echo -e "  • Password: ${POZNOTE_PASSWORD}"
+    echo -e "  • Port: ${HTTP_WEB_PORT}"
+}
+
 # Reconfigure existing installation
 reconfigure_poznote() {
 
@@ -77,12 +86,7 @@ reconfigure_poznote() {
 
     load_env_config
     
-    echo -e "\n${BLUE}Current configuration:\n${NC}"
-    echo -e "  • URL: http://your-server:${HTTP_WEB_PORT}"
-    echo -e "  • Username: ${POZNOTE_USERNAME}"
-    echo -e "  • Password: ${POZNOTE_PASSWORD}"
-    echo -e "  • Port: ${HTTP_WEB_PORT}"
-    
+    show_current_configuration
 
     echo -e "\n${GREEN}Update your configuration:${NC}\n"
 
@@ -119,10 +123,7 @@ reconfigure_poznote() {
     manage_container "restart"
     
     echo -e "\n${GREEN}Configuration Update Complete!${NC}"
-    echo -e "${BLUE}URL: ${YELLOW}http://your-server:${HTTP_WEB_PORT}${NC}"
-    echo -e "${BLUE}Username: ${YELLOW}$POZNOTE_USERNAME${NC}"
-    echo -e "${BLUE}Password: ${YELLOW}$POZNOTE_PASSWORD${NC}"
-    echo -e "${BLUE}Port: ${YELLOW}$HTTP_WEB_PORT${NC}"
+    show_current_configuration
     
     echo
     
@@ -450,10 +451,8 @@ show_info() {
         print_success "Poznote has been successfully installed!"
     fi
     echo
-    print_status "Access Information:\n"
-    echo "  URL: http://your-server:${HTTP_WEB_PORT}"
-    echo "  Username: ${POZNOTE_USERNAME}"
-    echo "  Password: ${POZNOTE_PASSWORD}"
+    print_status "Access Information:"
+    show_current_configuration
     echo
     
     if [ "$is_update" != "true" ]; then
@@ -529,13 +528,7 @@ main() {
         
         # Always show configuration if .env exists
         if [ -f ".env" ]; then
-            echo ""
-            echo "Current configuration:"
-            echo ""
-            echo "  - URL: http://localhost:${HTTP_WEB_PORT}"
-            echo "  - Username: ${POZNOTE_USERNAME}"
-            echo "  - Password: ${POZNOTE_PASSWORD}"
-            echo "  - Port: ${HTTP_WEB_PORT}"
+            show_current_configuration
         fi
         
         echo ""
