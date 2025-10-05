@@ -385,13 +385,13 @@ create_env_file() {
         exit 1
     fi
     
-    cp ".env.template" ".env"
-    
-    # Use sed for more robust replacement that handles spaces
-    sed -i "s/^POZNOTE_USERNAME=.*/POZNOTE_USERNAME=$POZNOTE_USERNAME/" .env
-    sed -i "s/^POZNOTE_PASSWORD=.*/POZNOTE_PASSWORD=$POZNOTE_PASSWORD/" .env
-    sed -i "s/^HTTP_WEB_PORT=.*/HTTP_WEB_PORT=$HTTP_WEB_PORT/" .env
-    # Deprecated .env variables are not used by this script
+    # Create .env file with proper variable substitution
+    # Using cat with here-document to avoid sed escaping issues
+    cat > .env << EOF
+POZNOTE_USERNAME=$POZNOTE_USERNAME
+POZNOTE_PASSWORD=$POZNOTE_PASSWORD
+HTTP_WEB_PORT=$HTTP_WEB_PORT
+EOF
     
     print_success ".env file created from template"
 }
