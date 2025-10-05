@@ -138,6 +138,18 @@ Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https
 
 Create a directory for your Poznote instance and create the following files:
 
+**Prepare the data directory:**
+
+**Linux/macOS:**
+```bash
+mkdir -p data/database
+```
+
+**Windows:**
+```cmd
+mkdir data\database
+```
+
 **docker-compose.yml**
 ```yaml
 services:
@@ -147,9 +159,9 @@ services:
     environment:
       POZNOTE_USERNAME: your_username
       POZNOTE_PASSWORD: your_password
-      HTTP_WEB_PORT: 8080
+      HTTP_WEB_PORT: 8040
     ports:
-      - "8080:80"
+      - "8040:80"
     volumes:
       - ./data:/var/www/html/data
 ```
@@ -158,7 +170,7 @@ services:
 ```
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8080
+HTTP_WEB_PORT=8040
 ```
 
 #### Step 3: Start Poznote
@@ -167,7 +179,7 @@ HTTP_WEB_PORT=8080
 docker-compose up -d
 ```
 
-Poznote will be available at `http://localhost:8080`
+Poznote will be available at `http://localhost:8040`
 
 #### Changing Settings (Username, Password, Port)
 
