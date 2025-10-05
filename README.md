@@ -127,6 +127,82 @@ fi
 
 </details>
 
+<details>
+<summary><strong>🐳 Docker Hub Deployment</strong></summary>
+
+#### Step 1: Prerequisite
+
+Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### Step 2: Deploy Poznote
+
+Create a directory for your Poznote instance and create the following files:
+
+**docker-compose.yml**
+```yaml
+services:
+  webserver:
+    image: timpoz/poznote:latest
+    restart: always
+    environment:
+      POZNOTE_USERNAME: your_username
+      POZNOTE_PASSWORD: your_password
+      HTTP_WEB_PORT: 8080
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data:/var/www/html/data
+```
+
+**.env** (optional, for environment variables)
+```
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_password
+HTTP_WEB_PORT=8080
+```
+
+#### Step 3: Start Poznote
+
+```bash
+docker-compose up -d
+```
+
+Poznote will be available at `http://localhost:8080`
+
+#### Changing Settings (Username, Password, Port)
+
+When using the Docker Hub image, you can change your username, password, or port by modifying the `docker-compose.yml` file:
+
+1. **Stop the container:**
+   ```bash
+   docker-compose down
+   ```
+
+2. **Edit your `docker-compose.yml`:**
+   ```yaml
+   services:
+     webserver:
+       image: timpoz/poznote:latest
+       restart: always
+       environment:
+         POZNOTE_USERNAME: new_username
+         POZNOTE_PASSWORD: new_password
+         HTTP_WEB_PORT: new_port
+       ports:
+         - "new_port:80"  # Update this too
+       volumes:
+         - ./data:/var/www/html/data
+   ```
+
+3. **Restart the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+**Note:** After changing username/password, you'll need to log out and log back in with the new credentials. Your data remains intact.
+
+</details>
+
 ## Access Your Instance
 
 After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
