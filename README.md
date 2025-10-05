@@ -16,7 +16,7 @@ A powerful note-taking application that puts you in complete control of your dat
 - [Workspaces](#workspaces)
 - [Change Settings](#change-settings)
 - [Reset Password](#reset-password)
-- [Update Application](#update-application)
+- [Update Application to the latest version](#update-application)
 - [Multiple Instances](#multiple-instances)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
@@ -185,39 +185,6 @@ HTTP_WEB_PORT=8040
 docker-compose up -d
 ```
 
-Poznote will be available at `http://localhost:8040`
-
-#### Changing Settings (Username, Password, Port)
-
-When using the Docker Hub image, you can change your username, password, or port by modifying the `docker-compose.yml` file:
-
-1. **Stop the container:**
-   ```bash
-   docker-compose down
-   ```
-
-2. **Edit your `docker-compose.yml`:**
-   ```yaml
-   services:
-     webserver:
-       image: timpoz/poznote:latest
-       restart: always
-       environment:
-         POZNOTE_USERNAME: new_username
-         POZNOTE_PASSWORD: new_password
-         HTTP_WEB_PORT: new_port
-       ports:
-         - "new_port:80"  # Update this too
-       volumes:
-         - ./data:/var/www/html/data
-   ```
-
-3. **Restart the container:**
-   ```bash
-   docker-compose up -d
-   ```
-
-**Note:** After changing username/password, you'll need to log out and log back in with the new credentials. Your data remains intact.
 
 </details>
 
@@ -251,15 +218,53 @@ powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
 
 Select option 2 (Change settings) from the menu. The script will preserve all your data.
 
+**Docker Hub Deployment:**
+
+When using the Docker Hub image, you can change your username, password, or port by modifying the `docker-compose.yml` file:
+
+1. **Stop the container:**
+   ```bash
+   docker-compose down
+   ```
+
+2. **Edit your `docker-compose.yml`:**
+   ```yaml
+   services:
+     webserver:
+       image: timpoz/poznote:latest
+       restart: always
+       environment:
+         POZNOTE_USERNAME: new_username
+         POZNOTE_PASSWORD: new_password
+         HTTP_WEB_PORT: new_port
+       ports:
+         - "new_port:80"  # Update this too
+       volumes:
+         - ./data:/var/www/html/data
+   ```
+
+3. **Restart the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
 ## Reset Password
 
-If you've forgotten your password, run the setup script and select "Change settings".
+If you've forgotten your password, see the "Change Settings" section above.
 
-## Update Application
+## Update Application to the latest version
 
 You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
 
-To update Poznote to the latest version, run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+To update Poznote to the latest version: 
+
+**Windows/Linux:**
+
+- Run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+
+**Docker Hub Deployment:**
+
+- WORK IN PROGRESS
 
 ## Workspaces
 
