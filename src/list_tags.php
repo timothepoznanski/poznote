@@ -30,20 +30,20 @@ $stmt = $con->prepare($select_query);
 $stmt->execute($search_params);
 
 $tags_list = [];
-$count_tags = 0;
 
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {   
 	$words = explode(',', $row['tags']);
 	foreach($words as $word) {
 		$word = trim($word); // Clean spaces
 		if (!empty($word)) { // Verify that tag is not empty
-			$count_tags++;
 			if (!in_array($word, $tags_list)) {
 				$tags_list[] = $word;
 			}
 		}		
 	}
 }
+
+$count_tags = count($tags_list);
 
 sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 ?>
@@ -78,7 +78,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		</form>
 		
 		<div class="tags-info">
-			There are <?php echo $count_tags; ?> tags total
+			There <?php echo ($count_tags == 1) ? 'is' : 'are'; ?> <?php echo $count_tags; ?> tag<?php echo ($count_tags == 1) ? '' : 's'; ?> total
 		</div>
 		
 		<div class="tags-grid" id="tagsList">
