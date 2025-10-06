@@ -67,9 +67,11 @@ Open Powershell and run the following commands:
 ```powershell
 mkdir poznote  # or another name if you want several Poznote instances running on the same server
 ```
+
 ```powershell
 cd poznote
 ```
+
 ```powershell
 notepad docker-compose.yml
 ```
@@ -103,7 +105,7 @@ Copy and paste the following lines into .env file:
 ```powershell
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040
+HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
 ```
 
 Start Poznote:
@@ -165,7 +167,7 @@ Copy and paste the following lines into .env file:
 ```bash
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040
+HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
 ```
 
 Start Poznote:
@@ -552,11 +554,9 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 
 ## Advanced Operations
 
-For those who don't want to use the Poznote image stored on Docker Hub (for example, if a network proxy doesn't allow it), you can try the following methods where the only dependency is the php/apache image. The Poznote image will be built locally. Also, setup scripts (Powershell and Bash) allow better management of the instance (verify password compliance, instance name, change settings, update Poznote, etc.).
+For those who don't want to use the Poznote image stored on Docker Hub (for example, if a network proxy doesn't allow it), you can try the following methods where the only dependency is the php/apache image. The Poznote image will be built locally. 
 
 ### Installation
-
-Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
 <details>
 <summary><strong>🪟 Windows Installation</strong></summary>
@@ -565,34 +565,42 @@ Poznote runs in a Docker container, making it incredibly easy to deploy anywhere
 
 Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-#### Step 2: Install Poznote
+#### Step 2: Deploy Poznote
 
-Open Powershell where you want to install Poznote, paste and run the following block of commands:
+Open Powershell and run the following commands:
 
 ```powershell
-docker ps >$null 2>&1
-if ($LASTEXITCODE -eq 0) {
-    do {
-        $instance = Read-Host "`nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]"
-        if ([string]::IsNullOrWhiteSpace($instance)) { $instance = "poznote" }
-        if (-not ($instance -cmatch "^[a-z0-9_-]+$")) {
-            Write-Host "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
-            continue
-        }
-        if (docker ps -a --format "{{.Names}}" | Where-Object { $_ -match "^$instance-webserver-1$" }) {
-            Write-Host "Container '$instance-webserver-1' already exists. Please choose a different instance name." -ForegroundColor Red
-            continue
-        }
-        break
-    } while ($true)
+$INSTANCE_NAME = "my-poznote"
+```
 
-    git clone https://github.com/timothepoznanski/poznote.git $instance
-    Set-Location $instance
-    powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
-} else {
-    Write-Host "Please start Docker Desktop" -ForegroundColor Red
-}
+```powershell
+git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
+```
 
+```powershell
+notepad Dockerfile  # If necessary (for example to add proxies)
+```
+
+```powershell
+cd $INSTANCE_NAME
+```
+
+```powershell
+notepad .env
+```
+
+Copy and paste the following lines into .env file:
+
+```powershell
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_password
+HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+```
+
+Start Poznote:
+
+```powershell
+docker compose up -d --build
 ```
 
 </details>
@@ -607,62 +615,108 @@ if ($LASTEXITCODE -eq 0) {
 
 #### Step 2: Install Poznote
 
-Open a terminal where you want to install Poznote, paste and run the following block of commands:
+Open a Terminal and run the following commands:
 
 ```bash
-if docker ps >/dev/null 2>&1; then
-    while true; do
-        read -p $'\nChoose an instance name (poznote-tom, my-notes, etc.) [poznote]: ' instance
-        instance=${instance:-poznote}
-        if [[ ! "$instance" =~ ^[a-z0-9_-]+$ ]]; then
-            echo "Name must contain only lowercase letters, numbers, underscores, and hyphens, without spaces."
-            continue
-        fi
-        if docker ps -a --format "{{.Names}}" | grep -q "^$instance-webserver-1$"; then
-            echo "Container '$instance-webserver-1' already exists. Please choose a different instance name."
-            continue
-        fi
-        break
-    done
+INSTANCE_NAME = "my-poznote"
+```
 
-    git clone https://github.com/timothepoznanski/poznote.git "$instance"
-    cd "$instance"
-    bash setup.sh
-else
-    echo "Please start Docker"
-fi
+```bash
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+```
 
+```bash
+vim Dockerfile  # If necessary (for example to add proxies)
+```
+
+```bash
+cd $INSTANCE_NAME
+```
+
+```bash
+vi .env
+```
+
+Copy and paste the following lines into .env file:
+
+```bash
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_password
+HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+```
+
+Start Poznote:
+
+```bash
+docker compose up -d --build
 ```
 
 </details>
 
+## Access Your Instance
+
+After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
+
+where YOUR_SERVER depends on your environment:
+
+- localhost
+- Your server's IP address
+- Your domain name
+
+and where YOUR_PORT depends on your port choice (see your .env file).
+
 ## Change Settings
 
-To change your username, password, or port:
+ If you need to change your login, password or port:
 
-**Linux:**
-```bash
-./setup.sh
-```
+1. Navigate to your Poznote directory
 
-**Windows:**
-```powershell
-powershell -ExecutionPolicy Bypass -NoProfile -File ".\setup.ps1"
-```
+2. Stop the container:
+   ```bash
+   docker compose down
+   ```
 
-Select option 2 (Change settings) from the menu. The script will preserve all your data.
+3. Edit your `.env` file
 
-## Update Poznote to the latest version
+4. Restart the container:
+   ```bash
+   docker compose up -d
+   ```
+
+## Forgot your password
+
+Find it in your `.env` file.
+
+## Update Application to the latest version
+
+You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
 
 To update Poznote to the latest version: 
 
-**Windows/Linux:**
+1. Navigate to your Poznote directory
 
-- Run the setup script and select "Update application". The script will pull updates while preserving your configuration and data.
+2. Stop the container:
+   ```bash
+   docker compose down
+   ```
+
+3. Pull the latest image
+   ```bash
+   docker compose pull
+   ```
+
+4. Restart the container:
+   ```bash
+   docker compose up -d
+   ```
+
+## Workspaces
+
+Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
 
 ## Multiple Instances
 
-You can run multiple isolated Poznote instances on the same server. Simply run the setup script multiple times with different instance names and ports.
+You can run multiple isolated Poznote instances on the same server. Just deploy new instances with different names and ports.
 
 ### Example: Tom and Alice instances on the same server
 
