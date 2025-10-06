@@ -612,11 +612,11 @@ git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
 ```
 
 ```bash
-vim Dockerfile  # If necessary (for example to add proxies)
+cd $INSTANCE_NAME
 ```
 
 ```bash
-cd $INSTANCE_NAME
+vim Dockerfile  # If necessary (for example to add proxies)
 ```
 
 ```bash
