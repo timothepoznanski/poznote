@@ -25,7 +25,7 @@ Simple, fast, and built for those who value freedom over their own data.
 - [Offline View](#offline-view)
 - [AI Features](#ai-features)
 - [API Documentation](#api-documentation)
-- [Manual Operations](#manual-operations)
+- [Advanced Operations](#advanced-operations)
 
 ## Features
 
