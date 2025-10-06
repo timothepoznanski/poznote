@@ -19,10 +19,6 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 # Copy php.ini
 COPY php.ini /usr/local/etc/php/
 
-# Copy entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Handle source files based on build argument
 COPY ${copy_src_files:+./src} /var/www/html
 

@@ -87,21 +87,18 @@ services:
       - "`${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    entrypoint: /usr/local/bin/entrypoint.sh
-    command: apache2-foreground
+    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
-```powershell
-notepad .env
-```
-
-Copy and paste the following lines into .env file:
+Modify the values in the following command and run it: 
 
 ```powershell
+@"
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
 HTTP_WEB_PORT=8040
+"@ | Out-File -FilePath .env -Encoding UTF8
 ```
 
 Start Poznote:
@@ -133,23 +130,32 @@ cd poznote
 ```
 
 ```bash
+cat <<EOF > docker-compose.yml
+services:
+  webserver:
+    image: timpoz/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+EOF
+```
+
+Modify the values in the following command and run it: 
+
+```bash
 cat <<EOF > .env
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
 HTTP_WEB_PORT=8040
 EOF
-```
-
-```bash
-vi .env
-```
-
-Copy and paste the following lines into .env file:
-
-```bash
-POZNOTE_USERNAME=your_username
-POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040
 ```
 
 Start Poznote:
