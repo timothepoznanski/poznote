@@ -553,8 +553,23 @@ function showUpdateCheckModal() {
     }
     
     if (statusElement) {
-        statusElement.textContent = 'Please wait while we check for updates...';
-        statusElement.style.color = '#555';
+        // Fetch current version and display it
+        fetch('version.txt')
+            .then(function(response) {
+                if (response.ok) {
+                    return response.text();
+                }
+                return 'unknown';
+            })
+            .then(function(version) {
+                const currentVersion = version.trim();
+                statusElement.textContent = 'Please wait while we check for updates...\nCurrent version: ' + currentVersion;
+                statusElement.style.color = '#555';
+            })
+            .catch(function() {
+                statusElement.textContent = 'Please wait while we check for updates...\nCurrent version: unknown';
+                statusElement.style.color = '#555';
+            });
     }
     
     if (buttonsElement) {
