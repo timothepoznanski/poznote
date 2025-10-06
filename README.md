@@ -72,6 +72,16 @@ mkdir poznote
 cd poznote
 ```
 
+Modify the values in the following command and run it: 
+
+```powershell
+@"
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+"@ | Out-File -FilePath .env -Encoding UTF8
+```
+
 ```powershell
 @"
 services:
@@ -89,16 +99,6 @@ services:
       - "./data:/var/www/html/data"
     command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
-```
-
-Modify the values in the following command and run it: 
-
-```powershell
-@"
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-"@ | Out-File -FilePath .env -Encoding UTF8
 ```
 
 Start Poznote:
@@ -129,6 +129,16 @@ mkdir poznote
 cd poznote
 ```
 
+Modify the values in the following command and run it: 
+
+```bash
+cat <<EOF > .env
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+EOF
+```
+
 ```bash
 cat <<EOF > docker-compose.yml
 services:
@@ -145,16 +155,6 @@ services:
     volumes:
       - "./data:/var/www/html/data"
     command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
-EOF
-```
-
-Modify the values in the following command and run it: 
-
-```bash
-cat <<EOF > .env
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
 EOF
 ```
 
