@@ -586,7 +586,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
-docker compose up -d --pull always
+docker compose up -d
 ```
 
 </details>
@@ -630,7 +630,7 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose up -d --pull always
+docker compose up -d
 ```
 
 </details>
