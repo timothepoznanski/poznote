@@ -1,7 +1,7 @@
-# Dockerfile used by docker-compose.yml
+# Dockerfile for Poznote
 FROM php:8.3.23-apache-bullseye
 
-# Install necessary dependencies  
+# Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     sqlite3 \
@@ -16,14 +16,26 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 # Copy php.ini
 COPY php.ini /usr/local/etc/php/
 
-# Note: Source files are mounted as volumes, not copied
-# 
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy source files to web root
+COPY ./src /var/www/html
 
 # Create directory for data volume (entries and attachments are inside data/)
-RUN mkdir -p /var/www/html/data 
+RUN mkdir -p /var/www/html/data
 
 # Enable Apache mod_rewrite if needed
 RUN a2enmod rewrite
+
+# Add OCI standard labels
+LABEL org.opencontainers.image.title="Poznote"
+LABEL org.opencontainers.image.description="Self-hosted, open-source note-taking app with full control and privacy over your data"
+LABEL org.opencontainers.image.authors="Timothé Poznanski"
+LABEL org.opencontainers.image.url="https://github.com/timothepoznanski/poznote"
+LABEL org.opencontainers.image.source="https://github.com/timothepoznanski/poznote"
+LABEL org.opencontainers.image.licenses="Open Source"
 
 # Expose port HTTP
 EXPOSE 80

@@ -90,7 +90,8 @@ services:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+    entrypoint: /usr/local/bin/entrypoint.sh
+    command: apache2-foreground
 ```
 
 ```powershell
@@ -151,7 +152,8 @@ services:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+    entrypoint: /usr/local/bin/entrypoint.sh
+    command: apache2-foreground
 ```
 
 ```bash
