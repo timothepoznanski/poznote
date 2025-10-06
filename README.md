@@ -140,7 +140,7 @@ EOF
 ```
 
 ```bash
-cat <<EOF > docker-compose.yml
+cat <<'EOF' > docker-compose.yml
 services:
   webserver:
     image: timpoz/poznote:latest
@@ -620,7 +620,7 @@ vim Dockerfile  # If necessary (for example to add proxies)
 ```
 
 ```bash
-cat <<EOF > .env
+cat <<'EOF' > .env
 POZNOTE_USERNAME=admin
 POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
