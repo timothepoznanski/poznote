@@ -220,7 +220,7 @@ To update Poznote to the latest version:
    ```
 
 3. Pull the latest image
-  ```bash
+   ```bash
    docker compose pull
    ```
 
