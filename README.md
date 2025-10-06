@@ -177,6 +177,7 @@ docker compose up -d
 
 </details>
 
+<details>
 <summary><strong>Specific situations</strong></summary>
 
 - **Development setups** — when deploying an instance with the source code mounted as a volume, allowing live updates without rebuilding or pulling a new image.
@@ -184,17 +185,6 @@ docker compose up -d
 - **Restricted environments** — where a network proxy prevents pulling the Poznote image from Docker Hub, but allows downloading the official php/apache image.
 
 - **Custom Dockerfile needs** — for example, when you need to modify the Dockerfile to add proxy environment variables or other custom settings. 
-
-Note: To update Poznote Dockerfile but keep local changes, you might want to use the following method: 
-
-```bash
-docker compose down
-git stash push -m "Keep local modifications"
-git pull
-git stash pop
-docker compose --build # --no-cache
-docker compose up -d
-```
 
 <details>
 <summary><strong>Windows Installation</strong></summary>
@@ -282,6 +272,8 @@ Start Poznote:
 ```bash
 docker compose -f docker-compose-mounted-src up -d
 ```
+
+</details>
 
 </details>
 
