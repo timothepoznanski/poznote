@@ -104,11 +104,11 @@ services:
 Start Poznote:
 
 ```powershell
-docker-compose build --pull
+docker compose build --pull
 ```
 
 ```powershell
-docker-compose up -d
+docker compose up -d
 ```
 
 </details>
@@ -165,11 +165,11 @@ EOF
 Start Poznote:
 
 ```bash
-docker-compose build --pull
+docker compose build --pull
 ```
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 </details>
