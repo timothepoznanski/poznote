@@ -16,7 +16,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - [Demo](#demo)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
-- [Workspaces](#workspaces)
 - [Change Settings](#change-settings)
 - [Forgot your password](#forgot-your-password)
 - [Update Application to the latest version](#update-application-to-the-latest-version)
@@ -54,7 +53,7 @@ Check out the Poznote website for a video demonstration!
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
 <details>
-<summary><strong>🪟 Windows Installation</strong></summary>
+<summary><strong>Windows Installation (Poznote Docker Hub image)</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -81,6 +80,8 @@ POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
 "@ | Out-File -FilePath .env -Encoding UTF8
 ```
+
+Create the docker-compose.yml file: 
 
 ```powershell
 @"
@@ -114,7 +115,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>🐧 Linux Installation</strong></summary>
+<summary><strong>Linux Installation (Poznote Docker Hub image)</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -143,6 +144,8 @@ HTTP_WEB_PORT=8040
 EOF
 ```
 
+Create the docker-compose.yml file: 
+
 ```bash
 cat <<'EOF' > docker-compose.yml
 services:
@@ -170,6 +173,114 @@ docker compose build --pull
 
 ```bash
 docker compose up -d
+```
+
+</details>
+
+<summary><strong>Specific situations</strong></summary>
+
+- **Development setups** — when deploying an instance with the source code mounted as a volume, allowing live updates without rebuilding or pulling a new image.
+
+- **Restricted environments** — where a network proxy prevents pulling the Poznote image from Docker Hub, but allows downloading the official php/apache image.
+
+- **Custom Dockerfile needs** — for example, when you need to modify the Dockerfile to add proxy environment variables or other custom settings. 
+
+Note: To update Poznote Dockerfile but keep local changes, you might want to use the following method: 
+
+```bash
+docker compose down
+git stash push -m "Keep local modifications"
+git pull
+git stash pop
+docker compose --build # --no-cache
+docker compose up -d
+```
+
+<details>
+<summary><strong>Windows Installation</strong></summary>
+
+#### Step 1: Prerequisite
+
+Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+
+#### Step 2: Deploy Poznote
+
+Open Powershell and run the following commands:
+
+```powershell
+$INSTANCE_NAME = "my-poznote"
+```
+
+```powershell
+git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
+```
+
+```powershell
+cd $INSTANCE_NAME
+```
+
+```powershell
+notepad Dockerfile  # If necessary (for example to add proxies)
+```
+
+Modify the values in the following command and run it: 
+
+```powershell
+@"
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+"@ | Out-File -FilePath .env -Encoding UTF8
+```
+
+Start Poznote:
+
+```powershell
+docker compose -f docker-compose-mounted-src up -d
+```
+
+</details>
+
+<details>
+<summary><strong>Linux Installation</strong></summary>
+
+#### Step 1: Prerequisite
+
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### Step 2: Install Poznote
+
+Open a Terminal and run the following commands:
+
+```bash
+INSTANCE_NAME = "my-poznote"
+```
+
+```bash
+git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
+```
+
+```bash
+cd $INSTANCE_NAME
+```
+
+```bash
+vim Dockerfile  # If necessary (for example to add proxies)
+```
+
+```bash
+cat <<'EOF' > .env
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+EOF
+```
+
+Start Poznote:
+
+```bash
+docker compose -f docker-compose-mounted-src up -d
 ```
 
 </details>
@@ -223,17 +334,13 @@ To update Poznote to the latest version:
 
 3. Pull the latest image
    ```bash
-   docker compose pull
+   docker compose build --pull
    ```
 
 4. Restart the container:
    ```bash
    docker compose up -d
    ```
-
-## Workspaces
-
-Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
 
 ## Multiple Instances
 
@@ -548,220 +655,8 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 
 **Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
 
-## Advanced Operations
-
-For those who don't want to use the Poznote image stored on Docker Hub (for example, if a network proxy doesn't allow it), you can try the following methods where the only dependency is the php/apache image. The Poznote image will be built locally. 
-
-### Installation
-
-<details>
-<summary><strong>🪟 Windows Installation</strong></summary>
-
-#### Step 1: Prerequisite
-
-Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
-
-#### Step 2: Deploy Poznote
-
-Open Powershell and run the following commands:
-
-```powershell
-$INSTANCE_NAME = "my-poznote"
-```
-
-```powershell
-git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
-```
-
-```powershell
-cd $INSTANCE_NAME
-```
-
-```powershell
-notepad Dockerfile  # If necessary (for example to add proxies)
-```
-
-Modify the values in the following command and run it: 
-
-```powershell
-@"
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-"@ | Out-File -FilePath .env -Encoding UTF8
-```
-
-Start Poznote:
-
-```powershell
-docker compose up -d
-```
-
-</details>
-
-<details>
-<summary><strong>🐧 Linux Installation</strong></summary>
-
-#### Step 1: Prerequisite
-
-1. Install [Docker engine](https://docs.docker.com/engine/install/)
-2. Install [Docker Compose](https://docs.docker.com/compose/install/)
-
-#### Step 2: Install Poznote
-
-Open a Terminal and run the following commands:
-
-```bash
-INSTANCE_NAME = "my-poznote"
-```
-
-```bash
-git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
-```
-
-```bash
-cd $INSTANCE_NAME
-```
-
-```bash
-vim Dockerfile  # If necessary (for example to add proxies)
-```
-
-```bash
-cat <<'EOF' > .env
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-EOF
-```
-
-Start Poznote:
-
-```bash
-docker compose up -d
-```
-
-</details>
-
-## Access Your Instance
-
-After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
-
-where YOUR_SERVER depends on your environment:
-
-- localhost
-- Your server's IP address
-- Your domain name
-
-and where YOUR_PORT depends on your port choice (see your .env file).
-
-## Change Settings
-
- If you need to change your login, password or port:
-
-1. Navigate to your Poznote directory
-
-2. Stop the container:
-   ```bash
-   docker compose down
-   ```
-
-3. Edit your `.env` file
-
-4. Restart the container:
-   ```bash
-   docker compose up -d
-   ```
-
-## Forgot your password
-
-Find it in your `.env` file.
-
-## Update Application to the latest version
-
-You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
-
-To update Poznote to the latest version: 
-
-1. Navigate to your Poznote directory
-
-2. Stop the container:
-   ```bash
-   docker compose down
-   ```
-
-3. Pull the latest image
-   ```bash
-   docker compose build --pull
-   ```
-
-4. Restart the container:
-   ```bash
-   docker compose up -d
-   ```
-
-## Workspaces
-
-Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.
-
-## Multiple Instances
-
-You can run multiple isolated Poznote instances on the same server. Just deploy new instances with different names and ports.
-
-### Example: Tom and Alice instances on the same server
-
-```
-Server: my-server.com
-├── Poznote-Tom
-│   ├── Port: 8040
-│   ├── URL: http://my-server.com:8040
-│   ├── Container: poznote-tom-webserver-1
-│   └── Data: ./poznote-tom/data/
-│
-└── Poznote-Alice
-    ├── Port: 8041
-    ├── URL: http://my-server.com:8041
-    ├── Container: poznote-alice-webserver-1
-    └── Data: ./poznote-alice/data/
-```
-
 ### Other advanced actions
 
-For advanced users who prefer direct configuration:
-
-**Install Poznote Linux (Bash):**
-
-```bash
-INSTANCE_NAME="VOTRE-NOM-DINSTANCE"
-git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
-cd $INSTANCE_NAME
-vim Dockerfile  # If necessary (for example to add proxies)
-cp .env.template .env
-vim .env
-mkdir -p data/entries
-mkdir -p data/database
-mkdir -p data/attachments
-docker compose up -d --build
-```
-
-**Change settings:**
-
-```bash
-docker compose down
-vim .env
-docker compose up -d
-```
-
-**Update Poznote to the latest version:** 
-
-```bash
-docker compose down
-git stash push -m "Keep local modifications"
-git pull
-git stash pop
-docker compose --build # --no-cache
-docker compose up -d --force-recreate
-```
 
 **Backup:** 
 
@@ -770,11 +665,3 @@ Copy `./data/` directory (contains entries, attachments, database)
 **Restore:** 
 
 Replace `./data/` directory and restart container
-
-**Password Reset:**
-
-```bash
-docker compose down
-vim .env  # `POZNOTE_PASSWORD=new_password`
-docker compose up -d
-```

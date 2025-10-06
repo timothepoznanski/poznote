@@ -339,6 +339,7 @@ try {
     <div class="settings-container">
         <h1> Workspaces</h1>
         <p>Manage your workspaces. Create, delete or select a workspace to work in.</p>
+        <p>Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.</p>
 
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
