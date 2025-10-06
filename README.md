@@ -73,27 +73,23 @@ cd poznote
 ```
 
 ```powershell
-notepad docker-compose.yml
-```
-
-Copy and paste the following lines into docker-compose.yml file:
-
-```powershell
+@"
 services:
   webserver:
     image: timpoz/poznote:latest
     restart: always
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+      POZNOTE_USERNAME: `${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: `${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: `${HTTP_WEB_PORT}
     ports:
-      - "${HTTP_WEB_PORT}:80"
+      - "`${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
     entrypoint: /usr/local/bin/entrypoint.sh
     command: apache2-foreground
+"@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
 ```powershell
@@ -105,7 +101,7 @@ Copy and paste the following lines into .env file:
 ```powershell
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+HTTP_WEB_PORT=8040
 ```
 
 Start Poznote:
@@ -129,33 +125,19 @@ docker compose up -d
 Open a Terminal and run the following commands:
 
 ```bash
-mkdir poznote  # or another name if you want several Poznote instances running on the same server
+mkdir poznote
 ```
+
 ```bash
 cd poznote
 ```
-```bash
-vi docker-compose.yml
-```
-
-Copy and paste the following lines into docker-compose.yml file:
 
 ```bash
-services:
-  webserver:
-    image: timpoz/poznote:latest
-    restart: always
-    environment:
-      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
-    ports:
-      - "${HTTP_WEB_PORT}:80"
-    volumes:
-      - "./data:/var/www/html/data"
-    entrypoint: /usr/local/bin/entrypoint.sh
-    command: apache2-foreground
+cat <<EOF > .env
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_password
+HTTP_WEB_PORT=8040
+EOF
 ```
 
 ```bash
@@ -167,7 +149,7 @@ Copy and paste the following lines into .env file:
 ```bash
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+HTTP_WEB_PORT=8040
 ```
 
 Start Poznote:
@@ -594,7 +576,7 @@ Copy and paste the following lines into .env file:
 ```powershell
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+HTTP_WEB_PORT=8040
 ```
 
 Start Poznote:
@@ -642,7 +624,7 @@ Copy and paste the following lines into .env file:
 ```bash
 POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_password
-HTTP_WEB_PORT=8040  # Or another port if you want several Poznote instances running on the same server
+HTTP_WEB_PORT=8040
 ```
 
 Start Poznote:
