@@ -95,8 +95,8 @@ Modify the values in the following command and run it:
 
 ```powershell
 @"
-POZNOTE_USERNAME=your_username
-POZNOTE_PASSWORD=your_password
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
 "@ | Out-File -FilePath .env -Encoding UTF8
 ```
@@ -104,7 +104,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
-docker compose up -d
+docker compose up -d --pull always
 ```
 
 </details>
@@ -152,8 +152,8 @@ Modify the values in the following command and run it:
 
 ```bash
 cat <<EOF > .env
-POZNOTE_USERNAME=your_username
-POZNOTE_PASSWORD=your_password
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
 EOF
 ```
@@ -161,7 +161,7 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose up -d
+docker compose up -d --pull always
 ```
 
 </details>
@@ -573,22 +573,20 @@ notepad Dockerfile  # If necessary (for example to add proxies)
 cd $INSTANCE_NAME
 ```
 
-```powershell
-notepad .env
-```
-
-Copy and paste the following lines into .env file:
+Modify the values in the following command and run it: 
 
 ```powershell
-POZNOTE_USERNAME=your_username
-POZNOTE_PASSWORD=your_password
+@"
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
+"@ | Out-File -FilePath .env -Encoding UTF8
 ```
 
 Start Poznote:
 
 ```powershell
-docker compose up -d --build
+docker compose up -d --pull always
 ```
 
 </details>
@@ -622,21 +620,17 @@ cd $INSTANCE_NAME
 ```
 
 ```bash
-vi .env
-```
-
-Copy and paste the following lines into .env file:
-
-```bash
-POZNOTE_USERNAME=your_username
-POZNOTE_PASSWORD=your_password
+cat <<EOF > .env
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
+EOF
 ```
 
 Start Poznote:
 
 ```bash
-docker compose up -d --build
+docker compose up -d --pull always
 ```
 
 </details>
