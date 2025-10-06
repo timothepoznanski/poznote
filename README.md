@@ -10,8 +10,11 @@
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
+<img width="1833" height="815" alt="poznote" src="https://github.com/user-attachments/assets/83712f95-92cf-4769-ab96-fecf16c9e09a" />
+
 ## Table of Contents
 
+- [Features](#features)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -24,10 +27,7 @@ Simple, fast, and built for those who value freedom over their own data.
 - [API Documentation](#api-documentation)
 - [Advanced Operations](#advanced-operations)
 
-<img width="1833" height="815" alt="poznote" src="https://github.com/user-attachments/assets/83712f95-92cf-4769-ab96-fecf16c9e09a" />
-
-<details>
-<summary><strong>Features</strong></summary>
+## Features
 
 - 📝 Rich Text Editor
 - 🔍 Powerful Search
@@ -42,8 +42,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🗑️ Trash system with restore functionality
 - 🔗 Public note sharing
 - 🌐 REST API for automation
-
-</details>
 
 ## Installation
 
