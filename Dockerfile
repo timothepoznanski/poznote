@@ -1,6 +1,9 @@
 # Dockerfile for Poznote
 FROM php:8.3.23-apache-bullseye
 
+# Build argument to decide whether to copy source files
+ARG copy_src_files=true
+
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev \
@@ -20,8 +23,8 @@ COPY php.ini /usr/local/etc/php/
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Copy source files to web root
-COPY ./src /var/www/html
+# Handle source files based on build argument
+COPY ${copy_src_files:+./src} /var/www/html
 
 # Create directory for data volume (entries and attachments are inside data/)
 RUN mkdir -p /var/www/html/data

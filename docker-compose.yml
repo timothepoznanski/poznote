@@ -3,6 +3,8 @@ services:
     build:
       context: . #  Use the current directory as the build context
       dockerfile: Dockerfile # Specify the Dockerfile to use
+      args:
+        copy_src_files: false
     restart: always      
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
