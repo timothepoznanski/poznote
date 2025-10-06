@@ -573,8 +573,6 @@ cd $INSTANCE_NAME
 notepad Dockerfile  # If necessary (for example to add proxies)
 ```
 
-
-
 Modify the values in the following command and run it: 
 
 ```powershell
