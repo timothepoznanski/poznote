@@ -65,7 +65,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell and run the following commands:
 
 ```powershell
-mkdir poznote  # or another name if you want several Poznote instances running on the same server
+mkdir poznote
 ```
 
 ```powershell
