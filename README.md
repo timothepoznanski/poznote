@@ -566,11 +566,11 @@ git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
 ```
 
 ```powershell
-notepad Dockerfile  # If necessary (for example to add proxies)
+cd $INSTANCE_NAME
 ```
 
 ```powershell
-cd $INSTANCE_NAME
+notepad Dockerfile  # If necessary (for example to add proxies)
 ```
 
 Modify the values in the following command and run it: 
@@ -586,7 +586,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
-docker compose up -d --pull always
+docker compose up -d
 ```
 
 </details>
@@ -612,11 +612,11 @@ git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
 ```
 
 ```bash
-vim Dockerfile  # If necessary (for example to add proxies)
+cd $INSTANCE_NAME
 ```
 
 ```bash
-cd $INSTANCE_NAME
+vim Dockerfile  # If necessary (for example to add proxies)
 ```
 
 ```bash
@@ -630,7 +630,7 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose up -d --pull always
+docker compose up -d
 ```
 
 </details>
