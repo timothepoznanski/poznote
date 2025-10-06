@@ -13,7 +13,6 @@ Simple, fast, and built for those who value freedom over their own data.
 ## Table of Contents
 
 - [Features](#features)
-- [Demo](#demo)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -42,11 +41,7 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🔗 Public note sharing
 - 🌐 REST API for automation
 
-## Demo
-
-Check out the Poznote website for a video demonstration!
-
-🔗 **[Visit Poznote Website](https://poznote.com/)**
+<img width="1833" height="815" alt="poznote" src="https://github.com/user-attachments/assets/83712f95-92cf-4769-ab96-fecf16c9e09a" />
 
 ## Installation
 
