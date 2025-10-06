@@ -566,12 +566,14 @@ git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
 ```
 
 ```powershell
-notepad Dockerfile  # If necessary (for example to add proxies)
+cd $INSTANCE_NAME
 ```
 
 ```powershell
-cd $INSTANCE_NAME
+notepad Dockerfile  # If necessary (for example to add proxies)
 ```
+
+
 
 Modify the values in the following command and run it: 
 
