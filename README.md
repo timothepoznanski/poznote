@@ -326,7 +326,8 @@ To update Poznote to the latest version:
 
 3. Pull the latest image
    ```bash
-   docker compose build --pull
+   docker compose pull   # If we use the Docker Hub Poznote image
+   docker compose build  # If we use the specific deployment method (PHP/Apache image + local build)
    ```
 
 4. Restart the container:
