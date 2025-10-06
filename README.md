@@ -24,6 +24,8 @@ Simple, fast, and built for those who value freedom over their own data.
 - [API Documentation](#api-documentation)
 - [Advanced Operations](#advanced-operations)
 
+<img width="1833" height="815" alt="poznote" src="https://github.com/user-attachments/assets/83712f95-92cf-4769-ab96-fecf16c9e09a" />
+
 <details>
 <summary><strong>Features</strong></summary>
 
@@ -42,8 +44,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🌐 REST API for automation
 
 </details>
-
-<img width="1833" height="815" alt="poznote" src="https://github.com/user-attachments/assets/83712f95-92cf-4769-ab96-fecf16c9e09a" />
 
 ## Installation
 
