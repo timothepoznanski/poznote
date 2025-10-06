@@ -104,7 +104,11 @@ services:
 Start Poznote:
 
 ```powershell
-docker compose up -d --pull always
+docker compose build --pull
+```
+
+```powershell
+docker compose up -d
 ```
 
 </details>
@@ -161,7 +165,11 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose up -d --pull always
+docker compose build --pull
+```
+
+```bash
+docker compose up -d
 ```
 
 </details>
@@ -684,7 +692,7 @@ To update Poznote to the latest version:
 
 3. Pull the latest image
    ```bash
-   docker compose pull
+   docker compose build --pull
    ```
 
 4. Restart the container:
