@@ -1,6 +1,7 @@
 # Poznote
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/timpoz/poznote)](https://hub.docker.com/r/timpoz/poznote)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
