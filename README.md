@@ -177,9 +177,9 @@ docker compose up -d
 
 - **Development setups** — when deploying an instance with the source code mounted as a volume, allowing live updates without rebuilding or pulling a new image.
 
-- **Restricted environments** — where a network proxy prevents pulling the Poznote image from Docker Hub, but allows downloading the official php/apache image.
+- **Restricted environments** — when a network proxy prevents pulling the Poznote image from Docker Hub, but allows downloading the official php/apache image.
 
-- **Custom Dockerfile needs** — for example, when you need to modify the Dockerfile to add proxy environment variables or other custom settings. 
+- **Custom Dockerfile needs** — when you need to modify a source code or deployment file like for example the Dockerfile to add proxy environment variables or other custom settings. 
 
 <details>
 <summary><strong>Windows Installation</strong></summary>
