@@ -100,7 +100,7 @@ services:
 Start Poznote:
 
 ```powershell
-docker compose build --pull
+docker compose pull
 ```
 
 ```powershell
@@ -163,7 +163,7 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose build --pull
+docker compose pull
 ```
 
 ```bash
@@ -221,6 +221,10 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
+docker compose build --pull
+```
+
+```powershell
 docker compose up -d
 ```
 
@@ -265,6 +269,10 @@ EOF
 Start Poznote:
 
 ```bash
+docker compose build --pull
+```
+
+```bash
 docker compose up -d
 ```
 
@@ -302,6 +310,13 @@ and where YOUR_PORT depends on your port choice (see your .env file).
    docker compose up -d
    ```
 
+Note for development setups: If you modified the **Dockerfile**, rebuild without cache:
+
+   ```bash
+   docker compose build --no-cache
+   docker compose up -d
+   ```
+
 ## Forgot your password
 
 Find it in your `.env` file.
@@ -322,7 +337,7 @@ To update Poznote to the latest version:
 3. Pull the latest image
    ```bash
    docker compose pull   # If we use the Docker Hub Poznote image
-   docker compose build  # If we use the specific deployment method (PHP/Apache image + local build)
+   docker compose build --pull  # If we use the specific deployment method (PHP/Apache image + local build)
    ```
 
 4. Restart the container:
