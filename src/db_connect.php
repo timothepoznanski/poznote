@@ -105,6 +105,29 @@ try {
     // Renamed setting: show_note_subheading (was show_note_location)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_subheading', '1')");
 
+    // Ensure required data directories exist
+    // $dbDir points to data/database, so we need to go up one level to get data/
+    $dataDir = dirname($dbDir);
+    $requiredDirs = ['attachments', 'database', 'entries'];
+    foreach ($requiredDirs as $dir) {
+        $fullPath = $dataDir . '/' . $dir;
+        if (!is_dir($fullPath)) {
+            if (!mkdir($fullPath, 0755, true)) {
+                error_log("Failed to create directory: $fullPath");
+                continue;
+            }
+            // Set proper ownership if running as root (Docker context)
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                chown($fullPath, 'www-data');
+                chgrp($fullPath, 'www-data');
+            }
+        }
+    }
+
+    // Create welcome note if no notes exist (first installation)
+    // This will be handled by a deferred function call to avoid circular dependencies during DB initialization
+    // The welcome note creation is registered to be executed after all includes are loaded
+
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }

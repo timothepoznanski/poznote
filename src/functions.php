@@ -14,26 +14,14 @@ function formatDateTime($t) {
  * Now unified: always use 'data/entries' directory in webroot
  */
 function getEntriesPath() {
-    // Try parent directory path first (for direct execution and to avoid empty src/data/entries)
-    $parent_path = realpath(dirname(__DIR__) . '/data/entries');
-    
-    if ($parent_path && is_dir($parent_path)) {
-        // Check if this directory actually contains files
-        $files = scandir($parent_path);
-        if (count($files) > 2) { // More than just . and ..
-            return $parent_path;
-        }
-    }
-    
-    // Try relative path (for Docker context)
-    $path = realpath('data/entries');
+    // Always use the data/entries path - guaranteed to exist from installation
+    $path = realpath(dirname(__DIR__) . '/data/entries');
     
     if ($path && is_dir($path)) {
         return $path;
     }
     
-    // Fallback: create entries directory in data location
-    // This should rarely happen as Docker creates the directories
+    // This should never happen after installation, but fallback just in case
     $data_path = dirname(__DIR__) . '/data/entries';
     if (!is_dir($data_path)) {
         mkdir($data_path, 0755, true);
@@ -186,5 +174,56 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
     } while ($count > 0);
     
     return $title;
+}
+
+/**
+ * Create a new note with both database entry and HTML file
+ * This is the standard way to create notes used throughout the application
+ */
+function createNote($con, $heading, $content, $folder = 'Default', $workspace = 'Poznote', $favorite = 0, $tags = '', $type = 'note') {
+    try {
+        // Insert note into database
+        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+        
+        if (!$stmt->execute([$heading, $content, $tags, $folder, $workspace, $type, $favorite])) {
+            return ['success' => false, 'error' => 'Failed to insert note into database'];
+        }
+        
+        $noteId = $con->lastInsertId();
+        
+        // Create the HTML file for the note content
+        $filename = getEntriesRelativePath() . $noteId . ".html";
+        
+        // Ensure the entries directory exists
+        $entriesDir = dirname($filename);
+        if (!is_dir($entriesDir)) {
+            mkdir($entriesDir, 0755, true);
+        }
+        
+        // Write HTML content to file
+        if (!empty($content)) {
+            $write_result = file_put_contents($filename, $content);
+            if ($write_result === false) {
+                // Log error but don't fail since DB entry was successful
+                error_log("Failed to write HTML file for note ID $noteId: $filename");
+                return ['success' => false, 'error' => 'Failed to create HTML file', 'id' => $noteId];
+            }
+            
+            // Set proper permissions
+            chmod($filename, 0644);
+            
+            // Set proper ownership if running as root (Docker context)
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                chown($filename, 'www-data');
+                chgrp($filename, 'www-data');
+            }
+        }
+        
+        return ['success' => true, 'id' => $noteId];
+        
+    } catch (Exception $e) {
+        error_log("Error creating note: " . $e->getMessage());
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
 }
 ?>
