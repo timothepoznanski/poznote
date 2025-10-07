@@ -221,7 +221,7 @@ HTTP_WEB_PORT=8040
 Start Poznote:
 
 ```powershell
-docker compose -f docker-compose-mounted-src up -d
+docker compose up -d
 ```
 
 </details>
@@ -265,7 +265,7 @@ EOF
 Start Poznote:
 
 ```bash
-docker compose -f docker-compose-mounted-src up -d
+docker compose up -d
 ```
 
 </details>
