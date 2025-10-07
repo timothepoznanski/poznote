@@ -1,10 +1,10 @@
 services:  
   webserver:       
     build:
-      context: . #  Use the current directory as the build context
-      dockerfile: Dockerfile # Specify the Dockerfile to use
+      context: .  # Use the current directory as the build context
+      dockerfile: Dockerfile  # Specify the Dockerfile to use
       args:
-        copy_src_files: false
+        copy_src_files: false  # This docker-compose.yml is specific for mounted src deployment 
     restart: always      
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
