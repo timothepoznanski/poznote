@@ -44,6 +44,11 @@ function proceedWithCompleteRestore() {
         form.querySelector('input[name="action"][value="complete_restore"]')
     );
     if (completeForm) {
+        // Hide confirmation modal first
+        hideCompleteRestoreConfirmation();
+        // Show spinner immediately
+        showRestoreSpinner();
+        // Submit the form
         completeForm.submit();
     } else {
         alert('Complete restore form not found. Please try again.');
@@ -148,4 +153,35 @@ function showCustomAlert(title = 'No File Selected', message = 'Please select a 
 
 function hideCustomAlert() {
     document.getElementById('customAlert').style.display = 'none';
+}
+
+// Restore spinner functions
+function showRestoreSpinner() {
+    try {
+        var spinner = document.getElementById('restoreSpinner');
+        var btn = document.getElementById('completeRestoreBtn');
+        if (spinner) {
+            spinner.style.display = 'inline-flex';
+            spinner.setAttribute('aria-hidden', 'false');
+        }
+        if (btn) {
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+        }
+    } catch (e) { /* ignore */ }
+}
+
+function hideRestoreSpinner() {
+    try {
+        var spinner = document.getElementById('restoreSpinner');
+        var btn = document.getElementById('completeRestoreBtn');
+        if (spinner) {
+            spinner.style.display = 'none';
+            spinner.setAttribute('aria-hidden', 'true');
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.setAttribute('aria-disabled', 'false');
+        }
+    } catch (e) { /* ignore */ }
 }

@@ -516,9 +516,15 @@ function importAttachmentsZip($uploadedFile) {
                     <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
                 </div>
                 
-                <button type="button" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
+                <button type="button" id="completeRestoreBtn" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
                     <span> Complete Restore
                 </button>
+                <!-- Spinner shown while processing restore -->
+                <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                    <div class="restore-spinner-circle" aria-hidden="true"></div>
+                    <span class="sr-only">Processing restore...</span>
+                    <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
+                </div>
             </form>
             
             <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">

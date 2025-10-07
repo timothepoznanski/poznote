@@ -10,28 +10,35 @@ function formatDateTime($t) {
 }
 
 /**
- * Get the correct entries directory path (dev or prod environment)
+ * Get the correct entries directory path
  * Now unified: always use 'data/entries' directory in webroot
  */
 function getEntriesPath() {
-    // Always use the data/entries path - guaranteed to exist from installation
-    $path = realpath(dirname(__DIR__) . '/data/entries');
+    // Always use the data/entries path - Docker volumes handle the mapping
+    $path = realpath('data/entries');
     
     if ($path && is_dir($path)) {
         return $path;
     }
     
-    // This should never happen after installation, but fallback just in case
-    $data_path = dirname(__DIR__) . '/data/entries';
-    if (!is_dir($data_path)) {
-        mkdir($data_path, 0755, true);
+    // Fallback: create entries directory in data location
+    // This should rarely happen as Docker creates the directories
+    if (!is_dir('data/entries')) {
+        if (!mkdir('data/entries', 0755, true)) {
+            error_log("Failed to create data/entries directory");
+            return false;
+        }
+        
+        // Set proper permissions
+        chmod('data/entries', 0755);
+        
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown($data_path, 'www-data');
-            chgrp($data_path, 'www-data');
+            chown('data/entries', 'www-data');
+            chgrp('data/entries', 'www-data');
         }
     }
-    return realpath($data_path);
+    return realpath('data/entries');
 }
 
 /**
@@ -49,13 +56,13 @@ function getAttachmentsPath() {
     // Fallback: create attachments directory in data location
     // This should rarely happen as Docker creates the directories
     if (!is_dir('data/attachments')) {
-        if (!mkdir('data/attachments', 0777, true)) {
+        if (!mkdir('data/attachments', 0755, true)) {
             error_log("Failed to create data/attachments directory");
             return false;
         }
         
         // Set proper permissions
-        chmod('data/attachments', 0777);
+        chmod('data/attachments', 0755);
         
         // Set proper ownership if running as root (Docker context)
         if (function_exists('posix_getuid') && posix_getuid() === 0) {
