@@ -22,6 +22,28 @@ require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
 
+// Create welcome note if this is a fresh installation (no notes exist)
+try {
+    $stmt = $con->query("SELECT COUNT(*) FROM entries");
+    $noteCount = $stmt->fetchColumn();
+    
+    if ($noteCount == 0) {
+        $welcomeContent = '<p>🎉 <strong>Welcome to Poznote!</strong></p>
+<p>Your personal note-taking application is ready to use. Enjoy!</p>
+<p><em>This welcome note can be deleted at any time.</em></p>
+<hr>
+<p><small>Version installed on ' . date('m/d/Y \a\t H:i') . '</small></p>';
+
+        // Use the standard note creation function
+        $result = createNote($con, 'Welcome to Poznote', $welcomeContent, 'Default', 'Poznote', 1);
+        if (!$result['success']) {
+            error_log("Failed to create welcome note: " . $result['error']);
+        }
+    }
+} catch (Exception $e) {
+    error_log("Error checking for welcome note: " . $e->getMessage());
+}
+
 // Initialization of workspaces and labels
 initializeWorkspacesAndLabels($con);
 

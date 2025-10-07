@@ -100,6 +100,21 @@ function restoreCompleteBackup($uploadedFile) {
         return ['success' => false, 'error' => 'Cannot create temporary directory'];
     }
     
+    // Ensure required data directories exist
+    $dataDir = dirname(__DIR__) . '/data';
+    $requiredDirs = ['attachments', 'database', 'entries'];
+    foreach ($requiredDirs as $dir) {
+        $fullPath = $dataDir . '/' . $dir;
+        if (!is_dir($fullPath)) {
+            mkdir($fullPath, 0755, true);
+            // Set proper ownership if running as root (Docker context)
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                chown($fullPath, 'www-data');
+                chgrp($fullPath, 'www-data');
+            }
+        }
+    }
+    
     $zip = new ZipArchive;
     $res = $zip->open($tempFile);
     

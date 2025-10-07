@@ -380,14 +380,12 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 **Complete Restore** 
 
-⚠️ If you want to restore your data to a fresh instance (new and empty), start by creating a new note, adding some content, and saving it. This ensures that the necessary data folders are created before you begin the restore process.
-
 Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
-⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
+⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files. 
 
 🔒 Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
 
