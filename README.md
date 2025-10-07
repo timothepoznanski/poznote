@@ -115,7 +115,7 @@ docker compose up -d
 #### Step 1: Prerequisite
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
-2. Install [Docker Compose](https://docs.docker.com/compose/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/linux)
 
 #### Step 2: Install Poznote
 
