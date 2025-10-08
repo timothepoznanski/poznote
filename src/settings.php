@@ -92,6 +92,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <div class="settings-card" onclick="checkForUpdates();">
                 <div class="settings-card-icon">
                     <i class="fa-sync-alt"></i>
+                    <span class="update-badge" style="display: none;"></span>
                 </div>
                 <div class="settings-card-content">
                     <h3>Check for Updates</h3>

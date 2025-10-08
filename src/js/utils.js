@@ -517,6 +517,65 @@ function checkForUpdates() {
         });
 }
 
+// Check for updates automatically (silent, once per day)
+function checkForUpdatesAutomatic() {
+    const now = Date.now();
+    const lastCheck = localStorage.getItem('poznote_last_update_check');
+    const lastCheckTime = lastCheck ? parseInt(lastCheck) : 0;
+    
+    // Check only once per day (24 hours = 24 * 60 * 60 * 1000 ms)
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    
+    if (now - lastCheckTime < oneDayMs) {
+        // Already checked today, skip
+        return;
+    }
+    
+    // Store current time as last check
+    localStorage.setItem('poznote_last_update_check', now.toString());
+    
+    // Perform silent check (no modals, only badge if update available)
+    fetch('check_updates.php')
+        .then(function(response) { 
+            if (!response.ok) {
+                throw new Error('HTTP Error: ' + response.status);
+            }
+            return response.json(); 
+        })
+        .then(function(data) {
+            if (data.has_updates && !data.error) {
+                // Show update badge silently
+                showUpdateBadge();
+            }
+        })
+        .catch(function(error) {
+            // Silent failure - no user notification for automatic checks
+        });
+}
+
+// Force automatic update check (bypasses 24h limit - for testing)
+function forceCheckForUpdatesAutomatic() {
+    localStorage.removeItem('poznote_last_update_check');
+    checkForUpdatesAutomatic();
+}
+
+// Test function to directly show the badge (for testing)
+function testUpdateBadge() {
+    showUpdateBadge();
+}
+
+// Simulate update available (for testing)
+function simulateUpdateAvailable() {
+    showUpdateBadge();
+}
+
+// Expose functions globally for console access
+window.forceCheckForUpdatesAutomatic = forceCheckForUpdatesAutomatic;
+window.showUpdateBadge = showUpdateBadge;
+window.hideUpdateBadge = hideUpdateBadge;
+window.testUpdateBadge = testUpdateBadge;
+window.simulateUpdateAvailable = simulateUpdateAvailable;
+
 function showUpdateInstructions() {
     var modal = document.getElementById('updateModal');
     if (modal) {
@@ -622,6 +681,13 @@ function hideUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
         badges[i].style.display = 'none';
+    }
+}
+
+function showUpdateBadge() {
+    var badges = document.querySelectorAll('.update-badge');
+    for (var i = 0; i < badges.length; i++) {
+        badges[i].style.display = 'inline-block';
     }
 }
 
