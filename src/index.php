@@ -264,7 +264,10 @@ $body_classes = trim($extra_body_classes);
             </div>
             <div class="sidebar-title-actions">
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
-                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings"><i class="fa-cog"></i></button>
+                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
+                    <i class="fa-cog"></i>
+                    <span class="update-badge" style="display: none;"></span>
+                </button>
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
             </div>
 

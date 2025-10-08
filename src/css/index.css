@@ -435,8 +435,29 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
-.sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #007DB8; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+
+/* Update badge for sidebar buttons */
+.sidebar-settings .update-badge {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    animation: pulse 2s infinite;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    font-family: system-ui, -apple-system, sans-serif;
+}
 /* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
 
 /* Align new note/folder rows with the search bar */
@@ -2077,6 +2098,13 @@ hr {
         transform: scale(1);
         box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.0);
     }
+}
+
+/* Animation pulse for update badge */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 /* Quand save est modifié, changer l'icône et la garder rouge */

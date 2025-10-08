@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize text selection handling for formatting
     initTextSelectionHandlers();
     
+    // Initialize automatic update checking (once per day)
+    checkForUpdatesAutomatic();
     
 });
 
