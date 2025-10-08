@@ -1028,6 +1028,24 @@
     color: #555;
 }
 
+#updateModal .version-info {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 20px 0;
+    border-left: 4px solid #007DB8;
+}
+
+#updateModal .version-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+#updateModal .version-info strong {
+    color: #007DB8;
+}
+
 #updateModal .btn-cancel {
     background-color: #6c757d !important;
     color: white !important;

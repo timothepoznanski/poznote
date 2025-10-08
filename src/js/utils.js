@@ -490,6 +490,9 @@ function checkForUpdates() {
                 const versionInfo = data.current_version ? '\nCurrent version: ' + data.current_version : '';
                 showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error + versionInfo, 'error');
             } else if (data.has_updates) {
+                // Store version information for the modal
+                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
+                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 closeUpdateCheckModal();
                 showUpdateInstructions();
             } else {
@@ -532,8 +535,10 @@ function checkForUpdatesAutomatic() {
         })
         .then(function(data) {
             if (data.has_updates && !data.error) {
-                // Store update availability and show update badge
+                // Store update availability and version information
                 localStorage.setItem('poznote_update_available', 'true');
+                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
+                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 showUpdateBadge();
             } else {
                 // Clear update availability flag
@@ -572,6 +577,17 @@ window.restoreUpdateBadge = restoreUpdateBadge;
 function showUpdateInstructions() {
     var modal = document.getElementById('updateModal');
     if (modal) {
+        // Fill version information
+        var currentVersionEl = document.getElementById('currentVersion');
+        var availableVersionEl = document.getElementById('availableVersion');
+        
+        if (currentVersionEl) {
+            currentVersionEl.textContent = localStorage.getItem('poznote_current_version') || 'unknown';
+        }
+        if (availableVersionEl) {
+            availableVersionEl.textContent = localStorage.getItem('poznote_remote_version') || 'unknown';
+        }
+        
         modal.style.display = 'flex';
     }
 }
