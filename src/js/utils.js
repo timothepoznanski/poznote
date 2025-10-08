@@ -498,22 +498,7 @@ function checkForUpdates() {
         })
         .catch(function(error) {
             console.error('Failed to check for updates:', error);
-            
-            // Try to get current version even when network fails
-            fetch('version.txt')
-                .then(function(response) {
-                    if (response.ok) {
-                        return response.text();
-                    }
-                    throw new Error('Cannot read version file');
-                })
-                .then(function(version) {
-                    const currentVersion = version.trim();
-                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message + '\nCurrent version: ' + currentVersion, 'error');
-                })
-                .catch(function(versionError) {
-                    showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message, 'error');
-                });
+            showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message, 'error');
         });
 }
 
@@ -612,23 +597,8 @@ function showUpdateCheckModal() {
     }
     
     if (statusElement) {
-        // Fetch current version and display it
-        fetch('version.txt')
-            .then(function(response) {
-                if (response.ok) {
-                    return response.text();
-                }
-                return 'unknown';
-            })
-            .then(function(version) {
-                const currentVersion = version.trim();
-                statusElement.textContent = 'Please wait while we check for updates...\nCurrent version: ' + currentVersion;
-                statusElement.style.color = '#555';
-            })
-            .catch(function() {
-                statusElement.textContent = 'Please wait while we check for updates...\nCurrent version: unknown';
-                statusElement.style.color = '#555';
-            });
+        statusElement.textContent = 'Please wait while we check for updates...';
+        statusElement.style.color = '#555';
     }
     
     if (buttonsElement) {
