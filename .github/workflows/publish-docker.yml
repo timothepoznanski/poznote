@@ -27,8 +27,8 @@ jobs:
       - name: Check if version needs update
         id: check_version
         run: |
-          # Read version from version.txt file
-          new_version=$(cat version.txt | tr -d '\n')
+          # Read version from src/version.txt file
+          new_version=$(cat src/version.txt | tr -d '\n')
           echo "New version from version.txt: $new_version"
 
           # Get the latest tag
