@@ -52,8 +52,8 @@ function checkForUpdates() {
         $remote_version = trim($response);
         $result['remote_version'] = $remote_version;
         
-        // Compare versions - higher date number means newer version
-        $result['has_updates'] = (intval($remote_version) > intval($current_version));
+        // Compare versions using semantic versioning
+        $result['has_updates'] = version_compare($remote_version, $current_version, '>');
         
     } catch (Exception $e) {
         $result['error'] = $e->getMessage();
