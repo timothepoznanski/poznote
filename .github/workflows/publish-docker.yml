@@ -53,6 +53,21 @@ jobs:
           git tag ${{ steps.check_version.outputs.version }}
           git push origin ${{ steps.check_version.outputs.version }}
 
+      - name: Create GitHub release
+        if: steps.check_version.outputs.needs_update == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.check_version.outputs.version }}
+          release_name: Release ${{ steps.check_version.outputs.version }}
+          body: |
+            Automatic release for version ${{ steps.check_version.outputs.version }}
+            
+            This release was automatically created when a new version was detected in the repository.
+          draft: false
+          prerelease: false
+
       - name: Log in to GitHub Container Registry
         if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/login-action@v3

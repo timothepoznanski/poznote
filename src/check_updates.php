@@ -33,8 +33,8 @@ function checkForUpdates() {
             $result['current_version'] = $current_version_clean;
         }
         
-        // Query GitHub API to get the latest release/tag
-        $github_api_url = 'https://api.github.com/repos/timothepoznanski/poznote/releases/latest';
+        // Query GitHub API to get the latest tag
+        $github_tags_url = 'https://api.github.com/repos/timothepoznanski/poznote/tags';
         
         $context = stream_context_create([
             'http' => [
@@ -47,28 +47,26 @@ function checkForUpdates() {
             ]
         ]);
         
-        $response = @file_get_contents($github_api_url, false, $context);
+        $response = @file_get_contents($github_tags_url, false, $context);
         
         if ($response === false) {
-            // Fallback: try to get tags directly
-            $github_tags_url = 'https://api.github.com/repos/timothepoznanski/poznote/tags';
-            $response = @file_get_contents($github_tags_url, false, $context);
-            
-            if ($response === false) {
-                $result['error'] = 'Cannot reach GitHub (check internet connection)';
-                return $result;
+            $result['error'] = 'Cannot reach GitHub (check internet connection)';
+            return $result;
+        }
+        
+        $tags_data = json_decode($response, true);
+        if (empty($tags_data)) {
+            $result['error'] = 'No tags found in repository';
+            return $result;
+        }
+        
+        // Find the highest version tag (semantic versioning)
+        $remote_version = '0.0.0';
+        foreach ($tags_data as $tag) {
+            $tag_version = ltrim($tag['name'], 'v');
+            if (version_compare($tag_version, $remote_version, '>')) {
+                $remote_version = $tag_version;
             }
-            
-            $tags_data = json_decode($response, true);
-            if (empty($tags_data)) {
-                $result['error'] = 'No tags found in repository';
-                return $result;
-            }
-            
-            $remote_version = ltrim($tags_data[0]['name'], 'v');
-        } else {
-            $release_data = json_decode($response, true);
-            $remote_version = ltrim($release_data['tag_name'], 'v');
         }
         
         $result['remote_version'] = $remote_version;
