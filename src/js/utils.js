@@ -493,6 +493,8 @@ function checkForUpdates() {
                 closeUpdateCheckModal();
                 showUpdateInstructions();
             } else {
+                // No updates available, clear the flag
+                localStorage.removeItem('poznote_update_available');
                 showUpdateCheckResult('✅ You are up to date!', 'Current version: ' + (data.current_version || 'unknown'), 'success');
             }
         })
@@ -512,7 +514,8 @@ function checkForUpdatesAutomatic() {
     const oneDayMs = 24 * 60 * 60 * 1000;
     
     if (now - lastCheckTime < oneDayMs) {
-        // Already checked today, skip
+        // Already checked today, restore badge if update was available
+        restoreUpdateBadge();
         return;
     }
     
@@ -529,8 +532,12 @@ function checkForUpdatesAutomatic() {
         })
         .then(function(data) {
             if (data.has_updates && !data.error) {
-                // Show update badge silently
+                // Store update availability and show update badge
+                localStorage.setItem('poznote_update_available', 'true');
                 showUpdateBadge();
+            } else {
+                // Clear update availability flag
+                localStorage.removeItem('poznote_update_available');
             }
         })
         .catch(function(error) {
@@ -560,6 +567,7 @@ window.showUpdateBadge = showUpdateBadge;
 window.hideUpdateBadge = hideUpdateBadge;
 window.testUpdateBadge = testUpdateBadge;
 window.simulateUpdateAvailable = simulateUpdateAvailable;
+window.restoreUpdateBadge = restoreUpdateBadge;
 
 function showUpdateInstructions() {
     var modal = document.getElementById('updateModal');
@@ -658,6 +666,13 @@ function showUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
         badges[i].style.display = 'inline-block';
+    }
+}
+
+function restoreUpdateBadge() {
+    const updateAvailable = localStorage.getItem('poznote_update_available');
+    if (updateAvailable === 'true') {
+        showUpdateBadge();
     }
 }
 
