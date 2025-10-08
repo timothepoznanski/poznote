@@ -581,11 +581,53 @@ function showUpdateInstructions() {
         var currentVersionEl = document.getElementById('currentVersion');
         var availableVersionEl = document.getElementById('availableVersion');
         
-        if (currentVersionEl) {
-            currentVersionEl.textContent = localStorage.getItem('poznote_current_version') || 'unknown';
-        }
-        if (availableVersionEl) {
-            availableVersionEl.textContent = localStorage.getItem('poznote_remote_version') || 'unknown';
+        var currentVersion = localStorage.getItem('poznote_current_version');
+        var remoteVersion = localStorage.getItem('poznote_remote_version');
+        
+        // If versions are not available, fetch them
+        if (!currentVersion || !remoteVersion) {
+            if (currentVersionEl) currentVersionEl.textContent = 'Loading...';
+            if (availableVersionEl) availableVersionEl.textContent = 'Loading...';
+            
+            // Fetch update information
+            fetch('check_updates.php')
+                .then(function(response) { 
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json(); 
+                })
+                .then(function(data) {
+                    if (data.has_updates && !data.error) {
+                        // Store version information
+                        localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
+                        localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
+                        
+                        // Update modal
+                        if (currentVersionEl) {
+                            currentVersionEl.textContent = data.current_version || 'unknown';
+                        }
+                        if (availableVersionEl) {
+                            availableVersionEl.textContent = data.remote_version || 'unknown';
+                        }
+                    } else {
+                        // No updates or error
+                        if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
+                        if (availableVersionEl) availableVersionEl.textContent = 'No update available';
+                    }
+                })
+                .catch(function(error) {
+                    if (currentVersionEl) currentVersionEl.textContent = 'Error loading version';
+                    if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
+                });
+        } else {
+            // Use cached versions
+            if (currentVersionEl) {
+                currentVersionEl.textContent = currentVersion;
+            }
+            if (availableVersionEl) {
+                availableVersionEl.textContent = remoteVersion;
+            }
         }
         
         modal.style.display = 'flex';
