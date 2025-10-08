@@ -5,7 +5,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/timpoz/poznote)](https://hub.docker.com/r/timpoz/poznote)
+[![Docker Pulls](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Ftimothepoznanski%2Fpoznote%2Fpackages%2Fcontainer%2Fpoznote&query=%24.download_count&label=GHCR%20Pulls&logo=github)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote)
 
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
@@ -46,6 +46,11 @@ Simple, fast, and built for those who value freedom over their own data.
 
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
+> **Note**: The Docker image is now hosted on [GitHub Container Registry (GHCR)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote). If you encounter rate limiting issues, you can authenticate with GitHub:
+> ```bash
+> echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+> ```
+
 <details>
 <summary><strong>Windows Installation</strong></summary>
 
@@ -77,7 +82,7 @@ HTTP_WEB_PORT=8040
 @"
 services:
   webserver:
-    image: timpoz/poznote:latest
+    image: ghcr.io/timothepoznanski/poznote:latest
     restart: always
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
@@ -134,7 +139,7 @@ EOF
 cat <<'EOF' > docker-compose.yml
 services:
   webserver:
-    image: timpoz/poznote:latest
+    image: ghcr.io/timothepoznanski/poznote:latest
     restart: always
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db
