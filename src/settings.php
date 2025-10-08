@@ -187,6 +187,10 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             if (window.opener && window.opener.location.pathname.includes('index.php')) {
                 window.opener.location.reload();
             }
+            
+            // Check for updates automatically and restore badge if needed
+            checkForUpdatesAutomatic();
+            restoreUpdateBadge();
         });
         
         // Set workspace context for JavaScript functions
