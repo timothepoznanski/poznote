@@ -65,8 +65,6 @@ mkdir poznote
 cd poznote
 ```
 
-Modify the values in the following command and run it: 
-
 ```powershell
 @"
 POZNOTE_USERNAME=admin
@@ -74,8 +72,6 @@ POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
 "@ | Out-File -FilePath .env -Encoding UTF8
 ```
-
-Create the docker-compose.yml file: 
 
 ```powershell
 @"
@@ -95,8 +91,6 @@ services:
     command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
-
-Start Poznote:
 
 ```powershell
 docker compose pull
@@ -128,8 +122,6 @@ mkdir poznote
 cd poznote
 ```
 
-Modify the values in the following command and run it: 
-
 ```bash
 cat <<EOF > .env
 POZNOTE_USERNAME=admin
@@ -137,8 +129,6 @@ POZNOTE_PASSWORD=admin123!
 HTTP_WEB_PORT=8040
 EOF
 ```
-
-Create the docker-compose.yml file: 
 
 ```bash
 cat <<'EOF' > docker-compose.yml
@@ -159,8 +149,6 @@ services:
 EOF
 ```
 
-Start Poznote:
-
 ```bash
 docker compose pull
 ```
@@ -173,15 +161,7 @@ docker compose up -d
 
 ## Access Your Instance
 
-After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
-
-where YOUR_SERVER depends on your environment:
-
-- localhost
-- Your server's IP address
-- Your domain name
-
-and where YOUR_PORT depends on your port choice (see your .env file).
+After installation, access Poznote at: `http://localhost:8040`
 
 ## Change Settings
 
@@ -275,16 +255,6 @@ Upload the complete backup ZIP to restore everything:
 - **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
 - **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)
 - **Purpose:** Allows recovery if import fails or data needs to be rolled back
-
-If you need, you still can do it manually:
-
-**Backup:** 
-
-Copy `./data/` directory (contains entries, attachments, database)
-
-**Restore:** 
-
-Replace `./data/` directory and restart container
 
 ## Offline View
 
