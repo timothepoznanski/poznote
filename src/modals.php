@@ -7,10 +7,8 @@
     <div class="modal-content">
         <h3>📱 Application Version</h3>
         <p>Here are the version details for your Poznote installation.</p>
-        <div class="version-info">
-            <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
-            <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
-        </div>
+        <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
+        <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Close</button>
             <button type="button" class="btn-update" onclick="goToUpdateInstructions()">See Update instructions</button>

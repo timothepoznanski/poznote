@@ -593,8 +593,7 @@ function showUpdateInstructions(hasUpdate = false) {
                 buttonEl.style.display = 'inline-block';
             }
         } else {
-            if (titleEl) titleEl.textContent = '📱 Application Version';
-            if (textEl) textEl.textContent = 'Here are the version details for your Poznote installation.';
+            if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
             if (buttonEl) {
                 buttonEl.style.display = 'none';
             }
