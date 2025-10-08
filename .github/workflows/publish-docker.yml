@@ -24,22 +24,37 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Get version from version.txt
-        id: version
+      - name: Check if version needs update
+        id: check_version
         run: |
-          # Read version from version.txt file
-          version=$(cat version.txt | tr -d '\n')
-          echo "Version from version.txt: $version"
-          
-          echo "version=$version" >> $GITHUB_OUTPUT
-          echo "version_clean=$version" >> $GITHUB_OUTPUT
+          # Read version from src/version.txt file
+          new_version=$(cat src/version.txt | tr -d '\n')
+          echo "New version from version.txt: $new_version"
+
+          # Get the latest tag
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          latest_version=$(echo $latest_tag | sed 's/v//')
+          echo "Latest tag version: $latest_version"
+
+          # Compare versions
+          if [ "$(printf '%s\n' "$latest_version" "$new_version" | sort -V | head -n1)" = "$latest_version" ] && [ "$latest_version" != "$new_version" ]; then
+              echo "needs_update=true" >> $GITHUB_OUTPUT
+              echo "version=$new_version" >> $GITHUB_OUTPUT
+              echo "version_clean=$new_version" >> $GITHUB_OUTPUT
+              echo "📦 Nouvelle version détectée: $new_version (dernier tag: $latest_version)"
+          else
+              echo "needs_update=false" >> $GITHUB_OUTPUT
+              echo "✅ Aucune nouvelle version à publier (version.txt: $new_version, dernier tag: $latest_version)"
+          fi
 
       - name: Create and push tag
+        if: steps.check_version.outputs.needs_update == 'true'
         run: |
-          git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
+          git tag ${{ steps.check_version.outputs.version }}
+          git push origin ${{ steps.check_version.outputs.version }}
 
       - name: Log in to GitHub Container Registry
+        if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -47,11 +62,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          build-args: |
+            APP_VERSION=${{ steps.check_version.outputs.version_clean }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/poznote:${{ steps.version.outputs.version_clean }}
+            ghcr.io/${{ github.repository_owner }}/poznote:${{ steps.check_version.outputs.version_clean }}
             ghcr.io/${{ github.repository_owner }}/poznote:latest
 

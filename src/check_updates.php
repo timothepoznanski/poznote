@@ -19,7 +19,7 @@ function checkForUpdates() {
     
     try {
         // Get current version from version.txt file
-        $version_file = __DIR__ . '/../version.txt';
+        $version_file = __DIR__ . '/version.txt';
         if (file_exists($version_file)) {
             $current_version_clean = trim(file_get_contents($version_file));
             $result['current_version'] = $current_version_clean;

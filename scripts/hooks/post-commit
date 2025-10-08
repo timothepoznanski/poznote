@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Post-commit hook for automatic version increment
+# When a commit has the exact message "Create new version", automatically increments src/version.txt
+
+# Prevent infinite recursion by checking if we're already in a version increment
+if [ "$POZNOTE_VERSION_INCREMENT" = "1" ]; then
+    exit 0
+fi
+
+# Get the last commit message
+COMMIT_MSG=$(git log -1 --pretty=%B)
+
+# Check if the message is exactly "Create new version"
+if [ "$COMMIT_MSG" = "Create new version" ]; then
+    echo "🔖 Detected 'Create new version' commit - Automatically incrementing version..."
+
+    # Check that src/version.txt exists
+    if [ ! -f "src/version.txt" ]; then
+        echo "❌ Error: src/version.txt not found"
+        exit 1
+    fi
+
+    # Read current version
+    current_version=$(cat src/version.txt | tr -d '\n')
+    echo "📖 Current version: $current_version"
+
+    # Parse semantic version
+    IFS='.' read -r major minor patch <<< "$current_version"
+
+    # Increment patch version
+    new_patch=$((patch + 1))
+    new_version="$major.$minor.$new_patch"
+
+    echo "⬆️ New version: $new_version"
+
+    # Set environment variable to prevent recursion
+    export POZNOTE_VERSION_INCREMENT=1
+
+    # Update src/version.txt
+    echo "$new_version" > src/version.txt
+
+    # Amend the commit with the new version
+    git add src/version.txt
+    git commit --amend --no-edit
+
+    echo "✅ Version automatically incremented to $new_version"
+    echo "💡 The commit has been amended with the new version"
+fi
