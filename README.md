@@ -161,10 +161,6 @@ docker compose up -d
 
 ## Access Your Instance
 
-After installation, access Poznote at: 
-
-[http://localhost:8040](http://localhost:8040)
-
 Use the credentials from .env file:
 
 Default Username: `admin`
@@ -172,6 +168,10 @@ Default Password: `admin123!`
 Default Port: `8040`
 
 If you want to change them, see the [Change Settings](#change-settings) section.
+
+Access your Poznote instance at: 
+
+[http://localhost:8040](http://localhost:8040)
 
 ## Change Settings
 
