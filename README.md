@@ -164,7 +164,9 @@ docker compose up -d
 Use the credentials from .env file:
 
 Default Username: `admin`
+
 Default Password: `admin123!`
+
 Default Port: `8040`
 
 If you want to change them, see the [Change Settings](#change-settings) section.
