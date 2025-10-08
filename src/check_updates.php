@@ -18,25 +18,25 @@ function checkForUpdates() {
     ];
     
     try {
-        // Get current version from version.txt 
-        $version_file = 'version.txt';
-        if (file_exists($version_file)) {
-            $current_version = trim(file_get_contents($version_file));
-        } else {
-            $result['error'] = 'Version file not found';
-            return $result;
+        // Get current version from local Git tags
+        $current_version = exec('git describe --tags --abbrev=0 2>/dev/null', $output, $return_code);
+        if ($return_code !== 0 || empty($current_version)) {
+            $current_version = 'v1.0.0'; // Default if no tags found
         }
         
-        $result['current_version'] = $current_version;
+        // Remove 'v' prefix for display
+        $current_version_clean = ltrim($current_version, 'v');
+        $result['current_version'] = $current_version_clean;
         
-        // Query GitHub API to get the version.txt from the main branch
-        $github_api_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/src/version.txt';
+        // Query GitHub API to get the latest release/tag
+        $github_api_url = 'https://api.github.com/repos/timothepoznanski/poznote/releases/latest';
         
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
                 'header' => [
-                    'User-Agent: Poznote-App/1.0'
+                    'User-Agent: Poznote-App/1.0',
+                    'Accept: application/vnd.github.v3+json'
                 ],
                 'timeout' => 10
             ]
@@ -45,15 +45,31 @@ function checkForUpdates() {
         $response = @file_get_contents($github_api_url, false, $context);
         
         if ($response === false) {
-            $result['error'] = 'Cannot reach GitHub (check internet connection)';
-            return $result;
+            // Fallback: try to get tags directly
+            $github_tags_url = 'https://api.github.com/repos/timothepoznanski/poznote/tags';
+            $response = @file_get_contents($github_tags_url, false, $context);
+            
+            if ($response === false) {
+                $result['error'] = 'Cannot reach GitHub (check internet connection)';
+                return $result;
+            }
+            
+            $tags_data = json_decode($response, true);
+            if (empty($tags_data)) {
+                $result['error'] = 'No tags found in repository';
+                return $result;
+            }
+            
+            $remote_version = ltrim($tags_data[0]['name'], 'v');
+        } else {
+            $release_data = json_decode($response, true);
+            $remote_version = ltrim($release_data['tag_name'], 'v');
         }
         
-        $remote_version = trim($response);
         $result['remote_version'] = $remote_version;
         
         // Compare versions using semantic versioning
-        $result['has_updates'] = version_compare($remote_version, $current_version, '>');
+        $result['has_updates'] = version_compare($remote_version, $current_version_clean, '>');
         
     } catch (Exception $e) {
         $result['error'] = $e->getMessage();
