@@ -5,7 +5,6 @@ requireAuth();
 require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
-include 'version_helper.php';
 
 // Include page initialization
 require_once 'page_init.php';
@@ -117,17 +116,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
                 <div class="settings-card-content">
                     <h3>About Poznote</h3>
-                </div>
-            </div>
-
-            <!-- Application Version -->
-            <div class="settings-card">
-                <div class="settings-card-icon">
-                    <i class="fa-tag"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>Application Version</h3>
-                    <span class="version-display"><?php echo htmlspecialchars(getAppVersionWithPrefix()); ?></span>
                 </div>
             </div>
 

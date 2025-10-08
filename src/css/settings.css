@@ -309,16 +309,3 @@ body {
     text-decoration: none;
     transform: translateY(-1px);
 }
-
-/* Version display styling */
-.version-display {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.9rem;
-    color: #007DB8;
-    font-weight: 600;
-    background: rgba(0, 125, 184, 0.1);
-    padding: 4px 8px;
-    border-radius: 4px;
-    margin-top: 4px;
-    display: inline-block;
-}

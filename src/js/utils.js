@@ -494,11 +494,14 @@ function checkForUpdates() {
                 localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
                 localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 closeUpdateCheckModal();
-                showUpdateInstructions();
+                showUpdateInstructions(true);
             } else {
-                // No updates available, clear the flag
+                // No updates available, but still show version info in update modal
+                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
+                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 localStorage.removeItem('poznote_update_available');
-                showUpdateCheckResult('✅ You are up to date!', 'Current version: ' + (data.current_version || 'unknown'), 'success');
+                closeUpdateCheckModal();
+                showUpdateInstructions(false);
             }
         })
         .catch(function(error) {
@@ -574,9 +577,29 @@ window.testUpdateBadge = testUpdateBadge;
 window.simulateUpdateAvailable = simulateUpdateAvailable;
 window.restoreUpdateBadge = restoreUpdateBadge;
 
-function showUpdateInstructions() {
+function showUpdateInstructions(hasUpdate = false) {
     var modal = document.getElementById('updateModal');
     if (modal) {
+        // Update modal title and content based on whether there's an update
+        var titleEl = modal.querySelector('h3');
+        var textEl = modal.querySelector('p');
+        var buttonEl = modal.querySelector('.btn-update');
+        
+        if (hasUpdate) {
+            if (titleEl) titleEl.textContent = '🎉 New Update Available!';
+            if (textEl) textEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
+            if (buttonEl) {
+                buttonEl.textContent = 'See Update instructions';
+                buttonEl.style.display = 'inline-block';
+            }
+        } else {
+            if (titleEl) titleEl.textContent = '📱 Application Version';
+            if (textEl) textEl.textContent = 'Here are the version details for your Poznote installation.';
+            if (buttonEl) {
+                buttonEl.style.display = 'none';
+            }
+        }
+        
         // Fill version information
         var currentVersionEl = document.getElementById('currentVersion');
         var availableVersionEl = document.getElementById('availableVersion');
@@ -598,7 +621,7 @@ function showUpdateInstructions() {
                     return response.json(); 
                 })
                 .then(function(data) {
-                    if (data.has_updates && !data.error) {
+                    if (!data.error) {
                         // Store version information
                         localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
                         localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
@@ -611,9 +634,9 @@ function showUpdateInstructions() {
                             availableVersionEl.textContent = data.remote_version || 'unknown';
                         }
                     } else {
-                        // No updates or error
+                        // Error
                         if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
-                        if (availableVersionEl) availableVersionEl.textContent = 'No update available';
+                        if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
                     }
                 })
                 .catch(function(error) {
