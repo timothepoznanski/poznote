@@ -5,14 +5,14 @@
 <!-- Update Modal -->
 <div id="updateModal" class="modal">
     <div class="modal-content">
-        <h3>🎉 New Update Available!</h3>
-        <p>A new version of Poznote is available. Your data will be preserved during the update.</p>
+        <h3>📱 Application Version</h3>
+        <p>Here are the version details for your Poznote installation.</p>
         <div class="version-info">
             <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
-            <p><strong>Available version:</strong> <span id="availableVersion">Loading...</span></p>
+            <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+            <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Close</button>
             <button type="button" class="btn-update" onclick="goToUpdateInstructions()">See Update instructions</button>
         </div>
     </div>
