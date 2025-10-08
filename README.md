@@ -25,7 +25,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - [Offline View](#offline-view)
 - [AI Features](#ai-features)
 - [API Documentation](#api-documentation)
-- [Advanced Operations](#advanced-operations)
 
 ## Features
 
@@ -48,7 +47,7 @@ Simple, fast, and built for those who value freedom over their own data.
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
 <details>
-<summary><strong>Windows Installation (Poznote Docker Hub image)</strong></summary>
+<summary><strong>Windows Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -110,7 +109,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>Linux Installation (Poznote Docker Hub image)</strong></summary>
+<summary><strong>Linux Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -172,114 +171,6 @@ docker compose up -d
 
 </details>
 
-<details>
-<summary><strong>Specific situations</strong></summary>
-
-- **Development setups** — when deploying an instance with the source code mounted as a volume, allowing live updates without rebuilding or pulling a new image.
-
-- **Restricted environments** — when a network proxy prevents pulling the Poznote image from Docker Hub, but allows downloading the official php/apache image.
-
-- **Custom Dockerfile needs** — when you need to modify a source code or deployment file like for example the Dockerfile to add proxy environment variables or other custom settings. 
-
-<details>
-<summary><strong>Windows Installation</strong></summary>
-
-#### Step 1: Prerequisite
-
-Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
-
-#### Step 2: Deploy Poznote
-
-Open Powershell and run the following commands:
-
-```powershell
-$INSTANCE_NAME = "my-poznote"
-```
-
-```powershell
-git clone https://github.com/timothepoznanski/poznote.git $INSTANCE_NAME
-```
-
-```powershell
-cd $INSTANCE_NAME
-```
-
-```powershell
-notepad Dockerfile  # If necessary (for example to add proxies)
-```
-
-Modify the values in the following command and run it: 
-
-```powershell
-@"
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-"@ | Out-File -FilePath .env -Encoding UTF8
-```
-
-Start Poznote:
-
-```powershell
-docker compose build --pull
-```
-
-```powershell
-docker compose up -d
-```
-
-</details>
-
-<details>
-<summary><strong>Linux Installation</strong></summary>
-
-#### Step 1: Prerequisite
-
-1. Install [Docker engine](https://docs.docker.com/engine/install/)
-2. Install [Docker Compose](https://docs.docker.com/compose/install/)
-
-#### Step 2: Install Poznote
-
-Open a Terminal and run the following commands:
-
-```bash
-INSTANCE_NAME = "my-poznote"
-```
-
-```bash
-git clone https://github.com/timothepoznanski/poznote.git "$INSTANCE_NAME"
-```
-
-```bash
-cd $INSTANCE_NAME
-```
-
-```bash
-vim Dockerfile  # If necessary (for example to add proxies)
-```
-
-```bash
-cat <<'EOF' > .env
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-EOF
-```
-
-Start Poznote:
-
-```bash
-docker compose build --pull
-```
-
-```bash
-docker compose up -d
-```
-
-</details>
-
-</details>
-
 ## Access Your Instance
 
 After installation, access Poznote at: `http://YOUR_SERVER:YOUR_PORT`
@@ -310,13 +201,6 @@ and where YOUR_PORT depends on your port choice (see your .env file).
    docker compose up -d
    ```
 
-Note for development setups: If you modified the **Dockerfile**, rebuild without cache:
-
-   ```bash
-   docker compose build --no-cache
-   docker compose up -d
-   ```
-
 ## Forgot your password
 
 Find it in your `.env` file.
@@ -336,8 +220,7 @@ To update Poznote to the latest version:
 
 3. Pull the latest image
    ```bash
-   docker compose pull   # If we use the Docker Hub Poznote image
-   docker compose build --pull  # If we use the specific deployment method (PHP/Apache image + local build)
+   docker compose pull
    ```
 
 4. Restart the container:
@@ -392,6 +275,16 @@ Upload the complete backup ZIP to restore everything:
 - **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
 - **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)
 - **Purpose:** Allows recovery if import fails or data needs to be rolled back
+
+If you need, you still can do it manually:
+
+**Backup:** 
+
+Copy `./data/` directory (contains entries, attachments, database)
+
+**Restore:** 
+
+Replace `./data/` directory and restart container
 
 ## Offline View
 
@@ -657,14 +550,3 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 - `workspace` (string) - *Optional* - Workspace to scope the operation (defaults to "Poznote")
 
 **Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
-
-### Other advanced actions
-
-
-**Backup:** 
-
-Copy `./data/` directory (contains entries, attachments, database)
-
-**Restore:** 
-
-Replace `./data/` directory and restart container
