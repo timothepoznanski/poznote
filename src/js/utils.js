@@ -491,14 +491,10 @@ function checkForUpdates() {
                 showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error + versionInfo, 'error');
             } else if (data.has_updates) {
                 // Store version information for the modal
-                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
-                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 closeUpdateCheckModal();
                 showUpdateInstructions(true);
             } else {
                 // No updates available, but still show version info in update modal
-                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
-                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 localStorage.removeItem('poznote_update_available');
                 closeUpdateCheckModal();
                 showUpdateInstructions(false);
@@ -540,8 +536,6 @@ function checkForUpdatesAutomatic() {
             if (data.has_updates && !data.error) {
                 // Store update availability and version information
                 localStorage.setItem('poznote_update_available', 'true');
-                localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
-                localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
                 showUpdateBadge();
             } else {
                 // Clear update availability flag
@@ -582,18 +576,19 @@ function showUpdateInstructions(hasUpdate = false) {
     if (modal) {
         // Update modal title and content based on whether there's an update
         var titleEl = modal.querySelector('h3');
-        var textEl = modal.querySelector('p');
+        var messageEl = modal.querySelector('#updateMessage');
         var buttonEl = modal.querySelector('.btn-update');
         
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = '🎉 New Update Available!';
-            if (textEl) textEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
+            if (messageEl) messageEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
             if (buttonEl) {
                 buttonEl.textContent = 'See Update instructions';
                 buttonEl.style.display = 'inline-block';
             }
         } else {
             if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
+            if (messageEl) messageEl.textContent = '';
             if (buttonEl) {
                 buttonEl.style.display = 'none';
             }
@@ -603,54 +598,37 @@ function showUpdateInstructions(hasUpdate = false) {
         var currentVersionEl = document.getElementById('currentVersion');
         var availableVersionEl = document.getElementById('availableVersion');
         
-        var currentVersion = localStorage.getItem('poznote_current_version');
-        var remoteVersion = localStorage.getItem('poznote_remote_version');
+        // Always fetch version information
+        if (currentVersionEl) currentVersionEl.textContent = 'Loading...';
+        if (availableVersionEl) availableVersionEl.textContent = 'Loading...';
         
-        // If versions are not available, fetch them
-        if (!currentVersion || !remoteVersion) {
-            if (currentVersionEl) currentVersionEl.textContent = 'Loading...';
-            if (availableVersionEl) availableVersionEl.textContent = 'Loading...';
-            
-            // Fetch update information
-            fetch('check_updates.php')
-                .then(function(response) { 
-                    if (!response.ok) {
-                        throw new Error('HTTP Error: ' + response.status);
+        // Fetch update information
+        fetch('check_updates.php')
+            .then(function(response) { 
+                if (!response.ok) {
+                    throw new Error('HTTP Error: ' + response.status);
+                }
+                return response.json(); 
+            })
+            .then(function(data) {
+                if (!data.error) {
+                    // Update modal
+                    if (currentVersionEl) {
+                        currentVersionEl.textContent = data.current_version || 'unknown';
                     }
-                    return response.json(); 
-                })
-                .then(function(data) {
-                    if (!data.error) {
-                        // Store version information
-                        localStorage.setItem('poznote_current_version', data.current_version || 'unknown');
-                        localStorage.setItem('poznote_remote_version', data.remote_version || 'unknown');
-                        
-                        // Update modal
-                        if (currentVersionEl) {
-                            currentVersionEl.textContent = data.current_version || 'unknown';
-                        }
-                        if (availableVersionEl) {
-                            availableVersionEl.textContent = data.remote_version || 'unknown';
-                        }
-                    } else {
-                        // Error
-                        if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
-                        if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
+                    if (availableVersionEl) {
+                        availableVersionEl.textContent = data.remote_version || 'unknown';
                     }
-                })
-                .catch(function(error) {
-                    if (currentVersionEl) currentVersionEl.textContent = 'Error loading version';
+                } else {
+                    // Error
+                    if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
                     if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
-                });
-        } else {
-            // Use cached versions
-            if (currentVersionEl) {
-                currentVersionEl.textContent = currentVersion;
-            }
-            if (availableVersionEl) {
-                availableVersionEl.textContent = remoteVersion;
-            }
-        }
+                }
+            })
+            .catch(function(error) {
+                if (currentVersionEl) currentVersionEl.textContent = 'Error loading version';
+                if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
+            });
         
         modal.style.display = 'flex';
     }

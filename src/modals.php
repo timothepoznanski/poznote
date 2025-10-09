@@ -6,6 +6,7 @@
 <div id="updateModal" class="modal">
     <div class="modal-content">
         <h3>📱 Application Version</h3>
+        <p id="updateMessage"></p>
         <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
         <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
         <div class="modal-buttons">
