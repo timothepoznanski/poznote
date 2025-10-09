@@ -5,8 +5,6 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
-[![Docker Pulls](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Ftimothepoznanski%2Fpoznote%2Fpackages%2Fcontainer%2Fpoznote&query=%24.download_count&label=GHCR%20Pulls&logo=github)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote)
-
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
