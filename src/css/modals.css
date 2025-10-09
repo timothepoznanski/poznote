@@ -8,6 +8,11 @@
    3. RESPONSIVE STYLES - Mobile adaptations
    =========================================== */
 
+/* Utility class for hiding elements */
+.hidden {
+    display: none !important;
+}
+
 /* ===========================================
    1. BASE MODAL STYLES
    =========================================== */
