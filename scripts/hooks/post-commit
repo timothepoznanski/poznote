@@ -3,8 +3,8 @@
 # Post-commit hook for automatic version increment
 # When a commit has the exact message "Create new version", automatically increments src/version.txt
 
-# Skip if this is an automatic version commit (marked by [AUTO-VERSION] in message)
-if git log -1 --pretty=%B | grep -q "\[AUTO-VERSION\]"; then
+# Prevent infinite recursion by checking if we're already in a version increment
+if [ "$POZNOTE_VERSION_INCREMENT" = "1" ]; then
     exit 0
 fi
 
@@ -34,12 +34,16 @@ if [ "$COMMIT_MSG" = "Create new version" ]; then
 
     echo "⬆️ New version: $new_version"
 
+    # Set environment variable to prevent recursion
+    export POZNOTE_VERSION_INCREMENT=1
+
     # Update src/version.txt
     echo "$new_version" > src/version.txt
 
-    # Amend the commit with the new version (marked as auto-version)
+    # Amend the commit with the new version
     git add src/version.txt
-    git commit --amend -m "Create new version [AUTO-VERSION]"
+    git commit --amend --no-edit
 
     echo "✅ Version automatically incremented to $new_version"
+    echo "💡 The commit has been amended with the new version"
 fi
