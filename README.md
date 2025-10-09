@@ -46,7 +46,7 @@ Simple, fast, and built for those who value freedom over their own data.
 
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
 
-> **Note**: The Docker image is now hosted on [GitHub Container Registry (GHCR)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote). If you encounter rate limiting issues, you can authenticate with GitHub:
+> **Note**: The Docker image is hosted on [GitHub Container Registry (GHCR)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote). If you encounter rate limiting issues, you can authenticate with GitHub:
 > ```bash
 > echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 > ```
