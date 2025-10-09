@@ -19,7 +19,7 @@ function checkForUpdates() {
     
     try {
         // Get current version from version.txt file
-        $version_file = __DIR__ . '/../version.txt';
+        $version_file = __DIR__ . '/version.txt';
         if (file_exists($version_file)) {
             $current_version_clean = trim(file_get_contents($version_file));
             $result['current_version'] = $current_version_clean;
@@ -27,7 +27,7 @@ function checkForUpdates() {
             // Fallback to git tags if version.txt doesn't exist
             $current_version = exec('git describe --tags --abbrev=0 2>/dev/null', $output, $return_code);
             if ($return_code !== 0 || empty($current_version)) {
-                $current_version = 'v1.0.0'; // Default if no tags found
+                $current_version = 'vX.X.X'; // Default if no tags found
             }
             $current_version_clean = ltrim($current_version, 'v');
             $result['current_version'] = $current_version_clean;

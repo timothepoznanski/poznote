@@ -576,18 +576,19 @@ function showUpdateInstructions(hasUpdate = false) {
     if (modal) {
         // Update modal title and content based on whether there's an update
         var titleEl = modal.querySelector('h3');
-        var textEl = modal.querySelector('p');
+        var messageEl = modal.querySelector('#updateMessage');
         var buttonEl = modal.querySelector('.btn-update');
         
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = '🎉 New Update Available!';
-            if (textEl) textEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
+            if (messageEl) messageEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
             if (buttonEl) {
                 buttonEl.textContent = 'See Update instructions';
                 buttonEl.style.display = 'inline-block';
             }
         } else {
             if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
+            if (messageEl) messageEl.textContent = '';
             if (buttonEl) {
                 buttonEl.style.display = 'none';
             }

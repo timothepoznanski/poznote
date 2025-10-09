@@ -37,7 +37,7 @@ function getAppVersion() {
     }
 
     // Ultimate fallback
-    return '1.0.0';
+    return 'X.X.X';
 }
 
 /**
