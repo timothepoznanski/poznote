@@ -8,6 +8,8 @@
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
+## Screen capture
+
 <img width="1873" height="846" alt="poznote" src="https://github.com/user-attachments/assets/610c44fd-481d-4f81-9be4-336e1a5c0f5d" />
 
 ## Table of Contents
@@ -43,11 +45,6 @@ Simple, fast, and built for those who value freedom over their own data.
 ## Installation
 
 Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
-
-> **Note**: The Docker image is hosted on [GitHub Container Registry (GHCR)](https://github.com/timothepoznanski/poznote/pkgs/container/poznote). If you encounter rate limiting issues, you can authenticate with GitHub:
-> ```bash
-> echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
-> ```
 
 <details>
 <summary><strong>Windows Installation</strong></summary>
