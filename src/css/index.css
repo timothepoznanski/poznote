@@ -827,7 +827,7 @@ body {
     gap: 2px;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Essential for proper AI menu positioning */
+    flex-wrap: wrap;
 }
 
 .note-action-btn.hide-on-selection {
@@ -1627,75 +1627,13 @@ img {
     color: #dc3545;
 }
 
-/* AI dropdown styles */
-.ai-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.ai-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-    min-width: 160px;
-    padding: 8px 0;
-    margin-top: 5px;
-    display: none;
-}
-
-.ai-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-}
-
-.ai-menu-item:last-child {
-    border-bottom: none;
-}
-
-.ai-menu-item:hover {
-    background-color: #f8f9fa;
-    color: #007DB8;
-}
-
-.ai-menu-item i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-    color: #007DB8;
-    font-size: 20px;
-}
-
-/* Mobile AI dropdown adjustments */
-/* .ai-dropdown.mobile .ai-menu {
-    min-width: 140px;
-    padding: 6px 0;
-} */
-
-/* .ai-dropdown.mobile .ai-menu-item {
-    padding: 8px 12px;
-    font-size: 13px;
-} */
-
 .search:focus{
     border-bottom: 1px solid #32a1ce;
 }
 
 /* ICONES TRASH pour interface principale */
 
-/* Share / Export dropdown styles (reuse AI menu patterns) */
+/* Share / Export dropdown styles */
 .share-dropdown {
     position: relative;
     display: inline-block;
@@ -2145,14 +2083,6 @@ hr {
 .toolbar-btn:hover i.fa-fill-drip,
 .toolbar-btn:focus i.fa-fill-drip {
     color: #ffe066 !important;
-}
-
-.toolbar-btn.btn-ai i.fa-robot {
-    display: none;
-}
-
-.toolbar-btn.btn-ai.loading .fa-robot-svg {
-    animation: rotate 1s linear infinite;
 }
 
 @keyframes rotate {
@@ -2628,19 +2558,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 /* Blue color when a note is shared publicly */
 .btn-share.is-shared .fa-square-share-nodes-svg {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
-}
-
-.fa-robot-svg {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/robot-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
 }
 
 .fa-square-share-nodes-svg {
