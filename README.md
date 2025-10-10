@@ -54,8 +54,6 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 <details>
 <summary><strong>If you are interested in the tech stack on which Poznote is built, have a look here</strong></summary>
 
-Poznote is built with a simple and efficient technology stack:
-
 ### Backend
 - **PHP 8.x** - Server-side scripting language
 - **SQLite 3** - Lightweight, file-based relational database
