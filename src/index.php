@@ -675,30 +675,15 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                     }
 
-                    // Actions dropdown
-                    echo '<div class="actions-dropdown">';
-                    $actions_onclick = "toggleActionsMenu(event, '" . htmlspecialchars($row['id'], ENT_QUOTES) . "', '" . htmlspecialchars($filename, ENT_QUOTES) . "', " . htmlspecialchars($title_json, ENT_QUOTES) . ")";
-                    echo '<button type="button" class="toolbar-btn btn-actions note-action-btn" title="Actions" onclick="' . $actions_onclick . '"><i class="fa-menu-vert-svg"></i></button>';
-                    echo '<div class="actions-menu" id="actionsMenu-'.htmlspecialchars($row['id'], ENT_QUOTES).'">';
-                    echo '<div class="actions-menu-item" onclick="duplicateNote(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-file-copy-svg"></i><span>Duplicate</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="showMoveFolderDialog(\''.$row['id'].'\'); closeActionsMenu();">';
-                    echo '<i class="fa-drive-file-move-svg"></i><span>Move</span>';
-                    echo '</div>';
-                    echo '<div class="actions-menu-item" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).'); closeActionsMenu();">';
-                    echo '<i class="fa-download"></i><span>Download</span>';
-                    echo '</div>';
+                    // Individual action buttons
+                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" title="Duplicate" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" title="Move" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-drive-file-move-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-download"></i></button>';
                     if (!$show_trash_button) {
-                        echo '<div class="actions-menu-item" onclick="deleteNote(\''.$row['id'].'\'); closeActionsMenu();">';
-                        echo '<i class="fa-trash"></i><span>Delete</span>';
-                        echo '</div>';
+                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                     }
-                    echo '<div class="actions-menu-item" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.'); closeActionsMenu();">';
-                    echo '<i class="fa-info-circle"></i><span>Information</span>';
-                    echo '</div>';
-                    echo '</div>';
-                    echo '</div>';                
+                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                
                     echo '</div>';
                     echo '</div>';
                 
