@@ -21,6 +21,7 @@ Simple, fast, and built for those who value freedom over their own data.
 ## Table of Contents
 
 - [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -46,12 +47,38 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🔗 Public note sharing
 - 🌐 REST API for automation
 
-## Installation
+## Tech Stack
 
-Poznote runs in a Docker container, making it incredibly easy to deploy anywhere.
+Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
 <details>
-<summary><strong>Windows Installation</strong></summary>
+<summary><strong>If you are interested in the tech stack on which Poznote is built, have a look here</strong></summary>
+
+### Backend
+- **PHP 8.x** - Server-side scripting language
+- **SQLite 3** - Lightweight, file-based relational database
+
+### Frontend
+- **HTML5** - Markup and structure
+- **CSS3** - Styling and responsive design
+- **JavaScript (Vanilla)** - Interactive features and dynamic content
+- **AJAX** - Asynchronous data loading
+
+### Storage
+- **HTML files** - Notes are stored as plain HTML files in the filesystem
+- **SQLite database** - Metadata, tags, relationships, and user data
+- **File attachments** - Stored directly in the filesystem
+
+### Infrastructure
+- **Apache HTTP Server** - Web server
+- **Docker** - Containerization for easy deployment and portability
+- **Docker Compose** - Multi-container orchestration
+</details>
+
+## Installation
+
+<details>
+<summary><strong>🖥️ Windows Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -107,7 +134,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>Linux Installation</strong></summary>
+<summary><strong>🐧 Linux Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -159,26 +186,6 @@ docker compose pull
 
 ```bash
 docker compose up -d
-```
-
-</details>
-
-<details>
-<summary><strong>Advanced: Docker command example</strong></summary>
-<br>
-
-```bash
-docker run -d \
-  --name poznote-test-webserver \
-  --restart always \
-  -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin123! \
-  -e HTTP_WEB_PORT=8077 \
-  -p 8077:80 \
-  -v ./data:/var/www/html/data \
-  ghcr.io/timothepoznanski/poznote:latest \
-  /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
 
 </details>
@@ -539,4 +546,4 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 - `folder_name` (string) - **Required** - The folder name to delete
 - `workspace` (string) - *Optional* - Workspace to scope the operation (defaults to "Poznote")
 
-**Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
+**Note:** The default folder cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
