@@ -55,18 +55,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <h3>Workspaces</h3>
                 </div>
             </div>
-            
-            <!-- AI Settings -->
-            <div class="settings-card" onclick="window.location = 'ai.php';">
-                <div class="settings-card-icon">
-                    <i class="fa-robot-svg"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3>AI Settings
-                        <?php echo isAIEnabled() ? '<span class="setting-status enabled">enabled</span>' : '<span class="setting-status disabled">disabled</span>'; ?>
-                    </h3>
-                </div>
-            </div>
                         
             <!-- Backup -->
             <div class="settings-card" onclick="window.location = 'backup_export.php';">

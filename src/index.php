@@ -573,29 +573,6 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    if (isAIEnabled()) {
-                        echo '<div class="ai-dropdown">';
-                        echo '<button type="button" class="toolbar-btn btn-ai note-action-btn" title="AI actions" onclick="toggleAIMenu(event, \''.$row['id'].'\')"><i class="fa-robot-svg"></i></button>';
-                        echo '<div class="ai-menu" id="aiMenu-'.$row['id'].'">';
-                        echo '<div class="ai-menu-item" onclick="generateAISummary(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-align-left"></i>';
-                        echo '<span>Summarize</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="checkErrors(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-check-light-full"></i>';
-                        echo '<span>Check content</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="autoGenerateTags(\''.$row['id'].'\'); closeAIMenu();">';
-                        echo '<i class="fa-tags"></i>';
-                        echo '<span>AI tags</span>';
-                        echo '</div>';
-                        echo '<div class="ai-menu-item" onclick="window.location = \'ai.php\'; closeAIMenu();">';
-                        echo '<i class="fa-cog"></i>';
-                        echo '<span>AI settings</span>';
-                        echo '</div>';
-                        echo '</div>';
-                        echo '</div>';
-                    }
                 
                     // Favorite / Share / Attachment buttons
                     $attachments_count = 0;
@@ -817,37 +794,6 @@ $body_classes = trim($extra_body_classes);
     <?php endif; ?>
         
     </div>  <!-- Close main-container -->
-    
-    <?php if (isAIEnabled()): ?>
-    <!-- AI Summary Modal -->
-    <div id="aiSummaryModal" class="modal">
-        <div class="modal-content ai-summary-simple">
-            <div class="modal-body">
-                <div id="aiSummaryLoading" class="ai-loading">
-                    <i class="fa-robot-svg rotating"></i>
-                    <p>Generating summary...</p>
-                </div>
-                <div id="aiSummaryContent">
-                    <div id="summaryText" class="summary-text-simple"></div>
-                </div>
-                <div id="aiSummaryError">
-                    <div class="error-content">
-                        <img src="images/circle-info-solid-full.svg" alt="Error" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;">
-                        <p id="errorMessage"></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="copyToClipboard()" id="copyBtn">
-                    <i class="fa-copy"></i> Copy
-                </button>
-                <button id="regenerateSummaryBtn" class="btn btn-primary" onclick="regenerateCurrentSummary()">
-                    <i class="fa-redo"></i> Regenerate
-                </button>
-                <button class="btn btn-secondary" onclick="closeAISummaryModal()">Close</button>
-            </div>
-        </div>
-    </div>
     <script>
         function startEditSubheading(noteId) {
             var disp = document.getElementById('subheading-display-' + noteId);
@@ -913,11 +859,9 @@ $body_classes = trim($extra_body_classes);
             window.location.href = url;
         }
     </script>
-    <?php endif; ?>
     
 </body>
 <script>
-    // Ensure this function is defined globally so inline onclick handlers can call it even when AI modal block isn't rendered
     function openNoteInfoEdit(noteId) {
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
         if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
@@ -968,9 +912,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/unified-search.js"></script>
 <script src="js/clickable-tags.js"></script>
 <script src="js/font-size-settings.js"></script>
-<?php if (isAIEnabled()): ?>
-<script src="js/ai.js"></script>
-<?php endif; ?>
 <script src="js/tasklist.js"></script>
 <script src="js/copy-code-on-focus.js"></script>
 

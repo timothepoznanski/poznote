@@ -7,7 +7,6 @@ function toggleShareMenu(event, noteId, filename, titleJson) {
     currentShareMenuNoteId = noteId;
 
     // Close other menus (guard with typeof to avoid ReferenceError if not present)
-    if (typeof closeAIMenu === 'function') closeAIMenu();
     if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
 
     // Find the menu elements specific to this note
@@ -508,7 +507,6 @@ function toggleActionsMenu(event, noteId, filename, titleJson) {
     currentActionsMenuNoteId = noteId;
 
     // Close other menus (guard with typeof to avoid ReferenceError if not present)
-    if (typeof closeAIMenu === 'function') closeAIMenu();
     if (typeof closeSettingsMenu === 'function') closeSettingsMenu();
     if (typeof closeShareMenu === 'function') closeShareMenu();
 

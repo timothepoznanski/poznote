@@ -647,86 +647,27 @@
     background: #006494;
 }
 
-/* AI SUMMARY MODALS */
-.modal-content.ai-summary-simple {
-    max-width: 600px;
-    width: 90%;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.modal-content.ai-summary-simple .modal-body {
-    padding: 25px;
-    min-height: 200px;
-}
-
-.ai-loading {
-    text-align: center;
-    padding: 30px;
-}
-
-.ai-loading i.rotating {
-    font-size: 2em;
-    color: #007DB8;
-    animation: rotate 1s linear infinite;
-    margin-bottom: 15px;
-}
-
-.ai-loading p {
-    color: #666;
-    font-style: italic;
-}
-
-.summary-text-simple {
-    color: #333;
-    line-height: 1.6;
-    font-size: 15px;
-    text-align: left;
-    margin: 0;
-    padding: 0;
-    background: none;
-    border: none;
-}
-
-/* Styles spécifiques pour la modal AI - boutons toujours visibles */
-.modal-content.ai-summary-simple .modal-footer {
-    padding: 15px 25px;
-    border-top: 1px solid #e9ecef;
-    background: #f8f9fa;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-}
-
-.modal-content.ai-summary-simple .modal-footer .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+/* ----------------------------------------
+   ALERTS - ensure top alert has styles
+   Some pages include attachments.css which define .alert,
+   but others may not. Provide a minimal, high-specificity rule here
+   so showTopAlert and server-rendered #topAlert look consistent.
+   ---------------------------------------- */
+.alert {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
     font-size: 14px;
-    opacity: 1 !important;
-    visibility: visible !important;
 }
-
-.modal-content.ai-summary-simple .modal-footer .btn-secondary {
-    background: #6c757d;
-    color: white;
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
-
-.modal-content.ai-summary-simple .modal-footer .btn-primary {
-    background: #007DB8;
-    color: white;
-}
-
-.modal-content.ai-summary-simple .modal-footer .btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
 .error-content {
@@ -749,180 +690,6 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-}
-
-/* Nouveau style pour modal AI avec boutons toujours visibles */
-.modal-content.ai-summary-always-buttons {
-    max-width: 700px;
-    width: 90%;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.modal-content.ai-summary-always-buttons .modal-header {
-    background: linear-gradient(135deg, #007DB8, #0056b3);
-    color: white;
-    padding: 20px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: none;
-}
-
-.modal-content.ai-summary-always-buttons .modal-header h4 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.modal-content.ai-summary-always-buttons .modal-header .close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-}
-
-.modal-content.ai-summary-always-buttons .modal-header .close:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.modal-content.ai-summary-always-buttons .modal-body {
-    padding: 0;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-content.ai-summary-always-buttons .ai-result-container {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto;
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.modal-content.ai-summary-always-buttons .ai-loading {
-    text-align: center;
-    padding: 50px 30px;
-}
-
-.modal-content.ai-summary-always-buttons .ai-loading i.rotating {
-    font-size: 3em;
-    color: #007DB8;
-    animation: rotate 1s linear infinite;
-    margin-bottom: 20px;
-}
-
-/* ----------------------------------------
-   ALERTS - ensure top alert has styles
-   Some pages include attachments.css or ai.css which define .alert,
-   but others may not. Provide a minimal, high-specificity rule here
-   so showTopAlert and server-rendered #topAlert look consistent.
-   ---------------------------------------- */
-.alert {
-    padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-
-.modal-content.ai-summary-always-buttons .ai-loading p {
-    color: #666;
-    font-style: italic;
-    font-size: 16px;
-}
-
-.modal-content.ai-summary-always-buttons .summary-text-simple {
-    color: #333;
-    line-height: 1.7;
-    font-size: 15px;
-    text-align: left;
-    margin: 0;
-    padding: 0;
-    background: none;
-    border: none;
-}
-
-.modal-content.ai-summary-always-buttons .error-content {
-    text-align: center;
-    padding: 50px 20px;
-    color: #d32f2f;
-}
-
-.modal-content.ai-summary-always-buttons .error-content i {
-    font-size: 3em;
-    margin-bottom: 15px;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible {
-    padding: 20px 25px;
-    border-top: 2px solid #e9ecef;
-    background: #f8f9fa;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn-primary {
-    background: #007DB8;
-    color: white;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn-secondary:hover {
-    background: #5a6268;
-}
-
-.modal-content.ai-summary-always-buttons .modal-footer.ai-buttons-always-visible .btn-primary:hover {
-    background: #0056b3;
 }
 
 .modal-footer .btn-secondary {
@@ -1442,28 +1209,6 @@
     flex: 1 !important;
     padding: 8px 12px !important;
     font-size: 14px !important;
-}
-
-/* AI modal mobile adjustments moved here */
-#aiSummaryModal .modal-content {
-    max-width: 95% !important;
-    width: 95% !important;
-    max-height: 90vh !important;
-    margin: 5vh auto !important;
-}
-
-#aiSummaryModal .modal-body {
-    max-height: 60vh !important;
-    overflow-y: auto !important;
-}
-
-.ai-loading i.rotating {
-    font-size: 1.5em !important;
-}
-
-.summary-content #summaryText {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
 }
 
 .modal-footer {

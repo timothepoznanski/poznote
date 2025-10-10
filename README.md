@@ -23,7 +23,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - [Multiple Instances](#multiple-instances)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
-- [AI Features](#ai-features)
 - [API Documentation](#api-documentation)
 
 ## Features
@@ -32,7 +31,6 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🔍 Powerful Search
 - 🏷️ Tag system
 - 📎 File Attachments
-- 🤖 AI-powered features
 - 📱 Responsive design
 - 🖥️ Multi-instance support
 - 🗂️ Workspaces
@@ -269,20 +267,6 @@ Upload the complete backup ZIP to restore everything:
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
-
-## AI Features
-
-Poznote includes powerful AI capabilities powered by **OpenAI** or **Mistral AI** to enhance your note-taking experience. These features are optional and require an API key from your chosen provider.
-
-### Available AI Features
-
-- **AI Summary** - Generate intelligent summaries of your notes for quick understanding.
-- **Auto Tags** - Automatically generate relevant tags based on note content.
-- **Check Content** - Analyzes note content to detect factual errors, logical inconsistencies, and contradictions while deliberately ignoring spelling and grammar issues.
-
-### Privacy & Data
-
-⚠️ Note: Enabling AI features sends your data to the chosen AI provider’s servers (OpenAI or Mistral). You can disable these features anytime in settings.
 
 ## API Documentation
 
