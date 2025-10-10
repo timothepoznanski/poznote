@@ -10,7 +10,7 @@ Simple, fast, and built for those who value freedom over their own data.
 
 ## Screen capture
 
-<img width="1873" height="846" alt="poznote" src="https://github.com/user-attachments/assets/610c44fd-481d-4f81-9be4-336e1a5c0f5d" />
+![poznote](poznote.png)
 
 ## Table of Contents
 
