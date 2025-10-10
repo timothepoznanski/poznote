@@ -10,7 +10,14 @@ Simple, fast, and built for those who value freedom over their own data.
 
 ## Screen capture
 
+### Mobile view
+
+![poznote-mobile](poznote-mobile.png)
+
+### Computer view
+
 ![poznote](poznote.png)
+
 
 ## Table of Contents
 
