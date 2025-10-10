@@ -822,11 +822,12 @@ body {
 }
 
 /* Ajustement de la toolbar pour les écrans desktop */
+/* Use flex-wrap to allow toolbar buttons to wrap on multiple lines if needed */
 .note-edit-toolbar {
     gap: 2px;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Essential for proper AI menu positioning */
 }
 
 .note-action-btn.hide-on-selection {
