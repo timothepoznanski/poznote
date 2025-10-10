@@ -107,10 +107,6 @@ try {
     $stmt->execute(['hide_folder_counts']);
     $v4 = $stmt->fetchColumn();
     if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
-
-    $stmt->execute(['show_trash_button']);
-    $show_trash_button = $stmt->fetchColumn();
-    $show_trash_button = ($show_trash_button === '1' || $show_trash_button === 'true');
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
@@ -670,18 +666,11 @@ $body_classes = trim($extra_body_classes);
                     $tags_json_escaped = htmlspecialchars($tags_json, ENT_QUOTES);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
-                    // Trash button in toolbar (if enabled)
-                    if ($show_trash_button) {
-                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
-                    }
-
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" title="Duplicate" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" title="Move" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-drive-file-move-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-download"></i></button>';
-                    if (!$show_trash_button) {
-                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
-                    }
+                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
                 
                     echo '</div>';
