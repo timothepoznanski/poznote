@@ -102,11 +102,11 @@ try {
 
     $stmt->execute(['hide_folder_actions']);
     $v3 = $stmt->fetchColumn();
-    if ($v3 === '0' || $v3 === 'false') $extra_body_classes .= ' folder-actions-always-visible';
+    if ($v3 === '1' || $v3 === 'true' || $v3 === null) $extra_body_classes .= ' folder-actions-always-visible';
 
     $stmt->execute(['hide_folder_counts']);
     $v4 = $stmt->fetchColumn();
-    if ($v4 === '1' || $v4 === 'true' || $v4 === null) $extra_body_classes .= ' hide-folder-counts';
+    if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
 }
