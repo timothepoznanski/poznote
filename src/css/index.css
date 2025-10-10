@@ -2697,8 +2697,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 .fa-smile {
   display: inline-block;
-  width: 0.9em;
-  height: 0.9em;
+  width: 1em;
+  height: 1em;
   background-image: url('../images/icons-light-full.svg');
   background-repeat: no-repeat;
   background-position: center;
