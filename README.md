@@ -21,6 +21,7 @@ Simple, fast, and built for those who value freedom over their own data.
 ## Table of Contents
 
 - [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -45,6 +46,32 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🗑️ Trash system with restore functionality
 - 🔗 Public note sharing
 - 🌐 REST API for automation
+
+## Tech Stack
+
+Poznote is built with a simple and efficient technology stack:
+
+### Backend
+- **PHP 8.x** - Server-side scripting language
+- **SQLite 3** - Lightweight, file-based relational database
+
+### Frontend
+- **HTML5** - Markup and structure
+- **CSS3** - Styling and responsive design
+- **JavaScript (Vanilla)** - Interactive features and dynamic content
+- **AJAX** - Asynchronous data loading
+
+### Storage
+- **HTML files** - Notes are stored as plain HTML files in the filesystem
+- **SQLite database** - Metadata, tags, relationships, and user data
+- **File attachments** - Stored directly in the filesystem
+
+### Infrastructure
+- **Apache HTTP Server** - Web server
+- **Docker** - Containerization for easy deployment and portability
+- **Docker Compose** - Multi-container orchestration
+
+Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
 ## Installation
 
