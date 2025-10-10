@@ -333,6 +333,7 @@ body {
 .btn-secondary {
     background: #6c757d;
     color: white;
+    margin-right: 15px;
 }
 
 .btn-secondary:hover {
