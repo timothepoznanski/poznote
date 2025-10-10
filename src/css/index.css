@@ -822,18 +822,12 @@ body {
 }
 
 /* Ajustement de la toolbar pour les écrans desktop */
+/* Use flex-wrap to allow toolbar buttons to wrap on multiple lines if needed */
 .note-edit-toolbar {
     gap: 2px;
     justify-content: center;
     align-items: center;
-    /* Keep toolbar on a single line to avoid height changes when buttons toggle */
-    /* flex-wrap: nowrap; */
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    /* Reserve a stable height so header doesn't shift when buttons appear/disappear */
-    min-height: 44px;
-    padding-left: 8px;
-    padding-right: 8px;
+    flex-wrap: wrap; /* Essential for proper AI menu positioning */
 }
 
 .note-action-btn.hide-on-selection {
