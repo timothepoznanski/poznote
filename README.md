@@ -47,7 +47,9 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🔗 Public note sharing
 - 🌐 REST API for automation
 
-## Installation
+## Tech Stack
+
+Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
 <details>
 <summary><strong>If you are interested in the tech stack on which Poznote is built, have a look here</strong></summary>
@@ -75,7 +77,7 @@ Poznote is built with a simple and efficient technology stack:
 - **Docker Compose** - Multi-container orchestration
 </details>
 
-Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
+## Installation
 
 <details>
 <summary><strong>🖥️ Windows Installation</strong></summary>
