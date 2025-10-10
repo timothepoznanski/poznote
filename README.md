@@ -188,7 +188,6 @@ docker compose up -d
 
 </details>
 
-
 ## Access Your Instance
 
 Use the credentials from .env file:
