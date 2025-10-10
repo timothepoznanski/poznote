@@ -783,10 +783,10 @@ body {
     background: transparent !important;
     border: none !important;
     border-radius: 5px;
-    /* padding: 6px 8px; */
+    padding: 6px 8px;
     font-size: 1.4em;
     cursor: pointer;
-    margin: 0 6px;
+    margin: 0 4px;
     transition: color 0.2s;
     outline: none;
     flex-shrink: 0;
@@ -794,6 +794,10 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+    /* Fixed size to prevent layout shift */
+    min-width: 38px;
+    min-height: 38px;
+    box-sizing: border-box;
 }
 
 /* Text formatting buttons: hidden by default, visible on selection */
@@ -802,23 +806,12 @@ body {
 }
 
 .text-format-btn.show-on-selection {
-    display: inline-block;
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-    width: auto;
-    padding: 6px 8px;
-    margin: 0 2px;
+    display: inline-flex;
 }
 
 /* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
 .note-action-btn {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
-    width: auto;
-    padding: 6px 8px;
-    margin: 0 4px;
+    display: inline-flex;
 }
 
 /* Ajustement de la toolbar pour les écrans desktop */
@@ -828,17 +821,12 @@ body {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    /* Fixed height based on button size: padding (6px*2) + font-size (1.4em ≈ ~22px) + gap = ~38px */
+    min-height: calc(1.4em + 12px + 6px);
 }
 
 .note-action-btn.hide-on-selection {
-    opacity: 0;
-    visibility: hidden;
-    position: relative;
-    width: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease, width 0.2s ease, padding 0.2s ease, margin 0.2s ease;
+    display: none;
 }
 
 .dropdown-menu {
