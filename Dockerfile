@@ -19,14 +19,26 @@ COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
 # Copy php.ini
 COPY php.ini /usr/local/etc/php/
 
-# Handle source files based on build argument
-COPY ${copy_src_files:+./src} /var/www/html
-
 # Create directory for data volume (entries and attachments are inside data/)
 RUN mkdir -p /var/www/html/data
 
 # Enable Apache mod_rewrite if needed
 RUN a2enmod rewrite
+
+# Add build arguments for cache busting and versioning
+# CACHE BUSTING: Use BUILD_DATE to force rebuild of source files layer
+ARG BUILD_DATE
+ARG VERSION
+LABEL build_date="${BUILD_DATE}"
+LABEL version="${VERSION}"
+
+# Force cache invalidation by using BUILD_DATE in a RUN command
+# This ensures the source files are ALWAYS copied fresh, never from cache
+RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.txt
+
+# Handle source files based on build argument
+# This layer will ALWAYS be rebuilt because the previous RUN command changes each time
+COPY ${copy_src_files:+./src} /var/www/html
 
 # Add OCI standard labels
 LABEL org.opencontainers.image.title="Poznote"

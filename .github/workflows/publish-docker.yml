@@ -85,6 +85,9 @@ jobs:
           context: .
           push: true
           build-args: |
+            copy_src_files=true
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ steps.check_version.outputs.version_clean }}
             APP_VERSION=${{ steps.check_version.outputs.version_clean }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/poznote:${{ steps.check_version.outputs.version_clean }}
