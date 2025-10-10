@@ -95,21 +95,14 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
-                    <h3>Hide Folders Notes Counts <span id="folder-counts-status" class="setting-status enabled">enabled</span></h3>
+                    <h3>Show Folders Notes Counts <span id="folder-counts-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
             <div class="settings-card" id="folder-actions-card">
                 <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
                 <div class="settings-card-content">
-                    <h3>Hide Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
-                </div>
-            </div>
-
-            <div class="settings-card" id="show-trash-button-card">
-                <div class="settings-card-icon"><i class="fa-trash"></i></div>
-                <div class="settings-card-content">
-                    <h3>Show Trash Button in Toolbar <span id="show-trash-button-status" class="setting-status disabled">disabled</span></h3>
+                    <h3>Show Folder Actions <span id="folder-actions-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
@@ -190,7 +183,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
                 var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
                 if(statusFolderActions){ statusFolderActions.textContent = enabled ? 'enabled' : 'disabled'; statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-                if(enabled) document.body.classList.remove('folder-actions-always-visible'); else document.body.classList.add('folder-actions-always-visible');
+                if(enabled) document.body.classList.add('folder-actions-always-visible'); else document.body.classList.remove('folder-actions-always-visible');
             }).catch(()=>{});
         }
         if(cardFolderActions){ cardFolderActions.addEventListener('click', function(){
@@ -203,27 +196,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
-
-        // Show trash button (database)
-        var cardTrashButton = document.getElementById('show-trash-button-card');
-        var statusTrashButton = document.getElementById('show-trash-button-status');
-        function refreshTrashButton(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_trash_button');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusTrashButton){ statusTrashButton.textContent = enabled ? 'enabled' : 'disabled'; statusTrashButton.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-            }).catch(()=>{});
-        }
-        if(cardTrashButton){ cardTrashButton.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_trash_button');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_trash_button'); setForm.append('value', toSet);
-                return fetch('api_settings.php',{method:'POST',body:setForm});
-            }).then(function(){ refreshTrashButton(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
-        }); }
-        refreshTrashButton();
     })();
     </script>
     <script>
