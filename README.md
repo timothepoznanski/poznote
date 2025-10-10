@@ -160,6 +160,7 @@ docker compose up -d
 <details>
 <summary><strong>Advanced: Docker commande example</strong></summary>
 
+
 ```bash
 docker run -d \
   --name poznote-test-webserver \
@@ -172,9 +173,9 @@ docker run -d \
   -v ./data:/var/www/html/data \
   ghcr.io/timothepoznanski/poznote:latest \
   /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
-  ```
+```
 
-  </details>
+</details>
 
 ## Access Your Instance
 
