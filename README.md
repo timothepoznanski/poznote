@@ -76,7 +76,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 ## Installation
 
 <details>
-<summary><strong>Windows Installation</strong></summary>
+<summary><strong>🖥️ Windows Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -132,7 +132,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>Linux Installation</strong></summary>
+<summary><strong>🐧 Linux Installation</strong></summary>
 
 #### Step 1: Prerequisite
 
