@@ -158,8 +158,8 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>Advanced: Docker commande example</strong></summary>
-
+<summary><strong>Advanced: Docker command example</strong></summary>
+<br>
 
 ```bash
 docker run -d \
