@@ -13,11 +13,33 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy apache config
-COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
+# Create Apache configuration
+RUN cat > /etc/apache2/sites-available/000-default.conf <<'EOF'
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /var/www/html
+</VirtualHost>
+EOF
 
-# Copy php.ini
-COPY php.ini /usr/local/etc/php/
+# Create PHP configuration
+RUN cat > /usr/local/etc/php/php.ini <<'EOF'
+error_reporting = E_ERROR | E_PARSE
+display_errors = Off
+log_errors = On
+error_log = /var/log/php_errors.log
+
+; File upload settings for Poznote
+upload_max_filesize = 200M
+post_max_size = 250M
+max_file_uploads = 20
+max_input_time = 300
+max_execution_time = 300
+memory_limit = 256M
+
+; Temporary file settings
+upload_tmp_dir = /tmp
+file_uploads = On
+EOF
 
 # Create directory for data volume (entries and attachments are inside data/)
 RUN mkdir -p /var/www/html/data
