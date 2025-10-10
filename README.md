@@ -546,4 +546,4 @@ curl -X DELETE http://localhost:8040/api_delete_folder.php \
 - `folder_name` (string) - **Required** - The folder name to delete
 - `workspace` (string) - *Optional* - Workspace to scope the operation (defaults to "Poznote")
 
-**Note:** The default folder ("Default", historically "Uncategorized") cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
+**Note:** The default folder cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
