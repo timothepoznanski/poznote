@@ -250,11 +250,19 @@ Format de réponse:
             'temperature' => $temperature
         ];
         
+        // Encode with proper flags to handle special characters and ensure valid JSON
+        $json_data = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        
+        // Check if json_encode failed
+        if ($json_data === false) {
+            return ['error' => 'Failed to encode request data: ' . json_last_error_msg()];
+        }
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->api_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Authorization: Bearer ' . $this->api_key
