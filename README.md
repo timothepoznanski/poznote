@@ -10,12 +10,11 @@ Simple, fast, and built for those who value freedom over their own data.
 
 ## Screen capture
 
-<details>
-<summary><strong>Want to see it on mobile?</strong></summary>
+### Mobile view
 
 ![poznote-mobile](poznote-mobile.png)
 
-</details>
+### Computer view
 
 ![poznote](poznote.png)
 
