@@ -188,25 +188,6 @@ docker compose up -d
 
 </details>
 
-<details>
-<summary><strong>Advanced: Docker command example</strong></summary>
-<br>
-
-```bash
-docker run -d \
-  --name poznote-test-webserver \
-  --restart always \
-  -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin123! \
-  -e HTTP_WEB_PORT=8077 \
-  -p 8077:80 \
-  -v ./data:/var/www/html/data \
-  ghcr.io/timothepoznanski/poznote:latest \
-  /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
-```
-
-</details>
 
 ## Access Your Instance
 
