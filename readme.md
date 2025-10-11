@@ -212,11 +212,11 @@ docker compose up -d
 
 **Option 1: One-Click Deployment (Recommended)**
 
-For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute and please follow the instructions in the gif below:
+For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute and follow the video tutorial:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-![Railway deployment](readme/railway.gif)
+[![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
 
 - One month of free usage to test the platform
 - Only $5/month if you decide to continue to keep your data online
