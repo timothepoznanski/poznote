@@ -87,6 +87,8 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Installation
 
+Choose your preferred installation method below. Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting like Railway.
+
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
 
