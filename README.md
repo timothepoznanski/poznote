@@ -5,6 +5,8 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
@@ -78,7 +80,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Try Poznote
 
-You can easily deploy a Poznote instance on Railway.com in just a few minutes. See [Installation -> Cloud](#cloud) section.
+You can easily deploy a Poznote instance on Railway.com in just a few minutes. See [Installation -> Cloud](#installation) section.
 
 ## Installation
 
@@ -196,13 +198,13 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>☁️ Cloud</strong></summary>
+<summary><strong>☁️ Cloud</strong></summary><br>
 
 I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following link to deploy the official version of Poznote:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-After deploying on Railway, you can get your personal Poznote URL here:
+After deploying on Railway, get your personal Poznote URL here:
 
 ![Get your ralway url here](railway.png)
 
