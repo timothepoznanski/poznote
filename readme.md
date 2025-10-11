@@ -31,7 +31,8 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 Username: `poznote`
-password: `poznote`
+<br>
+Password: `poznote`
 
 ## Table of Contents
 
