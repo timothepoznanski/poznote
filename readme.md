@@ -60,7 +60,7 @@ See [Installation -> Cloud](#installation) section for detailed instructions.
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
 <details>
-<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here</strong></summary>
+<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
 
 ### Backend
 - **PHP 8.x** - Server-side scripting language
