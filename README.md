@@ -8,7 +8,7 @@
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/vqxhIR?referralCode=OrXrqP&utm_medium=integration&utm_source=template&utm_campaign=generic)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
 ## Screen capture
 
