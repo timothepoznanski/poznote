@@ -89,11 +89,7 @@ Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud
 
 1. Use the `Windows method` to keep your notes locally on your Windows computer.
 
-2. Use the `Linux method` to run Poznote:
-
-- For local use: On your own machine (WSL, VirtualBox, Linux PC, etc.) to keep all your notes stored locally and private.
-
-- For remote access: On a Linux server connected to the internet so you can access your notes securely from any device — your phone, laptop, desktop web browser etc.
+2. Use the `Linux method` to run Poznote either locally on your own machine (WSL, VirtualBox, Linux PC, etc.) to keep your notes private, or on a Linux server connected to the internet to access your notes securely from any device (phone, laptop, desktop, etc.).
 
 3. Use the `Cloud method` if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
 
