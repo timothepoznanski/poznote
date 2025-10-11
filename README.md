@@ -21,8 +21,9 @@ Simple, fast, and built for those who value freedom over their own data.
 ## Table of Contents
 
 - [Features](#features)
-- [Tech Stack](#tech-stack)
 - [Try Poznote](#try-poznote)
+
+- [Tech Stack](#tech-stack)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -47,6 +48,14 @@ Simple, fast, and built for those who value freedom over their own data.
 - 🗑️ Trash system with restore functionality
 - 🔗 Public note sharing
 - 🌐 REST API for automation
+
+## Try Poznote
+
+You can easily deploy a Poznote instance on Railway.com in just a few minutes. 
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+See [Installation -> Cloud](#installation) section for detailed instructions.
 
 ## Tech Stack
 
@@ -75,14 +84,6 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker** - Containerization for easy deployment and portability
 - **Docker Compose** - Multi-container orchestration
 </details>
-
-## Try Poznote
-
-You can easily deploy a Poznote instance on Railway.com in just a few minutes. 
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
-
-See [Installation -> Cloud](#installation) section for detailed instructions.
 
 ## Installation
 
