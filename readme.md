@@ -31,7 +31,8 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 Username: `poznote`
-password: `poznote`
+<br>
+Password: `poznote`
 
 ## Table of Contents
 
@@ -203,25 +204,33 @@ docker compose up -d
 <summary><strong>☁️ Cloud</strong></summary>
 <br>
 
-**Option 1: One-Click Deployment (Recommended)**
+<details>
+<summary><strong>Option 1: One-Click Deployment (Recommended)</strong></summary>
+<br>
 
-For a **ready-to-use setup**, I’ve published a Poznote template on the Railway.com platform.
+For a **ready-to-use setup**, I've published a Poznote template on the Railway.com platform.
 
-First, you’ll need to create a Railway account.
-If you already have a GitHub account, you can sign up with it and enjoy one month of free usage.
-Otherwise, you can sign up using your email address and choose the $5/month plan.
+First, you'll need to create a Railway account.
+If you already have a GitHub account, you can sign up with it and enjoy **one month of free usage**.
+Otherwise, you can sign up using your email address and choose the **$5/month plan**.
 
 ![railway-login](readme/railway-login.png)
 
-To start, simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**:
+To start, simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
+Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
+
 [![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
 
-You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
+> You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
-**Option 2: Custom Cloud Deployment**
+</details>
+
+<details>
+<summary><strong>Option 2: Custom Cloud Deployment</strong></summary>
+<br>
 
 If you prefer using another cloud service that supports Docker, most platforms accept Docker commands with environment variables. Use the following command:
 
@@ -238,6 +247,8 @@ docker run -d \
   ghcr.io/timothepoznanski/poznote:latest \
   /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
+
+</details>
 
 </details>
 
