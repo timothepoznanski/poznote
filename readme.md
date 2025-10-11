@@ -11,11 +11,11 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 ### Computer view
 
-![poznote](readme-images/poznote.png)
+![poznote](readme/poznote.png)
 
 ### Mobile view
 
-![poznote-mobile](readme-images/poznote-mobile.png)
+![poznote-mobile](readme/poznote-mobile.png)
 
 ## Table of Contents
 
@@ -49,7 +49,7 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 ## Try Poznote
 
-You can easily deploy a Poznote instance on Railway.com in just a few minutes. 
+You can deploy a Poznote test instance in just one minute — I’ve prepared a ready-to-use template on Railway.com.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
@@ -85,7 +85,15 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Installation
 
-Choose your preferred installation method below. Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting like Railway.
+Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting.
+
+1. Use the `Windows method` to keep your notes locally on your Windows computer.
+
+2. Use the `Linux method` to run Poznote either locally on your own machine (WSL, VirtualBox, Linux PC, etc.) to keep your notes private, or on a Linux server connected to the internet to access your notes securely from any device (phone, laptop, desktop, etc.).
+
+3. Use the `Cloud method` if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
+
+Choose your preferred installation method below:
 
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
@@ -201,25 +209,38 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>☁️ Cloud</strong></summary><br>
+<summary><strong>☁️ Cloud</strong></summary>
+<br>
 
-I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
+**Option 1: One-Click Deployment (Recommended)**
+
+For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-Note: In the settings of your Poznote instance, don't forget to enable the "Serverless" option. This way, when you're not using it, the container automatically shuts down — so you won't consume any resources unnecessarily.
+![Railway deployment](readme/railway.gif)
 
-![Serverless](readme-images/serverless.png)
+- One month of free usage to test the platform
+- Only $5/month if you decide to continue to keep your data online
+- You can export your notes anytime from the Poznote interface if you switch providers or for backups
 
-Then, deploy:
+**Option 2: Custom Cloud Deployment**
 
-![deploy](readme-images/deploy.png)
+If you prefer using another cloud service that supports Docker, most platforms accept Docker commands with environment variables. Use the following command:
 
-After deploying on Railway, get your personal Poznote URL here:
-
-![Get your ralway url here](readme-images/railway.png)
-
-If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface.
+```bash
+docker run -d \
+  --name poznote-webserver \
+  --restart always \
+  -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
+  -e POZNOTE_USERNAME=admin \
+  -e POZNOTE_PASSWORD=admin123! \
+  -e HTTP_WEB_PORT=8040 \
+  -p 8040:80 \
+  -v ./data:/var/www/html/data \
+  ghcr.io/timothepoznanski/poznote:latest \
+  /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+```
 
 </details>
 
