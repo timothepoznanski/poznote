@@ -78,18 +78,12 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ### Try Poznote
 
-You can easily deploy a Poznote instance on Railway.com in just a few minutes. After creating a free account, you’ll get one month of free usage to try it out. If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
-
-After deploying on Railway, you can get your personal Poznote URL here:
-
-![Get your ralway url here](railway.png)
+You can easily deploy a Poznote instance on Railway.com in just a few minutes to try it! See [Installation/Cloud](#cloud-railway) section.
 
 ## Installation
 
 <details>
-<summary><strong>🖥️ Windows Installation</strong></summary>
+<summary><strong>🖥️ Windows (On your computer)</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -145,7 +139,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>🐧 Linux Installation</strong></summary>
+<summary><strong>🐧 Linux (On your server or computer)</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -198,6 +192,21 @@ docker compose pull
 ```bash
 docker compose up -d
 ```
+
+</details>
+
+<details>
+<summary><strong>☁️ Cloud</strong></summary>
+
+I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following link to deploy the official version of Poznote:
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+After deploying on Railway, you can get your personal Poznote URL here:
+
+![Get your ralway url here](railway.png)
+
+If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
 
 </details>
 
