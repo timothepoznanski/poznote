@@ -209,7 +209,7 @@ docker compose up -d
 For a **ready-to-use setup**, I’ve published a Poznote template on the Railway.com platform.
 
 First, you’ll need to create a Railway account.
-If you already have a GitHub account, you can sign up with it and enjoy one month of free usage.
+If you already have a GitHub account, you can sign up with it and enjoy **one month of free usage**.
 Otherwise, you can sign up using your email address and choose the $5/month plan.
 
 ![railway-login](readme/railway-login.png)
