@@ -5,8 +5,6 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
-
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
@@ -80,7 +78,11 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Try Poznote
 
-You can easily deploy a Poznote instance on Railway.com in just a few minutes. See [Installation -> Cloud](#installation) section.
+You can easily deploy a Poznote instance on Railway.com in just a few minutes. 
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+See [Installation -> Cloud](#installation) section for detailed instructions.
 
 ## Installation
 
