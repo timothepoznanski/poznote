@@ -207,19 +207,19 @@ I use Railway for its simplicity and ease of deployment. After creating a free a
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-Note: In the settings of your Poznote instance, don’t forget to enable the “Serverless” option. This way, when you’re not using it, the container automatically shuts down — so you won’t consume any resources unnecessarily.
+Note: In the settings of your Poznote instance, don't forget to enable the "Serverless" option. This way, when you're not using it, the container automatically shuts down — so you won't consume any resources unnecessarily.
 
-![readme-images/Serverless](serverless.png)
+![Serverless](readme-images/serverless.png)
 
 Then, deploy:
 
-![deploy](deploy.png)
+![deploy](readme-images/deploy.png)
 
 After deploying on Railway, get your personal Poznote URL here:
 
-![Get your ralway url here](railway.png)
+![Get your ralway url here](readme-images/railway.png)
 
-If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
+If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface.
 
 </details>
 
