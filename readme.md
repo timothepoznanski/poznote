@@ -222,7 +222,7 @@ If you have a Github account to login, it's perfect but if you don't you will be
 
 ![railway-login](readme/railway-login.png)
 
- you'll receive **one month of free usage** to test it out. Simply click the button below to deploy in a minute and **follow the video tutorial**:
+You will receive **one month of free usage** to test it out. Simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
