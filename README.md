@@ -21,7 +21,6 @@ Poznote is a lightweight, self-hosted note-taking application built with PHP and
 
 - [Features](#features)
 - [Try Poznote](#try-poznote)
-
 - [Tech Stack](#tech-stack)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
