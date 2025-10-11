@@ -51,6 +51,8 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 You can deploy a Poznote test instance in just one minute — I’ve prepared a ready-to-use template on Railway.com.
 
+[![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
+
 See [Installation -> Cloud](#installation) section for detailed instructions.
 
 ## Tech Stack
