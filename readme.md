@@ -85,7 +85,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Installation
 
-Choose your preferred installation method below. Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting.
+Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting.
 
 1. Use the `Windows method` to keep your notes locally on your Windows computer.
 
@@ -96,6 +96,8 @@ Choose your preferred installation method below. Docker makes it simple to run P
 - **For remote access**: On a Linux server connected to the internet so you can access your notes securely from any device — your phone, laptop, desktop web browser etc.
 
 3. Use the `Cloud method` if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
+
+Choose your preferred installation method below:
 
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
