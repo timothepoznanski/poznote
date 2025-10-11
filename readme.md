@@ -218,7 +218,7 @@ For a ready-to-use solution, I published a Poznote template on Railway. After cr
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-![Railway deployment](readme-images/railway.gif)
+![Railway deployment](readme/railway.gif)
 
 **Pricing:**
 
