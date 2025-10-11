@@ -129,7 +129,6 @@ services:
       - "`${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
@@ -186,7 +185,6 @@ services:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 EOF
 ```
 
