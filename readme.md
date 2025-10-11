@@ -210,8 +210,9 @@ docker compose up -d
 
 <details>
 <summary><strong>☁️ Cloud (Raleway)</strong></summary>
+<br>
 
-I use ![Railway](https://railway.com/) for its simplicity and ease of deployment. After creating a free account, you'll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
+I use [Railway](https://railway.com/) for its simplicity and ease of deployment. After creating a free account, you'll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
