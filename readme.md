@@ -87,6 +87,8 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Choose your preferred installation method below. Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting like Railway.
 
+Use the "Windows method" to keep your notes locally on your Windows computer.
+
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
 
@@ -142,6 +144,12 @@ docker compose up -d
 ```
 
 </details>
+
+Use the Linux method to run Poznote
+
+- **For local use**: On your own machine (WSL, VirtualBox, Linux PC, etc.) to keep all your notes stored locally and private.
+
+- **For remote access**: On a Linux server connected to the internet so you can access your notes securely from any device — your phone, laptop, desktop web browser etc.
 
 <details>
 <summary><strong>🐧 Linux</strong></summary>
@@ -200,10 +208,12 @@ docker compose up -d
 
 </details>
 
-<details>
-<summary><strong>☁️ Cloud</strong></summary><br>
+Use this method if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
 
-I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
+<details>
+<summary><strong>☁️ Cloud (Raleway)</strong></summary>
+
+I use ![Railway](https://railway.com/) for its simplicity and ease of deployment. After creating a free account, you'll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
