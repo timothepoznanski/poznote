@@ -7,13 +7,7 @@
 
 Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote gives you complete control over your data with zero vendor lock-in. Notes are stored as plain HTML files, making them readable even without the application. The platform requires minimal resources while offering powerful features like rich text editing, tagging, workspaces, file attachments, and a full REST API. Perfect for individuals who value privacy and data ownership.
 
-## Screen capture
-
-### Computer view
-
 ![poznote](readme/poznote.png)
-
-### Mobile view
 
 ![poznote-mobile](readme/poznote-mobile.png)
 
