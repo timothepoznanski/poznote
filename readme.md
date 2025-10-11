@@ -49,11 +49,10 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 ## Try Poznote
 
-You can deploy a Poznote test instance in just one minute — I’ve prepared a ready-to-use template on Railway.com.
+A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
-[![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
-
-See [Installation -> Cloud](#installation) section for detailed instructions.
+Username: `poznote`
+password: `poznote`
 
 ## Tech Stack
 
@@ -214,23 +213,21 @@ docker compose up -d
 
 **Option 1: One-Click Deployment (Recommended)**
 
-For a ready-to-use solution, I published a Poznote template on Railway.
+For a **ready-to-use setup**, I’ve published a Poznote template on the Railway.com platform.
 
-First, you must **create a free account** on railway.com website.
-<br>
-If you have a Github account to login, it's perfect but if you don't you will be able to login with an email account here:
+First, you’ll need to create a Railway account.
+If you already have a GitHub account, you can sign up with it and enjoy one month of free usage.
+Otherwise, you can sign up using your email address and choose the $5/month plan.
 
 ![railway-login](readme/railway-login.png)
 
-You will receive **one month of free usage** to test it out. Simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**:
+To start, simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
 [![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
 
-- One month of free usage to test the platform
-- Only $5/month if you decide to continue to keep your data online
-- You can export your notes anytime from the Poznote interface if you switch providers or for backups
+You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
 **Option 2: Custom Cloud Deployment**
 
