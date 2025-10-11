@@ -8,8 +8,6 @@
 Poznote is a self-hosted, open-source note-taking app that gives you full control and privacy over your data. Easy to install on your computer or server, Poznote saves your notes as plain HTML files, so you can read, edit, and back them up anytime — even without Poznote.
 Simple, fast, and built for those who value freedom over their own data.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
-
 ## Screen capture
 
 ### Computer view
@@ -24,6 +22,7 @@ Simple, fast, and built for those who value freedom over their own data.
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Try Poznote](#try-poznote)
 - [Installation](#installation)
 - [Access Your Instance](#access-your-instance)
 - [Change Settings](#change-settings)
@@ -76,6 +75,16 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker** - Containerization for easy deployment and portability
 - **Docker Compose** - Multi-container orchestration
 </details>
+
+### Try Poznote
+
+You can easily deploy a Poznote instance on Railway.com in just a few minutes. After creating a free account, you’ll get one month of free usage to try it out. If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+After deploying on Railway, you can get your personal Poznote URL here:
+
+![Get your ralway url here](railway.png)
 
 ## Installation
 
