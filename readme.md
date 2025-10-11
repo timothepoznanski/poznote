@@ -209,7 +209,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>☁️ Cloud (Railway)</strong></summary>
+<summary><strong>☁️ Cloud</strong></summary>
 <br>
 
 **Option 1: One-Click Deployment (Recommended)**
