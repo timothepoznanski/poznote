@@ -214,9 +214,11 @@ Otherwise, you can sign up using your email address and choose the **$5/month pl
 
 ![railway-login](readme/railway-login.png)
 
-To start, simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**:
+To start, simply click the button below to deploy in a minute and please make sure to **follow the video tutorial**.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
 
 [![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/lWnMLnRKaVE)
 
