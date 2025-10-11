@@ -17,21 +17,6 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 ![poznote-mobile](readme/poznote-mobile.png)
 
-## Table of Contents
-
-- [Features](#features)
-- [Try Poznote](#try-poznote)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Access Your Instance](#access-your-instance)
-- [Change Settings](#change-settings)
-- [Forgot your password](#forgot-your-password)
-- [Update Application to the latest version](#update-application-to-the-latest-version)
-- [Multiple Instances](#multiple-instances)
-- [Backup and Restore](#backup-and-restore)
-- [Offline View](#offline-view)
-- [API Documentation](#api-documentation)
-
 ## Features
 
 - 📝 Rich Text Editor
@@ -53,6 +38,19 @@ A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-dem
 
 Username: `poznote`
 password: `poznote`
+
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Access Your Instance](#access-your-instance)
+- [Change Settings](#change-settings)
+- [Forgot your password](#forgot-your-password)
+- [Update Application to the latest version](#update-application-to-the-latest-version)
+- [Multiple Instances](#multiple-instances)
+- [Backup and Restore](#backup-and-restore)
+- [Offline View](#offline-view)
+- [API Documentation](#api-documentation)
 
 ## Tech Stack
 
