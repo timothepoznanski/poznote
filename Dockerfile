@@ -76,8 +76,9 @@ EXPOSE 80
 # Set working directory
 WORKDIR /var/www/html
 
-# Start Apache in foreground
-# Note: This CMD is overridden by docker-compose.yml's command directive when using docker-compose.
-# It starts Apache in foreground mode to keep the container running, as Docker requires a foreground process.
-# In case someone wants to run this Dockerfile directly without docker-compose, this CMD ensures Apache starts correctly.
-CMD ["apache2-foreground"]
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Use custom entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
