@@ -51,8 +51,6 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 You can deploy a Poznote test instance in just one minute — I’ve prepared a ready-to-use template on Railway.com.
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
-
 See [Installation -> Cloud](#installation) section for detailed instructions.
 
 ## Tech Stack
@@ -214,7 +212,7 @@ docker compose up -d
 
 **Option 1: One-Click Deployment (Recommended)**
 
-For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute:
+For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute and please follow the instructions in the gif below:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
