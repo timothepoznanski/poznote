@@ -209,26 +209,59 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>☁️ Cloud (Raleway)</strong></summary>
+<summary><strong>☁️ Cloud (Railway)</strong></summary>
 <br>
 
-I use [Railway](https://railway.com/) for its simplicity and ease of deployment. After creating a free account, you'll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
+**Option 1: One-Click Deployment (Recommended)**
+
+For a ready-to-use solution, I published a Poznote template on [Railway.com](https://railway.com/). After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-Note: In the settings of your Poznote instance, don't forget to enable the "Serverless" option. This way, when you're not using it, the container automatically shuts down — so you won't consume any resources unnecessarily.
+**Option 2: Custom Cloud Deployment**
 
-![Serverless](readme-images/serverless.png)
+If you prefer using another cloud service that supports Docker, most platforms accept Docker commands with environment variables. Use the following command:
 
-Then, deploy:
+```bash
+docker run -d \
+  --name poznote-webserver \
+  --restart always \
+  -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
+  -e POZNOTE_USERNAME=admin \
+  -e POZNOTE_PASSWORD=admin123! \
+  -e HTTP_WEB_PORT=8040 \
+  -p 8040:80 \
+  -v ./data:/var/www/html/data \
+  ghcr.io/timothepoznanski/poznote:latest \
+  /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+```
 
-![deploy](readme-images/deploy.png)
+---
 
-After deploying on Railway, get your personal Poznote URL here:
+**Railway Configuration**
 
-![Get your ralway url here](readme-images/railway.png)
+1. **Enable Serverless Mode** (Recommended)
+   
+   In your Poznote instance settings, enable the "Serverless" option. This automatically shuts down the container when idle, preventing unnecessary resource consumption.
 
-If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface.
+   ![Serverless](readme-images/serverless.png)
+
+2. **Deploy Your Instance**
+
+   Click the deploy button to launch your Poznote instance.
+
+   ![deploy](readme-images/deploy.png)
+
+3. **Access Your Poznote URL**
+
+   After deployment, get your personal Poznote URL from the Railway dashboard.
+
+   ![Get your railway url here](readme-images/railway.png)
+
+**Pricing:**
+- **Free tier:** 1 month of free usage to test the platform
+- **Paid plan:** Only $5/month if you decide to continue
+- **Migration:** You can export your notes anytime from the Poznote interface if you switch providers
 
 </details>
 
