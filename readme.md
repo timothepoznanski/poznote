@@ -204,11 +204,13 @@ docker compose up -d
 <summary><strong>☁️ Cloud</strong></summary>
 <br>
 
-**Option 1: One-Click Deployment (Recommended)**
+<details>
+<summary><strong>Option 1: One-Click Deployment (Recommended)</strong></summary>
+<br>
 
-For a **ready-to-use setup**, I’ve published a Poznote template on the Railway.com platform.
+For a **ready-to-use setup**, I've published a Poznote template on the Railway.com platform.
 
-First, you’ll need to create a Railway account.
+First, you'll need to create a Railway account.
 If you already have a GitHub account, you can sign up with it and enjoy **one month of free usage**.
 Otherwise, you can sign up using your email address and choose the **$5/month plan**.
 
@@ -224,7 +226,11 @@ Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
 
 > You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
-**Option 2: Custom Cloud Deployment**
+</details>
+
+<details>
+<summary><strong>Option 2: Custom Cloud Deployment</strong></summary>
+<br>
 
 If you prefer using another cloud service that supports Docker, most platforms accept Docker commands with environment variables. Use the following command:
 
@@ -241,6 +247,8 @@ docker run -d \
   ghcr.io/timothepoznanski/poznote:latest \
   /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
+
+</details>
 
 </details>
 
