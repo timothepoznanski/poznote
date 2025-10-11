@@ -11,11 +11,11 @@ Poznote is a lightweight, self-hosted note-taking application built with PHP and
 
 ### Computer view
 
-![poznote](poznote.png)
+![poznote](readme-images/poznote.png)
 
 ### Mobile view
 
-![poznote-mobile](poznote-mobile.png)
+![poznote-mobile](readme-images/poznote-mobile.png)
 
 ## Table of Contents
 
