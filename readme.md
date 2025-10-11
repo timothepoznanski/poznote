@@ -203,21 +203,21 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Cloud</strong></summary><br>
 
-I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following link to deploy the official version of Poznote:
+I use Railway for its simplicity and ease of deployment. After creating a free account, you’ll receive one month of free usage to test it out. You can then use the following button to deploy the official version of Poznote:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
-After deploying on Railway, get your personal Poznote URL here:
-
-![Get your ralway url here](railway.png)
-
-Also, in the settings of your Poznote instance, don’t forget to enable the “Serverless” option. This way, when you’re not using it, the container automatically shuts down — so you won’t consume any resources unnecessarily.
+Note: In the settings of your Poznote instance, don’t forget to enable the “Serverless” option. This way, when you’re not using it, the container automatically shuts down — so you won’t consume any resources unnecessarily.
 
 ![Serverless](serverless.png)
 
 Then, deploy:
 
-![alt text](image.png)
+![serverless](serverless.png)
+
+After deploying on Railway, get your personal Poznote URL here:
+
+![Get your ralway url here](railway.png)
 
 If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
 
