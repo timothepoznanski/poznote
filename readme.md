@@ -209,7 +209,7 @@ I use Railway for its simplicity and ease of deployment. After creating a free a
 
 Note: In the settings of your Poznote instance, don’t forget to enable the “Serverless” option. This way, when you’re not using it, the container automatically shuts down — so you won’t consume any resources unnecessarily.
 
-![Serverless](serverless.png)
+![readme-images/Serverless](serverless.png)
 
 Then, deploy:
 
