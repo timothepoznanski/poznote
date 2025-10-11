@@ -11,11 +11,11 @@ Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote
 
 ### Computer view
 
-![poznote](readme-images/poznote.png)
+![poznote](readme/poznote.png)
 
 ### Mobile view
 
-![poznote-mobile](readme-images/poznote-mobile.png)
+![poznote-mobile](readme/poznote-mobile.png)
 
 ## Table of Contents
 
@@ -214,9 +214,17 @@ docker compose up -d
 
 **Option 1: One-Click Deployment (Recommended)**
 
-For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy:
+For a ready-to-use solution, I published a Poznote template on Railway. After creating a free account, you'll receive one month of free usage to test it out. Simply click the button below to deploy in a minute:
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+
+https://github.com/user-attachments/assets/d85e8e7b-3f4a-4c9a-bb52-ae0b0e7ff8c1
+
+**Pricing:**
+
+- One month of free usage to test the platform
+- Only $5/month if you decide to continue to keep your data online
+- You can export your notes anytime from the Poznote interface if you switch providers or for backups
 
 **Option 2: Custom Cloud Deployment**
 
@@ -235,33 +243,6 @@ docker run -d \
   ghcr.io/timothepoznanski/poznote:latest \
   /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 ```
-
----
-
-**Railway Configuration**
-
-1. **Enable Serverless Mode** (Recommended)
-   
-   In your Poznote instance settings, enable the "Serverless" option. This automatically shuts down the container when idle, preventing unnecessary resource consumption.
-
-   ![Serverless](readme-images/serverless.png)
-
-2. **Deploy Your Instance**
-
-   Click the deploy button to launch your Poznote instance.
-
-   ![deploy](readme-images/deploy.png)
-
-3. **Access Your Poznote URL**
-
-   After deployment, get your personal Poznote URL from the Railway dashboard.
-
-   ![Get your railway url here](readme-images/railway.png)
-
-**Pricing:**
-- **Free tier:** 1 month of free usage to test the platform
-- **Paid plan:** Only $5/month if you decide to continue
-- **Migration:** You can export your notes anytime from the Poznote interface if you switch providers
 
 </details>
 
