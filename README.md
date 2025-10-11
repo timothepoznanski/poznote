@@ -76,14 +76,14 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker Compose** - Multi-container orchestration
 </details>
 
-### Try Poznote
+## Try Poznote
 
-You can easily deploy a Poznote instance on Railway.com in just a few minutes to try it! See [Installation/Cloud](#cloud-railway) section.
+You can easily deploy a Poznote instance on Railway.com in just a few minutes. See [Installation -> Cloud](#cloud) section.
 
 ## Installation
 
 <details>
-<summary><strong>🖥️ Windows (On your computer)</strong></summary>
+<summary><strong>🖥️ Windows</strong></summary>
 
 #### Step 1: Prerequisite
 
@@ -139,7 +139,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>🐧 Linux (On your server or computer)</strong></summary>
+<summary><strong>🐧 Linux</strong></summary>
 
 #### Step 1: Prerequisite
 
