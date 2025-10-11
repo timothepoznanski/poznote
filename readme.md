@@ -211,6 +211,14 @@ After deploying on Railway, get your personal Poznote URL here:
 
 ![Get your ralway url here](railway.png)
 
+Also, in the settings of your Poznote instance, don’t forget to enable the “Serverless” option. This way, when you’re not using it, the container automatically shuts down — so you won’t consume any resources unnecessarily.
+
+![Serverless](serverless.png)
+
+Then, deploy:
+
+![alt text](image.png)
+
 If you decide to keep using their platform, you can upgrade your plan for only $5 per month. If not, you can still export your notes directly from the Poznote interface. 
 
 </details>
