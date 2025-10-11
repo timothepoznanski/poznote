@@ -213,7 +213,7 @@ Note: In the settings of your Poznote instance, don’t forget to enable the “
 
 Then, deploy:
 
-![serverless](serverless.png)
+![deploy](deploy.png)
 
 After deploying on Railway, get your personal Poznote URL here:
 
