@@ -46,6 +46,16 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         <br><br>
         
         <div class="settings-grid">
+            <!-- Trash -->
+            <div class="settings-card" onclick="window.location = 'trash.php';">
+                <div class="settings-card-icon">
+                    <i class="fa-trash"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Trash</h3>
+                </div>
+            </div>
+            
             <!-- Workspace Management -->
             <div class="settings-card" onclick="window.location = 'workspaces.php';">
                 <div class="settings-card-icon">

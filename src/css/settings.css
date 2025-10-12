@@ -153,6 +153,19 @@ body {
     content: '';
 }
 
+.fa-trash {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    background-image: url('../images/trash-can-light-full.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    font-family: inherit !important;
+    font-style: normal !important;
+    content: '';
+}
+
 .fa-layer-group {
     display: inline-block;
     width: 1em;

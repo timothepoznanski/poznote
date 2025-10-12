@@ -7,62 +7,6 @@
 
 <!-- Notes list display -->
 <?php
-// Render a dedicated "Trash" folder above Favorites
-try {
-    $trash_count = 0;
-    if (isset($con)) {
-        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmtTrash->execute([ $workspace_filter, $workspace_filter ]);
-        $trash_count = (int)$stmtTrash->fetchColumn();
-    }
-} catch (Exception $e) {
-    $trash_count = 0;
-}
-
-echo "<div class='folder-header' data-folder='Trash'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fa-trash folder-icon'></i>";
-echo "<span class='folder-name'>Trash</span>";
-echo "<span class='folder-note-count' id='count-Trash'>(" . $trash_count . ")</span>";
-echo "</div></div>";
-
-// Render a dedicated "Tags" folder that links to the tag listing page
-// Count unique tags for the current workspace (non-trashed entries)
-$tag_count = 0;
-$unique_tags = [];
-try {
-    if (isset($con)) {
-        $query = "SELECT tags FROM entries WHERE trash = 0";
-        $params = [];
-        if (!empty($workspace_filter)) {
-            $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace_filter;
-            $params[] = $workspace_filter;
-        }
-        $stmtTags = $con->prepare($query);
-        $stmtTags->execute($params);
-        while ($r = $stmtTags->fetch(PDO::FETCH_ASSOC)) {
-        $parts = explode(',', $r['tags'] ?? '');
-            foreach ($parts as $p) {
-                $t = trim($p);
-                if ($t !== '' && !in_array($t, $unique_tags)) {
-                    $unique_tags[] = $t;
-                }
-            }
-        }
-        $tag_count = count($unique_tags);
-    }
-} catch (Exception $e) {
-    $tag_count = 0;
-}
-
-echo "<div class='folder-header' data-folder='Tags'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fa-tags folder-icon'></i>";
-echo "<span class='folder-name'>Tags</span>";
-echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
-echo "</div></div>";
-
 // If there is no Favorites folder in the list, render the separator here so it always appears
 if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
     echo "<div class='favorites-separator' aria-hidden='true'></div>";
