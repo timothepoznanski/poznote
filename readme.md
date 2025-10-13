@@ -292,7 +292,6 @@ Choose the update method that matches your deployment:
 
 <details>
 <summary><strong>Update Poznote (Docker/Self-hosted)</strong></summary>
-<br>
 
 1. Navigate to your Poznote directory
 
