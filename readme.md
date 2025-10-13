@@ -283,7 +283,8 @@ To change your Username or Password (not possible to change port), watch this vi
 
 ## Forgot your password
 
-Find it in your `.env` file.
+- **Docker/Self-hosted:** Find it in your `.env` file.
+- **Railway:** Watch [this video tutorial](https://youtu.be/_h5pP7LreZc) to see where to retrieve your password.
 
 ## Update Application to the latest version
 
