@@ -290,6 +290,12 @@ Find it in your `.env` file.
 
 You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
 
+Choose the update method that matches your deployment:
+
+<details>
+<summary><strong>Update Poznote (Docker/Self-hosted)</strong></summary>
+<br>
+
 To update Poznote to the latest version: 
 
 1. Navigate to your Poznote directory
@@ -313,6 +319,26 @@ To update Poznote to the latest version:
    ```bash
    docker compose up -d
    ```
+
+</details>
+
+<details>
+<summary><strong>Update Poznote on Railway</strong></summary>
+<br>
+
+To update your Poznote instance deployed on Railway:
+
+![update-poznote-on-railway](readme/update-poznote-on-railway.gif)
+
+1. Go to your Railway dashboard and select your Poznote project
+2. Click on the Poznote service
+3. Navigate to the **Settings** tab
+4. Scroll down to the **Service** section
+5. Click on **Redeploy** to pull and deploy the latest version
+
+Railway will automatically pull the latest Poznote image and redeploy your instance while preserving your data.
+
+</details>
 
 ## Multiple Instances
 
