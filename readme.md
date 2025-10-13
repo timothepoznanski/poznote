@@ -277,7 +277,7 @@ If you need to change your login, password or port (Docker/Self-hosted only), ch
 
 To change your Username or Password (not possible to change port), watch this video tutorial:
 
-![Watch the settings tutorial](https://youtu.be/_h5pP7LreZc)
+[Watch the settings tutorial](https://youtu.be/_h5pP7LreZc)
 
 </details>
 
