@@ -204,7 +204,7 @@ To start, simply click the button below to deploy in a minute and please make su
 
 Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
 
-[![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/Q22kqv82bHQ)
+[![Watch the deployment tutorial](https://img.youtube.com/vi/Q22kqv82bHQ/maxresdefault.jpg)](https://youtu.be/Q22kqv82bHQ)
 
 > You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
@@ -277,7 +277,7 @@ If you need to change your login, password or port (Docker/Self-hosted only), ch
 
 To change your Username or Password (not possible to change port), watch this video tutorial:
 
-[![Watch the settings tutorial](https://img.youtube.com/vi/_h5pP7LreZc/maxresdefault.jpg)](https://youtu.be/_h5pP7LreZc)
+![Watch the settings tutorial](https://youtu.be/_h5pP7LreZc)
 
 </details>
 
@@ -317,7 +317,7 @@ Choose the update method that matches your deployment:
 
 To update your Poznote instance deployed on Railway:
 
-![update-poznote-on-railway](https://youtu.be/Mhpk6gitul8)
+[update-poznote-on-railway](https://youtu.be/Mhpk6gitul8)
 
 1. Go to your Railway dashboard and select your Poznote project
 2. Click on the Poznote service
