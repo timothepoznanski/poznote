@@ -288,15 +288,11 @@ Find it in your `.env` file.
 
 ## Update Application to the latest version
 
-You can check if your application is up to date directly from the Poznote interface by using the **Settings → Check Updates** menu option.
-
 Choose the update method that matches your deployment:
 
 <details>
 <summary><strong>Update Poznote (Docker/Self-hosted)</strong></summary>
 <br>
-
-To update Poznote to the latest version: 
 
 1. Navigate to your Poznote directory
 
@@ -305,17 +301,12 @@ To update Poznote to the latest version:
    docker compose down
    ```
 
-3. Remove the local image to force download of the latest version:
-   ```bash
-   docker rmi ghcr.io/timothepoznanski/poznote:latest
-   ```
-
-4. Pull the latest image:
+3. Pull the latest image:
    ```bash
    docker compose pull
    ```
 
-5. Restart the container:
+4. Restart the container:
    ```bash
    docker compose up -d
    ```
