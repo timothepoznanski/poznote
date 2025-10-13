@@ -204,7 +204,7 @@ To start, simply click the button below to deploy in a minute and please make su
 
 Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
 
-[![Watch the deployment tutorial](https://img.youtube.com/vi/lWnMLnRKaVE/maxresdefault.jpg)](https://youtu.be/Q22kqv82bHQ)
+[Watch the deployment tutorial](https://youtu.be/Q22kqv82bHQ)
 
 > You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
@@ -250,7 +250,10 @@ Access your Poznote instance at:
 
 ## Change Settings
 
- If you need to change your login, password or port:
+If you need to change your login, password or port (Docker/Self-hosted only), choose the method that matches your deployment:
+
+<details>
+<summary><strong>Change Settings on a Docker/Self-hosted instance</strong></summary>
 
 1. Navigate to your Poznote directory
 
@@ -266,6 +269,18 @@ Access your Poznote instance at:
    docker compose up -d
    ```
 
+</details>
+
+<details>
+<summary><strong>Change Settings on Railway</strong></summary>
+<br>
+
+To change your Username or Password (not possible to change port), watch this video tutorial:
+
+[Change Settings on Railway](https://youtu.be/_h5pP7LreZc)
+
+</details>
+
 ## Forgot your password
 
 Find it in your `.env` file.
@@ -275,7 +290,7 @@ Find it in your `.env` file.
 Choose the update method that matches your deployment:
 
 <details>
-<summary><strong>Update Poznote (Docker/Self-hosted)</strong></summary>
+<summary><strong>Update Poznote on a Docker/Self-hosted instance</strong></summary>
 
 1. Navigate to your Poznote directory
 
@@ -302,7 +317,7 @@ Choose the update method that matches your deployment:
 
 To update your Poznote instance deployed on Railway:
 
-![update-poznote-on-railway](readme/update-poznote-on-railway.gif)
+[update-poznote-on-railway](https://youtu.be/Mhpk6gitul8)
 
 1. Go to your Railway dashboard and select your Poznote project
 2. Click on the Poznote service
