@@ -99,11 +99,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell and run the following commands:
 
 ```powershell
-mkdir poznote
-```
-
-```powershell
-cd poznote
+mkdir poznote && cd poznote
 ```
 
 ```powershell
@@ -133,11 +129,7 @@ services:
 ```
 
 ```powershell
-docker compose pull
-```
-
-```powershell
-docker compose up -d
+docker compose pull && docker compose up -d
 ```
 
 </details>
@@ -155,11 +147,7 @@ docker compose up -d
 Open a Terminal and run the following commands:
 
 ```bash
-mkdir poznote
-```
-
-```bash
-cd poznote
+mkdir poznote && cd poznote
 ```
 
 ```bash
@@ -189,11 +177,7 @@ EOF
 ```
 
 ```bash
-docker compose pull
-```
-
-```bash
-docker compose up -d
+docker compose pull && docker compose up -d
 ```
 
 </details>
