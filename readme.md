@@ -299,12 +299,17 @@ To update Poznote to the latest version:
    docker compose down
    ```
 
-3. Pull the latest image
+3. Remove the local image to force download of the latest version:
+   ```bash
+   docker rmi ghcr.io/timothepoznanski/poznote:latest
+   ```
+
+4. Pull the latest image:
    ```bash
    docker compose pull
    ```
 
-4. Restart the container:
+5. Restart the container:
    ```bash
    docker compose up -d
    ```
