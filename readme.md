@@ -204,7 +204,7 @@ To start, simply click the button below to deploy in a minute and please make su
 
 Video tutorial to set up a Poznote instance on Railway in 2 minutes only:
 
-[![Watch the deployment tutorial](https://img.youtube.com/vi/Q22kqv82bHQ/maxresdefault.jpg)](https://youtu.be/Q22kqv82bHQ)
+[Watch the deployment tutorial](https://youtu.be/Q22kqv82bHQ)
 
 > You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
