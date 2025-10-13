@@ -250,10 +250,10 @@ Access your Poznote instance at:
 
 ## Change Settings
 
-If you need to change your login, password or port (Docker/Self-hosted only), Choose the method that matches your deployment:
+If you need to change your login, password or port (Docker/Self-hosted only), choose the method that matches your deployment:
 
 <details>
-<summary><strong>Change Settings (Docker/Self-hosted)</strong></summary>
+<summary><strong>Change Settings on a Docker/Self-hosted instance</strong></summary>
 
 To change your Username, Password or Port:
 
@@ -277,7 +277,7 @@ To change your Username, Password or Port:
 <summary><strong>Change Settings on Railway</strong></summary>
 <br>
 
-To change your Username or Password, watch this video tutorial:
+To change your Username or Password (not possible to change port), watch this video tutorial:
 
 [![Watch the settings tutorial](https://img.youtube.com/vi/_h5pP7LreZc/maxresdefault.jpg)](https://youtu.be/_h5pP7LreZc)
 
@@ -292,7 +292,7 @@ Find it in your `.env` file.
 Choose the update method that matches your deployment:
 
 <details>
-<summary><strong>Update Poznote (Docker/Self-hosted)</strong></summary>
+<summary><strong>Update Poznote on a Docker/Self-hosted instance</strong></summary>
 
 1. Navigate to your Poznote directory
 
