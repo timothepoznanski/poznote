@@ -11,7 +11,7 @@ Both options give you complete control over your data with zero vendor lock-in.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Access Your Instance](#access-your-instance)
+- [Access Poznote](#access-poznote)
 - [Change Settings](#change-settings)
 - [Forgot Your Password](#forgot-your-password)
 - [Update to Latest Version](#update-to-latest-version)
@@ -19,7 +19,7 @@ Both options give you complete control over your data with zero vendor lock-in.
 
 ## Installation
 
-Choose your preferred installation method below. Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting like Railway.
+Choose your preferred installation method below. Docker makes it simple to run Poznote on Windows or Linux.
 
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
@@ -33,11 +33,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell and run the following commands:
 
 ```powershell
-mkdir poznote
-```
-
-```powershell
-cd poznote
+mkdir poznote && cd poznote
 ```
 
 ```powershell
@@ -63,16 +59,11 @@ services:
       - "`${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
 ```powershell
-docker compose pull
-```
-
-```powershell
-docker compose up -d
+docker compose pull && docker compose up -d
 ```
 
 </details>
@@ -90,11 +81,7 @@ docker compose up -d
 Open a Terminal and run the following commands:
 
 ```bash
-mkdir poznote
-```
-
-```bash
-cd poznote
+mkdir poznote && cd poznote
 ```
 
 ```bash
@@ -120,21 +107,16 @@ services:
       - "${HTTP_WEB_PORT}:80"
     volumes:
       - "./data:/var/www/html/data"
-    command: /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
 EOF
 ```
 
 ```bash
-docker compose pull
-```
-
-```bash
-docker compose up -d
+docker compose pull && docker compose up -d
 ```
 
 </details>
 
-## Access Your Instance
+## Access Poznote
 
 After installation, access Poznote in your web browser:
 
@@ -151,19 +133,9 @@ After installation, access Poznote in your web browser:
 
 To modify your username, password, or port:
 
-### Step 1: Navigate to Your Poznote Directory
-
 ```bash
-cd poznote
+cd poznote && docker compose down
 ```
-
-### Step 2: Stop the Container
-
-```bash
-docker compose down
-```
-
-### Step 3: Edit Your `.env` File
 
 Edit the `.env` file with your preferred text editor and modify the values:
 
@@ -172,8 +144,6 @@ POZNOTE_USERNAME=your_new_username
 POZNOTE_PASSWORD=your_new_password
 HTTP_WEB_PORT=8040
 ```
-
-### Step 4: Restart the Container
 
 ```bash
 docker compose up -d
@@ -193,25 +163,17 @@ To retrieve your password:
 
 To update Poznote to the latest version:
 
-### Step 1: Navigate to Your Poznote Directory
-
 ```bash
 cd poznote
 ```
-
-### Step 2: Stop the Container
 
 ```bash
 docker compose down
 ```
 
-### Step 3: Pull the Latest Image
-
 ```bash
 docker compose pull
 ```
-
-### Step 4: Restart the Container
 
 ```bash
 docker compose up -d
