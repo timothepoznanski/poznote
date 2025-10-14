@@ -89,7 +89,7 @@ To update your Poznote instance to the latest version:
 
 **Video Tutorial**
 
-**[Update Poznote on Railway](https://youtu.be/Mhpk6gitul8)**
+**[Update Poznote on Railway](https://youtu.be/jbUlCEWndoo)**
 
 Railway will automatically:
 - Pull the latest Poznote image
