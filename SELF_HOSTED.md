@@ -1,6 +1,12 @@
-# Poznote - Self-Hosted Installation Guide
+# Poznote - Self-Hosted Guide
 
 This guide will help you deploy Poznote on your own machine or server using Docker.
+
+With self-hosting, you have two options:
+- **🏠 Local deployment**: Keep your notes on your own computer (Windows/Linux) for complete privacy
+- **🌍 Server deployment**: Deploy on an internet-connected server (VPS, cloud VM, etc.) to access your notes from anywhere (phone, laptop, tablet)
+
+Both options give you complete control over your data with zero vendor lock-in.
 
 ## Table of Contents
 
@@ -9,6 +15,7 @@ This guide will help you deploy Poznote on your own machine or server using Dock
   - [Windows](#windows)
   - [Linux](#linux)
 - [Access Your Instance](#access-your-instance)
+- [Multiple Instances](#multiple-instances)
 - [Change Settings](#change-settings)
 - [Forgot Your Password](#forgot-your-password)
 - [Update to Latest Version](#update-to-latest-version)
@@ -133,6 +140,106 @@ After installation, access Poznote in your web browser:
 
 > ⚠️ **Important:** Change these default credentials after your first login!
 
+## Multiple Instances
+
+You can run multiple isolated Poznote instances on the same server. Each instance has its own data, port, and credentials.
+
+### Why Multiple Instances?
+
+Perfect for:
+- Different family members with separate accounts
+- Separating personal and work notes
+- Testing new features without affecting production
+- Hosting for multiple users on the same server
+
+### Example: Tom and Alice instances on the same server
+
+```
+Server: my-server.com
+├── Poznote-Tom
+│   ├── Port: 8040
+│   ├── URL: http://my-server.com:8040
+│   ├── Container: poznote-tom-webserver-1
+│   └── Data: ./poznote-tom/data/
+│
+└── Poznote-Alice
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
+    ├── Container: poznote-alice-webserver-1
+    └── Data: ./poznote-alice/data/
+```
+
+### How to Deploy Multiple Instances
+
+Simply repeat the installation steps in different directories with different ports.
+
+#### Example: Creating Tom's instance
+
+```bash
+mkdir poznote-tom && cd poznote-tom
+
+cat <<EOF > .env
+POZNOTE_USERNAME=tom
+POZNOTE_PASSWORD=tom_password123!
+HTTP_WEB_PORT=8040
+EOF
+
+cat <<'EOF' > docker-compose.yml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+EOF
+
+docker compose pull && docker compose up -d
+```
+
+#### Example: Creating Alice's instance
+
+```bash
+cd .. # Go back to parent directory
+mkdir poznote-alice && cd poznote-alice
+
+cat <<EOF > .env
+POZNOTE_USERNAME=alice
+POZNOTE_PASSWORD=alice_password123!
+HTTP_WEB_PORT=8041
+EOF
+
+cat <<'EOF' > docker-compose.yml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+EOF
+
+docker compose pull && docker compose up -d
+```
+
+Now you have two completely isolated instances:
+- Tom's Poznote: http://localhost:8040
+- Alice's Poznote: http://localhost:8041
+
+> 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
+
 ## Change Settings
 
 To modify your username, password, or port:
@@ -204,26 +311,3 @@ docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
-
----
-
-## Custom Cloud Deployment
-
-If you prefer using another cloud service that supports Docker, most platforms accept Docker commands with environment variables. Use the following command:
-
-```bash
-docker run -d \
-  --name poznote-webserver \
-  --restart always \
-  -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
-  -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin123! \
-  -e HTTP_WEB_PORT=8040 \
-  -p 8040:80 \
-  -v ./data:/var/www/html/data \
-  ghcr.io/timothepoznanski/poznote:latest
-```
-
----
-
-**Need help?** Check the [main README](README.md) for more information or open an issue on GitHub.

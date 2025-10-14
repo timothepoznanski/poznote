@@ -12,7 +12,6 @@
 - [Try Poznote](#try-poznote)
 - [Tech Stack](#tech-stack)
 - [Installation](#installation)
-- [Multiple Instances](#multiple-instances)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [API Documentation](#api-documentation)
@@ -83,49 +82,22 @@ Choose your deployment method:
 
 Deploy Poznote on your own machine or server using Docker. Perfect for:
 - ✅ Complete control over your data
-- ✅ Local or private server deployment
+- ✅ Keep notes locally on your machine OR deploy on a server for remote access
+- ✅ Access from anywhere when deployed on an internet-connected server
 - ✅ Windows, Linux, or custom cloud providers
 
-**👉 [View Self-Hosted Installation Guide](SELF_HOSTED.md)**
+**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-### ☁️ Railway (Cloud)
+### ☁️ Cloud Platforms
 
-Deploy Poznote on Railway.com with one click. Perfect for:
-- ✅ No server management
-- ✅ Automated deployments
-- ✅ Access from anywhere
+Deploy Poznote on cloud platforms without managing infrastructure. Perfect for:
+- ✅ No server, network, certificate, or storage management
+- ✅ Automated deployments and updates
+- ✅ Quick setup without infrastructure configuration
+- ✅ Railway (one-click) or other providers (DigitalOcean, Render, Fly.io, etc.)
 
-**👉 [View Railway Installation Guide](RAILWAY.md)**
+**👉 [View Cloud Deployment Guide](CLOUD.md)**
 
----
-
-Both guides include complete instructions for:
-- Installation and setup
-- Accessing your instance
-- Changing settings (username, password, port)
-- Password recovery
-- Updating to the latest version
-
-## Multiple Instances
-
-You can run multiple isolated Poznote instances on the same server. Just deploy new instances with different names and ports.
-
-### Example: Tom and Alice instances on the same server
-
-```
-Server: my-server.com
-├── Poznote-Tom
-│   ├── Port: 8040
-│   ├── URL: http://my-server.com:8040
-│   ├── Container: poznote-tom-webserver-1
-│   └── Data: ./poznote-tom/data/
-│
-└── Poznote-Alice
-    ├── Port: 8041
-    ├── URL: http://my-server.com:8041
-    ├── Container: poznote-alice-webserver-1
-    └── Data: ./poznote-alice/data/
-```
 
 ## Backup and Restore
 
