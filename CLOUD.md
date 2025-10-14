@@ -10,7 +10,6 @@ This guide will help you deploy Poznote on cloud platforms without managing your
 ## Table of Contents
 
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
-  - [Railway Prerequisites](#railway-prerequisites)
   - [Poznote Installation on Railway](#poznote-installation-on-railway)
   - [Access Poznote](#access-poznote)
   - [Poznote Settings](#poznote-settings)
@@ -28,20 +27,9 @@ Railway.com offers the easiest way to deploy Poznote in the cloud. The platform 
 - Easy scaling
 - No infrastructure management
 
-### Railway Prerequisites
-
-Create a Railway account at [Railway.com](https://railway.com):
-
-**Option A: Sign up with GitHub**
-- Get **one month of free usage**
-- Seamless integration with the deployment template
-
-**Option B: Sign up with Email**
-- Choose the **$5/month plan**
-
-![railway-login](readme/railway-login.png)
-
 ### Poznote Installation on Railway
+
+Create a Railway account at [Railway.com](https://railway.com) and choose the **$5/month plan**
 
 For a **ready-to-use setup**, use the official Poznote template on Railway.
 
@@ -52,12 +40,6 @@ Click the button below to start the deployment:
 Watch this 2-minute video tutorial that guides you through the entire deployment process:
 
 **[Watch the deployment tutorial](https://youtu.be/Q22kqv82bHQ)**
-
-The video shows you:
-- How to deploy Poznote in one click
-- How to configure your environment variables
-- How to get your instance URL
-- How to access your Poznote instance
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
