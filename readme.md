@@ -78,26 +78,9 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Choose your deployment method:
 
-### 🖥️ Self-Hosted (Windows or Linux)
+- 🖥️ Deploy Poznote on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-Deploy Poznote on your own machine or server:
-- Complete control over your data
-- Keep notes locally on your machine OR deploy on a server for remote access
-- Access from anywhere when deployed on an internet-connected server
-- Windows or Linux
-
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
-
-### ☁️ Cloud Platforms
-
-Deploy Poznote on cloud platforms without managing infrastructure:
-- No server, network, certificate, or storage management
-- Automated deployments and updates
-- Quick setup without infrastructure configuration
-- Railway (one-click) or other providers (DigitalOcean, Render, Fly.io, etc.)
-
-**👉 [View Cloud Deployment Guide](CLOUD.md)**
-
+- ☁️ Deploy Poznote on cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
 ## Backup and Restore
 
@@ -119,12 +102,6 @@ Upload the complete backup ZIP to restore everything:
   - Works for all workspaces at once
 
 ⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files. 
-
-🔒 Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
-
-- **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
-- **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)
-- **Purpose:** Allows recovery if import fails or data needs to be rolled back
 
 ## Offline View
 
