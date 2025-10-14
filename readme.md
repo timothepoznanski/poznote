@@ -5,6 +5,24 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Try Poznote](#try-poznote)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Access Your Instance](#access-your-instance)
+- [Change Settings](#change-settings)
+- [Forgot your password](#forgot-your-password)
+- [Update Application to the latest version](#update-application-to-the-latest-version)
+- [Multiple Instances](#multiple-instances)
+- [Backup and Restore](#backup-and-restore)
+- [Offline View](#offline-view)
+- [API Documentation](#api-documentation)
+
+## Introduction
+
 Poznote is a lightweight, self-hosted note-taking application. Deploying Poznote gives you complete control over your data with zero vendor lock-in. Notes are stored as plain HTML files, making them readable even without the application. The platform requires minimal resources while offering powerful features like rich text editing, tagging, workspaces, file attachments, and a full REST API. Perfect for individuals who value privacy and data ownership.
 
 ![poznote](readme/poznote.png)
@@ -33,19 +51,6 @@ A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-dem
 Username: `poznote`
 <br>
 Password: `poznote`
-
-## Table of Contents
-
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Access Your Instance](#access-your-instance)
-- [Change Settings](#change-settings)
-- [Forgot your password](#forgot-your-password)
-- [Update Application to the latest version](#update-application-to-the-latest-version)
-- [Multiple Instances](#multiple-instances)
-- [Backup and Restore](#backup-and-restore)
-- [Offline View](#offline-view)
-- [API Documentation](#api-documentation)
 
 ## Tech Stack
 
@@ -283,7 +288,8 @@ To change your Username or Password (not possible to change port), watch this vi
 
 ## Forgot your password
 
-Find it in your `.env` file.
+- **Docker/Self-hosted:** Find it in your `.env` file.
+- **Railway:** Watch [this video tutorial](https://youtu.be/_h5pP7LreZc) to see where to retrieve your password.
 
 ## Update Application to the latest version
 
