@@ -5,7 +5,6 @@ This guide will help you deploy Poznote on cloud platforms without managing your
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Choose Your Cloud Platform](#choose-your-cloud-platform)
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
   - [Railway Prerequisites](#railway-prerequisites)
   - [Railway Installation](#railway-installation)
@@ -27,27 +26,10 @@ Cloud deployment allows you to run Poznote without managing servers or infrastru
 - ✅ Access from anywhere
 - ✅ Built-in monitoring and logging
 
-## Choose Your Cloud Platform
-
-### 🚂 Railway (Recommended for beginners)
-- One-click deployment
-- Free tier available
-- Automated deployments
-- Minimal configuration required
-
-### ☁️ Other Cloud Providers
-- More flexibility and control
-- Choose your preferred cloud provider
-- Generic Docker deployment
-- Requires more configuration
-
----
-
 ## Option 1: Railway (Recommended)
 
 Railway.com offers the easiest way to deploy Poznote in the cloud. The platform provides:
 - ✅ Automated deployments from GitHub
-- ✅ Free tier available (with GitHub account)
 - ✅ Automatic HTTPS
 - ✅ Easy scaling
 - ✅ No infrastructure management
@@ -302,19 +284,3 @@ When deploying to custom cloud providers, keep these important points in mind:
 - ✅ Always change default credentials after deployment
 - ✅ Use strong passwords
 - ✅ Configure environment variables securely (use platform's secret management)
-
----
-
-## Data Ownership & Portability
-
-Regardless of which cloud platform you choose, your data remains yours:
-
-- ✅ Export your complete backup anytime from Poznote's Settings
-- ✅ The backup ZIP contains all notes, attachments, and database
-- ✅ Easily migrate between platforms (Railway → DigitalOcean, Cloud → Self-hosted, etc.)
-- ✅ Notes are stored as plain HTML files - readable without Poznote
-- ✅ Zero vendor lock-in
-
----
-
-**Need help?** Check the [main README](README.md) for more information or open an issue on GitHub.
