@@ -77,18 +77,17 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 ### Infrastructure
 - **Apache HTTP Server** - Web server
 - **Docker** - Containerization for easy deployment and portability
-- **Docker Compose** - Multi-container orchestration
 </details>
 
 ## Installation
 
 Docker makes it simple to run Poznote on any platform - Windows, Linux, or cloud hosting.
 
-1. Use the `Windows method` to keep your notes locally on your Windows computer.
+1. Use the `Windows install method` to keep your notes locally on your Windows computer.
 
-2. Use the `Linux method` to run Poznote either locally on your own machine (WSL, VirtualBox, Linux PC, etc.) to keep your notes private, or on a Linux server connected to the internet to access your notes securely from any device (phone, laptop, desktop, etc.).
+2. Use the `Linux install method` to run Poznote either locally on your own machine (WSL, VirtualBox, Linux machine, etc.) to keep your notes private, or on a Linux server connected to the internet to access your notes securely from any device (phone, laptop, desktop, etc.).
 
-3. Use the `Cloud method` if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
+3. Use the `Cloud install method` if you want to access Poznote from anywhere without managing your own server, with automated deployments and easy scaling.
 
 Choose your preferred installation method below:
 
@@ -231,8 +230,7 @@ docker run -d \
   -e HTTP_WEB_PORT=8040 \
   -p 8040:80 \
   -v ./data:/var/www/html/data \
-  ghcr.io/timothepoznanski/poznote:latest \
-  /bin/sh -c "chmod 755 /var/www/html && chown -R www-data:www-data /var/www/html/data && chmod -R 775 /var/www/html/data && apache2-foreground"
+  ghcr.io/timothepoznanski/poznote:latest
 ```
 
 </details>
@@ -240,6 +238,9 @@ docker run -d \
 </details>
 
 ## Access Your Instance
+
+<details>
+<summary><strong>Access Poznote (Docker/Self-hosted)</strong></summary>
 
 Use the credentials from .env file:
 
@@ -252,6 +253,20 @@ If you want to change them, see the [Change Settings](#change-settings) section.
 Access your Poznote instance at: 
 
 [http://localhost:8040](http://localhost:8040)
+
+</details>
+
+<details>
+<summary><strong>Access Poznote (Railway)</strong></summary>
+
+Use the credentials from variables set in Raleway service:
+
+- Default Username: `admin`
+- Default Password: `admin123!`
+
+[Watch the end of the deployment tutorial to see how to get the url address](https://youtu.be/Q22kqv82bHQ)
+
+</details>
 
 ## Change Settings
 
