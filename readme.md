@@ -103,12 +103,6 @@ Upload the complete backup ZIP to restore everything:
 
 ⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files. 
 
-🔒 Every time you import/restore a database through the web interface, Poznote automatically creates a backup of your current database before proceeding.
-
-- **Location:** `data/database/poznote.db.backup.YYYY-MM-DD_HH-MM-SS`
-- **Format:** Timestamped backup files (e.g., `poznote.db.backup.2025-08-15_14-36-19`)
-- **Purpose:** Allows recovery if import fails or data needs to be rolled back
-
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.

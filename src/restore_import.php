@@ -179,12 +179,6 @@ function restoreDatabaseFromFile($sqlFile) {
     
     $dbPath = SQLITE_DATABASE;
     
-    // First, backup current database
-    $backupPath = $dbPath . '.backup.' . date('Y-m-d_H-i-s');
-    if (file_exists($dbPath)) {
-        copy($dbPath, $backupPath);
-    }
-    
     // Remove current database
     if (file_exists($dbPath)) {
         unlink($dbPath);
@@ -309,12 +303,6 @@ function restoreBackup($uploadedFile) {
     }
     
     $dbPath = SQLITE_DATABASE;
-    
-    // First, backup current database
-    $backupPath = $dbPath . '.backup.' . date('Y-m-d_H-i-s');
-    if (file_exists($dbPath)) {
-        copy($dbPath, $backupPath);
-    }
     
     // Remove current database
     if (file_exists($dbPath)) {
@@ -526,12 +514,6 @@ function importAttachmentsZip($uploadedFile) {
                     <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
                 </div>
             </form>
-            
-            <div class="info-box" style="background: #e3f2fd; border: 1px solid #1976d2; border-radius: 4px; padding: 12px; margin: 15px 0; font-size: 14px;">
-                
-                <strong>Automatic Backup:</strong> Your current database will be automatically backed up before restore. 
-                Backup files are stored in <code>data/database/</code> with format <code>poznote.db.backup.YYYY-MM-DD_HH-MM-SS</code>.
-            </div>
         </div>
         
         <!-- Bottom padding for better spacing -->
