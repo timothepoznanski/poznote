@@ -20,19 +20,19 @@ This guide will help you deploy Poznote on cloud platforms without managing your
 ## Introduction
 
 Cloud deployment allows you to run Poznote without managing servers or infrastructure. Benefits include:
-- ✅ No server maintenance
-- ✅ Automatic HTTPS and domain management
-- ✅ Easy scaling and updates
-- ✅ Access from anywhere
-- ✅ Built-in monitoring and logging
+- No server maintenance
+- Automatic HTTPS and domain management
+- Easy scaling and updates
+- Access from anywhere
+- Built-in monitoring and logging
 
 ## Option 1: Railway (Recommended)
 
 Railway.com offers the easiest way to deploy Poznote in the cloud. The platform provides:
-- ✅ Automated deployments from GitHub
-- ✅ Automatic HTTPS
-- ✅ Easy scaling
-- ✅ No infrastructure management
+- Automated deployments from GitHub
+- Automatic HTTPS
+- Easy scaling
+- No infrastructure management
 
 ### Railway Prerequisites
 

@@ -78,23 +78,23 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Choose your deployment method:
 
-### 🖥️ Self-Hosted (Docker)
+### 🖥️ Self-Hosted
 
-Deploy Poznote on your own machine or server using Docker. Perfect for:
-- ✅ Complete control over your data
-- ✅ Keep notes locally on your machine OR deploy on a server for remote access
-- ✅ Access from anywhere when deployed on an internet-connected server
-- ✅ Windows, Linux, or custom cloud providers
+Deploy Poznote on your own machine or server:
+- Complete control over your data
+- Keep notes locally on your machine OR deploy on a server for remote access
+- Access from anywhere when deployed on an internet-connected server
+- Windows or Linux
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 ### ☁️ Cloud Platforms
 
-Deploy Poznote on cloud platforms without managing infrastructure. Perfect for:
-- ✅ No server, network, certificate, or storage management
-- ✅ Automated deployments and updates
-- ✅ Quick setup without infrastructure configuration
-- ✅ Railway (one-click) or other providers (DigitalOcean, Render, Fly.io, etc.)
+Deploy Poznote on cloud platforms without managing infrastructure:
+- No server, network, certificate, or storage management
+- Automated deployments and updates
+- Quick setup without infrastructure configuration
+- Railway (one-click) or other providers (DigitalOcean, Render, Fly.io, etc.)
 
 **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
