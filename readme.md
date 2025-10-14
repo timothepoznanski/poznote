@@ -78,14 +78,9 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Choose your deployment method:
 
-### 🖥️ Self-Hosted (Windows or Linux)
+### 🖥️ Deploy Poznote on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-Deploy Poznote on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
-
-### ☁️ Cloud Platforms
-
-Deploy Poznote on cloud platforms without managing infrastructure **👉 [View Cloud Deployment Guide](CLOUD.md)**
-
+### ☁️ Deploy Poznote on cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
 ## Backup and Restore
 
