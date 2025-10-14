@@ -2,9 +2,15 @@
 
 This guide will help you deploy Poznote on cloud platforms without managing your own infrastructure.
 
+Cloud deployment allows you to run Poznote without managing servers or infrastructure. Benefits include:
+- No server maintenance
+- Automatic HTTPS and domain management
+- Easy scaling and updates
+- Access from anywhere
+- Built-in monitoring and logging
+
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
   - [Railway Prerequisites](#railway-prerequisites)
   - [Poznote Installation on Railway](#poznote-installation-on-railway)
@@ -15,15 +21,6 @@ This guide will help you deploy Poznote on cloud platforms without managing your
 - [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
   - [Generic Docker Deployment](#generic-docker-deployment)
   - [Key Considerations](#key-considerations)
-
-## Introduction
-
-Cloud deployment allows you to run Poznote without managing servers or infrastructure. Benefits include:
-- No server maintenance
-- Automatic HTTPS and domain management
-- Easy scaling and updates
-- Access from anywhere
-- Built-in monitoring and logging
 
 ## Option 1: Railway (Recommended)
 

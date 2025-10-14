@@ -164,19 +164,7 @@ To retrieve your password:
 To update Poznote to the latest version:
 
 ```bash
-cd poznote
-```
-
-```bash
-docker compose down
-```
-
-```bash
-docker compose pull
-```
-
-```bash
-docker compose up -d
+cd poznote && docker compose down && docker compose pull && docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
