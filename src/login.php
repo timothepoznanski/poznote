@@ -98,10 +98,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             <button type="submit" class="login-button">Login</button>
         </form>
             <p class="github-link">
-                <a href="https://github.com/timothepoznanski/poznote#forgot-your-password" target="_blank">
-                    Forgot your password?
+                <a href="https://github.com/timothepoznanski/poznote" target="_blank">
+                    Poznote documentation
                 </a>
+            </p>
         </div>
-    </div>
 </body>
 </html>
