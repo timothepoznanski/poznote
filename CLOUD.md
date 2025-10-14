@@ -73,21 +73,6 @@ The video shows you:
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
-#### Manual Railway Setup
-
-If you prefer to deploy manually on Railway:
-
-1. Go to your [Railway dashboard](https://railway.app/dashboard)
-2. Click **"New Project"**
-3. Select **"Deploy from GitHub repo"** or **"Empty Project"**
-4. Configure the following environment variables:
-   - `SQLITE_DATABASE=/var/www/html/data/database/poznote.db`
-   - `POZNOTE_USERNAME=admin`
-   - `POZNOTE_PASSWORD=admin123!`
-5. Set the Docker image: `ghcr.io/timothepoznanski/poznote:latest`
-6. Add a volume mount: `./data:/var/www/html/data`
-7. Deploy the service
-
 ### Railway Access
 
 After deployment is complete:
@@ -110,7 +95,7 @@ Or watch the end of the [deployment tutorial video](https://youtu.be/Q22kqv82bHQ
 
 > ⚠️ **Important:** Change these default credentials after your first login!
 
-Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app`
+Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/Q22kqv82bHQ) to see how to. 
 
 ### Railway Settings
 
