@@ -80,23 +80,11 @@ Choose your deployment method:
 
 ### 🖥️ Self-Hosted (Windows or Linux)
 
-Deploy Poznote on your own machine or server:
-- Complete control over your data
-- Keep notes locally on your machine OR deploy on a server for remote access
-- Access from anywhere when deployed on an internet-connected server
-- Windows or Linux
-
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+Deploy Poznote on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 ### ☁️ Cloud Platforms
 
-Deploy Poznote on cloud platforms without managing infrastructure:
-- No server, network, certificate, or storage management
-- Automated deployments and updates
-- Quick setup without infrastructure configuration
-- Railway (one-click) or other providers (DigitalOcean, Render, Fly.io, etc.)
-
-**👉 [View Cloud Deployment Guide](CLOUD.md)**
+Deploy Poznote on cloud platforms without managing infrastructure **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
 
 ## Backup and Restore
