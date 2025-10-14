@@ -1,8 +1,6 @@
 # Poznote - Cloud Deployment Guide
 
-This guide will help you deploy Poznote on cloud platforms without managing your own infrastructure.
-
-Cloud deployment allows you to run Poznote without managing servers or infrastructure. Benefits include:
+This guide will help you deploy Poznote on cloud platforms without managing your own infrastructure. Benefits include:
 - No server maintenance
 - Automatic HTTPS and domain management
 - Easy scaling and updates
