@@ -111,4 +111,221 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-Access the **Swagger UI documentation** directly from Poznote in `Settings > API Documentation`.
+### 📚 Interactive Documentation (Swagger)
+
+Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
+
+### 📖 Command Line Examples (Curl)
+
+Ready-to-use curl commands for every API operation.
+
+<details>
+<summary><strong>📝 Notes Management</strong></summary>
+<br>
+
+**List Notes**
+```bash
+# List all notes
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_notes.php
+
+# Filter by workspace
+curl -u 'username:password' \
+  "http://YOUR_SERVER/src/api_list_notes.php?workspace=Personal"
+```
+
+**Create Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "heading": "My New Note",
+    "entrycontent": "This is the content of my note",
+    "tags": "work,important",
+    "folder_name": "Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_create_note.php
+```
+
+**Update Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 123,
+    "heading": "Updated Title",
+    "entrycontent": "Updated content",
+    "tags": "work,updated",
+    "folder": "Projects"
+  }' \
+  http://YOUR_SERVER/src/api_update_note.php
+```
+
+**Delete Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123}' \
+  http://YOUR_SERVER/src/api_delete_note.php
+```
+
+**Move Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "note_id": 123,
+    "folder_name": "Archive",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_move_note.php
+```
+
+**Share Note**
+```bash
+# Enable sharing
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "shared": 1}' \
+  http://YOUR_SERVER/src/api_share_note.php
+```
+
+</details>
+
+<details>
+<summary><strong>🗑️ Trash Management</strong></summary>
+<br>
+
+**List Trash**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_trash.php
+```
+
+**Restore Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123}' \
+  http://YOUR_SERVER/src/api_restore_note.php
+```
+
+</details>
+
+<details>
+<summary><strong>📁 Folders Management</strong></summary>
+<br>
+
+**Create Folder**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "My Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_create_folder.php
+```
+
+**Delete Folder**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "Old Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_delete_folder.php
+```
+
+</details>
+
+<details>
+<summary><strong>🗂️ Workspaces Management</strong></summary>
+<br>
+
+**List Workspaces**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_workspaces.php
+```
+
+</details>
+
+<details>
+<summary><strong>🏷️ Tags Management</strong></summary>
+<br>
+
+**List Tags**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_tags.php
+```
+
+**Apply Tags**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 123,
+    "tags": "work,urgent,meeting"
+  }' \
+  http://YOUR_SERVER/src/api_apply_tags.php
+```
+
+</details>
+
+<details>
+<summary><strong>⭐ Favorites Management</strong></summary>
+<br>
+
+**Add to Favorites**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "favorite": 1}' \
+  http://YOUR_SERVER/src/api_favorites.php
+```
+
+**Remove from Favorites**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "favorite": 0}' \
+  http://YOUR_SERVER/src/api_favorites.php
+```
+
+</details>
+
+<details>
+<summary><strong>📎 Attachments Management</strong></summary>
+<br>
+
+**List Attachments**
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/src/api_attachments.php?note_id=123"
+```
+
+**Upload Attachment**
+```bash
+curl -X POST -u 'username:password' \
+  -F "note_id=123" \
+  -F "file=@/path/to/file.pdf" \
+  http://YOUR_SERVER/src/api_attachments.php
+```
+
+</details>
+
+<details>
+<summary><strong>ℹ️ System Information</strong></summary>
+<br>
+
+**Check Version**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_version.php
+```
+
+</details>
