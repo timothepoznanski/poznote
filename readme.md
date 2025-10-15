@@ -121,6 +121,8 @@ Settings > API Documentation
 
 ### 📖 Command Line Examples
 
+Ready-to-use curl commands for every API operation: notes, folders, workspaces, tags, favorites, attachments, and system information.
+
 <details>
 <summary><strong>📝 Notes Management</strong></summary>
 
@@ -323,5 +325,3 @@ curl -u 'username:password' \
 ```
 
 </details>
-
-Ready-to-use curl commands for every API operation: notes, folders, workspaces, tags, favorites, attachments, and system information.
