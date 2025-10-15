@@ -35,7 +35,7 @@ requireAuth();
     <script>
         window.onload = function() {
             SwaggerUIBundle({
-                url: "openapi.yaml",
+                url: "openapi.yaml?v=<?php echo time(); ?>",
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
