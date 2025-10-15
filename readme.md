@@ -111,8 +111,6 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
----
-
 ### 📚 Interactive Documentation
 
 Access the **Swagger UI** directly from Poznote:
@@ -123,8 +121,6 @@ Settings > API Documentation
 
 Browse all endpoints, view request/response schemas, and test API calls interactively.
 
----
-
 ### 🔐 Authentication
 
 All API requests require authentication:
@@ -134,10 +130,8 @@ All API requests require authentication:
 | **Basic Auth** | Username and password via HTTP Basic Auth |
 | **Session Cookie** | PHP session (for browser-based requests) |
 
----
-
 ### 📖 Command Line Examples
 
-**[➤ View complete curl examples for all endpoints](http://YOUR_SERVER/src/api-docs/curl-examples.html)**
+[View complete curl examples for all endpoints](http://YOUR_SERVER/src/api-docs/curl-examples.html)
 
 Ready-to-use curl commands for every API operation: notes, folders, workspaces, tags, favorites, attachments, and system information.
