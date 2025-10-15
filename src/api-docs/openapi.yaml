@@ -16,7 +16,7 @@ info:
     url: https://github.com/timothepoznanski/poznote
 
 servers:
-  - url: .
+  - url: ..
     description: Current server
 
 tags:
