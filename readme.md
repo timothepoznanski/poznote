@@ -111,11 +111,4 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-Access the **Swagger UI documentation** from `Settings > API Documentation` or at:
-
-```
-http://YOUR_SERVER:HTTP_WEB_PORT/src/api_docs.php
-```
-
-
-
+Access the **Swagger UI documentation** directly from Poznote in `Settings > API Documentation`.
