@@ -8,20 +8,22 @@ info:
   version: 1.0.0
 
 tags:
-  - name: Notes
-    description: Note management
-  - name: Folders
-    description: Folder management
-  - name: Workspaces
-    description: Workspace management
-  - name: Tags
-    description: Tag management
-  - name: Attachments
-    description: Attachment management
-  - name: Favorites
-    description: Favorites management
-  - name: System
-    description: System information and updates
+  - name: Notes Management
+    description: Create, read, update and delete notes
+  - name: Trash Management
+    description: Manage notes in trash (list and restore)
+  - name: Folders Management
+    description: Create and delete folders
+  - name: Workspaces Management
+    description: List and create workspaces
+  - name: Tags Management
+    description: List all tags and apply tags to notes
+  - name: Attachments Management
+    description: Upload and list file attachments
+  - name: Favorites Management
+    description: Add or remove notes from favorites
+  - name: System Information
+    description: Version check and system updates
 
 security:
   - BasicAuth: []
@@ -75,7 +77,7 @@ paths:
   /api_list_notes.php:
     get:
       tags:
-        - Notes
+        - Notes Management
       summary: List notes
       description: Get list of notes with optional filters
       parameters:
@@ -123,7 +125,7 @@ paths:
   /api_create_note.php:
     post:
       tags:
-        - Notes
+        - Notes Management
       summary: Create note
       description: Create a new note with content
       requestBody:
@@ -194,7 +196,7 @@ paths:
   /api_update_note.php:
     post:
       tags:
-        - Notes
+        - Notes Management
       summary: Update note
       description: Update an existing note (only ID is required, all other fields are optional)
       requestBody:
@@ -243,7 +245,7 @@ paths:
   /api_delete_note.php:
     post:
       tags:
-        - Notes
+        - Notes Management
       summary: Delete note
       description: Move note to trash (soft delete)
       requestBody:
@@ -266,7 +268,7 @@ paths:
   /api_list_trash.php:
     get:
       tags:
-        - Notes
+        - Trash Management
       summary: List trash notes
       description: Get list of notes in trash with optional filters
       parameters:
@@ -320,7 +322,7 @@ paths:
   /api_restore_note.php:
     post:
       tags:
-        - Notes
+        - Trash Management
       summary: Restore note from trash
       description: Restore a note from trash (set trash = 0)
       requestBody:
@@ -368,7 +370,7 @@ paths:
   /api_share_note.php:
     post:
       tags:
-        - Notes
+        - Notes Management
       summary: Share note
       description: Enable or disable public sharing for a note
       requestBody:
@@ -412,7 +414,7 @@ paths:
   /api_workspaces.php:
     get:
       tags:
-        - Workspaces
+        - Workspaces Management
       summary: List workspaces
       description: Get all available workspaces
       responses:
@@ -420,7 +422,7 @@ paths:
           description: List of workspaces returned successfully
     post:
       tags:
-        - Workspaces
+        - Workspaces Management
       summary: Create workspace
       description: Create a new workspace
       requestBody:
@@ -443,7 +445,7 @@ paths:
   /api_list_tags.php:
     get:
       tags:
-        - Tags
+        - Tags Management
       summary: List all tags
       description: Get all tags with usage count
       parameters:
@@ -461,7 +463,7 @@ paths:
   /api_favorites.php:
     post:
       tags:
-        - Favorites
+        - Favorites Management
       summary: Toggle favorite
       description: Add or remove a note from favorites
       requestBody:
@@ -490,7 +492,7 @@ paths:
   /api_attachments.php:
     get:
       tags:
-        - Attachments
+        - Attachments Management
       summary: List attachments
       description: Get all attachments for a specific note
       parameters:
@@ -506,7 +508,7 @@ paths:
           description: List of attachments returned successfully
     post:
       tags:
-        - Attachments
+        - Attachments Management
       summary: Upload attachment
       description: Upload a file and attach it to a note
       requestBody:
@@ -534,7 +536,7 @@ paths:
   /api_create_folder.php:
     post:
       tags:
-        - Folders
+        - Folders Management
       summary: Create folder
       description: Create a new folder in a workspace
       requestBody:
@@ -561,7 +563,7 @@ paths:
   /api_delete_folder.php:
     post:
       tags:
-        - Folders
+        - Folders Management
       summary: Delete folder
       requestBody:
         content:
@@ -580,7 +582,7 @@ paths:
   /api_version.php:
     get:
       tags:
-        - System
+        - System Information
       summary: Check version
       description: Get current version and check if updates are available
       responses:
