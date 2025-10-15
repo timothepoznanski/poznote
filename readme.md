@@ -11,7 +11,7 @@
 - [Features](#features)
 - [Try Poznote](#try-poznote)
 - [Tech Stack](#tech-stack)
-- [Installation](#installation)
+- [Getting Started](#getting-started)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [API Documentation](#api-documentation)
@@ -74,7 +74,9 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker** - Containerization for easy deployment and portability
 </details>
 
-## Installation
+## Getting Started
+
+These guides cover everything you need to deploy and run Poznote: installation, configuration, updates, and best practices.
 
 Choose your deployment method:
 
