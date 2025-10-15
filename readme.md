@@ -113,26 +113,16 @@ Poznote provides a REST API for programmatic access to notes, folders, workspace
 
 ### 📚 Interactive Documentation
 
-Access the **Swagger UI documentation** from Settings or at:
+Access the **Swagger UI documentation** from `Settings > API Documentation` or at:
+
 ```
 http://YOUR_SERVER:HTTP_WEB_PORT/src/api_docs.php
 ```
 
-The interactive documentation allows you to:
-- 🔍 Browse all API endpoints
-- 🧪 Test API calls directly from your browser
-- 📖 View request/response schemas
-
 ###  Authentication
 
-All API requests require authentication:
+All API requests require authentication using **HTTP Basic Auth**:
 
-**API Key (Recommended)**
-```bash
-curl -H "X-API-Key: your_api_key" http://localhost:8040/src/api_list_notes.php
-```
-
-**HTTP Basic Auth**
 ```bash
 curl -u 'username:password' http://localhost:8040/src/api_list_notes.php
 ```
@@ -141,12 +131,12 @@ curl -u 'username:password' http://localhost:8040/src/api_list_notes.php
 
 **List notes:**
 ```bash
-curl -H "X-API-Key: your_key" "http://localhost:8040/src/api_list_notes.php?workspace=Poznote"
+curl -u 'username:password' "http://localhost:8040/src/api_list_notes.php?workspace=Poznote"
 ```
 
 **Create a note:**
 ```bash
-curl -X POST -H "X-API-Key: your_key" \
+curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"heading":"My Note","entrycontent":"Content"}' \
   http://localhost:8040/src/api_create_note.php
