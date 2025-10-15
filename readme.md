@@ -109,9 +109,52 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 ## API Documentation
 
-Poznote provides a REST API for programmatic access to notes and folders.
+Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-### API quick links
+### 📚 Interactive Documentation
+
+Access the **Swagger UI documentation** from Settings or at:
+```
+http://YOUR_SERVER:HTTP_WEB_PORT/src/api_docs.php
+```
+
+The interactive documentation allows you to:
+- 🔍 Browse all API endpoints
+- 🧪 Test API calls directly from your browser
+- 📖 View request/response schemas
+
+###  Authentication
+
+All API requests require authentication:
+
+**API Key (Recommended)**
+```bash
+curl -H "X-API-Key: your_api_key" http://localhost:8040/src/api_list_notes.php
+```
+
+**HTTP Basic Auth**
+```bash
+curl -u 'username:password' http://localhost:8040/src/api_list_notes.php
+```
+
+### 🚀 Quick Examples
+
+**List notes:**
+```bash
+curl -H "X-API-Key: your_key" "http://localhost:8040/src/api_list_notes.php?workspace=Poznote"
+```
+
+**Create a note:**
+```bash
+curl -X POST -H "X-API-Key: your_key" \
+  -H "Content-Type: application/json" \
+  -d '{"heading":"My Note","entrycontent":"Content"}' \
+  http://localhost:8040/src/api_create_note.php
+```
+
+For complete API reference, visit the Swagger UI documentation.
+
+### API quick links (legacy)
 
  - [List Notes](#list-notes)
  - [Create Note](#create-note)
@@ -122,21 +165,6 @@ Poznote provides a REST API for programmatic access to notes and folders.
  - [Move Note](#move-note)
  - [Delete Note](#delete-note)
  - [Delete Folder](#delete-folder)
-
-
-### Authentication
-
-All API requests require HTTP Basic authentication:
-```bash
-curl -u 'username:password' http://localhost:8040/API_ENDPOINT_NAME.php
-```
-
-### Base URL
-
-Access the API at your Poznote instance:
-```
-http://YOUR_SERVER:HTTP_WEB_PORT/
-```
 
 ### Response Format
 

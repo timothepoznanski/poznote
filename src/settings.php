@@ -97,6 +97,16 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <!-- API Documentation -->
+            <div class="settings-card" onclick="window.open('api_docs.php', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-code"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>API Documentation</h3>
+                </div>
+            </div>
+
             <!-- Poznote Website -->
             <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                 <div class="settings-card-icon">
