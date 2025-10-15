@@ -1,7 +1,10 @@
 openapi: 3.0.3
 info:
   title: Poznote API
-  description: REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
+  description: |
+    REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
+    
+    [View complete curl examples in the README](https://github.com/timothepoznanski/poznote#api-documentation)
   version: 1.0.0
 
 tags:

@@ -132,6 +132,185 @@ All API requests require authentication:
 
 ### 📖 Command Line Examples
 
-[View complete curl examples for all endpoints](http://YOUR_SERVER/src/api-docs/curl-examples.html)
+> **Note:** Replace `username:password` with your Poznote credentials and `YOUR_SERVER` with your server URL (e.g., `http://localhost:8040`).
+
+#### Notes Management
+
+**List Notes**
+```bash
+# List all notes
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_notes.php
+
+# Filter by workspace
+curl -u 'username:password' \
+  "http://YOUR_SERVER/src/api_list_notes.php?workspace=Personal"
+```
+
+**Create Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "heading": "My New Note",
+    "entrycontent": "This is the content of my note",
+    "tags": "work,important",
+    "folder_name": "Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_create_note.php
+```
+
+**Update Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 123,
+    "heading": "Updated Title",
+    "entrycontent": "Updated content",
+    "tags": "work,updated",
+    "folder": "Projects"
+  }' \
+  http://YOUR_SERVER/src/api_update_note.php
+```
+
+**Delete Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123}' \
+  http://YOUR_SERVER/src/api_delete_note.php
+```
+
+**Move Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "note_id": 123,
+    "folder_name": "Archive",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_move_note.php
+```
+
+**Share Note**
+```bash
+# Enable sharing
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "shared": 1}' \
+  http://YOUR_SERVER/src/api_share_note.php
+```
+
+#### Trash Management
+
+**List Trash**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_trash.php
+```
+
+**Restore Note**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123}' \
+  http://YOUR_SERVER/src/api_restore_note.php
+```
+
+#### Folders Management
+
+**Create Folder**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "My Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_create_folder.php
+```
+
+**Delete Folder**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "Old Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/src/api_delete_folder.php
+```
+
+#### Workspaces Management
+
+**List Workspaces**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_workspaces.php
+```
+
+#### Tags Management
+
+**List Tags**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_tags.php
+```
+
+**Apply Tags**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 123,
+    "tags": "work,urgent,meeting"
+  }' \
+  http://YOUR_SERVER/src/api_apply_tags.php
+```
+
+#### Favorites Management
+
+**Add to Favorites**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "favorite": 1}' \
+  http://YOUR_SERVER/src/api_favorites.php
+```
+
+**Remove from Favorites**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"id": 123, "favorite": 0}' \
+  http://YOUR_SERVER/src/api_favorites.php
+```
+
+#### Attachments Management
+
+**List Attachments**
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/src/api_attachments.php?note_id=123"
+```
+
+**Upload Attachment**
+```bash
+curl -X POST -u 'username:password' \
+  -F "note_id=123" \
+  -F "file=@/path/to/file.pdf" \
+  http://YOUR_SERVER/src/api_attachments.php
+```
+
+#### System Information
+
+**Check Version**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_version.php
+```
 
 Ready-to-use curl commands for every API operation: notes, folders, workspaces, tags, favorites, attachments, and system information.
