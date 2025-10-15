@@ -37,9 +37,6 @@ info:
     Replace `username:password` with your Poznote credentials and `YOUR_SERVER` with your server URL.
     
   version: 1.0.0
-  contact:
-    name: Poznote
-    url: https://github.com/timothepoznanski/poznote
 
 servers:
   - url: ..
