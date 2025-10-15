@@ -134,7 +134,8 @@ All API requests require authentication:
 
 > **Note:** Replace `username:password` with your Poznote credentials and `YOUR_SERVER` with your server URL (e.g., `http://localhost:8040`).
 
-#### Notes Management
+<details>
+<summary><strong>📝 Notes Management</strong></summary>
 
 **List Notes**
 ```bash
@@ -204,7 +205,10 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_share_note.php
 ```
 
-#### Trash Management
+</details>
+
+<details>
+<summary><strong>🗑️ Trash Management</strong></summary>
 
 **List Trash**
 ```bash
@@ -220,7 +224,10 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_restore_note.php
 ```
 
-#### Folders Management
+</details>
+
+<details>
+<summary><strong>📁 Folders Management</strong></summary>
 
 **Create Folder**
 ```bash
@@ -244,7 +251,10 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_delete_folder.php
 ```
 
-#### Workspaces Management
+</details>
+
+<details>
+<summary><strong>🗂️ Workspaces Management</strong></summary>
 
 **List Workspaces**
 ```bash
@@ -252,7 +262,10 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_workspaces.php
 ```
 
-#### Tags Management
+</details>
+
+<details>
+<summary><strong>🏷️ Tags Management</strong></summary>
 
 **List Tags**
 ```bash
@@ -271,7 +284,10 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_apply_tags.php
 ```
 
-#### Favorites Management
+</details>
+
+<details>
+<summary><strong>⭐ Favorites Management</strong></summary>
 
 **Add to Favorites**
 ```bash
@@ -289,7 +305,10 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_favorites.php
 ```
 
-#### Attachments Management
+</details>
+
+<details>
+<summary><strong>📎 Attachments Management</strong></summary>
 
 **List Attachments**
 ```bash
@@ -305,12 +324,17 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/src/api_attachments.php
 ```
 
-#### System Information
+</details>
+
+<details>
+<summary><strong>ℹ️ System Information</strong></summary>
 
 **Check Version**
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/src/api_version.php
 ```
+
+</details>
 
 Ready-to-use curl commands for every API operation: notes, folders, workspaces, tags, favorites, attachments, and system information.
