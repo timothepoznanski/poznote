@@ -121,6 +121,7 @@ Ready-to-use curl commands for every API operation.
 
 <details>
 <summary><strong>📝 Notes Management</strong></summary>
+<br>
 
 **List Notes**
 ```bash
@@ -194,6 +195,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>🗑️ Trash Management</strong></summary>
+<br>
 
 **List Trash**
 ```bash
@@ -213,6 +215,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>📁 Folders Management</strong></summary>
+<br>
 
 **Create Folder**
 ```bash
@@ -240,6 +243,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>🗂️ Workspaces Management</strong></summary>
+<br>
 
 **List Workspaces**
 ```bash
@@ -251,6 +255,7 @@ curl -u 'username:password' \
 
 <details>
 <summary><strong>🏷️ Tags Management</strong></summary>
+<br>
 
 **List Tags**
 ```bash
@@ -273,6 +278,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>⭐ Favorites Management</strong></summary>
+<br>
 
 **Add to Favorites**
 ```bash
@@ -294,6 +300,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>📎 Attachments Management</strong></summary>
+<br>
 
 **List Attachments**
 ```bash
@@ -313,6 +320,7 @@ curl -X POST -u 'username:password' \
 
 <details>
 <summary><strong>ℹ️ System Information</strong></summary>
+<br>
 
 **Check Version**
 ```bash
