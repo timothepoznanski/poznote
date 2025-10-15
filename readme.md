@@ -113,26 +113,13 @@ Poznote provides a REST API for programmatic access to notes, folders, workspace
 
 ### 📚 Interactive Documentation
 
-Access the **Swagger UI** directly from Poznote:
+Access the **Swagger UI** directly from Poznote and browse all endpoints, view request/response schemas, and test API calls interactively.
 
 ```
 Settings > API Documentation
 ```
 
-Browse all endpoints, view request/response schemas, and test API calls interactively.
-
-### 🔐 Authentication
-
-All API requests require authentication:
-
-| Method | Usage |
-|--------|-------|
-| **Basic Auth** | Username and password via HTTP Basic Auth |
-| **Session Cookie** | PHP session (for browser-based requests) |
-
 ### 📖 Command Line Examples
-
-> **Note:** Replace `username:password` with your Poznote credentials and `YOUR_SERVER` with your server URL (e.g., `http://localhost:8040`).
 
 <details>
 <summary><strong>📝 Notes Management</strong></summary>
