@@ -5,9 +5,36 @@ info:
     REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
     
     ## Authentication
+    
     All API requests require authentication using:
     - **Basic Auth**: Username and password via HTTP Basic Auth
     - **Session**: PHP session cookie (for browser-based requests)
+    
+    ### Using the API with curl
+    
+    **List notes:**
+    ```bash
+    curl -u 'username:password' \
+      "http://YOUR_SERVER/src/api_list_notes.php?workspace=Poznote"
+    ```
+    
+    **Create a note:**
+    ```bash
+    curl -X POST -u 'username:password' \
+      -H "Content-Type: application/json" \
+      -d '{"heading":"My Note","entrycontent":"Note content"}' \
+      http://YOUR_SERVER/src/api_create_note.php
+    ```
+    
+    **Update a note:**
+    ```bash
+    curl -X POST -u 'username:password' \
+      -H "Content-Type: application/json" \
+      -d '{"id":123,"heading":"Updated Title","entrycontent":"Updated content"}' \
+      http://YOUR_SERVER/src/api_update_note.php
+    ```
+    
+    Replace `username:password` with your Poznote credentials and `YOUR_SERVER` with your server URL.
     
   version: 1.0.0
   contact:
