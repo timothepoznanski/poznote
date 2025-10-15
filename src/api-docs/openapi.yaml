@@ -1,0 +1,631 @@
+openapi: 3.0.3
+info:
+  title: Poznote API
+  description: |
+    REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
+    
+    ## Authentication
+    All API requests require authentication using:
+    - **Basic Auth**: Username and password via HTTP Basic Auth
+    - **Session**: PHP session cookie (for browser-based requests)
+    
+  version: 1.0.0
+  contact:
+    name: Poznote
+    url: https://github.com/timothepoznanski/poznote
+
+servers:
+  - url: ..
+    description: Current server
+
+tags:
+  - name: Notes
+    description: Note management
+  - name: Folders
+    description: Folder management
+  - name: Workspaces
+    description: Workspace management
+  - name: Tags
+    description: Tag management
+  - name: Attachments
+    description: Attachment management
+  - name: Favorites
+    description: Favorites management
+  - name: System
+    description: System information and updates
+
+security:
+  - BasicAuth: []
+  - SessionAuth: []
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+
+  schemas:
+    Note:
+      type: object
+      properties:
+        id:
+          type: integer
+        heading:
+          type: string
+        subheading:
+          type: string
+        entrycontent:
+          type: string
+        tags:
+          type: string
+        folder:
+          type: string
+        workspace:
+          type: string
+        favorite:
+          type: integer
+          enum: [0, 1]
+        trash:
+          type: integer
+          enum: [0, 1]
+        type:
+          type: string
+          enum: [note, task]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+paths:
+  /api_list_notes.php:
+    get:
+      tags:
+        - Notes
+      summary: List notes
+      description: Get list of notes with optional filters
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Filter by workspace name (optional)"
+          schema:
+            type: string
+        - name: folder
+          in: query
+          required: false
+          description: "Filter by folder name (optional)"
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          description: "Text search in note content (optional)"
+          schema:
+            type: string
+        - name: tag
+          in: query
+          required: false
+          description: "Filter by tag (optional)"
+          schema:
+            type: string
+        - name: favorite
+          in: query
+          required: false
+          description: "Filter favorites only - 1=yes, 0=no (optional)"
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: get_folders
+          in: query
+          required: false
+          description: "Return folders list instead of notes (optional)"
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+
+  /api_create_note.php:
+    post:
+      tags:
+        - Notes
+      summary: Create note
+      description: Create a new note with content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - heading
+              properties:
+                heading:
+                  type: string
+                  description: "Note title (required)"
+                  example: "My New Note"
+                subheading:
+                  type: string
+                  description: "Note subtitle (optional)"
+                  example: "Important information"
+                entrycontent:
+                  type: string
+                  description: "Text content (optional)"
+                  example: "This is the content of my note"
+                entry:
+                  type: string
+                  description: "HTML content (optional)"
+                  example: "<p>This is <strong>HTML</strong> content</p>"
+                tags:
+                  type: string
+                  description: "Comma-separated tags (optional)"
+                  example: "work,important,todo"
+                folder_name:
+                  type: string
+                  description: "Folder name (optional, default: Default)"
+                  example: "Work"
+                workspace:
+                  type: string
+                  description: "Workspace name (optional, default: Poznote)"
+                  example: "Personal"
+                type:
+                  type: string
+                  enum: [note, task]
+                  description: "Note type (optional, default: note)"
+                  example: "note"
+                location:
+                  type: string
+                  description: "Geographic location (optional)"
+                  example: "Paris"
+      responses:
+        '200':
+          description: Note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note created successfully"
+                  id:
+                    type: integer
+                    description: ID of created note
+                    example: 123
+
+  /api_update_note.php:
+    post:
+      tags:
+        - Notes
+      summary: Update note
+      description: Update an existing note (only ID is required, all other fields are optional)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - heading
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID (required)"
+                  example: 123
+                heading:
+                  type: string
+                  description: "Note title (required)"
+                  example: "Updated Title"
+                subheading:
+                  type: string
+                  description: "Note subtitle (optional)"
+                  example: "Updated subtitle"
+                entrycontent:
+                  type: string
+                  description: "Text content (optional)"
+                  example: "Updated content"
+                entry:
+                  type: string
+                  description: "HTML content (optional)"
+                tags:
+                  type: string
+                  description: "Comma-separated tags (optional)"
+                  example: "updated,modified"
+                folder:
+                  type: string
+                  description: "Folder name (optional)"
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+      responses:
+        '200':
+          description: Note updated successfully
+
+  /api_delete_note.php:
+    post:
+      tags:
+        - Notes
+      summary: Delete note
+      description: Move note to trash (soft delete)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID to delete (required)"
+                  example: 123
+      responses:
+        '200':
+          description: Note moved to trash successfully
+
+  /api_list_trash.php:
+    get:
+      tags:
+        - Notes
+      summary: List trash notes
+      description: Get list of notes in trash with optional filters
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Filter by workspace name (optional)"
+          schema:
+            type: string
+            example: "Personal"
+        - name: search
+          in: query
+          required: false
+          description: "Search in heading, subheading, and tags (optional)"
+          schema:
+            type: string
+            example: "meeting"
+      responses:
+        '200':
+          description: List of trash notes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  total:
+                    type: integer
+                    description: Total number of notes in trash
+                    example: 5
+                  count:
+                    type: integer
+                    description: Number of notes returned (after filters)
+                    example: 5
+                  notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Note'
+                  filters:
+                    type: object
+                    properties:
+                      workspace:
+                        type: string
+                        nullable: true
+                      search:
+                        type: string
+                        nullable: true
+
+  /api_restore_note.php:
+    post:
+      tags:
+        - Notes
+      summary: Restore note from trash
+      description: Restore a note from trash (set trash = 0)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID to restore (required)"
+                  example: 123
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Note restored successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note restored successfully"
+                  note_id:
+                    type: integer
+                    example: 123
+                  note_heading:
+                    type: string
+                    example: "My restored note"
+        '400':
+          description: Bad request (note not in trash or ID missing)
+        '404':
+          description: Note not found
+
+  /api_share_note.php:
+    post:
+      tags:
+        - Notes
+      summary: Share note
+      description: Enable or disable public sharing for a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - shared
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID (required)"
+                  example: 123
+                shared:
+                  type: integer
+                  enum: [0, 1]
+                  description: "Enable or disable sharing - 1=enable, 0=disable (required)"
+                  example: 1
+      responses:
+        '200':
+          description: Sharing status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  share_token:
+                    type: string
+                    description: Token for public access (if shared=1)
+                  share_url:
+                    type: string
+                    description: Public URL (if shared=1)
+
+  /api_workspaces.php:
+    get:
+      tags:
+        - Workspaces
+      summary: List workspaces
+      description: Get all available workspaces
+      responses:
+        '200':
+          description: List of workspaces returned successfully
+    post:
+      tags:
+        - Workspaces
+      summary: Create workspace
+      description: Create a new workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: "Workspace name (required)"
+                  example: "My Project"
+      responses:
+        '200':
+          description: Workspace created successfully
+
+  /api_list_tags.php:
+    get:
+      tags:
+        - Tags
+      summary: List all tags
+      description: Get all tags with usage count
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Filter by workspace (optional)"
+          schema:
+            type: string
+            example: "Poznote"
+      responses:
+        '200':
+          description: List of tags with counts returned successfully
+
+  /api_favorites.php:
+    post:
+      tags:
+        - Favorites
+      summary: Toggle favorite
+      description: Add or remove a note from favorites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - favorite
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID (required)"
+                  example: 123
+                favorite:
+                  type: integer
+                  enum: [0, 1]
+                  description: "Add or remove from favorites - 1=add, 0=remove (required)"
+                  example: 1
+      responses:
+        '200':
+          description: Favorite status updated successfully
+
+  /api_attachments.php:
+    get:
+      tags:
+        - Attachments
+      summary: List attachments
+      description: Get all attachments for a specific note
+      parameters:
+        - name: note_id
+          in: query
+          required: true
+          description: "Note ID (required)"
+          schema:
+            type: integer
+            example: 123
+      responses:
+        '200':
+          description: List of attachments returned successfully
+    post:
+      tags:
+        - Attachments
+      summary: Upload attachment
+      description: Upload a file and attach it to a note
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - note_id
+                - file
+              properties:
+                note_id:
+                  type: integer
+                  description: "Note ID (required)"
+                  example: 123
+                file:
+                  type: string
+                  format: binary
+                  description: "File to upload (required)"
+      responses:
+        '200':
+          description: File uploaded successfully
+
+  /api_create_folder.php:
+    post:
+      tags:
+        - Folders
+      summary: Create folder
+      description: Create a new folder in a workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - folder_name
+              properties:
+                folder_name:
+                  type: string
+                  description: "Folder name (required)"
+                  example: "Work Projects"
+                workspace:
+                  type: string
+                  description: "Workspace name (optional, default: Poznote)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Folder created successfully
+
+  /api_delete_folder.php:
+    post:
+      tags:
+        - Folders
+      summary: Delete folder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                folder_name:
+                  type: string
+                workspace:
+                  type: string
+      responses:
+        '200':
+          description: Folder deleted
+
+  /api_version.php:
+    get:
+      tags:
+        - System
+      summary: Check version
+      description: Get current version and check if updates are available
+      responses:
+        '200':
+          description: Version information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current_version:
+                    type: string
+                    description: Current installed version
+                    example: "1.0.30"
+                  latest_version:
+                    type: string
+                    description: Latest available version from GitHub
+                    example: "1.0.31"
+                  is_up_to_date:
+                    type: boolean
+                    description: Whether the current version is up to date
+                    example: false
+                  has_update:
+                    type: boolean
+                    description: Whether an update is available
+                    example: true
+                  update_available:
+                    type: boolean
+                    description: Whether an update is available (alias)
+                    example: true
+                  error:
+                    type: string
+                    nullable: true
+                    description: Error message if version check failed
+                    example: null
+        '401':
+          description: Authentication required

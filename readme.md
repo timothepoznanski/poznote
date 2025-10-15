@@ -109,247 +109,37 @@ The **📦 Complete Backup** creates a standalone offline version of your notes.
 
 ## API Documentation
 
-Poznote provides a REST API for programmatic access to notes and folders.
+Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-### API quick links
+### 📚 Interactive Documentation
 
- - [List Notes](#list-notes)
- - [Create Note](#create-note)
- - [Create Task List](#create-task-list)
- - [Update Task List](#update-task-list)
- - [Update Note](#update-note)
- - [Create Folder](#create-folder)
- - [Move Note](#move-note)
- - [Delete Note](#delete-note)
- - [Delete Folder](#delete-folder)
+Access the **Swagger UI documentation** from `Settings > API Documentation` or at:
 
-
-### Authentication
-
-All API requests require HTTP Basic authentication:
-```bash
-curl -u 'username:password' http://localhost:8040/API_ENDPOINT_NAME.php
+```
+http://YOUR_SERVER:HTTP_WEB_PORT/src/api_docs.php
 ```
 
-### Base URL
+###  Authentication
 
-Access the API at your Poznote instance:
-```
-http://YOUR_SERVER:HTTP_WEB_PORT/
-```
-
-### Response Format
-
-**HTTP Status Codes:**
-- `200` - Success (updates, deletes)
-- `201` - Created  
-- `400` - Bad Request
-- `401` - Unauthorized
-- `404` - Not Found
-- `409` - Conflict (duplicate)
-- `500` - Server Error
-
-### Endpoints
-
-#### List Notes
+All API requests require authentication using **HTTP Basic Auth**:
 
 ```bash
-curl -u 'username:password' http://localhost:8040/api_list_notes.php?workspace=MyWorkspace
+curl -u 'username:password' http://localhost:8040/src/api_list_notes.php
 ```
 
-You can pass the workspace as a query parameter (`?workspace=NAME`) or as POST data (`workspace=NAME`). If omitted, the API will return notes from all workspaces.
+### 🚀 Quick Examples
 
-**Parameters:**
-- `workspace` (string) - *Optional* - Filter notes by workspace name
-
----
-
-#### Create Note
-
+**List notes:**
 ```bash
-curl -X POST http://localhost:8040/api_create_note.php \
-  -u 'username:password' \
+curl -u 'username:password' "http://localhost:8040/src/api_list_notes.php?workspace=Poznote"
+```
+
+**Create a note:**
+```bash
+curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{
-    "heading": "My New Note",
-    "entry": "<p>This is the <strong>HTML content</strong> of the note</p>",
-    "entrycontent": "This is the plain text content of the note",
-    "tags": "personal,important",
-    "folder_name": "Projects",
-    "workspace": "MyWorkspace"
-  }'
+  -d '{"heading":"My Note","entrycontent":"Content"}' \
+  http://localhost:8040/src/api_create_note.php
 ```
 
-**Parameters:**
-- `heading` (string) - **Required** - The note title
-- `entry` (string) - *Optional* - HTML content that will be saved to the note's HTML file
-- `entrycontent` (string) - *Optional* - Plain text content that will be saved to the database
-- `tags` (string) - *Optional* - Comma-separated tags
-- `folder_name` (string) - *Optional* - Folder name (defaults to "Default")
-- `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
-
----
-
-#### Create Task List
-
-```bash
-curl -X POST http://localhost:8040/api_create_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "heading": "Shopping list",
-    "type": "tasklist",
-    "entry": "",
-    "entrycontent": "[ { \"id\": 1690000000000, \"text\": \"Buy bread\", \"completed\": false, \"important\": false } ]",
-    "tags": "shopping,urgent",
-    "folder_name": "Home",
-    "workspace": "MyWorkspace"
-  }'
-```
-
-**Parameters:**
-- `heading` (string) - **Required** - The note title
-- `type` (string) - *Optional* - Set to `tasklist` to create a task list note
-- `entry` (string) - *Optional* - HTML content (can be empty for tasklist)
-- `entrycontent` (string) - *Optional* - JSON string containing the tasks (see structure below)
-- `tags` (string) - *Optional* - Comma-separated tags
-- `folder_name` (string) - *Optional* - Folder name (defaults to "Default")
-- `workspace` (string) - *Optional* - Workspace name (defaults to "Poznote")
-
-Example `entrycontent` structure (JSON array of tasks):
-
-```
-[
-  { "id": 1690000000000, "text": "Buy milk", "completed": false, "important": false, "noteId": 123 },
-  { "id": 1690000001000, "text": "Prepare meeting", "completed": true, "important": true, "noteId": 123 }
-]
-```
-
----
-
-#### Update Task List
-
-```bash
-curl -X POST http://localhost:8040/api_update_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "123",
-    "heading": "Shopping list",
-    "entry": "",
-    "entrycontent": "[ { \"id\":1690000000000, \"text\":\"Buy bread\", \"completed\":false, \"important\":false } ]",
-    "tags": "shopping,urgent",
-    "folder": "Home",
-    "workspace": "MyWorkspace"
-  }'
-```
-
-**Parameters:**
-- `id` (string|number) - **Required** - The note id to update
-- `heading` (string) - **Required** - The note title
-- `entry` (string) - *Optional* - HTML content (for compatibility; usually empty for tasklist)
-- `entrycontent` (string) - *Required* for tasklist updates - JSON string with the tasks
-- `tags` (string) - *Optional* - Comma-separated tags
-- `folder` (string) - *Optional* - Folder name
-- `workspace` (string) - *Optional* - Workspace name
-
----
-
-#### Update Note
-
-```bash
-curl -X POST http://localhost:8040/api_update_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "123",
-    "heading": "Meeting Notes",
-    "entry": "Discussed the new project timeline and key deliverables.",
-    "entrycontent": "Discussed the new project timeline and key deliverables.",
-    "tags": "meeting,work,project",
-    "folder": "Work",
-    "workspace": "MyWorkspace"
-  }'
-```
-
-**Parameters:**
-- `id` (string|number) - **Required** - The note id to update
-- `heading` (string) - **Required** - The note title
-- `entry` (string) - *Optional* - HTML content that will be saved to the note's HTML file
-- `entrycontent` (string) - *Optional* - Plain text content that will be saved to the database
-- `tags` (string) - *Optional* - Comma-separated tags
-- `folder` (string) - *Optional* - Folder name (if provided, must exist in the workspace or as an existing entry folder)
-- `workspace` (string) - *Optional* - Workspace name
-
-#### Create Folder
-```bash
-curl -X POST http://localhost:8040/api_create_folder.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
-```
-
-**Parameters:**
-- `folder_name` (string) - **Required** - The folder name
-- `workspace` (string) - *Optional* - Workspace name to scope the folder (defaults to "Poznote")
-
----
-
-#### Move Note
-```bash
-curl -X POST http://localhost:8040/api_move_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "note_id": "123",
-    "folder_name": "Work Projects",
-    "workspace": "MyWorkspace"
-  }'
-```
-
-**Parameters:**
-- `note_id` (string) - **Required** - The ID of the note to move
-- `folder_name` (string) - **Required** - The target folder name
-- `workspace` (string) - *Optional* - If provided, moves the note into the specified workspace (handles title conflicts)
-
----
-
-#### Delete Note
-```bash
-# Soft delete (to trash)
-curl -X DELETE http://localhost:8040/api_delete_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"note_id": "123", "workspace": "MyWorkspace"}'
-
-# Permanent delete
-curl -X DELETE http://localhost:8040/api_delete_note.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "note_id": "123",
-    "permanent": true,
-    "workspace": "MyWorkspace"
-  }'
-```
-
-**Parameters:**
-- `note_id` (string) - **Required** - The ID of the note to delete
-- `permanent` (boolean) - *Optional* - If true, permanently delete; otherwise move to trash
-- `workspace` (string) - *Optional* - Workspace to scope the operation
-
----
-
-#### Delete Folder
-```bash
-curl -X DELETE http://localhost:8040/api_delete_folder.php \
-  -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"folder_name": "Work Projects", "workspace": "MyWorkspace"}'
-```
-
-**Parameters:**
-- `folder_name` (string) - **Required** - The folder name to delete
-- `workspace` (string) - *Optional* - Workspace to scope the operation (defaults to "Poznote")
-
-**Note:** The default folder cannot be deleted. When a folder is deleted, all its notes are moved to the default folder.
+For complete API reference with all available endpoints, authentication details, and interactive testing, visit the **Swagger UI documentation** in Settings.
