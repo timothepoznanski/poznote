@@ -1,32 +1,8 @@
 openapi: 3.0.3
 info:
   title: Poznote API
-  description: |
-    REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
-    
-    ## Authentication
-    
-    All API requests require authentication using:
-    - **Basic Auth**: Username and password via HTTP Basic Auth
-    - **Session**: PHP session cookie (for browser-based requests)
-    
-    ## Command Line Examples
-    
-    📖 **[View complete curl examples for all endpoints →](curl-examples.html)**
-    
-    The examples page includes ready-to-use curl commands for:
-    - Notes management (create, update, delete, move, share)
-    - Trash management (list, restore)
-    - Folders and workspaces
-    - Tags and favorites
-    - Attachments
-    - System information
-    
+  description: REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
   version: 1.0.0
-
-servers:
-  - url: ..
-    description: Current server
 
 tags:
   - name: Notes

@@ -68,7 +68,6 @@
             border-radius: 6px;
             overflow-x: auto;
             margin: 15px 0;
-            position: relative;
         }
         
         .code-block pre {
@@ -76,28 +75,6 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.5;
-        }
-        
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s;
-        }
-        
-        .copy-btn:hover {
-            background: #2980b9;
-        }
-        
-        .copy-btn.copied {
-            background: #27ae60;
         }
         
         .note {
@@ -137,6 +114,30 @@
             margin-bottom: 8px;
         }
         
+        .section ul a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .section ul a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .section ul ul {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        
+        #authentication {
+            scroll-margin-top: 20px;
+        }
+        
+        h2[id], h3[id] {
+            scroll-margin-top: 20px;
+        }
+        
         code {
             background: #f4f4f4;
             padding: 2px 6px;
@@ -159,21 +160,77 @@
         </div>
         
         <div class="section">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#notes-management">Notes Management</a>
+                    <ul>
+                        <li><a href="#list-notes">List Notes</a></li>
+                        <li><a href="#create-note">Create Note</a></li>
+                        <li><a href="#update-note">Update Note</a></li>
+                        <li><a href="#delete-note">Delete Note</a></li>
+                        <li><a href="#duplicate-note">Duplicate Note</a></li>
+                        <li><a href="#move-note">Move Note</a></li>
+                        <li><a href="#share-note">Share Note</a></li>
+                    </ul>
+                </li>
+                <li><a href="#trash-management">Trash Management</a>
+                    <ul>
+                        <li><a href="#list-trash">List Trash</a></li>
+                        <li><a href="#restore-note">Restore Note</a></li>
+                    </ul>
+                </li>
+                <li><a href="#folders-management">Folders Management</a>
+                    <ul>
+                        <li><a href="#create-folder">Create Folder</a></li>
+                        <li><a href="#delete-folder">Delete Folder</a></li>
+                    </ul>
+                </li>
+                <li><a href="#workspaces-management">Workspaces Management</a>
+                    <ul>
+                        <li><a href="#list-workspaces">List Workspaces</a></li>
+                    </ul>
+                </li>
+                <li><a href="#tags-management">Tags Management</a>
+                    <ul>
+                        <li><a href="#list-tags">List Tags</a></li>
+                        <li><a href="#apply-tags">Apply Tags</a></li>
+                    </ul>
+                </li>
+                <li><a href="#favorites-management">Favorites Management</a>
+                    <ul>
+                        <li><a href="#add-favorites">Add to Favorites</a></li>
+                        <li><a href="#remove-favorites">Remove from Favorites</a></li>
+                    </ul>
+                </li>
+                <li><a href="#attachments-management">Attachments Management</a>
+                    <ul>
+                        <li><a href="#list-attachments">List Attachments</a></li>
+                        <li><a href="#upload-attachment">Upload Attachment</a></li>
+                    </ul>
+                </li>
+                <li><a href="#system-information">System Information</a>
+                    <ul>
+                        <li><a href="#check-version">Check Version</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="section" id="authentication">
             <h2>Authentication</h2>
             <p>All API requests require HTTP Basic Authentication. Include your credentials using the <code>-u</code> flag:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -u 'username:password' http://YOUR_SERVER/src/api_list_notes.php</pre>
             </div>
         </div>
         
-        <div class="section">
+        <div class="section" id="notes-management">
             <h2>Notes Management</h2>
             
-            <h3>List Notes</h3>
+            <h3 id="list-notes">List Notes</h3>
             <p>Get all notes, optionally filtered by workspace:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre># List all notes
 curl -u 'username:password' \
   http://YOUR_SERVER/src/api_list_notes.php
@@ -187,10 +244,9 @@ curl -u 'username:password' \
   "http://YOUR_SERVER/src/api_list_notes.php?search=meeting"</pre>
             </div>
             
-            <h3>Create Note</h3>
+            <h3 id="create-note">Create Note</h3>
             <p>Create a new note with title and content:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -203,10 +259,9 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_create_note.php</pre>
             </div>
             
-            <h3>Update Note</h3>
+            <h3 id="update-note">Update Note</h3>
             <p>Update an existing note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -220,30 +275,27 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_update_note.php</pre>
             </div>
             
-            <h3>Delete Note (Move to Trash)</h3>
+            <h3 id="delete-note">Delete Note (Move to Trash)</h3>
             <p>Soft delete - moves note to trash:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123}' \
   http://YOUR_SERVER/src/api_delete_note.php</pre>
             </div>
             
-            <h3>Duplicate Note</h3>
+            <h3 id="duplicate-note">Duplicate Note</h3>
             <p>Create a copy of an existing note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123}' \
   http://YOUR_SERVER/src/api_duplicate_note.php</pre>
             </div>
             
-            <h3>Move Note</h3>
+            <h3 id="move-note">Move Note</h3>
             <p>Move a note to a different folder or workspace:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -254,10 +306,9 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_move_note.php</pre>
             </div>
             
-            <h3>Share Note</h3>
+            <h3 id="share-note">Share Note</h3>
             <p>Enable or disable public sharing for a note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre># Enable sharing
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -279,12 +330,11 @@ curl -X POST -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>Trash Management</h2>
+            <h2 id="trash-management">Trash Management</h2>
             
-            <h3>List Trash</h3>
+            <h3 id="list-trash">List Trash</h3>
             <p>Get all notes in trash:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre># List all trash notes
 curl -u 'username:password' \
   http://YOUR_SERVER/src/api_list_trash.php
@@ -294,10 +344,9 @@ curl -u 'username:password' \
   "http://YOUR_SERVER/src/api_list_trash.php?workspace=Personal"</pre>
             </div>
             
-            <h3>Restore Note</h3>
+            <h3 id="restore-note">Restore Note</h3>
             <p>Restore a note from trash:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123}' \
@@ -306,12 +355,11 @@ curl -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>Folders Management</h2>
+            <h2 id="folders-management">Folders Management</h2>
             
-            <h3>Create Folder</h3>
+            <h3 id="create-folder">Create Folder</h3>
             <p>Create a new folder in a workspace:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -321,10 +369,9 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_create_folder.php</pre>
             </div>
             
-            <h3>Delete Folder</h3>
+            <h3 id="delete-folder">Delete Folder</h3>
             <p>Delete a folder (notes are moved to default folder):</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -336,24 +383,22 @@ curl -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>Workspaces Management</h2>
+            <h2 id="workspaces-management">Workspaces Management</h2>
             
-            <h3>List Workspaces</h3>
+            <h3 id="list-workspaces">List Workspaces</h3>
             <p>Get all available workspaces:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -u 'username:password' \
   http://YOUR_SERVER/src/api_workspaces.php</pre>
             </div>
         </div>
         
         <div class="section">
-            <h2>Tags Management</h2>
+            <h2 id="tags-management">Tags Management</h2>
             
-            <h3>List Tags</h3>
+            <h3 id="list-tags">List Tags</h3>
             <p>Get all tags, optionally filtered by workspace:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre># List all tags
 curl -u 'username:password' \
   http://YOUR_SERVER/src/api_list_tags.php
@@ -363,10 +408,9 @@ curl -u 'username:password' \
   "http://YOUR_SERVER/src/api_list_tags.php?workspace=Personal"</pre>
             </div>
             
-            <h3>Apply Tags</h3>
+            <h3 id="apply-tags">Apply Tags</h3>
             <p>Add or update tags for a note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -378,12 +422,11 @@ curl -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>Favorites Management</h2>
+            <h2 id="favorites-management">Favorites Management</h2>
             
-            <h3>Add to Favorites</h3>
+            <h3 id="add-favorites">Add to Favorites</h3>
             <p>Mark a note as favorite:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -393,10 +436,9 @@ curl -u 'username:password' \
   http://YOUR_SERVER/src/api_favorites.php</pre>
             </div>
             
-            <h3>Remove from Favorites</h3>
+            <h3 id="remove-favorites">Remove from Favorites</h3>
             <p>Unmark a note as favorite:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
@@ -408,20 +450,18 @@ curl -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>Attachments Management</h2>
+            <h2 id="attachments-management">Attachments Management</h2>
             
-            <h3>List Attachments</h3>
+            <h3 id="list-attachments">List Attachments</h3>
             <p>Get all attachments for a note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -u 'username:password' \
   "http://YOUR_SERVER/src/api_attachments.php?note_id=123"</pre>
             </div>
             
-            <h3>Upload Attachment</h3>
+            <h3 id="upload-attachment">Upload Attachment</h3>
             <p>Upload a file attachment to a note:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -X POST -u 'username:password' \
   -F "note_id=123" \
   -F "file=@/path/to/file.pdf" \
@@ -430,12 +470,11 @@ curl -u 'username:password' \
         </div>
         
         <div class="section">
-            <h2>System Information</h2>
+            <h2 id="system-information">System Information</h2>
             
-            <h3>Check Version</h3>
+            <h3 id="check-version">Check Version</h3>
             <p>Get current version and check for updates:</p>
             <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                 <pre>curl -u 'username:password' \
   http://YOUR_SERVER/src/api_version.php</pre>
             </div>
@@ -450,22 +489,5 @@ curl -u 'username:password' \
             </ul>
         </div>
     </div>
-    
-    <script>
-        function copyCode(button) {
-            const codeBlock = button.parentElement;
-            const code = codeBlock.querySelector('pre').textContent;
-            
-            navigator.clipboard.writeText(code).then(() => {
-                button.textContent = 'Copied!';
-                button.classList.add('copied');
-                
-                setTimeout(() => {
-                    button.textContent = 'Copy';
-                    button.classList.remove('copied');
-                }, 2000);
-            });
-        }
-    </script>
 </body>
 </html>

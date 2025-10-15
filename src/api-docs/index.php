@@ -18,6 +18,14 @@ requireAuth();
             max-width: 1460px;
             margin: 0 auto;
         }
+        /* Masquer le bloc scheme-container (Authorize button) */
+        .swagger-ui .scheme-container {
+            display: none;
+        }
+        /* Retirer la barre en dessous des opblock-tag */
+        .swagger-ui .opblock-tag {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
