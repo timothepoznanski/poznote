@@ -98,7 +98,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             </div>
 
             <!-- API Documentation -->
-            <div class="settings-card" onclick="window.open('api_docs.php', '_blank');">
+            <div class="settings-card" onclick="window.open('api-docs/', '_blank');">
                 <div class="settings-card-icon">
                     <i class="fa-code"></i>
                 </div>
