@@ -92,11 +92,6 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 - Want it completely free
 - Prefer maximum privacy (no internet exposure)
 
-**Requirements:**
-- **Windows/Mac:** Docker Desktop (free & easy)
-- **Linux:** Docker or manual installation
-- A few GB of disk space
-
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 </td>
@@ -111,11 +106,6 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 - Want complete control over your infrastructure
 - Are comfortable with server management
 
-**Requirements:**
-- A VPS or home server with public IP
-- Docker or manual installation
-- Basic server administration knowledge
-
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 </td>
@@ -126,14 +116,9 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ✅ **Choose this if you:**
 - Want access from anywhere with zero setup
-- Don't want to manage servers
-- Prefer automatic updates and backups
+- Don't want to manage server and security
+- Prefer one-clic updates
 - Are okay with ~$5/month
-
-**Requirements:**
-- Railway, Render, or similar account
-- Credit card for payment
-- 5 minutes of your time
 
 **👉 [View Cloud Guide](CLOUD.md)**
 
