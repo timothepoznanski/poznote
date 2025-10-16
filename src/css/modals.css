@@ -786,54 +786,70 @@
 
 #updateModal .modal-content {
     text-align: center;
-    max-width: 420px;
+    max-width: 520px;
+    padding: 30px;
 }
 
 #updateModal .modal-content h3 {
     color: #007DB8;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    font-size: 24px;
 }
 
 #updateModal .modal-content p {
     margin: 15px 0;
-    line-height: 1.5;
+    line-height: 1.6;
     color: #555;
 }
 
 #updateModal .version-info {
     background-color: #f8f9fa;
-    border-radius: 6px;
-    padding: 15px;
+    border-radius: 8px;
+    padding: 15px 20px;
     margin: 20px 0;
     border-left: 4px solid #007DB8;
 }
 
 #updateModal .version-info p {
-    margin: 8px 0;
-    font-size: 14px;
+    margin: 10px 0;
+    font-size: 15px;
     color: #333;
 }
 
 #updateModal .version-info strong {
     color: #007DB8;
+    font-weight: 600;
 }
 
 /* Update buttons container */
 #updateModal .update-buttons-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
     margin-top: 20px;
-    padding-top: 15px;
+    padding-top: 20px;
     border-top: 1px solid rgba(224,224,224,0.9);
 }
 
 /* Instructions buttons row */
 #updateModal .update-instructions-buttons {
     display: none; /* Hidden by default, shown via JS when update available */
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: stretch;
+}
+
+/* Responsive: stack buttons on very small screens */
+@media (max-width: 500px) {
+    #updateModal .update-instructions-buttons {
+        flex-direction: column;
+    }
+    
+    #updateModal .btn-update {
+        width: 100%;
+        min-width: auto;
+    }
 }
 
 /* Override modal-buttons for update modal to center the Close button */
@@ -848,22 +864,45 @@
     background-color: #6c757d !important;
     color: white !important;
     border: none !important;
+    min-width: 120px;
+    padding: 10px 24px !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #updateModal .btn-cancel:hover {
     background-color: #5a6268 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+}
+
+#updateModal .btn-cancel:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #updateModal .btn-update {
     background-color: #007DB8 !important;
     color: white !important;
     border: none !important;
-    flex: 1;
-    max-width: 250px;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    min-width: 200px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #updateModal .btn-update:hover {
     background-color: #0056b3 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.4);
+}
+
+#updateModal .btn-update:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #updateCheckModal .modal-content {
