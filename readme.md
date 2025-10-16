@@ -18,11 +18,9 @@
 
 ## Introduction
 
-Poznote is a personal, free, self-hosted note manager — simple and intuitive. Capture and organize your notes quickly while keeping full control over your data, with zero vendor lock-in. Notes are stored as plain HTML files, accessible even without the app. Fast, clean, and fully under your control — designed for those who value efficiency above all.
+Poznote is a personal, free, self-hosted, simple and intuitive note manager.<br><br>Capture and organize your notes quickly while keeping full control over your data, with zero vendor lock-in. Notes are stored as plain HTML files, accessible even without the app. Fast, clean, and fully under your control — designed for those who value efficiency above all.
 
 ![poznote](readme/poznote.png)
-
-![poznote-mobile](readme/poznote-mobile.png)
 
 ## Features
 
@@ -34,7 +32,8 @@ Poznote is a personal, free, self-hosted note manager — simple and intuitive. 
 - 🖥️ Multi-instance support
 - 🗂️ Workspaces
 - 🏠 Self-hosted
-- 💾 Built-in backup and export tools
+- 💾 Built-in backup and restore tools
+- 📖 Export tool for offline reading
 - 🗑️ Trash system with restore functionality
 - 🔗 Public note sharing
 - 🌐 REST API for automation
@@ -76,18 +75,64 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Install, Configure or Update
 
-These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote:
-
-- ✅ **Installation** - Step-by-step deployment instructions
-- ⚙️ **Configuration** - Change settings
-- 🔄 **Updates** - Update to the latest version
-- 🔐 **Access** - Access to Poznote
+These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote.
 
 **Choose your deployment method:**
 
-- 🖥️ **Self-Hosted** - On your own machine or own server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+<table>
+<tr>
+<td width="33%" valign="top">
 
-- ☁️ **Cloud** - On Railway or other cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
+### 💻 Local (Your Computer)
+**Personal use only - not accessible online**
+
+✅ **Choose this if you:**
+- Want to use Poznote only on your computer
+- Don't need access from other devices
+- Want it completely free
+- Prefer maximum privacy (no internet exposure)
+
+**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+
+</td>
+<td width="33%" valign="top">
+
+### 🖥️ Self-Hosted Server
+**Your own server - accessible online**
+
+✅ **Choose this if you:**
+- Want to access from anywhere
+- Have your own server or VPS
+- Want complete control over your infrastructure
+- Are comfortable with server management
+
+**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+
+</td>
+<td width="33%" valign="top">
+
+### ☁️ Managed Cloud
+**Fully managed - accessible online**
+
+✅ **Choose this if you:**
+- Want access from anywhere with almost zero setup
+- Have no experience with server management
+- or don't want to manage server and security
+- Prefer one-clic updates
+- Are okay with ~$5/month
+
+**👉 [View Cloud Guide](CLOUD.md)**
+
+<br>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+**Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
 
 ## Backup and Restore
 
