@@ -50,12 +50,11 @@ Password: `poznote`
 
 These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote.
 
-**Choose your deployment method:**
+Choose your deployment method:
 
 ---
 
-### 💻 Local (Your Computer)
-**Personal use only - not accessible online**
+### 💻 Local (Your Computer) - **Personal use only - not accessible online**
 
 ✅ **Choose this if you:**
 - Want to use Poznote only on your computer
@@ -68,8 +67,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ---
 
-### 🖥️ Self-Hosted Server
-**Your own server - accessible online**
+### 🖥️ Self-Hosted Server - **Your own server - accessible online**
 
 ✅ **Choose this if you:**
 - Want to access from anywhere
@@ -81,8 +79,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ---
 
-### ☁️ Managed Cloud
-**Fully managed - accessible online**
+### ☁️ Managed Cloud - **Fully managed - accessible online**
 
 ✅ **Choose this if you:**
 - Want access from anywhere with zero setup
