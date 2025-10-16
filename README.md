@@ -51,7 +51,7 @@ Password: `poznote`
 
 Choose your installation method:
 
-### 💻 Choose Local method if you:
+### 💻 Choose `Local` method if you:
 
 - Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
@@ -61,7 +61,7 @@ Choose your installation method:
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
-### 🖥️ Choose Server method if you:
+### 🖥️ Choose `Server` method if you:
 
 - Want to access from anywhere
 - Have your own server or VPS
@@ -70,7 +70,7 @@ Choose your installation method:
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
-### ☁️ Choose Managed Cloud method if you:
+### ☁️ Choose `Managed Cloud` method if you:
 
 - Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
