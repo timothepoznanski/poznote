@@ -81,7 +81,7 @@ Choose your installation method:
 
 **👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
-**Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
+<br><br>
 
 ## Manage Poznote
 
