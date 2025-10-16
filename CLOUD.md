@@ -39,7 +39,7 @@ Click the button below to start the deployment:
 
 Watch this 2-minute video tutorial that guides you through the entire deployment process:
 
-**[Watch the deployment tutorial](https://youtu.be/Q22kqv82bHQ)**
+**[Watch the deployment tutorial](https://youtu.be/RkN0-v8sz2w)**
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
@@ -55,7 +55,7 @@ After deployment is complete:
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
 
-Or watch the end of the [deployment tutorial video](https://youtu.be/Q22kqv82bHQ) to see how to get the URL.
+Or watch the end of the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to get the URL.
 
 **Step 2: Log In**
 
@@ -65,7 +65,7 @@ Or watch the end of the [deployment tutorial video](https://youtu.be/Q22kqv82bHQ
 
 > ⚠️ **Important:** Change these default credentials after your first login!
 
-Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/Q22kqv82bHQ) to see how to. 
+Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
 
 ### Poznote Settings
 
