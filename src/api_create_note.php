@@ -52,23 +52,21 @@ if (!empty($tags)) {
     $tags = implode(',', $validTags);
 }
 
+// If heading is empty, default to "New note". Otherwise trim input.
+$originalHeading = trim($originalHeading);
 if ($originalHeading === '') {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'The heading field is required']);
-    exit;
+    $heading = generateUniqueTitle('New note', null, $workspace);
+} else {
+    // If the provided heading already exists, auto-rename using generateUniqueTitle
+    $check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+    $check->execute([$originalHeading, $workspace, $workspace]);
+    if ($check->fetchColumn() > 0) {
+        // Generate a unique variant based on the requested heading
+        $heading = generateUniqueTitle($originalHeading, null, $workspace);
+    } else {
+        $heading = $originalHeading;
+    }
 }
-
-// Enforce uniqueness of heading within the workspace: reject if same heading exists (non-trashed)
-$check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-$check->execute([$originalHeading, $workspace, $workspace]);
-if ($check->fetchColumn() > 0) {
-    http_response_code(409);
-    echo json_encode(['success' => false, 'message' => 'A note with the same title already exists in this workspace']);
-    exit;
-}
-
-// Use the original heading (no auto-rename) since duplicates are disallowed
-$heading = $originalHeading;
 
 // Validate folder existence: if a non-default folder is provided, ensure it exists
 if (!isDefaultFolder($folder, $workspace)) {

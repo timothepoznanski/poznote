@@ -53,8 +53,8 @@
 		}
 	}
 	
-	// Generate unique title for Untitled notes (workspace-aware)
-	$uniqueTitle = generateUniqueTitle('Untitled note', null, $workspace);
+	// Generate unique title for new notes (workspace-aware)
+	$uniqueTitle = generateUniqueTitle('New note', null, $workspace);
 
 	// Insert the new note (include workspace and type)
 	$query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?)";

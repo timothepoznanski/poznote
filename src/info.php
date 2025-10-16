@@ -42,7 +42,7 @@ try {
     exit;
 }
 
-$title = $note['heading'] ?: 'Untitled Note';
+$title = $note['heading'] ?: 'New note';
 
 // Format dates
 function formatDate($dateStr) {
