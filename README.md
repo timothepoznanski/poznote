@@ -55,7 +55,7 @@ Choose your installation method:
 
 ### 💻 Local
 
-✅ **Choose this if you:**
+**Choose this if you:**
 - Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
 - Want it completely free
@@ -68,7 +68,7 @@ Choose your installation method:
 
 ### 🖥️ Server
 
-✅ **Choose this if you:**
+**Choose this if you:**
 - Want to access from anywhere
 - Have your own server or VPS
 - Want complete control over your infrastructure
@@ -80,7 +80,7 @@ Choose your installation method:
 
 ### ☁️ Managed Cloud
 
-✅ **Choose this if you:**
+**Choose this if you:**
 - Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Prefer one-click updates
