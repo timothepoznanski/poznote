@@ -79,9 +79,48 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 **Choose your deployment method:**
 
-- 🖥️ **Self-Hosted** - On your own machine or own server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+<table>
+<tr>
+<td width="50%">
 
-- ☁️ **Cloud** - On Railway or other cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
+### 🖥️ Self-Hosted
+**Run Poznote on your own computer or server**
+
+✅ **Choose this if you:**
+- Want to run Poznote on your personal computer (Windows, Mac, Linux)
+- Have a home server or NAS
+- Want complete control over your data
+- Don't want to pay for hosting
+
+**Requirements:**
+- Docker Desktop (free) OR basic server knowledge
+- A few GB of disk space
+
+**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+
+</td>
+<td width="50%">
+
+### ☁️ Cloud Deployment
+**Run Poznote on the internet (accessible anywhere)**
+
+✅ **Choose this if you:**
+- Want to access your notes from anywhere (phone, tablet, work computer)
+- Don't want to manage a server yourself
+- Are okay with a small monthly cost (~$5/month)
+- Want automatic backups and updates
+
+**Requirements:**
+- A Railway, Render, or similar cloud account
+- Credit card for payment
+
+**👉 [View Cloud Deployment Guide](CLOUD.md)**
+
+</td>
+</tr>
+</table>
+
+**Not sure which to choose?** Start with **Self-Hosted** on your computer - it's free and you can always migrate to cloud later.
 
 ## Backup and Restore
 
