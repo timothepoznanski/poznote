@@ -11,7 +11,7 @@
 - [Features](#features)
 - [Try Poznote](#try-poznote)
 - [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
+- [Install, Configure or Update](#install-configure-or-update)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [API Documentation](#api-documentation)
@@ -74,15 +74,14 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker** - Containerization for easy deployment and portability
 </details>
 
-## Getting Started
+## Install, Configure or Update
 
-These comprehensive guides cover **everything you need** to deploy, configure, maintain, and update Poznote:
+These comprehensive guides cover everything you need to deploy, configure, maintain, and update Poznote:
 
 - ✅ **Installation** - Step-by-step deployment instructions
-- ⚙️ **Configuration** - Environment variables and settings
-- 🔄 **Updates** - How to update to the latest version
-- 🔧 **Maintenance** - Best practices and troubleshooting
-- 🔐 **Security** - Authentication and access control
+- ⚙️ **Configuration** - Change settings
+- 🔄 **Updates** - Update to the latest version
+- 🔐 **Access** - Access to Poznote
 
 **Choose your deployment method:**
 
