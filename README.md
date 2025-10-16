@@ -10,7 +10,8 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Play with Poznote demo](#play-with-poznote-demo)
-- [Install, Configure or Update](#install-configure-or-update)
+- [Install Poznote](#install-poznote)
+- [Manage Poznote](#manage-poznote)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [Tech Stack](#tech-stack)
@@ -46,11 +47,9 @@ Username: `poznote`
 <br>
 Password: `poznote`
 
-## Install, Configure or Update
+## Install Poznote
 
-These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote.
-
-Choose your deployment method:
+Choose your installation method:
 
 ---
 
@@ -63,7 +62,7 @@ Choose your deployment method:
 - Prefer maximum privacy (no internet exposure)
 - Have no experience with server management or don't want to manage server and security
 
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
 ---
 
@@ -75,7 +74,7 @@ Choose your deployment method:
 - Want complete control over your infrastructure
 - Are comfortable with server management
 
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
 ---
 
@@ -87,11 +86,35 @@ Choose your deployment method:
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Cloud Guide](CLOUD.md)**
+**👉 [View Cloud Guide](POZNOTE-CLOUD-INSTALL.md)**
 
 ---
 
 **Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
+
+## Manage Poznote
+
+If you need to change Poznote password, username or port, update to the latest version etc.
+
+---
+
+### 💻 Local
+
+**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
+
+---
+
+### 🖥️ Server
+
+**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
+
+---
+
+### ☁️ Managed Cloud
+
+**👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)**
+
+---
 
 ## Backup and Restore
 

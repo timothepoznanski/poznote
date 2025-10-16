@@ -1,10 +1,11 @@
-# Poznote - Self-Hosted Guide
+# Poznote - Self-Hosted Install Guide
 
-This guide will help you **deploy, configure, update and manage** Poznote on your own machine or server using Docker.
+This guide will help you **Install** Poznote on your own machine or server using Docker.
 
 With self-hosting, you have two options:
-- **🏠 Local deployment**: Keep your notes on your own computer (Windows/Linux) for complete privacy
-- **🌍 Server deployment**: Deploy on an internet-connected server (VPS, cloud VM, etc.) to access your notes from anywhere (phone, laptop, tablet)
+
+- **🏠 Local install**: Keep your notes on your own computer (Windows/Linux) for complete privacy
+- **🌍 Server install**: Deploy on an internet-connected server (VPS, cloud VM, etc.) to access your notes from anywhere (phone, laptop, tablet)
 
 Both options give you complete control over your data with zero vendor lock-in.
 
@@ -12,9 +13,6 @@ Both options give you complete control over your data with zero vendor lock-in.
 
 - [Installation](#installation)
 - [Access Poznote](#access-poznote)
-- [Change Settings](#change-settings)
-- [Forgot Your Password](#forgot-your-password)
-- [Update to Latest Version](#update-to-latest-version)
 - [Multiple Instances](#multiple-instances)
 
 ## Installation
@@ -128,46 +126,6 @@ After installation, access Poznote in your web browser:
 - Port: `8040`
 
 > ⚠️ **Important:** Change these default credentials after your first login!
-
-## Change Settings
-
-To modify your username, password, or port:
-
-```bash
-cd poznote && docker compose down
-```
-
-Edit the `.env` file with your preferred text editor and modify the values:
-
-```
-POZNOTE_USERNAME=your_new_username
-POZNOTE_PASSWORD=your_new_password
-HTTP_WEB_PORT=8040
-```
-
-```bash
-docker compose up -d
-```
-
-## Forgot Your Password
-
-Your credentials are stored in the `.env` file in your Poznote directory.
-
-To retrieve your password:
-
-1. Navigate to your Poznote directory
-2. Open the `.env` file
-3. Look for the `POZNOTE_PASSWORD` value
-
-## Update to Latest Version
-
-To update Poznote to the latest version:
-
-```bash
-cd poznote && docker compose down && docker compose pull && docker compose up -d
-```
-
-Your data is preserved in the `./data` directory and will not be affected by the update.
 
 ## Multiple Instances
 

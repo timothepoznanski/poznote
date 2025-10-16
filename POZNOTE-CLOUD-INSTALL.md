@@ -1,45 +1,36 @@
-# Poznote - Cloud Deployment Guide
+# Poznote - Cloud Install Guide
 
-This guide will help you **deploy, configure, update and manage** Poznote on cloud platforms without managing your own infrastructure. Benefits include:
-- No server maintenance
-- Automatic HTTPS and domain management
-- Easy scaling and updates
-- Access from anywhere
-- Built-in monitoring and logging
+This guide will help you **install** Poznote on cloud platforms without managing your own infrastructure.
 
 ## Table of Contents
 
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
   - [Poznote Installation on Railway](#poznote-installation-on-railway)
   - [Access Poznote](#access-poznote)
-  - [Poznote Settings](#poznote-settings)
-  - [Poznote Password Recovery](#poznote-password-recovery)
-  - [Poznote Updates](#poznote-updates)
 - [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
   - [Generic Docker Deployment](#generic-docker-deployment)
   - [Key Considerations](#key-considerations)
 
 ## Option 1: Railway (Recommended)
 
-Railway.com offers the easiest way to deploy Poznote in the cloud. The platform provides:
+Railway.com offers the easiest way to install Poznote in the cloud. The platform provides:
 - Automated deployments from GitHub
 - Automatic HTTPS
 - Easy scaling
+- One-click updates
 - No infrastructure management
 
 ### Poznote Installation on Railway
 
-Create a Railway account at [Railway.com](https://railway.com) and choose the **$5/month plan**
-
-For a **ready-to-use setup**, use the official Poznote template on Railway.
-
-Click the button below to start the deployment:
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
+Create a Railway account at [Railway.com](https://railway.com) and choose the **$5/month plan**.
 
 Watch this 2-minute video tutorial that guides you through the entire deployment process:
 
 **[Watch the deployment tutorial](https://youtu.be/RkN0-v8sz2w)**
+
+Click the button below to start the deployment:
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/poznote)
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
@@ -66,35 +57,6 @@ Or watch the end of the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w
 > ⚠️ **Important:** Change these default credentials after your first login!
 
 Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
-
-### Poznote Settings
-
-To change your username or password on Railway, watch this video tutorial that shows you step by step how to change your settings:
-
-**[Change Settings on Railway](https://youtu.be/_h5pP7LreZc)**
-
-> 📝 **Note:** Unlike self-hosted installations, you cannot change the port.
-
-### Poznote Password Recovery
-
-If you forgot your password, you can retrieve it from Railway:
-
-Watch this video tutorial:
-
-**[Retrieve Your Password on Railway](https://youtu.be/_h5pP7LreZc)**
-
-### Poznote Updates
-
-To update your Poznote instance to the latest version:
-
-**Video Tutorial**
-
-**[Update Poznote on Railway](https://youtu.be/jbUlCEWndoo)**
-
-Railway will automatically:
-- Pull the latest Poznote image
-- Redeploy your instance
-- Preserve all your data (notes, attachments, database)
 
 ## Option 2: Other Cloud Providers
 
