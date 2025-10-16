@@ -60,6 +60,7 @@ Choose your installation method:
 - Have no experience with server management or don't want to manage server and security
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
+<br><br>
 
 ### 🖥️ Choose "Server" method if you:
 
@@ -69,7 +70,7 @@ Choose your installation method:
 - Are comfortable with server management
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
-<br>
+<br><br>
 
 ### ☁️ Choose "Managed Cloud" method if you:
 
