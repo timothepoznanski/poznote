@@ -85,9 +85,9 @@ These comprehensive guides cover everything you need to deploy, configure, maint
 
 **Choose your deployment method:**
 
-- 🖥️ **Self-Hosted** - Deploy on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+- 🖥️ **Self-Hosted** - On your own machine or own server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-- ☁️ **Cloud** - Deploy on Railway, AWS, or other cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
+- ☁️ **Cloud** - On Railway or other cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
 ## Backup and Restore
 
