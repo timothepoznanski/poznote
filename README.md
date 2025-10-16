@@ -81,7 +81,7 @@ Choose your installation method:
 
 **👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
-<br><br>
+<br>
 
 ## Manage Poznote
 
