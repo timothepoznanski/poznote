@@ -54,10 +54,10 @@ Choose your deployment method:
 
 ---
 
-### 💻 Local (Your Computer) - **Personal use only - not accessible online**
+### 💻 Local
 
 ✅ **Choose this if you:**
-- Want to use Poznote only on your computer
+- Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
 - Want it completely free
 - Prefer maximum privacy (no internet exposure)
@@ -67,7 +67,7 @@ Choose your deployment method:
 
 ---
 
-### 🖥️ Self-Hosted Server - **Your own server - accessible online**
+### 🖥️ Server
 
 ✅ **Choose this if you:**
 - Want to access from anywhere
@@ -79,10 +79,10 @@ Choose your deployment method:
 
 ---
 
-### ☁️ Managed Cloud - **Fully managed - accessible online**
+### ☁️ Managed Cloud
 
 ✅ **Choose this if you:**
-- Want access from anywhere with zero setup
+- Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
