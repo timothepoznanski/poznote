@@ -54,28 +54,30 @@ Choose your installation method:
 ### 💻 Choose "Local" method if you:
 
 - Want to use Poznote only on your Windows or Linux computer
+- Prefer maximum privacy (no internet exposure)
 - Don't need access from other devices (your phone)
 - Want it completely free
-- Prefer maximum privacy (no internet exposure)
 - Have no experience with server management or don't want to manage server and security
+- Are ready to run a few commands (don't worry if you don't know how yet - it's not complicated!)
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 <br><br>
 
 ### 🖥️ Choose "Server" method if you:
 
-- Want to access from anywhere
+- Want to access from anywhere (phone, tablet, computer)
 - Have your own server or VPS
 - Want complete control over your infrastructure
-- Are comfortable with server management
+- Want to keep your notes private
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 <br><br>
 
 ### ☁️ Choose "Managed Cloud" method if you:
 
-- Want access from anywhere with almost zero setup
+- Want access from anywhere (phone, tablet, computer) with almost zero setup
 - Have no experience with server management or don't want to manage server and security
+- Don't know how to use command line or don't want to use command line 
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
