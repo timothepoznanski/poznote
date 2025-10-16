@@ -88,9 +88,9 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ✅ **Choose this if you:**
 - Want to run Poznote on your personal computer (Windows, Mac, Linux)
-- Have a home server or NAS
+- Have a home server or VPS
 - Want complete control over your data
-- Don't want to pay for hosting
+- Prefer managing your own infrastructure
 
 **Requirements:**
 - Docker Desktop (free) OR basic server knowledge
