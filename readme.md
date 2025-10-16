@@ -52,9 +52,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 **Choose your deployment method:**
 
-<table>
-<tr>
-<td width="33%" valign="top">
+---
 
 ### 💻 Local (Your Computer)
 **Personal use only - not accessible online**
@@ -67,8 +65,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-</td>
-<td width="33%" valign="top">
+---
 
 ### 🖥️ Self-Hosted Server
 **Your own server - accessible online**
@@ -81,29 +78,21 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
-</td>
-<td width="33%" valign="top">
+---
 
 ### ☁️ Managed Cloud
-**Fully managed - accessible online**
+**Fully managed - zero maintenance**
 
 ✅ **Choose this if you:**
-- Want access from anywhere with almost zero setup
+- Want access from anywhere with zero setup
 - Have no experience with server management
-- or don't want to manage server and security
+- Don't want to manage server and security
 - Prefer one-clic updates
 - Are okay with ~$5/month
 
 **👉 [View Cloud Guide](CLOUD.md)**
 
-<br>
-</td>
-</tr>
-</table>
-
-</td>
-</tr>
-</table>
+---
 
 **Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
 
