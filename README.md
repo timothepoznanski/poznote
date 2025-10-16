@@ -10,7 +10,8 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Play with Poznote demo](#play-with-poznote-demo)
-- [Install, Configure or Update](#install-configure-or-update)
+- [Install Poznote](#install-poznote)
+- [Manage Poznote](#manage-poznote)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [Tech Stack](#tech-stack)
@@ -46,30 +47,26 @@ Username: `poznote`
 <br>
 Password: `poznote`
 
-## Install, Configure or Update
+## Install Poznote
 
-These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote.
-
-**Choose your deployment method:**
+Choose your installation method:
 
 ---
 
-### 💻 Local (Your Computer)
-**Personal use only - not accessible online**
+### 💻 Local
 
 ✅ **Choose this if you:**
-- Want to use Poznote only on your computer
+- Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
 - Want it completely free
 - Prefer maximum privacy (no internet exposure)
 - Have no experience with server management or don't want to manage server and security
 
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
 ---
 
-### 🖥️ Self-Hosted Server
-**Your own server - accessible online**
+### 🖥️ Server
 
 ✅ **Choose this if you:**
 - Want to access from anywhere
@@ -77,24 +74,47 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 - Want complete control over your infrastructure
 - Are comfortable with server management
 
-**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
 ---
 
 ### ☁️ Managed Cloud
-**Fully managed - accessible online**
 
 ✅ **Choose this if you:**
-- Want access from anywhere with zero setup
+- Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Cloud Guide](CLOUD.md)**
+**👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
 ---
 
 **Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
+
+## Manage Poznote
+
+If you need to change Poznote password, username or port, update to the latest version etc.
+
+---
+
+### 💻 Local
+
+**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
+
+---
+
+### 🖥️ Server
+
+**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
+
+---
+
+### ☁️ Managed Cloud
+
+**👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)**
+
+---
 
 ## Backup and Restore
 
