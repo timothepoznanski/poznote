@@ -123,6 +123,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 **👉 [View Cloud Guide](CLOUD.md)**
 
+<br>
 </td>
 </tr>
 </table>
