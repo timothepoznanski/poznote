@@ -83,7 +83,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 <tr>
 <td width="33%">
 
-### � Local (Your Computer)
+### 💻 Local (Your Computer)
 **Personal use only - not accessible online**
 
 ✅ **Choose this if you:**
@@ -93,8 +93,8 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 - Prefer maximum privacy (no internet exposure)
 
 **Requirements:**
-- Docker Desktop (free)
-- Windows, Mac, or Linux
+- **Windows/Mac:** Docker Desktop (free & easy)
+- **Linux:** Docker or manual installation
 - A few GB of disk space
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
