@@ -69,7 +69,7 @@ Choose your installation method:
 - Are comfortable with server management
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
-<br><br>
+<br>
 
 ### ☁️ Choose "Managed Cloud" method if you:
 
