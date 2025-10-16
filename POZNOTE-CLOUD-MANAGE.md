@@ -4,14 +4,14 @@ This guide will help you **Configure, update and manage** Poznote on cloud platf
 
 ## Table of Contents
 
-- [Option 1: Railway](#option-1-railway)
+- [Railway Cloud](#Railway Cloud)
   - [Get Your Instance URL](#get-your-instance-url)
   - [Change Poznote Settings](#change-poznote-settings)
   - [Poznote Password Recovery](#poznote-password-recovery)
   - [Update Poznote to the latest version](#update-poznote-to-the-latest-version)
-- [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
+- [Other Cloud Providers](#other-cloud-providers)
 
-## Option 1: Railway
+## Railway Cloud
 
 ### Get Your Instance URL
 
@@ -54,7 +54,7 @@ Railway will automatically:
 - Redeploy your instance
 - Preserve all your data (notes, attachments, database)
 
-## Option 2: Other Cloud Providers
+## Other Cloud Providers
 
 The management of your Poznote instance will depend on your chosen cloud provider. Each platform has its own interface and procedures for:
 

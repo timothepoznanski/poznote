@@ -14,7 +14,7 @@ This guide will help you **install** Poznote on cloud platforms without managing
 ## Option 1: Railway (Recommended)
 
 Railway.com offers the easiest way to install Poznote in the cloud. The platform provides:
-- Automated deployments from GitHub
+- Automated deployments
 - Automatic HTTPS
 - Easy scaling
 - One-click updates
