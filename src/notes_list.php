@@ -135,7 +135,7 @@ foreach($folders as $folderName => $notes) {
         $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
-        echo "<span class='note-title'>" . ($row1["heading"] ?: 'Untitled note') . "</span>";
+    echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }

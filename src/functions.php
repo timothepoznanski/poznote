@@ -101,8 +101,8 @@ function getWorkspaceFilter() {
 
 /**
  * Generate a unique note title to prevent duplicates
- * For "Untitled note", adds date and time
- * For other titles, adds a suffix number if duplicate exists
+ * Default to "New note" when empty.
+ * If a title already exists, add a numeric suffix like " (1)", " (2)", ...
  */
 function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = null) {
     global $con;
@@ -110,13 +110,7 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
     // Clean the original title
     $title = trim($originalTitle);
     if (empty($title)) {
-        $title = 'Untitled note';
-    }
-    
-    // For "Untitled note", always add date and time in YYMMddHHmmss format
-    if ($title === 'Untitled note') {
-        $dateTime = date('ymdHis'); // Format: YYMMddHHmmss
-        $title = 'Untitled-note-' . $dateTime;
+        $title = 'New note';
     }
     
     // Check if title already exists (excluding the current note if updating)
