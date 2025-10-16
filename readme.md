@@ -19,7 +19,6 @@
 ## Introduction
 
 Poznote is a personal, free, self-hosted note manager — simple and intuitive. Capture and organize your notes quickly while keeping full control over your data, with zero vendor lock-in. Notes are stored as plain HTML files, accessible even without the app. Fast, clean, and fully under your control — designed for those who value efficiency above all.
-<br>
 
 ![poznote](readme/poznote.png)
 
