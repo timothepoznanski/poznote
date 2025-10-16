@@ -112,12 +112,12 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 <td width="33%" valign="top">
 
 ### ☁️ Managed Cloud
-**Fully managed - zero maintenance**
+**Fully managed - accessible online**
 
 ✅ **Choose this if you:**
-- Want access from anywhere with zero setup
+- Want access from anywhere with almost zero setup
 - Have no experience with server management
-- Don't want to manage server and security
+- or don't want to manage server and security
 - Prefer one-clic updates
 - Are okay with ~$5/month
 
