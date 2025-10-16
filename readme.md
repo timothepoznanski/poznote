@@ -76,13 +76,19 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Getting Started
 
-These guides cover everything you need to deploy and run Poznote: installation, configuration, updates, and best practices.
+These comprehensive guides cover **everything you need** to deploy, configure, maintain, and update Poznote:
 
-Choose your deployment method:
+- ✅ **Installation** - Step-by-step deployment instructions
+- ⚙️ **Configuration** - Environment variables and settings
+- 🔄 **Updates** - How to update to the latest version
+- 🔧 **Maintenance** - Best practices and troubleshooting
+- 🔐 **Security** - Authentication and access control
 
-- 🖥️ Deploy Poznote on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+**Choose your deployment method:**
 
-- ☁️ Deploy Poznote on cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
+- 🖥️ **Self-Hosted** - Deploy on your own machine or server **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+
+- ☁️ **Cloud** - Deploy on Railway, AWS, or other cloud platforms **👉 [View Cloud Deployment Guide](CLOUD.md)**
 
 ## Backup and Restore
 
