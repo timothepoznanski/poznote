@@ -229,4 +229,10 @@ body {
   content: '';
 }
 
+/* Hide "Show Folder Actions" setting on mobile */
+@media (max-width: 800px) {
+    #folder-actions-card {
+        display: none !important;
+    }
+}
 

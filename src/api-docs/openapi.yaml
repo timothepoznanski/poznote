@@ -9,21 +9,13 @@ info:
 
 tags:
   - name: Notes Management
-    description: Create, read, update and delete notes
   - name: Trash Management
-    description: Manage notes in trash (list and restore)
   - name: Folders Management
-    description: Create and delete folders
   - name: Workspaces Management
-    description: List and create workspaces
   - name: Tags Management
-    description: List all tags and apply tags to notes
   - name: Attachments Management
-    description: Upload and list file attachments
   - name: Favorites Management
-    description: Add or remove notes from favorites
   - name: System Information
-    description: Version check and system updates
 
 security:
   - BasicAuth: []

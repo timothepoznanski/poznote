@@ -349,6 +349,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         refreshNoteSortBadge();
         
         // Make refresh functions available globally
+        window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
         window.refreshFontSizeBadge = refreshFontSizeBadge;
         window.refreshNoteSortBadge = refreshNoteSortBadge;
     })();

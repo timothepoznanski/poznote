@@ -7,11 +7,18 @@
     <div class="modal-content">
         <h3>📱 Application Version</h3>
         <p id="updateMessage"></p>
-        <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
-        <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Close</button>
-            <button type="button" class="btn-update" onclick="goToUpdateInstructions()">See Update instructions</button>
+        <div class="version-info">
+            <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
+            <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>
+        </div>
+        <div class="update-buttons-container">
+            <div class="update-instructions-buttons">
+                <button type="button" class="btn-update" onclick="goToSelfHostedUpdateInstructions()">Self-Hosted Instructions</button>
+                <button type="button" class="btn-update" onclick="goToCloudUpdateInstructions()">Cloud/Railway Instructions</button>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Close</button>
+            </div>
         </div>
     </div>
 </div>
