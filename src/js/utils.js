@@ -642,11 +642,11 @@ function closeUpdateModal() {
 }
 
 function goToSelfHostedUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote/blob/main/POZNOTE-SELF-HOSTED-MANAGE.md#update-to-latest-version', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/readme/POZNOTE-SELF-HOSTED-MANAGE.md#update-to-latest-version', '_blank');
 }
 
 function goToCloudUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote/blob/main/POZNOTE-CLOUD-MANAGE.md#poznote-updates', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/readme/POZNOTE-CLOUD-MANAGE.md#poznote-updates', '_blank');
 }
 
 function showUpdateCheckModal() {

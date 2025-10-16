@@ -60,7 +60,7 @@ Choose your installation method:
 - Have no experience with server management or don't want to manage server and security
 - Are ready to run a few commands (don't worry if you don't know how yet - it's not complicated!)
 
-**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
+**👉 [View Poznote Self-Hosted Install Guide](readme/POZNOTE-SELF-HOSTED-INSTALL.md)**
 <br><br>
 
 ### 🖥️ Choose "Server" method if you:
@@ -70,7 +70,7 @@ Choose your installation method:
 - Want complete control over your infrastructure
 - Want to keep your notes private
 
-**👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
+**👉 [View Poznote Self-Hosted Install Guide](readme/POZNOTE-SELF-HOSTED-INSTALL.md)**
 <br><br>
 
 ### ☁️ Choose "Managed Cloud" method if you:
@@ -81,18 +81,18 @@ Choose your installation method:
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
+**👉 [View Poznote Cloud Install Guide](readme/POZNOTE-CLOUD-INSTALL.md)**
 
 
 ## Manage Poznote
 
 If you need to change Poznote password, username or port, update to the latest version etc.
 
-- You have a "Local" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
+- You have a "Local" instance 👉 [View Poznote Self-Hosted Manage Guide](readme/POZNOTE-SELF-HOSTED-MANAGE.md)
 
-- You have a "Server" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
+- You have a "Server" instance 👉 [View Poznote Self-Hosted Manage Guide](readme/POZNOTE-SELF-HOSTED-MANAGE.md)
 
-- You have a "Managed Cloud" instance 👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)
+- You have a "Managed Cloud" instance 👉 [View Poznote Cloud Manage Guide](readme/POZNOTE-CLOUD-MANAGE.md)
 
 ## Backup and Restore
 
