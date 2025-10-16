@@ -116,7 +116,8 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ✅ **Choose this if you:**
 - Want access from anywhere with zero setup
-- Don't want to manage server and security
+- Don't want to manage server
+- or have no experience with server management
 - Prefer one-clic updates
 - Are okay with ~$5/month
 
