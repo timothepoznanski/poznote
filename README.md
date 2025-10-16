@@ -86,11 +86,11 @@ Choose your installation method:
 
 If you need to change Poznote password, username or port, update to the latest version etc.
 
-- 💻 You have a "Local" instance: [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
+- You have a "Local" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-- 🖥️ You have a "Server" instance: [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
+- You have a "Server" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-- ☁️ You have a "Managed Cloud" instance: [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)
+- You have a "Managed Cloud" instance 👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)
 
 ## Backup and Restore
 
