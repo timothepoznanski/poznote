@@ -22,8 +22,6 @@ Poznote is a personal, free, self-hosted, simple and intuitive note manager.<br>
 
 ![poznote](readme/poznote.png)
 
-![poznote-mobile](readme/poznote-mobile.png)
-
 ## Features
 
 - 📝 Rich Text Editor
@@ -34,7 +32,8 @@ Poznote is a personal, free, self-hosted, simple and intuitive note manager.<br>
 - 🖥️ Multi-instance support
 - 🗂️ Workspaces
 - 🏠 Self-hosted
-- 💾 Built-in backup and export tools
+- 💾 Built-in backup and restore tools
+- 📖 Export tool for offline reading
 - 🗑️ Trash system with restore functionality
 - 🔗 Public note sharing
 - 🌐 REST API for automation
