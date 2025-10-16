@@ -86,7 +86,7 @@ Choose your installation method:
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Cloud Guide](POZNOTE-CLOUD-INSTALL.md)**
+**👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
 ---
 

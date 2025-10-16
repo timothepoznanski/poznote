@@ -2,13 +2,6 @@
 
 This guide will help you **Install** Poznote on your own machine or server using Docker.
 
-With self-hosting, you have two options:
-
-- **🏠 Local install**: Keep your notes on your own computer (Windows/Linux) for complete privacy
-- **🌍 Server install**: Deploy on an internet-connected server (VPS, cloud VM, etc.) to access your notes from anywhere (phone, laptop, tablet)
-
-Both options give you complete control over your data with zero vendor lock-in.
-
 ## Table of Contents
 
 - [Installation](#installation)
