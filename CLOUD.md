@@ -39,7 +39,7 @@ Click the button below to start the deployment:
 
 Watch this 2-minute video tutorial that guides you through the entire deployment process:
 
-**[Watch the deployment tutorial](https://youtu.be/Q22kqv82bHQ)**
+**[Watch the deployment tutorial](https://youtu.be/RkN0-v8sz2w)**
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
