@@ -51,8 +51,6 @@ Password: `poznote`
 
 Choose your installation method:
 
----
-
 ### 💻 Local
 
 **Choose this if you:**
@@ -64,8 +62,6 @@ Choose your installation method:
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
----
-
 ### 🖥️ Server
 
 **Choose this if you:**
@@ -75,8 +71,6 @@ Choose your installation method:
 - Are comfortable with server management
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
-
----
 
 ### ☁️ Managed Cloud
 
@@ -88,33 +82,23 @@ Choose your installation method:
 
 **👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
----
-
 **Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
 
 ## Manage Poznote
 
 If you need to change Poznote password, username or port, update to the latest version etc.
 
----
-
 ### 💻 Local
 
 **👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
-
----
 
 ### 🖥️ Server
 
 **👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
 
----
-
 ### ☁️ Managed Cloud
 
 **👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)**
-
----
 
 ## Backup and Restore
 
