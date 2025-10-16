@@ -51,9 +51,8 @@ Password: `poznote`
 
 Choose your installation method:
 
-### 💻 Local
+### 💻 Choose Local method if you:
 
-**Choose this if you:**
 - Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
 - Want it completely free
@@ -62,9 +61,8 @@ Choose your installation method:
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
-### 🖥️ Server
+### 🖥️ Choose Server method if you:
 
-**Choose this if you:**
 - Want to access from anywhere
 - Have your own server or VPS
 - Want complete control over your infrastructure
@@ -72,9 +70,8 @@ Choose your installation method:
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
 
-### ☁️ Managed Cloud
+### ☁️ Choose Managed Cloud method if you:
 
-**Choose this if you:**
 - Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Prefer one-click updates
@@ -88,17 +85,11 @@ Choose your installation method:
 
 If you need to change Poznote password, username or port, update to the latest version etc.
 
-### 💻 Local
+### 💻 Local 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
+### 🖥️ Server 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-### 🖥️ Server
-
-**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
-
-### ☁️ Managed Cloud
-
-**👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)**
+### ☁️ Managed Cloud 👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)
 
 ## Backup and Restore
 
