@@ -578,20 +578,19 @@ function showUpdateInstructions(hasUpdate = false) {
         // Update modal title and content based on whether there's an update
         var titleEl = modal.querySelector('h3');
         var messageEl = modal.querySelector('#updateMessage');
-        var buttonEl = modal.querySelector('.btn-update');
+        var updateButtonsContainer = modal.querySelector('.update-instructions-buttons');
         
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = '🎉 New Update Available!';
             if (messageEl) messageEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
-            if (buttonEl) {
-                buttonEl.textContent = 'See Update instructions';
-                buttonEl.setAttribute('style', 'visibility: visible !important');
+            if (updateButtonsContainer) {
+                updateButtonsContainer.style.display = 'flex';
             }
         } else {
             if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
-            if (buttonEl) {
-                buttonEl.remove();
+            if (updateButtonsContainer) {
+                updateButtonsContainer.style.display = 'none';
             }
         }
         
@@ -642,8 +641,12 @@ function closeUpdateModal() {
     }
 }
 
-function goToUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote?tab=readme-ov-file#update-application-to-the-latest-version', '_blank');
+function goToSelfHostedUpdateInstructions() {
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/SELF_HOSTED.md#update-to-latest-version', '_blank');
+}
+
+function goToCloudUpdateInstructions() {
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/CLOUD.md#poznote-updates', '_blank');
 }
 
 function showUpdateCheckModal() {

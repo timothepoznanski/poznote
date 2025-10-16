@@ -818,6 +818,32 @@
     color: #007DB8;
 }
 
+/* Update buttons container */
+#updateModal .update-buttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(224,224,224,0.9);
+}
+
+/* Instructions buttons row */
+#updateModal .update-instructions-buttons {
+    display: none; /* Hidden by default, shown via JS when update available */
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Override modal-buttons for update modal to center the Close button */
+#updateModal .modal-buttons {
+    justify-content: center;
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
 #updateModal .btn-cancel {
     background-color: #6c757d !important;
     color: white !important;
@@ -832,6 +858,8 @@
     background-color: #007DB8 !important;
     color: white !important;
     border: none !important;
+    flex: 1;
+    max-width: 250px;
 }
 
 #updateModal .btn-update:hover {

@@ -75,7 +75,8 @@ window.moveNoteToFolder = moveNoteToFolder;
 window.showUpdateInstructions = showUpdateInstructions;
 window.closeUpdateModal = closeUpdateModal;
 window.closeUpdateCheckModal = closeUpdateCheckModal;
-window.goToUpdateInstructions = goToUpdateInstructions;
+window.goToSelfHostedUpdateInstructions = goToSelfHostedUpdateInstructions;
+window.goToCloudUpdateInstructions = goToCloudUpdateInstructions;
 
 // Functions for element events for elements (compatibility)
 window.updateidsearch = updateidsearch;
