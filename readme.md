@@ -81,7 +81,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 <table>
 <tr>
-<td width="33%">
+<td width="33%" valign="top">
 
 ### 💻 Local (Your Computer)
 **Personal use only - not accessible online**
@@ -95,7 +95,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 </td>
-<td width="33%">
+<td width="33%" valign="top">
 
 ### 🖥️ Self-Hosted Server
 **Your own server - accessible online**
@@ -109,7 +109,7 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 </td>
-<td width="33%">
+<td width="33%" valign="top">
 
 ### ☁️ Managed Cloud
 **Fully managed - zero maintenance**
