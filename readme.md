@@ -101,8 +101,8 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 **Your own server - accessible online**
 
 ✅ **Choose this if you:**
-- Have your own server or VPS
 - Want to access from anywhere
+- Have your own server or VPS
 - Want complete control over your infrastructure
 - Are comfortable with server management
 
