@@ -51,11 +51,8 @@ Password: `poznote`
 
 Choose your installation method:
 
----
+### 💻 Choose "Local" method if you:
 
-### 💻 Local
-
-✅ **Choose this if you:**
 - Want to use Poznote only on your Windows or Linux computer
 - Don't need access from other devices (your phone)
 - Want it completely free
@@ -63,24 +60,20 @@ Choose your installation method:
 - Have no experience with server management or don't want to manage server and security
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
+<br><br>
 
----
+### 🖥️ Choose "Server" method if you:
 
-### 🖥️ Server
-
-✅ **Choose this if you:**
 - Want to access from anywhere
 - Have your own server or VPS
 - Want complete control over your infrastructure
 - Are comfortable with server management
 
 **👉 [View Poznote Self-Hosted Install Guide](POZNOTE-SELF-HOSTED-INSTALL.md)**
+<br><br>
 
----
+### ☁️ Choose "Managed Cloud" method if you:
 
-### ☁️ Managed Cloud
-
-✅ **Choose this if you:**
 - Want access from anywhere with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Prefer one-click updates
@@ -88,33 +81,16 @@ Choose your installation method:
 
 **👉 [View Poznote Cloud Install Guide](POZNOTE-CLOUD-INSTALL.md)**
 
----
-
-**Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
 
 ## Manage Poznote
 
 If you need to change Poznote password, username or port, update to the latest version etc.
 
----
+- You have a "Local" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-### 💻 Local
+- You have a "Server" instance 👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)
 
-**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
-
----
-
-### 🖥️ Server
-
-**👉 [View Poznote Self-Hosted Manage Guide](POZNOTE-SELF-HOSTED-MANAGE.md)**
-
----
-
-### ☁️ Managed Cloud
-
-**👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)**
-
----
+- You have a "Managed Cloud" instance 👉 [View Poznote Cloud Manage Guide](POZNOTE-CLOUD-MANAGE.md)
 
 ## Backup and Restore
 
