@@ -9,7 +9,7 @@
 
 - [Introduction](#introduction)
 - [Features](#features)
-- [Try Poznote](#try-poznote)
+- [Play with Poznote demo](#play-with-poznote-demo)
 - [Tech Stack](#tech-stack)
 - [Install, Configure or Update](#install-configure-or-update)
 - [Backup and Restore](#backup-and-restore)
@@ -39,7 +39,7 @@ Poznote is a personal, free, self-hosted note manager — simple and intuitive. 
 - 🔗 Public note sharing
 - 🌐 REST API for automation
 
-## Try Poznote
+## Play with Poznote demo
 
 A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
