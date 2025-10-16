@@ -75,12 +75,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## Install, Configure or Update
 
-These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote:
-
-- ✅ **Installation** - Step-by-step deployment instructions
-- ⚙️ **Configuration** - Change settings
-- 🔄 **Updates** - Update to the latest version
-- 🔐 **Access** - Access to Poznote
+These comprehensive guides cover everything you need to **deploy, configure, update and manage** Poznote.
 
 **Choose your deployment method:**
 
