@@ -81,46 +81,67 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 <table>
 <tr>
-<td width="50%">
+<td width="33%">
 
-### 🖥️ Self-Hosted
-**Run Poznote on your own computer or server**
+### � Local (Your Computer)
+**Personal use only - not accessible online**
 
 ✅ **Choose this if you:**
-- Want to run Poznote on your personal computer (Windows, Mac, Linux)
-- Have a home server or VPS
-- Want complete control over your data
-- Prefer managing your own infrastructure
+- Want to use Poznote only on your computer
+- Don't need access from other devices
+- Want it completely free
+- Prefer maximum privacy (no internet exposure)
 
 **Requirements:**
-- Docker Desktop (free) OR basic server knowledge
+- Docker Desktop (free)
+- Windows, Mac, or Linux
 - A few GB of disk space
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
 </td>
-<td width="50%">
+<td width="33%">
 
-### ☁️ Cloud Deployment
-**Run Poznote on the internet (accessible anywhere)**
+### 🖥️ Self-Hosted Server
+**Your own server - accessible online**
 
 ✅ **Choose this if you:**
-- Want to access your notes from anywhere (phone, tablet, work computer)
-- Don't want to manage a server yourself
-- Are okay with a small monthly cost (~$5/month)
-- Want automatic backups and updates
+- Have your own server or VPS
+- Want to access from anywhere
+- Want complete control over your infrastructure
+- Are comfortable with server management
 
 **Requirements:**
-- A Railway, Render, or similar cloud account
-- Credit card for payment
+- A VPS or home server with public IP
+- Docker or manual installation
+- Basic server administration knowledge
 
-**👉 [View Cloud Deployment Guide](CLOUD.md)**
+**👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
+
+</td>
+<td width="33%">
+
+### ☁️ Managed Cloud
+**Fully managed - zero maintenance**
+
+✅ **Choose this if you:**
+- Want access from anywhere with zero setup
+- Don't want to manage servers
+- Prefer automatic updates and backups
+- Are okay with ~$5/month
+
+**Requirements:**
+- Railway, Render, or similar account
+- Credit card for payment
+- 5 minutes of your time
+
+**👉 [View Cloud Guide](CLOUD.md)**
 
 </td>
 </tr>
 </table>
 
-**Not sure which to choose?** Start with **Self-Hosted** on your computer - it's free and you can always migrate to cloud later.
+**Not sure which to choose?** Start with **Local** on your computer - it's free and you can always migrate later.
 
 ## Backup and Restore
 
