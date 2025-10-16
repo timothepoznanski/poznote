@@ -18,7 +18,7 @@
 
 ## Introduction
 
-Poznote is a lightweight, free, self-hosted note-taking web app that gives you full control over your data — with zero vendor lock-in. Notes are stored as plain HTML files, keeping them accessible even without the app. Despite its minimal resource usage, Poznote delivers powerful features like a rich text editor, tagging, workspaces, file attachments, REST API, full-text search, responsive design, and note sharing. It’s built for those who value efficiency above all — fast, simple, and always under your control.
+Poznote is a personal, free, self-hosted note manager — simple and intuitive. Capture and organize your notes quickly while keeping full control over your data, with zero vendor lock-in. Notes are stored as plain HTML files, accessible even without the app. Fast, clean, and fully under your control — designed for those who value efficiency above all.
 
 ![poznote](readme/poznote.png)
 
