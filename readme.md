@@ -10,10 +10,10 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Play with Poznote demo](#play-with-poznote-demo)
-- [Tech Stack](#tech-stack)
 - [Install, Configure or Update](#install-configure-or-update)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
+- [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
 
 ## Introduction
@@ -45,33 +45,6 @@ A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-dem
 Username: `poznote`
 <br>
 Password: `poznote`
-
-## Tech Stack
-
-Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
-
-<details>
-<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
-
-### Backend
-- **PHP 8.x** - Server-side scripting language
-- **SQLite 3** - Lightweight, file-based relational database
-
-### Frontend
-- **HTML5** - Markup and structure
-- **CSS3** - Styling and responsive design
-- **JavaScript (Vanilla)** - Interactive features and dynamic content
-- **AJAX** - Asynchronous data loading
-
-### Storage
-- **HTML files** - Notes are stored as plain HTML files in the filesystem
-- **SQLite database** - Metadata, tags, relationships, and user data
-- **File attachments** - Stored directly in the filesystem
-
-### Infrastructure
-- **Apache HTTP Server** - Web server
-- **Docker** - Containerization for easy deployment and portability
-</details>
 
 ## Install, Configure or Update
 
@@ -158,6 +131,33 @@ Upload the complete backup ZIP to restore everything:
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
+
+## Tech Stack
+
+Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
+
+<details>
+<summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
+
+### Backend
+- **PHP 8.x** - Server-side scripting language
+- **SQLite 3** - Lightweight, file-based relational database
+
+### Frontend
+- **HTML5** - Markup and structure
+- **CSS3** - Styling and responsive design
+- **JavaScript (Vanilla)** - Interactive features and dynamic content
+- **AJAX** - Asynchronous data loading
+
+### Storage
+- **HTML files** - Notes are stored as plain HTML files in the filesystem
+- **SQLite database** - Metadata, tags, relationships, and user data
+- **File attachments** - Stored directly in the filesystem
+
+### Infrastructure
+- **Apache HTTP Server** - Web server
+- **Docker** - Containerization for easy deployment and portability
+</details>
 
 ## API Documentation
 
