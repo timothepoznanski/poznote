@@ -59,9 +59,10 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 
 ✅ **Choose this if you:**
 - Want to use Poznote only on your computer
-- Don't need access from other devices
+- Don't need access from other devices (your phone)
 - Want it completely free
 - Prefer maximum privacy (no internet exposure)
+- Have no experience with server management or don't want to manage server and security
 
 **👉 [View Self-Hosted Guide](SELF_HOSTED.md)**
 
@@ -81,14 +82,13 @@ These comprehensive guides cover everything you need to **deploy, configure, upd
 ---
 
 ### ☁️ Managed Cloud
-**Fully managed - zero maintenance**
+**Fully managed - accessible online**
 
 ✅ **Choose this if you:**
 - Want access from anywhere with zero setup
-- Have no experience with server management
-- Or don't want to manage server and security
-- Prefer one-clic updates
-- Are okay with ~$5/month
+- Have no experience with server management or don't want to manage server and security
+- Prefer one-click updates
+- Are okay with approximately $5/month (Cloud provider fees)
 
 **👉 [View Cloud Guide](CLOUD.md)**
 
