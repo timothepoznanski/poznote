@@ -1,6 +1,6 @@
 # Poznote - Self-Hosted Guide
 
-This guide will help you deploy Poznote on your own machine or server using Docker.
+This guide will help you **deploy, configure, update and manage** Poznote on your own machine or server using Docker.
 
 With self-hosting, you have two options:
 - **🏠 Local deployment**: Keep your notes on your own computer (Windows/Linux) for complete privacy
