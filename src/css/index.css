@@ -390,7 +390,7 @@ body {
     overflow-x: hidden;
     padding: 6 16 16 16;
     box-sizing: border-box;
-    background: #FFFFFF;
+    background: #f8f9fa;
     flex-shrink: 0;
     /* Hide scrollbars but keep scroll functionality for all screen sizes */
     -ms-overflow-style: none;  /* IE and Edge */
@@ -575,7 +575,7 @@ body {
 .resize-handle {
     width: 3px;
     height: 100vh;
-    background: #FFFFFF;
+    background: #f8f9fa;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
@@ -982,7 +982,7 @@ a.links_arbo_left.selected-note {
     padding: 10px 12px 10px 44px;
     border-radius: 8px;
     /* border: 1px solid #d3d6db; */
-    background: #f6f7f9;
+    background: #ffffff;
     font-size: 0.9em;
     transition: border-color 0.18s, box-shadow 0.18s;
     box-shadow: 0 0 0 1px #e6e6e6;
