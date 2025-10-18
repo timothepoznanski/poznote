@@ -198,6 +198,69 @@ function parseMarkdown(text) {
             continue;
         }
         
+        // Tables - detect table rows (lines with | separators)
+        if (line.match(/^\s*\|.+\|\s*$/)) {
+            flushParagraph();
+            
+            let tableRows = [];
+            let isFirstRow = true;
+            let hasHeaderSeparator = false;
+            
+            // Collect all consecutive table rows
+            while (i < lines.length && lines[i].match(/^\s*\|.+\|\s*$/)) {
+                let currentLine = lines[i].trim();
+                
+                // Check if this is a header separator line (|---|---|)
+                if (currentLine.match(/^\|[\s\-:|]+\|$/)) {
+                    hasHeaderSeparator = true;
+                    i++;
+                    continue;
+                }
+                
+                // Parse table cells
+                let cells = currentLine
+                    .split('|')
+                    .slice(1, -1) // Remove first and last empty elements
+                    .map(cell => cell.trim());
+                
+                tableRows.push({
+                    cells: cells,
+                    isHeader: isFirstRow && !hasHeaderSeparator
+                });
+                
+                if (isFirstRow) {
+                    isFirstRow = false;
+                }
+                
+                i++;
+            }
+            i--; // Adjust because the for loop will increment
+            
+            // Generate HTML table
+            if (tableRows.length > 0) {
+                let tableHTML = '<table>';
+                let hasHeader = hasHeaderSeparator || tableRows[0].isHeader;
+                
+                // Process rows
+                for (let r = 0; r < tableRows.length; r++) {
+                    let row = tableRows[r];
+                    let isHeaderRow = (r === 0 && hasHeader);
+                    let cellTag = isHeaderRow ? 'th' : 'td';
+                    
+                    tableHTML += '<tr>';
+                    for (let c = 0; c < row.cells.length; c++) {
+                        let cellContent = applyInlineStyles(row.cells[c]);
+                        tableHTML += '<' + cellTag + '>' + cellContent + '</' + cellTag + '>';
+                    }
+                    tableHTML += '</tr>';
+                }
+                
+                tableHTML += '</table>';
+                result.push(tableHTML);
+            }
+            continue;
+        }
+        
         // Regular text - add to current paragraph
         currentParagraph.push(line);
     }
