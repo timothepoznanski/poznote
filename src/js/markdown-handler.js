@@ -373,10 +373,10 @@ function initializeMarkdownNote(noteId) {
         const shouldScroll = new URLSearchParams(window.location.search).get('scroll') === '1';
         const shouldScrollFromSession = sessionStorage.getItem('shouldScrollToNote') === 'true';
         
-        // Only focus (which triggers scroll) if we're on desktop or if we explicitly want to scroll to the note
-        if (!isMobile || shouldScroll || shouldScrollFromSession) {
-            editorDiv.focus();
-        }
+        // Focus disabled - don't automatically focus the editor when opening a note
+        // if (!isMobile || shouldScroll || shouldScrollFromSession) {
+        //     editorDiv.focus();
+        // }
     }
 }
 
@@ -394,7 +394,8 @@ function switchToEditMode(noteId) {
     // Switch to edit mode
     previewDiv.style.display = 'none';
     editorDiv.style.display = 'block';
-    editorDiv.focus();
+    // Focus disabled - don't automatically focus when switching to edit mode
+    // editorDiv.focus();
     
     // Show preview button, hide edit button
     if (editBtn) editBtn.style.display = 'none';
