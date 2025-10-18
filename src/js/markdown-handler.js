@@ -297,17 +297,21 @@ function initializeMarkdownNote(noteId) {
         noteEntry.setAttribute('data-markdown-content', markdownContent);
     }
     
+    // Determine initial mode: preview if content exists, edit if empty
+    var isEmpty = markdownContent.trim() === '';
+    var startInEditMode = isEmpty;
+    
     // Create preview and editor containers
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
     previewDiv.innerHTML = parseMarkdown(markdownContent);
-    previewDiv.style.display = 'none'; // Hidden initially (we start in edit mode)
+    previewDiv.style.display = startInEditMode ? 'none' : 'block'; // Show if not empty
     
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
-    editorDiv.style.display = 'block'; // Visible initially (we start in edit mode)
+    editorDiv.style.display = startInEditMode ? 'block' : 'none'; // Show if empty
     editorDiv.setAttribute('data-ph', 'Write your markdown here...');
     
     // Replace note content with preview and editor
@@ -319,13 +323,19 @@ function initializeMarkdownNote(noteId) {
     // Add edit and preview buttons in toolbar
     var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
     if (toolbar) {
-        // Edit button (markdown icon) - hidden in edit mode
+        // Hide separator button for markdown notes
+        var separatorBtn = toolbar.querySelector('.btn-separator');
+        if (separatorBtn) {
+            separatorBtn.style.display = 'none';
+        }
+        
+        // Edit button (markdown icon) - hidden in edit mode, visible in preview mode
         var editBtn = document.createElement('button');
         editBtn.type = 'button';
         editBtn.className = 'toolbar-btn markdown-edit-btn note-action-btn';
         editBtn.innerHTML = '<i class="fa-markdown"></i>';
         editBtn.title = 'Edit markdown';
-        editBtn.style.display = 'none'; // Hidden initially (we start in edit mode)
+        editBtn.style.display = startInEditMode ? 'none' : ''; // Hidden if empty (edit mode), visible if not empty (preview mode)
         editBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -333,13 +343,13 @@ function initializeMarkdownNote(noteId) {
         };
         toolbar.insertBefore(editBtn, toolbar.firstChild);
         
-        // Preview button (eye icon) - visible in edit mode
+        // Preview button (eye icon) - visible in edit mode, hidden in preview mode
         var previewBtn = document.createElement('button');
         previewBtn.type = 'button';
         previewBtn.className = 'toolbar-btn markdown-preview-btn note-action-btn';
         previewBtn.innerHTML = '<i class="fa-eye"></i>';
         previewBtn.title = 'Preview markdown';
-        previewBtn.style.display = ''; // Visible initially (we start in edit mode)
+        previewBtn.style.display = startInEditMode ? '' : 'none'; // Visible if empty (edit mode), hidden if not empty (preview mode)
         previewBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -351,10 +361,14 @@ function initializeMarkdownNote(noteId) {
     // Setup event listeners for the editor
     setupMarkdownEditorListeners(noteId);
     
-    // Set the global noteid and give focus to the editor (we start in edit mode)
+    // Set the global noteid
     noteid = noteId;
     window.noteid = noteId;
-    editorDiv.focus();
+    
+    // Give focus to the editor only if starting in edit mode (empty note)
+    if (startInEditMode) {
+        editorDiv.focus();
+    }
 }
 
 function switchToEditMode(noteId) {

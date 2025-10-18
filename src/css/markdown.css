@@ -1,5 +1,10 @@
 /* Markdown note styles */
 
+/* Hide separator button and formatting buttons for markdown notes */
+[data-note-type="markdown"] ~ .note-toolbar .btn-separator {
+    display: none !important;
+}
+
 .markdown-preview {
     padding: 10px;
     min-height: 100px;
