@@ -303,6 +303,11 @@ function refreshLeftColumnForWorkspace(workspaceName) {
                 if (typeof reinitializeClickableTagsAfterAjax === 'function') {
                     reinitializeClickableTagsAfterAjax();
                 }
+                
+                // Reinitialize note click handlers for mobile scroll functionality
+                if (typeof window.initializeNoteClickHandlers === 'function') {
+                    window.initializeNoteClickHandlers();
+                }
             } catch (error) {
                 console.error('Error reinitializing after workspace change:', error);
             }
