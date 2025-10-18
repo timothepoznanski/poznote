@@ -35,6 +35,25 @@ $note_id = trim($data['note_id']);
 $permanent = isset($data['permanent']) ? (bool)$data['permanent'] : false;
 
 try {
+    // First, check if this is the protected note by getting its heading
+    $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
+
+    if ($workspace) {
+        $checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $checkStmt->execute([$note_id, $workspace, $workspace]);
+    } else {
+        $checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+        $checkStmt->execute([$note_id]);
+    }
+    $heading = $checkStmt->fetchColumn();
+    
+    // Protection: Prevent deletion of the special "THINGS TO KNOW BEFORE TESTING" note
+    if ($heading === 'THINGS TO KNOW BEFORE TESTING') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'This note is protected and cannot be deleted']);
+        exit;
+    }
+
     // Vérifier que la note existe
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 

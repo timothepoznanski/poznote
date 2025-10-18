@@ -3526,3 +3526,79 @@ input[type="search"]::-webkit-search-results-decoration {
   /* transform: scale(1.18); */
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
+
+/* Protected note styling */
+.protected-note {
+  position: relative;
+}
+
+.protected-note::before {
+  content: "🔒";
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.protected-note .note-title {
+  padding-right: 20px; /* Make space for the lock icon */
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* Protected note content and title */
+.protected-title {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+
+.protected-note-content {
+  background-color: #f8fafc !important;
+  cursor: not-allowed !important;
+  opacity: 0.9;
+  border-left: 3px solid #2563eb;
+  position: relative;
+}
+
+.protected-note-content::before {
+  content: "🔒 Cette note est protégée en lecture seule";
+  display: block;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 8px 12px;
+  margin: -10px -10px 15px -10px;
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid #bfdbfe;
+}
+
+/* Protected tags styling */
+.protected-tags {
+  opacity: 0.8;
+}
+
+.readonly-tag {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.readonly-tag::after {
+  content: "🔒";
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+/* Protected note action buttons */
+.toolbar-btn[disabled] {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  background-color: #f1f5f9 !important;
+}

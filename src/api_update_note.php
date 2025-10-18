@@ -37,6 +37,28 @@ if (empty($id)) {
     exit;
 }
 
+// Protection: Prevent modification of the special "THINGS TO KNOW BEFORE TESTING" note
+// Check both the new title and the current title in the database
+if ($originalHeading === 'THINGS TO KNOW BEFORE TESTING') {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'This note is protected and cannot be modified']);
+    exit;
+}
+
+// Also check the current title in the database
+try {
+    $currentStmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+    $currentStmt->execute([$id]);
+    $currentHeading = $currentStmt->fetchColumn();
+    if ($currentHeading === 'THINGS TO KNOW BEFORE TESTING') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'This note is protected and cannot be modified']);
+        exit;
+    }
+} catch (Exception $e) {
+    // Continue if we can't check current heading
+}
+
 if ($originalHeading === '') {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'heading is required']);

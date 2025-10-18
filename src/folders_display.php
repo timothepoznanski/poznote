@@ -9,13 +9,29 @@
 function organizeNotesByFolder($stmt_left, $defaultFolderName) {
     $folders = [];
     $folders_with_results = [];
+    $specialNote = null;
     
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
         $folder = $row1["folder"] ?: $defaultFolderName;
         if (!isset($folders[$folder])) {
             $folders[$folder] = [];
         }
-        $folders[$folder][] = $row1;
+        
+        // Separate the special note to put it first
+        if ($row1["heading"] === 'THINGS TO KNOW BEFORE TESTING') {
+            $specialNote = $row1;
+        } else {
+            $folders[$folder][] = $row1;
+        }
+    }
+    
+    // Add special note at the beginning of its folder if it exists
+    if ($specialNote) {
+        $specialFolder = $specialNote["folder"] ?: $defaultFolderName;
+        if (!isset($folders[$specialFolder])) {
+            $folders[$specialFolder] = [];
+        }
+        array_unshift($folders[$specialFolder], $specialNote);
     }
     
     return $folders;

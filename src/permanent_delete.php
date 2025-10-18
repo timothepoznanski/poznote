@@ -8,8 +8,26 @@
 	
 	$id = $_POST['id'];
 	
-	// Get note data before deletion to access attachments
+	// Get note data and check if it's protected
 	$workspace = $_POST['workspace'] ?? null;
+
+	// First check the heading to see if it's protected
+	if ($workspace) {
+		$checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+		$checkStmt->execute([$id, $workspace, $workspace]);
+	} else {
+		$checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
+		$checkStmt->execute([$id]);
+	}
+	$heading = $checkStmt->fetchColumn();
+	
+	// Protection: Prevent deletion of the special "THINGS TO KNOW BEFORE TESTING" note
+	if ($heading === 'THINGS TO KNOW BEFORE TESTING') {
+		echo 'This note is protected and cannot be deleted';
+		exit;
+	}
+
+	// Get note data before deletion to access attachments
 
 	if ($workspace) {
 		$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");

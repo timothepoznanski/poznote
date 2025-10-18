@@ -123,6 +123,11 @@ foreach($folders as $folderName => $notes) {
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
+        // Add protected note class for the special note
+        if ($row1["heading"] === 'THINGS TO KNOW BEFORE TESTING') {
+            $noteClass .= ' protected-note';
+        }
+        
         // Add onclick handler for AJAX loading (desktop only, mobile uses touch handlers)
         $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
         $escapedLink = htmlspecialchars($link, ENT_QUOTES);
