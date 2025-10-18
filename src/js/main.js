@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize automatic update checking (once per day)
     checkForUpdatesAutomatic();
     
+    // Restore folder states from localStorage
+    restoreFolderStates();
+    
 });
 
 // Global functions available for HTML (compatibility)
@@ -45,6 +48,7 @@ window.executeDeleteFolder = executeDeleteFolder;
 window.showDeleteFolderModal = showDeleteFolderModal;
 window.selectFolder = selectFolder;
 window.toggleFolder = toggleFolder;
+window.restoreFolderStates = restoreFolderStates;
 window.showNewWorkspacePrompt = showNewWorkspacePrompt;
 window.deleteCurrentWorkspace = deleteCurrentWorkspace;
 window.startDownload = startDownload;

@@ -48,16 +48,6 @@ function convertTagsToEditable(noteId) {
         return;
     }
     
-    // Disable tag editing for protected note
-    // Get the note title to check if it's protected
-    const titleInput = document.getElementById('inp' + noteId);
-    const noteTitle = titleInput ? titleInput.value : '';
-    
-    if (noteTitle === 'THINGS TO KNOW BEFORE TESTING') {
-        renderProtectedTags(tagsInput, nameTagsContainer);
-        return;
-    }
-    
     const tagsValue = tagsInput.value.trim();
     
     // Remove existing editable container if it exists
@@ -840,45 +830,7 @@ function redirectToTag(tag) {
     window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
 }
 
-/**
- * Render protected tags (read-only) for the special protected note
- */
-function renderProtectedTags(tagsInput, nameTagsContainer) {
-    // Clear existing editable container
-    const existingContainer = nameTagsContainer.querySelector('.editable-tags-container');
-    if (existingContainer) {
-        existingContainer.remove();
-    }
-    
-    // Create protected tags container
-    const protectedContainer = document.createElement('div');
-    protectedContainer.className = 'editable-tags-container protected-tags';
-    
-    // Get current tags value
-    const tagsValue = tagsInput.value || '';
-    const tags = tagsValue.split(/[\s,]+/).filter(tag => tag.trim() !== '');
-    
-    // Render tags as read-only
-    tags.forEach(tag => {
-        const tagSpan = document.createElement('span');
-        tagSpan.className = 'tag-item readonly-tag';
-        tagSpan.textContent = tag;
-        tagSpan.title = 'Protected tag (read-only)';
-        protectedContainer.appendChild(tagSpan);
-    });
-    
-    // Add info text if no tags
-    if (tags.length === 0) {
-        const noTagsSpan = document.createElement('span');
-        noTagsSpan.className = 'no-tags-placeholder';
-        noTagsSpan.textContent = 'No tags (protected)';
-        noTagsSpan.style.opacity = '0.6';
-        protectedContainer.appendChild(noTagsSpan);
-    }
-    
-    // Add the protected container to the name_tags element
-    nameTagsContainer.appendChild(protectedContainer);
-}
+
 
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;

@@ -46,13 +46,6 @@ try {
         $checkStmt->execute([$note_id]);
     }
     $heading = $checkStmt->fetchColumn();
-    
-    // Protection: Prevent deletion of the special "THINGS TO KNOW BEFORE TESTING" note
-    if ($heading === 'THINGS TO KNOW BEFORE TESTING') {
-        http_response_code(403);
-        echo json_encode(['success' => false, 'message' => 'This note is protected and cannot be deleted']);
-        exit;
-    }
 
     // Vérifier que la note existe
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;

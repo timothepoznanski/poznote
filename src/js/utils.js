@@ -997,6 +997,50 @@ function toggleFolder(folderId) {
     }
 }
 
+/**
+ * Restore folder states from localStorage on page load
+ * This preserves user preferences for which folders should stay open/closed
+ */
+function restoreFolderStates() {
+    // Get all folder toggle elements
+    const folderToggles = document.querySelectorAll('[data-folder-id]');
+    
+    folderToggles.forEach(function(toggleElement) {
+        const folderId = toggleElement.getAttribute('data-folder-id');
+        const folderContent = document.getElementById(folderId);
+        const icon = toggleElement.querySelector('.folder-icon');
+        
+        if (!folderContent || !folderId) return;
+        
+        // Get the folder name to check if it's Favorites
+        const folderHeader = toggleElement.closest('.folder-header');
+        const folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
+        const folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+        
+        // Check localStorage for this folder's state
+        const savedState = localStorage.getItem('folder_' + folderId);
+        
+        // Only override the PHP-determined state if user has explicitly set a preference
+        if (savedState === 'open') {
+            // User explicitly opened this folder - keep it open
+            folderContent.style.display = 'block';
+            if (icon && folderNameText !== 'Favorites') {
+                icon.classList.remove('fa-folder');
+                icon.classList.add('fa-folder-open');
+            }
+        } else if (savedState === 'closed') {
+            // User explicitly closed this folder - keep it closed
+            folderContent.style.display = 'none';
+            if (icon && folderNameText !== 'Favorites') {
+                icon.classList.remove('fa-folder-open');
+                icon.classList.add('fa-folder');
+            }
+        }
+        // If no saved state exists, leave the folder as it was set by PHP logic
+        // This preserves the smart PHP logic for determining initial folder states
+    });
+}
+
 function emptyFolder(folderName) {
     showConfirmModal(
         'Empty Folder',

@@ -20,12 +20,6 @@
 		$checkStmt->execute([$id]);
 	}
 	$heading = $checkStmt->fetchColumn();
-	
-	// Protection: Prevent deletion of the special "THINGS TO KNOW BEFORE TESTING" note
-	if ($heading === 'THINGS TO KNOW BEFORE TESTING') {
-		echo 'This note is protected and cannot be deleted';
-		exit;
-	}
 
 	// Get note data before deletion to access attachments
 
