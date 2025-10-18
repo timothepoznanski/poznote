@@ -70,6 +70,47 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Delete oldest release and tag
+        if: steps.check_version.outputs.needs_update == 'true'
+        run: |
+          # Keep only the 10 most recent releases
+          KEEP_COUNT=10
+          
+          # Get all releases sorted by creation date (newest first)
+          all_releases=$(gh release list --limit 1000 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[].tagName')
+          
+          # Count total releases
+          total_releases=$(echo "$all_releases" | wc -l)
+          echo "� Total releases: $total_releases"
+          
+          if [ "$total_releases" -gt "$KEEP_COUNT" ]; then
+            # Get releases to delete (everything after the first KEEP_COUNT)
+            releases_to_delete=$(echo "$all_releases" | tail -n +$((KEEP_COUNT + 1)))
+            
+            echo "🗑️  Deleting old releases (keeping $KEEP_COUNT most recent):"
+            
+            # Delete each old release and its tag
+            while IFS= read -r tag; do
+              if [ -n "$tag" ]; then
+                echo "  - Deleting release: $tag"
+                
+                # Delete the release
+                gh release delete "$tag" --yes 2>/dev/null || echo "    ⚠️  Failed to delete release $tag"
+                
+                # Delete the tag remotely
+                git push origin --delete "$tag" 2>/dev/null || echo "    ⚠️  Tag $tag not found on remote"
+                
+                echo "    ✅ Deleted: $tag"
+              fi
+            done <<< "$releases_to_delete"
+            
+            echo "✅ Cleanup completed - kept $KEEP_COUNT most recent releases"
+          else
+            echo "ℹ️  No cleanup needed (only $total_releases releases, keeping $KEEP_COUNT)"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Log in to GitHub Container Registry
         if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/login-action@v3
