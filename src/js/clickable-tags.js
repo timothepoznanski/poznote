@@ -830,6 +830,8 @@ function redirectToTag(tag) {
     window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
 }
 
+
+
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;
 window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;

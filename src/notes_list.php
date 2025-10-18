@@ -124,8 +124,8 @@ foreach($folders as $folderName => $notes) {
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
         // Add onclick handler for AJAX loading (desktop only, mobile uses touch handlers)
-        $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES);
-        $escapedLink = htmlspecialchars($link, ENT_QUOTES);
+        $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES, 'UTF-8');
+        $escapedLink = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
         
         // Escape for JavaScript (for onclick handler) - use json_encode but without outer quotes
         $jsEscapedHeading = json_encode($row1["heading"], JSON_HEX_APOS | JSON_HEX_QUOT);
@@ -135,7 +135,7 @@ foreach($folders as $folderName => $notes) {
         $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
-    echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }

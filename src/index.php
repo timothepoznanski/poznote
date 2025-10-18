@@ -644,10 +644,10 @@ $body_classes = trim($extra_body_classes);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
                     // Individual action buttons
-                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" title="Duplicate" onclick="duplicateNote(\''.$row['id'].'\')"><i class="fa-file-copy-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" title="Move" onclick="showMoveFolderDialog(\''.$row['id'].'\')"><i class="fa-drive-file-move-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-file-copy-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-drive-file-move-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-download"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" title="Delete" onclick="deleteNote(\''.$row['id'].'\')"><i class="fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
                 
                     echo '</div>';
@@ -685,8 +685,9 @@ $body_classes = trim($extra_body_classes);
                     
                     // Hidden folder value for the note
                     echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
-                    // Title
-                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'New note'), ENT_QUOTES).'"/></h4>';
+                    
+                    // Title - disable for protected note
+                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'New note'), ENT_QUOTES, 'UTF-8').'"/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
                     if (!empty($row['created'])) {
@@ -699,7 +700,7 @@ $body_classes = trim($extra_body_classes);
                     }
                 
                     // Prepare subheading/location display (prefer explicit subheading, fallback to location)
-                    $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES);
+                    $subheading_display = htmlspecialchars($row['subheading'] ?? ($row['location'] ?? ''), ENT_QUOTES, 'UTF-8');
 
                     // Determine whether we actually need to render the subline block.
                     $show_created_setting = false;
@@ -734,7 +735,7 @@ $body_classes = trim($extra_body_classes);
                                 echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>Add subheading here</em></span>';
                             }
                         }
-                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES).'" />';
+                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
                         echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
                         echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
                         echo '</div>';
@@ -757,6 +758,7 @@ $body_classes = trim($extra_body_classes);
                     // Note content with font size style
                     $note_type = $row['type'] ?? 'note';
                     $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
+                    
                     echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$entryfinal.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';

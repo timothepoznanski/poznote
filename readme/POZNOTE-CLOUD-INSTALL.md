@@ -46,7 +46,7 @@ After deployment is complete:
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
 
-Or watch the end of the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to get the URL.
+Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
 
 **Step 2: Log In**
 

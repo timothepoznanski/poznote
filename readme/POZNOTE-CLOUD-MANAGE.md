@@ -4,7 +4,7 @@ This guide will help you **Configure, update and manage** Poznote on cloud platf
 
 ## Table of Contents
 
-- [Railway Cloud](#Railway Cloud)
+- [Railway Cloud](#railway-cloud)
   - [Get Your Instance URL](#get-your-instance-url)
   - [Change Poznote Settings](#change-poznote-settings)
   - [Poznote Password Recovery](#poznote-password-recovery)
@@ -21,7 +21,7 @@ This guide will help you **Configure, update and manage** Poznote on cloud platf
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
 
-Or watch the end of the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to get the URL.
+Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
 
 Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
 

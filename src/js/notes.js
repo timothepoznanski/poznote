@@ -38,7 +38,6 @@ function saveNote() {
     }
     
     if(updateNoteEnCours == 1) {
-        showNotificationPopup("Save running...");
         return;
     }
     
