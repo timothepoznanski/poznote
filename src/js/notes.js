@@ -19,7 +19,7 @@ function createNewNote() {
             if(res.status === 1) {
                 window.scrollTo(0, 0);
                 var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
-                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id;
+                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
             } else {
                 showNotificationPopup(res.error || 'Error creating note', 'error');
             }
@@ -206,6 +206,10 @@ function deleteNote(noteId) {
 
 function redirectToWorkspace() {
     var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+    // Ensure we don't scroll to note after delete on mobile
+    if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('shouldScrollToNote');
+    }
     window.location.href = wsRedirect;
 }
 

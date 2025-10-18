@@ -217,11 +217,15 @@ window.loadNoteDirectly = function(url, noteId, event) {
                                     reinitializeNoteContent();
 
                                     // Auto-scroll to right column on mobile after note is loaded
-                                    // But only if we actually have a noteId (i.e., a specific note was clicked)
+                                    // Only if the user clicked on a note (sessionStorage flag)
                                     if (isMobileDevice() && noteId && typeof scrollToRightColumn === 'function') {
-                                        setTimeout(() => {
-                                            scrollToRightColumn();
-                                        }, 100);
+                                        const shouldScroll = sessionStorage.getItem('shouldScrollToNote');
+                                        if (shouldScroll === 'true') {
+                                            setTimeout(() => {
+                                                scrollToRightColumn();
+                                                sessionStorage.removeItem('shouldScrollToNote');
+                                            }, 100);
+                                        }
                                     }
 
                                     // Reapply highlights after content has been reinitialized.

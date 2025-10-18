@@ -134,20 +134,9 @@ try {
     $stmt->execute($params);
     
     $notes = array();
-    $specialNote = null;
     
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Separate the special note to put it first
-        if ($row['heading'] === 'THINGS TO KNOW BEFORE TESTING') {
-            $specialNote = $row;
-        } else {
-            $notes[] = $row;
-        }
-    }
-    
-    // Add special note at the beginning if it exists
-    if ($specialNote) {
-        array_unshift($notes, $specialNote);
+        $notes[] = $row;
     }
 
     echo json_encode(['success' => true, 'notes' => $notes]);

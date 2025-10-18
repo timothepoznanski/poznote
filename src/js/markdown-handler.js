@@ -366,8 +366,17 @@ function initializeMarkdownNote(noteId) {
     window.noteid = noteId;
     
     // Give focus to the editor only if starting in edit mode (empty note)
+    // But not on mobile to avoid unwanted scrolling
     if (startInEditMode) {
-        editorDiv.focus();
+        // Check if we're not on mobile or if we explicitly want to scroll
+        const isMobile = typeof isMobileDevice === 'function' ? isMobileDevice() : (window.innerWidth <= 800);
+        const shouldScroll = new URLSearchParams(window.location.search).get('scroll') === '1';
+        const shouldScrollFromSession = sessionStorage.getItem('shouldScrollToNote') === 'true';
+        
+        // Focus disabled - don't automatically focus the editor when opening a note
+        // if (!isMobile || shouldScroll || shouldScrollFromSession) {
+        //     editorDiv.focus();
+        // }
     }
 }
 
@@ -385,7 +394,8 @@ function switchToEditMode(noteId) {
     // Switch to edit mode
     previewDiv.style.display = 'none';
     editorDiv.style.display = 'block';
-    editorDiv.focus();
+    // Focus disabled - don't automatically focus when switching to edit mode
+    // editorDiv.focus();
     
     // Show preview button, hide edit button
     if (editBtn) editBtn.style.display = 'none';
@@ -416,9 +426,15 @@ function switchToPreviewMode(noteId) {
     if (editBtn) editBtn.style.display = '';
     if (previewBtn) previewBtn.style.display = 'none';
     
-    // Mark as edited and trigger save
-    if (typeof updateNote === 'function') {
-        updateNote();
+    // Check if content has actually changed before triggering save
+    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
+    var currentContent = markdownContent;
+    
+    // Only mark as edited and trigger save if content has changed
+    if (previousContent !== currentContent) {
+        if (typeof updateNote === 'function') {
+            updateNote();
+        }
     }
 }
 
