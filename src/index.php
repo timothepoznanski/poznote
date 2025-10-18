@@ -1049,7 +1049,7 @@ function handleNoteClick(event) {
 }
 
 // Add click listeners to all note-related elements
-function initializeNoteClickHandlers() {
+window.initializeNoteClickHandlers = function() {
     // Listen for clicks on note links and elements that might load notes
     const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
     noteElements.forEach(element => {
