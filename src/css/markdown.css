@@ -180,3 +180,22 @@
 .markdown-preview table tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+/* Task lists (checkboxes) */
+.markdown-preview ul.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.markdown-preview li.task-list-item {
+    list-style: none;
+    position: relative;
+    padding-left: 0;
+}
+
+.markdown-preview li.task-list-item input[type="checkbox"] {
+    margin-right: 0.5em;
+    cursor: default;
+    vertical-align: middle;
+}
+
