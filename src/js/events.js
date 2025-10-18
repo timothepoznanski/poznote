@@ -616,6 +616,13 @@ function initTextSelectionHandlers() {
                             isTitleOrTagField = true;
                             break;
                         }
+                        // If selection is inside a markdown editor or preview, hide formatting toolbar
+                        if (currentElement.classList && 
+                            (currentElement.classList.contains('markdown-editor') || 
+                             currentElement.classList.contains('markdown-preview'))) {
+                            isTitleOrTagField = true;
+                            break;
+                        }
                         // If selection is inside a task list, treat it as non-editable for formatting
                         try {
                             if (currentElement && currentElement.closest && currentElement.closest('.task-list-container, .tasks-list, .task-item, .task-text')) {

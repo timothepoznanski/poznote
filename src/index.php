@@ -372,7 +372,7 @@ $body_classes = trim($extra_body_classes);
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt"></i>HTML Note';
+        noteItem.innerHTML = '<i class="fa-file-alt"></i>Note (HTML)';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -409,7 +409,7 @@ $body_classes = trim($extra_body_classes);
         // Markdown note item
         var markdownItem = document.createElement('button');
         markdownItem.className = 'create-menu-item';
-        markdownItem.innerHTML = '<i class="fa-markdown"></i>Markdown Note (experimental)';
+        markdownItem.innerHTML = '<i class="fa-markdown"></i>Note (MD)';
         markdownItem.onclick = function() {
             createMarkdownNote();
             createMenu.remove();

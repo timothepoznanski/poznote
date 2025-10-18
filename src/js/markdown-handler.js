@@ -10,6 +10,31 @@ function parseMarkdown(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     
+    // Helper function to apply inline styles (bold, italic, code, links, etc.)
+    function applyInlineStyles(text) {
+        // Inline code (must be first to protect code content from other replacements)
+        text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Bold and italic
+        text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+        text = text.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
+        text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+        text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+        text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+        
+        // Strikethrough
+        text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+        
+        // Links [text](url)
+        text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        
+        // Images ![alt](url)
+        text = text.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1">');
+        
+        return text;
+    }
+    
     // Process line by line for block-level elements
     let lines = html.split('\n');
     let result = [];
@@ -21,27 +46,7 @@ function parseMarkdown(text) {
     function flushParagraph() {
         if (currentParagraph.length > 0) {
             let para = currentParagraph.join('<br>');
-            
-            // Inline code
-            para = para.replace(/`([^`]+)`/g, '<code>$1</code>');
-            
-            // Bold and italic
-            para = para.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
-            para = para.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
-            para = para.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-            para = para.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-            para = para.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-            para = para.replace(/_([^_]+)_/g, '<em>$1</em>');
-            
-            // Strikethrough
-            para = para.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-            
-            // Links [text](url)
-            para = para.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-            
-            // Images ![alt](url)
-            para = para.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1">');
-            
+            para = applyInlineStyles(para);
             result.push('<p>' + para + '</p>');
             currentParagraph = [];
         }
@@ -81,32 +86,44 @@ function parseMarkdown(text) {
         // Headers
         if (line.match(/^######\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^######\s+(.+)$/, '<h6>$1</h6>'));
+            result.push(line.replace(/^######\s+(.+)$/, function(match, content) {
+                return '<h6>' + applyInlineStyles(content) + '</h6>';
+            }));
             continue;
         }
         if (line.match(/^#####\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^#####\s+(.+)$/, '<h5>$1</h5>'));
+            result.push(line.replace(/^#####\s+(.+)$/, function(match, content) {
+                return '<h5>' + applyInlineStyles(content) + '</h5>';
+            }));
             continue;
         }
         if (line.match(/^####\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^####\s+(.+)$/, '<h4>$1</h4>'));
+            result.push(line.replace(/^####\s+(.+)$/, function(match, content) {
+                return '<h4>' + applyInlineStyles(content) + '</h4>';
+            }));
             continue;
         }
         if (line.match(/^###\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^###\s+(.+)$/, '<h3>$1</h3>'));
+            result.push(line.replace(/^###\s+(.+)$/, function(match, content) {
+                return '<h3>' + applyInlineStyles(content) + '</h3>';
+            }));
             continue;
         }
         if (line.match(/^##\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^##\s+(.+)$/, '<h2>$1</h2>'));
+            result.push(line.replace(/^##\s+(.+)$/, function(match, content) {
+                return '<h2>' + applyInlineStyles(content) + '</h2>';
+            }));
             continue;
         }
         if (line.match(/^#\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^#\s+(.+)$/, '<h1>$1</h1>'));
+            result.push(line.replace(/^#\s+(.+)$/, function(match, content) {
+                return '<h1>' + applyInlineStyles(content) + '</h1>';
+            }));
             continue;
         }
         
@@ -120,7 +137,30 @@ function parseMarkdown(text) {
         // Blockquotes
         if (line.match(/^&gt;\s+(.+)$/)) {
             flushParagraph();
-            result.push(line.replace(/^&gt;\s+(.+)$/, '<blockquote>$1</blockquote>'));
+            result.push(line.replace(/^&gt;\s+(.+)$/, function(match, content) {
+                return '<blockquote>' + applyInlineStyles(content) + '</blockquote>';
+            }));
+            continue;
+        }
+        
+        // Task lists (checkboxes) - must be checked before unordered lists
+        if (line.match(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/)) {
+            flushParagraph();
+            // Check if next lines are also task list items to group them
+            let listItems = [line.replace(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/, function(match, checked, content) {
+                let isChecked = checked.toLowerCase() === 'x';
+                let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
+                return '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content) + '</li>';
+            })];
+            while (i + 1 < lines.length && lines[i + 1].match(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/)) {
+                i++;
+                listItems.push(lines[i].replace(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/, function(match, checked, content) {
+                    let isChecked = checked.toLowerCase() === 'x';
+                    let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
+                    return '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content) + '</li>';
+                }));
+            }
+            result.push('<ul class="task-list">' + listItems.join('') + '</ul>');
             continue;
         }
         
@@ -128,10 +168,14 @@ function parseMarkdown(text) {
         if (line.match(/^\s*[\*\-\+]\s+(.+)$/)) {
             flushParagraph();
             // Check if next lines are also list items to group them
-            let listItems = [line.replace(/^\s*[\*\-\+]\s+(.+)$/, '<li>$1</li>')];
+            let listItems = [line.replace(/^\s*[\*\-\+]\s+(.+)$/, function(match, content) {
+                return '<li>' + applyInlineStyles(content) + '</li>';
+            })];
             while (i + 1 < lines.length && lines[i + 1].match(/^\s*[\*\-\+]\s+(.+)$/)) {
                 i++;
-                listItems.push(lines[i].replace(/^\s*[\*\-\+]\s+(.+)$/, '<li>$1</li>'));
+                listItems.push(lines[i].replace(/^\s*[\*\-\+]\s+(.+)$/, function(match, content) {
+                    return '<li>' + applyInlineStyles(content) + '</li>';
+                }));
             }
             result.push('<ul>' + listItems.join('') + '</ul>');
             continue;
@@ -141,12 +185,79 @@ function parseMarkdown(text) {
         if (line.match(/^\s*\d+\.\s+(.+)$/)) {
             flushParagraph();
             // Check if next lines are also list items to group them
-            let listItems = [line.replace(/^\s*\d+\.\s+(.+)$/, '<li>$1</li>')];
+            let listItems = [line.replace(/^\s*\d+\.\s+(.+)$/, function(match, content) {
+                return '<li>' + applyInlineStyles(content) + '</li>';
+            })];
             while (i + 1 < lines.length && lines[i + 1].match(/^\s*\d+\.\s+(.+)$/)) {
                 i++;
-                listItems.push(lines[i].replace(/^\s*\d+\.\s+(.+)$/, '<li>$1</li>'));
+                listItems.push(lines[i].replace(/^\s*\d+\.\s+(.+)$/, function(match, content) {
+                    return '<li>' + applyInlineStyles(content) + '</li>';
+                }));
             }
             result.push('<ol>' + listItems.join('') + '</ol>');
+            continue;
+        }
+        
+        // Tables - detect table rows (lines with | separators)
+        if (line.match(/^\s*\|.+\|\s*$/)) {
+            flushParagraph();
+            
+            let tableRows = [];
+            let isFirstRow = true;
+            let hasHeaderSeparator = false;
+            
+            // Collect all consecutive table rows
+            while (i < lines.length && lines[i].match(/^\s*\|.+\|\s*$/)) {
+                let currentLine = lines[i].trim();
+                
+                // Check if this is a header separator line (|---|---|)
+                if (currentLine.match(/^\|[\s\-:|]+\|$/)) {
+                    hasHeaderSeparator = true;
+                    i++;
+                    continue;
+                }
+                
+                // Parse table cells
+                let cells = currentLine
+                    .split('|')
+                    .slice(1, -1) // Remove first and last empty elements
+                    .map(cell => cell.trim());
+                
+                tableRows.push({
+                    cells: cells,
+                    isHeader: isFirstRow && !hasHeaderSeparator
+                });
+                
+                if (isFirstRow) {
+                    isFirstRow = false;
+                }
+                
+                i++;
+            }
+            i--; // Adjust because the for loop will increment
+            
+            // Generate HTML table
+            if (tableRows.length > 0) {
+                let tableHTML = '<table>';
+                let hasHeader = hasHeaderSeparator || tableRows[0].isHeader;
+                
+                // Process rows
+                for (let r = 0; r < tableRows.length; r++) {
+                    let row = tableRows[r];
+                    let isHeaderRow = (r === 0 && hasHeader);
+                    let cellTag = isHeaderRow ? 'th' : 'td';
+                    
+                    tableHTML += '<tr>';
+                    for (let c = 0; c < row.cells.length; c++) {
+                        let cellContent = applyInlineStyles(row.cells[c]);
+                        tableHTML += '<' + cellTag + '>' + cellContent + '</' + cellTag + '>';
+                    }
+                    tableHTML += '</tr>';
+                }
+                
+                tableHTML += '</table>';
+                result.push(tableHTML);
+            }
             continue;
         }
         
@@ -186,17 +297,21 @@ function initializeMarkdownNote(noteId) {
         noteEntry.setAttribute('data-markdown-content', markdownContent);
     }
     
+    // Determine initial mode: preview if content exists, edit if empty
+    var isEmpty = markdownContent.trim() === '';
+    var startInEditMode = isEmpty;
+    
     // Create preview and editor containers
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
     previewDiv.innerHTML = parseMarkdown(markdownContent);
-    previewDiv.style.display = 'none'; // Hidden initially (we start in edit mode)
+    previewDiv.style.display = startInEditMode ? 'none' : 'block'; // Show if not empty
     
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
-    editorDiv.style.display = 'block'; // Visible initially (we start in edit mode)
+    editorDiv.style.display = startInEditMode ? 'block' : 'none'; // Show if empty
     editorDiv.setAttribute('data-ph', 'Write your markdown here...');
     
     // Replace note content with preview and editor
@@ -208,13 +323,19 @@ function initializeMarkdownNote(noteId) {
     // Add edit and preview buttons in toolbar
     var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
     if (toolbar) {
-        // Edit button (markdown icon) - hidden in edit mode
+        // Hide separator button for markdown notes
+        var separatorBtn = toolbar.querySelector('.btn-separator');
+        if (separatorBtn) {
+            separatorBtn.style.display = 'none';
+        }
+        
+        // Edit button (markdown icon) - hidden in edit mode, visible in preview mode
         var editBtn = document.createElement('button');
         editBtn.type = 'button';
         editBtn.className = 'toolbar-btn markdown-edit-btn note-action-btn';
         editBtn.innerHTML = '<i class="fa-markdown"></i>';
         editBtn.title = 'Edit markdown';
-        editBtn.style.display = 'none'; // Hidden initially (we start in edit mode)
+        editBtn.style.display = startInEditMode ? 'none' : ''; // Hidden if empty (edit mode), visible if not empty (preview mode)
         editBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -222,13 +343,13 @@ function initializeMarkdownNote(noteId) {
         };
         toolbar.insertBefore(editBtn, toolbar.firstChild);
         
-        // Preview button (eye icon) - visible in edit mode
+        // Preview button (eye icon) - visible in edit mode, hidden in preview mode
         var previewBtn = document.createElement('button');
         previewBtn.type = 'button';
         previewBtn.className = 'toolbar-btn markdown-preview-btn note-action-btn';
         previewBtn.innerHTML = '<i class="fa-eye"></i>';
         previewBtn.title = 'Preview markdown';
-        previewBtn.style.display = ''; // Visible initially (we start in edit mode)
+        previewBtn.style.display = startInEditMode ? '' : 'none'; // Visible if empty (edit mode), hidden if not empty (preview mode)
         previewBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -240,10 +361,14 @@ function initializeMarkdownNote(noteId) {
     // Setup event listeners for the editor
     setupMarkdownEditorListeners(noteId);
     
-    // Set the global noteid and give focus to the editor (we start in edit mode)
+    // Set the global noteid
     noteid = noteId;
     window.noteid = noteId;
-    editorDiv.focus();
+    
+    // Give focus to the editor only if starting in edit mode (empty note)
+    if (startInEditMode) {
+        editorDiv.focus();
+    }
 }
 
 function switchToEditMode(noteId) {
