@@ -79,12 +79,21 @@ function saveNoteToServer() {
     
     var entcontent = getTextContentFromElement(entryElem);
     
-    // Check if this is a task list note
+    // Check if this is a task list note or markdown note
     var noteType = entryElem.getAttribute('data-note-type') || 'note';
     if (noteType === 'tasklist') {
         // For task list notes, save the JSON data instead of HTML
         entcontent = getTaskListData(noteid) || '';
         ent = entcontent; // Also save JSON to HTML file for consistency
+    } else if (noteType === 'markdown') {
+        // For markdown notes, save the raw markdown content
+        if (typeof getMarkdownContentForNote === 'function') {
+            var markdownContent = getMarkdownContentForNote(noteid);
+            if (markdownContent !== null) {
+                ent = markdownContent;
+                entcontent = markdownContent;
+            }
+        }
     }
     
     var tags = tagsElem ? tagsElem.value : '';

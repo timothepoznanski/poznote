@@ -82,8 +82,10 @@ $using_unified_search = handleUnifiedSearch();
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
+    <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
+    <script src="js/markdown-handler.js"></script>
 
 </head>
 
@@ -370,7 +372,7 @@ $body_classes = trim($extra_body_classes);
         // Note item
         var noteItem = document.createElement('button');
         noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt"></i>Note';
+        noteItem.innerHTML = '<i class="fa-file-alt"></i>HTML Note';
         noteItem.onclick = function() {
             // Use in-page creation flow instead of opening a new tab
             if (typeof newnote === 'function') {
@@ -404,6 +406,15 @@ $body_classes = trim($extra_body_classes);
             createMenu.remove();
         };
 
+        // Markdown note item
+        var markdownItem = document.createElement('button');
+        markdownItem.className = 'create-menu-item';
+        markdownItem.innerHTML = '<i class="fa-markdown"></i>Markdown Note (experimental)';
+        markdownItem.onclick = function() {
+            createMarkdownNote();
+            createMenu.remove();
+        };
+
         // Workspace item
         var workspaceItem = document.createElement('button');
             workspaceItem.className = 'create-menu-item';
@@ -415,6 +426,7 @@ $body_classes = trim($extra_body_classes);
         };
         
         createMenu.appendChild(noteItem);
+        createMenu.appendChild(markdownItem);
         createMenu.appendChild(folderItem);
         createMenu.appendChild(taskListItem);
     createMenu.appendChild(workspaceItem);
@@ -475,6 +487,43 @@ $body_classes = trim($extra_body_classes);
     
     // Make function globally available
     window.createTaskListNote = createTaskListNote;
+    
+    // Markdown note creation function
+    function createMarkdownNote() {
+        var params = new URLSearchParams({
+            now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
+            folder: selectedFolder,
+            workspace: selectedWorkspace || 'Poznote',
+            type: 'markdown'
+        });
+        
+        fetch("insert_new.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
+            body: params.toString()
+        })
+        .then(function(response) { return response.text(); })
+        .then(function(data) {
+            try {
+                var res = JSON.parse(data);
+                if(res.status === 1) {
+                    window.scrollTo(0, 0);
+                    var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id;
+                } else {
+                    showNotificationPopup(res.error || 'Error creating markdown note', 'error');
+                }
+            } catch(e) {
+                showNotificationPopup('Error creating markdown note: ' + data, 'error');
+            }
+        })
+        .catch(function(error) {
+            showNotificationPopup('Network error: ' + error.message, 'error');
+        });
+    }
+    
+    // Make function globally available
+    window.createMarkdownNote = createMarkdownNote;
     </script>
     
     <div class="resize-handle" id="resizeHandle"></div>
@@ -485,8 +534,9 @@ $body_classes = trim($extra_body_classes);
     <div id="right_col">
             
         <?php        
-            // Array to collect tasklist IDs for initialization
+            // Array to collect tasklist and markdown IDs for initialization
             $tasklist_ids = [];
+            $markdown_ids = [];
                         
             // Check if we should display a note or nothing
             if ($res_right && $res_right) {
@@ -646,7 +696,7 @@ $body_classes = trim($extra_body_classes);
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-file-copy-svg"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-drive-file-move-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadFile(\''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).')"><i class="fa-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
                 
@@ -759,14 +809,27 @@ $body_classes = trim($extra_body_classes);
                     $note_type = $row['type'] ?? 'note';
                     $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$entryfinal.'</div>';
+                    // For markdown notes, store the markdown content in a data attribute
+                    if ($note_type === 'markdown') {
+                        $markdown_content = htmlspecialchars($entryfinal, ENT_QUOTES);
+                        $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
+                        // Start with the raw markdown displayed
+                        $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
+                    } else {
+                        $display_content = $entryfinal;
+                    }
+                    
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
                     
-                    // Collect tasklist IDs for later initialization
+                    // Collect tasklist and markdown IDs for later initialization
                     if ($note_type === 'tasklist') {
                         $tasklist_ids[] = $row['id'];
+                    }
+                    if ($note_type === 'markdown') {
+                        $markdown_ids[] = $row['id'];
                     }
                 }
             } else {
@@ -789,6 +852,19 @@ $body_classes = trim($extra_body_classes);
         if (typeof initializeTaskList === 'function') {
             <?php foreach ($tasklist_ids as $tasklist_id): ?>
             initializeTaskList(<?php echo $tasklist_id; ?>, 'tasklist');
+            <?php endforeach; ?>
+        }
+    });
+    </script>
+    <?php endif; ?>
+    
+    <?php if (!empty($markdown_ids)): ?>
+    <!-- Initialize all markdown notes -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initializeMarkdownNote === 'function') {
+            <?php foreach ($markdown_ids as $markdown_id): ?>
+            initializeMarkdownNote(<?php echo $markdown_id; ?>);
             <?php endforeach; ?>
         }
     });

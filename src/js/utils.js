@@ -1304,6 +1304,54 @@ function hideMoveFolderError() {
 // executeFolderAction removed
 
 
+// Function to download a note (handles markdown and HTML)
+function downloadNote(noteId, url, filename, noteType) {
+    // For markdown notes, download the markdown content
+    if (noteType === 'markdown') {
+        // Get the markdown content
+        var markdownContent = '';
+        if (typeof getMarkdownContentForNote === 'function') {
+            markdownContent = getMarkdownContentForNote(noteId);
+        }
+        
+        // If we couldn't get the content from the editor, try the data attribute
+        if (!markdownContent) {
+            var noteEntry = document.getElementById('entry' + noteId);
+            if (noteEntry) {
+                markdownContent = noteEntry.getAttribute('data-markdown-content') || '';
+            }
+        }
+        
+        // Create a blob with the markdown content
+        var blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+        var blobUrl = URL.createObjectURL(blob);
+        
+        // Ensure the filename has .md extension
+        var downloadFilename = filename;
+        if (downloadFilename && !downloadFilename.toLowerCase().endsWith('.md')) {
+            // Remove .html extension if present
+            downloadFilename = downloadFilename.replace(/\.html?$/i, '');
+            downloadFilename = downloadFilename + '.md';
+        }
+        
+        // Download the file
+        var link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = downloadFilename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the blob URL
+        setTimeout(function() {
+            URL.revokeObjectURL(blobUrl);
+        }, 100);
+    } else {
+        // For HTML notes, use the original download function
+        downloadFile(url, filename);
+    }
+}
+
 // Function to download a file
 function downloadFile(url, filename) {
     // Ensure the filename has .html extension

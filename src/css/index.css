@@ -651,7 +651,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    min-width: 140px;
+    min-width: 200px;
     padding: 8px 0;
     margin-top: 5px;
     display: none;
@@ -2834,6 +2834,19 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   content: '';
 }
 
+.fa-markdown {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-image: url('../images/markdown.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
 .fa-home {
   display: inline-block;
   width: 1em;
@@ -3303,6 +3316,20 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   width: 1em;
   height: 1em;
   background-image: url('../images/create_new_folder.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  font-family: inherit !important;
+  font-style: normal !important;
+  content: '';
+}
+
+/* Use specific markdown icon */
+.create-menu-item .fa-markdown {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  background-image: url('../images/markdown.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
