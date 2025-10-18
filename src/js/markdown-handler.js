@@ -404,7 +404,8 @@ function switchToPreviewMode(noteId) {
     if (!previewDiv || !editorDiv) return;
     
     // Switch to preview mode
-    var markdownContent = editorDiv.textContent;
+    // Use innerText instead of textContent to preserve line breaks properly
+    var markdownContent = editorDiv.innerText || editorDiv.textContent;
     previewDiv.innerHTML = parseMarkdown(markdownContent);
     noteEntry.setAttribute('data-markdown-content', markdownContent);
     
@@ -449,7 +450,8 @@ function getMarkdownContentForNote(noteId) {
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     if (editorDiv && editorDiv.style.display !== 'none') {
         // In edit mode, get content from editor
-        return editorDiv.textContent || '';
+        // Use innerText to preserve line breaks properly
+        return editorDiv.innerText || editorDiv.textContent || '';
     }
     
     // In preview mode, get from data attribute
