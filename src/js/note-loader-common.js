@@ -779,6 +779,29 @@ function reinitializeNoteContent() {
         console.error('Error while initializing tasklist entries after AJAX load:', e);
     }
 
+    // If the loaded note(s) include any markdown entries, initialize them so the markdown content
+    // is replaced with the interactive markdown editor/preview UI when notes are loaded via AJAX.
+    try {
+        const markdownEntries = document.querySelectorAll('[data-note-type="markdown"]');
+        markdownEntries.forEach(function(entry) {
+            const idAttr = entry.id || '';
+            if (!idAttr) return;
+            const noteId = idAttr.replace('entry', '');
+            if (typeof initializeMarkdownNote === 'function') {
+                // Call initializeMarkdownNote after a short delay to ensure the DOM is stable
+                setTimeout(function() {
+                    try {
+                        initializeMarkdownNote(noteId);
+                    } catch (e) {
+                        console.error('Error initializing markdown note for noteId', noteId, e);
+                    }
+                }, 50);
+            }
+        });
+    } catch (e) {
+        console.error('Error while initializing markdown entries after AJAX load:', e);
+    }
+
     // Re-initialize toolbar functionality
     if (typeof initializeToolbarHandlers === 'function') {
         initializeToolbarHandlers();
