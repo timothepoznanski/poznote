@@ -1068,6 +1068,7 @@ function initializeNoteClickHandlers() {
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteClickHandlers();
+    checkAndScrollToNote();
 });
 </script>
 
