@@ -173,6 +173,11 @@ function initializeMarkdownNote(noteId) {
     var noteType = noteEntry.getAttribute('data-note-type');
     if (noteType !== 'markdown') return;
     
+    // Check if already initialized (prevent double initialization)
+    if (noteEntry.querySelector('.markdown-editor') && noteEntry.querySelector('.markdown-preview')) {
+        return; // Already initialized, skip
+    }
+    
     // Get the markdown content from the data attribute or text content
     var markdownContent = noteEntry.getAttribute('data-markdown-content') || noteEntry.textContent || '';
     
