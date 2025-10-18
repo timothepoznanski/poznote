@@ -366,8 +366,17 @@ function initializeMarkdownNote(noteId) {
     window.noteid = noteId;
     
     // Give focus to the editor only if starting in edit mode (empty note)
+    // But not on mobile to avoid unwanted scrolling
     if (startInEditMode) {
-        editorDiv.focus();
+        // Check if we're not on mobile or if we explicitly want to scroll
+        const isMobile = typeof isMobileDevice === 'function' ? isMobileDevice() : (window.innerWidth <= 800);
+        const shouldScroll = new URLSearchParams(window.location.search).get('scroll') === '1';
+        const shouldScrollFromSession = sessionStorage.getItem('shouldScrollToNote') === 'true';
+        
+        // Only focus (which triggers scroll) if we're on desktop or if we explicitly want to scroll to the note
+        if (!isMobile || shouldScroll || shouldScrollFromSession) {
+            editorDiv.focus();
+        }
     }
 }
 

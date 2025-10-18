@@ -472,7 +472,7 @@ $body_classes = trim($extra_body_classes);
                 if(res.status === 1) {
                     window.scrollTo(0, 0);
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id;
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
                     showNotificationPopup(res.error || 'Error creating task list', 'error');
                 }
@@ -509,7 +509,7 @@ $body_classes = trim($extra_body_classes);
                 if(res.status === 1) {
                     window.scrollTo(0, 0);
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id;
+                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
                     showNotificationPopup(res.error || 'Error creating markdown note', 'error');
                 }
@@ -1023,13 +1023,18 @@ function scrollToLeftColumn() {
 function checkAndScrollToNote() {
     const isMobile = window.innerWidth <= 800;
     if (isMobile) {
-        // Check if there's a note parameter in the URL or if a note is displayed
+        // Only scroll if there's a scroll parameter in the URL
         const urlParams = new URLSearchParams(window.location.search);
-        const hasNoteParam = urlParams.has('note');
-        const hasNoteContent = document.querySelector('#right_col .notecard');
+        const shouldScroll = urlParams.has('scroll') && urlParams.get('scroll') === '1';
         
-        if (hasNoteParam || hasNoteContent) {
-            scrollToRightColumn();
+        if (shouldScroll) {
+            setTimeout(function() {
+                scrollToRightColumn();
+                // Remove the scroll parameter from URL
+                urlParams.delete('scroll');
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                window.history.replaceState({}, '', newUrl);
+            }, 100);
         }
     }
 }
@@ -1038,10 +1043,8 @@ function checkAndScrollToNote() {
 function handleNoteClick(event) {
     const isMobile = window.innerWidth <= 800;
     if (isMobile) {
-        // Small delay to let the note load first
-        setTimeout(() => {
-            scrollToRightColumn();
-        }, 100);
+        // Mark that we want to scroll after the note loads
+        sessionStorage.setItem('shouldScrollToNote', 'true');
     }
 }
 
@@ -1051,17 +1054,6 @@ function initializeNoteClickHandlers() {
     const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
     noteElements.forEach(element => {
         element.addEventListener('click', handleNoteClick);
-    });
-    
-    // Also listen for general clicks that might trigger note loading
-    document.addEventListener('click', function(e) {
-        // Check if the clicked element or its parent might load a note
-        // But exclude buttons that don't actually load notes (favorites, delete, etc.)
-        const target = e.target.closest('a[href*="note="], .links_arbo_left, .note-title, .note-link');
-        if (target && window.innerWidth <= 800) {
-            // Only for actual note loading links, not action buttons
-            setTimeout(checkAndScrollToNote, 150);
-        }
     });
 }
 
