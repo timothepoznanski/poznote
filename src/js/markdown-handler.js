@@ -425,9 +425,15 @@ function switchToPreviewMode(noteId) {
     if (editBtn) editBtn.style.display = '';
     if (previewBtn) previewBtn.style.display = 'none';
     
-    // Mark as edited and trigger save
-    if (typeof updateNote === 'function') {
-        updateNote();
+    // Check if content has actually changed before triggering save
+    var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
+    var currentContent = markdownContent;
+    
+    // Only mark as edited and trigger save if content has changed
+    if (previousContent !== currentContent) {
+        if (typeof updateNote === 'function') {
+            updateNote();
+        }
     }
 }
 
