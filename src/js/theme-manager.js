@@ -39,11 +39,6 @@
         var newTheme = currentTheme === 'light' ? 'dark' : 'light';
         
         applyTheme(newTheme);
-        
-        // Show notification
-        if (typeof showNotificationPopup === 'function') {
-            showNotificationPopup('Theme changed to ' + newTheme + ' mode', 'success');
-        }
     }
 
     // Update toggle button appearance
