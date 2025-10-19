@@ -61,6 +61,23 @@ body.dark-mode .folder-toggle {
     color: #e0e0e0;
 }
 
+/* Folder names */
+body.dark-mode .folder-name {
+    color: #e0e0e0;
+}
+
+/* Folder icons */
+body.dark-mode .folder-icon {
+    color: #b0b0b0;
+}
+
+/* Folder note count */
+body.dark-mode .folder-note-count {
+    color: #999;
+}
+
+/* Toolbar icons */
+
 /* Notes list */
 body.dark-mode .links_arbo_left {
     background-color: #1a1a1a;
