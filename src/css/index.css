@@ -1017,11 +1017,11 @@ a.links_arbo_left.selected-note {
 .searchbar-input {
     padding: 10px 12px 10px 44px;
     border-radius: 8px;
-    /* border: 1px solid #d3d6db; */
+    border: 1px solid #d3d6db;
     background: #ffffff;
     font-size: 0.9em;
     transition: border-color 0.18s, box-shadow 0.18s;
-    box-shadow: 0 0 0 1px #e6e6e6;
+    /* box-shadow: 0 0 0 1px #e6e6e6; */
     outline: none;
     width: 100%;
     min-width: 0;

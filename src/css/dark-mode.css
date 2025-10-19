@@ -38,7 +38,12 @@ body.dark-mode .searchbar-input::placeholder {
 }
 
 body.dark-mode .searchbar-icon {
-    color: #808080;
+    color: #e0e0e0;
+}
+
+/* Favorites separator */
+body.dark-mode .favorites-separator {
+    border-bottom-color: #404040;
 }
 
 /* Folder headers */
