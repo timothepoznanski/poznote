@@ -9,22 +9,24 @@
     // Initialize theme on page load
     function initTheme() {
         var savedTheme = localStorage.getItem('poznote-theme');
-        
-        // Default to light mode if no preference saved
         if (!savedTheme) {
-            savedTheme = 'light';
+            // Fallback to system preference if nothing saved
+            try {
+                savedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            } catch (e) {
+                savedTheme = 'light';
+            }
         }
-        
         applyTheme(savedTheme);
     }
 
-    // Apply theme to body
+    // Apply theme to document
     function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
+        var root = document.documentElement;
+        // Set data-theme on <html> for early CSS and keep legacy body class for compatibility
+        root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+        root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+        if (theme === 'dark') document.body.classList.add('dark-mode'); else document.body.classList.remove('dark-mode');
         
         // Save preference
         localStorage.setItem('poznote-theme', theme);

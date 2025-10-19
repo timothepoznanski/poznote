@@ -34,6 +34,8 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 <title>Trash - Poznote</title>
+	<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+	<meta name="color-scheme" content="dark light">
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>

@@ -78,7 +78,22 @@ $using_unified_search = handleUnifiedSearch();
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <?php $v = '20251020.5'; // Version cache pour forcer le rechargement ?>
+    <?php $v = '20251020.6'; // Version cache pour forcer le rechargement ?>
+    <script>
+    (function(){
+        try {
+            var theme = localStorage.getItem('poznote-theme');
+            if (!theme) {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            }
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
