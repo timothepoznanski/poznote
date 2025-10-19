@@ -413,7 +413,7 @@ $body_classes = trim($extra_body_classes);
         // Markdown note item
         var markdownItem = document.createElement('button');
         markdownItem.className = 'create-menu-item';
-        markdownItem.innerHTML = '<i class="fa-markdown"></i>Note (MD)';
+        markdownItem.innerHTML = '<i class="fa-file-alt"></i>Note (MD)';
         markdownItem.onclick = function() {
             createMarkdownNote();
             createMenu.remove();
