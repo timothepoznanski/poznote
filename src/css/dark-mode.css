@@ -153,6 +153,18 @@ body.dark-mode .tag-item {
     border-color: #404040;
 }
 
+body.dark-mode h1 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .tags-info {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .tag-name {
+    color: #e0e0e0 !important;
+}
+
 /* Editable tags */
 body.dark-mode .clickable-tag-wrapper {
     background: #2a2a2a;
@@ -208,11 +220,11 @@ body.dark-mode .tag-input::placeholder {
 
 /* Modals */
 body.dark-mode .modal {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 body.dark-mode .modal-content {
-    /* background-color: #242424; */
+    background-color: #1a1a1a;
     color: #e0e0e0;
     border-color: #404040;
 }
@@ -461,7 +473,22 @@ body.dark-mode .workspace-name-item {
     color: #e0e0e0;
 }
 
+body.dark-mode .info-label {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .info-value {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
 body.dark-mode .info-card {
+    /* background-color: #242424; */
+    border-color: #404040;
+}
+
+body.dark-mode .info-row {
     /* background-color: #242424; */
     border-color: #404040;
 }
@@ -486,6 +513,17 @@ body.dark-mode .trash-container {
     background-color: #1a1a1a;
     color: #e0e0e0;
 }
+
+body.dark-mode .trash-header {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .trash-innernote {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
 
 /* Note info subheading */
 body.dark-mode .subheading-link {
