@@ -127,6 +127,11 @@ body.dark-mode .noteentry {
     color: #e0e0e0;
 }
 
+/* Note placeholder */
+body.dark-mode div[contentEditable=true]:empty:before {
+    color: #555555;
+}
+
 /* Toolbar buttons */
 body.dark-mode .toolbar-btn {
     background-color: #2a2a2a;
@@ -368,6 +373,10 @@ body.dark-mode .workspace-menu-item.current-workspace i {
 }
 
 body.dark-mode .workspace-menu-divider {
+    background-color: #404040;
+}
+
+body.dark-mode .form-group input {
     background-color: #404040;
 }
 
@@ -635,13 +644,13 @@ body.dark-mode .emoji-picker-popup .emoji-item:hover {
 
 /* Color palette popup */
 body.dark-mode .color-palette-popup {
-    /* background-color: #242424; */
+    background-color: #242424;
     border-color: #404040;
 }
 
 /* Task list items */
 body.dark-mode .task-item {
-    /* background-color: #242424; */
+    background-color: #242424;
     border-color: #404040;
 }
 
@@ -649,7 +658,6 @@ body.dark-mode .task-input {
     background-color: #242424;
     border-color: #404040;
 }
-
 
 body.dark-mode .task-item:hover {
     background-color: #2a2a2a;
