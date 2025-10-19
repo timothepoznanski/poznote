@@ -2584,12 +2584,15 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 /* Blue color when a note is shared publicly */
-.btn-share.is-shared .fa-square-share-nodes-svg {
+.btn-share.is-shared .fa-share-nodes {
+  color: #007DB8 !important;
+}
+.btn-share.is-shared i.fa-share-nodes {
   color: #007DB8 !important;
 }
 
 /* Font Awesome icon customizations */
-.fa-square-share-nodes-svg::before { content: "\f1e0"; }
+.fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
 .fa-folder::before { content: "\f07b"; }
 .fa-folder-open::before { content: "\f07c"; }
@@ -2642,11 +2645,9 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-check-light-full::before { content: "\f00c"; }
 .fa-align-left::before { content: "\f036"; }
 .fa-copy::before { content: "\f0c5"; }
-.fa-file-copy-svg::before { content: "\f0c5"; }
-.fa-menu-vert-svg::before { content: "\f142"; }
-.fa-drive-file-move-svg::before { content: "\f56f"; }
+.fa-trash-restore-alt::before { content: "\f2ea"; }
 
-.fa-square-share-nodes-svg,
+.fa-share-nodes,
 .fa-smile,
 .fa-folder,
 .fa-folder-open,
@@ -2697,9 +2698,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-check-light-full,
 .fa-align-left,
 .fa-copy,
-.fa-file-copy-svg,
-.fa-menu-vert-svg,
-.fa-drive-file-move-svg {
+.fa-trash-restore-alt {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;
@@ -2720,22 +2719,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   font-size: 0.875em !important;
 }
 
-.fa-menu-vert-svg {
-  font-family: "Font Awesome 5 Pro";
-  font-weight: 900;
-  font-size: 0.875em !important;
-}
-
 .fa-plus {
   font-size: 1em !important;
 }
 
 .fa-star-light {
   font-size: 0.95em !important;
-}
-
-.fa-file-copy-svg {
-  font-size: 0.7em !important;
 }
 
 .fa-bold {

@@ -129,10 +129,15 @@ function setSaveButtonRed(isRed) {
     var saveBtn = null;
     
     if (noteContainer) {
-        // Search within the current note container
-        saveBtn = noteContainer.querySelector('.toolbar-btn > .fa-save');
-        if (saveBtn) {
-            saveBtn = saveBtn.parentElement;
+        // Search for btn-save class directly (more reliable with Font Awesome)
+        saveBtn = noteContainer.querySelector('.btn-save');
+        
+        if (!saveBtn) {
+            // Fallback: search using the icon
+            saveBtn = noteContainer.querySelector('.toolbar-btn > .fa-save');
+            if (saveBtn) {
+                saveBtn = saveBtn.parentElement;
+            }
         }
         
         if (!saveBtn) {
@@ -150,9 +155,13 @@ function setSaveButtonRed(isRed) {
     
     if (!saveBtn) {
         // Global fallback for cases where noteid is not set or container not found
-        saveBtn = document.querySelector('.toolbar-btn > .fa-save');
-        if (saveBtn) {
-            saveBtn = saveBtn.parentElement;
+        saveBtn = document.querySelector('.btn-save');
+        
+        if (!saveBtn) {
+            saveBtn = document.querySelector('.toolbar-btn > .fa-save');
+            if (saveBtn) {
+                saveBtn = saveBtn.parentElement;
+            }
         }
         
         if (!saveBtn) {

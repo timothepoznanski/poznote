@@ -154,7 +154,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="Restore this note" class="fa-trash-restore-alt-svg" data-noteid="'.$id.'"></i>'
+					.'<i title="Restore this note" class="fa-trash-restore-alt" data-noteid="'.$id.'"></i>'
 					.'<i title="Delete permanently" class="fa-trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
 					.'<div class="lastupdated">Last modified on '.$updated.'</div>'

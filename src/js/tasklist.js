@@ -82,7 +82,7 @@ function renderTasks(tasks, noteId) {
                 <i class="task-icon-trash"></i>
             </button>
             <div class="task-drag-handle" title="Drag to reorder">
-                <i class="fa-menu-vert-svg"></i>
+                <i class="fa-grip-vertical"></i>
             </div>`;
         } else {
             // Incomplete tasks: show favorite and drag buttons
@@ -91,7 +91,7 @@ function renderTasks(tasks, noteId) {
                 <i class="${starClass}"></i>
             </button>
             <div class="task-drag-handle" title="Drag to reorder">
-                <i class="fa-menu-vert-svg"></i>
+                <i class="fa-grip-vertical"></i>
             </div>`;
         }
         

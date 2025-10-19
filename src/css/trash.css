@@ -267,7 +267,7 @@ body.trash-page {
 .fa-arrow-circle-left::before { content: "\f060"; }
 .trash-empty-button::before { content: "\f51a"; }
 .fa-trash::before { content: "\f2ed"; }
-.fa-trash-restore-alt-svg::before { content: "\f829"; }
+.fa-trash-restore-alt::before { content: "\f2ea"; }
 
 .fa-arrow-circle-left,
 .trash-empty-button {
@@ -304,7 +304,7 @@ body.trash-page {
     color: #ff0000 !important;
 }
 
-.fa-trash-restore-alt-svg {
+.fa-trash-restore-alt {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;
     font-style: normal;
@@ -320,7 +320,7 @@ body.trash-page {
     vertical-align: middle;
 }
 
-.fa-trash-restore-alt-svg:hover {
+.fa-trash-restore-alt:hover {
     color: #22c55e !important;
 }
 
@@ -440,7 +440,7 @@ body.trash-page {
     }
     
     /* Larger trash action icons on mobile for better touch targets */
-    .fa-trash, .fa-trash-restore-alt-svg {
+    .fa-trash, .fa-trash-restore-alt {
         width: 1.5em !important;
         height: 1.5em !important;
     }

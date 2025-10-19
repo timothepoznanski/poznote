@@ -211,9 +211,11 @@
 
 .task-icon-trash::before { content: "\f2ed"; }
 .task-icon-star::before { content: "\f005"; }
+.fa-grip-vertical::before { content: "\f58e"; }
 
 .task-icon-trash,
-.task-icon-star {
+.task-icon-star,
+.fa-grip-vertical {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;
