@@ -47,7 +47,9 @@ if (isAuthenticated()) {
 if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    if (authenticate($username, $password)) {
+    $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
+    
+    if (authenticate($username, $password, $rememberMe)) {
         // Redirect to index with JavaScript to include localStorage workspace
         // Include minimal HTML to ensure proper execution
         echo '<!DOCTYPE html><html><head>';
@@ -95,6 +97,13 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
                 <?php if ($error): ?>
                     <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
+            </div>
+            
+            <div class="form-group remember-me-group">
+                <label class="remember-me-label">
+                    <input type="checkbox" name="remember_me" value="1" id="remember_me">
+                    <span>Remember me for 30 days</span>
+                </label>
             </div>
             
             <button type="submit" class="login-button">Login</button>

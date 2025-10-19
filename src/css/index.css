@@ -946,8 +946,8 @@ body {
 
 .workspace-menu-item i {
     margin-right: 8px;
-    font-size: 20px;
-    /* width: 16px; */
+    font-size: 14px;
+    width: 16px;
     text-align: center;
     color: #666;
 }
