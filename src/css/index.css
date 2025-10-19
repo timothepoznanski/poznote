@@ -2666,7 +2666,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group,
 .fa-cog,
 .fa-eye,
-.fa-markdown,
 .fa-home,
 .fa-bold,
 .fa-italic,
@@ -2713,9 +2712,11 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .fa-globe,
-.fa-github {
+.fa-github,
+.fa-markdown {
   font-family: "Font Awesome 5 Brands";
-  /* font-weight: 400; */
+  font-weight: 400;
+  font-style: normal;
   font-size: 0.875em !important;
 }
 
