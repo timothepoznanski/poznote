@@ -112,7 +112,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <!-- Poznote Website -->
             <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fa-globe"></i>
+                    <i class="fa-info"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>About Poznote</h3>
