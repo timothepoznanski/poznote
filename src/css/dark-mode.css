@@ -524,3 +524,30 @@ body.dark-mode .backup-section {
     /* background-color: #242424; */
     border-color: #404040;
 }
+
+/* Icons - Make all icons lighter in dark mode by modifying the filter */
+/* Override the default dark gray filter with a lighter one */
+body.dark-mode [class*="fa-"] {
+    filter: brightness(0) saturate(0%) invert(80%) !important;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+body.dark-mode [class*="fa-"]:hover {
+    transform: scale(1.18);
+    filter: brightness(0) saturate(0%) invert(90%) !important;
+}
+
+body.dark-mode .sidebar-plus {
+    filter: brightness(0) saturate(0%) invert(80%) !important;
+}
+
+/* Keep some specific icons with their original colors when active/selected */
+body.dark-mode .toolbar-btn.save-modified .fa-save {
+    filter: none !important;
+}
+
+body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
+body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
+body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
+    filter: none !important;
+}
