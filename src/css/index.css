@@ -1766,7 +1766,8 @@ img {
 
 /* Make delete icon red in actions menu */
 .actions-menu-item .fa-trash {
-    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
+    color: #ff0000 !important;
+    filter: none !important;
 }
 
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
@@ -2573,21 +2574,20 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
 
 /* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
+.btn-attachment.has-attachments i.fa-paperclip,
 .btn-attachment.has-attachments .fa-paperclip {
-  /* tint paperclip icon to app blue */
   color: #007DB8 !important;
 }
 
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
-.btn-favorite.is-favorite .fa-star-light {
+.toolbar-btn.btn-favorite.is-favorite i.fa-star-light,
+.toolbar-btn.btn-favorite.is-favorite .fa-star-light {
   color: #007DB8 !important;
 }
 
 /* Blue color when a note is shared publicly */
-.btn-share.is-shared .fa-share-nodes {
-  color: #007DB8 !important;
-}
-.btn-share.is-shared i.fa-share-nodes {
+.toolbar-btn.btn-share.is-shared i.fa-share-nodes,
+.toolbar-btn.btn-share.is-shared .fa-share-nodes {
   color: #007DB8 !important;
 }
 
@@ -2946,6 +2946,17 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
+/* Exception: Remove filter for save button when modified (to show red color) */
+.toolbar-btn.save-modified .fa-save {
+  filter: none !important;
+}
+
+/* Exception: Remove filter for favorite/share/attachment when active (to show blue color) */
+.toolbar-btn.is-favorite .fa-star-light,
+.toolbar-btn.is-shared .fa-share-nodes,
+.toolbar-btn.has-attachments .fa-paperclip {
+  filter: none !important;
+}
 
 .sidebar-plus{
   /* transform: scale(1.18); */
