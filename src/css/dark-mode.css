@@ -419,7 +419,8 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
 
 /* Resize handle */
 body.dark-mode .resize-handle {
-    background-color: #404040;
+    background-color: #1a1a1a;
+    border-right: 1px solid #404040;
 }
 
 body.dark-mode .resize-handle:hover {
