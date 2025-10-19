@@ -645,6 +645,12 @@ body.dark-mode .task-item {
     border-color: #404040;
 }
 
+body.dark-mode .task-input {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+
 body.dark-mode .task-item:hover {
     background-color: #2a2a2a;
 }
