@@ -51,7 +51,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <!-- Theme Mode -->
             <div class="settings-card" id="theme-mode-card" onclick="toggleTheme();">
                 <div class="settings-card-icon">
-                    <i class="fa-code"></i>
+                    <i class="fa fa-sun"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>Theme Mode (experimental) <span id="theme-mode-badge" class="setting-status">light mode</span></h3>

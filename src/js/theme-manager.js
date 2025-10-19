@@ -44,13 +44,24 @@
     // Update toggle button appearance
     function updateToggleButton(theme) {
         var badge = document.getElementById('theme-mode-badge');
+        var icon = document.querySelector('#theme-mode-card .settings-card-icon i');
+        
         if (badge) {
             if (theme === 'dark') {
                 badge.textContent = 'dark mode';
                 badge.className = 'setting-status enabled';
             } else {
                 badge.textContent = 'light mode';
-                badge.className = 'setting-status disabled';
+                badge.className = 'setting-status enabled';
+            }
+        }
+        
+        // Change icon: moon for dark mode, sun for light mode
+        if (icon) {
+            if (theme === 'dark') {
+                icon.className = 'fa fa-moon';
+            } else {
+                icon.className = 'fa fa-sun';
             }
         }
     }

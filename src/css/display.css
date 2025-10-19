@@ -81,6 +81,8 @@ body {
 .fa-list-ol::before { content: "\f0cb"; }
 .fa-smile::before { content: "\f118"; }
 .fa-grin::before { content: "\f580"; }
+.fa-moon::before { content: "\f186"; }
+.fa-sun::before { content: "\f185"; }
 
 .fa-arrow-left,
 .fa-user,
@@ -89,7 +91,9 @@ body {
 .fa-map-marker-alt,
 .fa-hashtag,
 .fa-folder-open,
-.fa-list-ol {
+.fa-list-ol,
+.fa-moon,
+.fa-sun {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;
     font-style: normal;
