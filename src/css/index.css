@@ -2607,6 +2607,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-minus::before { content: "\f068"; }
 .fa-info-circle::before { content: "\f05a"; }
 .fa-search::before { content: "\f002"; }
+.fa-spinner::before { content: "\f110"; }
 .fa-star-light::before { content: "\f005"; }
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-cog::before { content: "\f013"; }
@@ -2662,6 +2663,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-minus,
 .fa-info-circle,
 .fa-search,
+.fa-spinner,
 .fa-star-light,
 .fa-layer-group,
 .fa-cog,
