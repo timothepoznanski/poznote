@@ -2189,12 +2189,17 @@ hr {
 }
 
 .folder-icon {
-    font-size: 1.2em;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
-    width: 16px;
     align-content: center;
+}
+
+/* Réduire les icônes dans les dossiers (Trash, Tags, Favorites) */
+.fa-trash.folder-icon,
+.fa-tags.folder-icon,
+.fa-star-light.folder-icon {
+    font-size: 0.8em !important;
 }
 
 .folder-name {
