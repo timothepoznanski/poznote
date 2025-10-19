@@ -29,6 +29,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/display.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
 </head>
 <body>
     <div class="settings-container">
@@ -47,6 +48,16 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         <br><br>
 
         <div class="settings-grid">
+            <!-- Theme Mode -->
+            <div class="settings-card" id="theme-mode-card" onclick="toggleTheme();">
+                <div class="settings-card-icon">
+                    <i class="fa-moon"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Theme Mode <span id="theme-mode-badge" class="setting-status">light mode</span></h3>
+                </div>
+            </div>
+
             <!-- Moved from settings.php: user preferences -->
             <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
                 <div class="settings-card-icon">
@@ -112,6 +123,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     </div>
 
     <?php include 'modals.php'; ?>
+    <script src="js/theme-manager.js"></script>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>

@@ -77,7 +77,9 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="login-container">

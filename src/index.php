@@ -87,6 +87,8 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+    <script src="js/theme-manager.js"></script>
     <script src="js/toolbar.js"></script>
     <script src="js/note-loader-common.js"></script>
     <script src="js/markdown-handler.js"></script>

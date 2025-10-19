@@ -311,6 +311,7 @@ try {
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/workspaces.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
     <style>
         /* Ensure workspace list displays name + buttons on a single line */
         .workspace-list ul { list-style: none; padding: 0; margin: 0; }
@@ -443,6 +444,7 @@ try {
     </script>
     <?php endif; ?>
 
+    <script src="js/theme-manager.js"></script>
     <script src="js/workspaces.js"></script>
     <script>
         // Initialize workspace page when DOM is loaded

@@ -29,6 +29,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
 </head>
 
 <body>
@@ -135,6 +136,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <?php include 'modals.php'; ?>
     
     <!-- Include JavaScript files -->
+    <script src="js/theme-manager.js"></script>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>

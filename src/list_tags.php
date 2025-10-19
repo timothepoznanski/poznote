@@ -57,6 +57,8 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<script src="js/theme-manager.js"></script>
 </head>
 <body class="tags-page">
 	<div class="tags-container">

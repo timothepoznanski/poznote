@@ -1,0 +1,511 @@
+/* Dark Mode Styles for Poznote */
+
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Main containers */
+body.dark-mode #left_col,
+body.dark-mode #right_col {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Sidebar header */
+body.dark-mode .sidebar-header {
+    background-color: #242424;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode .sidebar-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .workspace-title-text {
+    color: #e0e0e0;
+}
+
+/* Search bar */
+body.dark-mode .searchbar-input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .searchbar-input::placeholder {
+    color: #808080;
+}
+
+body.dark-mode .searchbar-icon {
+    color: #808080;
+}
+
+/* Folder headers */
+body.dark-mode .folder-header {
+    background-color: #242424;
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode .folder-header h2 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .folder-toggle {
+    color: #e0e0e0;
+}
+
+/* Notes list */
+body.dark-mode .links_arbo_left {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-mode .links_arbo_left:hover {
+    background-color: #333;
+}
+
+body.dark-mode .links_arbo_left.active {
+    background-color: #1e3a5f;
+    border-left: 3px solid #4a9eff;
+}
+
+body.dark-mode .note-title {
+    color: #e0e0e0;
+}
+
+/* Note content */
+body.dark-mode .notecard {
+    background-color: #1a1a1a;
+}
+
+body.dark-mode .innernote {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .css-title {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .noteentry {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Toolbar buttons */
+body.dark-mode .toolbar-btn {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .toolbar-btn:hover {
+    background-color: #333;
+}
+
+/* Tags */
+body.dark-mode .name_tags {
+    color: #e0e0e0;
+}
+
+body.dark-mode .name_tags * {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .tag-item {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+/* Modals */
+body.dark-mode .modal {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .modal-content {
+    background-color: #242424;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .modal-content h3 {
+    color: #4a9eff;
+}
+
+body.dark-mode .modal-content input,
+body.dark-mode .modal-content select,
+body.dark-mode .modal-content textarea {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .modal-buttons button {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .modal-buttons button:hover {
+    background-color: #333;
+}
+
+body.dark-mode .modal-buttons button:first-child {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+body.dark-mode .modal-buttons button:first-child:hover {
+    background-color: #2a4a7f;
+}
+
+/* Settings/Display pages */
+body.dark-mode .settings-container {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-card {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .settings-card:hover {
+    background-color: #2a2a2a;
+    border-color: #4a9eff;
+}
+
+body.dark-mode .settings-card h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-card-icon {
+    color: #4a9eff;
+}
+
+body.dark-mode .btn,
+body.dark-mode .btn-secondary {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .btn:hover,
+body.dark-mode .btn-secondary:hover {
+    background-color: #333;
+}
+
+/* Links */
+body.dark-mode a {
+    color: #4a9eff;
+}
+
+body.dark-mode a:hover {
+    color: #6ab3ff;
+}
+
+body.dark-mode .back-link {
+    color: #4a9eff;
+}
+
+body.dark-mode .back-link:hover {
+    color: #6ab3ff;
+}
+
+/* Subheading and dates */
+body.dark-mode .note-subline {
+    color: #999;
+}
+
+body.dark-mode .lastupdated {
+    color: #999 !important;
+}
+
+/* Badges */
+body.dark-mode .setting-status.enabled {
+    background-color: #1a4d2e;
+    color: #7dd3a0;
+}
+
+body.dark-mode .setting-status.disabled {
+    background-color: #4d1a1a;
+    color: #ff9999;
+}
+
+/* Workspace menu */
+body.dark-mode .workspace-menu {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .workspace-menu-item {
+    color: #e0e0e0;
+}
+
+body.dark-mode .workspace-menu-item:hover {
+    background-color: #2a2a2a;
+}
+
+/* Create menu */
+body.dark-mode #header-create-menu {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .create-menu-item {
+    color: #e0e0e0;
+}
+
+body.dark-mode .create-menu-item:hover {
+    background-color: #2a2a2a;
+}
+
+/* Folder options (move dialog) */
+body.dark-mode .folder-option {
+    background-color: #242424;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .folder-option:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-mode .folder-option.selected {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+/* Attachments */
+body.dark-mode .note-attachments-row {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .attachment-link {
+    color: #4a9eff;
+}
+
+body.dark-mode .attachment-link:hover {
+    color: #6ab3ff;
+}
+
+/* Code blocks */
+body.dark-mode .noteentry code,
+body.dark-mode .noteentry pre {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+/* Highlighted text in search */
+body.dark-mode mark,
+body.dark-mode .highlight {
+    background-color: #4d4d00;
+    color: #ffff99;
+}
+
+/* Horizontal rules */
+body.dark-mode hr {
+    border-color: #404040;
+}
+
+/* Login page */
+body.dark-mode .login-container {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .login-container h1 {
+    color: #e0e0e0;
+}
+
+/* Info page */
+body.dark-mode .info-container {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .info-card {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+/* Workspaces page */
+body.dark-mode .workspace-list {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .workspace-item {
+    background-color: #2a2a2a;
+    border-color: #404040;
+}
+
+body.dark-mode .workspace-item:hover {
+    background-color: #333;
+}
+
+/* Trash page */
+body.dark-mode .trash-container {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Note info subheading */
+body.dark-mode .subheading-link {
+    color: #e0e0e0;
+}
+
+body.dark-mode .subheading-placeholder {
+    color: #808080;
+}
+
+body.dark-mode .inline-subheading-input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+/* Table styles */
+body.dark-mode table {
+    border-color: #404040;
+}
+
+body.dark-mode table th {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode table td {
+    background-color: #242424;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+/* Scrollbar (for webkit browsers) */
+body.dark-mode ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 6px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* Resize handle */
+body.dark-mode .resize-handle {
+    background-color: #404040;
+}
+
+body.dark-mode .resize-handle:hover {
+    background-color: #4a9eff;
+}
+
+/* Notification popup */
+body.dark-mode .notification-popup {
+    background-color: #242424;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .notification-popup.success {
+    background-color: #1a4d2e;
+    border-color: #2a6d4e;
+}
+
+body.dark-mode .notification-popup.error {
+    background-color: #4d1a1a;
+    border-color: #6d2a2a;
+}
+
+/* Alert messages */
+body.dark-mode .alert {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+body.dark-mode .alert-success {
+    background-color: #1a4d2e;
+    color: #7dd3a0;
+    border-color: #2a6d4e;
+}
+
+body.dark-mode .alert-danger,
+body.dark-mode .alert-error {
+    background-color: #4d1a1a;
+    color: #ff9999;
+    border-color: #6d2a2a;
+}
+
+/* Emoji picker */
+body.dark-mode .emoji-picker-popup {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .emoji-picker-popup .emoji-item:hover {
+    background-color: #2a2a2a;
+}
+
+/* Color palette popup */
+body.dark-mode .color-palette-popup {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+/* Task list items */
+body.dark-mode .task-item {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+body.dark-mode .task-item:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-mode .task-checkbox {
+    border-color: #404040;
+}
+
+/* Markdown preview */
+body.dark-mode .markdown-preview {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .markdown-preview h1,
+body.dark-mode .markdown-preview h2,
+body.dark-mode .markdown-preview h3,
+body.dark-mode .markdown-preview h4,
+body.dark-mode .markdown-preview h5,
+body.dark-mode .markdown-preview h6 {
+    color: #e0e0e0;
+}
+
+/* Backup/Export page */
+body.dark-mode .backup-container {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .backup-section {
+    background-color: #242424;
+    border-color: #404040;
+}

@@ -98,6 +98,8 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/info.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="info-page">

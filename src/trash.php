@@ -38,6 +38,8 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/trash.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
+	<script src="js/theme-manager.js"></script>
 </head>
 <body class="trash-page">
 	<div class="trash-container">

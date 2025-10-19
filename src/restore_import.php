@@ -470,6 +470,8 @@ function importAttachmentsZip($uploadedFile) {
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/restore_import.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="backup-container">
