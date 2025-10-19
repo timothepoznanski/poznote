@@ -4,13 +4,46 @@
 function parseMarkdown(text) {
     if (!text) return '';
     
-    // Escape HTML first to prevent XSS
+    // First, extract and protect images and links from HTML escaping
+    // We'll use placeholders and restore them later
+    let protectedElements = [];
+    let protectedIndex = 0;
+    
+    // Protect images first ![alt](url "title")
+    text = text.replace(/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function(match, alt, url, title) {
+        let placeholder = '\x00PIMG' + protectedIndex + '\x00';
+        let imgTag;
+        if (title) {
+            imgTag = '<img src="' + url + '" alt="' + alt + '" title="' + title + '">';
+        } else {
+            imgTag = '<img src="' + url + '" alt="' + alt + '">';
+        }
+        protectedElements[protectedIndex] = imgTag;
+        protectedIndex++;
+        return placeholder;
+    });
+    
+    // Protect links [text](url "title")
+    text = text.replace(/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function(match, linkText, url, title) {
+        let placeholder = '\x00PLNK' + protectedIndex + '\x00';
+        let linkTag;
+        if (title) {
+            linkTag = '<a href="' + url + '" title="' + title + '" target="_blank" rel="noopener">' + linkText + '</a>';
+        } else {
+            linkTag = '<a href="' + url + '" target="_blank" rel="noopener">' + linkText + '</a>';
+        }
+        protectedElements[protectedIndex] = linkTag;
+        protectedIndex++;
+        return placeholder;
+    });
+    
+    // Now escape HTML to prevent XSS
     let html = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
     
-    // Helper function to apply inline styles (bold, italic, code, links, etc.)
+    // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
         // Inline code (must be first to protect code content from other replacements)
         text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -26,11 +59,10 @@ function parseMarkdown(text) {
         // Strikethrough
         text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
         
-        // Links [text](url)
-        text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-        
-        // Images ![alt](url)
-        text = text.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1">');
+        // Restore protected elements (images and links)
+        text = text.replace(/\x00P(IMG|LNK)(\d+)\x00/g, function(match, type, index) {
+            return protectedElements[parseInt(index)] || match;
+        });
         
         return text;
     }
