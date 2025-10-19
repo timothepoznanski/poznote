@@ -95,6 +95,8 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Note Information - <?php echo htmlspecialchars($title); ?></title>
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/info.css">
 </head>
 <body>

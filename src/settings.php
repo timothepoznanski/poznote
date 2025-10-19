@@ -25,6 +25,8 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Settings - Poznote</title>
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/modals.css">
 </head>

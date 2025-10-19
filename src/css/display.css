@@ -50,6 +50,13 @@ body {
     color: #6b7280;
     font-size: 2.2rem;
 }
+
+/* Réduire les icônes Font Awesome dans settings-card-icon */
+.settings-card-icon i[class*="fa-"],
+.settings-card-icon [class*="fa-"] {
+    font-size: 0.55em !important;
+}
+
 .settings-card-content {
     display: flex;
     align-items: center;
@@ -64,129 +71,51 @@ body {
 .setting-status.show { background: #dcfce7; color: #166534; }
 .setting-status.hide { background: #fee2e2; color: #991b1b; }
 
-.fa-arrow-left {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/arrow-left-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
+.fa-arrow-left::before { content: "\f060"; }
+.fa-user::before { content: "\f007"; }
+.fa-text-height::before { content: "\f034"; }
+.fa-calendar-alt::before { content: "\f073"; }
+.fa-map-marker-alt::before { content: "\f3c5"; }
+.fa-hashtag::before { content: "\f292"; }
+.fa-folder-open::before { content: "\f07c"; }
+.fa-list-ol::before { content: "\f0cb"; }
+.fa-smile::before { content: "\f118"; }
+.fa-grin::before { content: "\f580"; }
 
-.fa-user {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/user-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-text-height {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/text-height-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-smile {
-    display: inline-block;
-    width: 0.9em;
-    height: 0.9em;
-    background-image: url('../images/icons-light-full.svg');
-    content: '';
-}
-
-.fa-grin {
-    display: inline-block;
-    width: 0.9em;
-    height: 0.9em;
-    background-image: url('../images/face-smile-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-calendar-alt {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/calendar-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-map-marker-alt {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/note-sticky-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-hashtag {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/hashtag-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-folder-open {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/folder-open-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
+.fa-arrow-left,
+.fa-user,
+.fa-text-height,
+.fa-calendar-alt,
+.fa-map-marker-alt,
+.fa-hashtag,
+.fa-folder-open,
 .fa-list-ol {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/list-ol-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
+}
+
+.fa-smile,
+.fa-grin {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.75em;
+    vertical-align: middle;
 }
 
 /* Button styles */
@@ -216,17 +145,20 @@ body {
     transform: translateY(-1px);
 }
 
+.fa-trash::before { content: "\f2ed"; }
+
 .fa-trash {
+  font-family: "Font Awesome 5 Pro";
+  font-weight: 300;
+  font-style: normal;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/trash-can-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+  font-size: 0.875em;
+  vertical-align: middle;
 }
 
 /* Hide "Show Folder Actions" setting on mobile */

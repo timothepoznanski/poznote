@@ -53,6 +53,8 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tags - Poznote</title>
+	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
+	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
 </head>

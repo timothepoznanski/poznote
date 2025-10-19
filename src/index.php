@@ -78,6 +78,10 @@ $using_unified_search = handleUnifiedSearch();
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
     <link type="text/css" rel="stylesheet" href="css/index.css"/>
     <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modals.css"/>
@@ -266,7 +270,7 @@ $body_classes = trim($extra_body_classes);
                     <i class="fa-cog"></i>
                     <span class="update-badge" style="display: none;"></span>
                 </button>
-                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
+                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus-circle"></i></button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
