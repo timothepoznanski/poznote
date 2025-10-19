@@ -323,16 +323,39 @@ body.dark-mode .setting-status.disabled {
 
 /* Workspace menu */
 body.dark-mode .workspace-menu {
-    /* background-color: #242424; */
+    background-color: #1a1a1a;
     border-color: #404040;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .workspace-menu-item {
     color: #e0e0e0;
+    border-bottom-color: #2a2a2a;
 }
 
 body.dark-mode .workspace-menu-item:hover {
     background-color: #2a2a2a;
+}
+
+body.dark-mode .workspace-menu-item.current-workspace {
+    background-color: #1e3a5f;
+    color: #4a9eff;
+}
+
+body.dark-mode .workspace-menu-item i {
+    color: #b0b0b0;
+}
+
+body.dark-mode .workspace-menu-item:hover i {
+    color: #e0e0e0;
+}
+
+body.dark-mode .workspace-menu-item.current-workspace i {
+    color: #4a9eff;
+}
+
+body.dark-mode .workspace-menu-divider {
+    background-color: #404040;
 }
 
 /* Create menu */
