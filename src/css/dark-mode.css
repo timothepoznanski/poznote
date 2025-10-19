@@ -451,6 +451,16 @@ body.dark-mode .info-container {
     color: #e0e0e0;
 }
 
+body.dark-mode .settings-section h3 {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .workspace-name-item {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
 body.dark-mode .info-card {
     /* background-color: #242424; */
     border-color: #404040;
@@ -623,12 +633,19 @@ body.dark-mode .markdown-preview h6 {
 /* Backup/Export page */
 body.dark-mode .backup-container {
     background-color: #1a1a1a;
-    color: #e0e0e0;
+    /* color: #e0e0e0; */
 }
 
 body.dark-mode .backup-section {
     /* background-color: #242424; */
     border-color: #404040;
+    color: #e0e0e0;
+}
+
+body.dark-mode .backup-section h3 {
+    /* background-color: #242424; */
+    border-color: #404040;
+    color: #e0e0e0;
 }
 
 /* Icons - Make all icons lighter in dark mode by modifying the filter */
