@@ -257,6 +257,7 @@ body.dark-mode .settings-container {
 body.dark-mode .settings-card {
     /* background-color: #242424; */
     border-color: #404040;
+    border-bottom: #404040;
 }
 
 body.dark-mode .settings-card:hover {
