@@ -423,8 +423,19 @@ body.dark-mode .folder-option.selected {
 }
 
 /* Attachments */
+
+body.dark-mode .settings-section {
+    background-color: #404040;
+    /* border-color: #404040; */
+}
+
+body.dark-mode .attachment-upload-section {
+    background-color: #242424;
+    /* border-color: #404040; */
+}
+
 body.dark-mode .note-attachments-row {
-    /* background-color: #242424; */
+    background-color: #242424;
     border-color: #404040;
 }
 
@@ -473,9 +484,20 @@ body.dark-mode .info-container {
 }
 
 body.dark-mode .settings-section h3 {
-    background-color: #1a1a1a;
+    /* background-color: #1a1a1a; */
     color: #e0e0e0;
 }
+
+body.dark-mode .settings-section .btn {
+    /* background-color: #1a1a1a; */
+    color: #404040;
+}
+
+body.dark-mode .settings-section .btn:enabled {
+    /* background-color: #1a1a1a; */
+    color: #e0e0e0;
+}
+
 
 body.dark-mode .workspace-name-item {
     background-color: #1a1a1a;
