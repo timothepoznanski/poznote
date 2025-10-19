@@ -1,6 +1,8 @@
 .task-list-container {
     padding: 10px 0;
     font-family: inherit;
+}
+
 .task-drag-handle {
     cursor: grab;
     color: #999;
@@ -13,9 +15,9 @@
     align-items: center;
     justify-content: center;
     min-width: 16px;
-
 }
-    .task-input-container {
+
+.task-input-container {
     position: relative;
     margin-bottom: 15px;
     display: flex;
@@ -178,11 +180,29 @@
 }
 
 .task-delete-btn i {
-    font-size: 24px;
+    font-size: 14px;
 }
 
 .task-important-btn i {
-    font-size: 26px;
+    font-size: 14px;
+}
+
+.task-delete-btn i,
+.task-important-btn i,
+.task-drag-handle i {
+    color: #999;
+    font-family: "Font Awesome 5 Pro" !important;
+    font-weight: 300 !important;
+    font-style: normal !important;
+    display: inline-block !important;
+}
+
+.task-delete-btn:hover i {
+    color: #d32f2f;
+}
+
+.task-important-btn:hover i {
+    color: #ffa000;
 }
 
 /* Important task styling */
@@ -211,11 +231,9 @@
 
 .task-icon-trash::before { content: "\f2ed"; }
 .task-icon-star::before { content: "\f005"; }
-.fa-grip-vertical::before { content: "\f58e"; }
 
 .task-icon-trash,
-.task-icon-star,
-.fa-grip-vertical {
+.task-icon-star {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;
@@ -233,4 +251,11 @@
 .task-item.important .task-icon-star {
   color: #ff0000 !important;
 }
+
+.task-item.important .fa-star {
+  color: #ff0000 !important;
+}
+
+.task-important-btn.is-favorite i {
+  color: #ff0000 !important;
 }

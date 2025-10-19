@@ -78,20 +78,21 @@ $using_unified_search = handleUnifiedSearch();
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
-    <link type="text/css" rel="stylesheet" href="css/index.css"/>
-    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
-    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
-    <script src="js/theme-manager.js"></script>
-    <script src="js/toolbar.js"></script>
-    <script src="js/note-loader-common.js"></script>
-    <script src="js/markdown-handler.js"></script>
+    <?php $v = '20251020.5'; // Version cache pour forcer le rechargement ?>
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $v; ?>"/>
+    <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
+    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
+    <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
+    <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
+    <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -994,10 +995,10 @@ $body_classes = trim($extra_body_classes);
 <script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
-<script src="js/clickable-tags.js"></script>
-<script src="js/font-size-settings.js"></script>
-<script src="js/tasklist.js"></script>
-<script src="js/copy-code-on-focus.js"></script>
+<script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
+<script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
+<script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 
 <script>
 // Mobile navigation functionality
