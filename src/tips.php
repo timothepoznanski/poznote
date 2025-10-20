@@ -64,7 +64,7 @@ $v = '20251020.6';
 
         <div class="tips-content">
             <div class="tips-list">
-                <div class="tip-item"><i class="fa-list-check"></i> <a href="../README.md#interactive-tasklist-notes" target="_blank">Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
+                <div class="tip-item"><i class="fa-list-check"></i> <a href="https://github.com/timothepoznanski/poznote/blob/main/readme/FEATURES.md#interactive-tasklist-notes" target="_blank">Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
                 <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
                 <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
                 <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords or tags simultaneously.</div>
