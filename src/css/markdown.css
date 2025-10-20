@@ -212,6 +212,41 @@ body.markdown-split-view-enabled [data-note-type="markdown"] {
     gap: 1px;
 }
 
+/* Help message for split view */
+.markdown-split-help {
+    font-size: 10px !important;
+    color: #aaa !important;
+    padding: 2px 6px;
+    margin-bottom: 6px;
+    text-align: center;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    cursor: default;
+    user-select: none;
+}
+
+.markdown-split-help:hover {
+    opacity: 0.9;
+    color: #888 !important;
+}
+
+.markdown-split-help i {
+    font-size: 9px;
+}
+
+/* Simple help icon */
+.markdown-split-help .help-icon {
+    font-size: 9px;
+    color: #999;
+    font-weight: bold;
+    margin-right: 2px;
+}
+
 body.markdown-split-view-enabled .markdown-editor {
     display: block !important;
     width: 50%;

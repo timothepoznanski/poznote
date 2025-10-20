@@ -1,6 +1,17 @@
 // Markdown handler for Poznote
 // Simple markdown parser and renderer
 
+// Helper function to normalize content from contentEditable
+function normalizeContentEditableText(element) {
+    // Get text content while preserving line breaks
+    var content = element.innerText || element.textContent || '';
+    
+    // Handle different line ending styles
+    content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    return content;
+}
+
 function parseMarkdown(text) {
     if (!text) return '';
     
@@ -77,7 +88,32 @@ function parseMarkdown(text) {
     
     function flushParagraph() {
         if (currentParagraph.length > 0) {
-            let para = currentParagraph.join('<br>');
+            // Process line breaks according to Markdown rules:
+            // - Lines ending with 2+ spaces become <br>
+            // - Other lines are joined with spaces, unless they're short (likely intentional breaks)
+            let processedLines = [];
+            for (let i = 0; i < currentParagraph.length; i++) {
+                let line = currentParagraph[i];
+                if (i < currentParagraph.length - 1) {
+                    // Check if line ends with 2+ spaces (hard line break)
+                    if (line.match(/\s{2,}$/)) {
+                        processedLines.push(line.replace(/\s{2,}$/, '') + '<br>');
+                    } else {
+                        // For short lines or if next line starts a new sentence, add line break
+                        let nextLine = currentParagraph[i + 1];
+                        if (line.length < 80 && (nextLine.match(/^[A-Z]/) || line.match(/[.!?:]$/))) {
+                            processedLines.push(line + '<br>');
+                        } else {
+                            // Soft line break - join with next line using space
+                            processedLines.push(line + ' ');
+                        }
+                    }
+                } else {
+                    // Last line
+                    processedLines.push(line);
+                }
+            }
+            let para = processedLines.join('').replace(/\s+<br>/g, '<br>').replace(/\s+$/, '');
             para = applyInlineStyles(para);
             result.push('<p>' + para + '</p>');
             currentParagraph = [];
@@ -344,12 +380,24 @@ function initializeMarkdownNote(noteId) {
     previewDiv.innerHTML = parseMarkdown(markdownContent);
     previewDiv.style.display = (startInEditMode && !isSplitViewEnabled) ? 'none' : 'block';
     
+    // Add a subtle help message in split view mode
+    if (isSplitViewEnabled) {
+        var helpMessage = document.createElement('div');
+        helpMessage.className = 'markdown-split-help';
+        helpMessage.innerHTML = '<span class="help-icon">ℹ</span> You can disable this view in display options';
+        helpMessage.style.cssText = 'font-size: 11px; color: #888; padding: 4px 8px; border-bottom: 1px solid #f0f0f0; margin-bottom: 8px; text-align: center; background: #fafafa;';
+        previewDiv.insertBefore(helpMessage, previewDiv.firstChild);
+    }
+    
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
     editorDiv.style.display = (!startInEditMode && !isSplitViewEnabled) ? 'none' : 'block';
     editorDiv.setAttribute('data-ph', 'Write your markdown here...');
+    
+    // Ensure proper line break handling in contentEditable
+    editorDiv.style.whiteSpace = 'pre-wrap';
     
     // Replace note content with preview and editor
     noteEntry.innerHTML = '';
@@ -453,8 +501,8 @@ function switchToPreviewMode(noteId) {
     if (!previewDiv || !editorDiv) return;
     
     // Switch to preview mode
-    // Use innerText instead of textContent to preserve line breaks properly
-    var markdownContent = editorDiv.innerText || editorDiv.textContent;
+    // Use helper function to properly normalize content
+    var markdownContent = normalizeContentEditableText(editorDiv);
     previewDiv.innerHTML = parseMarkdown(markdownContent);
     noteEntry.setAttribute('data-markdown-content', markdownContent);
     
@@ -505,8 +553,8 @@ function getMarkdownContentForNote(noteId) {
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     if (editorDiv && editorDiv.style.display !== 'none') {
         // In edit mode, get content from editor
-        // Use innerText to preserve line breaks properly
-        return editorDiv.innerText || editorDiv.textContent || '';
+        // Use helper function to properly normalize content
+        return normalizeContentEditableText(editorDiv);
     }
     
     // In preview mode, get from data attribute
@@ -536,7 +584,8 @@ function setupMarkdownEditorListeners(noteId) {
     
     editorDiv.addEventListener('input', function() {
         // Update the data attribute with current content
-        var content = editorDiv.textContent || '';
+        // Use helper function to properly normalize content
+        var content = normalizeContentEditableText(editorDiv);
         noteEntry.setAttribute('data-markdown-content', content);
         
         // Check if split view is currently enabled (can change dynamically)
@@ -567,7 +616,8 @@ function getMarkdownContent(noteId) {
     
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     if (editorDiv) {
-        return editorDiv.textContent || '';
+        // Use helper function to properly normalize content
+        return normalizeContentEditableText(editorDiv);
     }
     
     return noteEntry.getAttribute('data-markdown-content') || '';
