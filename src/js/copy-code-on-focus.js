@@ -98,15 +98,21 @@
             var toast = document.createElement('div');
             toast.className = 'copy-toast-message';
             toast.style.pointerEvents = 'auto';
-            toast.style.background = 'rgba(33,33,33,0.94)';
-            toast.style.color = 'white';
-            toast.style.padding = '8px 12px';
+            toast.style.background = '#2d3748';
+            toast.style.color = '#e2e8f0';
+            toast.style.padding = '10px 16px';
             toast.style.marginTop = '8px';
-            toast.style.borderRadius = '6px';
-            toast.style.boxShadow = '0 4px 10px rgba(0,0,0,0.2)';
-            toast.style.fontSize = '13px';
-            toast.style.maxWidth = '320px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            toast.style.fontSize = '14px';
+            toast.style.fontWeight = '500';
+            toast.style.maxWidth = '280px';
             toast.style.wordBreak = 'break-word';
+            toast.style.border = '1px solid rgba(255,255,255,0.1)';
+            toast.style.userSelect = 'none';
+            toast.style.webkitUserSelect = 'none';
+            toast.style.mozUserSelect = 'none';
+            toast.style.msUserSelect = 'none';
             toast.style.opacity = '0';
             toast.style.transition = 'opacity 160ms ease-in-out, transform 160ms ease-in-out';
             toast.style.transform = 'translateY(-6px)';
@@ -200,7 +206,7 @@
             copyText(text).then(function (ok) {
                 if (ok) {
                     showFeedback(longPressElement);
-                    showToast('Copied to clipboard');
+                    showToast('Copied to clipboard!');
                 } else {
                     showToast('Copy failed — select the code and press Ctrl+C');
                 }
@@ -247,7 +253,7 @@
     // Add a tiny style for feedback if possible
     function injectStyle() {
         try {
-            var css = '.' + FEEDBACK_CLASS + ' { outline: 2px solid rgba(0,150,136,0.9); transition: outline .15s ease-in-out; }';
+            var css = '.' + FEEDBACK_CLASS + ' { outline: 2px solid #007DB8; transition: outline .15s ease-in-out; }';
             var head = document.head || document.getElementsByTagName('head')[0];
             var style = document.createElement('style');
             style.type = 'text/css';
