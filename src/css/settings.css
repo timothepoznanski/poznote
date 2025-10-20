@@ -75,6 +75,12 @@ body {
     position: relative;
 }
 
+/* Réduire les icônes Font Awesome dans settings-card-icon */
+.settings-card-icon i[class*="fa-"],
+.settings-card-icon [class*="fa-"] {
+    font-size: 0.55em !important;
+}
+
 .update-badge {
     position: absolute;
     top: -2px;
@@ -140,147 +146,46 @@ body {
     color: #991b1b;
 }
 
-.fa-arrow-left {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/arrow-left-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
+.fa-arrow-left::before { content: "\f060"; }
+.fa-layer-group::before { content: "\f5fd"; }
+.fa-upload::before { content: "\f093"; }
+.fa-download::before { content: "\f019"; }
+.fa-file-alt::before { content: "\f15c"; }
+.fa-sync-alt::before { content: "\f2f1"; }
+.fa-globe::before { content: "\f0ac"; }
+.fa-info::before { content: "\f129"; }
+.fa-code-branch::before { content: "\f126"; }
+.fa-code::before { content: "\f121"; }
+.fa-coffee::before { content: "\f0f4"; }
 
-.fa-layer-group {
+.fa-arrow-left,
+.fa-layer-group,
+.fa-upload,
+.fa-download,
+.fa-file-alt,
+.fa-sync-alt,
+.fa-info,
+.fa-code-branch,
+.fa-code,
+.fa-coffee {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/layer-group-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-upload {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/upload-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-download {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/download-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-file-alt {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/file-lines-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-sync-alt {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/rotate-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
 }
 
 .fa-globe {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/earth-americas-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-info {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/info-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-code-branch {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/code-branch-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-code {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/code-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-coffee {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/coffee.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
+    font-family: "Font Awesome 5 Brands";
+    font-weight: 400;
+    font-size: 0.875em;
+    vertical-align: middle;
 }
 
 /* Button styles */

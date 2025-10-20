@@ -69,7 +69,7 @@ function renderTasks(tasks, noteId) {
     if (!Array.isArray(tasks)) return '';
 
     return tasks.map(task => {
-        const starClass = task.important ? 'task-icon-star' : 'task-icon-star';
+        const starClass = 'fa-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
         const title = task.important ? 'Remove important' : 'Mark as important';
         
@@ -79,10 +79,10 @@ function renderTasks(tasks, noteId) {
             // Completed tasks: show delete and drag buttons
             buttonsHtml = `
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
-                <i class="task-icon-trash"></i>
+                <i class="fa-trash"></i>
             </button>
             <div class="task-drag-handle" title="Drag to reorder">
-                <i class="fa-menu-vert-svg"></i>
+                <i class="fa-grip-vertical"></i>
             </div>`;
         } else {
             // Incomplete tasks: show favorite and drag buttons
@@ -91,7 +91,7 @@ function renderTasks(tasks, noteId) {
                 <i class="${starClass}"></i>
             </button>
             <div class="task-drag-handle" title="Drag to reorder">
-                <i class="fa-menu-vert-svg"></i>
+                <i class="fa-grip-vertical"></i>
             </div>`;
         }
         

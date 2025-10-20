@@ -87,6 +87,30 @@ input[type="password"]::placeholder {
     color: #a0aec0;
 }
 
+.remember-me-group {
+    margin-bottom: 1rem;
+}
+
+.remember-me-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 400;
+    color: #4a5568;
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+.remember-me-label input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.remember-me-label span {
+    user-select: none;
+}
+
 .login-button {
     width: 100%;
     padding: 0.875rem 1rem;

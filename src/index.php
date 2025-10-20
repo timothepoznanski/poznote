@@ -78,14 +78,36 @@ $using_unified_search = handleUnifiedSearch();
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <link type="text/css" rel="stylesheet" href="css/index.css"/>
-    <link rel="stylesheet" href="css/index-mobile.css" media="(max-width: 800px)">
-    <link type="text/css" rel="stylesheet" href="css/modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
-    <script src="js/toolbar.js"></script>
-    <script src="js/note-loader-common.js"></script>
-    <script src="js/markdown-handler.js"></script>
+    <?php $v = '20251020.6'; // Version cache pour forcer le rechargement ?>
+    <script>
+    (function(){
+        try {
+            var theme = localStorage.getItem('poznote-theme');
+            if (!theme) {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            }
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="color-scheme" content="dark light">
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $v; ?>"/>
+    <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
+    <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
+    <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
+    <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
+    <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -266,7 +288,7 @@ $body_classes = trim($extra_body_classes);
                     <i class="fa-cog"></i>
                     <span class="update-badge" style="display: none;"></span>
                 </button>
-                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus"></i></button>
+                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus-circle"></i></button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
@@ -409,7 +431,7 @@ $body_classes = trim($extra_body_classes);
         // Markdown note item
         var markdownItem = document.createElement('button');
         markdownItem.className = 'create-menu-item';
-        markdownItem.innerHTML = '<i class="fa-markdown"></i>Note (MD)';
+        markdownItem.innerHTML = '<i class="fa-file-alt"></i>Note (MD)';
         markdownItem.onclick = function() {
             createMarkdownNote();
             createMenu.remove();
@@ -639,7 +661,7 @@ $body_classes = trim($extra_body_classes);
 
                     echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     $share_class = $is_shared ? ' is-shared' : '';
-                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-square-share-nodes-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                         
                     // Generate dates safely for JavaScript with robust encoding
@@ -694,8 +716,8 @@ $body_classes = trim($extra_body_classes);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
                     // Individual action buttons
-                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-file-copy-svg"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-drive-file-move-svg"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-copy"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-folder-open"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
@@ -988,10 +1010,10 @@ $body_classes = trim($extra_body_classes);
 <script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>
-<script src="js/clickable-tags.js"></script>
-<script src="js/font-size-settings.js"></script>
-<script src="js/tasklist.js"></script>
-<script src="js/copy-code-on-focus.js"></script>
+<script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
+<script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
+<script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
+<script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 
 <script>
 // Mobile navigation functionality

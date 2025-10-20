@@ -436,7 +436,25 @@ body {
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
-.sidebar-plus { background: transparent; border: none; color: #007DB8; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+
+/* Réduire la taille des icônes Font Awesome dans la sidebar */
+.sidebar-title-actions i,
+.sidebar-title-actions [class*="fa-"],
+.sidebar-display i,
+.sidebar-display [class*="fa-"],
+.sidebar-settings i,
+.sidebar-settings [class*="fa-"] {
+    font-size: 0.7em !important;
+}
+
+/* Icône plus-circle un peu plus grande */
+.sidebar-plus i,
+.sidebar-plus [class*="fa-"],
+.sidebar-plus .fa-plus-circle {
+    font-size: 1em !important;
+    color: #6c757d !important;
+}
 
 /* Update badge for sidebar buttons */
 .sidebar-settings .update-badge {
@@ -571,6 +589,12 @@ body {
 .folder-actions i { margin-left: 12px; color:#6b7280; cursor:pointer; font-size: 1.2em; }
 .folder-actions i:hover { color:#374151; }
 
+/* Réduire les icônes Font Awesome dans folder-actions */
+.folder-actions i[class*="fa-"],
+.folder-actions [class*="fa-"] {
+    font-size: 0.85em !important;
+}
+
 
 .resize-handle {
     width: 3px;
@@ -698,6 +722,12 @@ body {
     color: #007DB8;
 }
 
+/* Override pour les icônes Font Awesome dans le menu create */
+.create-menu-item i[class*="fa-"],
+.create-menu-item [class*="fa-"] {
+    font-size: 18px !important;
+}
+
 /* LEFT HEADER */
 
 .left-header {
@@ -798,6 +828,12 @@ body {
     min-width: 38px;
     min-height: 38px;
     box-sizing: border-box;
+}
+
+/* Réduire la taille des icônes Font Awesome dans la toolbar */
+.toolbar-btn i,
+.toolbar-btn [class*="fa-"] {
+    font-size: 0.75em !important;
 }
 
 /* Text formatting buttons: hidden by default, visible on selection */
@@ -910,8 +946,8 @@ body {
 
 .workspace-menu-item i {
     margin-right: 8px;
-    font-size: 20px;
-    /* width: 16px; */
+    font-size: 14px;
+    width: 16px;
     text-align: center;
     color: #666;
 }
@@ -981,11 +1017,11 @@ a.links_arbo_left.selected-note {
 .searchbar-input {
     padding: 10px 12px 10px 44px;
     border-radius: 8px;
-    /* border: 1px solid #d3d6db; */
+    border: 1px solid #d3d6db;
     background: #ffffff;
     font-size: 0.9em;
     transition: border-color 0.18s, box-shadow 0.18s;
-    box-shadow: 0 0 0 1px #e6e6e6;
+    /* box-shadow: 0 0 0 1px #e6e6e6; */
     outline: none;
     width: 100%;
     min-width: 0;
@@ -1284,7 +1320,7 @@ img {
 }
 
 .fa-tag.icon_tag {
-    font-size: 18px;
+    font-size: 14px;
     margin-right: 8px;
     flex-shrink: 0;
     align-self: center;
@@ -1296,8 +1332,19 @@ img {
     opacity: 0.7;
 }
 
-.fa-tag.icon_tag {
-    background-image: url('../images/tags-light-full.svg') !important;
+.fa-tag.icon_tag::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    content: "\f02c";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
 } 
 
 .name_tags {
@@ -1719,7 +1766,8 @@ img {
 
 /* Make delete icon red in actions menu */
 .actions-menu-item .fa-trash {
-    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
+    color: #ff0000 !important;
+    filter: none !important;
 }
 
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
@@ -2036,13 +2084,11 @@ hr {
 
 /* Quand save est modifié, changer l'icône et la garder rouge */
 .toolbar-btn.save-modified i.fa-save {
-    background-image: url('../images/floppy-disk-light-full.svg') !important;
-    filter: invert(13%) sepia(95%) saturate(7481%) hue-rotate(0deg) brightness(102%) contrast(107%);
+    color: #ff0000 !important;
 }
 .toolbar-btn.save-modified:hover i.fa-save,
 .toolbar-btn.save-modified:focus i.fa-save {
-    background-image: url('../images/floppy-disk-light-full.svg') !important;
-    filter: invert(13%) sepia(95%) saturate(7481%) hue-rotate(0deg) brightness(102%) contrast(107%);
+    color: #ff0000 !important;
 }
 /* Pour l'icône save normale, couleur gris foncé par défaut */
 .toolbar-btn:not(.save-modified) i.fa-save {
@@ -2143,12 +2189,17 @@ hr {
 }
 
 .folder-icon {
-    font-size: 1.2em;
     color: #b0b0b0;
     margin-right: 8px;
     transition: transform 0.2s;
-    width: 16px;
     align-content: center;
+}
+
+/* Réduire les icônes dans les dossiers (Trash, Tags, Favorites) */
+.fa-trash.folder-icon,
+.fa-tags.folder-icon,
+.fa-star-light.folder-icon {
+    font-size: 0.8em !important;
 }
 
 .folder-name {
@@ -2528,814 +2579,177 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(359deg); } }
 
 /* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
+.btn-attachment.has-attachments i.fa-paperclip,
 .btn-attachment.has-attachments .fa-paperclip {
-  /* tint paperclip SVG to app blue */
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%) !important;
-  background-image: url('../images/paperclip-light-full.svg') !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-size: contain !important;
-  content: '' !important; /* swap pseudo-element to use background-image */
+  color: #007DB8 !important;
 }
 
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
-.btn-favorite.is-favorite .fa-star-light {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+.toolbar-btn.btn-favorite.is-favorite i.fa-star-light,
+.toolbar-btn.btn-favorite.is-favorite .fa-star-light {
+  color: #007DB8 !important;
 }
 
 /* Blue color when a note is shared publicly */
-.btn-share.is-shared .fa-square-share-nodes-svg {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+.toolbar-btn.btn-share.is-shared i.fa-share-nodes,
+.toolbar-btn.btn-share.is-shared .fa-share-nodes {
+  color: #007DB8 !important;
 }
 
-.fa-square-share-nodes-svg {
+/* Font Awesome icon customizations */
+.fa-share-nodes::before { content: "\f1e0"; }
+.fa-smile::before { content: "\f118"; }
+.fa-folder::before { content: "\f07b"; }
+.fa-folder-open::before { content: "\f07c"; }
+.fa-edit::before { content: "\f044"; }
+.fa-download::before { content: "\f019"; }
+.fa-maximize::before { content: "\f31e"; }
+.fa-trash::before { content: "\f2ed"; }
+.fa-save::before { content: "\f0c7"; }
+.fa-link::before { content: "\f0c1"; }
+.fa-unlink::before { content: "\f127"; }
+.fa-paperclip::before { content: "\f0c6"; }
+.fa-minus::before { content: "\f068"; }
+.fa-info-circle::before { content: "\f05a"; }
+.fa-search::before { content: "\f002"; }
+.fa-spinner::before { content: "\f110"; }
+.fa-star-light::before { content: "\f005"; }
+.fa-star::before { content: "\f005"; }
+.fa-layer-group::before { content: "\f5fd"; }
+.fa-cog::before { content: "\f013"; }
+.fa-eye::before { content: "\f06e"; }
+.fa-markdown::before { content: "\f60f"; }
+.fa-home::before { content: "\f015"; }
+.fa-bold::before { content: "\f032"; }
+.fa-italic::before { content: "\f033"; }
+.fa-underline::before { content: "\f0cd"; }
+.fa-eraser::before { content: "\f12d"; }
+.fa-strikethrough::before { content: "\f0cc"; }
+.fa-palette::before { content: "\f53f"; }
+.fa-fill-drip::before { content: "\f576"; }
+.fa-list-ul::before { content: "\f0ca"; }
+.fa-list-ol::before { content: "\f0cb"; }
+.fa-text-height::before { content: "\f034"; }
+.fa-code::before { content: "\f121"; }
+.fa-terminal::before { content: "\f120"; }
+.fa-tag::before { content: "\f02b"; }
+.fa-tags::before { content: "\f02c"; }
+.fa-sign-out-alt::before { content: "\f2f5"; }
+.fa-sync-alt::before { content: "\f2f1"; }
+.fa-github::before { content: "\f09b"; }
+.fa-globe::before { content: "\f0ac"; }
+.fa-upload::before { content: "\f093"; }
+.fa-arrow-left::before { content: "\f060"; }
+.fa-info::before { content: "\f129"; }
+.fa-file-alt::before { content: "\f15c"; }
+.fa-plus::before { content: "\f067"; }
+.fa-plus-circle::before { content: "\f055"; }
+.fa-calendar-alt::before { content: "\f073"; }
+.fa-code-branch::before { content: "\f126"; }
+.fa-map-marker-alt::before { content: "\f3c5"; }
+.fa-user::before { content: "\f007"; }
+.fa-hashtag::before { content: "\f292"; }
+.fa-check-light-full::before { content: "\f00c"; }
+.fa-align-left::before { content: "\f036"; }
+.fa-copy::before { content: "\f0c5"; }
+.fa-trash-restore-alt::before { content: "\f2ea"; }
+.fa-grip-vertical::before { content: "\f58e"; }
+
+.fa-share-nodes,
+.fa-smile,
+.fa-folder,
+.fa-folder-open,
+.fa-edit,
+.fa-download,
+.fa-maximize,
+.fa-trash,
+.fa-save,
+.fa-link,
+.fa-unlink,
+.fa-paperclip,
+.fa-minus,
+.fa-info-circle,
+.fa-search,
+.fa-spinner,
+.fa-star-light,
+.fa-star,
+.fa-layer-group,
+.fa-cog,
+.fa-eye,
+.fa-home,
+.fa-bold,
+.fa-italic,
+.fa-underline,
+.fa-eraser,
+.fa-strikethrough,
+.fa-palette,
+.fa-fill-drip,
+.fa-list-ul,
+.fa-list-ol,
+.fa-text-height,
+.fa-code,
+.fa-terminal,
+.fa-tag,
+.fa-tags,
+.fa-sign-out-alt,
+.fa-sync-alt,
+.fa-upload,
+.fa-arrow-left,
+.fa-info,
+.fa-file-alt,
+.fa-plus,
+.fa-plus-circle,
+.fa-calendar-alt,
+.fa-code-branch,
+.fa-map-marker-alt,
+.fa-user,
+.fa-hashtag,
+.fa-check-light-full,
+.fa-align-left,
+.fa-copy,
+.fa-trash-restore-alt,
+.fa-grip-vertical {
+  font-family: "Font Awesome 5 Pro";
+  font-weight: 300;
+  font-style: normal;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/square-share-nodes-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+  font-size: 0.875em;
+  vertical-align: middle;
 }
 
-.fa-file-copy-svg {
-  display: inline-block;
-  width: 0.8em;
-  height: 0.8em;
-  background-image: url('../images/file-copy.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+.fa-github,
+.fa-markdown {
+  font-family: "Font Awesome 5 Brands";
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.875em !important;
 }
 
-.fa-menu-vert-svg {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/menu-vert.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+.fa-globe {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
 }
 
-.fa-drive-file-move-svg {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/drive_file_move.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-smile {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/icons-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-folder {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/folder-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-folder-open {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/folder-open-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-edit {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/pen-to-square-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-download {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/download-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-maximize {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/maximize-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-trash {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/trash-can-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-save {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/floppy-disk-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-link {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/link-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-unlink {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/link-slash-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-paperclip {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/paperclip-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-minus {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/minus-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-info-circle {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/info-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-search {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/magnifying-glass-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+.fa-plus {
+  font-size: 1em !important;
 }
 
 .fa-star-light {
-    display: inline-block;
-    width: 1.2em;
-    height: 1.2em;
-    background-image: url('../images/star-light-full.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
-
-.fa-layer-group {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/layer-group-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-cog {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/gear-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-eye {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/eye-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-markdown {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/markdown.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-home {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/house-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+  font-size: 0.95em !important;
 }
 
 .fa-bold {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/bold-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
   transition: transform 0.2s ease;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
 }
 
 .fa-bold:hover {
   transform: scale(1.2);
-  filter: invert(13%) sepia(94%) saturate(7000%) hue-rotate(185deg) brightness(95%) contrast(105%);
-}
-
-.fa-italic {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/italic-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-underline {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/underline-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-eraser {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/eraser-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-strikethrough {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/strikethrough-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-palette {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/palette-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-fill-drip {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/highlighter-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-list-ul {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/list-ul-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-list-ol {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/list-ol-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-text-height {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/text-height-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-code {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/code-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-terminal {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/terminal-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-tag {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/tag-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-tags {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/tags-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-sign-out-alt {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/right-from-bracket-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-sync-alt {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/rotate-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-github {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/github-brands-solid-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-globe {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/earth-americas-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-upload {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/upload-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-arrow-left {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/arrow-left-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-info {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/info-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-file-alt {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/file-lines-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-plus {
-  display: inline-block;
-  width: 1.4em;
-  height: 1.4em;
-  background-image: url('../images/plus-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-calendar-alt {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/calendar-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-code-branch {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/code-branch-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-map-marker-alt {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/note-sticky-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-user {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/user-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-hashtag {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/hashtag-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-check-light-full {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/check-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-align-left {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/align-left-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.fa-copy {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/copy-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-.folder-delete-btn.fa-trash {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/folder_delete.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-/* Use specific folder move files icon */
-.folder-move-files-btn.fa-folder-open {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/drive_file_move.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-/* Use specific note move icon */
-.btn-folder .fa-folder {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/drive_file_move.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-/* Use specific create folder icon */
-.create-menu-item .fa-folder {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/create_new_folder.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
-
-/* Use specific markdown icon */
-.create-menu-item .fa-markdown {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/markdown.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+  color: #007DB8 !important;
 }
 
 /* General rule for any input that might have search type */
@@ -3548,6 +2962,17 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
+/* Exception: Remove filter for save button when modified (to show red color) */
+.toolbar-btn.save-modified .fa-save {
+  filter: none !important;
+}
+
+/* Exception: Remove filter for favorite/share/attachment when active (to show blue color) */
+.toolbar-btn.is-favorite .fa-star-light,
+.toolbar-btn.is-shared .fa-share-nodes,
+.toolbar-btn.has-attachments .fa-paperclip {
+  filter: none !important;
+}
 
 .sidebar-plus{
   /* transform: scale(1.18); */
