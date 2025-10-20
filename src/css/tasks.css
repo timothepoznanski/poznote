@@ -1,6 +1,8 @@
 .task-list-container {
     padding: 10px 0;
     font-family: inherit;
+}
+
 .task-drag-handle {
     cursor: grab;
     color: #999;
@@ -13,9 +15,9 @@
     align-items: center;
     justify-content: center;
     min-width: 16px;
-
 }
-    .task-input-container {
+
+.task-input-container {
     position: relative;
     margin-bottom: 15px;
     display: flex;
@@ -178,11 +180,29 @@
 }
 
 .task-delete-btn i {
-    font-size: 24px;
+    font-size: 14px;
 }
 
 .task-important-btn i {
-    font-size: 26px;
+    font-size: 14px;
+}
+
+.task-delete-btn i,
+.task-important-btn i,
+.task-drag-handle i {
+    color: #999;
+    font-family: "Font Awesome 5 Pro" !important;
+    font-weight: 300 !important;
+    font-style: normal !important;
+    display: inline-block !important;
+}
+
+.task-delete-btn:hover i {
+    color: #d32f2f;
+}
+
+.task-important-btn:hover i {
+    color: #ffa000;
 }
 
 /* Important task styling */
@@ -209,34 +229,33 @@
     justify-content: center;
 }
 
-.task-icon-trash {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/trash-can-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
-}
+.task-icon-trash::before { content: "\f2ed"; }
+.task-icon-star::before { content: "\f005"; }
 
+.task-icon-trash,
 .task-icon-star {
+  font-family: "Font Awesome 5 Pro";
+  font-weight: 300;
+  font-style: normal;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
   display: inline-block;
-  width: 1em;
-  height: 1em;
-  background-image: url('../images/star-light-full.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  font-family: inherit !important;
-  font-style: normal !important;
-  content: '';
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+  font-size: 0.875em;
+  vertical-align: middle;
 }
 
 /* Red star icon for important tasks */
 .task-item.important .task-icon-star {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(7466%) hue-rotate(344deg) brightness(93%) contrast(103%);
+  color: #ff0000 !important;
 }
+
+.task-item.important .fa-star {
+  color: #ff0000 !important;
+}
+
+.task-important-btn.is-favorite i {
+  color: #ff0000 !important;
 }

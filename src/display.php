@@ -25,8 +25,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Display - Poznote</title>
+    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+    <meta name="color-scheme" content="dark light">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/display.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
 </head>
 <body>
     <div class="settings-container">
@@ -45,6 +50,16 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         <br><br>
 
         <div class="settings-grid">
+            <!-- Theme Mode -->
+            <div class="settings-card" id="theme-mode-card" onclick="toggleTheme();">
+                <div class="settings-card-icon">
+                    <i class="fa fa-sun"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Theme Mode (experimental) <span id="theme-mode-badge" class="setting-status">light mode</span></h3>
+                </div>
+            </div>
+
             <!-- Moved from settings.php: user preferences -->
             <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
                 <div class="settings-card-icon">
@@ -110,6 +125,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     </div>
 
     <?php include 'modals.php'; ?>
+    <script src="js/theme-manager.js"></script>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>

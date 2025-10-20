@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Icons</title>
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/index.css"/>
+    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
+    <style>
+        body {
+            padding: 40px;
+            font-family: Arial, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .icon-test {
+            margin: 10px;
+            padding: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        i {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test des icônes Font Awesome</h1>
+    
+    <div class="test-section">
+        <h2>Icônes utilisées dans les tâches</h2>
+        
+        <div class="icon-test">
+            <i class="fa-star"></i>
+            <span>fa-star (étoile)</span>
+        </div>
+        
+        <div class="icon-test">
+            <i class="fa-trash"></i>
+            <span>fa-trash (poubelle)</span>
+        </div>
+        
+        <div class="icon-test">
+            <i class="fa-grip-vertical"></i>
+            <span>fa-grip-vertical (poignée)</span>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test dans le contexte des boutons de tâches</h2>
+        
+        <button class="task-important-btn btn-favorite">
+            <i class="fa-star"></i>
+        </button>
+        
+        <button class="task-delete-btn">
+            <i class="fa-trash"></i>
+        </button>
+        
+        <div class="task-drag-handle">
+            <i class="fa-grip-vertical"></i>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Autres icônes pour comparaison</h2>
+        
+        <div class="icon-test">
+            <i class="fa-home"></i>
+            <span>fa-home (devrait fonctionner)</span>
+        </div>
+        
+        <div class="icon-test">
+            <i class="fa-bold"></i>
+            <span>fa-bold (devrait fonctionner)</span>
+        </div>
+        
+        <div class="icon-test">
+            <i class="fa-star-light"></i>
+            <span>fa-star-light (devrait fonctionner)</span>
+        </div>
+    </div>
+</body>
+</html>

@@ -264,68 +264,64 @@ body.trash-page {
     color: #d32f2f;
 }
 
-.fa-arrow-circle-left  {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/arrow-left-light-full.svg') !important;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
-}
+.fa-arrow-circle-left::before { content: "\f060"; }
+.trash-empty-button::before { content: "\f51a"; }
+.fa-trash::before { content: "\f2ed"; }
+.fa-trash-restore-alt::before { content: "\f2ea"; }
 
-.trash-empty-button  {
+.fa-arrow-circle-left,
+.trash-empty-button {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-image: url('../images/broom-light-full.svg') !important;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
 }
 
 .fa-trash {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
-    width: 1.2em;
-    height: 1.2em;
-    background-image: url('../images/trash-can-light-full.svg') !important;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
     cursor: pointer;
-    transition: filter 0.1s ease;
+    transition: color 0.1s ease;
+    font-size: 0.95em;
+    vertical-align: middle;
 }
 
 .fa-trash:hover {
-    filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(7484%) hue-rotate(0deg) brightness(91%) contrast(108%);
+    color: #ff0000 !important;
 }
 
-.fa-trash-restore-alt-svg {
+.fa-trash-restore-alt {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
-    width: 1.2em;
-    height: 1.2em;
-    background-image: url('../images/trash-can-arrow-up-light-full.svg') !important;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    font-family: inherit !important;
-    font-style: normal !important;
-    content: '';
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
     cursor: pointer;
-    transition: filter 0.2s ease;
+    transition: color 0.2s ease;
+    font-size: 0.95em;
+    vertical-align: middle;
 }
 
-.fa-trash-restore-alt-svg:hover {
-    filter: brightness(0) saturate(100%) invert(34%) sepia(86%) saturate(1352%) hue-rotate(100deg) brightness(92%) contrast(89%);
+.fa-trash-restore-alt:hover {
+    color: #22c55e !important;
 }
 
 /* Styles mobiles pour la page trash */
@@ -444,7 +440,7 @@ body.trash-page {
     }
     
     /* Larger trash action icons on mobile for better touch targets */
-    .fa-trash, .fa-trash-restore-alt-svg {
+    .fa-trash, .fa-trash-restore-alt {
         width: 1.5em !important;
         height: 1.5em !important;
     }

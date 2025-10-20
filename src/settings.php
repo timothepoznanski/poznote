@@ -25,8 +25,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Settings - Poznote</title>
+    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+    <meta name="color-scheme" content="dark light">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
 </head>
 
 <body>
@@ -110,7 +115,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <!-- Poznote Website -->
             <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fa-globe"></i>
+                    <i class="fa-info"></i>
                 </div>
                 <div class="settings-card-content">
                     <h3>About Poznote</h3>
@@ -133,6 +138,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <?php include 'modals.php'; ?>
     
     <!-- Include JavaScript files -->
+    <script src="js/theme-manager.js"></script>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>

@@ -47,7 +47,9 @@ if (isAuthenticated()) {
 if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    if (authenticate($username, $password)) {
+    $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
+    
+    if (authenticate($username, $password, $rememberMe)) {
         // Redirect to index with JavaScript to include localStorage workspace
         // Include minimal HTML to ensure proper execution
         echo '<!DOCTYPE html><html><head>';
@@ -72,8 +74,14 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Poznote</title>
+    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+    <meta name="color-scheme" content="dark light">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="login-container">
@@ -93,6 +101,13 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
                 <?php if ($error): ?>
                     <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
+            </div>
+            
+            <div class="form-group remember-me-group">
+                <label class="remember-me-label">
+                    <input type="checkbox" name="remember_me" value="1" id="remember_me">
+                    <span>Remember me for 30 days</span>
+                </label>
             </div>
             
             <button type="submit" class="login-button">Login</button>
