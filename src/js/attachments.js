@@ -253,6 +253,113 @@ function handleImageFilesAndInsert(files, dropTarget) {
 function handleSingleImageFile(file, dropTarget) {
     if (!file.type || !file.type.startsWith('image/')) return;
     
+    // Vérifier si c'est une note markdown
+    var noteEntry = dropTarget;
+    var isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') && 
+                     noteEntry.getAttribute('data-note-type') === 'markdown';
+    
+    if (isMarkdown) {
+        handleMarkdownImageUpload(file, dropTarget, noteEntry);
+    } else {
+        handleHTMLImageInsert(file, dropTarget);
+    }
+}
+
+function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
+    var noteId = noteEntry.id.replace('entry', '');
+    
+    // Montrer un indicateur de chargement
+    var loadingText = '![Uploading ' + file.name + '...]()';
+    insertMarkdownAtCursor(loadingText, dropTarget);
+    
+    // Uploader le fichier
+    var formData = new FormData();
+    formData.append('action', 'upload');
+    formData.append('note_id', noteId);
+    formData.append('file', file);
+    if (typeof selectedWorkspace !== 'undefined') {
+        formData.append('workspace', selectedWorkspace || 'Poznote');
+    }
+    
+    fetch('api_attachments.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Remplacer le texte de chargement par la syntaxe markdown finale
+            var imageMarkdown = '![' + file.name + '](api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + data.attachment_id + ')';
+            replaceLoadingText(loadingText, imageMarkdown, dropTarget);
+            
+            // Marquer la note comme modifiée
+            if (typeof markNoteAsModified === 'function') {
+                markNoteAsModified(noteId);
+            }
+        } else {
+            // Supprimer le texte de chargement en cas d'erreur
+            replaceLoadingText(loadingText, '', dropTarget);
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup('Upload failed: ' + data.message, 'error');
+            }
+        }
+    })
+    .catch(function(error) {
+        replaceLoadingText(loadingText, '', dropTarget);
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup('Upload failed: ' + error.message, 'error');
+        }
+    });
+}
+
+function insertMarkdownAtCursor(text, dropTarget) {
+    // Pour les notes markdown, insérer dans l'éditeur markdown
+    var editor = dropTarget.querySelector('.markdown-editor');
+    if (editor) {
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var range = sel.getRangeAt(0);
+            if (editor.contains(range.commonAncestorContainer) || 
+                editor === range.commonAncestorContainer) {
+                
+                // Insérer le texte à la position du curseur
+                range.deleteContents();
+                var textNode = document.createTextNode(text);
+                range.insertNode(textNode);
+                
+                // Placer le curseur après le texte inséré
+                range.setStartAfter(textNode);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                
+                return;
+            }
+        }
+        
+        // Fallback : ajouter à la fin
+        var currentContent = editor.textContent || '';
+        editor.textContent = currentContent + '\n' + text;
+        editor.focus();
+    }
+}
+
+function replaceLoadingText(oldText, newText, dropTarget) {
+    var editor = dropTarget.querySelector('.markdown-editor');
+    if (editor) {
+        var content = editor.textContent || '';
+        editor.textContent = content.replace(oldText, newText);
+        
+        // Déclencher l'événement input pour que les listeners de markdown soient informés
+        var event = new Event('input', { bubbles: true });
+        editor.dispatchEvent(event);
+    }
+}
+
+function handleHTMLImageInsert(file, dropTarget) {
+    // Code existant pour les notes HTML
     var reader = new FileReader();
     reader.onload = function(ev) {
         var dataUrl = ev.target.result;

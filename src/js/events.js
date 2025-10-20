@@ -224,6 +224,8 @@ function setupDragDropEvents() {
             var potential = el && el.closest ? el.closest('.noteentry') : null;
             if (potential) {
                 e.preventDefault();
+                // Ajouter une classe visuelle pour montrer que le drop est possible
+                potential.classList.add('drag-over');
             }
         } catch (err) {}
     });
@@ -241,6 +243,19 @@ function setupDragDropEvents() {
         } catch (err) {}
     });
 
+    document.body.addEventListener('dragleave', function(e) {
+        try {
+            var el = document.elementFromPoint(e.clientX, e.clientY);
+            var potential = el && el.closest ? el.closest('.noteentry') : null;
+            if (!potential) {
+                // Supprimer la classe visuelle
+                document.querySelectorAll('.noteentry.drag-over').forEach(function(note) {
+                    note.classList.remove('drag-over');
+                });
+            }
+        } catch (err) {}
+    });
+
     document.body.addEventListener('drop', function(e) {
         try {
             var el = document.elementFromPoint(e.clientX, e.clientY);
@@ -254,6 +269,9 @@ function setupDragDropEvents() {
 
             e.preventDefault();
             e.stopPropagation();
+
+            // Supprimer la classe visuelle
+            note.classList.remove('drag-over');
 
             var dt = e.dataTransfer;
             if (!dt) return;
