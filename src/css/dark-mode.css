@@ -692,11 +692,15 @@ body.dark-mode .attachment-link:hover {
 /* Code blocks */
 html[data-theme='dark'] .noteentry code,
 html[data-theme='dark'] .noteentry pre,
+html[data-theme='dark'] .code-block,
+html[data-theme='dark'] pre.code-block,
 body.dark-mode .noteentry code,
-body.dark-mode .noteentry pre {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #404040;
+body.dark-mode .noteentry pre,
+body.dark-mode .code-block,
+body.dark-mode pre.code-block {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
 }
 
 /* Highlighted text in search */
