@@ -70,11 +70,13 @@ if (!$note) {
             <h3>Upload New Attachment</h3>
             
             <div class="attachment-upload-section">
+                <div class="drag-drop-info">You can drag and drop your file below:</div><br>
                 <div class="form-group">
                     <input type="file" id="attachmentFile" class="file-input" onchange="showFileName()">
                     <div class="accepted-types">
                         All file types accepted (max 200MB)
                     </div>
+                    <br>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
                 

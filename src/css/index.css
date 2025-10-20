@@ -1321,7 +1321,7 @@ img {
 
 .fa-tag.icon_tag {
     font-size: 14px;
-    margin-right: 8px;
+    margin-right: 14px;
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
@@ -1492,10 +1492,10 @@ img {
 }
 
 .fa-paperclip.icon_attachment {
-    font-size: 18px; /* larger paperclip on index */
-    margin-right: 8px;
+    font-size: 14px;
+    margin-right: 14px;
     flex-shrink: 0;
-    color: #007DB8;
+    /* color: #007DB8; */
     align-self: center;
     line-height: 1;
 }
