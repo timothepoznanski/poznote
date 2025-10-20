@@ -113,7 +113,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             </div>
 
             <!-- News -->
-            <div class="settings-card" onclick="window.open('https://poznote.com/news', '_blank');">
+            <div class="settings-card" onclick="window.open('https://poznote.com/news.html', '_blank');">
                 <div class="settings-card-icon">
                     <i class="fa-newspaper"></i>
                 </div>
