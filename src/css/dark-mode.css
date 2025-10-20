@@ -328,6 +328,74 @@ body.dark-mode .modal-buttons button:first-child:hover {
     background-color: #2a4a7f;
 }
 
+/* Font Size Settings Modal (dark theme refinements) */
+html[data-theme='dark'] #fontSizeModal .modal-header h2,
+body.dark-mode #fontSizeModal .modal-header h2 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-body p,
+body.dark-mode #fontSizeModal .modal-body p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-section,
+body.dark-mode #fontSizeModal .font-size-section {
+    background-color: #1f1f1f;
+    border-color: #3a3a3a;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls label,
+body.dark-mode #fontSizeModal .font-size-controls label {
+    color: #d8d8d8;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls input,
+body.dark-mode #fontSizeModal .font-size-controls input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
+body.dark-mode #fontSizeModal .font-size-controls input::placeholder {
+    color: #808080;
+}
+
+html[data-theme='dark'] #fontSizeModal .default-info,
+body.dark-mode #fontSizeModal .default-info {
+    color: #ffa6a6; /* softened red for dark bg */
+}
+
+html[data-theme='dark'] #fontSizeModal .font-size-preview,
+body.dark-mode #fontSizeModal .font-size-preview {
+    background-color: #242424;
+    border-color: #3a3a3a;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary,
+body.dark-mode #fontSizeModal .modal-footer .btn-primary {
+    background-color: #1e3a5f;
+    color: #fff;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary:hover,
+body.dark-mode #fontSizeModal .modal-footer .btn-primary:hover {
+    background-color: #2a4a7f;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel,
+body.dark-mode #fontSizeModal .modal-footer .btn-cancel {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel:hover,
+body.dark-mode #fontSizeModal .modal-footer .btn-cancel:hover {
+    background-color: #333;
+}
+
 /* Settings/Display pages */
 html[data-theme='dark'] .settings-container,
 body.dark-mode .settings-container {
