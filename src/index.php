@@ -1122,10 +1122,7 @@ function initializeMarkdownSplitView() {
                 }
             });
             
-            // Update help messages
-            if (typeof updateMarkdownSplitHelpMessages === 'function') {
-                updateMarkdownSplitHelpMessages(enabled);
-            }
+            // Split view disabled on mobile, help messages removed
         })
         .catch(e=>console.error('Error loading markdown split view setting:', e));
 }
@@ -1154,28 +1151,8 @@ window.updateMarkdownSplitView = function(enabled) {
         }
     });
     
-    // Update help messages for split view
-    updateMarkdownSplitHelpMessages(enabled);
+    // No need for help messages anymore
 };
-
-// Function to add/remove help messages in split view
-function updateMarkdownSplitHelpMessages(enabled) {
-    var previewDivs = document.querySelectorAll('.markdown-preview');
-    previewDivs.forEach(function(previewDiv) {
-        var existingHelp = previewDiv.querySelector('.markdown-split-help');
-        
-        if (enabled && !existingHelp) {
-            // Add help message
-            var helpMessage = document.createElement('div');
-            helpMessage.className = 'markdown-split-help';
-            helpMessage.innerHTML = '<span class="help-icon">ℹ</span> You can disable this view in display options';
-            previewDiv.insertBefore(helpMessage, previewDiv.firstChild);
-        } else if (!enabled && existingHelp) {
-            // Remove help message
-            existingHelp.remove();
-        }
-    });
-}
 </script>
 
 </html>
