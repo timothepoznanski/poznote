@@ -64,21 +64,18 @@ $v = '20251020.6';
 
         <div class="tips-content">
             <div class="tips-list">
-                <div class="tip-item"><i class="fa-list-check"></i> Create special tasklist notes and drag tasks to reorder</div>
-                <div class="tip-item"><i class="fa-image"></i> Drag & drop images into notes</div>
-                <div class="tip-item"><i class="fa-paperclip"></i> Drag & drop attachments directly into notes</div>
-                <div class="tip-item"><i class="fa-tags"></i> Click tags to filter notes</div>
-                <div class="tip-item"><i class="fa-search"></i> Search bar finds any note instantly</div>
-                <div class="tip-item"><i class="fa-code"></i> Click code blocks to copy them</div>
-                <div class="tip-item"><i class="fa-share"></i> Share notes with public links</div>
-                <div class="tip-item"><i class="fa-arrows-up-down"></i> Move notes to favorites, trash or folders</div>
-                <div class="tip-item"><i class="fa-download"></i> Export all notes for offline reading</div>
-                <div class="tip-item"><i class="fa-smile"></i> Use Ctrl + ; for emoji shortcuts</div>
-                <div class="tip-item"><i class="fa-arrows-h"></i> Drag divider to resize columns</div>
-                <div class="tip-item"><i class="fa-layer-group"></i> Create workspaces for different projects</div>
-                <div class="tip-item"><i class="fa-sort"></i> Change note sorting in settings</div>
-                <div class="tip-item"><i class="fa-star"></i> Star notes to mark as favorites</div>
-                <div class="tip-item"><i class="fa-moon"></i> Toggle dark mode in settings</div>
+                <div class="tip-item"><i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.</div>
+                <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
+                <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
+                <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords or tags simultaneously.</div>
+                <div class="tip-item"><i class="fa-code"></i> Long-press any code block to copy its contents to your clipboard.</div>
+                <div class="tip-item"><i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.</div>
+                <div class="tip-item"><i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.</div>
+                <div class="tip-item"><i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.</div>
+                <div class="tip-item"><i class="fa-smile"></i> Add emojis to note titles using Ctrl + ; on Windows.</div>
+                <div class="tip-item"><i class="fa-arrows-h"></i> Resize the left sidebar by dragging its border.</div>
+                <div class="tip-item"><i class="fa-layer-group"></i> Create separate workspaces and transfer notes between them.</div>
+                <div class="tip-item"><i class="fa-sort"></i> Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.</div>
             </div>
         </div>
     </div>
