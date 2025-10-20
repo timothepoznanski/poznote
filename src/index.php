@@ -98,6 +98,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
     <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
@@ -283,6 +284,7 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
+                <button class="sidebar-tips" onclick="navigateToTips(); markTipsAsViewed();" title="Tips & Tricks"><i class="fa-lightbulb"></i></button>
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
                 <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
                     <i class="fa-cog"></i>
@@ -994,6 +996,56 @@ $body_classes = trim($extra_body_classes);
         
         window.location.href = url;
     }
+    
+    // Navigate to tips page with current workspace and note parameters
+    function navigateToTips() {
+        // Mark tips as viewed
+        markTipsAsViewed();
+        
+        var url = 'tips.php';
+        var params = [];
+        
+        // Add workspace parameter if selected
+        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+            params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
+        }
+        
+        // Add note parameter if currently viewing a note
+        var urlParams = new URLSearchParams(window.location.search);
+        var noteId = urlParams.get('note');
+        if (noteId) {
+            params.push('note=' + encodeURIComponent(noteId));
+        }
+        
+        // Build final URL
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        window.location.href = url;
+    }
+    
+    // Tips viewed state management
+    function markTipsAsViewed() {
+        localStorage.setItem('poznote-tips-viewed', 'true');
+        var tipsButton = document.querySelector('.sidebar-tips');
+        if (tipsButton) {
+            tipsButton.classList.remove('tips-unviewed');
+        }
+    }
+    
+    function checkTipsViewedState() {
+        var hasViewed = localStorage.getItem('poznote-tips-viewed');
+        var tipsButton = document.querySelector('.sidebar-tips');
+        if (!hasViewed && tipsButton) {
+            tipsButton.classList.add('tips-unviewed');
+        }
+    }
+    
+    // Initialize tips state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkTipsViewedState();
+    });
 </script>
 <script src="js/index-config.js"></script>
 <!-- Modules refactorisés de script.js -->

@@ -435,14 +435,43 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+.sidebar-tips { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
+
+/* Hover and focus states for sidebar buttons */
+.sidebar-display:hover,
+.sidebar-settings:hover,
+.sidebar-tips:hover,
+.sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
+
+.sidebar-display:focus,
+.sidebar-settings:focus,
+.sidebar-tips:focus,
+.sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
+
+/* Tips button blinking animation */
+@keyframes tips-blink {
+    0%, 50% { color: #dc3545; }
+    51%, 100% { color: #f39c12; }
+}
+
+.sidebar-tips.tips-unviewed {
+    animation: tips-blink 1.5s infinite;
+}
+
+.sidebar-tips.tips-unviewed:hover {
+    animation: none;
+    color: #f39c12;
+}
 
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="fa-"],
 .sidebar-display i,
 .sidebar-display [class*="fa-"],
+.sidebar-tips i,
+.sidebar-tips [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;
@@ -2618,6 +2647,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-cog::before { content: "\f013"; }
 .fa-eye::before { content: "\f06e"; }
+.fa-lightbulb::before { content: "\f0eb"; }
+.fa-bolt::before { content: "\f0e7"; }
 .fa-markdown::before { content: "\f60f"; }
 .fa-home::before { content: "\f015"; }
 .fa-bold::before { content: "\f032"; }
@@ -2703,6 +2734,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-code-branch,
 .fa-map-marker-alt,
 .fa-user,
+.fa-lightbulb,
 .fa-hashtag,
 .fa-check-light-full,
 .fa-align-left,
