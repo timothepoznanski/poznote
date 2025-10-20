@@ -328,6 +328,77 @@ body.dark-mode .modal-buttons button:first-child:hover {
     background-color: #2a4a7f;
 }
 
+/* Move Folder Files Modal (dark theme refinements) */
+html[data-theme='dark'] #moveFolderFilesModal .modal-content h3,
+body.dark-mode #moveFolderFilesModal .modal-content h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-content p,
+body.dark-mode #moveFolderFilesModal .modal-content p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect,
+body.dark-mode #moveFolderFilesModal select#moveFolderFilesTargetSelect {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus,
+body.dark-mode #moveFolderFilesModal select#moveFolderFilesTargetSelect:focus {
+    outline: none;
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* Info helper text and icons (override inline light theme color) */
+html[data-theme='dark'] #moveFolderFilesModal .modal-info-message,
+body.dark-mode #moveFolderFilesModal .modal-info-message {
+    color: #a8a8a8 !important;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-info-message i,
+body.dark-mode #moveFolderFilesModal .modal-info-message i {
+    color: #9aa4b2;
+}
+
+/* Buttons: ensure cancel remains neutral and primary is blue regardless of order */
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #404040;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
+    background-color: #333;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary {
+    background-color: #1e3a5f;
+    color: #fff;
+    border: none;
+}
+
+html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary:hover,
+body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary:hover {
+    background-color: #2a4a7f;
+}
+
+/* Error message block */
+html[data-theme='dark'] #moveFolderFilesModal .modal-error-message,
+body.dark-mode #moveFolderFilesModal .modal-error-message {
+    background-color: rgba(255, 77, 77, 0.08);
+    color: #ff7b7b;
+    border: 1px solid #7a2e2e;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
 /* Font Size Settings Modal (dark theme refinements) */
 html[data-theme='dark'] #fontSizeModal .modal-header h2,
 body.dark-mode #fontSizeModal .modal-header h2 {
