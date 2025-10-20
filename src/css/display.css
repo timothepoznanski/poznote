@@ -1,5 +1,5 @@
 body {
-    /* background: #f8f9fa; */
+    background: #ffffff; /* Default light background */
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: row;
@@ -170,5 +170,12 @@ body {
     #folder-actions-card {
         display: none !important;
     }
+}
+
+/* Ensure dark mode applies correctly */
+html[data-theme='dark'] body,
+body.dark-mode {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
 }
 

@@ -17,22 +17,40 @@
                 savedTheme = 'light';
             }
         }
-        applyTheme(savedTheme);
+        
+        // Check if theme was already applied by inline script to avoid duplication
+        var currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme && currentTheme === savedTheme) {
+            // Theme already applied, just update UI elements
+            updateToggleButton(savedTheme);
+        } else {
+            // Apply theme if not already set or different
+            applyTheme(savedTheme);
+        }
     }
 
     // Apply theme to document
     function applyTheme(theme) {
         var root = document.documentElement;
+        var normalizedTheme = theme === 'dark' ? 'dark' : 'light';
+        
         // Set data-theme on <html> for early CSS and keep legacy body class for compatibility
-        root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
-        root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-        if (theme === 'dark') document.body.classList.add('dark-mode'); else document.body.classList.remove('dark-mode');
+        root.setAttribute('data-theme', normalizedTheme);
+        root.style.colorScheme = normalizedTheme;
+        root.style.backgroundColor = normalizedTheme === 'dark' ? '#1a1a1a' : '#ffffff';
+        
+        // Manage body class for compatibility
+        if (normalizedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
         
         // Save preference
-        localStorage.setItem('poznote-theme', theme);
+        localStorage.setItem('poznote-theme', normalizedTheme);
         
         // Update toggle button if it exists
-        updateToggleButton(theme);
+        updateToggleButton(normalizedTheme);
     }
 
     // Toggle between light and dark mode
@@ -40,7 +58,13 @@
         var currentTheme = localStorage.getItem('poznote-theme') || 'light';
         var newTheme = currentTheme === 'light' ? 'dark' : 'light';
         
+        // Force apply the new theme to ensure all elements are updated
         applyTheme(newTheme);
+        
+        // Force a small delay and re-apply to ensure proper styling
+        setTimeout(function() {
+            applyTheme(newTheme);
+        }, 10);
     }
 
     // Update toggle button appearance
@@ -83,5 +107,19 @@
         document.addEventListener('DOMContentLoaded', initTheme);
     } else {
         initTheme();
+    }
+    
+    // For display.php specifically, add a listener for page visibility changes
+    // to reapply theme when returning to the page
+    if (window.location.pathname.includes('display.php')) {
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // Page became visible again, reapply theme after a small delay
+                setTimeout(function() {
+                    var currentTheme = localStorage.getItem('poznote-theme') || 'light';
+                    applyTheme(currentTheme);
+                }, 100);
+            }
+        });
     }
 })();
