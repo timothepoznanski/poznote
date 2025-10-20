@@ -19,7 +19,9 @@
 
 ## Introduction
 
-Poznote is a free, self-hosted, and beautifully simple note manager built for speed and clarity.<br><br>Capture, organize, and access your notes while keeping full ownership of your data. No tracking, no lock-in, just you and your notes. Created for those who put efficiency and control of their data first.
+Poznote is a free, self-hosted, and beautifully simple note manager built for speed and clarity.<br><br>
+Capture, organize, and access your notes while keeping full ownership of your data.<br>
+Created for those who put efficiency and control of their data first.
 
 ![poznote](readme/poznote.png)
 
