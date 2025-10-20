@@ -112,13 +112,23 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <!-- News -->
+            <div class="settings-card" onclick="window.open('https://poznote.com/news', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-newspaper"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Poznote News</h3>
+                </div>
+            </div>
+
             <!-- Poznote Website -->
             <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
                 <div class="settings-card-icon">
-                    <i class="fa-info"></i>
+                    <i class="fa-globe"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>About Poznote</h3>
+                    <h3>Poznote website</h3>
                 </div>
             </div>
 

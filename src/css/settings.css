@@ -153,6 +153,7 @@ body {
 .fa-file-alt::before { content: "\f15c"; }
 .fa-sync-alt::before { content: "\f2f1"; }
 .fa-globe::before { content: "\f0ac"; }
+.fa-newspaper::before { content: "\f1ea"; }
 .fa-info::before { content: "\f129"; }
 .fa-code-branch::before { content: "\f126"; }
 .fa-code::before { content: "\f121"; }
@@ -164,6 +165,8 @@ body {
 .fa-download,
 .fa-file-alt,
 .fa-sync-alt,
+.fa-globe,
+.fa-newspaper,
 .fa-info,
 .fa-code-branch,
 .fa-code,
@@ -177,13 +180,6 @@ body {
     font-variant: normal;
     text-rendering: auto;
     line-height: 1;
-    font-size: 0.875em;
-    vertical-align: middle;
-}
-
-.fa-globe {
-    font-family: "Font Awesome 5 Brands";
-    font-weight: 400;
     font-size: 0.875em;
     vertical-align: middle;
 }
