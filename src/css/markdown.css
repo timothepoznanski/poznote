@@ -204,3 +204,55 @@
     vertical-align: middle;
 }
 
+/* Markdown Split View Styles */
+body.markdown-split-view-enabled [data-note-type="markdown"] {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    gap: 1px;
+}
+
+body.markdown-split-view-enabled .markdown-editor {
+    display: block !important;
+    width: 50%;
+    border-right: 1px solid #e0e0e0;
+    resize: none;
+    overflow-y: auto;
+}
+
+body.markdown-split-view-enabled .markdown-preview {
+    display: block !important;
+    width: 50%;
+    overflow-y: auto;
+    padding-left: 15px;
+}
+
+/* Hide markdown mode toggle buttons in split view */
+body.markdown-split-view-enabled .markdown-edit-btn,
+body.markdown-split-view-enabled .markdown-preview-btn {
+    display: none !important;
+}
+
+/* Mobile: disable split view */
+@media (max-width: 800px) {
+    body.markdown-split-view-enabled [data-note-type="markdown"] {
+        display: block;
+    }
+    
+    body.markdown-split-view-enabled .markdown-editor {
+        width: 100%;
+        border-right: none;
+    }
+    
+    body.markdown-split-view-enabled .markdown-preview {
+        width: 100%;
+        padding-left: 10px;
+        display: none !important;
+    }
+    
+    body.markdown-split-view-enabled .markdown-edit-btn,
+    body.markdown-split-view-enabled .markdown-preview-btn {
+        display: inline-flex !important;
+    }
+}
+
