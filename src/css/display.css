@@ -107,6 +107,22 @@ body {
     vertical-align: middle;
 }
 
+.fa-columns::before { content: "\f0db"; }
+
+.fa-columns {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 0.875em;
+    vertical-align: middle;
+}
+
 .fa-smile,
 .fa-grin {
     font-family: "Font Awesome 5 Pro";
