@@ -41,6 +41,17 @@ Created for those who put efficiency and control of their data first.<br><br>
 - 🔗 Public note sharing
 - 🌐 REST API for automation
 
+<details>
+<summary><strong>🚀 Features to Know</strong></summary>
+
+### Interactive Tasklist Notes
+
+Create tasklist notes with drag-and-drop reordering and clickable links.
+
+![Tasklist demonstration](readme/tasklist.gif)
+
+</details>
+
 ## Play with Poznote demo
 
 A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
