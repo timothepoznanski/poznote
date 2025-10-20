@@ -284,7 +284,7 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-tips" onclick="navigateToTips(); markTipsAsViewed();" title="Tips & Tricks"><i class="fa-lightbulb"></i></button>
+                <button class="sidebar-tips" onclick="navigateToTips(); markTipsAsViewed();" title="Did you know?"><i class="fa-lightbulb"></i></button>
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
                 <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
                     <i class="fa-cog"></i>
