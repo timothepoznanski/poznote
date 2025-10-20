@@ -628,6 +628,23 @@ function saveTagsDirectly(noteId, tagsValue) {
         // For task list notes, save the JSON data instead of HTML
         textContent = typeof getTaskListData === 'function' ? getTaskListData(noteId) || '' : '';
         cleanContent = textContent; // Also save JSON to HTML file for consistency
+    } else if (noteType === 'markdown') {
+        // For markdown notes, save the raw markdown content
+        if (typeof getMarkdownContentForNote === 'function') {
+            const markdownContent = getMarkdownContentForNote(noteId);
+            if (markdownContent !== null) {
+                cleanContent = markdownContent;
+                textContent = markdownContent;
+            } else {
+                // Fallback to regular content handling if markdown function fails
+                cleanContent = contentDiv.innerHTML;
+                textContent = contentDiv.textContent || '';
+            }
+        } else {
+            // Fallback to regular content handling if markdown function not available
+            cleanContent = contentDiv.innerHTML;
+            textContent = contentDiv.textContent || '';
+        }
     } else {
         // For regular notes, clean search highlights from content before saving (same as updatenote)
         cleanContent = contentDiv.innerHTML;
