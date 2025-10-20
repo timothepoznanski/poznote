@@ -1,0 +1,123 @@
+<?php
+// Authentication check
+require 'auth.php';
+requireAuth();
+
+require_once 'config.php';
+include 'db_connect.php';
+include 'functions.php';
+
+// Get workspace parameter
+$workspace = $_GET['workspace'] ?? 'Poznote';
+$note_id = $_GET['note'] ?? '';
+
+// Version for cache busting
+$v = '20251020.6';
+?>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+    <title>Did you kown? - Poznote</title>
+    <script>
+    (function(){
+        try {
+            var theme = localStorage.getItem('poznote-theme');
+            if (!theme) {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            }
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        } catch (e) {}
+    })();
+    </script>
+    <meta name="color-scheme" content="dark light">
+    <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/brands.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/solid.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/regular.min.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/index.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/tips.css?v=<?php echo $v; ?>"/>
+    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
+</head>
+<body>
+    <div class="tips-container">
+        <div class="tips-header">
+            <div class="tips-header-left">
+                <h1>Did you know?</h1>
+                <p>Please check all these quick tips to get the most out of Poznote.</p>
+                <div class="coming-soon-note">
+                    <i class="fa-video"></i> GIF demonstrations for these features are being created - coming soon!
+                </div>
+            </div>
+            <div class="tips-header-right">
+                <button class="btn-back" onclick="goBack()">
+                    Back
+                </button>
+            </div>
+        </div>
+
+        <div class="tips-content">
+            <div class="tips-list">
+                <div class="tip-item"><i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.</div>
+                <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
+                <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
+                <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords or tags simultaneously.</div>
+                <div class="tip-item"><i class="fa-code"></i> Long-press any code block to copy its contents to your clipboard.</div>
+                <div class="tip-item"><i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.</div>
+                <div class="tip-item"><i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.</div>
+                <div class="tip-item"><i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.</div>
+                <div class="tip-item"><i class="fa-smile"></i> Add emojis to note titles using Ctrl + ; on Windows.</div>
+                <div class="tip-item"><i class="fa-arrows-h"></i> Resize the left sidebar by dragging its border.</div>
+                <div class="tip-item"><i class="fa-layer-group"></i> Create separate workspaces and transfer notes between them.</div>
+                <div class="tip-item"><i class="fa-sort"></i> Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function goBack() {
+        // Build return URL with current workspace and note parameters
+        var url = 'index.php';
+        var params = [];
+        
+        // Add workspace parameter
+        var workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
+        if (workspace && workspace !== 'Poznote') {
+            params.push('workspace=' + encodeURIComponent(workspace));
+        }
+        
+        // Add note parameter if provided
+        var noteId = '<?php echo htmlspecialchars($note_id, ENT_QUOTES); ?>';
+        if (noteId) {
+            params.push('note=' + encodeURIComponent(noteId));
+        }
+        
+        // Build final URL
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        window.location.href = url;
+    }
+
+    // Handle keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Escape key to go back
+        if (e.key === 'Escape') {
+            goBack();
+        }
+    });
+    
+    // Mark tips as viewed when this page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        localStorage.setItem('poznote-tips-viewed', 'true');
+    });
+    </script>
+</body>
+</html>

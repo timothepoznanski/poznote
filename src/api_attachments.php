@@ -209,7 +209,12 @@ function handleUpload() {
             
             if ($success) {
                 error_log("File uploaded successfully: $original_name");
-                echo json_encode(['success' => true, 'message' => 'File uploaded successfully']);
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'File uploaded successfully',
+                    'attachment_id' => $new_attachment['id'],
+                    'filename' => $original_name
+                ]);
             } else {
                 unlink($file_path); // Clean up file if database update fails
                 error_log("Database update failed for file: $original_name");

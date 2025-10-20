@@ -692,11 +692,15 @@ body.dark-mode .attachment-link:hover {
 /* Code blocks */
 html[data-theme='dark'] .noteentry code,
 html[data-theme='dark'] .noteentry pre,
+html[data-theme='dark'] .code-block,
+html[data-theme='dark'] pre.code-block,
 body.dark-mode .noteentry code,
-body.dark-mode .noteentry pre {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    border-color: #404040;
+body.dark-mode .noteentry pre,
+body.dark-mode .code-block,
+body.dark-mode pre.code-block {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
 }
 
 /* Highlighted text in search */
@@ -1063,6 +1067,34 @@ body.dark-mode [class*="fa-"]:hover {
 html[data-theme='dark'] .sidebar-plus,
 body.dark-mode .sidebar-plus {
     filter: brightness(0) saturate(0%) invert(80%) !important;
+}
+
+/* Tips button keeps its orange color in dark mode */
+html[data-theme='dark'] .sidebar-tips,
+body.dark-mode .sidebar-tips {
+    color: #f39c12 !important;
+}
+
+html[data-theme='dark'] .sidebar-tips:hover,
+body.dark-mode .sidebar-tips:hover {
+    background: rgba(0, 125, 184, 0.2) !important;
+}
+
+/* Tips button blinking animation in dark mode */
+@keyframes tips-blink-dark {
+    0%, 50% { color: #dc3545 !important; }
+    51%, 100% { color: #f39c12 !important; }
+}
+
+html[data-theme='dark'] .sidebar-tips.tips-unviewed,
+body.dark-mode .sidebar-tips.tips-unviewed {
+    animation: tips-blink-dark 1.5s infinite;
+}
+
+html[data-theme='dark'] .sidebar-tips.tips-unviewed:hover,
+body.dark-mode .sidebar-tips.tips-unviewed:hover {
+    animation: none;
+    color: #f39c12 !important;
 }
 
 /* Keep some specific icons with their original colors when active/selected */

@@ -3,11 +3,50 @@
 
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
-    // Get text content while preserving line breaks
-    var content = element.innerText || element.textContent || '';
+    // More robust content extraction that handles contentEditable quirks
+    var content = '';
+    
+    // Try to walk through the DOM structure to better preserve formatting
+    if (element.childNodes.length > 0) {
+        var parts = [];
+        for (var i = 0; i < element.childNodes.length; i++) {
+            var node = element.childNodes[i];
+            if (node.nodeType === Node.TEXT_NODE) {
+                parts.push(node.textContent);
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.tagName === 'DIV') {
+                    // DIV usually represents a line
+                    var divText = node.textContent || '';
+                    if (divText === '' && node.querySelector('br')) {
+                        // Empty div with BR = empty line
+                        parts.push('');
+                    } else {
+                        parts.push(divText);
+                    }
+                } else if (node.tagName === 'BR') {
+                    // BR = line break
+                    parts.push('');
+                } else {
+                    // Other elements, get their text content
+                    parts.push(node.textContent || '');
+                }
+            }
+        }
+        content = parts.join('\n');
+    } else {
+        // Fallback to innerText/textContent
+        content = element.innerText || element.textContent || '';
+    }
     
     // Handle different line ending styles
     content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
+    // Fix excessive blank lines (but preserve intentional double line breaks)
+    // Replace 3+ consecutive newlines with exactly 2 newlines
+    content = content.replace(/\n{3,}/g, '\n\n');
+    
+    // Remove trailing newlines (but preserve intentional spacing)
+    content = content.replace(/\n+$/, '');
     
     return content;
 }
@@ -88,32 +127,26 @@ function parseMarkdown(text) {
     
     function flushParagraph() {
         if (currentParagraph.length > 0) {
-            // Process line breaks according to Markdown rules:
-            // - Lines ending with 2+ spaces become <br>
-            // - Other lines are joined with spaces, unless they're short (likely intentional breaks)
+            // Process line breaks according to GitHub Flavored Markdown rules:
+            // - Single line breaks become <br> (visible line breaks)
+            // - Lines ending with 2+ spaces also become <br> (redundant but consistent)
             let processedLines = [];
             for (let i = 0; i < currentParagraph.length; i++) {
                 let line = currentParagraph[i];
                 if (i < currentParagraph.length - 1) {
-                    // Check if line ends with 2+ spaces (hard line break)
+                    // Check if line ends with 2+ spaces (remove trailing spaces, add <br>)
                     if (line.match(/\s{2,}$/)) {
                         processedLines.push(line.replace(/\s{2,}$/, '') + '<br>');
                     } else {
-                        // For short lines or if next line starts a new sentence, add line break
-                        let nextLine = currentParagraph[i + 1];
-                        if (line.length < 80 && (nextLine.match(/^[A-Z]/) || line.match(/[.!?:]$/))) {
-                            processedLines.push(line + '<br>');
-                        } else {
-                            // Soft line break - join with next line using space
-                            processedLines.push(line + ' ');
-                        }
+                        // GitHub style: single line breaks become <br>
+                        processedLines.push(line + '<br>');
                     }
                 } else {
-                    // Last line
+                    // Last line - no <br> needed
                     processedLines.push(line);
                 }
             }
-            let para = processedLines.join('').replace(/\s+<br>/g, '<br>').replace(/\s+$/, '');
+            let para = processedLines.join('');
             para = applyInlineStyles(para);
             result.push('<p>' + para + '</p>');
             currentParagraph = [];

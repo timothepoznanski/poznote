@@ -247,6 +247,28 @@ body.markdown-split-view-enabled [data-note-type="markdown"] {
     margin-right: 2px;
 }
 
+/* Indicateur visuel pour le drag & drop */
+.noteentry.drag-over {
+    border: 2px dashed #007DB8 !important;
+    background-color: rgba(0, 125, 184, 0.05) !important;
+    transition: all 0.2s ease;
+}
+
+.noteentry.drag-over .markdown-editor {
+    background-color: rgba(0, 125, 184, 0.02);
+    transition: background-color 0.2s ease;
+}
+
+/* Style pour le texte de chargement d'upload */
+.markdown-editor {
+    position: relative;
+}
+
+/* Animation subtile pour indiquer l'upload en cours */
+.noteentry[data-note-type="markdown"] .markdown-editor:focus {
+    box-shadow: 0 0 0 1px rgba(0, 125, 184, 0.3);
+}
+
 body.markdown-split-view-enabled .markdown-editor {
     display: block !important;
     width: 50%;
