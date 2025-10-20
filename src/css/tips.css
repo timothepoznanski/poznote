@@ -34,6 +34,22 @@
     margin: 0;
 }
 
+.coming-soon-note {
+    margin-top: 15px;
+    padding: 8px 12px;
+    background: rgba(52, 152, 219, 0.1);
+    border-left: 3px solid #3498db;
+    border-radius: 4px;
+    color: var(--info-text-color, #2980b9);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.coming-soon-note i {
+    margin-right: 6px;
+    color: #3498db;
+}
+
 .btn-back {
     background: var(--primary-color, #007DB8);
     color: white;
@@ -88,6 +104,17 @@
     --card-background: #2a2a2a;
     --border-color: #404040;
     --primary-color: #4a9eff;
+    --info-text-color: #5dade2;
+}
+
+[data-theme="dark"] .coming-soon-note {
+    background: rgba(93, 173, 226, 0.15);
+    border-left-color: #5dade2;
+    color: var(--info-text-color);
+}
+
+[data-theme="dark"] .coming-soon-note i {
+    color: #5dade2;
 }
 
 /* Responsive design */

@@ -51,6 +51,9 @@ $v = '20251020.6';
             <div class="tips-header-left">
                 <h1>Did you know?</h1>
                 <p>Please check all these quick tips to get the most out of Poznote.</p>
+                <div class="coming-soon-note">
+                    <i class="fa-video"></i> GIF demonstrations for these features are being created - coming soon!
+                </div>
             </div>
             <div class="tips-header-right">
                 <button class="btn-back" onclick="goBack()">
@@ -61,13 +64,14 @@ $v = '20251020.6';
 
         <div class="tips-content">
             <div class="tips-list">
-                <div class="tip-item"><i class="fa-plus"></i> Click + button to create notes</div>
+                <div class="tip-item"><i class="fa-list-check"></i> Create special tasklist notes and drag tasks to reorder</div>
                 <div class="tip-item"><i class="fa-image"></i> Drag & drop images into notes</div>
+                <div class="tip-item"><i class="fa-paperclip"></i> Drag & drop attachments directly into notes</div>
                 <div class="tip-item"><i class="fa-tags"></i> Click tags to filter notes</div>
                 <div class="tip-item"><i class="fa-search"></i> Search bar finds any note instantly</div>
                 <div class="tip-item"><i class="fa-code"></i> Click code blocks to copy them</div>
                 <div class="tip-item"><i class="fa-share"></i> Share notes with public links</div>
-                <div class="tip-item"><i class="fa-paperclip"></i> Add file attachments with paperclip button</div>
+                <div class="tip-item"><i class="fa-arrows-up-down"></i> Move notes to favorites, trash or folders</div>
                 <div class="tip-item"><i class="fa-download"></i> Export all notes for offline reading</div>
                 <div class="tip-item"><i class="fa-smile"></i> Use Ctrl + ; for emoji shortcuts</div>
                 <div class="tip-item"><i class="fa-arrows-h"></i> Drag divider to resize columns</div>

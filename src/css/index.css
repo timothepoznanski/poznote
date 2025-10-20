@@ -2648,6 +2648,17 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-cog::before { content: "\f013"; }
 .fa-eye::before { content: "\f06e"; }
 .fa-lightbulb::before { content: "\f0eb"; }
+.fa-video::before { content: "\f03d"; }
+.fa-plus::before { content: "\f067"; }
+.fa-list-check::before { content: "\f0ae"; }
+.fa-image::before { content: "\f03e"; }
+.fa-tags::before { content: "\f02c"; }
+.fa-code::before { content: "\f121"; }
+.fa-share::before { content: "\f064"; }
+.fa-arrows-up-down::before { content: "\f07d"; }
+.fa-arrows-h::before { content: "\f07e"; }
+.fa-sort::before { content: "\f0dc"; }
+.fa-moon::before { content: "\f186"; }
 .fa-bolt::before { content: "\f0e7"; }
 .fa-markdown::before { content: "\f60f"; }
 .fa-home::before { content: "\f015"; }
@@ -2740,7 +2751,18 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-align-left,
 .fa-copy,
 .fa-trash-restore-alt,
-.fa-grip-vertical {
+.fa-grip-vertical,
+.fa-video,
+.fa-plus,
+.fa-list-check,
+.fa-image,
+.fa-tags,
+.fa-code,
+.fa-share,
+.fa-arrows-up-down,
+.fa-arrows-h,
+.fa-sort,
+.fa-moon {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;
