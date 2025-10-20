@@ -1028,17 +1028,68 @@ $body_classes = trim($extra_body_classes);
     // Tips viewed state management
     function markTipsAsViewed() {
         localStorage.setItem('poznote-tips-viewed', 'true');
+        stopTipsBlinking();
         var tipsButton = document.querySelector('.sidebar-tips');
         if (tipsButton) {
             tipsButton.classList.remove('tips-unviewed');
         }
     }
     
+    // Variables for JavaScript animation
+    var tipsBlinkInterval = null;
+    var originalTipsColor = '#f39c12'; // orange
+    var blinkColor = '#ff0000'; // bright red
+    
+    function startTipsBlinking() {
+        var tipsButton = document.querySelector('.sidebar-tips');
+        if (!tipsButton) return;
+        
+        // Stop any existing animation
+        stopTipsBlinking();
+        
+        var isBlinkColor = false;
+        tipsBlinkInterval = setInterval(function() {
+            if (isBlinkColor) {
+                tipsButton.style.setProperty('color', originalTipsColor, 'important');
+                tipsButton.style.setProperty('background-color', 'transparent', 'important');
+                console.log('Switched to orange:', originalTipsColor);
+            } else {
+                tipsButton.style.setProperty('color', blinkColor, 'important');
+                tipsButton.style.setProperty('background-color', 'rgba(255, 0, 0, 0.1)', 'important');
+                console.log('Switched to red:', blinkColor);
+            }
+            isBlinkColor = !isBlinkColor;
+        }, 750); // 750ms = 1.5s cycle / 2
+        
+        console.log('Tips blinking started with JavaScript animation (using !important)');
+    }
+    
+    function stopTipsBlinking() {
+        if (tipsBlinkInterval) {
+            clearInterval(tipsBlinkInterval);
+            tipsBlinkInterval = null;
+        }
+        var tipsButton = document.querySelector('.sidebar-tips');
+        if (tipsButton) {
+            // Remove the inline styles to let CSS take over
+            tipsButton.style.removeProperty('color');
+            tipsButton.style.removeProperty('background-color');
+        }
+        console.log('Tips blinking stopped');
+    }
+
     function checkTipsViewedState() {
         var hasViewed = localStorage.getItem('poznote-tips-viewed');
         var tipsButton = document.querySelector('.sidebar-tips');
+        console.log('Tips debug:', {
+            hasViewed: hasViewed,
+            tipsButton: tipsButton,
+            shouldBlink: !hasViewed && tipsButton
+        });
         if (!hasViewed && tipsButton) {
-            tipsButton.classList.add('tips-unviewed');
+            startTipsBlinking();
+        } else {
+            stopTipsBlinking();
         }
     }
     

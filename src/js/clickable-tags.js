@@ -619,23 +619,34 @@ function saveTagsDirectly(noteId, tagsValue) {
         window.updateNoteEnCours = 1;
     }
     
-    // Clean search highlights from content before saving (same as updatenote)
-    let cleanContent = contentDiv.innerHTML;
-    if (typeof cleanSearchHighlightsFromElement === 'function') {
-        cleanContent = cleanSearchHighlightsFromElement(contentDiv);
-    }
+    // Check if this is a task list note or markdown note (same logic as in notes.js)
+    let cleanContent = '';
+    let textContent = '';
+    const noteType = contentDiv.getAttribute('data-note-type') || 'note';
     
-    // Get text content for entrycontent (also clean highlights)
-    let textContent = contentDiv.textContent || '';
-    if (typeof cleanSearchHighlightsFromElement === 'function') {
-        const clonedForText = contentDiv.cloneNode(true);
-        const highlights = clonedForText.querySelectorAll('.search-highlight');
-        highlights.forEach(highlight => {
-            const parent = highlight.parentNode;
-            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-            parent.normalize();
-        });
-        textContent = clonedForText.textContent || '';
+    if (noteType === 'tasklist') {
+        // For task list notes, save the JSON data instead of HTML
+        textContent = typeof getTaskListData === 'function' ? getTaskListData(noteId) || '' : '';
+        cleanContent = textContent; // Also save JSON to HTML file for consistency
+    } else {
+        // For regular notes, clean search highlights from content before saving (same as updatenote)
+        cleanContent = contentDiv.innerHTML;
+        if (typeof cleanSearchHighlightsFromElement === 'function') {
+            cleanContent = cleanSearchHighlightsFromElement(contentDiv);
+        }
+        
+        // Get text content for entrycontent (also clean highlights)
+        textContent = contentDiv.textContent || '';
+        if (typeof cleanSearchHighlightsFromElement === 'function') {
+            const clonedForText = contentDiv.cloneNode(true);
+            const highlights = clonedForText.querySelectorAll('.search-highlight');
+            highlights.forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                parent.normalize();
+            });
+            textContent = clonedForText.textContent || '';
+        }
     }
     
     const params = new URLSearchParams({
