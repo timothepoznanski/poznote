@@ -12,7 +12,7 @@ $workspace = $_GET['workspace'] ?? 'Poznote';
 $note_id = $_GET['note'] ?? '';
 
 // Version for cache busting
-$v = '20251020.6';
+$v = '20251021.1';
 ?>
 <html>
 <head>
