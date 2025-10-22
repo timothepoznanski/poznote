@@ -151,7 +151,7 @@ EOF
 docker compose pull && docker compose up -d
 ```
 
-<details>
+</details>
 
 <details>
 <summary><strong>☁️ Cloud</strong></summary>
