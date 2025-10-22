@@ -54,7 +54,7 @@ Username: `poznote`
 <br>
 Password: `poznote`
 
-## Install Poznote
+## Install
 
 Choose your preferred installation method below.
 
@@ -153,7 +153,7 @@ docker compose pull && docker compose up -d
 
 </details>
 
-## Access Poznote
+## Access
 
 After installation, access Poznote in your web browser:
 
@@ -166,7 +166,7 @@ After installation, access Poznote in your web browser:
 
 > ⚠️ **Important:** Change these default credentials after your first login!
 
-## Change Poznote Settings
+## Change Settings
 
 To modify your username, password, or port:
 
@@ -186,7 +186,7 @@ HTTP_WEB_PORT=8040
 docker compose up -d
 ```
 
-## Poznote Password Recovery
+## Password Recovery
 
 Your credentials are stored in the `.env` file in your Poznote directory.
 
@@ -196,7 +196,7 @@ To retrieve your password:
 2. Open the `.env` file
 3. Look for the `POZNOTE_PASSWORD` value
 
-## Update Poznote to the latest version
+## Update to the latest version
 
 To update Poznote to the latest version:
 
