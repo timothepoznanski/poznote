@@ -581,7 +581,7 @@ curl -u 'username:password' \
 
 </details>
 
-## ☁️ Poznote on the Cloud
+## Poznote on the Cloud
 
 If you:
 
