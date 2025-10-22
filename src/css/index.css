@@ -3045,3 +3045,88 @@ input[type="search"]::-webkit-search-results-decoration {
   transform: scale(1.18);
 }
 
+/* Create note in folder modal styles */
+.create-note-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.create-note-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.create-note-option:hover {
+    border-color: #007DB8;
+    background-color: #f8fafb;
+}
+
+.create-note-option.selected {
+    border-color: #007DB8;
+    background-color: #e8f4f8;
+}
+
+.create-note-option i {
+    font-size: 24px;
+    color: #007DB8;
+    margin-right: 16px;
+    min-width: 30px;
+    text-align: center;
+}
+
+.create-note-option span {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.create-note-option p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    margin-top: 4px;
+}
+
+.create-note-option > div {
+    flex: 1;
+}
+
+/* Dark mode styles for create note modal */
+html[data-theme='dark'] .create-note-option,
+body.dark-mode .create-note-option {
+    background-color: #2a2a2a;
+    border-color: #444;
+}
+
+html[data-theme='dark'] .create-note-option:hover,
+body.dark-mode .create-note-option:hover {
+    border-color: #007DB8;
+    background-color: #333;
+}
+
+html[data-theme='dark'] .create-note-option.selected,
+body.dark-mode .create-note-option.selected {
+    border-color: #007DB8;
+    background-color: #1a3a4a;
+}
+
+html[data-theme='dark'] .create-note-option span,
+body.dark-mode .create-note-option span {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .create-note-option p,
+body.dark-mode .create-note-option p {
+    color: #aaa;
+}
+

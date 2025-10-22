@@ -1366,3 +1366,94 @@ function downloadFile(url, filename) {
     link.click();
     document.body.removeChild(link);
 }
+
+// Create note in folder functionality
+var selectedNoteType = null;
+var targetFolderName = null;
+
+function showCreateNoteInFolderModal(folderName) {
+    targetFolderName = folderName;
+    selectedNoteType = null;
+    
+    // Update modal title
+    var folderSpan = document.getElementById('createNoteTargetFolder');
+    if (folderSpan) {
+        folderSpan.textContent = folderName;
+    }
+    
+    // Reset selection
+    var options = document.querySelectorAll('.create-note-option');
+    options.forEach(function(option) {
+        option.classList.remove('selected');
+    });
+    
+    // Show modal
+    var modal = document.getElementById('createNoteInFolderModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function selectNoteType(noteType) {
+    selectedNoteType = noteType;
+    
+    // Close modal immediately
+    closeModal('createNoteInFolderModal');
+    
+    // Create note directly
+    createNoteInFolder();
+}
+
+function createNoteInFolder() {
+    if (!selectedNoteType || !targetFolderName) {
+        return;
+    }
+    
+    // Set the selected folder temporarily so the existing functions use it
+    var originalSelectedFolder = selectedFolder;
+    selectedFolder = targetFolderName;
+    
+    // Call the same functions that the main create buttons use
+    try {
+        switch(selectedNoteType) {
+            case 'html':
+                if (typeof newnote === 'function') {
+                    newnote();
+                } else if (typeof createNewNote === 'function') {
+                    createNewNote();
+                } else {
+                    // Fallback to basic creation
+                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName), '_blank');
+                }
+                break;
+            case 'markdown':
+                if (typeof createMarkdownNote === 'function') {
+                    createMarkdownNote();
+                } else {
+                    // Fallback to basic markdown creation
+                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=markdown', '_blank');
+                }
+                break;
+            case 'list':
+                if (typeof createTaskListNote === 'function') {
+                    createTaskListNote();
+                } else {
+                    // Fallback to basic tasklist creation
+                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=tasklist', '_blank');
+                }
+                break;
+            default:
+                if (typeof newnote === 'function') {
+                    newnote();
+                } else if (typeof createNewNote === 'function') {
+                    createNewNote();
+                } else {
+                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName), '_blank');
+                }
+                break;
+        }
+    } finally {
+        // Restore original selected folder
+        selectedFolder = originalSelectedFolder;
+    }
+}
