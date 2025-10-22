@@ -1,4 +1,4 @@
-# Poznote - Cloud Install Guide
+# Poznote - Cloud Install and Manage Guide
 
 This guide will help you **install and manage** Poznote on cloud platforms without managing your own infrastructure.
 
@@ -7,15 +7,14 @@ This guide will help you **install and manage** Poznote on cloud platforms witho
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
   - [Poznote Installation on Railway](#poznote-installation-on-railway)
   - [Poznote Access](#poznote-access)
-- [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
-  - [Generic Docker Deployment](#generic-docker-deployment)
-  - [Key Considerations](#key-considerations)
-- [Railway Cloud Management](#railway-cloud)
   - [Get Your Instance URL](#get-your-instance-url)
   - [Change Poznote Settings](#change-poznote-settings)
   - [Poznote Password Recovery](#poznote-password-recovery)
   - [Update Poznote to the latest version](#update-poznote-to-the-latest-version)
-- [Other Cloud Providers Management](#other-cloud-providers-1)
+- [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
+  - [Generic Docker Deployment](#generic-docker-deployment)
+  - [Key Considerations](#key-considerations)
+- [Manage Poznote on other Cloud platforms](#manage-poznote-on-other-cloud-platforms)
 
 ## Option 1: Railway (Recommended)
 
@@ -63,6 +62,47 @@ Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to 
 > ⚠️ **Important:** Change these default credentials after your first login!
 
 Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
+
+### Get Your Instance URL
+
+1. Go to your Railway dashboard
+2. Click on your Poznote project
+3. Click on the Poznote service
+4. Navigate to the **Settings** tab
+5. Find your public URL in the **Networking** section
+
+Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
+
+Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
+
+### Change Poznote Settings
+
+To change your username or password on Railway, watch this video tutorial that shows you step by step how to change your settings:
+
+**[Change Settings on Railway](https://youtu.be/_h5pP7LreZc)**
+
+> 📝 **Note:** Unlike self-hosted installations, you cannot change the port.
+
+### Poznote Password Recovery
+
+If you forgot your password, you can retrieve it from Railway:
+
+Watch this video tutorial:
+
+**[Retrieve Your Password on Railway](https://youtu.be/_h5pP7LreZc)**
+
+### Update Poznote to the latest version
+
+To update your Poznote instance to the latest version:
+
+**Video Tutorial**
+
+**[Update Poznote on Railway](https://youtu.be/jbUlCEWndoo)**
+
+Railway will automatically:
+- Pull the latest Poznote image
+- Redeploy your instance
+- Preserve all your data (notes, attachments, database)
 
 ## Option 2: Other Cloud Providers
 
@@ -136,50 +176,7 @@ When deploying to custom cloud providers, keep these important points in mind:
 - ✅ Use Poznote's built-in backup feature (Settings → Backup)
 - ✅ Store backups in a separate location (cloud storage, local machine)
 
-## Railway Cloud
-
-### Get Your Instance URL
-
-1. Go to your Railway dashboard
-2. Click on your Poznote project
-3. Click on the Poznote service
-4. Navigate to the **Settings** tab
-5. Find your public URL in the **Networking** section
-
-Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
-
-Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
-
-### Change Poznote Settings
-
-To change your username or password on Railway, watch this video tutorial that shows you step by step how to change your settings:
-
-**[Change Settings on Railway](https://youtu.be/_h5pP7LreZc)**
-
-> 📝 **Note:** Unlike self-hosted installations, you cannot change the port.
-
-### Poznote Password Recovery
-
-If you forgot your password, you can retrieve it from Railway:
-
-Watch this video tutorial:
-
-**[Retrieve Your Password on Railway](https://youtu.be/_h5pP7LreZc)**
-
-### Update Poznote to the latest version
-
-To update your Poznote instance to the latest version:
-
-**Video Tutorial**
-
-**[Update Poznote on Railway](https://youtu.be/jbUlCEWndoo)**
-
-Railway will automatically:
-- Pull the latest Poznote image
-- Redeploy your instance
-- Preserve all your data (notes, attachments, database)
-
-## Other Cloud Providers
+## Manage Poznote on other Cloud platforms
 
 The management of your Poznote instance will depend on your chosen cloud provider. Each platform has its own interface and procedures for:
 
