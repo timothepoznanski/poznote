@@ -243,6 +243,42 @@
     </div>
 </div>
 
+<!-- Create note in folder modal -->
+<div id="createNoteInFolderModal" class="modal">
+    <div class="modal-content">
+        <h3>Create note in <span id="createNoteTargetFolder"></span></h3>
+        <div class="modal-body">
+            <p>Choose the type of note to create:</p>
+            <div class="create-note-options">
+                <div class="create-note-option" data-type="html" onclick="selectNoteType('html')">
+                    <i class="fa fa-file-alt"></i>
+                    <div>
+                        <span>HTML Note</span>
+                        <p>Rich text with formatting, images, and links</p>
+                    </div>
+                </div>
+                <div class="create-note-option" data-type="markdown" onclick="selectNoteType('markdown')">
+                    <i class="fa fa-markdown"></i>
+                    <div>
+                        <span>Markdown Note</span>
+                        <p>Lightweight markup language for structured text</p>
+                    </div>
+                </div>
+                <div class="create-note-option" data-type="list" onclick="selectNoteType('list')">
+                    <i class="fa fa-list-ul"></i>
+                    <div>
+                        <span>Task List</span>
+                        <p>Checklist with checkboxes for tasks and items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('createNoteInFolderModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
     <div class="modal-content">

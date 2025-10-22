@@ -10,12 +10,17 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Play with Poznote demo](#play-with-poznote-demo)
-- [Install Poznote](#install-poznote)
-- [Manage Poznote](#manage-poznote)
+- [Install](#install)
+- [Access](#access)
+- [Change Settings](#change-settings)
+- [Password Recovery](#password-recovery)
+- [Update to the latest version](#update-to-the-latest-version)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
+- [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
+- [Poznote on the Cloud](#poznote-on-the-cloud)
 
 ## Introduction
 
@@ -49,52 +54,157 @@ Username: `poznote`
 <br>
 Password: `poznote`
 
-## Install Poznote
+## Install
 
-Choose your installation method:
+Choose your preferred installation method below.
 
-### 💻 Choose "Local" method if you:
+<details>
+<summary><strong>🖥️ Windows</strong></summary>
 
-- Want to use Poznote only on your Windows or Linux computer
-- Prefer maximum privacy (no internet exposure)
-- Don't need access from other devices (your phone)
-- Want it completely free
-- Have no experience with server management or don't want to manage server and security
-- Are ready to run a few commands (don't worry if you don't know how yet - it's not complicated!)
+#### Step 1: Prerequisite
 
-**👉 [View Poznote Self-Hosted Install Guide](readme/POZNOTE-SELF-HOSTED-INSTALL.md)**
-<br><br>
+Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-### 🖥️ Choose "Server" method if you:
+#### Step 2: Deploy Poznote
 
-- Want to access from anywhere (phone, tablet, computer)
-- Have your own server or VPS
-- Want complete control over your infrastructure
-- Want to keep your notes private
+Open Powershell and run the following commands:
 
-**👉 [View Poznote Self-Hosted Install Guide](readme/POZNOTE-SELF-HOSTED-INSTALL.md)**
-<br><br>
+```powershell
+mkdir poznote && cd poznote
+```
 
-### ☁️ Choose "Managed Cloud" method if you:
+```powershell
+@"
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+"@ | Out-File -FilePath .env -Encoding UTF8
+```
 
-- Want access from anywhere (phone, tablet, computer) with almost zero setup
-- Have no experience with server management or don't want to manage server and security
-- Don't know how to use command line or don't want to use command line 
-- Prefer one-click updates
-- Are okay with approximately $5/month (Cloud provider fees)
+```powershell
+@"
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: `${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: `${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: `${HTTP_WEB_PORT}
+    ports:
+      - "`${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+"@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
+```
 
-**👉 [View Poznote Cloud Install Guide](readme/POZNOTE-CLOUD-INSTALL.md)**
+```powershell
+docker compose pull && docker compose up -d
+```
 
+</details>
 
-## Manage Poznote
+<details>
+<summary><strong>🐧 Linux</strong></summary>
 
-If you need to change Poznote password, username or port, update to the latest version etc.
+#### Step 1: Prerequisite
 
-- You have a "Local" instance 👉 [View Poznote Self-Hosted Manage Guide](readme/POZNOTE-SELF-HOSTED-MANAGE.md)
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/linux)
 
-- You have a "Server" instance 👉 [View Poznote Self-Hosted Manage Guide](readme/POZNOTE-SELF-HOSTED-MANAGE.md)
+#### Step 2: Install Poznote
 
-- You have a "Managed Cloud" instance 👉 [View Poznote Cloud Manage Guide](readme/POZNOTE-CLOUD-MANAGE.md)
+Open a Terminal and run the following commands:
+
+```bash
+mkdir poznote && cd poznote
+```
+
+```bash
+cat <<EOF > .env
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD=admin123!
+HTTP_WEB_PORT=8040
+EOF
+```
+
+```bash
+cat <<'EOF' > docker-compose.yml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+EOF
+```
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+</details>
+
+## Access
+
+After installation, access Poznote in your web browser:
+
+**URL:** [http://localhost:8040](http://localhost:8040)
+
+**Default Credentials:**
+- Username: `admin`
+- Password: `admin123!`
+- Port: `8040`
+
+> ⚠️ **Important:** Change these default credentials after your first login!
+
+## Change Settings
+
+To modify your username, password, or port:
+
+```bash
+cd poznote && docker compose down
+```
+
+Edit the `.env` file with your preferred text editor and modify the values:
+
+```
+POZNOTE_USERNAME=your_new_username
+POZNOTE_PASSWORD=your_new_password
+HTTP_WEB_PORT=8040
+```
+
+```bash
+docker compose up -d
+```
+
+## Password Recovery
+
+Your credentials are stored in the `.env` file in your Poznote directory.
+
+To retrieve your password:
+
+1. Navigate to your Poznote directory
+2. Open the `.env` file
+3. Look for the `POZNOTE_PASSWORD` value
+
+## Update to the latest version
+
+To update Poznote to the latest version:
+
+```bash
+cd poznote && docker compose down && docker rmi ghcr.io/timothepoznanski/poznote:latest && docker compose pull && docker compose up -d
+```
+
+Your data is preserved in the `./data` directory and will not be affected by the update.
 
 ## Backup and Restore
 
@@ -120,6 +230,106 @@ Upload the complete backup ZIP to restore everything:
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
+
+## Multiple Instances
+
+You can run multiple isolated Poznote instances on the same server. Each instance has its own data, port, and credentials.
+
+### Why Multiple Instances?
+
+Perfect for:
+- Different family members with separate accounts
+- Separating personal and work notes
+- Testing new features without affecting production
+- Hosting for multiple users on the same server
+
+### Example: Tom and Alice instances on the same server
+
+```
+Server: my-server.com
+├── Poznote-Tom
+│   ├── Port: 8040
+│   ├── URL: http://my-server.com:8040
+│   ├── Container: poznote-tom-webserver-1
+│   └── Data: ./poznote-tom/data/
+│
+└── Poznote-Alice
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
+    ├── Container: poznote-alice-webserver-1
+    └── Data: ./poznote-alice/data/
+```
+
+### How to Deploy Multiple Instances
+
+Simply repeat the installation steps in different directories with different ports.
+
+#### Example: Creating Tom's instance
+
+```bash
+mkdir poznote-tom && cd poznote-tom
+
+cat <<EOF > .env
+POZNOTE_USERNAME=tom
+POZNOTE_PASSWORD=tom_password123!
+HTTP_WEB_PORT=8040
+EOF
+
+cat <<'EOF' > docker-compose.yml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+EOF
+
+docker compose pull && docker compose up -d
+```
+
+#### Example: Creating Alice's instance
+
+```bash
+cd .. # Go back to parent directory
+mkdir poznote-alice && cd poznote-alice
+
+cat <<EOF > .env
+POZNOTE_USERNAME=alice
+POZNOTE_PASSWORD=alice_password123!
+HTTP_WEB_PORT=8041
+EOF
+
+cat <<'EOF' > docker-compose.yml
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:latest
+    restart: always
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
+      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
+      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
+    ports:
+      - "${HTTP_WEB_PORT}:80"
+    volumes:
+      - "./data:/var/www/html/data"
+EOF
+
+docker compose pull && docker compose up -d
+```
+
+Now you have two completely isolated instances:
+- Tom's Poznote: http://localhost:8040
+- Alice's Poznote: http://localhost:8041
+
+> 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
 
 ## Tech Stack
 
@@ -370,3 +580,16 @@ curl -u 'username:password' \
 ```
 
 </details>
+
+## Poznote on the Cloud
+
+If you:
+
+- Want access from anywhere (phone, tablet, computer) with almost zero setup
+- Have no experience with server management or don't want to manage server and security
+- Don't know how to use command line or don't want to use command line 
+- Prefer one-click updates
+- Are okay with approximately $5/month (Cloud provider fees)
+
+**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
+

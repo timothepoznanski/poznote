@@ -93,10 +93,12 @@ function generateFolderActions($folderName, $workspace_filter) {
         // No actions for Favorites folder
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
-    $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal(\"$folderName\")' title='Create note in folder'></i>";
+        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
         $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
     } else {
-    $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal(\"$folderName\")' title='Create note in folder'></i>";
+        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
         $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
         $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
     }
