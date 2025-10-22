@@ -12,10 +12,9 @@
 - [Play with Poznote demo](#play-with-poznote-demo)
 - [Install Poznote](#install-poznote)
 - [Access Poznote](#access-poznote)
-- [Manage Poznote](#manage-poznote)
-  - [Change Poznote Settings](#change-poznote-settings)
-  - [Poznote Password Recovery](#poznote-password-recovery)
-  - [Update Poznote to the latest version](#update-poznote-to-the-latest-version)
+- [Change Poznote Settings](#change-poznote-settings)
+- [Poznote Password Recovery](#poznote-password-recovery)
+- [Update Poznote to the latest version](#update-poznote-to-the-latest-version)
 - [Backup and Restore](#backup-and-restore)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
@@ -166,8 +165,6 @@ After installation, access Poznote in your web browser:
 - Port: `8040`
 
 > ⚠️ **Important:** Change these default credentials after your first login!
-
-## Manage Poznote
 
 ## Change Poznote Settings
 
