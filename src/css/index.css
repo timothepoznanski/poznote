@@ -3180,15 +3180,17 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Make markdown toggle icons red */
+/* Make markdown toggle icons blue */
 .markdown-edit-btn .fa-markdown,
 .markdown-preview-btn .fa-eye {
-  filter: brightness(0) saturate(100%) invert(12%) sepia(94%) saturate(7463%) hue-rotate(354deg) brightness(98%) contrast(118%) !important;
+  color: #007DB8 !important;
+  filter: none !important;
 }
 
 .markdown-edit-btn:hover .fa-markdown,
 .markdown-preview-btn:hover .fa-eye {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(89%) saturate(6851%) hue-rotate(354deg) brightness(91%) contrast(118%) !important;
+  color: #007DB8 !important;
+  filter: none !important;
   transform: scale(1.18);
 }
 
