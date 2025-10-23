@@ -297,6 +297,12 @@ body.markdown-split-view-enabled .markdown-preview {
     padding-left: 15px;
 }
 
+/* Style for split view toggle button - same as favorite star */
+.toolbar-btn.markdown-split-view-btn.active i.fa-columns,
+.toolbar-btn.markdown-split-view-btn.active .fa-columns {
+    color: #007DB8 !important;
+}
+
 /* Hide markdown mode toggle buttons in split view (desktop only) */
 @media (min-width: 801px) {
     body.markdown-split-view-enabled .markdown-edit-btn,

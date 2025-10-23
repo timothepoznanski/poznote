@@ -440,16 +440,44 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
     
-    // Add edit and preview buttons in toolbar (only if not in split view OR if on mobile)
-    if (!isSplitViewEnabled || isMobile) {
-        var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
-        if (toolbar) {
-            // Hide separator button for markdown notes
-            var separatorBtn = toolbar.querySelector('.btn-separator');
-            if (separatorBtn) {
-                separatorBtn.style.display = 'none';
+    var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
+    if (toolbar) {
+        // Hide separator button for markdown notes
+        var separatorBtn = toolbar.querySelector('.btn-separator');
+        if (separatorBtn) {
+            separatorBtn.style.display = 'none';
+        }
+        
+        // Check if split view button already exists, if not create it
+        var existingSplitViewBtn = toolbar.querySelector('.markdown-split-view-btn');
+        if (!existingSplitViewBtn) {
+            // Split view toggle button (columns icon) - always visible for markdown notes
+            var splitViewBtn = document.createElement('button');
+            splitViewBtn.type = 'button';
+            splitViewBtn.className = 'toolbar-btn markdown-split-view-btn note-action-btn';
+            splitViewBtn.innerHTML = '<i class="fa-columns"></i>';
+            splitViewBtn.title = 'Toggle split view';
+            // Add active class if split view is enabled
+            if (isSplitViewEnabled) {
+                splitViewBtn.classList.add('active');
             }
-            
+            splitViewBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMarkdownSplitView(noteId);
+            };
+            toolbar.insertBefore(splitViewBtn, toolbar.firstChild);
+        } else {
+            // Update existing button's active state
+            if (isSplitViewEnabled) {
+                existingSplitViewBtn.classList.add('active');
+            } else {
+                existingSplitViewBtn.classList.remove('active');
+            }
+        }
+        
+        // Edit and preview buttons (only if not in split view OR if on mobile)
+        if (!isSplitViewEnabled || isMobile) {
             // Edit button (markdown icon) - hidden in edit mode, visible in preview mode
             var editBtn = document.createElement('button');
             editBtn.type = 'button';
@@ -659,6 +687,72 @@ function getMarkdownContent(noteId) {
     return noteEntry.getAttribute('data-markdown-content') || '';
 }
 
+// Toggle markdown split view
+function toggleMarkdownSplitView(noteId) {
+    // Get current state
+    var form = new FormData();
+    form.append('action', 'get');
+    form.append('key', 'markdown_split_view_enabled');
+    
+    fetch('api_settings.php', {method: 'POST', body: form})
+        .then(r => r.json())
+        .then(j => {
+            // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
+            var currently = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
+            // Only disable if explicitly set to '0' or 'false'
+            if (j && j.success && (j.value === '0' || j.value === 'false')) {
+                currently = false;
+            }
+            
+            // Toggle the state
+            var toSet = currently ? '0' : '1';
+            var setForm = new FormData();
+            setForm.append('action', 'set');
+            setForm.append('key', 'markdown_split_view_enabled');
+            setForm.append('value', toSet);
+            
+            return fetch('api_settings.php', {method: 'POST', body: setForm});
+        })
+        .then(function() {
+            // Reload the state from database
+            var form = new FormData();
+            form.append('action', 'get');
+            form.append('key', 'markdown_split_view_enabled');
+            
+            return fetch('api_settings.php', {method: 'POST', body: form});
+        })
+        .then(r => r.json())
+        .then(j => {
+            // Get the new state
+            var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
+            if (j && j.success && (j.value === '0' || j.value === 'false')) {
+                enabled = false;
+            }
+            
+            // Update body class
+            document.body.classList.toggle('markdown-split-view-enabled', enabled);
+            
+            // Re-initialize the note to apply the new state
+            var noteEntry = document.getElementById('entry' + noteId);
+            if (noteEntry && typeof window.initializeMarkdownNote === 'function') {
+                // Clear existing markdown setup
+                noteEntry.querySelector('.markdown-editor')?.remove();
+                noteEntry.querySelector('.markdown-preview')?.remove();
+                
+                // Remove existing toolbar buttons (except split view button which will be updated)
+                var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
+                if (toolbar) {
+                    toolbar.querySelector('.markdown-edit-btn')?.remove();
+                    toolbar.querySelector('.markdown-preview-btn')?.remove();
+                    // Don't remove split view button - it will be updated by initializeMarkdownNote
+                }
+                
+                window.initializeMarkdownNote(noteId);
+            }
+        })
+        .catch(e => console.error('Error toggling markdown split view:', e));
+}
+
 // Make functions globally available
 window.initializeMarkdownNote = initializeMarkdownNote;
 window.toggleMarkdownMode = toggleMarkdownMode;
@@ -668,3 +762,4 @@ window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.parseMarkdown = parseMarkdown;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
+window.toggleMarkdownSplitView = toggleMarkdownSplitView;

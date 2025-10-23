@@ -2676,6 +2676,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
+/* Blue color for split view when active */
+.toolbar-btn.markdown-split-view-btn.active i.fa-columns,
+.toolbar-btn.markdown-split-view-btn.active .fa-columns {
+  color: #007DB8 !important;
+}
+
 /* Font Awesome icon customizations */
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
@@ -2698,6 +2704,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-cog::before { content: "\f013"; }
 .fa-eye::before { content: "\f06e"; }
+.fa-columns::before { content: "\f0db"; }
 .fa-lightbulb::before { content: "\f0eb"; }
 .fa-video::before { content: "\f03d"; }
 .fa-plus::before { content: "\f067"; }
@@ -2770,6 +2777,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group,
 .fa-cog,
 .fa-eye,
+.fa-columns,
 .fa-home,
 .fa-bold,
 .fa-italic,
@@ -3159,10 +3167,11 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: none !important;
 }
 
-/* Exception: Remove filter for favorite/share/attachment when active (to show blue color) */
+/* Exception: Remove filter for favorite/share/attachment/split-view when active (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
 .toolbar-btn.is-shared .fa-share-nodes,
-.toolbar-btn.has-attachments .fa-paperclip {
+.toolbar-btn.has-attachments .fa-paperclip,
+.toolbar-btn.markdown-split-view-btn.active .fa-columns {
   filter: none !important;
 }
 

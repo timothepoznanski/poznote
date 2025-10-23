@@ -1196,3 +1196,12 @@ body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
 body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
 }
+
+/* Style for split view toggle button in dark mode - same as favorite star */
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn.active i.fa-columns,
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn.active .fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn.active i.fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn.active .fa-columns {
+    color: #007DB8 !important;
+    filter: none !important;
+}
