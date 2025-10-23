@@ -1197,11 +1197,29 @@ body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
 }
 
-/* Style for split view toggle button in dark mode - same as favorite star */
-html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn.active i.fa-columns,
-html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn.active .fa-columns,
-body.dark-mode .toolbar-btn.markdown-split-view-btn.active i.fa-columns,
-body.dark-mode .toolbar-btn.markdown-split-view-btn.active .fa-columns {
+/* Style for split view toggle button in dark mode - always blue */
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn i.fa-columns,
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn .fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn i.fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn .fa-columns {
     color: #007DB8 !important;
     filter: none !important;
+}
+
+/* Make markdown toggle icons blue in dark mode */
+html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn .fa-eye,
+body.dark-mode .markdown-edit-btn .fa-markdown,
+body.dark-mode .markdown-preview-btn .fa-eye {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
+body.dark-mode .markdown-edit-btn:hover .fa-markdown,
+body.dark-mode .markdown-preview-btn:hover .fa-eye {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
 }

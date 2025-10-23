@@ -297,9 +297,9 @@ body.markdown-split-view-enabled .markdown-preview {
     padding-left: 15px;
 }
 
-/* Style for split view toggle button - same as favorite star */
-.toolbar-btn.markdown-split-view-btn.active i.fa-columns,
-.toolbar-btn.markdown-split-view-btn.active .fa-columns {
+/* Style for split view toggle button - always blue */
+.toolbar-btn.markdown-split-view-btn i.fa-columns,
+.toolbar-btn.markdown-split-view-btn .fa-columns {
     color: #007DB8 !important;
 }
 
