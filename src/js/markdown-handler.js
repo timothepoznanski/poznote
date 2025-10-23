@@ -456,7 +456,8 @@ function initializeMarkdownNote(noteId) {
             splitViewBtn.type = 'button';
             splitViewBtn.className = 'toolbar-btn markdown-split-view-btn note-action-btn';
             splitViewBtn.innerHTML = '<i class="fa-columns"></i>';
-            splitViewBtn.title = 'Toggle split view';
+            // Set title based on current state
+            splitViewBtn.title = isSplitViewEnabled ? 'Disable split view' : 'Enable split view';
             // Add active class if split view is enabled
             if (isSplitViewEnabled) {
                 splitViewBtn.classList.add('active');
@@ -468,11 +469,13 @@ function initializeMarkdownNote(noteId) {
             };
             toolbar.insertBefore(splitViewBtn, toolbar.firstChild);
         } else {
-            // Update existing button's active state
+            // Update existing button's active state and title
             if (isSplitViewEnabled) {
                 existingSplitViewBtn.classList.add('active');
+                existingSplitViewBtn.title = 'Disable split view';
             } else {
                 existingSplitViewBtn.classList.remove('active');
+                existingSplitViewBtn.title = 'Enable split view';
             }
         }
         
