@@ -812,6 +812,14 @@ function toggleTablePicker() {
     return;
   }
   
+  // Save current selection/cursor position
+  const sel = window.getSelection();
+  if (sel.rangeCount > 0) {
+    window.savedTableRange = sel.getRangeAt(0).cloneRange();
+  } else {
+    window.savedTableRange = null;
+  }
+  
   // Create table picker popup
   const picker = document.createElement('div');
   picker.className = 'table-picker-popup';
@@ -1005,32 +1013,66 @@ function insertTable(rows, cols) {
   
   tableHTML += '</tbody></table><p><br></p>'; // Add paragraph after table
   
-  // Insert table
+  // Insert table at saved cursor position
   try {
-    // Try to get current selection
-    const sel = window.getSelection();
     let insertSuccess = false;
     
-    if (sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
+    // Try to restore the saved range
+    if (window.savedTableRange) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(window.savedTableRange);
       
-      // Make sure we're inside the noteentry
-      if (noteentry.contains(range.commonAncestorContainer) || noteentry === range.commonAncestorContainer) {
-        insertSuccess = document.execCommand('insertHTML', false, tableHTML);
+      // Try to insert at the saved position
+      insertSuccess = document.execCommand('insertHTML', false, tableHTML);
+      
+      // Clean up saved range
+      window.savedTableRange = null;
+    } else {
+      // No saved range, try current selection
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        
+        // Make sure we're inside the noteentry
+        if (noteentry.contains(range.commonAncestorContainer) || noteentry === range.commonAncestorContainer) {
+          insertSuccess = document.execCommand('insertHTML', false, tableHTML);
+        }
       }
     }
     
-    // If insertHTML didn't work or no selection, append to end of noteentry
+    // If insertHTML didn't work, use fallback insertion
     if (!insertSuccess) {
-      noteentry.insertAdjacentHTML('beforeend', tableHTML);
-      
-      // Move cursor to the end
-      const range = document.createRange();
       const sel = window.getSelection();
-      range.selectNodeContents(noteentry);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
+      let range;
+      
+      if (window.savedTableRange) {
+        range = window.savedTableRange;
+        window.savedTableRange = null;
+      } else if (sel.rangeCount > 0) {
+        range = sel.getRangeAt(0);
+      } else {
+        // Create a range at the end of noteentry
+        range = document.createRange();
+        range.selectNodeContents(noteentry);
+        range.collapse(false);
+      }
+      
+      // Manual insertion using range
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = tableHTML;
+      const table = tempDiv.firstChild;
+      
+      if (range) {
+        range.deleteContents();
+        range.insertNode(table);
+        
+        // Move cursor after the table
+        range.setStartAfter(table);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
     }
     
     // Trigger input event to save
@@ -1057,12 +1099,14 @@ function insertTable(rows, cols) {
   } catch (e) {
     console.error('Error inserting table:', e);
     
-    // Fallback: directly append to noteentry
+    // Final fallback: append to end of noteentry
     try {
       noteentry.insertAdjacentHTML('beforeend', tableHTML);
       noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+      window.savedTableRange = null;
     } catch (fallbackError) {
       console.error('Fallback insertion also failed:', fallbackError);
+      window.savedTableRange = null;
     }
   }
 }

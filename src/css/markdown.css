@@ -5,6 +5,12 @@
     display: none !important;
 }
 
+/* Hide emoji and table buttons for markdown notes */
+[data-note-type="markdown"] ~ .note-toolbar .btn-emoji,
+[data-note-type="markdown"] ~ .note-toolbar .btn-table {
+    display: none !important;
+}
+
 .markdown-preview {
     padding: 10px;
     min-height: 100px;

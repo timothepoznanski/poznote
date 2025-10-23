@@ -1436,7 +1436,7 @@ function executeCreateAction() {
             createMarkdownNoteInUtils();
             break;
         case 'list':
-            createTaskListNote();
+            createTaskListNoteInUtils();
             break;
         case 'folder':
             newFolder();
@@ -1479,16 +1479,17 @@ function createHtmlNote() {
     }
 }
 
-function createTaskListNote() {
+function createTaskListNoteInUtils() {
     if (isCreatingInFolder && targetFolderName) {
         var originalSelectedFolder = selectedFolder;
         selectedFolder = targetFolderName;
         
+        // Call the real createTaskListNote function from notes.js
         if (typeof window.createTaskListNote === 'function') {
             window.createTaskListNote();
         } else {
-            // Fallback to basic tasklist creation
-            window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=tasklist', '_blank');
+            // Fallback
+            window.location.href = 'insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=tasklist';
         }
         
         // Restore original folder
@@ -1498,7 +1499,8 @@ function createTaskListNote() {
         if (typeof window.createTaskListNote === 'function') {
             window.createTaskListNote();
         } else {
-            window.open('insert_new.php?type=tasklist', '_blank');
+            // Fallback
+            window.location.href = 'insert_new.php?type=tasklist';
         }
     }
 }

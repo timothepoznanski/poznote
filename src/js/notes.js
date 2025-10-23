@@ -32,6 +32,72 @@ function createNewNote() {
     });
 }
 
+function createTaskListNote() {
+    var params = new URLSearchParams({
+        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
+        folder: selectedFolder,
+        workspace: selectedWorkspace || 'Poznote',
+        type: 'tasklist'
+    });
+    
+    fetch("insert_new.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
+        body: params.toString()
+    })
+    .then(function(response) { return response.text(); })
+    .then(function(data) {
+        try {
+            var res = JSON.parse(data);
+            if(res.status === 1) {
+                window.scrollTo(0, 0);
+                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
+            } else {
+                showNotificationPopup(res.error || 'Error creating tasklist', 'error');
+            }
+        } catch(e) {
+            showNotificationPopup('Error creating tasklist: ' + data, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error: ' + error.message, 'error');
+    });
+}
+
+function createMarkdownNote() {
+    var params = new URLSearchParams({
+        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
+        folder: selectedFolder,
+        workspace: selectedWorkspace || 'Poznote',
+        type: 'markdown'
+    });
+    
+    fetch("insert_new.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
+        body: params.toString()
+    })
+    .then(function(response) { return response.text(); })
+    .then(function(data) {
+        try {
+            var res = JSON.parse(data);
+            if(res.status === 1) {
+                window.scrollTo(0, 0);
+                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
+            } else {
+                showNotificationPopup(res.error || 'Error creating markdown note', 'error');
+            }
+        } catch(e) {
+            showNotificationPopup('Error creating markdown note: ' + data, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Network error: ' + error.message, 'error');
+    });
+}
+
 function saveNote() {
     if(noteid == -1 || noteid === null || noteid === undefined || noteid == '') {
         return;
