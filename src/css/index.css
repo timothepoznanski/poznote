@@ -3056,7 +3056,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .create-section {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
 }
 
 /* Legacy class name for backwards compatibility */

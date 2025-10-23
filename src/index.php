@@ -1005,17 +1005,11 @@ $body_classes = trim($extra_body_classes);
             tipsButton.style.removeProperty('color');
             tipsButton.style.removeProperty('background-color');
         }
-        console.log('Tips blinking stopped');
     }
 
     function checkTipsViewedState() {
         var hasViewed = localStorage.getItem('poznote-tips-viewed');
         var tipsButton = document.querySelector('.sidebar-tips');
-        console.log('Tips debug:', {
-            hasViewed: hasViewed,
-            tipsButton: tipsButton,
-            shouldBlink: !hasViewed && tipsButton
-        });
         if (!hasViewed && tipsButton) {
             startTipsBlinking();
         } else {

@@ -283,7 +283,7 @@
                             <p>Organize your notes in folders</p>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="workspace" onclick="selectCreateType('workspace')">
+                    <div class="create-note-option" data-type="workspace" onclick="selectCreateType('workspace')" style="margin-top: 14px;">
                         <i class="fa fa-layer-group"></i>
                         <div>
                             <span>Workspace</span>
