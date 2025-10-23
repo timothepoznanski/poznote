@@ -1367,18 +1367,26 @@ function downloadFile(url, filename) {
     document.body.removeChild(link);
 }
 
-// Create note in folder functionality
-var selectedNoteType = null;
+// Unified create functionality
+var selectedCreateType = null;
 var targetFolderName = null;
+var isCreatingInFolder = false;
 
-function showCreateNoteInFolderModal(folderName) {
+function showCreateModal(folderName = null) {
     targetFolderName = folderName;
-    selectedNoteType = null;
+    selectedCreateType = null;
+    isCreatingInFolder = !!folderName;
     
-    // Update modal title
-    var folderSpan = document.getElementById('createNoteTargetFolder');
-    if (folderSpan) {
-        folderSpan.textContent = folderName;
+    // Update modal title and sections visibility
+    var modalTitle = document.getElementById('createModalTitle');
+    var otherSection = document.getElementById('otherSection');
+    
+    if (isCreatingInFolder) {
+        modalTitle.textContent = 'Create note in ' + folderName;
+        if (otherSection) otherSection.style.display = 'none';
+    } else {
+        modalTitle.textContent = 'Create';
+        if (otherSection) otherSection.style.display = 'block';
     }
     
     // Reset selection
@@ -1388,72 +1396,145 @@ function showCreateNoteInFolderModal(folderName) {
     });
     
     // Show modal
-    var modal = document.getElementById('createNoteInFolderModal');
+    var modal = document.getElementById('createModal');
     if (modal) {
         modal.style.display = 'flex';
     }
 }
 
-function selectNoteType(noteType) {
-    selectedNoteType = noteType;
-    
-    // Close modal immediately
-    closeModal('createNoteInFolderModal');
-    
-    // Create note directly
-    createNoteInFolder();
+// Legacy function for backwards compatibility
+function showCreateNoteInFolderModal(folderName) {
+    showCreateModal(folderName);
 }
 
-function createNoteInFolder() {
-    if (!selectedNoteType || !targetFolderName) {
+function selectCreateType(createType) {
+    selectedCreateType = createType;
+    
+    // Close modal immediately
+    closeModal('createModal');
+    
+    // Create the selected item
+    executeCreateAction();
+}
+
+// Legacy function for backwards compatibility
+function selectNoteType(noteType) {
+    selectCreateType(noteType);
+}
+
+function executeCreateAction() {
+    if (!selectedCreateType) {
         return;
     }
     
-    // Set the selected folder temporarily so the existing functions use it
-    var originalSelectedFolder = selectedFolder;
-    selectedFolder = targetFolderName;
-    
-    // Call the same functions that the main create buttons use
-    try {
-        switch(selectedNoteType) {
-            case 'html':
-                if (typeof newnote === 'function') {
-                    newnote();
-                } else if (typeof createNewNote === 'function') {
-                    createNewNote();
-                } else {
-                    // Fallback to basic creation
-                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName), '_blank');
-                }
-                break;
-            case 'markdown':
-                if (typeof createMarkdownNote === 'function') {
-                    createMarkdownNote();
-                } else {
-                    // Fallback to basic markdown creation
-                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=markdown', '_blank');
-                }
-                break;
-            case 'list':
-                if (typeof createTaskListNote === 'function') {
-                    createTaskListNote();
-                } else {
-                    // Fallback to basic tasklist creation
-                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=tasklist', '_blank');
-                }
-                break;
-            default:
-                if (typeof newnote === 'function') {
-                    newnote();
-                } else if (typeof createNewNote === 'function') {
-                    createNewNote();
-                } else {
-                    window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName), '_blank');
-                }
-                break;
-        }
-    } finally {
-        // Restore original selected folder
-        selectedFolder = originalSelectedFolder;
+    // Handle different creation types
+    switch(selectedCreateType) {
+        case 'html':
+            createHtmlNote();
+            break;
+        case 'markdown':
+            createMarkdownNoteInUtils();
+            break;
+        case 'list':
+            createTaskListNoteInUtils();
+            break;
+        case 'folder':
+            newFolder();
+            break;
+        case 'workspace':
+            createWorkspace();
+            break;
+        default:
+            console.error('Unknown create type:', selectedCreateType);
     }
+}
+
+function createHtmlNote() {
+    if (isCreatingInFolder && targetFolderName) {
+        // Set the selected folder temporarily so the existing functions use it
+        var originalSelectedFolder = selectedFolder;
+        selectedFolder = targetFolderName;
+        
+        // Call the note creation function
+        if (typeof newnote === 'function') {
+            newnote();
+        } else if (typeof createNewNote === 'function') {
+            createNewNote();
+        } else {
+            // Fallback to basic creation
+            window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName), '_blank');
+        }
+        
+        // Restore original folder
+        selectedFolder = originalSelectedFolder;
+    } else {
+        // Regular creation (not in specific folder)
+        if (typeof newnote === 'function') {
+            newnote();
+        } else if (typeof createNewNote === 'function') {
+            createNewNote();
+        } else {
+            window.open('insert_new.php', '_blank');
+        }
+    }
+}
+
+function createTaskListNoteInUtils() {
+    if (isCreatingInFolder && targetFolderName) {
+        var originalSelectedFolder = selectedFolder;
+        selectedFolder = targetFolderName;
+        
+        // Call the real createTaskListNote function from notes.js
+        if (typeof window.createTaskListNote === 'function') {
+            window.createTaskListNote();
+        } else {
+            // Fallback
+            window.location.href = 'insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=tasklist';
+        }
+        
+        // Restore original folder
+        selectedFolder = originalSelectedFolder;
+    } else {
+        // Regular creation (not in specific folder)
+        if (typeof window.createTaskListNote === 'function') {
+            window.createTaskListNote();
+        } else {
+            // Fallback
+            window.location.href = 'insert_new.php?type=tasklist';
+        }
+    }
+}
+
+function createMarkdownNoteInUtils() {
+    if (isCreatingInFolder && targetFolderName) {
+        var originalSelectedFolder = selectedFolder;
+        selectedFolder = targetFolderName;
+        
+        if (typeof window.createMarkdownNote === 'function') {
+            window.createMarkdownNote();
+        } else {
+            // Fallback to basic markdown creation
+            window.open('insert_new.php?folder=' + encodeURIComponent(targetFolderName) + '&type=markdown', '_blank');
+        }
+        
+        // Restore original folder
+        selectedFolder = originalSelectedFolder;
+    } else {
+        // Regular creation (not in specific folder)
+        if (typeof window.createMarkdownNote === 'function') {
+            window.createMarkdownNote();
+        } else {
+            window.open('insert_new.php?type=markdown', '_blank');
+        }
+    }
+}
+
+function createWorkspace() {
+    // Navigate to the workspaces management page
+    window.location = 'workspaces.php';
+}
+
+// Legacy function for backwards compatibility
+function createNoteInFolder() {
+    executeCreateAction();
 }

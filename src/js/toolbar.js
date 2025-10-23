@@ -804,6 +804,318 @@ function createLinkFromModal() {
   return addLinkToNote();
 }
 
+function toggleTablePicker() {
+  const existingPicker = document.querySelector('.table-picker-popup');
+  
+  if (existingPicker) {
+    existingPicker.remove();
+    return;
+  }
+  
+  // Save current selection/cursor position
+  const sel = window.getSelection();
+  if (sel.rangeCount > 0) {
+    window.savedTableRange = sel.getRangeAt(0).cloneRange();
+  } else {
+    window.savedTableRange = null;
+  }
+  
+  // Create table picker popup
+  const picker = document.createElement('div');
+  picker.className = 'table-picker-popup';
+  
+  // Create header
+  const header = document.createElement('div');
+  header.className = 'table-picker-header';
+  header.textContent = 'Insert Table';
+  picker.appendChild(header);
+  
+  // Create grid container
+  const grid = document.createElement('div');
+  grid.className = 'table-picker-grid';
+  
+  const maxRows = 10;
+  const maxCols = 10;
+  
+  // Create grid cells
+  for (let row = 0; row < maxRows; row++) {
+    for (let col = 0; col < maxCols; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'table-picker-cell';
+      cell.dataset.row = row + 1;
+      cell.dataset.col = col + 1;
+      grid.appendChild(cell);
+    }
+  }
+  
+  picker.appendChild(grid);
+  
+  // Create label
+  const label = document.createElement('div');
+  label.className = 'table-picker-label';
+  label.textContent = '1 × 1';
+  picker.appendChild(label);
+  
+  // Append to body
+  document.body.appendChild(picker);
+  
+  // Position picker near table button
+  const tableBtn = document.querySelector('.btn-table');
+  if (tableBtn) {
+    const rect = tableBtn.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const isMobile = isMobileDevice();
+    
+    // Picker dimensions
+    const pickerWidth = isMobile ? Math.min(280, windowWidth - 40) : 320;
+    const pickerHeight = 320;
+    
+    picker.style.position = 'fixed';
+    picker.style.width = pickerWidth + 'px';
+    
+    // Calculate vertical position
+    let top = rect.bottom + 10;
+    if (top + pickerHeight > windowHeight - 20) {
+      // If picker overflows bottom, place above button
+      top = rect.top - pickerHeight - 10;
+      if (top < 20) {
+        // If it doesn't fit above either, center vertically
+        top = Math.max(20, (windowHeight - pickerHeight) / 2);
+      }
+    }
+    
+    // Calculate horizontal position
+    let left;
+    if (isMobile) {
+      // On mobile, center in screen
+      left = (windowWidth - pickerWidth) / 2;
+    } else {
+      // On desktop, center on button
+      left = rect.left - (pickerWidth / 2) + (rect.width / 2);
+      if (left + pickerWidth > windowWidth - 20) {
+        left = windowWidth - pickerWidth - 20;
+      }
+      if (left < 20) {
+        left = 20;
+      }
+    }
+    
+    picker.style.top = top + 'px';
+    picker.style.left = left + 'px';
+  }
+  
+  // Show picker with animation
+  setTimeout(() => {
+    picker.classList.add('show');
+  }, 10);
+  
+  // Handle hover over grid
+  let currentRows = 0;
+  let currentCols = 0;
+  
+  grid.addEventListener('mouseover', function(e) {
+    if (e.target.classList.contains('table-picker-cell')) {
+      const row = parseInt(e.target.dataset.row);
+      const col = parseInt(e.target.dataset.col);
+      
+      currentRows = row;
+      currentCols = col;
+      
+      // Highlight cells
+      const cells = grid.querySelectorAll('.table-picker-cell');
+      cells.forEach(cell => {
+        const cellRow = parseInt(cell.dataset.row);
+        const cellCol = parseInt(cell.dataset.col);
+        
+        if (cellRow <= row && cellCol <= col) {
+          cell.classList.add('highlighted');
+        } else {
+          cell.classList.remove('highlighted');
+        }
+      });
+      
+      // Update label
+      label.textContent = `${row} × ${col}`;
+    }
+  });
+  
+  // Handle click on grid
+  grid.addEventListener('click', function(e) {
+    if (e.target.classList.contains('table-picker-cell')) {
+      const rows = parseInt(e.target.dataset.row);
+      const cols = parseInt(e.target.dataset.col);
+      
+      insertTable(rows, cols);
+      picker.classList.remove('show');
+      setTimeout(() => {
+        picker.remove();
+      }, 200);
+    }
+  });
+  
+  // Close picker when clicking outside
+  setTimeout(() => {
+    document.addEventListener('click', function closeTablePicker(e) {
+      if (!picker.contains(e.target) && !e.target.closest('.btn-table')) {
+        picker.classList.remove('show');
+        setTimeout(() => {
+          picker.remove();
+        }, 200);
+        document.removeEventListener('click', closeTablePicker);
+      }
+    });
+  }, 100);
+  
+  // Close on escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      picker.classList.remove('show');
+      setTimeout(() => {
+        picker.remove();
+      }, 200);
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  
+  document.addEventListener('keydown', handleEscape);
+}
+
+function insertTable(rows, cols) {
+  // Find the active note editor
+  const noteentry = document.querySelector('.noteentry[contenteditable="true"]');
+  
+  if (!noteentry) {
+    console.error('No editable note found');
+    return;
+  }
+  
+  // Focus the editor first
+  noteentry.focus();
+  
+  // Build table HTML
+  let tableHTML = '<table class="inserted-table" style="border-collapse: collapse; width: 100%; margin: 12px 0;">';
+  tableHTML += '<tbody>';
+  
+  for (let r = 0; r < rows; r++) {
+    tableHTML += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      tableHTML += '<td style="border: 1px solid #ddd; padding: 8px; min-width: 50px;">';
+      if (r === 0 && c === 0) {
+        tableHTML += '&nbsp;'; // Non-breaking space for first cell
+      } else {
+        tableHTML += '&nbsp;';
+      }
+      tableHTML += '</td>';
+    }
+    tableHTML += '</tr>';
+  }
+  
+  tableHTML += '</tbody></table><p><br></p>'; // Add paragraph after table
+  
+  // Insert table at saved cursor position
+  try {
+    let insertSuccess = false;
+    
+    // Try to restore the saved range
+    if (window.savedTableRange) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(window.savedTableRange);
+      
+      // Try to insert at the saved position
+      insertSuccess = document.execCommand('insertHTML', false, tableHTML);
+      
+      // Clean up saved range
+      window.savedTableRange = null;
+    } else {
+      // No saved range, try current selection
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        
+        // Make sure we're inside the noteentry
+        if (noteentry.contains(range.commonAncestorContainer) || noteentry === range.commonAncestorContainer) {
+          insertSuccess = document.execCommand('insertHTML', false, tableHTML);
+        }
+      }
+    }
+    
+    // If insertHTML didn't work, use fallback insertion
+    if (!insertSuccess) {
+      const sel = window.getSelection();
+      let range;
+      
+      if (window.savedTableRange) {
+        range = window.savedTableRange;
+        window.savedTableRange = null;
+      } else if (sel.rangeCount > 0) {
+        range = sel.getRangeAt(0);
+      } else {
+        // Create a range at the end of noteentry
+        range = document.createRange();
+        range.selectNodeContents(noteentry);
+        range.collapse(false);
+      }
+      
+      // Manual insertion using range
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = tableHTML;
+      const table = tempDiv.firstChild;
+      
+      if (range) {
+        range.deleteContents();
+        range.insertNode(table);
+        
+        // Move cursor after the table
+        range.setStartAfter(table);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+    
+    // Trigger input event to save
+    noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+    
+    // Focus on first cell
+    setTimeout(() => {
+      const insertedTable = noteentry.querySelector('table.inserted-table:last-of-type');
+      if (insertedTable) {
+        const firstCell = insertedTable.querySelector('td');
+        if (firstCell) {
+          // Place cursor in first cell
+          firstCell.focus();
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(firstCell);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    }, 100);
+    
+  } catch (e) {
+    console.error('Error inserting table:', e);
+    
+    // Final fallback: append to end of noteentry
+    try {
+      noteentry.insertAdjacentHTML('beforeend', tableHTML);
+      noteentry.dispatchEvent(new Event('input', {bubbles: true}));
+      window.savedTableRange = null;
+    } catch (fallbackError) {
+      console.error('Fallback insertion also failed:', fallbackError);
+      window.savedTableRange = null;
+    }
+  }
+}
+
+// Helper function to detect mobile device (reuse if already exists)
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+}
+
 // Ensure all toolbar functions are available in global scope
 window.addLinkToNote = addLinkToNote;
 window.toggleRedColor = toggleRedColor;
@@ -813,3 +1125,5 @@ window.toggleCodeBlock = toggleCodeBlock;
 window.toggleInlineCode = toggleInlineCode;
 window.toggleEmojiPicker = toggleEmojiPicker;
 window.insertEmoji = insertEmoji;
+window.toggleTablePicker = toggleTablePicker;
+window.insertTable = insertTable;

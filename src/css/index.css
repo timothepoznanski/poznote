@@ -1953,6 +1953,57 @@ pre.code-block,
     box-sizing: border-box;
 }
 
+/* Icône de copie pour les blocs de code */
+.code-block-copy-btn,
+pre.code-block .code-block-copy-btn,
+.noteentry pre .code-block-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.15s ease, transform 0.1s ease;
+    z-index: 10;
+    padding: 0;
+    font-size: 14px;
+    color: #586069;
+}
+
+.code-block:hover .code-block-copy-btn,
+pre.code-block:hover .code-block-copy-btn,
+.noteentry pre:hover .code-block-copy-btn {
+    opacity: 1;
+}
+
+.code-block-copy-btn:hover {
+    background: #f0f0f0;
+    color: #24292e;
+    transform: scale(1.05);
+}
+
+.code-block-copy-btn:active {
+    transform: scale(0.95);
+}
+
+.code-block-copy-btn.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.code-block-copy-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
 /* Règle spécifique supplémentaire pour s'assurer que le padding est appliqué */
 .noteentry pre, pre.code-block, .code-block {
     padding: 30px !important;
@@ -2625,6 +2676,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
+/* Blue color for split view (always blue, active or not) */
+.toolbar-btn.markdown-split-view-btn i.fa-columns,
+.toolbar-btn.markdown-split-view-btn .fa-columns {
+  color: #007DB8 !important;
+}
+
 /* Font Awesome icon customizations */
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
@@ -2647,6 +2704,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-cog::before { content: "\f013"; }
 .fa-eye::before { content: "\f06e"; }
+.fa-columns::before { content: "\f0db"; }
 .fa-lightbulb::before { content: "\f0eb"; }
 .fa-video::before { content: "\f03d"; }
 .fa-plus::before { content: "\f067"; }
@@ -2671,6 +2729,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-fill-drip::before { content: "\f576"; }
 .fa-list-ul::before { content: "\f0ca"; }
 .fa-list-ol::before { content: "\f0cb"; }
+.fa-table::before { content: "\f0ce"; }
 .fa-text-height::before { content: "\f034"; }
 .fa-code::before { content: "\f121"; }
 .fa-terminal::before { content: "\f120"; }
@@ -2718,6 +2777,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group,
 .fa-cog,
 .fa-eye,
+.fa-columns,
 .fa-home,
 .fa-bold,
 .fa-italic,
@@ -2728,6 +2788,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-fill-drip,
 .fa-list-ul,
 .fa-list-ol,
+.fa-table,
 .fa-text-height,
 .fa-code,
 .fa-terminal,
@@ -2893,6 +2954,91 @@ input[type="search"]::-webkit-search-results-decoration {
     background: #a8a8a8;
 }
 
+/* Table picker styles */
+.table-picker-popup {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 16px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.table-picker-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.table-picker-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.table-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 24px);
+    grid-template-rows: repeat(10, 24px);
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.table-picker-cell {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    background: white;
+}
+
+.table-picker-cell:hover {
+    border-color: #007DB8;
+}
+
+.table-picker-cell.highlighted {
+    background: #e3f2fd;
+    border-color: #007DB8;
+}
+
+.table-picker-label {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Inserted table styles */
+.noteentry table.inserted-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+}
+
+.noteentry table.inserted-table td,
+.noteentry table.inserted-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    min-width: 50px;
+}
+
+.noteentry table.inserted-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.noteentry table.inserted-table tr:hover {
+    background-color: #f9f9f9;
+}
+
 .folder-option:last-child {
     border-bottom: none;
 }
@@ -3021,10 +3167,11 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: none !important;
 }
 
-/* Exception: Remove filter for favorite/share/attachment when active (to show blue color) */
+/* Exception: Remove filter for favorite/share/attachment/split-view (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
 .toolbar-btn.is-shared .fa-share-nodes,
-.toolbar-btn.has-attachments .fa-paperclip {
+.toolbar-btn.has-attachments .fa-paperclip,
+.toolbar-btn.markdown-split-view-btn .fa-columns {
   filter: none !important;
 }
 
@@ -3033,19 +3180,35 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* Make markdown toggle icons red */
+/* Make markdown toggle icons blue */
 .markdown-edit-btn .fa-markdown,
 .markdown-preview-btn .fa-eye {
-  filter: brightness(0) saturate(100%) invert(12%) sepia(94%) saturate(7463%) hue-rotate(354deg) brightness(98%) contrast(118%) !important;
+  color: #007DB8 !important;
+  filter: none !important;
 }
 
 .markdown-edit-btn:hover .fa-markdown,
 .markdown-preview-btn:hover .fa-eye {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(89%) saturate(6851%) hue-rotate(354deg) brightness(91%) contrast(118%) !important;
+  color: #007DB8 !important;
+  filter: none !important;
   transform: scale(1.18);
 }
 
-/* Create note in folder modal styles */
+/* Unified create modal styles */
+.create-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.create-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Legacy class name for backwards compatibility */
 .create-note-options {
     display: flex;
     flex-direction: column;
@@ -3127,6 +3290,11 @@ body.dark-mode .create-note-option span {
 
 html[data-theme='dark'] .create-note-option p,
 body.dark-mode .create-note-option p {
+    color: #aaa;
+}
+
+html[data-theme='dark'] .create-section h4,
+body.dark-mode .create-section h4 {
     color: #aaa;
 }
 

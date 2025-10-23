@@ -703,6 +703,39 @@ body.dark-mode pre.code-block {
     border-color: #404040 !important;
 }
 
+/* Icône de copie pour les blocs de code en mode sombre */
+html[data-theme='dark'] .code-block-copy-btn,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn,
+body.dark-mode .code-block-copy-btn,
+body.dark-mode pre.code-block .code-block-copy-btn,
+body.dark-mode .noteentry pre .code-block-copy-btn {
+    background: rgba(40, 40, 40, 0.95);
+    border-color: #505050;
+    color: #b8b8b8;
+}
+
+html[data-theme='dark'] .code-block-copy-btn:hover,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn:hover,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn:hover,
+body.dark-mode .code-block-copy-btn:hover,
+body.dark-mode pre.code-block .code-block-copy-btn:hover,
+body.dark-mode .noteentry pre .code-block-copy-btn:hover {
+    background: rgba(60, 60, 60, 0.95);
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .code-block-copy-btn.copied,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn.copied,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied,
+body.dark-mode .code-block-copy-btn.copied,
+body.dark-mode pre.code-block .code-block-copy-btn.copied,
+body.dark-mode .noteentry pre .code-block-copy-btn.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
 /* Highlighted text in search */
 html[data-theme='dark'] mark,
 html[data-theme='dark'] .highlight,
@@ -953,6 +986,58 @@ body.dark-mode .emoji-picker-popup .emoji-item:hover {
     background-color: #2a2a2a;
 }
 
+/* Table picker popup */
+html[data-theme='dark'] .table-picker-popup,
+body.dark-mode .table-picker-popup {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .table-picker-header,
+body.dark-mode .table-picker-header {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .table-picker-cell,
+body.dark-mode .table-picker-cell {
+    background-color: #1a1a1a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .table-picker-cell:hover,
+body.dark-mode .table-picker-cell:hover {
+    border-color: #64B5F6;
+}
+
+html[data-theme='dark'] .table-picker-cell.highlighted,
+body.dark-mode .table-picker-cell.highlighted {
+    background-color: #1e3a5f;
+    border-color: #64B5F6;
+}
+
+html[data-theme='dark'] .table-picker-label,
+body.dark-mode .table-picker-label {
+    color: #b0b0b0;
+}
+
+/* Inserted table styles for dark mode */
+html[data-theme='dark'] .noteentry table.inserted-table td,
+html[data-theme='dark'] .noteentry table.inserted-table th,
+body.dark-mode .noteentry table.inserted-table td,
+body.dark-mode .noteentry table.inserted-table th {
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .noteentry table.inserted-table th,
+body.dark-mode .noteentry table.inserted-table th {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .noteentry table.inserted-table tr:hover,
+body.dark-mode .noteentry table.inserted-table tr:hover {
+    background-color: #2a2a2a;
+}
+
 /* Color palette popup */
 html[data-theme='dark'] .color-palette-popup,
 body.dark-mode .color-palette-popup {
@@ -1110,4 +1195,31 @@ body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
 body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
 body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
+}
+
+/* Style for split view toggle button in dark mode - always blue */
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn i.fa-columns,
+html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn .fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn i.fa-columns,
+body.dark-mode .toolbar-btn.markdown-split-view-btn .fa-columns {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+/* Make markdown toggle icons blue in dark mode */
+html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn .fa-eye,
+body.dark-mode .markdown-edit-btn .fa-markdown,
+body.dark-mode .markdown-preview-btn .fa-eye {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
+html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
+body.dark-mode .markdown-edit-btn:hover .fa-markdown,
+body.dark-mode .markdown-preview-btn:hover .fa-eye {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
 }

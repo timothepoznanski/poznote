@@ -121,13 +121,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
-            <div class="settings-card" id="markdown-split-view-card">
-                <div class="settings-card-icon"><i class="fa-columns"></i></div>
-                <div class="settings-card-content">
-                    <h3>Markdown Split View <span id="markdown-split-view-status" class="setting-status enabled">enabled</span></h3>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -219,111 +212,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
-
-        // Markdown Split View (database)
-        var cardMarkdownSplit = document.getElementById('markdown-split-view-card');
-        var statusMarkdownSplit = document.getElementById('markdown-split-view-status');
-        function refreshMarkdownSplit(){
-            var form = new FormData(); form.append('action','get'); form.append('key','markdown_split_view_enabled');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-                var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-                // Only disable if explicitly set to '0' or 'false'
-                if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                    enabled = false;
-                }
-                if(statusMarkdownSplit){ statusMarkdownSplit.textContent = enabled ? 'enabled' : 'disabled'; statusMarkdownSplit.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-                if(enabled) document.body.classList.add('markdown-split-view-enabled'); else document.body.classList.remove('markdown-split-view-enabled');
-            }).catch(()=>{});
-        }
-        if(cardMarkdownSplit){ cardMarkdownSplit.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','markdown_split_view_enabled');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-                var currently = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-                // Only disable if explicitly set to '0' or 'false'
-                if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                    currently = false;
-                }
-                var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','markdown_split_view_enabled'); setForm.append('value', toSet);
-                return fetch('api_settings.php',{method:'POST',body:setForm});
-            }).then(function(){ refreshMarkdownSplit(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
-        }); }
-        refreshMarkdownSplit();
-    })();
-    </script>
-    <script>
-    // Function to notify index.php about markdown split view changes
-    function notifyMarkdownSplitViewChange() {
-        // Check if we have access to the opener window (the main index.php page)
-        if (window.opener && typeof window.opener.updateMarkdownSplitView === 'function') {
-            // Get current state
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','markdown_split_view_enabled');
-            fetch('api_settings.php',{method:'POST',body:form})
-                .then(r=>r.json())
-                .then(j=>{
-                    // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-                    var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-                    // Only disable if explicitly set to '0' or 'false'
-                    if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                        enabled = false;
-                    }
-                    window.opener.updateMarkdownSplitView(enabled);
-                })
-                .catch(e=>console.error(e));
-        }
-    }
-    
-    // Override the markdown split refresh to also notify the opener
-    (function() {
-        var cardMarkdownSplit = document.getElementById('markdown-split-view-card');
-        if (cardMarkdownSplit) {
-            var originalClickHandler = cardMarkdownSplit.onclick;
-            cardMarkdownSplit.onclick = null;
-            
-            cardMarkdownSplit.addEventListener('click', function(){
-                var form = new FormData(); form.append('action','get'); form.append('key','markdown_split_view_enabled');
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                    // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-                    var currently = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-                    // Only disable if explicitly set to '0' or 'false'
-                    if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                        currently = false;
-                    }
-                    var toSet = currently ? '0' : '1';
-                    var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','markdown_split_view_enabled'); setForm.append('value', toSet);
-                    return fetch('api_settings.php',{method:'POST',body:setForm});
-                }).then(function(){ 
-                    // Refresh local state
-                    var form = new FormData(); form.append('action','get'); form.append('key','markdown_split_view_enabled');
-                    fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                        // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-                        var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-                        // Only disable if explicitly set to '0' or 'false'
-                        if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                            enabled = false;
-                        }
-                        var statusMarkdownSplit = document.getElementById('markdown-split-view-status');
-                        if(statusMarkdownSplit){ 
-                            statusMarkdownSplit.textContent = enabled ? 'enabled' : 'disabled'; 
-                            statusMarkdownSplit.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                        }
-                        document.body.classList.toggle('markdown-split-view-enabled', enabled);
-                    });
-                    
-                    // Notify opener and reload if needed
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
-                        notifyMarkdownSplitViewChange();
-                        setTimeout(function() {
-                            window.opener.location.reload();
-                        }, 100);
-                    }
-                }).catch(e=>console.error(e));
-            });
-        }
     })();
     </script>
     <script>

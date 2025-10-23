@@ -14,7 +14,7 @@ This guide will help you **install and manage** Poznote on cloud platforms witho
 - [Option 2: Other Cloud Providers](#option-2-other-cloud-providers)
   - [Generic Docker Deployment](#generic-docker-deployment)
   - [Key Considerations](#key-considerations)
-- [Manage Poznote on other Cloud platforms](#manage-poznote-on-other-cloud-platforms)
+  - [Manage](#manage)
 
 ## Option 1: Railway (Recommended)
 
@@ -51,8 +51,6 @@ After deployment is complete:
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
 
-Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
-
 **Step 2: Log In**
 
 **Default Credentials:**
@@ -70,8 +68,6 @@ Your instance URL will look like: `https://poznote-production-xxxx.up.railway.ap
 3. Click on the Poznote service
 4. Navigate to the **Settings** tab
 5. Find your public URL in the **Networking** section
-
-Or the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) at **1:15** to see how to get the URL.
 
 Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
 
@@ -176,7 +172,7 @@ When deploying to custom cloud providers, keep these important points in mind:
 - ✅ Use Poznote's built-in backup feature (Settings → Backup)
 - ✅ Store backups in a separate location (cloud storage, local machine)
 
-## Manage Poznote on other Cloud platforms
+### Manage
 
 The management of your Poznote instance will depend on your chosen cloud provider. Each platform has its own interface and procedures for:
 

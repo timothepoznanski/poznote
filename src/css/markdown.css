@@ -1,7 +1,9 @@
 /* Markdown note styles */
 
-/* Hide separator button and formatting buttons for markdown notes */
-[data-note-type="markdown"] ~ .note-toolbar .btn-separator {
+/* Hide separator, emoji and table buttons for markdown notes */
+.innernote[data-markdown-note="true"] .btn-separator,
+.innernote[data-markdown-note="true"] .btn-emoji,
+.innernote[data-markdown-note="true"] .btn-table {
     display: none !important;
 }
 
@@ -293,6 +295,12 @@ body.markdown-split-view-enabled .markdown-preview {
     width: 50%;
     overflow-y: auto;
     padding-left: 15px;
+}
+
+/* Style for split view toggle button - always blue */
+.toolbar-btn.markdown-split-view-btn i.fa-columns,
+.toolbar-btn.markdown-split-view-btn .fa-columns {
+    color: #007DB8 !important;
 }
 
 /* Hide markdown mode toggle buttons in split view (desktop only) */
