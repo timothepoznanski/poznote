@@ -33,9 +33,9 @@
     height: 100%;
     background-color: rgba(0,0,0,0.4);
     /* When opened by JS, the script sets display:flex so the modal uses flex layout */
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 40px 16px 16px 16px;
+    padding: 16px;
     box-sizing: border-box;
     overflow: auto;
 }
@@ -85,7 +85,7 @@
     border-radius: 8px;
     width: 90%;
     max-width: var(--modal-max-width);
-    margin: 0 auto; /* horizontal center; vertical spacing comes from .modal padding */
+    margin: -80px auto 0 auto; /* negative top margin to move modal higher */
     font-family: 'Inter', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     box-sizing: border-box;
@@ -1456,4 +1456,14 @@
         align-items: center !important;
         padding: 20px 12px !important;
     }
+}
+
+/* Specific positioning for create modal */
+#createModal.modal {
+    align-items: flex-start !important;
+    padding: 60px 16px 16px 16px !important;
+}
+
+#createModal .modal-content {
+    margin: 0 auto !important;
 }
