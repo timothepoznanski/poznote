@@ -2671,6 +2671,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-fill-drip::before { content: "\f576"; }
 .fa-list-ul::before { content: "\f0ca"; }
 .fa-list-ol::before { content: "\f0cb"; }
+.fa-table::before { content: "\f0ce"; }
 .fa-text-height::before { content: "\f034"; }
 .fa-code::before { content: "\f121"; }
 .fa-terminal::before { content: "\f120"; }
@@ -2728,6 +2729,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-fill-drip,
 .fa-list-ul,
 .fa-list-ol,
+.fa-table,
 .fa-text-height,
 .fa-code,
 .fa-terminal,
@@ -2891,6 +2893,91 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .emoji-picker::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* Table picker styles */
+.table-picker-popup {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 16px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.table-picker-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.table-picker-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.table-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 24px);
+    grid-template-rows: repeat(10, 24px);
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.table-picker-cell {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    background: white;
+}
+
+.table-picker-cell:hover {
+    border-color: #007DB8;
+}
+
+.table-picker-cell.highlighted {
+    background: #e3f2fd;
+    border-color: #007DB8;
+}
+
+.table-picker-label {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Inserted table styles */
+.noteentry table.inserted-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+}
+
+.noteentry table.inserted-table td,
+.noteentry table.inserted-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    min-width: 50px;
+}
+
+.noteentry table.inserted-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.noteentry table.inserted-table tr:hover {
+    background-color: #f9f9f9;
 }
 
 .folder-option:last-child {

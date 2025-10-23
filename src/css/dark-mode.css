@@ -953,6 +953,58 @@ body.dark-mode .emoji-picker-popup .emoji-item:hover {
     background-color: #2a2a2a;
 }
 
+/* Table picker popup */
+html[data-theme='dark'] .table-picker-popup,
+body.dark-mode .table-picker-popup {
+    background-color: #242424;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .table-picker-header,
+body.dark-mode .table-picker-header {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .table-picker-cell,
+body.dark-mode .table-picker-cell {
+    background-color: #1a1a1a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .table-picker-cell:hover,
+body.dark-mode .table-picker-cell:hover {
+    border-color: #64B5F6;
+}
+
+html[data-theme='dark'] .table-picker-cell.highlighted,
+body.dark-mode .table-picker-cell.highlighted {
+    background-color: #1e3a5f;
+    border-color: #64B5F6;
+}
+
+html[data-theme='dark'] .table-picker-label,
+body.dark-mode .table-picker-label {
+    color: #b0b0b0;
+}
+
+/* Inserted table styles for dark mode */
+html[data-theme='dark'] .noteentry table.inserted-table td,
+html[data-theme='dark'] .noteentry table.inserted-table th,
+body.dark-mode .noteentry table.inserted-table td,
+body.dark-mode .noteentry table.inserted-table th {
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .noteentry table.inserted-table th,
+body.dark-mode .noteentry table.inserted-table th {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .noteentry table.inserted-table tr:hover,
+body.dark-mode .noteentry table.inserted-table tr:hover {
+    background-color: #2a2a2a;
+}
+
 /* Color palette popup */
 html[data-theme='dark'] .color-palette-popup,
 body.dark-mode .color-palette-popup {

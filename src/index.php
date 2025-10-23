@@ -558,6 +558,9 @@ $body_classes = trim($extra_body_classes);
                     // Home button (mobile only)
                     echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="Back to notes" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
                     
+                    // Save button (first for easy access)
+                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    
                     // Text formatting buttons
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
@@ -575,7 +578,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
                     echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                 
                     // Favorite / Share / Attachment buttons
