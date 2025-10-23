@@ -703,6 +703,39 @@ body.dark-mode pre.code-block {
     border-color: #404040 !important;
 }
 
+/* Icône de copie pour les blocs de code en mode sombre */
+html[data-theme='dark'] .code-block-copy-btn,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn,
+body.dark-mode .code-block-copy-btn,
+body.dark-mode pre.code-block .code-block-copy-btn,
+body.dark-mode .noteentry pre .code-block-copy-btn {
+    background: rgba(40, 40, 40, 0.95);
+    border-color: #505050;
+    color: #b8b8b8;
+}
+
+html[data-theme='dark'] .code-block-copy-btn:hover,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn:hover,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn:hover,
+body.dark-mode .code-block-copy-btn:hover,
+body.dark-mode pre.code-block .code-block-copy-btn:hover,
+body.dark-mode .noteentry pre .code-block-copy-btn:hover {
+    background: rgba(60, 60, 60, 0.95);
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .code-block-copy-btn.copied,
+html[data-theme='dark'] pre.code-block .code-block-copy-btn.copied,
+html[data-theme='dark'] .noteentry pre .code-block-copy-btn.copied,
+body.dark-mode .code-block-copy-btn.copied,
+body.dark-mode pre.code-block .code-block-copy-btn.copied,
+body.dark-mode .noteentry pre .code-block-copy-btn.copied {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
 /* Highlighted text in search */
 html[data-theme='dark'] mark,
 html[data-theme='dark'] .highlight,

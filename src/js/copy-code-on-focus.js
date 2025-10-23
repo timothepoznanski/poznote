@@ -268,12 +268,113 @@
         }
     }
 
+    // Add copy button to code blocks
+    function addCopyButtonToCodeBlocks() {
+        // Find all code blocks
+        var codeBlocks = document.querySelectorAll('pre, .code-block');
+        
+        codeBlocks.forEach(function(block) {
+            // Skip if already has a copy button
+            if (block.querySelector('.code-block-copy-btn')) {
+                return;
+            }
+            
+            // Skip inline code elements
+            if (block.tagName.toLowerCase() === 'code' && block.parentElement.tagName.toLowerCase() !== 'pre') {
+                return;
+            }
+            
+            // Create copy button
+            var btn = document.createElement('button');
+            btn.className = 'code-block-copy-btn';
+            btn.setAttribute('type', 'button');
+            btn.setAttribute('aria-label', 'Copy code to clipboard');
+            btn.setAttribute('title', 'Copy code');
+            
+            // SVG icon for copy
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            
+            // Add click handler
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var text = normalizeCodeText(block);
+                if (!text) return;
+                
+                copyText(text).then(function (ok) {
+                    if (ok) {
+                        // Visual feedback on button
+                        btn.classList.add('copied');
+                        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                        
+                        showToast('Copied to clipboard!');
+                        
+                        // Reset button after 2 seconds
+                        setTimeout(function() {
+                            btn.classList.remove('copied');
+                            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                        }, 2000);
+                    } else {
+                        showToast('Copy failed — select the code and press Ctrl+C');
+                    }
+                }).catch(function () {
+                    showToast('Copy failed — select the code and press Ctrl+C');
+                });
+            });
+            
+            // Add button to the code block
+            block.appendChild(btn);
+        });
+    }
+
+    // Watch for dynamically added code blocks
+    function observeCodeBlocks() {
+        var observer = new MutationObserver(function(mutations) {
+            var shouldUpdate = false;
+            
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) { // Element node
+                            var tagName = node.tagName ? node.tagName.toLowerCase() : '';
+                            if (tagName === 'pre' || node.classList && node.classList.contains('code-block')) {
+                                shouldUpdate = true;
+                            } else if (node.querySelectorAll) {
+                                var hasCodeBlocks = node.querySelectorAll('pre, .code-block').length > 0;
+                                if (hasCodeBlocks) {
+                                    shouldUpdate = true;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldUpdate) {
+                addCopyButtonToCodeBlocks();
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () { injectStyle(); try { ensureToastContainer(); } catch(e){} });
+        document.addEventListener('DOMContentLoaded', function () { 
+            injectStyle(); 
+            try { ensureToastContainer(); } catch(e){} 
+            addCopyButtonToCodeBlocks();
+            observeCodeBlocks();
+        });
     } else {
         injectStyle();
         try { ensureToastContainer(); } catch(e){}
+        addCopyButtonToCodeBlocks();
+        observeCodeBlocks();
     }
 
 })();
