@@ -3045,7 +3045,21 @@ input[type="search"]::-webkit-search-results-decoration {
   transform: scale(1.18);
 }
 
-/* Create note in folder modal styles */
+/* Unified create modal styles */
+.create-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.create-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Legacy class name for backwards compatibility */
 .create-note-options {
     display: flex;
     flex-direction: column;
@@ -3127,6 +3141,11 @@ body.dark-mode .create-note-option span {
 
 html[data-theme='dark'] .create-note-option p,
 body.dark-mode .create-note-option p {
+    color: #aaa;
+}
+
+html[data-theme='dark'] .create-section h4,
+body.dark-mode .create-section h4 {
     color: #aaa;
 }
 

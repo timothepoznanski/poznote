@@ -243,38 +243,59 @@
     </div>
 </div>
 
-<!-- Create note in folder modal -->
-<div id="createNoteInFolderModal" class="modal">
+<!-- Create modal (unified for both create button and folder actions) -->
+<div id="createModal" class="modal">
     <div class="modal-content">
-        <h3>Create note in <span id="createNoteTargetFolder"></span></h3>
+        <h3 id="createModalTitle">Create</h3>
         <div class="modal-body">
-            <p>Choose the type of note to create:</p>
-            <div class="create-note-options">
-                <div class="create-note-option" data-type="html" onclick="selectNoteType('html')">
-                    <i class="fa fa-file-alt"></i>
-                    <div>
-                        <span>HTML Note</span>
-                        <p>Rich text with formatting, images, and links</p>
+            <div class="create-options">
+                <!-- Notes section -->
+                <div class="create-section" id="notesSection">
+                    <div class="create-note-option" data-type="html" onclick="selectCreateType('html')">
+                        <i class="fa fa-file-alt"></i>
+                        <div>
+                            <span>HTML Note</span>
+                            <p>Rich text with formatting, images, and links</p>
+                        </div>
+                    </div>
+                    <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
+                        <i class="fa fa-markdown"></i>
+                        <div>
+                            <span>Markdown Note</span>
+                            <p>Lightweight markup language for structured text</p>
+                        </div>
+                    </div>
+                    <div class="create-note-option" data-type="list" onclick="selectCreateType('list')">
+                        <i class="fa fa-list-ul"></i>
+                        <div>
+                            <span>Task List</span>
+                            <p>Checklist with checkboxes for tasks and items</p>
+                        </div>
                     </div>
                 </div>
-                <div class="create-note-option" data-type="markdown" onclick="selectNoteType('markdown')">
-                    <i class="fa fa-markdown"></i>
-                    <div>
-                        <span>Markdown Note</span>
-                        <p>Lightweight markup language for structured text</p>
+                
+                <!-- Other items section (only shown when creating from main button) -->
+                <div class="create-section" id="otherSection">
+                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')">
+                        <i class="fa fa-folder"></i>
+                        <div>
+                            <span>Folder</span>
+                            <p>Organize your notes in folders</p>
+                        </div>
                     </div>
-                </div>
-                <div class="create-note-option" data-type="list" onclick="selectNoteType('list')">
-                    <i class="fa fa-list-ul"></i>
-                    <div>
-                        <span>Task List</span>
-                        <p>Checklist with checkboxes for tasks and items</p>
+                    <br>
+                    <div class="create-note-option" data-type="workspace" onclick="selectCreateType('workspace')">
+                        <i class="fa fa-layer-group"></i>
+                        <div>
+                            <span>Workspace</span>
+                            <p>Create a new workspace environment</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('createNoteInFolderModal')">Cancel</button>
+            <button type="button" class="btn-cancel" onclick="closeModal('createModal')">Cancel</button>
         </div>
     </div>
 </div>

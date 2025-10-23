@@ -382,83 +382,13 @@ $body_classes = trim($extra_body_classes);
 
     </div>
     <script>
-    // Create menu functionality with debugging
+    // Create menu functionality - now opens unified modal
     function toggleCreateMenu() {
-        var existingMenu = document.getElementById('header-create-menu');
-        if (existingMenu) {
-            existingMenu.remove();
-            return;
-        }
-        
-        var createMenu = document.createElement('div');
-        createMenu.id = 'header-create-menu';
-        
-        // Note item
-        var noteItem = document.createElement('button');
-        noteItem.className = 'create-menu-item';
-        noteItem.innerHTML = '<i class="fa-file-alt"></i>Note (HTML)';
-        noteItem.onclick = function() {
-            // Use in-page creation flow instead of opening a new tab
-            if (typeof newnote === 'function') {
-                newnote();
-            } else if (typeof createNewNote === 'function') {
-                createNewNote();
-            } else if (window.NoteManager && typeof window.NoteManager.createNote === 'function') {
-                window.NoteManager.createNote();
-            } else {
-                // Fallback: open insert_new.php if JS handlers are unavailable
-                window.open('insert_new.php', '_blank');
-            }
-            createMenu.remove();
-        };
-        
-        // Folder item
-        var folderItem = document.createElement('button');
-        folderItem.className = 'create-menu-item';
-        folderItem.innerHTML = '<i class="fa-folder"></i>Folder';
-        folderItem.onclick = function() {
-            newFolder();
-            createMenu.remove();
-        };
-        
-        // Task list item
-        var taskListItem = document.createElement('button');
-        taskListItem.className = 'create-menu-item';
-        taskListItem.innerHTML = '<i class="fa-list-ul"></i>Task list';
-        taskListItem.onclick = function() {
-            createTaskListNote();
-            createMenu.remove();
-        };
-
-        // Markdown note item
-        var markdownItem = document.createElement('button');
-        markdownItem.className = 'create-menu-item';
-        markdownItem.innerHTML = '<i class="fa-file-alt"></i>Note (MD)';
-        markdownItem.onclick = function() {
-            createMarkdownNote();
-            createMenu.remove();
-        };
-
-        // Workspace item
-        var workspaceItem = document.createElement('button');
-            workspaceItem.className = 'create-menu-item';
-            workspaceItem.innerHTML = '<i class="fa-layer-group"></i>Workspace';
-        workspaceItem.onclick = function() {
-            // Navigate to the workspaces management page
-            window.location = 'workspaces.php';
-            createMenu.remove();
-        };
-        
-        createMenu.appendChild(noteItem);
-        createMenu.appendChild(markdownItem);
-        createMenu.appendChild(folderItem);
-        createMenu.appendChild(taskListItem);
-    createMenu.appendChild(workspaceItem);
-        
-        var plusButton = document.querySelector('.sidebar-plus');
-        if (plusButton && plusButton.parentNode) {
-            plusButton.parentNode.appendChild(createMenu);
-            createMenu.style.display = 'block';
+        // Show the unified create modal instead of dropdown menu
+        if (typeof showCreateModal === 'function') {
+            showCreateModal();
+        } else {
+            console.error('showCreateModal function not available');
         }
     }
     
