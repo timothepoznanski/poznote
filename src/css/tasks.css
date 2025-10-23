@@ -259,3 +259,9 @@
 .task-important-btn.is-favorite i {
   color: #ff0000 !important;
 }
+
+/* Tasklist note styles - Hide separator and table buttons for tasklist notes */
+.innernote[data-tasklist-note="true"] .btn-separator,
+.innernote[data-tasklist-note="true"] .btn-table {
+    display: none !important;
+}

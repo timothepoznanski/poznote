@@ -527,8 +527,10 @@ $body_classes = trim($extra_body_classes);
                     }
                
                     // Note display
+                    $markdown_attr = ($note_type === 'markdown') ? ' data-markdown-note="true"' : '';
+                    $tasklist_attr = ($note_type === 'tasklist') ? ' data-tasklist-note="true"' : '';
                     echo '<div id="note'.$row['id'].'" class="notecard">';
-                    echo '<div class="innernote">';
+                    echo '<div class="innernote"'.$markdown_attr.$tasklist_attr.'>';
                     echo '<div class="note-header">';
                     echo '<div class="note-edit-toolbar">';
                     

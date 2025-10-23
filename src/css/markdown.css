@@ -1,13 +1,9 @@
 /* Markdown note styles */
 
-/* Hide separator button and formatting buttons for markdown notes */
-[data-note-type="markdown"] ~ .note-toolbar .btn-separator {
-    display: none !important;
-}
-
-/* Hide emoji and table buttons for markdown notes */
-[data-note-type="markdown"] ~ .note-toolbar .btn-emoji,
-[data-note-type="markdown"] ~ .note-toolbar .btn-table {
+/* Hide separator, emoji and table buttons for markdown notes */
+.innernote[data-markdown-note="true"] .btn-separator,
+.innernote[data-markdown-note="true"] .btn-emoji,
+.innernote[data-markdown-note="true"] .btn-table {
     display: none !important;
 }
 
