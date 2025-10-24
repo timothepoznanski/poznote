@@ -462,24 +462,94 @@ function setupLinkEvents() {
         }
     });
     
-    // Image paste management
+    // Image and text paste management
     document.body.addEventListener('paste', function(e) {
         try {
             var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
             if (!note) return;
             
-            var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
-            if (!items) return;
+            // Check if this is a markdown note
+            var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
             
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
-                    e.preventDefault();
-                    var file = item.getAsFile();
-                    if (file) {
-                        handleImageFilesAndInsert([file], note);
+            var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
+            
+            // Handle image paste
+            if (items) {
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        var file = item.getAsFile();
+                        if (file) {
+                            handleImageFilesAndInsert([file], note);
+                        }
+                        return;
                     }
-                    break;
+                }
+            }
+            
+            // Handle text paste for HTML rich notes (not markdown)
+            if (!isMarkdownNote && e.clipboardData) {
+                var htmlData = e.clipboardData.getData('text/html');
+                var plainText = e.clipboardData.getData('text/plain');
+                
+                // Detect if this is code from VSCode or another code editor
+                // VSCode adds specific classes or the HTML contains code-like formatting
+                var isCodeFromEditor = false;
+                
+                if (htmlData) {
+                    // Check for VSCode specific markers or code editor patterns
+                    isCodeFromEditor = htmlData.includes('class="vscode-') || 
+                                       htmlData.includes('monaco-') ||
+                                       htmlData.includes('mtk') || // VSCode token class
+                                       (htmlData.includes('<span') && htmlData.includes('font-family') && plainText.split('\n').length > 1);
+                }
+                
+                // Also check if the plain text looks like code (multiple lines with indentation)
+                if (!isCodeFromEditor && plainText) {
+                    var lines = plainText.split('\n');
+                    var hasIndentation = lines.some(function(line) {
+                        return line.match(/^[\t ]{2,}/);
+                    });
+                    // If multiple lines with indentation, likely code
+                    if (lines.length > 2 && hasIndentation) {
+                        isCodeFromEditor = true;
+                    }
+                }
+                
+                if (isCodeFromEditor && plainText) {
+                    e.preventDefault();
+                    
+                    // Create a <pre> element with monospace font to preserve code formatting
+                    var pre = document.createElement('pre');
+                    pre.className = 'code-block';
+                    pre.textContent = plainText;
+                    
+                    // Insert the <pre> at cursor position
+                    var selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        var range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        
+                        // Insert the pre element
+                        range.insertNode(pre);
+                        
+                        // Add a line break after for easier editing
+                        var br = document.createElement('br');
+                        range.setStartAfter(pre);
+                        range.insertNode(br);
+                        
+                        // Move cursor after the inserted code
+                        range.setStartAfter(br);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    
+                    // Trigger update
+                    if (typeof updateNote === 'function') {
+                        updateNote();
+                    }
                 }
             }
         } catch (err) {
