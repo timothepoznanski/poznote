@@ -570,6 +570,34 @@ curl -X POST -u 'username:password' \
 </details>
 
 <details>
+<summary><strong>💾 Backup Management</strong></summary>
+<br>
+
+**Create Backup**
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  http://YOUR_SERVER/src/api_backup.php
+```
+
+**List Backups**
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/src/api_list_backups.php
+```
+
+**Download Backup**
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/src/api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip" \
+  -o backup.zip
+```
+
+Backups are stored in the `data/backups/` directory with the naming pattern: `poznote_backup_YYYY-MM-DD_HH-MM-SS.zip`
+
+</details>
+
+<details>
 <summary><strong>ℹ️ System Information</strong></summary>
 <br>
 

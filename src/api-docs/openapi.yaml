@@ -4,6 +4,10 @@ info:
   description: |
     REST API for Poznote - Note-taking application with workspaces, folders, tags and attachments support.
     
+    **Authentication:** All endpoints support both HTTP Basic Authentication and Session Authentication.
+    - Use HTTP Basic Auth (`-u username:password`) for scripts and automation
+    - Use Session Auth for browser-based access (Swagger UI)
+    
     [View complete curl examples in the README](https://github.com/timothepoznanski/poznote#api-documentation)
   version: 1.0.0
 
@@ -15,6 +19,7 @@ tags:
   - name: Tags Management
   - name: Attachments Management
   - name: Favorites Management
+  - name: Backup Management
   - name: System Information
 
 security:
@@ -570,6 +575,200 @@ paths:
       responses:
         '200':
           description: Folder deleted
+
+  /api_backup.php:
+    post:
+      tags:
+        - Backup Management
+      summary: Create complete backup
+      description: |
+        Creates a complete backup ZIP file containing:
+        - Database SQL dump
+        - All HTML note entries
+        - All attachments with metadata
+        - Index.html file for offline browsing
+        
+        **Authentication:** Supports both HTTP Basic Auth and Session Auth.
+        
+        The backup file is saved in the `data/backups/` directory and can be downloaded using the returned path.
+      security:
+        - BasicAuth: []
+        - SessionAuth: []
+      responses:
+        '200':
+          description: Backup created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Backup created successfully"
+                  backup_file:
+                    type: string
+                    description: Filename of the created backup
+                    example: "poznote_backup_2025-10-24_14-30-15.zip"
+                  backup_path:
+                    type: string
+                    description: Relative path to download the backup
+                    example: "../data/backups/poznote_backup_2025-10-24_14-30-15.zip"
+                  backup_size:
+                    type: integer
+                    description: Size in bytes
+                    example: 1048576
+                  backup_size_mb:
+                    type: number
+                    format: float
+                    description: Size in megabytes
+                    example: 1.0
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: ISO 8601 timestamp of creation
+                    example: "2025-10-24T14:30:15+00:00"
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Authentication required"
+        '500':
+          description: Server error during backup creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Failed to create backup file"
+
+  /api_list_backups.php:
+    get:
+      tags:
+        - Backup Management
+      summary: List available backups
+      description: |
+        Returns a list of all available backup files in the backups directory, sorted by creation date (newest first).
+        
+        **Authentication:** Supports both HTTP Basic Auth and Session Auth.
+      security:
+        - BasicAuth: []
+        - SessionAuth: []
+      responses:
+        '200':
+          description: List of backups returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  backups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        filename:
+                          type: string
+                          example: "poznote_backup_2025-10-24_14-30-15.zip"
+                        path:
+                          type: string
+                          example: "../data/backups/poznote_backup_2025-10-24_14-30-15.zip"
+                        download_url:
+                          type: string
+                          example: "api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip"
+                        size:
+                          type: integer
+                          example: 1048576
+                        size_mb:
+                          type: number
+                          format: float
+                          example: 1.0
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-10-24T14:30:15+00:00"
+                  total:
+                    type: integer
+                    description: Total number of backups
+                    example: 5
+        '401':
+          description: Authentication required
+
+  /api_download_backup.php:
+    get:
+      tags:
+        - Backup Management
+      summary: Download a backup file
+      description: |
+        Downloads a specific backup file from the backups directory.
+        The file will be sent as a ZIP download.
+        
+        **Authentication:** Supports both HTTP Basic Auth and Session Auth.
+      security:
+        - BasicAuth: []
+        - SessionAuth: []
+      parameters:
+        - name: filename
+          in: query
+          required: true
+          description: "Name of the backup file to download (must match pattern poznote_backup_YYYY-MM-DD_HH-MM-SS.zip)"
+          schema:
+            type: string
+            example: "poznote_backup_2025-10-24_14-30-15.zip"
+      responses:
+        '200':
+          description: Backup file download
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request (missing filename or invalid format)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid backup filename format"
+        '401':
+          description: Authentication required
+        '404':
+          description: Backup file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Backup file not found"
 
   /api_version.php:
     get:
