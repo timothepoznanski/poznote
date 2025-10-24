@@ -458,7 +458,37 @@ function setupLinkEvents() {
         if (e.target.tagName === 'A' && e.target.closest('[contenteditable="true"]')) {
             e.preventDefault();
             e.stopPropagation();
-            window.open(e.target.href, '_blank');
+            
+            // Check if this is a note-to-note link
+            var href = e.target.href;
+            var noteMatch = href.match(/[?&]note=(\d+)/);
+            var workspaceMatch = href.match(/[?&]workspace=([^&]+)/);
+            
+            if (noteMatch && noteMatch[1]) {
+                // This is a note-to-note link - open it within the app
+                var targetNoteId = noteMatch[1];
+                var targetWorkspace = workspaceMatch ? decodeURIComponent(workspaceMatch[1]) : (selectedWorkspace || 'Poznote');
+                
+                // If workspace is different, reload page with new workspace and note
+                if (targetWorkspace !== selectedWorkspace) {
+                    // Update localStorage with the new workspace
+                    try {
+                        localStorage.setItem('poznote_selected_workspace', targetWorkspace);
+                    } catch (e) {
+                        console.log('Could not save workspace to localStorage:', e);
+                    }
+                    
+                    // Navigate to the new workspace with the target note
+                    var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace) + '&note=' + targetNoteId;
+                    window.location.href = url;
+                } else {
+                    // Same workspace, just load the note
+                    loadNoteById(targetNoteId);
+                }
+            } else {
+                // Regular external link - open in new tab
+                window.open(href, '_blank');
+            }
         }
     });
     
@@ -827,6 +857,48 @@ function initTextSelectionHandlers() {
         // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
+}
+
+// Helper function to load a note by ID
+function loadNoteById(noteId) {
+    var workspace = selectedWorkspace || 'Poznote';
+    var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
+    
+    // Use the existing loadNoteDirectly function if available
+    if (typeof window.loadNoteDirectly === 'function') {
+        window.loadNoteDirectly(url, noteId, null);
+    } else {
+        // Fallback: navigate directly
+        window.location.href = url;
+    }
+}
+
+// Helper function to switch workspace with callback
+function switchWorkspace(targetWorkspace, callback) {
+    // If switching to a different workspace, we need to reload the entire page
+    // to refresh the left column with notes from the new workspace
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace !== targetWorkspace) {
+        // Build the URL for the new workspace with the target note
+        var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace);
+        
+        // If there's a callback that would load a note, extract the note ID from it
+        // Since we're reloading the page, we can append the note parameter
+        if (callback) {
+            // Try to detect if callback will load a note
+            // For now, we'll just reload to the workspace and let the callback handle the note
+            window.location.href = url;
+        } else {
+            window.location.href = url;
+        }
+    } else {
+        // Same workspace, just update the variable and call callback
+        if (typeof selectedWorkspace !== 'undefined') {
+            selectedWorkspace = targetWorkspace;
+        }
+        if (callback) {
+            callback();
+        }
+    }
 }
 
 // Expose updateNote globally for use in other modules
