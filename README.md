@@ -15,7 +15,7 @@
 - [Change Settings](#change-settings)
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
-- [Backup / Export and Restore / Import](#backup-export-and-restore-import)
+- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
