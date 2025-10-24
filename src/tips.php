@@ -64,7 +64,11 @@ $v = '20251021.1';
                 <div class="tip-item"><i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
                 <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
                 <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
-                <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords or tags simultaneously.</div>
+                <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords simultaneously.</div>
+                <div class="tip-item">
+                    <div><i class="fa-search"></i> Search across multiple tags simultaneously.</div>
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip1.png" alt="Search across multiple tags" class="tip-image" style="display: block; margin: 10px 0 0 0; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
                 <div class="tip-item"><i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.</div>
                 <div class="tip-item"><i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.</div>
                 <div class="tip-item"><i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.</div>
