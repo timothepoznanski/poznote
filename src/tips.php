@@ -68,15 +68,32 @@ $v = '20251021.1';
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip3.png" alt="Create tasklist notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
                 <div class="tip-item">
-                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.
+                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. HTML notes embed them inline.
                 </div>
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip4.png" alt="Add images - drag and drop" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
+                <div class="tip-item">
+                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments.
+                </div>
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip5.png" alt="Add images - paste screenshots" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
-                <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
+                <div class="tip-item">
+                    <i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip6.png" alt="Click on tag to filter" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-tags"></i> Search in tags list.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip7.png" alt="Search in tags list" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip8.png" alt="Search in tags list" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
                 <div class="tip-item">
                     <i class="fa-search"></i> Search across multiple keywords simultaneously.
                 </div>
