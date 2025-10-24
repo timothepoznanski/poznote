@@ -459,6 +459,18 @@ function setupLinkEvents() {
             e.preventDefault();
             e.stopPropagation();
             
+            // Check if user has selected text (wants to edit) vs simple click (wants to follow link)
+            var selection = window.getSelection();
+            var hasSelection = selection && selection.toString().trim().length > 0;
+            
+            if (hasSelection) {
+                // User has selected text - they want to edit the link, not follow it
+                // Do nothing here, let the normal selection behavior work
+                // The toolbar's link button will handle editing
+                return;
+            }
+            
+            // No selection - user wants to follow the link
             // Check if this is a note-to-note link
             var href = e.target.href;
             var noteMatch = href.match(/[?&]note=(\d+)/);

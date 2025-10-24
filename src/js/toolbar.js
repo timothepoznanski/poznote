@@ -763,6 +763,27 @@ function addLinkToNote() {
     }
     
     showLinkModal(existingUrl, selectedText, function(url, text) {
+      // If url is null, it means we want to remove the link
+      if (url === null) {
+        if (window.savedExistingLink) {
+          // Remove the link but keep the text content
+          const linkText = window.savedExistingLink.textContent;
+          const textNode = document.createTextNode(linkText);
+          window.savedExistingLink.parentNode.replaceChild(textNode, window.savedExistingLink);
+          
+          // Save the note automatically
+          const noteentry = document.querySelector('.noteentry');
+          if (noteentry && typeof window.updatenote === 'function') {
+            window.updatenote();
+          }
+        }
+        
+        // Clean up
+        window.savedLinkRange = null;
+        window.savedExistingLink = null;
+        return;
+      }
+      
       if (!url) return;
       
       // If we're editing an existing link, just update it

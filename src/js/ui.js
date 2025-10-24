@@ -558,10 +558,29 @@ function showLinkModal(defaultUrl, defaultText, callback) {
     
     var urlInput = document.getElementById('linkModalUrl');
     var textInput = document.getElementById('linkModalText');
+    var removeLinkBtn = document.getElementById('linkModalRemove');
+    var modalTitle = modal.querySelector('.modal-header h3');
     
     urlInput.value = defaultUrl || 'https://';
     textInput.value = defaultText || '';
     linkModalCallback = callback;
+    
+    // Update modal title and enable/disable remove button based on whether we're editing an existing link
+    var isEditingLink = defaultUrl && defaultUrl !== 'https://';
+    if (modalTitle) {
+        modalTitle.textContent = isEditingLink ? 'Manage Link' : 'Add Link';
+    }
+    if (removeLinkBtn) {
+        if (isEditingLink) {
+            removeLinkBtn.disabled = false;
+            removeLinkBtn.classList.remove('btn-disabled');
+            removeLinkBtn.classList.add('btn-danger');
+        } else {
+            removeLinkBtn.disabled = true;
+            removeLinkBtn.classList.add('btn-disabled');
+            removeLinkBtn.classList.remove('btn-danger');
+        }
+    }
     
     modal.style.display = 'flex';
     setTimeout(function() {
@@ -574,7 +593,7 @@ function createLinkModal() {
     var modalHtml = '<div id="linkModal" class="modal" style="display: none;">' +
         '<div class="modal-content">' +
         '<div class="modal-header">' +
-        '<h3>Add Link</h3>' +
+        '<h3>Manage Link</h3>' +
         '</div>' +
         '<div class="modal-body">' +
         '<div style="margin-bottom: 10px;">' +
@@ -587,8 +606,9 @@ function createLinkModal() {
         '</div>' +
         '</div>' +
     '<div class="modal-buttons">' +
+    '<button type="button" class="btn btn-disabled" id="linkModalRemove" style="margin-right: auto;" disabled>Remove link</button>' +
     '<button type="button" class="btn btn-cancel" id="linkModalCancel">Cancel</button>' +
-    '<button type="button" class="btn btn-primary" id="linkModalAdd">Add</button>' +
+    '<button type="button" class="btn btn-primary" id="linkModalAdd">Save</button>' +
         '</div>' +
         '</div>' +
         '</div>';
@@ -598,6 +618,7 @@ function createLinkModal() {
     // Attach event listeners to buttons
     var cancelBtn = document.getElementById('linkModalCancel');
     var addBtn = document.getElementById('linkModalAdd');
+    var removeBtn = document.getElementById('linkModalRemove');
     
     cancelBtn.addEventListener('click', function() {
         closeModal('linkModal');
@@ -605,6 +626,10 @@ function createLinkModal() {
     
     addBtn.addEventListener('click', function() {
         executeLinkModalAction();
+    });
+    
+    removeBtn.addEventListener('click', function() {
+        executeLinkModalRemove();
     });
     
     // Attach event listeners for Enter key
@@ -635,6 +660,26 @@ function executeLinkModalAction() {
     
     if (callback && url) {
         callback(url, text || url);
+    }
+    
+    // Close modal with a slight delay to allow DOM operations to complete
+    setTimeout(function() {
+        var modal = document.getElementById('linkModal');
+        if (modal) {
+            modal.remove();
+        }
+    }, 50);
+}
+
+function executeLinkModalRemove() {
+    var callback = linkModalCallback;
+    
+    // Reset callback BEFORE calling it to avoid re-entry
+    linkModalCallback = null;
+    
+    // Call the callback with null to signal link removal
+    if (callback) {
+        callback(null, null);
     }
     
     // Close modal with a slight delay to allow DOM operations to complete
