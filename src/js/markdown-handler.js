@@ -1,6 +1,25 @@
 // Markdown handler for Poznote
 // Simple markdown parser and renderer
 
+// Helper function to check if split view button should be shown
+function checkSplitViewButtonSetting(callback) {
+    var form = new FormData();
+    form.append('action', 'get');
+    form.append('key', 'show_markdown_split_view_button');
+    
+    fetch('api_settings.php', {method: 'POST', body: form})
+        .then(r => r.json())
+        .then(j => {
+            // Default to enabled (true) if setting not found or is '1'
+            var enabled = !j || !j.success || j.value === '1' || j.value === 'true' || j.value === null;
+            callback(enabled);
+        })
+        .catch(() => {
+            // Default to enabled on error
+            callback(true);
+        });
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -503,7 +522,7 @@ function initializeMarkdownNote(noteId) {
             } else {
                 currentMode = 'preview';
                 viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-                viewModeBtn.title = 'Preview mode (click to switch to split view)';
+                viewModeBtn.title = 'Preview mode (click to switch to edit mode)';
             }
             
             viewModeBtn.setAttribute('data-current-mode', currentMode);
@@ -513,6 +532,7 @@ function initializeMarkdownNote(noteId) {
                 e.stopPropagation();
                 cycleMarkdownViewMode(noteId);
             };
+            
             toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
         } else {
             // Update existing button based on current state
@@ -530,7 +550,7 @@ function initializeMarkdownNote(noteId) {
             } else {
                 currentMode = 'preview';
                 existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-                existingViewModeBtn.title = 'Preview mode (click to switch to split view)';
+                existingViewModeBtn.title = 'Preview mode (click to switch to edit mode)';
                 existingViewModeBtn.classList.remove('active');
             }
             existingViewModeBtn.setAttribute('data-current-mode', currentMode);
@@ -752,20 +772,30 @@ function cycleMarkdownViewMode(noteId) {
     
     var nextMode;
     
-    // Determine next mode based on current mode
-    // Cycle: Edit -> Preview -> Split -> Edit...
-    if (currentMode === 'edit') {
-        nextMode = 'preview';
-    } else if (currentMode === 'preview') {
-        nextMode = 'split';
-    } else { // split
-        nextMode = 'edit';
-    }
-    
-    // On mobile, skip split view (cycle only between edit and preview)
-    if (isMobile && nextMode === 'split') {
-        nextMode = 'edit';
-    }
+    // Check if split view button is enabled
+    checkSplitViewButtonSetting(function(showSplitViewButton) {
+        // Determine next mode based on current mode
+        // Cycle: Edit -> Preview -> Split -> Edit... (or Edit -> Preview -> Edit if split is disabled)
+        if (currentMode === 'edit') {
+            nextMode = 'preview';
+        } else if (currentMode === 'preview') {
+            // Skip split if button is disabled or on mobile
+            if (!showSplitViewButton || isMobile) {
+                nextMode = 'edit';
+            } else {
+                nextMode = 'split';
+            }
+        } else { // split
+            nextMode = 'edit';
+        }
+        
+        // Continue with the mode change
+        applyViewModeChange(noteId, noteEntry, nextMode, isSplitViewEnabled);
+    });
+}
+
+// Helper function to apply the view mode change
+function applyViewModeChange(noteId, noteEntry, nextMode, isSplitViewEnabled) {
     
     // Save mode to localStorage (global for all notes)
     try {
