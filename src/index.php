@@ -1118,6 +1118,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeNoteClickHandlers();
     checkAndScrollToNote();
     initializeMarkdownSplitView();
+    
+    // Initialize image click handlers for images in notes
+    if (typeof reinitializeImageClickHandlers === 'function') {
+        reinitializeImageClickHandlers();
+    }
 });
 
 // Initialize markdown split view state from database
