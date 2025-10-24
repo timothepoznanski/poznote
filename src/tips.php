@@ -50,10 +50,7 @@ $v = '20251021.1';
         <div class="tips-header">
             <div class="tips-header-left">
                 <h1>Did you know?</h1>
-                <p>Please check all these quick tips to get the most out of Poznote.</p>
-                <div class="coming-soon-note">
-                    <i class="fa-video"></i> GIF demonstrations for these features are being created - coming soon!
-                </div>
+                <p>Please check all these quick tips. There might be a few things here you didn’t know Poznote could do.</p>
             </div>
             <div class="tips-header-right">
                 <button class="btn-back" onclick="goBack()">
@@ -64,11 +61,10 @@ $v = '20251021.1';
 
         <div class="tips-content">
             <div class="tips-list">
-                <div class="tip-item"><i class="fa-list-check"></i> <a href="https://github.com/timothepoznanski/poznote/blob/main/readme/FEATURES.md#interactive-tasklist-notes" target="_blank">Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
+                <div class="tip-item"><i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
                 <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
                 <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
                 <div class="tip-item"><i class="fa-search"></i> Search across multiple keywords or tags simultaneously.</div>
-                <div class="tip-item"><i class="fa-code"></i> Long-press any code block to copy its contents to your clipboard.</div>
                 <div class="tip-item"><i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.</div>
                 <div class="tip-item"><i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.</div>
                 <div class="tip-item"><i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.</div>
