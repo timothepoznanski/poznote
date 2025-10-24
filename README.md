@@ -210,7 +210,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 
 Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
-**Complete Backup**
+**📦 Complete Backup**
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
 
@@ -218,7 +218,7 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
-**Import Individual Notes**
+**📥 Import Individual Notes**
 
 Import one or more HTML or Markdown notes directly:
 
@@ -228,7 +228,7 @@ Import one or more HTML or Markdown notes directly:
   - Titles are automatically extracted from file content or filename
   - Supports both full HTML documents and simple fragments
 
-**Complete Restore** 
+**🔄 Complete Restore** 
 
 Upload the complete backup ZIP to restore everything:
 
