@@ -388,11 +388,11 @@ Ready-to-use curl commands for every API operation.
 ```bash
 # List all notes
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_list_notes.php
+  http://YOUR_SERVER/api_list_notes.php
 
 # Filter by workspace
 curl -u 'username:password' \
-  "http://YOUR_SERVER/src/api_list_notes.php?workspace=Personal"
+  "http://YOUR_SERVER/api_list_notes.php?workspace=Personal"
 ```
 
 **Create Note**
@@ -406,7 +406,7 @@ curl -X POST -u 'username:password' \
     "folder_name": "Projects",
     "workspace": "Personal"
   }' \
-  http://YOUR_SERVER/src/api_create_note.php
+  http://YOUR_SERVER/api_create_note.php
 ```
 
 **Update Note**
@@ -420,7 +420,7 @@ curl -X POST -u 'username:password' \
     "tags": "work,updated",
     "folder": "Projects"
   }' \
-  http://YOUR_SERVER/src/api_update_note.php
+  http://YOUR_SERVER/api_update_note.php
 ```
 
 **Delete Note**
@@ -428,7 +428,7 @@ curl -X POST -u 'username:password' \
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123}' \
-  http://YOUR_SERVER/src/api_delete_note.php
+  http://YOUR_SERVER/api_delete_note.php
 ```
 
 **Move Note**
@@ -440,7 +440,7 @@ curl -X POST -u 'username:password' \
     "folder_name": "Archive",
     "workspace": "Personal"
   }' \
-  http://YOUR_SERVER/src/api_move_note.php
+  http://YOUR_SERVER/api_move_note.php
 ```
 
 **Share Note**
@@ -449,7 +449,7 @@ curl -X POST -u 'username:password' \
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123, "shared": 1}' \
-  http://YOUR_SERVER/src/api_share_note.php
+  http://YOUR_SERVER/api_share_note.php
 ```
 
 </details>
@@ -461,7 +461,7 @@ curl -X POST -u 'username:password' \
 **List Trash**
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_list_trash.php
+  http://YOUR_SERVER/api_list_trash.php
 ```
 
 **Restore Note**
@@ -469,7 +469,7 @@ curl -u 'username:password' \
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123}' \
-  http://YOUR_SERVER/src/api_restore_note.php
+  http://YOUR_SERVER/api_restore_note.php
 ```
 
 </details>
@@ -486,7 +486,7 @@ curl -X POST -u 'username:password' \
     "folder_name": "My Projects",
     "workspace": "Personal"
   }' \
-  http://YOUR_SERVER/src/api_create_folder.php
+  http://YOUR_SERVER/api_create_folder.php
 ```
 
 **Delete Folder**
@@ -497,7 +497,7 @@ curl -X POST -u 'username:password' \
     "folder_name": "Old Projects",
     "workspace": "Personal"
   }' \
-  http://YOUR_SERVER/src/api_delete_folder.php
+  http://YOUR_SERVER/api_delete_folder.php
 ```
 
 </details>
@@ -509,7 +509,7 @@ curl -X POST -u 'username:password' \
 **List Workspaces**
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_workspaces.php
+  http://YOUR_SERVER/api_workspaces.php
 ```
 
 </details>
@@ -521,7 +521,7 @@ curl -u 'username:password' \
 **List Tags**
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_list_tags.php
+  http://YOUR_SERVER/api_list_tags.php
 ```
 
 **Apply Tags**
@@ -532,7 +532,7 @@ curl -X POST -u 'username:password' \
     "id": 123,
     "tags": "work,urgent,meeting"
   }' \
-  http://YOUR_SERVER/src/api_apply_tags.php
+  http://YOUR_SERVER/api_apply_tags.php
 ```
 
 </details>
@@ -546,7 +546,7 @@ curl -X POST -u 'username:password' \
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123, "favorite": 1}' \
-  http://YOUR_SERVER/src/api_favorites.php
+  http://YOUR_SERVER/api_favorites.php
 ```
 
 **Remove from Favorites**
@@ -554,7 +554,7 @@ curl -X POST -u 'username:password' \
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123, "favorite": 0}' \
-  http://YOUR_SERVER/src/api_favorites.php
+  http://YOUR_SERVER/api_favorites.php
 ```
 
 </details>
@@ -566,7 +566,7 @@ curl -X POST -u 'username:password' \
 **List Attachments**
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/src/api_attachments.php?note_id=123"
+  "http://YOUR_SERVER/api_attachments.php?note_id=123"
 ```
 
 **Upload Attachment**
@@ -574,7 +574,7 @@ curl -u 'username:password' \
 curl -X POST -u 'username:password' \
   -F "note_id=123" \
   -F "file=@/path/to/file.pdf" \
-  http://YOUR_SERVER/src/api_attachments.php
+  http://YOUR_SERVER/api_attachments.php
 ```
 
 </details>
@@ -587,19 +587,19 @@ curl -X POST -u 'username:password' \
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  http://YOUR_SERVER/src/api_backup.php
+  http://YOUR_SERVER/api_backup.php
 ```
 
 **List Backups**
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_list_backups.php
+  http://YOUR_SERVER/api_list_backups.php
 ```
 
 **Download Backup**
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/src/api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip" \
+  "http://YOUR_SERVER/api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip" \
   -o backup.zip
 ```
 
@@ -614,7 +614,7 @@ Backups are stored in the `data/backups/` directory with the naming pattern: `po
 **Check Version**
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/src/api_version.php
+  http://YOUR_SERVER/api_version.php
 ```
 
 </details>
