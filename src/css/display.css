@@ -211,6 +211,13 @@ body {
     }
 }
 
+/* Hide "Show Markdown Split View" button setting on mobile */
+@media (max-width: 800px) {
+    #show-split-view-btn-card {
+        display: none !important;
+    }
+}
+
 /* Ensure dark mode applies correctly */
 html[data-theme='dark'] body,
 body.dark-mode {
