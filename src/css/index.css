@@ -2676,6 +2676,20 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
+/* Blue color for markdown view mode toggle button */
+.toolbar-btn.markdown-view-mode-btn i,
+.toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+}
+
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+  transform: scale(1.18);
+}
+
 /* Font Awesome icon customizations */
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }

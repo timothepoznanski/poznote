@@ -1114,6 +1114,12 @@ body.dark-mode .markdown-preview h6 {
     color: #e0e0e0;
 }
 
+/* Placeholder for empty preview in split view - dark mode */
+html[data-theme='dark'] .markdown-preview-placeholder,
+body.dark-mode .markdown-preview-placeholder {
+    color: #666;
+}
+
 /* Backup/Export page */
 html[data-theme='dark'] .backup-container,
 body.dark-mode .backup-container {
@@ -1206,7 +1212,25 @@ body.dark-mode .toolbar-btn.markdown-split-view-btn .fa-columns {
     filter: none !important;
 }
 
-/* Make markdown toggle icons blue in dark mode */
+/* Make markdown view mode toggle button blue in dark mode */
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn i,
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-view-mode-btn i,
+body.dark-mode .toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Make markdown toggle icons blue in dark mode (legacy support) */
 html[data-theme='dark'] .markdown-edit-btn .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn .fa-eye,
 body.dark-mode .markdown-edit-btn .fa-markdown,
