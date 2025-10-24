@@ -575,7 +575,6 @@ function createLinkModal() {
         '<div class="modal-content">' +
         '<div class="modal-header">' +
         '<h3>Add Link</h3>' +
-        '<span class="close">&times;</span>' +
         '</div>' +
         '<div class="modal-body">' +
         '<div style="margin-bottom: 10px;">' +
@@ -597,13 +596,8 @@ function createLinkModal() {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
     // Attach event listeners to buttons
-    var closeBtn = document.querySelector('#linkModal .close');
     var cancelBtn = document.getElementById('linkModalCancel');
     var addBtn = document.getElementById('linkModalAdd');
-    
-    closeBtn.addEventListener('click', function() {
-        closeModal('linkModal');
-    });
     
     cancelBtn.addEventListener('click', function() {
         closeModal('linkModal');
