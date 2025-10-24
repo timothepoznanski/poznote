@@ -1193,7 +1193,7 @@ function loadFoldersForMoveModal(currentFolder) {
 
 function onWorkspaceChange() {
     // When workspace changes, reload folders for the new workspace
-    var selectedWorkspace = document.getElementById('workspaceSelect').value;
+    var newWorkspace = document.getElementById('workspaceSelect').value;
     var currentFolder = null; // We don't exclude any folder when changing workspace
     
     // Clear the move modal state
@@ -1203,7 +1203,7 @@ function onWorkspaceChange() {
     // Load folders for the selected workspace
     var params = new URLSearchParams({
         action: 'list',
-        workspace: selectedWorkspace
+        workspace: newWorkspace
     });
     
     fetch("folder_operations.php", {
@@ -1217,9 +1217,33 @@ function onWorkspaceChange() {
             // Store all folders for the new workspace
             allFolders = data.folders || [];
             
+            console.log('Loaded ' + allFolders.length + ' folders for workspace: ' + newWorkspace);
             
-            
-            console.log('Loaded ' + allFolders.length + ' folders for workspace: ' + selectedWorkspace);
+            // Update the target folder dropdown with folders from the new workspace
+            var select = document.getElementById('moveNoteTargetSelect');
+            if (select) {
+                select.innerHTML = '<option value="">Select target folder...</option>';
+                
+                // Populate with folders from the new workspace
+                for (var i = 0; i < allFolders.length; i++) {
+                    var folder = allFolders[i];
+                    // Don't include Favorites in target options
+                    if (folder !== 'Favorites') {
+                        var option = document.createElement('option');
+                        option.value = folder;
+                        option.textContent = folder;
+                        select.appendChild(option);
+                    }
+                }
+                
+                // Select the first real option if available
+                try {
+                    if (select.options.length > 1) {
+                        select.selectedIndex = 1;
+                        select.dispatchEvent(new Event('change'));
+                    }
+                } catch (e) {}
+            }
         }
     })
     .catch(function(error) {
@@ -1257,11 +1281,16 @@ function moveNoteToFolder() {
         showMoveFolderError('Please select a target folder');
         return;
     }
+    
+    // Get the selected workspace
+    var workspaceSelect = document.getElementById('workspaceSelect');
+    var targetWorkspace = workspaceSelect ? workspaceSelect.value : (selectedWorkspace || 'Poznote');
 
     var params = new URLSearchParams({
         action: 'move_to',
         note_id: noteId,
-        folder: targetFolder
+        folder: targetFolder,
+        workspace: targetWorkspace
     });
 
     fetch("folder_operations.php", {
