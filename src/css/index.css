@@ -2724,6 +2724,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-up-down::before { content: "\f07d"; }
 .fa-arrows-h::before { content: "\f07e"; }
 .fa-sort::before { content: "\f0dc"; }
+.fa-mobile::before { content: "\f3cd"; }
+.fa-file-import::before { content: "\f56f"; }
 .fa-moon::before { content: "\f186"; }
 .fa-bolt::before { content: "\f0e7"; }
 .fa-markdown::before { content: "\f60f"; }
