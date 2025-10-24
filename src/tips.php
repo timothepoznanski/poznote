@@ -61,8 +61,21 @@ $v = '20251021.1';
 
         <div class="tips-content">
             <div class="tips-list">
-                <div class="tip-item"><i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.</a></div>
-                <div class="tip-item"><i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.</div>
+                <div class="tip-item">
+                    <i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip3.png" alt="Create tasklist notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments, HTML notes embed them inline.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip4.png" alt="Add images - drag and drop" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip5.png" alt="Add images - paste screenshots" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
                 <div class="tip-item"><i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.</div>
                 <div class="tip-item">
                     <i class="fa-search"></i> Search across multiple keywords simultaneously.
