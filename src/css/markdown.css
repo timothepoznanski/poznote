@@ -309,14 +309,14 @@ body.markdown-split-view-enabled .markdown-preview {
 .markdown-preview-placeholder {
     color: #999;
     padding: 10px;
-    text-align: center;
+    text-align: left;
     opacity: 0.6;
 }
 
 .markdown-preview.empty {
     display: flex !important;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 /* Style for split view toggle button - always blue */

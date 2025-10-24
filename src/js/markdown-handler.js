@@ -457,9 +457,13 @@ function initializeMarkdownNote(noteId) {
     // Create preview and editor containers
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
-    // Set preview content or placeholder if empty in split view
-    if (isEmpty && isSplitViewEnabled) {
-        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here...</div>';
+    // Set preview content or placeholder if empty
+    if (isEmpty) {
+        if (isSplitViewEnabled) {
+            previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here...</div>';
+        } else {
+            previewDiv.innerHTML = '<div class="markdown-preview-placeholder">You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.</div>';
+        }
         previewDiv.classList.add('empty');
     } else {
         previewDiv.innerHTML = parseMarkdown(markdownContent);
@@ -618,7 +622,16 @@ function switchToPreviewMode(noteId) {
     // Switch to preview mode
     // Use helper function to properly normalize content
     var markdownContent = normalizeContentEditableText(editorDiv);
-    previewDiv.innerHTML = parseMarkdown(markdownContent);
+    var isEmpty = markdownContent.trim() === '';
+    
+    if (isEmpty) {
+        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.</div>';
+        previewDiv.classList.add('empty');
+    } else {
+        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        previewDiv.classList.remove('empty');
+    }
+    
     noteEntry.setAttribute('data-markdown-content', markdownContent);
     
     // Use setProperty to override !important rules
