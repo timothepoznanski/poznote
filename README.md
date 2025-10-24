@@ -208,7 +208,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 
 ## Backup / Export and Restore / import
 
-Poznote includes built-in backup (export) and restoration (import) functionality accessible through Settings.
+Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
 **Complete Backup**
 
