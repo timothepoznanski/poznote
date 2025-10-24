@@ -504,61 +504,70 @@ function initializeMarkdownNote(noteId) {
             separatorBtn.style.display = 'none';
         }
         
-        // Check if view mode toggle button already exists, if not create it
-        var existingViewModeBtn = toolbar.querySelector('.markdown-view-mode-btn');
-        if (!existingViewModeBtn) {
-            // Create unified view mode toggle button that cycles through: Edit -> Preview -> Split
-            var viewModeBtn = document.createElement('button');
-            viewModeBtn.type = 'button';
-            viewModeBtn.className = 'toolbar-btn markdown-view-mode-btn note-action-btn';
-            
-            // Determine current view mode and set icon/title
-            var currentMode;
-            if (isSplitViewEnabled) {
-                currentMode = 'split';
-                viewModeBtn.innerHTML = '<i class="fa-columns"></i>';
-                viewModeBtn.title = 'Split view (click to switch to edit mode)';
-                viewModeBtn.classList.add('active');
-            } else if (startInEditMode) {
-                currentMode = 'edit';
-                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
-                viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+        // Check split view setting to adjust tooltips
+        checkSplitViewButtonSetting(function(showSplitViewButton) {
+            // Check if view mode toggle button already exists, if not create it
+            var existingViewModeBtn = toolbar.querySelector('.markdown-view-mode-btn');
+            if (!existingViewModeBtn) {
+                // Create unified view mode toggle button that cycles through: Edit -> Preview -> Split
+                var viewModeBtn = document.createElement('button');
+                viewModeBtn.type = 'button';
+                viewModeBtn.className = 'toolbar-btn markdown-view-mode-btn note-action-btn';
+                
+                // Determine current view mode and set icon/title
+                var currentMode;
+                if (isSplitViewEnabled) {
+                    currentMode = 'split';
+                    viewModeBtn.innerHTML = '<i class="fa-columns"></i>';
+                    viewModeBtn.title = 'Split view (click to switch to edit mode)';
+                    viewModeBtn.classList.add('active');
+                } else if (startInEditMode) {
+                    currentMode = 'edit';
+                    viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                    viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+                } else {
+                    currentMode = 'preview';
+                    viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                    // Tooltip depends on whether split view is available
+                    viewModeBtn.title = showSplitViewButton ? 
+                        'Preview mode (click to switch to split view)' : 
+                        'Preview mode (click to switch to edit mode)';
+                }
+                
+                viewModeBtn.setAttribute('data-current-mode', currentMode);
+                
+                viewModeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cycleMarkdownViewMode(noteId);
+                };
+                
+                toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
             } else {
-                currentMode = 'preview';
-                viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-                viewModeBtn.title = 'Preview mode (click to switch to edit mode)';
+                // Update existing button based on current state
+                var currentMode;
+                if (isSplitViewEnabled) {
+                    currentMode = 'split';
+                    existingViewModeBtn.innerHTML = '<i class="fa-columns"></i>';
+                    existingViewModeBtn.title = 'Split view (click to switch to edit mode)';
+                    existingViewModeBtn.classList.add('active');
+                } else if (startInEditMode) {
+                    currentMode = 'edit';
+                    existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                    existingViewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+                    existingViewModeBtn.classList.remove('active');
+                } else {
+                    currentMode = 'preview';
+                    existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                    // Tooltip depends on whether split view is available
+                    existingViewModeBtn.title = showSplitViewButton ? 
+                        'Preview mode (click to switch to split view)' : 
+                        'Preview mode (click to switch to edit mode)';
+                    existingViewModeBtn.classList.remove('active');
+                }
+                existingViewModeBtn.setAttribute('data-current-mode', currentMode);
             }
-            
-            viewModeBtn.setAttribute('data-current-mode', currentMode);
-            
-            viewModeBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                cycleMarkdownViewMode(noteId);
-            };
-            
-            toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
-        } else {
-            // Update existing button based on current state
-            var currentMode;
-            if (isSplitViewEnabled) {
-                currentMode = 'split';
-                existingViewModeBtn.innerHTML = '<i class="fa-columns"></i>';
-                existingViewModeBtn.title = 'Split view (click to switch to edit mode)';
-                existingViewModeBtn.classList.add('active');
-            } else if (startInEditMode) {
-                currentMode = 'edit';
-                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
-                existingViewModeBtn.title = 'Edit mode (click to switch to preview mode)';
-                existingViewModeBtn.classList.remove('active');
-            } else {
-                currentMode = 'preview';
-                existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-                existingViewModeBtn.title = 'Preview mode (click to switch to edit mode)';
-                existingViewModeBtn.classList.remove('active');
-            }
-            existingViewModeBtn.setAttribute('data-current-mode', currentMode);
-        }
+        });
     }
     
     // Setup event listeners for the editor
@@ -932,7 +941,12 @@ function updateViewModeButton(noteId, mode) {
         viewModeBtn.classList.remove('active');
     } else if (mode === 'preview') {
         viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-        viewModeBtn.title = 'Preview mode (click to switch to split view)';
+        // Check if split view is available to set appropriate tooltip
+        checkSplitViewButtonSetting(function(showSplitViewButton) {
+            viewModeBtn.title = showSplitViewButton ? 
+                'Preview mode (click to switch to split view)' : 
+                'Preview mode (click to switch to edit mode)';
+        });
         viewModeBtn.classList.remove('active');
     } else if (mode === 'split') {
         viewModeBtn.innerHTML = '<i class="fa-columns"></i>';
