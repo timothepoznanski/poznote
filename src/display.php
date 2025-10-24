@@ -56,7 +56,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa fa-sun"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Theme Mode (experimental) <span id="theme-mode-badge" class="setting-status">light mode</span></h3>
+                    <h3>Theme Mode <span id="theme-mode-badge" class="setting-status">light mode</span></h3>
                 </div>
             </div>
 
@@ -66,7 +66,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-user"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Login Display Name <span id="login-display-badge" class="setting-status">loading...</span></h3>
+                    <h3>Login Display <span id="login-display-badge" class="setting-status">loading...</span></h3>
                 </div>
             </div>
 
@@ -124,7 +124,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <div class="settings-card" id="show-split-view-btn-card">
                 <div class="settings-card-icon"><i class="fa-columns"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Markdown Split View Button <span id="show-split-view-btn-status" class="setting-status enabled">enabled</span></h3>
+                    <h3>Show Markdown Split View<span id="show-split-view-btn-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
