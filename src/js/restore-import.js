@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hideImportConfirmation();
             hideNotesImportConfirmation();
             hideAttachmentsImportConfirmation();
+            hideIndividualNotesImportConfirmation();
             hideCompleteRestoreConfirmation();
             hideCustomAlert();
         }
@@ -141,6 +142,36 @@ function proceedWithAttachmentsImport() {
     );
     if (attachmentsForm) {
         attachmentsForm.submit();
+    }
+}
+
+// Individual Notes Import Functions
+function showIndividualNotesImportConfirmation() {
+    const fileInput = document.getElementById('individual_notes_files');
+    
+    if (!fileInput.files.length) {
+        showCustomAlert('No Files Selected', 'Please select one or more HTML or Markdown files before proceeding with the import.');
+        return;
+    }
+    
+    // Update summary text
+    const fileCount = fileInput.files.length;
+    const fileText = fileCount === 1 ? '1 note' : `${fileCount} notes`;
+    const summary = `This will import ${fileText} into the Default folder of the Poznote workspace.`;
+    document.getElementById('individualNotesImportSummary').textContent = summary;
+    
+    document.getElementById('individualNotesImportConfirmModal').style.display = 'flex';
+}
+
+function hideIndividualNotesImportConfirmation() {
+    document.getElementById('individualNotesImportConfirmModal').style.display = 'none';
+}
+
+function proceedWithIndividualNotesImport() {
+    const form = document.getElementById('individualNotesForm');
+    if (form) {
+        hideIndividualNotesImportConfirmation();
+        form.submit();
     }
 }
 

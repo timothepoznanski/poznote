@@ -20,6 +20,8 @@ $import_notes_message = '';
 $import_notes_error = '';
 $import_attachments_message = '';
 $import_attachments_error = '';
+$import_individual_notes_message = '';
+$import_individual_notes_error = '';
 
 // Process actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -75,6 +77,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 $import_attachments_error = "No attachments file selected or upload error.";
+            }
+            break;
+            
+        case 'import_individual_notes':
+            if (isset($_FILES['individual_notes_files']) && !empty($_FILES['individual_notes_files']['name'][0])) {
+                $workspace = $_POST['target_workspace'] ?? 'Poznote';
+                $folder = $_POST['target_folder'] ?? 'Default';
+                $result = importIndividualNotes($_FILES['individual_notes_files'], $workspace, $folder);
+                if ($result['success']) {
+                    $import_individual_notes_message = "Notes imported successfully! " . $result['message'];
+                } else {
+                    $import_individual_notes_error = "Import error: " . $result['error'];
+                }
+            } else {
+                $import_individual_notes_error = "No notes selected or upload error.";
             }
             break;
     }
@@ -459,6 +476,145 @@ function importAttachmentsZip($uploadedFile) {
     
     return ['success' => true, 'message' => "Imported {$importedCount} attachment files."];
 }
+
+function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = 'Default') {
+    global $con;
+    
+    // Validate workspace exists
+    $stmt = $con->prepare("SELECT name FROM workspaces WHERE name = ?");
+    $stmt->execute([$workspace]);
+    if (!$stmt->fetch()) {
+        return ['success' => false, 'error' => 'Workspace does not exist'];
+    }
+    
+    $entriesPath = getEntriesPath();
+    if (!$entriesPath || !is_dir($entriesPath)) {
+        return ['success' => false, 'error' => 'Cannot find entries directory'];
+    }
+    
+    $importedCount = 0;
+    $errorCount = 0;
+    $errors = [];
+    
+    // Handle multiple file uploads
+    $fileCount = count($uploadedFiles['name']);
+    
+    for ($i = 0; $i < $fileCount; $i++) {
+        // Skip if there was an upload error
+        if ($uploadedFiles['error'][$i] !== UPLOAD_ERR_OK) {
+            $errorCount++;
+            $errors[] = $uploadedFiles['name'][$i] . ': Upload error';
+            continue;
+        }
+        
+        $fileName = $uploadedFiles['name'][$i];
+        $tmpName = $uploadedFiles['tmp_name'][$i];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Validate file type
+        if (!in_array($fileExtension, ['html', 'md', 'markdown'])) {
+            $errorCount++;
+            $errors[] = $fileName . ': Invalid file type (only .html, .md, .markdown allowed)';
+            continue;
+        }
+        
+        // Read file content
+        $content = file_get_contents($tmpName);
+        if ($content === false) {
+            $errorCount++;
+            $errors[] = $fileName . ': Cannot read file';
+            continue;
+        }
+        
+        // Determine note type based on file extension
+        $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
+        
+        // Extract title from filename (without extension)
+        $title = pathinfo($fileName, PATHINFO_FILENAME);
+        
+        // For markdown files, try to extract title from first line if it's a heading
+        if ($noteType === 'markdown') {
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (preg_match('/^#\s+(.+)$/', $line, $matches)) {
+                    $title = trim($matches[1]);
+                    break;
+                } elseif (!empty($line) && $line[0] !== '#') {
+                    // Stop at first non-heading, non-empty line
+                    break;
+                }
+            }
+        } else {
+            // For HTML files, try to extract title from <title> or <h1> tags
+            if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $content, $matches)) {
+                $extractedTitle = trim(strip_tags($matches[1]));
+                if (!empty($extractedTitle)) {
+                    $title = $extractedTitle;
+                }
+            } elseif (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $content, $matches)) {
+                $extractedTitle = trim(strip_tags($matches[1]));
+                if (!empty($extractedTitle)) {
+                    $title = $extractedTitle;
+                }
+            }
+        }
+        
+        // Sanitize title
+        $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        if (empty($title)) {
+            $title = 'Imported Note ' . date('Y-m-d H:i:s');
+        }
+        
+        try {
+            // Insert note into database
+            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, datetime('now'), datetime('now'))");
+            $stmt->execute([$title, $folder, $workspace, $noteType]);
+            $noteId = $con->lastInsertId();
+            
+            // Save content to file
+            $noteFile = $entriesPath . '/' . $noteId . '.html';
+            if ($noteType === 'markdown') {
+                // For markdown notes, wrap content in basic structure if needed
+                $wrappedContent = $content;
+            } else {
+                // For HTML notes, ensure it's properly formatted
+                if (stripos($content, '<html') === false) {
+                    // Wrap in basic HTML structure if not present
+                    $wrappedContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<title>" . htmlspecialchars($title, ENT_QUOTES) . "</title>\n</head>\n<body>\n" . $content . "\n</body>\n</html>";
+                } else {
+                    $wrappedContent = $content;
+                }
+            }
+            
+            if (file_put_contents($noteFile, $wrappedContent) !== false) {
+                chmod($noteFile, 0644);
+                $importedCount++;
+            } else {
+                $errorCount++;
+                $errors[] = $fileName . ': Cannot write file';
+                // Delete the database entry if file creation failed
+                $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+                $stmt->execute([$noteId]);
+            }
+            
+        } catch (Exception $e) {
+            $errorCount++;
+            $errors[] = $fileName . ': ' . $e->getMessage();
+        }
+    }
+    
+    $message = "Imported {$importedCount} note(s) into workspace '{$workspace}', folder '{$folder}'.";
+    if ($errorCount > 0) {
+        $message .= " {$errorCount} error(s): " . implode('; ', $errors);
+    }
+    
+    return [
+        'success' => $importedCount > 0,
+        'message' => $message,
+        'error' => $errorCount > 0 ? implode('; ', $errors) : ''
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -519,6 +675,40 @@ function importAttachmentsZip($uploadedFile) {
                     <span class="sr-only">Processing restore...</span>
                     <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
                 </div>
+            </form>
+        </div>
+        
+        <!-- Individual Notes Import Section -->
+        <div class="backup-section">
+            <h3>Import Individual Notes</h3>
+            <p>Import one or more HTML or Markdown notes. <br><br>Notes will be imported into the <b>Default</b> folder of the <b>Poznote</b> workspace.</p>
+            
+            <?php if ($import_individual_notes_message): ?>
+                <div class="alert alert-success">
+                    <?php echo htmlspecialchars($import_individual_notes_message); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($import_individual_notes_error): ?>
+                <div class="alert alert-danger">
+                    <?php echo htmlspecialchars($import_individual_notes_error); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="post" enctype="multipart/form-data" id="individualNotesForm">
+                <input type="hidden" name="action" value="import_individual_notes">
+                <input type="hidden" name="target_workspace" value="Poznote">
+                <input type="hidden" name="target_folder" value="Default">
+                
+                <div class="form-group">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
+                    <small class="form-text text-muted">You can select multiple files at once. Supported formats: .html, .md, .markdown</small>
+                </div>
+                <br>
+                
+                <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()">
+                    Import Notes
+                </button>
             </form>
         </div>
         
@@ -594,6 +784,23 @@ function importAttachmentsZip($uploadedFile) {
         </div>
     </div>
 
+    <!-- Individual Notes Import Confirmation Modal -->
+    <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Import Individual Notes?</h3>
+            <p id="individualNotesImportSummary">This will import the selected notes into the specified workspace and folder.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithIndividualNotesImport()">
+                    Yes, Import Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Alert Modal -->
     <div id="customAlert" class="custom-alert">
         <div class="custom-alert-content">
@@ -614,7 +821,8 @@ function importAttachmentsZip($uploadedFile) {
 (function(){ try {
     var stored = localStorage.getItem('poznote_selected_workspace');
     if (stored && stored !== 'Poznote') {
-        var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        var a = document.getElementById('backToNotesLink'); 
+        if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
     }
 } catch(e){} })();
 </script>
