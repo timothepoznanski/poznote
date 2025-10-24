@@ -206,7 +206,7 @@ cd poznote && docker compose down && docker rmi ghcr.io/timothepoznanski/poznote
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
 
-## Backup / Export and Restore / import
+## Backup / Export and Restore / Import
 
 Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
