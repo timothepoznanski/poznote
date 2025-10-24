@@ -1940,7 +1940,7 @@ pre.code-block,
     position: relative;
 }
 
-/* S'assurer que les blocs de code ont les bonnes marges même sans wrapper */
+/* Ensure code blocks have the correct margins even without a wrapper */
 .code-block, pre.code-block, .noteentry pre {
     margin: 0 !important;
     padding: 30px 30px !important;
@@ -1953,7 +1953,7 @@ pre.code-block,
     box-sizing: border-box;
 }
 
-/* Icône de copie pour les blocs de code */
+/* Copy icon for code blocks */
 .code-block-copy-btn,
 pre.code-block .code-block-copy-btn,
 .noteentry pre .code-block-copy-btn {
@@ -1969,18 +1969,12 @@ pre.code-block .code-block-copy-btn,
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.2s ease, background 0.15s ease, transform 0.1s ease;
     z-index: 10;
     padding: 0;
     font-size: 14px;
     color: #586069;
-}
-
-.code-block:hover .code-block-copy-btn,
-pre.code-block:hover .code-block-copy-btn,
-.noteentry pre:hover .code-block-copy-btn {
-    opacity: 1;
 }
 
 .code-block-copy-btn:hover {

@@ -14,7 +14,7 @@
         <div class="update-buttons-container">
             <div class="update-instructions-buttons">
                 <button type="button" class="btn-update" onclick="goToSelfHostedUpdateInstructions()">Self-Hosted Instructions</button>
-                <button type="button" class="btn-update" onclick="goToCloudUpdateInstructions()">Cloud/Railway Instructions</button>
+                <button type="button" class="btn-update" onclick="goToCloudUpdateInstructions()">Cloud Instructions</button>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Close</button>

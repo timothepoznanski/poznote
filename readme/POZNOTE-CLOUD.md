@@ -5,7 +5,7 @@ This guide will help you **install and manage** Poznote on cloud platforms witho
 ## Table of Contents
 
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
-  - [Poznote Installation on Railway](#poznote-installation-on-railway)
+  - [Installation on Railway](#poznote-installation-on-railway)
   - [Access](#access)
   - [Get Your Instance URL](#get-your-instance-url)
   - [Change Settings](#change-settings)
@@ -25,7 +25,7 @@ Railway.com offers the easiest way to install Poznote in the cloud. The platform
 - One-click updates
 - No infrastructure management
 
-### Poznote Installation on Railway
+### Installation on Railway
 
 Create a Railway account at [Railway.com](https://railway.com) and choose the **$5/month plan**.
 
@@ -39,7 +39,7 @@ Click the button below to start the deployment:
 
 > 💡 **Tip:** You can export your notes anytime from the Poznote interface if you ever decide to leave Railway, switch providers, or back up your data.
 
-### Poznote Access
+### Access
 
 After deployment is complete:
 
@@ -71,7 +71,7 @@ Your instance URL will look like: `https://poznote-production-xxxx.up.railway.ap
 
 Your instance URL will look like: `https://poznote-production-xxxx.up.railway.app` but you can change it. See the [deployment tutorial video](https://youtu.be/RkN0-v8sz2w) to see how to. 
 
-### Change Poznote Settings
+### Change Settings
 
 To change your username or password on Railway, watch this video tutorial that shows you step by step how to change your settings:
 
@@ -79,7 +79,7 @@ To change your username or password on Railway, watch this video tutorial that s
 
 > 📝 **Note:** Unlike self-hosted installations, you cannot change the port.
 
-### Poznote Password Recovery
+### Password Recovery
 
 If you forgot your password, you can retrieve it from Railway:
 
@@ -87,7 +87,7 @@ Watch this video tutorial:
 
 **[Retrieve Your Password on Railway](https://youtu.be/_h5pP7LreZc)**
 
-### Update Poznote to the latest version
+### Update to the latest version
 
 To update your Poznote instance to the latest version:
 

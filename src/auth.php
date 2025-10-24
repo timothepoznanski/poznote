@@ -97,7 +97,7 @@ function requireApiAuth() {
     }
     
     // Validate credentials
-    if (!authenticate($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])) {
+    if ($_SERVER['PHP_AUTH_USER'] !== AUTH_USERNAME || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
         echo json_encode(['error' => 'Invalid credentials']);
