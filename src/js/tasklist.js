@@ -473,23 +473,23 @@ function enableDragAndDrop(noteId) {
         }
     }
 
-    // If Sortable is present, use it; otherwise load from CDN then init
+    // If Sortable is present, use it; otherwise load from local file then init
     if (typeof Sortable !== 'undefined') {
         initSortable();
         return;
     }
 
-    // Load SortableJS from CDN as a progressive enhancement
-    const existingScript = document.querySelector('script[data-sortable-cdn]');
+    // Load SortableJS from local file as a progressive enhancement
+    const existingScript = document.querySelector('script[data-sortable-local]');
     if (!existingScript) {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+        script.src = 'js/Sortable.min.js';
         script.async = true;
-        script.setAttribute('data-sortable-cdn', '1');
+        script.setAttribute('data-sortable-local', '1');
         script.onload = function() { initSortable(); };
         script.onerror = function() {
-            // If CDN fails, fall back to HTML5 implementation below
-            try { console.warn('tasklist: SortableJS CDN failed, falling back to HTML5 DnD'); } catch(e){}
+            // If local file fails, fall back to HTML5 implementation below
+            try { console.warn('tasklist: SortableJS local file failed, falling back to HTML5 DnD'); } catch(e){}
             // continue to HTML5 fallback
             attachHTML5Handlers();
         };
