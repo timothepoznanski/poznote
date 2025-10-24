@@ -106,13 +106,75 @@ $v = '20251021.1';
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip1.png" alt="Search across multiple tags" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
-                <div class="tip-item"><i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.</div>
-                <div class="tip-item"><i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.</div>
-                <div class="tip-item"><i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.</div>
-                <div class="tip-item"><i class="fa-smile"></i> Add emojis to note titles using Ctrl + ; on Windows.</div>
-                <div class="tip-item"><i class="fa-arrows-h"></i> Resize the left sidebar by dragging its border.</div>
-                <div class="tip-item"><i class="fa-layer-group"></i> Create separate workspaces and transfer notes between them.</div>
-                <div class="tip-item"><i class="fa-sort"></i> Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.</div>
+                <div class="tip-item">
+                    <i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip9.png" alt="Generate public links" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip10.png" alt="Public link access" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip11.png" alt="Drag notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip13.png" alt="Export backup" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip14.png" alt="Offline browsing" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-smile"></i> Add emojis to note titles using Ctrl + ; on Windows.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip15.png" alt="Add emojis" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-arrows-h"></i> Resize the left sidebar by dragging its border.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip16.png" alt="Resize sidebar" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-layer-group"></i> Create separate workspaces.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip17.png" alt="Create workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip18.png" alt="Separate workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-layer-group"></i> Transfer notes one by one or all at a time between workspaces.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip19.png" alt="Transfer notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip20.png" alt="Transfer notes between workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip21.png" alt="Transfer all notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-sort"></i> Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip22.png" alt="Toggle markdown preview" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip23.png" alt="Markdown toolbar buttons" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip24.png" alt="Preview edit buttons" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
             </div>
         </div>
     </div>
