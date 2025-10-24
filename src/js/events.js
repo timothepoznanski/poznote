@@ -550,6 +550,51 @@ function setupLinkEvents() {
                     if (typeof updateNote === 'function') {
                         updateNote();
                     }
+                    return;
+                }
+                
+                // Detect if this is a URL being pasted
+                if (plainText && !htmlData) {
+                    var trimmedText = plainText.trim();
+                    // Check if the pasted text is a valid URL (http/https/ftp)
+                    var urlRegex = /^(https?:\/\/|ftp:\/\/)[^\s]+$/i;
+                    
+                    if (urlRegex.test(trimmedText)) {
+                        e.preventDefault();
+                        
+                        // Create a clickable link element
+                        var link = document.createElement('a');
+                        link.href = trimmedText;
+                        link.textContent = trimmedText;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        
+                        // Insert the link at cursor position
+                        var selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            var range = selection.getRangeAt(0);
+                            range.deleteContents();
+                            
+                            // Insert the link element
+                            range.insertNode(link);
+                            
+                            // Add a space after for easier editing
+                            var space = document.createTextNode(' ');
+                            range.setStartAfter(link);
+                            range.insertNode(space);
+                            
+                            // Move cursor after the inserted link
+                            range.setStartAfter(space);
+                            range.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                        
+                        // Trigger update
+                        if (typeof updateNote === 'function') {
+                            updateNote();
+                        }
+                    }
                 }
             }
         } catch (err) {
