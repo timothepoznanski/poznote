@@ -184,6 +184,18 @@ $v = '20251021.1';
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip25.png" alt="Mobile swipe navigation" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
+                <div class="tip-item">
+                    <i class="fa-file-import"></i> Import existing HTML and Markdown notes directly into Poznote.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip26.png" alt="Import existing notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div class="tip-item">
+                    <i class="fa-code"></i> Copy code from VSCode and paste it into an HTML note to automatically create a code block. You can also highlight, bold, italicize, underline, and colorize text within the code block.
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip27.png" alt="VSCode code paste with formatting" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
             </div>
         </div>
     </div>
