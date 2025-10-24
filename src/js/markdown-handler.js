@@ -1,6 +1,25 @@
 // Markdown handler for Poznote
 // Simple markdown parser and renderer
 
+// Helper function to check if split view button should be shown
+function checkSplitViewButtonSetting(callback) {
+    var form = new FormData();
+    form.append('action', 'get');
+    form.append('key', 'show_markdown_split_view_button');
+    
+    fetch('api_settings.php', {method: 'POST', body: form})
+        .then(r => r.json())
+        .then(j => {
+            // Default to enabled (true) if setting not found or is '1'
+            var enabled = !j || !j.success || j.value === '1' || j.value === 'true' || j.value === null;
+            callback(enabled);
+        })
+        .catch(() => {
+            // Default to enabled on error
+            callback(true);
+        });
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -402,17 +421,54 @@ function initializeMarkdownNote(noteId) {
     var isMobile = window.innerWidth <= 800;
     var isSplitViewEnabled = document.body.classList.contains('markdown-split-view-enabled') && !isMobile;
     
-    // Determine initial mode: 
-    // - Split view: show both editor and preview
-    // - Regular mode: preview if content exists, edit if empty
-    // - Mobile: always start in edit mode
+    // Try to restore saved view mode (global for all notes)
+    var savedMode = null;
+    try {
+        savedMode = localStorage.getItem('poznote-markdown-view-mode');
+    } catch (e) {
+        console.warn('Could not read view mode from localStorage:', e);
+    }
+    
+    // Determine initial mode:
+    // 1. If saved mode exists, use it (unless it's split and we're on mobile)
+    // 2. Otherwise: split view if enabled, preview if content exists, edit if empty
+    // 3. Mobile: always start in edit mode
     var isEmpty = markdownContent.trim() === '';
-    var startInEditMode = isMobile || (isEmpty && !isSplitViewEnabled);
+    var startInEditMode;
+    
+    if (savedMode && !isMobile) {
+        if (savedMode === 'split') {
+            isSplitViewEnabled = true;
+            document.body.classList.add('markdown-split-view-enabled');
+            startInEditMode = false;
+        } else if (savedMode === 'edit') {
+            isSplitViewEnabled = false;
+            document.body.classList.remove('markdown-split-view-enabled');
+            startInEditMode = true;
+        } else { // preview
+            isSplitViewEnabled = false;
+            document.body.classList.remove('markdown-split-view-enabled');
+            startInEditMode = false;
+        }
+    } else {
+        startInEditMode = isMobile || (isEmpty && !isSplitViewEnabled);
+    }
     
     // Create preview and editor containers
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
-    previewDiv.innerHTML = parseMarkdown(markdownContent);
+    // Set preview content or placeholder if empty
+    if (isEmpty) {
+        if (isSplitViewEnabled) {
+            previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here...</div>';
+        } else {
+            previewDiv.innerHTML = '<div class="markdown-preview-placeholder">You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.</div>';
+        }
+        previewDiv.classList.add('empty');
+    } else {
+        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        previewDiv.classList.remove('empty');
+    }
     
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
@@ -448,69 +504,70 @@ function initializeMarkdownNote(noteId) {
             separatorBtn.style.display = 'none';
         }
         
-        // Check if split view button already exists, if not create it
-        var existingSplitViewBtn = toolbar.querySelector('.markdown-split-view-btn');
-        if (!existingSplitViewBtn) {
-            // Split view toggle button (columns icon) - always visible for markdown notes
-            var splitViewBtn = document.createElement('button');
-            splitViewBtn.type = 'button';
-            splitViewBtn.className = 'toolbar-btn markdown-split-view-btn note-action-btn';
-            splitViewBtn.innerHTML = '<i class="fa-columns"></i>';
-            // Set title based on current state
-            splitViewBtn.title = isSplitViewEnabled ? 'Disable split view' : 'Enable split view';
-            // Add active class if split view is enabled
-            if (isSplitViewEnabled) {
-                splitViewBtn.classList.add('active');
-            }
-            splitViewBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleMarkdownSplitView(noteId);
-            };
-            toolbar.insertBefore(splitViewBtn, toolbar.firstChild);
-        } else {
-            // Update existing button's active state and title
-            if (isSplitViewEnabled) {
-                existingSplitViewBtn.classList.add('active');
-                existingSplitViewBtn.title = 'Disable split view';
+        // Check split view setting to adjust tooltips
+        checkSplitViewButtonSetting(function(showSplitViewButton) {
+            // Check if view mode toggle button already exists, if not create it
+            var existingViewModeBtn = toolbar.querySelector('.markdown-view-mode-btn');
+            if (!existingViewModeBtn) {
+                // Create unified view mode toggle button that cycles through: Edit -> Preview -> Split
+                var viewModeBtn = document.createElement('button');
+                viewModeBtn.type = 'button';
+                viewModeBtn.className = 'toolbar-btn markdown-view-mode-btn note-action-btn';
+                
+                // Determine current view mode and set icon/title
+                var currentMode;
+                if (isSplitViewEnabled) {
+                    currentMode = 'split';
+                    viewModeBtn.innerHTML = '<i class="fa-columns"></i>';
+                    viewModeBtn.title = 'Split view (click to switch to edit mode)';
+                    viewModeBtn.classList.add('active');
+                } else if (startInEditMode) {
+                    currentMode = 'edit';
+                    viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                    viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+                } else {
+                    currentMode = 'preview';
+                    viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                    // Tooltip depends on whether split view is available
+                    viewModeBtn.title = showSplitViewButton ? 
+                        'Preview mode (click to switch to split view)' : 
+                        'Preview mode (click to switch to edit mode)';
+                }
+                
+                viewModeBtn.setAttribute('data-current-mode', currentMode);
+                
+                viewModeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cycleMarkdownViewMode(noteId);
+                };
+                
+                toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
             } else {
-                existingSplitViewBtn.classList.remove('active');
-                existingSplitViewBtn.title = 'Enable split view';
+                // Update existing button based on current state
+                var currentMode;
+                if (isSplitViewEnabled) {
+                    currentMode = 'split';
+                    existingViewModeBtn.innerHTML = '<i class="fa-columns"></i>';
+                    existingViewModeBtn.title = 'Split view (click to switch to edit mode)';
+                    existingViewModeBtn.classList.add('active');
+                } else if (startInEditMode) {
+                    currentMode = 'edit';
+                    existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                    existingViewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+                    existingViewModeBtn.classList.remove('active');
+                } else {
+                    currentMode = 'preview';
+                    existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                    // Tooltip depends on whether split view is available
+                    existingViewModeBtn.title = showSplitViewButton ? 
+                        'Preview mode (click to switch to split view)' : 
+                        'Preview mode (click to switch to edit mode)';
+                    existingViewModeBtn.classList.remove('active');
+                }
+                existingViewModeBtn.setAttribute('data-current-mode', currentMode);
             }
-        }
-        
-        // Edit and preview buttons (only if not in split view OR if on mobile)
-        if (!isSplitViewEnabled || isMobile) {
-            // Edit button (markdown icon) - hidden in edit mode, visible in preview mode
-            var editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.className = 'toolbar-btn markdown-edit-btn note-action-btn';
-            editBtn.innerHTML = '<i class="fa-markdown"></i>';
-            editBtn.title = 'Edit markdown';
-            // Hide edit button if we're starting in edit mode
-            editBtn.style.display = startInEditMode ? 'none' : '';
-            editBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                switchToEditMode(noteId);
-            };
-            toolbar.insertBefore(editBtn, toolbar.firstChild);
-            
-            // Preview button (eye icon) - visible in edit mode, hidden in preview mode
-            var previewBtn = document.createElement('button');
-            previewBtn.type = 'button';
-            previewBtn.className = 'toolbar-btn markdown-preview-btn note-action-btn';
-            previewBtn.innerHTML = '<i class="fa-eye"></i>';
-            previewBtn.title = 'Preview markdown';
-            // Show preview button if we're starting in edit mode
-            previewBtn.style.display = startInEditMode ? '' : 'none';
-            previewBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                switchToPreviewMode(noteId);
-            };
-            toolbar.insertBefore(previewBtn, toolbar.firstChild);
-        }
+        });
     }
     
     // Setup event listeners for the editor
@@ -552,9 +609,12 @@ function switchToEditMode(noteId) {
     // Focus disabled - don't automatically focus when switching to edit mode
     // editorDiv.focus();
     
-    // Show preview button, hide edit button
+    // Show preview button, hide edit button (legacy support)
     if (editBtn) editBtn.style.display = 'none';
     if (previewBtn) previewBtn.style.display = '';
+    
+    // Update view mode button
+    updateViewModeButton(noteId, 'edit');
 }
 
 function switchToPreviewMode(noteId) {
@@ -571,16 +631,28 @@ function switchToPreviewMode(noteId) {
     // Switch to preview mode
     // Use helper function to properly normalize content
     var markdownContent = normalizeContentEditableText(editorDiv);
-    previewDiv.innerHTML = parseMarkdown(markdownContent);
+    var isEmpty = markdownContent.trim() === '';
+    
+    if (isEmpty) {
+        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.</div>';
+        previewDiv.classList.add('empty');
+    } else {
+        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        previewDiv.classList.remove('empty');
+    }
+    
     noteEntry.setAttribute('data-markdown-content', markdownContent);
     
     // Use setProperty to override !important rules
     editorDiv.style.setProperty('display', 'none', 'important');
     previewDiv.style.setProperty('display', 'block', 'important');
     
-    // Show edit button, hide preview button
+    // Show edit button, hide preview button (legacy support)
     if (editBtn) editBtn.style.display = '';
     if (previewBtn) previewBtn.style.display = 'none';
+    
+    // Update view mode button
+    updateViewModeButton(noteId, 'preview');
     
     // Check if content has actually changed before triggering save
     var previousContent = noteEntry.getAttribute('data-markdown-content') || '';
@@ -660,7 +732,13 @@ function setupMarkdownEditorListeners(noteId) {
         
         // In split view mode, update preview in real-time
         if (currentSplitViewEnabled && previewDiv) {
-            previewDiv.innerHTML = parseMarkdown(content);
+            if (content.trim() === '') {
+                previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here...</div>';
+                previewDiv.classList.add('empty');
+            } else {
+                previewDiv.innerHTML = parseMarkdown(content);
+                previewDiv.classList.remove('empty');
+            }
         }
         
         // Make sure noteid is set
@@ -690,70 +768,196 @@ function getMarkdownContent(noteId) {
     return noteEntry.getAttribute('data-markdown-content') || '';
 }
 
-// Toggle markdown split view
-function toggleMarkdownSplitView(noteId) {
-    // Get current state
-    var form = new FormData();
-    form.append('action', 'get');
-    form.append('key', 'markdown_split_view_enabled');
+// Cycle through markdown view modes: Edit -> Preview -> Split -> Edit...
+function cycleMarkdownViewMode(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
     
-    fetch('api_settings.php', {method: 'POST', body: form})
-        .then(r => r.json())
-        .then(j => {
-            // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-            var currently = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-            // Only disable if explicitly set to '0' or 'false'
-            if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                currently = false;
+    var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+    if (!viewModeBtn) return;
+    
+    var isMobile = window.innerWidth <= 800;
+    var isSplitViewEnabled = document.body.classList.contains('markdown-split-view-enabled') && !isMobile;
+    
+    // Detect current mode from actual UI state
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+    var currentMode;
+    
+    if (isSplitViewEnabled) {
+        currentMode = 'split';
+    } else if (editorDiv && editorDiv.style.display !== 'none') {
+        currentMode = 'edit';
+    } else {
+        currentMode = 'preview';
+    }
+    
+    var nextMode;
+    
+    // Check if split view button is enabled
+    checkSplitViewButtonSetting(function(showSplitViewButton) {
+        // Determine next mode based on current mode
+        // Cycle: Edit -> Preview -> Split -> Edit... (or Edit -> Preview -> Edit if split is disabled)
+        if (currentMode === 'edit') {
+            nextMode = 'preview';
+        } else if (currentMode === 'preview') {
+            // Skip split if button is disabled or on mobile
+            if (!showSplitViewButton || isMobile) {
+                nextMode = 'edit';
+            } else {
+                nextMode = 'split';
             }
-            
-            // Toggle the state
-            var toSet = currently ? '0' : '1';
+        } else { // split
+            nextMode = 'edit';
+        }
+        
+        // Continue with the mode change
+        applyViewModeChange(noteId, noteEntry, nextMode, isSplitViewEnabled);
+    });
+}
+
+// Helper function to apply the view mode change
+function applyViewModeChange(noteId, noteEntry, nextMode, isSplitViewEnabled) {
+    
+    // Save mode to localStorage (global for all notes)
+    try {
+        localStorage.setItem('poznote-markdown-view-mode', nextMode);
+    } catch (e) {
+        console.warn('Could not save view mode to localStorage:', e);
+    }
+    
+    // Apply the view mode change - Simple and direct
+    if (nextMode === 'edit') {
+        // Switch to edit mode
+        if (isSplitViewEnabled) {
+            // Disable split view first
             var setForm = new FormData();
             setForm.append('action', 'set');
             setForm.append('key', 'markdown_split_view_enabled');
-            setForm.append('value', toSet);
+            setForm.append('value', '0');
             
-            return fetch('api_settings.php', {method: 'POST', body: setForm});
-        })
-        .then(function() {
-            // Reload the state from database
-            var form = new FormData();
-            form.append('action', 'get');
-            form.append('key', 'markdown_split_view_enabled');
+            fetch('api_settings.php', {method: 'POST', body: setForm})
+                .then(() => {
+                    document.body.classList.remove('markdown-split-view-enabled');
+                    switchToEditMode(noteId);
+                    updateViewModeButton(noteId, 'edit');
+                })
+                .catch(e => console.error('Error disabling split view:', e));
+        } else {
+            switchToEditMode(noteId);
+            updateViewModeButton(noteId, 'edit');
+        }
+    } else if (nextMode === 'preview') {
+        // Switch to preview mode
+        if (isSplitViewEnabled) {
+            // Disable split view first
+            var setForm = new FormData();
+            setForm.append('action', 'set');
+            setForm.append('key', 'markdown_split_view_enabled');
+            setForm.append('value', '0');
             
-            return fetch('api_settings.php', {method: 'POST', body: form});
-        })
-        .then(r => r.json())
-        .then(j => {
-            // Get the new state
-            var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-            if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                enabled = false;
-            }
-            
-            // Update body class
-            document.body.classList.toggle('markdown-split-view-enabled', enabled);
-            
-            // Re-initialize the note to apply the new state
-            var noteEntry = document.getElementById('entry' + noteId);
-            if (noteEntry && typeof window.initializeMarkdownNote === 'function') {
-                // Clear existing markdown setup
-                noteEntry.querySelector('.markdown-editor')?.remove();
-                noteEntry.querySelector('.markdown-preview')?.remove();
-                
-                // Remove existing toolbar buttons (except split view button which will be updated)
-                var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
-                if (toolbar) {
-                    toolbar.querySelector('.markdown-edit-btn')?.remove();
-                    toolbar.querySelector('.markdown-preview-btn')?.remove();
-                    // Don't remove split view button - it will be updated by initializeMarkdownNote
+            fetch('api_settings.php', {method: 'POST', body: setForm})
+                .then(() => {
+                    document.body.classList.remove('markdown-split-view-enabled');
+                    switchToPreviewMode(noteId);
+                    updateViewModeButton(noteId, 'preview');
+                })
+                .catch(e => console.error('Error disabling split view:', e));
+        } else {
+            switchToPreviewMode(noteId);
+            updateViewModeButton(noteId, 'preview');
+        }
+    } else if (nextMode === 'split') {
+        // Enable split view
+        var setForm = new FormData();
+        setForm.append('action', 'set');
+        setForm.append('key', 'markdown_split_view_enabled');
+        setForm.append('value', '1');
+        
+        fetch('api_settings.php', {method: 'POST', body: setForm})
+            .then(() => {
+                document.body.classList.add('markdown-split-view-enabled');
+                // Show both editor and preview
+                var editorDiv = noteEntry.querySelector('.markdown-editor');
+                var previewDiv = noteEntry.querySelector('.markdown-preview');
+                if (editorDiv && previewDiv) {
+                    editorDiv.style.setProperty('display', 'block', 'important');
+                    previewDiv.style.setProperty('display', 'block', 'important');
+                    // Update preview with current content
+                    var content = normalizeContentEditableText(editorDiv);
+                    if (content.trim() === '') {
+                        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here...</div>';
+                        previewDiv.classList.add('empty');
+                    } else {
+                        previewDiv.innerHTML = parseMarkdown(content);
+                        previewDiv.classList.remove('empty');
+                    }
                 }
-                
-                window.initializeMarkdownNote(noteId);
-            }
-        })
-        .catch(e => console.error('Error toggling markdown split view:', e));
+                updateViewModeButton(noteId, 'split');
+            })
+            .catch(e => console.error('Error enabling split view:', e));
+    }
+}
+
+// Helper function to reinitialize markdown note after split view toggle
+function reinitializeMarkdownNote(noteId, targetMode) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (noteEntry && typeof window.initializeMarkdownNote === 'function') {
+        // Clear existing markdown setup
+        noteEntry.querySelector('.markdown-editor')?.remove();
+        noteEntry.querySelector('.markdown-preview')?.remove();
+        
+        // Remove existing toolbar button - it will be recreated
+        var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
+        if (toolbar) {
+            toolbar.querySelector('.markdown-view-mode-btn')?.remove();
+        }
+        
+        window.initializeMarkdownNote(noteId);
+        
+        // After reinitializing, apply the target mode if not split
+        if (targetMode && targetMode !== 'split') {
+            setTimeout(function() {
+                if (targetMode === 'edit') {
+                    switchToEditMode(noteId);
+                } else if (targetMode === 'preview') {
+                    switchToPreviewMode(noteId);
+                }
+            }, 50);
+        }
+    }
+}
+
+// Helper function to update view mode button icon and title
+function updateViewModeButton(noteId, mode) {
+    var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+    if (!viewModeBtn) return;
+    
+    viewModeBtn.setAttribute('data-current-mode', mode);
+    
+    if (mode === 'edit') {
+        viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+        viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
+        viewModeBtn.classList.remove('active');
+    } else if (mode === 'preview') {
+        viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+        // Check if split view is available to set appropriate tooltip
+        checkSplitViewButtonSetting(function(showSplitViewButton) {
+            viewModeBtn.title = showSplitViewButton ? 
+                'Preview mode (click to switch to split view)' : 
+                'Preview mode (click to switch to edit mode)';
+        });
+        viewModeBtn.classList.remove('active');
+    } else if (mode === 'split') {
+        viewModeBtn.innerHTML = '<i class="fa-columns"></i>';
+        viewModeBtn.title = 'Split view (click to switch to edit mode)';
+        viewModeBtn.classList.add('active');
+    }
+}
+
+// Legacy function for backward compatibility
+function toggleMarkdownSplitView(noteId) {
+    cycleMarkdownViewMode(noteId);
 }
 
 // Make functions globally available
@@ -766,3 +970,6 @@ window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.parseMarkdown = parseMarkdown;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.toggleMarkdownSplitView = toggleMarkdownSplitView;
+window.cycleMarkdownViewMode = cycleMarkdownViewMode;
+window.updateViewModeButton = updateViewModeButton;
+window.reinitializeMarkdownNote = reinitializeMarkdownNote;

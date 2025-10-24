@@ -732,55 +732,107 @@ function addLinkToNote() {
     const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
     const selectedText = hasSelection ? sel.toString() : '';
     
+    // Check if the selection is within an existing link
+    let existingLink = null;
+    let existingUrl = 'https://';
+    
+    if (hasSelection) {
+      const range = sel.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      
+      // Check if the selection is inside a link element
+      if (container.nodeType === Node.TEXT_NODE) {
+        existingLink = container.parentElement.closest('a');
+      } else if (container.nodeType === Node.ELEMENT_NODE) {
+        existingLink = container.closest('a');
+      }
+      
+      // If we found an existing link, get its URL
+      if (existingLink && existingLink.href) {
+        existingUrl = existingLink.href;
+      }
+    }
+    
     // Save the current selection before opening modal to preserve it
     if (hasSelection) {
       window.savedLinkRange = sel.getRangeAt(0).cloneRange();
+      window.savedExistingLink = existingLink;
     } else {
       window.savedLinkRange = null;
+      window.savedExistingLink = null;
     }
     
-    showLinkModal('https://', selectedText, function(url, text) {
+    showLinkModal(existingUrl, selectedText, function(url, text) {
+      // If url is null, it means we want to remove the link
+      if (url === null) {
+        if (window.savedExistingLink) {
+          // Remove the link but keep the text content
+          const linkText = window.savedExistingLink.textContent;
+          const textNode = document.createTextNode(linkText);
+          window.savedExistingLink.parentNode.replaceChild(textNode, window.savedExistingLink);
+          
+          // Save the note automatically
+          const noteentry = document.querySelector('.noteentry');
+          if (noteentry && typeof window.updatenote === 'function') {
+            window.updatenote();
+          }
+        }
+        
+        // Clean up
+        window.savedLinkRange = null;
+        window.savedExistingLink = null;
+        return;
+      }
+      
       if (!url) return;
       
-      // Create the link element
-      const a = document.createElement('a');
-      a.href = url;
-      a.textContent = text;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      
-      if (window.savedLinkRange) {
-        // Restore the saved selection and replace it with the link
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(window.savedLinkRange);
-        
-        // Replace the selected text with the link
-        window.savedLinkRange.deleteContents();
-        window.savedLinkRange.insertNode(a);
-        
-        // Clear selection and position cursor after the link
-        sel.removeAllRanges();
-        const newRange = document.createRange();
-        newRange.setStartAfter(a);
-        newRange.setEndAfter(a);
-        sel.addRange(newRange);
+      // If we're editing an existing link, just update it
+      if (window.savedExistingLink) {
+        window.savedExistingLink.href = url;
+        if (text) {
+          window.savedExistingLink.textContent = text;
+        }
       } else {
-        // No saved selection, insert at current cursor position or end of editor
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-          const range = sel.getRangeAt(0);
-          range.insertNode(a);
-          // Position cursor after the link
-          range.setStartAfter(a);
-          range.setEndAfter(a);
+        // Create a new link element
+        const a = document.createElement('a');
+        a.href = url;
+        a.textContent = text;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        
+        if (window.savedLinkRange) {
+          // Restore the saved selection and replace it with the link
+          const sel = window.getSelection();
           sel.removeAllRanges();
-          sel.addRange(range);
+          sel.addRange(window.savedLinkRange);
+          
+          // Replace the selected text with the link
+          window.savedLinkRange.deleteContents();
+          window.savedLinkRange.insertNode(a);
+          
+          // Clear selection and position cursor after the link
+          sel.removeAllRanges();
+          const newRange = document.createRange();
+          newRange.setStartAfter(a);
+          newRange.setEndAfter(a);
+          sel.addRange(newRange);
         } else {
-          // Fallback: append to editor
-          const noteentry = document.querySelector('.noteentry');
-          if (noteentry) {
-            noteentry.appendChild(a);
+          // No saved selection, insert at current cursor position or end of editor
+          const sel = window.getSelection();
+          if (sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            range.insertNode(a);
+            // Position cursor after the link
+            range.setStartAfter(a);
+            range.setEndAfter(a);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          } else {
+            // Fallback: append to editor
+            const noteentry = document.querySelector('.noteentry');
+            if (noteentry) {
+              noteentry.appendChild(a);
+            }
           }
         }
       }
@@ -791,8 +843,9 @@ function addLinkToNote() {
         window.updatenote();
       }
       
-      // Clean up saved range
+      // Clean up saved range and existing link reference
       window.savedLinkRange = null;
+      window.savedExistingLink = null;
     });
   } catch (err) {
     console.error('Error in addLinkToNote:', err);

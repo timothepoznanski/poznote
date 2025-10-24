@@ -8,7 +8,7 @@
 }
 
 .markdown-preview {
-    padding: 10px;
+    /* padding: 5px; */
     min-height: 100px;
 }
 
@@ -78,8 +78,16 @@
 }
 
 .markdown-preview p {
-    margin: 1em 0;
+    margin: 0 0 1em 0;
     line-height: 1.6;
+}
+
+.markdown-preview p:first-child {
+    margin-top: 0;
+}
+
+.markdown-preview p:last-child {
+    margin-bottom: 0;
 }
 
 .markdown-preview code {
@@ -295,6 +303,20 @@ body.markdown-split-view-enabled .markdown-preview {
     width: 50%;
     overflow-y: auto;
     padding-left: 15px;
+}
+
+/* Placeholder for empty preview in split view */
+.markdown-preview-placeholder {
+    color: #999;
+    padding: 10px;
+    text-align: left;
+    opacity: 0.6;
+}
+
+.markdown-preview.empty {
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 /* Style for split view toggle button - always blue */

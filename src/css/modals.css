@@ -1381,15 +1381,30 @@
 .workspace-list .btn-danger { background: #e04b4b; color: #fff; border: none; }
 .workspace-list .btn-danger:hover { background: #c43b3b; }
 /* Ensure destructive buttons inside modals are visually prominent */
-.modal .btn-danger {
-    background: #e04b4b;
-    color: #fff;
+.modal .btn-disabled {
+    background: #cccccc !important;
+    color: #888888 !important;
     border: none;
     padding: 8px 12px;
     border-radius: 6px;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+.modal .btn-disabled:hover {
+    background: #cccccc !important;
+    cursor: not-allowed !important;
+}
+.modal .btn-danger {
+    background: #e04b4b !important;
+    color: #fff !important;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 1;
 }
 .modal .btn-danger:hover {
-    background: #c43b3b;
+    background: #c43b3b !important;
 }
 /* .btn-rename visibility controlled earlier */
 .workspace-list .btn-rename {

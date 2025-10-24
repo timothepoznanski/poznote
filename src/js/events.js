@@ -458,28 +458,185 @@ function setupLinkEvents() {
         if (e.target.tagName === 'A' && e.target.closest('[contenteditable="true"]')) {
             e.preventDefault();
             e.stopPropagation();
-            window.open(e.target.href, '_blank');
+            
+            // Check if user has selected text (wants to edit) vs simple click (wants to follow link)
+            var selection = window.getSelection();
+            var hasSelection = selection && selection.toString().trim().length > 0;
+            
+            if (hasSelection) {
+                // User has selected text - they want to edit the link, not follow it
+                // Do nothing here, let the normal selection behavior work
+                // The toolbar's link button will handle editing
+                return;
+            }
+            
+            // No selection - user wants to follow the link
+            // Check if this is a note-to-note link
+            var href = e.target.href;
+            var noteMatch = href.match(/[?&]note=(\d+)/);
+            var workspaceMatch = href.match(/[?&]workspace=([^&]+)/);
+            
+            if (noteMatch && noteMatch[1]) {
+                // This is a note-to-note link - open it within the app
+                var targetNoteId = noteMatch[1];
+                var targetWorkspace = workspaceMatch ? decodeURIComponent(workspaceMatch[1]) : (selectedWorkspace || 'Poznote');
+                
+                // If workspace is different, reload page with new workspace and note
+                if (targetWorkspace !== selectedWorkspace) {
+                    // Update localStorage with the new workspace
+                    try {
+                        localStorage.setItem('poznote_selected_workspace', targetWorkspace);
+                    } catch (e) {
+                        console.log('Could not save workspace to localStorage:', e);
+                    }
+                    
+                    // Navigate to the new workspace with the target note
+                    var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace) + '&note=' + targetNoteId;
+                    window.location.href = url;
+                } else {
+                    // Same workspace, just load the note
+                    loadNoteById(targetNoteId);
+                }
+            } else {
+                // Regular external link - open in new tab
+                window.open(href, '_blank');
+            }
         }
     });
     
-    // Image paste management
+    // Image and text paste management
     document.body.addEventListener('paste', function(e) {
         try {
             var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
             if (!note) return;
             
-            var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
-            if (!items) return;
+            // Check if this is a markdown note
+            var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
             
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
-                    e.preventDefault();
-                    var file = item.getAsFile();
-                    if (file) {
-                        handleImageFilesAndInsert([file], note);
+            var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
+            
+            // Handle image paste
+            if (items) {
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    if (item && item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        var file = item.getAsFile();
+                        if (file) {
+                            handleImageFilesAndInsert([file], note);
+                        }
+                        return;
                     }
-                    break;
+                }
+            }
+            
+            // Handle text paste for HTML rich notes (not markdown)
+            if (!isMarkdownNote && e.clipboardData) {
+                var htmlData = e.clipboardData.getData('text/html');
+                var plainText = e.clipboardData.getData('text/plain');
+                
+                // Detect if this is code from VSCode or another code editor
+                // VSCode adds specific classes or the HTML contains code-like formatting
+                var isCodeFromEditor = false;
+                
+                if (htmlData) {
+                    // Check for VSCode specific markers or code editor patterns
+                    isCodeFromEditor = htmlData.includes('class="vscode-') || 
+                                       htmlData.includes('monaco-') ||
+                                       htmlData.includes('mtk') || // VSCode token class
+                                       (htmlData.includes('<span') && htmlData.includes('font-family') && plainText.split('\n').length > 1);
+                }
+                
+                // Also check if the plain text looks like code (multiple lines with indentation)
+                if (!isCodeFromEditor && plainText) {
+                    var lines = plainText.split('\n');
+                    var hasIndentation = lines.some(function(line) {
+                        return line.match(/^[\t ]{2,}/);
+                    });
+                    // If multiple lines with indentation, likely code
+                    if (lines.length > 2 && hasIndentation) {
+                        isCodeFromEditor = true;
+                    }
+                }
+                
+                if (isCodeFromEditor && plainText) {
+                    e.preventDefault();
+                    
+                    // Create a <pre> element with monospace font to preserve code formatting
+                    var pre = document.createElement('pre');
+                    pre.className = 'code-block';
+                    pre.textContent = plainText;
+                    
+                    // Insert the <pre> at cursor position
+                    var selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        var range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        
+                        // Insert the pre element
+                        range.insertNode(pre);
+                        
+                        // Add a line break after for easier editing
+                        var br = document.createElement('br');
+                        range.setStartAfter(pre);
+                        range.insertNode(br);
+                        
+                        // Move cursor after the inserted code
+                        range.setStartAfter(br);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                    
+                    // Trigger update
+                    if (typeof updateNote === 'function') {
+                        updateNote();
+                    }
+                    return;
+                }
+                
+                // Detect if this is a URL being pasted
+                if (plainText && !htmlData) {
+                    var trimmedText = plainText.trim();
+                    // Check if the pasted text is a valid URL (http/https/ftp)
+                    var urlRegex = /^(https?:\/\/|ftp:\/\/)[^\s]+$/i;
+                    
+                    if (urlRegex.test(trimmedText)) {
+                        e.preventDefault();
+                        
+                        // Create a clickable link element
+                        var link = document.createElement('a');
+                        link.href = trimmedText;
+                        link.textContent = trimmedText;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        
+                        // Insert the link at cursor position
+                        var selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            var range = selection.getRangeAt(0);
+                            range.deleteContents();
+                            
+                            // Insert the link element
+                            range.insertNode(link);
+                            
+                            // Add a space after for easier editing
+                            var space = document.createTextNode(' ');
+                            range.setStartAfter(link);
+                            range.insertNode(space);
+                            
+                            // Move cursor after the inserted link
+                            range.setStartAfter(space);
+                            range.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                        
+                        // Trigger update
+                        if (typeof updateNote === 'function') {
+                            updateNote();
+                        }
+                    }
                 }
             }
         } catch (err) {
@@ -712,6 +869,48 @@ function initTextSelectionHandlers() {
         // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
+}
+
+// Helper function to load a note by ID
+function loadNoteById(noteId) {
+    var workspace = selectedWorkspace || 'Poznote';
+    var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
+    
+    // Use the existing loadNoteDirectly function if available
+    if (typeof window.loadNoteDirectly === 'function') {
+        window.loadNoteDirectly(url, noteId, null);
+    } else {
+        // Fallback: navigate directly
+        window.location.href = url;
+    }
+}
+
+// Helper function to switch workspace with callback
+function switchWorkspace(targetWorkspace, callback) {
+    // If switching to a different workspace, we need to reload the entire page
+    // to refresh the left column with notes from the new workspace
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace !== targetWorkspace) {
+        // Build the URL for the new workspace with the target note
+        var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace);
+        
+        // If there's a callback that would load a note, extract the note ID from it
+        // Since we're reloading the page, we can append the note parameter
+        if (callback) {
+            // Try to detect if callback will load a note
+            // For now, we'll just reload to the workspace and let the callback handle the note
+            window.location.href = url;
+        } else {
+            window.location.href = url;
+        }
+    } else {
+        // Same workspace, just update the variable and call callback
+        if (typeof selectedWorkspace !== 'undefined') {
+            selectedWorkspace = targetWorkspace;
+        }
+        if (callback) {
+            callback();
+        }
+    }
 }
 
 // Expose updateNote globally for use in other modules

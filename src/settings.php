@@ -67,7 +67,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-upload"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Backup (Export)</h3>
+                    <h3>Backup / Export</h3>
                 </div>
             </div>
             
@@ -77,7 +77,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-download"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Restore (Import)</h3>
+                    <h3>Restore / Import</h3>
                 </div>
             </div>
 

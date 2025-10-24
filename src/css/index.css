@@ -2676,6 +2676,20 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
+/* Blue color for markdown view mode toggle button */
+.toolbar-btn.markdown-view-mode-btn i,
+.toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+}
+
+.toolbar-btn.markdown-view-mode-btn:hover i,
+.toolbar-btn.markdown-view-mode-btn:hover [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+  transform: scale(1.18);
+}
+
 /* Font Awesome icon customizations */
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
@@ -2710,6 +2724,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-up-down::before { content: "\f07d"; }
 .fa-arrows-h::before { content: "\f07e"; }
 .fa-sort::before { content: "\f0dc"; }
+.fa-mobile::before { content: "\f3cd"; }
+.fa-file-import::before { content: "\f56f"; }
 .fa-moon::before { content: "\f186"; }
 .fa-bolt::before { content: "\f0e7"; }
 .fa-markdown::before { content: "\f60f"; }
@@ -2817,6 +2833,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrows-up-down,
 .fa-arrows-h,
 .fa-sort,
+.fa-mobile,
+.fa-file-import,
 .fa-moon {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;

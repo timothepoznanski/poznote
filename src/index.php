@@ -569,7 +569,6 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-unlink text-format-btn" title="Remove link" onclick="document.execCommand(\'unlink\')"><i class="fa-unlink"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';

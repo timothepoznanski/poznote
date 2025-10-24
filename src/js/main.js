@@ -74,6 +74,7 @@ window.executeInputModalAction = executeInputModalAction;
 window.showLinkModal = showLinkModal;
 window.closeLinkModal = closeLinkModal;
 window.executeLinkModalAction = executeLinkModalAction;
+window.executeLinkModalRemove = executeLinkModalRemove;
 window.showMoveFolderDialog = showMoveFolderDialog;
 window.moveNoteToFolder = moveNoteToFolder;
 window.showUpdateInstructions = showUpdateInstructions;

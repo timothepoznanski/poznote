@@ -15,7 +15,7 @@
 - [Change Settings](#change-settings)
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
-- [Backup and Restore](#backup-and-restore)
+- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
@@ -206,11 +206,11 @@ cd poznote && docker compose down && docker rmi ghcr.io/timothepoznanski/poznote
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
 
-## Backup and Restore
+## Backup / Export and Restore / Import
 
-Poznote includes built-in backup (export) and restoration (import) functionality accessible through Settings.
+Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
-**Complete Backup**
+**📦 Complete Backup**
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
 
@@ -218,7 +218,17 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
-**Complete Restore** 
+**📥 Import Individual Notes**
+
+Import one or more HTML or Markdown notes directly:
+
+  - Upload `.html`, `.md`, or `.markdown` files
+  - Multiple files can be selected at once
+  - Notes are imported into the Default folder of the Poznote workspace
+  - Titles are automatically extracted from file content or filename
+  - Supports both full HTML documents and simple fragments
+
+**🔄 Complete Restore** 
 
 Upload the complete backup ZIP to restore everything:
 
