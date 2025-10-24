@@ -125,6 +125,9 @@ $v = '20251021.1';
                     <i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.
                 </div>
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip12.png" alt="Export backup" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
                     <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/dev/readme/tips/tip13.png" alt="Export backup" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
                 </div>
                 <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
