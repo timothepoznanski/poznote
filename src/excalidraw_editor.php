@@ -12,7 +12,7 @@ $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : 'Poznote';
 
 // Load existing note data if editing
 $existing_data = null;
-$note_title = 'New Excalidraw Diagram';
+$note_title = 'New Excalidrax (experimental)';
 
 if ($note_id > 0) {
     $stmt = $con->prepare('SELECT heading, entry FROM entries WHERE id = ?');
@@ -36,7 +36,7 @@ if ($note_id > 0) {
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
+    <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidrax</title>
     
     <!-- Theme -->
     <script>

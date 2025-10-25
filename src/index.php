@@ -863,11 +863,11 @@ $body_classes = trim($extra_body_classes);
                         $preview_image = getEntriesRelativePath() . $row['id'] . ".png";
                         if (file_exists($preview_image)) {
                             $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
-                            $display_content .= '<img src="'.$preview_image.'" alt="Excalidraw diagram" data-excalidraw-note-id="'.$row['id'].'" data-is-excalidraw="true" />';
+                            $display_content .= '<img src="'.$preview_image.'" alt="Excalidrax diagram" data-excalidraw-note-id="'.$row['id'].'" data-is-excalidraw="true" />';
                             $display_content .= '</div>';
                         } else {
                             $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
-                            $display_content .= '<p style="text-align:center; padding: 40px; color: #999;">Click to open diagram</p>';
+                            $display_content .= '<p style="text-align:center; padding: 40px; color: #999;">Click to open Excalidrax</p>';
                             $display_content .= '</div>';
                         }
                     } else {

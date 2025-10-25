@@ -1,5 +1,5 @@
 // Excalidraw integration for Poznote
-// Handles creation and opening of Excalidraw diagram notes
+// Handles creation and opening of Excalidrax diagram notes
 
 // Create a new Excalidraw note
 function createExcalidrawNote() {
@@ -23,7 +23,7 @@ function openExcalidrawNote(noteId) {
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }
 
-// Download Excalidraw diagram as PNG image
+// Download Excalidrax diagram as PNG image
 function downloadExcalidrawImage(noteId) {
     // Get the PNG file path for this note
     const pngPath = `data/entries/${noteId}.png`;
@@ -32,12 +32,12 @@ function downloadExcalidrawImage(noteId) {
     const img = new Image();
     img.onload = function() {
         // PNG exists, download it
-        downloadImageFromUrl(pngPath, `excalidraw-diagram-${noteId}.png`);
+        downloadImageFromUrl(pngPath, `excalidrax-diagram-${noteId}.png`);
     };
     img.onerror = function() {
         // PNG doesn't exist, show error message
         console.error('Excalidraw PNG not found for note ' + noteId);
-        alert('Diagram image not found. Please open the diagram in the editor and save it first.');
+        alert('Excalidrax image not found. Please open the diagram in the editor and save it first.');
     };
     img.src = pngPath;
 }
@@ -47,7 +47,7 @@ function downloadImageFromUrl(imageSrc, filename) {
     // Use the same logic as the existing downloadImage function
     const link = document.createElement('a');
     link.href = imageSrc;
-    link.download = filename || 'excalidraw-diagram.png';
+    link.download = filename || 'excalidrax-diagram.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -272,18 +272,18 @@
                             <p>Checklist with checkboxes for tasks and items</p>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="excalidraw" onclick="selectCreateType('excalidraw')">
-                        <i class="fa fa-draw-polygon"></i>
-                        <div>
-                            <span>Excalidraw Diagram</span>
-                            <p>Create diagrams, sketches, and visual notes</p>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
                 <div class="create-section" id="otherSection">
-                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')">
+                    <div class="create-note-option" data-type="excalidraw" onclick="selectCreateType('excalidraw')">
+                        <i class="fa fa-draw-polygon"></i>
+                        <div>
+                            <span>Excalidrax (experimental)</span>
+                            <p>Create diagrams, sketches, and visual notes</p>
+                        </div>
+                    </div>
+                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')" style="margin-top: 14px;">
                         <i class="fa fa-folder"></i>
                         <div>
                             <span>Folder</span>
