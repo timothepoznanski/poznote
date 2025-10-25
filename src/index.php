@@ -44,6 +44,48 @@ try {
     error_log("Error checking for welcome note: " . $e->getMessage());
 }
 
+// Check if we need to redirect to include workspace from localStorage or default_workspace setting
+// Only redirect if no workspace parameter is present in GET
+if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
+    // Check for default workspace in database
+    $defaultWorkspace = null;
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['default_workspace']);
+        $defaultWorkspace = $stmt->fetchColumn();
+        if ($defaultWorkspace === false || $defaultWorkspace === '') {
+            $defaultWorkspace = null;
+        }
+    } catch (Exception $e) {
+        $defaultWorkspace = null;
+    }
+    
+    // If default workspace is set to a specific workspace (not __last_opened__), redirect with it
+    if ($defaultWorkspace !== null && $defaultWorkspace !== '__last_opened__') {
+        // Build redirect URL preserving other parameters
+        $params = $_GET;
+        $params['workspace'] = $defaultWorkspace;
+        $queryString = http_build_query($params);
+        header('Location: index.php?' . $queryString);
+        exit;
+    } else {
+        // Use localStorage (either because default is __last_opened__ or no default is set)
+        echo '<!DOCTYPE html><html><head><script>
+        (function(){
+            try {
+                var workspace = localStorage.getItem("poznote_selected_workspace");
+                if (workspace && workspace !== "" && workspace !== "Poznote") {
+                    var params = new URLSearchParams(window.location.search);
+                    params.set("workspace", workspace);
+                    window.location.href = "index.php?" + params.toString();
+                }
+            } catch(e) {}
+        })();
+        </script></head><body></body></html>';
+        // Don't exit here - let the page continue loading with Poznote as default
+    }
+}
+
 // Initialization of workspaces and labels
 initializeWorkspacesAndLabels($con);
 
@@ -284,7 +326,7 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-tips" onclick="navigateToTips(); markTipsAsViewed();" title="Did you know?"><i class="fa-lightbulb"></i></button>
+                <button class="sidebar-tips" onclick="navigateToTips();" title="Did you know?"><i class="fa-lightbulb"></i></button>
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
                 <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
                     <i class="fa-cog"></i>
@@ -936,9 +978,6 @@ $body_classes = trim($extra_body_classes);
     
     // Navigate to tips page with current workspace and note parameters
     function navigateToTips() {
-        // Mark tips as viewed
-        markTipsAsViewed();
-        
         var url = 'tips.php';
         var params = [];
         
@@ -961,73 +1000,6 @@ $body_classes = trim($extra_body_classes);
         
         window.location.href = url;
     }
-    
-    // Tips viewed state management
-    function markTipsAsViewed() {
-        localStorage.setItem('poznote-tips-viewed', 'true');
-        stopTipsBlinking();
-        var tipsButton = document.querySelector('.sidebar-tips');
-        if (tipsButton) {
-            tipsButton.classList.remove('tips-unviewed');
-        }
-    }
-    
-    // Variables for JavaScript animation
-    var tipsBlinkInterval = null;
-    var originalTipsColor = '#f39c12'; // orange
-    var blinkColor = '#ff0000'; // bright red
-    
-    function startTipsBlinking() {
-        var tipsButton = document.querySelector('.sidebar-tips');
-        if (!tipsButton) return;
-        
-        // Stop any existing animation
-        stopTipsBlinking();
-        
-        var isBlinkColor = false;
-        tipsBlinkInterval = setInterval(function() {
-            if (isBlinkColor) {
-                tipsButton.style.setProperty('color', originalTipsColor, 'important');
-                tipsButton.style.setProperty('background-color', 'transparent', 'important');
-                console.log('Switched to orange:', originalTipsColor);
-            } else {
-                tipsButton.style.setProperty('color', blinkColor, 'important');
-                tipsButton.style.setProperty('background-color', 'rgba(255, 0, 0, 0.1)', 'important');
-                console.log('Switched to red:', blinkColor);
-            }
-            isBlinkColor = !isBlinkColor;
-        }, 750); // 750ms = 1.5s cycle / 2
-        
-        console.log('Tips blinking started with JavaScript animation (using !important)');
-    }
-    
-    function stopTipsBlinking() {
-        if (tipsBlinkInterval) {
-            clearInterval(tipsBlinkInterval);
-            tipsBlinkInterval = null;
-        }
-        var tipsButton = document.querySelector('.sidebar-tips');
-        if (tipsButton) {
-            // Remove the inline styles to let CSS take over
-            tipsButton.style.removeProperty('color');
-            tipsButton.style.removeProperty('background-color');
-        }
-    }
-
-    function checkTipsViewedState() {
-        var hasViewed = localStorage.getItem('poznote-tips-viewed');
-        var tipsButton = document.querySelector('.sidebar-tips');
-        if (!hasViewed && tipsButton) {
-            startTipsBlinking();
-        } else {
-            stopTipsBlinking();
-        }
-    }
-    
-    // Initialize tips state on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        checkTipsViewedState();
-    });
 </script>
 <script src="js/index-config.js"></script>
 <!-- Modules refactorisés de script.js -->
