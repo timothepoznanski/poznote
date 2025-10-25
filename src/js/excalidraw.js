@@ -45,14 +45,8 @@ function insertExcalidrawDiagram() {
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
     
-    // Create HTML container for the Excalidraw diagram
-    const diagramHTML = `
-        <div class="excalidraw-container" id="${diagramId}" style="border: 2px dashed #ccc; padding: 20px; margin: 10px 0; min-height: 300px; text-align: center; background-color: #f9f9f9; cursor: pointer;" onclick="openExcalidrawEditor('${diagramId}')">
-            <i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
-            <p style="color: #666; font-size: 16px; margin: 0;">Click to create/edit diagram</p>
-            <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">Excalidraw diagram placeholder</p>
-        </div>
-    `;
+    // Create simple button for the Excalidraw diagram
+    const diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click here to create your Excalidraw image</button>`;
     
     // Insert at cursor position
     insertHtmlAtCursor(diagramHTML);
