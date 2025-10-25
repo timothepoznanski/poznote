@@ -239,11 +239,6 @@ $v = '20251021.1';
             goBack();
         }
     });
-    
-    // Mark tips as viewed when this page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        localStorage.setItem('poznote-tips-viewed', 'true');
-    });
     </script>
 </body>
 </html>

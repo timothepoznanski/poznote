@@ -450,21 +450,6 @@ body {
 .sidebar-tips:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
-/* Tips button blinking animation */
-@keyframes tips-blink {
-    0%, 50% { color: #dc3545; }
-    51%, 100% { color: #f39c12; }
-}
-
-.sidebar-tips.tips-unviewed {
-    animation: tips-blink 1.5s infinite;
-}
-
-.sidebar-tips.tips-unviewed:hover {
-    animation: none;
-    color: #f39c12;
-}
-
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="fa-"],

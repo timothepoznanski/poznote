@@ -1166,27 +1166,13 @@ body.dark-mode .sidebar-tips {
     color: #f39c12 !important;
 }
 
+
 html[data-theme='dark'] .sidebar-tips:hover,
 body.dark-mode .sidebar-tips:hover {
     background: rgba(0, 125, 184, 0.2) !important;
 }
 
-/* Tips button blinking animation in dark mode */
-@keyframes tips-blink-dark {
-    0%, 50% { color: #dc3545 !important; }
-    51%, 100% { color: #f39c12 !important; }
-}
-
-html[data-theme='dark'] .sidebar-tips.tips-unviewed,
-body.dark-mode .sidebar-tips.tips-unviewed {
-    animation: tips-blink-dark 1.5s infinite;
-}
-
-html[data-theme='dark'] .sidebar-tips.tips-unviewed:hover,
-body.dark-mode .sidebar-tips.tips-unviewed:hover {
-    animation: none;
-    color: #f39c12 !important;
-}
+/* Sidebar plus button styles */
 
 /* Keep some specific icons with their original colors when active/selected */
 html[data-theme='dark'] .toolbar-btn.save-modified .fa-save,
