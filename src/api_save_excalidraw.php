@@ -85,26 +85,59 @@ if ($note_id === 0) {
 
 // Save HTML content to file (same as other note types)
 if ($note_id > 0) {
-    // Generate HTML content now that we have the note_id
-    if (!empty($base64_image)) {
-        $html_content = '<div class="excalidraw-container">';
-        $html_content .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" />';
-        $html_content .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $html_content .= '</div>';
-    } else {
-        // If no image, create a placeholder with just the diagram data
-        $html_content = '<div class="excalidraw-container">';
-        $html_content .= '<p style="text-align:center; padding: 40px; color: #999;">Excalidraw diagram</p>';
-        $html_content .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $html_content .= '</div>';
-    }
-    
     $filename = getEntriesRelativePath() . $note_id . ".html";
     
     // Ensure the entries directory exists
     $entriesDir = dirname($filename);
     if (!is_dir($entriesDir)) {
         mkdir($entriesDir, 0755, true);
+    }
+    
+    // Check if file exists to preserve existing content
+    $existing_content = '';
+    if (file_exists($filename)) {
+        $existing_content = file_get_contents($filename);
+    }
+    
+    // Generate new Excalidraw HTML content
+    if (!empty($base64_image)) {
+        $new_excalidraw_html = '<div><br></div>'; // Editable line above
+        $new_excalidraw_html .= '<div class="excalidraw-container">';
+        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" style="border: 1px solid #9ca3af; border-radius: 4px;" contenteditable="false" />';
+        $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
+        $new_excalidraw_html .= '</div>';
+        $new_excalidraw_html .= '<div><br></div>'; // Editable line below
+    } else {
+        // If no image, create a placeholder with just the diagram data
+        $new_excalidraw_html = '<div><br></div>'; // Editable line above
+        $new_excalidraw_html .= '<div class="excalidraw-container">';
+        $new_excalidraw_html .= '<p style="text-align:center; padding: 40px; color: #999;" contenteditable="false">Excalidraw diagram</p>';
+        $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
+        $new_excalidraw_html .= '</div>';
+        $new_excalidraw_html .= '<div><br></div>'; // Editable line below
+    }
+    
+    // If we have existing content, replace just the Excalidraw part
+    if (!empty($existing_content)) {
+        // Use regex to replace the existing excalidraw-container and surrounding divs
+        // This pattern matches: optional empty div + excalidraw-container + optional empty div
+        $updated_content = preg_replace(
+            '/(?:<div><br><\/div>)?\s*<div class="excalidraw-container"[^>]*>.*?<\/div>\s*(?:<div><br><\/div>)?/s',
+            $new_excalidraw_html,
+            $existing_content
+        );
+        
+        // If no replacement was made (no existing container), keep original content
+        if ($updated_content === $existing_content) {
+            // No existing Excalidraw container found, this shouldn't happen for updates
+            // but let's handle it gracefully by replacing all content
+            $html_content = $new_excalidraw_html;
+        } else {
+            $html_content = $updated_content;
+        }
+    } else {
+        // New file, use just the Excalidraw content
+        $html_content = $new_excalidraw_html;
     }
     
     // Write HTML content to file

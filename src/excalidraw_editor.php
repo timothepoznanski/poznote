@@ -21,7 +21,57 @@ if ($note_id > 0) {
     
     if ($note) {
         $note_title = $note['heading'];
-        $existing_data = $note['entry']; // JSON data stored in entry field
+        $entry_content = $note['entry']; // Full content from database
+        $existing_data = null; // This will hold the extracted JSON
+        
+        // For the unified system, always try to extract JSON from the HTML file first
+        require_once 'functions.php';
+        $html_file = getEntriesRelativePath() . $note_id . '.html';
+        if (file_exists($html_file)) {
+            $html_content = file_get_contents($html_file);
+            // Extract JSON from the hidden excalidraw-data div
+            if (preg_match('/<div class="excalidraw-data"[^>]*>(.*?)<\/div>/s', $html_content, $matches)) {
+                $extracted_json = $matches[1];
+                // Decode HTML entities
+                $extracted_json = html_entity_decode($extracted_json, ENT_QUOTES | ENT_HTML5);
+                // Trim whitespace
+                $extracted_json = trim($extracted_json);
+                
+                // Validate JSON before using it
+                if (!empty($extracted_json) && $extracted_json !== '{}') {
+                    $json_test = json_decode($extracted_json, true);
+                    if (json_last_error() === JSON_ERROR_NONE && $json_test !== null) {
+                        $existing_data = $extracted_json;
+                        error_log("Successfully extracted JSON from HTML for note $note_id");
+                    } else {
+                        error_log("Invalid JSON extracted for note $note_id: " . json_last_error_msg());
+                        $existing_data = null;
+                    }
+                } else {
+                    error_log("Empty JSON extracted for note $note_id");
+                    $existing_data = null;
+                }
+            } else {
+                // No excalidraw-data div found in HTML, try database as fallback
+                if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                    // Legacy system: entry field contains direct JSON data
+                    $existing_data = $entry_content;
+                    error_log("Using legacy JSON from database for note $note_id");
+                } else {
+                    error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
+                    $existing_data = null;
+                }
+            }
+        } else {
+            // HTML file doesn't exist, use database content as fallback
+            if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                $existing_data = $entry_content;
+                error_log("HTML file not found, using database content for note $note_id");
+            } else {
+                error_log("HTML file not found and database content is HTML for note $note_id");
+                $existing_data = null;
+            }
+        }
         
         // Debug: log the data we're loading
         error_log("Loading note $note_id: " . substr($existing_data, 0, 100) . "...");
@@ -92,23 +142,57 @@ if ($note_id > 0) {
     <script>
     let noteId = <?php echo $note_id; ?>;
     const workspace = <?php echo json_encode($workspace); ?>;
-    let existingData = <?php echo $existing_data ? json_encode($existing_data) : 'null'; ?>;
     
-    // Parse and simplify existing data to avoid loading issues
-    if (existingData) {
-        try {
-            existingData = JSON.parse(existingData);
-            
-            if (existingData && existingData.elements) {
-                existingData = {
-                    elements: existingData.elements,
-                    appState: {} // Simplified app state
-                };
+    // Safer data handling
+    let existingData = null;
+    try {
+        const rawData = <?php echo $existing_data ? json_encode($existing_data) : 'null'; ?>;
+        
+        if (rawData) {
+            if (typeof rawData === 'object') {
+                existingData = rawData;
+            } else if (typeof rawData === 'string') {
+                // If the string contains non-JSON characters, try to clean it
+                let cleanedData = rawData.trim();
+                
+                // Look for complete JSON structure that starts with { and ends with }}
+                let jsonMatch = cleanedData.match(/^(\{.*\}\})/);
+                if (jsonMatch) {
+                    cleanedData = jsonMatch[1];
+                    console.log('Found JSON pattern, using cleaned data:', cleanedData.substring(0, 100) + '...');
+                }
+                
+                existingData = JSON.parse(cleanedData);
             }
-        } catch (e) {
-            console.error('Error parsing existing data:', e);
-            existingData = null;
         }
+        
+        // Validate and clean the data structure for Excalidraw
+        if (existingData && existingData.elements) {
+            // Ensure elements is an array
+            if (!Array.isArray(existingData.elements)) {
+                existingData.elements = [];
+            }
+            
+            // Ensure appState exists and has minimal required properties
+            if (!existingData.appState || typeof existingData.appState !== 'object') {
+                existingData.appState = {};
+            }
+            
+            // Create a clean data structure with only essential properties
+            existingData = {
+                elements: existingData.elements,
+                appState: {
+                    viewBackgroundColor: existingData.appState.viewBackgroundColor || "#ffffff",
+                    zoom: existingData.appState.zoom || { value: 1 },
+                    scrollX: existingData.appState.scrollX || 0,
+                    scrollY: existingData.appState.scrollY || 0
+                }
+            };
+        }
+        
+    } catch (parseError) {
+        console.error('Failed to load diagram data');
+        existingData = null;
     }
     
     let excalidrawAPI = null;

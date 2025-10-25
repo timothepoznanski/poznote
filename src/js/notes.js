@@ -160,6 +160,10 @@ function saveNoteToServer() {
                 entcontent = markdownContent;
             }
         }
+    } else if (noteType === 'excalidraw') {
+        // For Excalidraw notes in the new unified system, treat as regular HTML
+        // The HTML already contains the image and hidden data, so save as-is
+        // This allows text to be added around the Excalidraw diagram
     }
     
     var tags = tagsElem ? tagsElem.value : '';

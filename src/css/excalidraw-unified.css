@@ -2,27 +2,49 @@
 
 .excalidraw-container {
     text-align: center;
-    padding: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
-    margin: 10px 0;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    margin: 5px 0;
+    display: inline-block;
+    max-width: 100%;
+    width: fit-content;
+    height: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    /* Prevent the container itself from being editable and avoid cursor artifacts */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent outline and focus indicators */
+    outline: none !important;
+    /* Ensure no cursor appears */
+    pointer-events: none;
+    /* Ensure container doesn't expand beyond content */
+    overflow: hidden;
+    line-height: 0;
 }
 
 .excalidraw-image {
-    max-width: 80%;
-    max-height: 400px;
+    max-width: 100%;
+    max-height: 300px;
     height: auto;
+    border: 1px solid #9ca3af !important;
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: transform 0.2s ease;
     display: block;
-    margin: 0 auto;
+    margin: 0;
+    object-fit: contain;
+    /* Keep image selectable for context menu but prevent editing */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Re-enable pointer events for context menu */
+    pointer-events: auto;
+    /* Prevent any outline or focus indicators */
+    outline: none !important;
 }
 
 .excalidraw-image:hover {
-    transform: scale(1.02);
+    border-color: #9ca3af;
 }
 
 .excalidraw-data {
@@ -35,6 +57,14 @@
     border-color: #404040;
 }
 
+[data-theme="dark"] .excalidraw-image {
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] .excalidraw-image:hover {
+    border-color: #6b7280;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .excalidraw-container {
@@ -44,4 +74,21 @@
     .excalidraw-image {
         max-width: 100%;
     }
+}
+
+/* Prevent cursor and caret artifacts around Excalidraw content */
+.noteentry .excalidraw-container::before,
+.noteentry .excalidraw-container::after {
+    display: none !important;
+}
+
+/* Hide any potential cursor/caret near Excalidraw elements */
+.excalidraw-container + br,
+.excalidraw-container + div:empty {
+    display: none;
+}
+
+/* Ensure no caret appears near Excalidraw content */
+[contenteditable] .excalidraw-container {
+    caret-color: transparent;
 }
