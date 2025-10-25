@@ -226,14 +226,18 @@ function saveEmbeddedDiagram() {
         
         $diagram_html .= '</div>';
         
-        // Find and replace the existing diagram container or placeholder
+        // Find and replace the existing diagram container or button placeholder
         $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>/s';
+        $button_pattern = '/<button[^>]*id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/button>/s';
         
         if (preg_match($pattern, $html_content)) {
-            // Replace existing diagram or placeholder
+            // Replace existing diagram container
             $html_content = preg_replace($pattern, $diagram_html, $html_content);
+        } else if (preg_match($button_pattern, $html_content)) {
+            // Replace existing button placeholder
+            $html_content = preg_replace($button_pattern, $diagram_html, $html_content);
         } else {
-            // Container doesn't exist, add it to the end of the note
+            // Neither container nor button exists, add it to the end of the note
             if (empty($html_content)) {
                 // If note is completely empty, just add the diagram
                 $html_content = $diagram_html;
