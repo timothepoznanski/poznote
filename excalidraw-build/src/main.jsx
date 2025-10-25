@@ -26,7 +26,6 @@ window.PoznoteExcalidraw = {
         initialData={options.initialData || { elements: [], appState: {} }}
         theme={options.theme || 'light'}
         ref={(api) => {
-          console.log('Excalidraw ref callback called with:', api);
           excalidrawAPI = api;
         }}
         onChange={(elements, appState, files) => {
@@ -34,17 +33,10 @@ window.PoznoteExcalidraw = {
           lastElements = elements;
           lastAppState = appState;
           lastFiles = files;
-          
-          // Only log when there are actual elements or meaningful changes
-          if (elements.length > 0) {
-            console.log('onChange captured:', elements.length, 'elements');
-          }
         }}
         onInitLibrary={(err) => {
           if (err) {
             console.error('Excalidraw library initialization error:', err);
-          } else {
-            console.log('Excalidraw library initialized successfully');
           }
         }}
       />
@@ -55,32 +47,24 @@ window.PoznoteExcalidraw = {
     // Return API object using onChange data as fallback
     return {
       getSceneElements: () => {
-        console.log('Getting scene elements...');
         if (excalidrawAPI) {
-          console.log('Using direct API');
           return excalidrawAPI.getSceneElements();
         }
-        console.log('Using onChange fallback, elements:', lastElements.length);
         return lastElements;
       },
       getAppState: () => {
-        console.log('Getting app state...');
         if (excalidrawAPI) {
           return excalidrawAPI.getAppState();
         }
-        console.log('Using onChange fallback appState');
         return lastAppState;
       },
       getFiles: () => {
-        console.log('Getting files...');
         if (excalidrawAPI) {
           return excalidrawAPI.getFiles();
         }
-        console.log('Using onChange fallback files');
         return lastFiles;
       },
       exportToCanvas: async (exportOptions) => {
-        console.log('Exporting to canvas...');
         return await exportToCanvas(exportOptions);
       }
     };
@@ -89,5 +73,3 @@ window.PoznoteExcalidraw = {
   // Direct export function
   exportToCanvas: exportToCanvas
 };
-
-console.log('PoznoteExcalidraw loaded successfully');

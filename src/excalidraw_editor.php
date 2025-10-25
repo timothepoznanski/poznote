@@ -12,7 +12,7 @@ $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : 'Poznote';
 
 // Load existing note data if editing
 $existing_data = null;
-$note_title = 'New Excalidrax (experimental)';
+$note_title = 'New note';
 
 if ($note_id > 0) {
     $stmt = $con->prepare('SELECT heading, entry FROM entries WHERE id = ?');
@@ -94,26 +94,16 @@ if ($note_id > 0) {
     const workspace = <?php echo json_encode($workspace); ?>;
     let existingData = <?php echo $existing_data ? json_encode($existing_data) : 'null'; ?>;
     
-    // Debug PHP values
-    console.log('PHP Debug:');
-    console.log('- note_id from PHP:', <?php echo $note_id; ?>);
-    console.log('- existing_data from PHP (raw):', <?php echo json_encode($existing_data); ?>);
-    console.log('- existing_data length:', <?php echo $existing_data ? strlen($existing_data) : 0; ?>);
-    
     // Parse and simplify existing data to avoid loading issues
     if (existingData) {
         try {
-            console.log('Parsing existing data...');
             existingData = JSON.parse(existingData);
-            console.log('Parsed data:', existingData);
             
             if (existingData && existingData.elements) {
-                console.log('Simplifying existing data to avoid loading errors...');
                 existingData = {
                     elements: existingData.elements,
                     appState: {} // Simplified app state
                 };
-                console.log('Simplified data:', existingData);
             }
         } catch (e) {
             console.error('Error parsing existing data:', e);
@@ -124,12 +114,8 @@ if ($note_id > 0) {
     let excalidrawAPI = null;
 
     window.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, checking PoznoteExcalidraw...');
-        
         // Wait for bundle to load
         setTimeout(function() {
-            console.log('PoznoteExcalidraw:', typeof window.PoznoteExcalidraw);
-            
             if (!window.PoznoteExcalidraw) {
                 console.error('PoznoteExcalidraw not found');
                 document.getElementById('loading').innerHTML = 'Error: Failed to load Excalidraw. Please refresh the page.';
@@ -137,9 +123,6 @@ if ($note_id > 0) {
             }
             
             try {
-                console.log('Initializing Excalidraw...');
-                console.log('Initial data:', existingData);
-                
                 // Initialize Excalidraw
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
                     initialData: existingData || { elements: [], appState: {} },
@@ -149,8 +132,6 @@ if ($note_id > 0) {
                 // Hide loading message
                 const loading = document.getElementById('loading');
                 if (loading) loading.style.display = 'none';
-                
-                console.log('Excalidraw initialized successfully');
                 
             } catch (error) {
                 console.error('Error initializing Excalidraw:', error);

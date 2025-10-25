@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
 $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
-$heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New Excalidrax (experimental)';
+$heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New note';
 $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
 $preview_image = isset($_FILES['preview_image']) ? $_FILES['preview_image'] : null;
 
