@@ -646,7 +646,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
                     // Excalidraw diagram button - insert at cursor position
-                    echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fa-edit"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
                 
                     // Hide emoji button for tasklist notes
                     if ($note_type !== 'tasklist') {

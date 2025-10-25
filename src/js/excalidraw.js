@@ -20,6 +20,34 @@ function openExcalidrawNote(noteId) {
 
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
+    // Check if the current note has content
+    const currentNoteId = getCurrentNoteId();
+    if (!currentNoteId) {
+        alert('Please save the note first before adding diagrams');
+        return;
+    }
+    
+    // Get the current note content
+    const noteEntry = document.getElementById('entry' + currentNoteId);
+    if (!noteEntry) {
+        alert('Note editor not found');
+        return;
+    }
+    
+    // Check if note is empty (no content or just whitespace/empty tags)
+    const noteContent = noteEntry.innerHTML.trim();
+    const hasOnlyEmptyTags = /^(<br\s*\/?>|\s|&nbsp;)*$/.test(noteContent);
+    
+    if (!noteContent || hasOnlyEmptyTags) {
+        // Show popup message
+        if (window.showNotificationPopup) {
+            showNotificationPopup('Please add some content to the note before inserting an Excalidraw diagram.', 'warning');
+        } else {
+            alert('Please add some content to the note before inserting an Excalidraw diagram.');
+        }
+        return;
+    }
+    
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
     

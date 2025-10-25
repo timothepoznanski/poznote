@@ -583,6 +583,11 @@ function handleImageClick(event) {
     const isExcalidraw = img.getAttribute('data-is-excalidraw') === 'true';
     const excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
     
+    // Also check if this image is inside an Excalidraw container
+    const excalidrawContainer = img.closest('.excalidraw-container');
+    const isEmbeddedExcalidraw = excalidrawContainer !== null;
+    const diagramId = excalidrawContainer ? excalidrawContainer.id : null;
+    
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-maximize"></i>
@@ -594,10 +599,20 @@ function handleImageClick(event) {
         </div>
     `;
     
-    // Add Edit option for Excalidraw images
+    // Add Edit option for Excalidraw images (standalone notes)
     if (isExcalidraw && excalidrawNoteId) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
+                <i class="fa-edit"></i>
+                Edit
+            </div>
+        ` + menuHTML;
+    }
+    
+    // Add Edit option for embedded Excalidraw diagrams
+    if (isEmbeddedExcalidraw && diagramId) {
+        menuHTML = `
+            <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
                 <i class="fa-edit"></i>
                 Edit
             </div>
@@ -661,6 +676,15 @@ function handleImageClick(event) {
             const noteId = e.target.closest('.image-menu-item')?.getAttribute('data-note-id');
             if (noteId) {
                 openExcalidrawNote(noteId);
+            }
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'edit-embedded-excalidraw') {
+            const diagramId = e.target.closest('.image-menu-item')?.getAttribute('data-diagram-id');
+            if (diagramId && window.openExcalidrawEditor) {
+                openExcalidrawEditor(diagramId);
             }
             // Remove menu safely
             if (document.body.contains(menu)) {

@@ -177,12 +177,31 @@ function saveEmbeddedDiagram() {
         $html_file = getEntriesRelativePath() . $note_id . '.html';
         
         if (!file_exists($html_file)) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Note HTML file not found']);
-            return;
+            // HTML file doesn't exist, try to get content from database
+            $stmt = $con->prepare("SELECT entry FROM entries WHERE id = ?");
+            $stmt->execute([$note_id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$row) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Note not found']);
+                return;
+            }
+            
+            $html_content = $row['entry'] ?? '';
+            
+            // Create the HTML file with the database content
+            $entriesDir = dirname($html_file);
+            if (!is_dir($entriesDir)) {
+                mkdir($entriesDir, 0755, true);
+            }
+            
+            if (!empty($html_content)) {
+                file_put_contents($html_file, $html_content);
+            }
+        } else {
+            $html_content = file_get_contents($html_file);
         }
-        
-        $html_content = file_get_contents($html_file);
         
         // Extract preview image data (remove data:image/png;base64, prefix)
         $image_data = '';
@@ -192,8 +211,8 @@ function saveEmbeddedDiagram() {
         
         // Create the updated diagram HTML with embedded data and preview
         $diagram_html = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
-                              style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; background-color: #f9f9f9; cursor: pointer; text-align: center;" 
-                              onclick="openExcalidrawEditor(\'' . htmlspecialchars($diagram_id) . '\')"
+                              style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
+                              data-diagram-id="' . htmlspecialchars($diagram_id) . '"
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if (!empty($image_data)) {
@@ -203,7 +222,7 @@ function saveEmbeddedDiagram() {
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
         }
         
-        $diagram_html .= '<p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">Click to edit</p></div>';
+        $diagram_html .= '</div>';
         
         // Find and replace the existing diagram container or insert if not found
         $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>/s';
@@ -212,9 +231,14 @@ function saveEmbeddedDiagram() {
             // Replace existing diagram
             $html_content = preg_replace($pattern, $diagram_html, $html_content);
         } else {
-            // This shouldn't happen normally, but handle it gracefully
-            echo json_encode(['success' => false, 'message' => 'Diagram container not found in note']);
-            return;
+            // Container doesn't exist, add it to the end of the note
+            if (empty($html_content)) {
+                // If note is completely empty, just add the diagram
+                $html_content = $diagram_html;
+            } else {
+                // Add diagram at the end of existing content
+                $html_content .= "\n" . $diagram_html;
+            }
         }
         
         // Save the updated HTML
@@ -222,9 +246,9 @@ function saveEmbeddedDiagram() {
             throw new Exception('Failed to write HTML file');
         }
         
-        // Update the last modified time in database
-        $stmt = $con->prepare("UPDATE entries SET updated = datetime('now') WHERE id = ?");
-        $stmt->execute([$note_id]);
+        // Update the database with the new content and last modified time
+        $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
+        $stmt->execute([$html_content, $note_id]);
         
         echo json_encode([
             'success' => true,
