@@ -23,6 +23,20 @@
 	$workspace = $_POST['workspace'] ?? null; // optional
 	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
 	
+	// Check if this is an Excalidraw note to preserve its JSON data
+	$isExcalidrawNote = false;
+	$originalEntryContent = $entrycontent;
+	if ($id > 0) {
+		$typeStmt = $con->prepare('SELECT type, entry FROM entries WHERE id = ?');
+		$typeStmt->execute([$id]);
+		$existingNote = $typeStmt->fetch(PDO::FETCH_ASSOC);
+		if ($existingNote && $existingNote['type'] === 'excalidraw') {
+			$isExcalidrawNote = true;
+			// For Excalidraw notes, preserve the existing JSON data in entry column
+			$entrycontent = $existingNote['entry'];
+		}
+	}
+	
 	// Enforce uniqueness: if another non-trashed note in the same workspace has the same heading, fail.
 	// Allow the same heading if it belongs to this note (by id).
 	$heading = $originalHeading;
@@ -78,22 +92,24 @@
 		mkdir($entriesDir, 0755, true);
 	}
 	
-	// Write HTML content to file with error checking
-	$write_result = file_put_contents($filename, $entry);
-	if ($write_result === false) {
-		error_log("Failed to write HTML file: $filename");
-		error_log("Entry content length: " . strlen($entry));
-		error_log("Directory exists: " . (is_dir(dirname($filename)) ? 'yes' : 'no'));
-		error_log("Directory writable: " . (is_writable(dirname($filename)) ? 'yes' : 'no'));
-		
-		// Return error to client
-		header('Content-Type: application/json');
-		echo json_encode([
-			'status' => 'error',
-			'message' => 'Failed to save HTML content',
-			'file_error' => 'Cannot write to file: ' . $filename
-		]);
-		die();
+	// Write HTML content to file with error checking (only for non-Excalidraw notes)
+	if (!$isExcalidrawNote) {
+		$write_result = file_put_contents($filename, $entry);
+		if ($write_result === false) {
+			error_log("Failed to write HTML file: $filename");
+			error_log("Entry content length: " . strlen($entry));
+			error_log("Directory exists: " . (is_dir(dirname($filename)) ? 'yes' : 'no'));
+			error_log("Directory writable: " . (is_writable(dirname($filename)) ? 'yes' : 'no'));
+			
+			// Return error to client
+			header('Content-Type: application/json');
+			echo json_encode([
+				'status' => 'error',
+				'message' => 'Failed to save HTML content',
+				'file_error' => 'Cannot write to file: ' . $filename
+			]);
+			die();
+		}
 	}
     
 	$updated_date = date("Y-m-d H:i:s", $seconds);

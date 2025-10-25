@@ -30,11 +30,15 @@ window.PoznoteExcalidraw = {
           excalidrawAPI = api;
         }}
         onChange={(elements, appState, files) => {
-          // Store the latest data from onChange
+          // Store the latest data from onChange (debounced to avoid spam)
           lastElements = elements;
           lastAppState = appState;
           lastFiles = files;
-          console.log('onChange captured:', elements.length, 'elements');
+          
+          // Only log when there are actual elements or meaningful changes
+          if (elements.length > 0) {
+            console.log('onChange captured:', elements.length, 'elements');
+          }
         }}
         onInitLibrary={(err) => {
           if (err) {
