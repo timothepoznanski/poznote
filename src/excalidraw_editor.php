@@ -108,7 +108,7 @@ if ($note_id > 0) {
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidrax</title>
+    <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
     <!-- Theme -->
     <script>

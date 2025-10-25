@@ -279,7 +279,7 @@
                     <div class="create-note-option" data-type="excalidraw" onclick="selectCreateType('excalidraw')">
                         <i class="fa fa-draw-polygon"></i>
                         <div>
-                            <span>Excalidrax (experimental)</span>
+                            <span>HTML Note with Excalidraw (experimental)</span>
                             <p>Create diagrams, sketches, and visual notes</p>
                         </div>
                     </div>

@@ -224,11 +224,11 @@ function saveEmbeddedDiagram() {
         
         $diagram_html .= '</div>';
         
-        // Find and replace the existing diagram container or insert if not found
+        // Find and replace the existing diagram container or placeholder
         $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>/s';
         
         if (preg_match($pattern, $html_content)) {
-            // Replace existing diagram
+            // Replace existing diagram or placeholder
             $html_content = preg_replace($pattern, $diagram_html, $html_content);
         } else {
             // Container doesn't exist, add it to the end of the note
