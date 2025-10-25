@@ -48,9 +48,13 @@
 		}
 	}
 	
-	// Delete HTML file
+	// Delete HTML file and PNG file (for Excalidraw notes)
 	$filename = getEntriesRelativePath() . $id . ".html";
 	if (file_exists($filename)) unlink($filename);
+	
+	// Delete PNG file (for Excalidraw notes)
+	$png_filename = getEntriesRelativePath() . $id . ".png";
+	if (file_exists($png_filename)) unlink($png_filename);
 	
 	// Delete database entry (respect workspace if provided)
 	if ($workspace) {

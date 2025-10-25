@@ -20,9 +20,13 @@
         $rows = $res ? $res->fetchAll(PDO::FETCH_ASSOC) : [];
     }
     foreach($rows as $row) {
-        // Delete HTML file
+        // Delete HTML file and PNG file (for Excalidraw notes)
         $file_path = getEntriesRelativePath() . $row["id"] . ".html";
         if(file_exists($file_path)) unlink($file_path);
+        
+        // Delete PNG file (for Excalidraw notes)
+        $png_file_path = getEntriesRelativePath() . $row["id"] . ".png";
+        if(file_exists($png_file_path)) unlink($png_file_path);
         
         // Delete attachment files
         $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
