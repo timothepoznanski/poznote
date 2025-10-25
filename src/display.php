@@ -37,12 +37,12 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <div class="settings-container">
         <br>
         <?php 
+            // Build basic URL - workspace will be handled by JavaScript
             $back_params = [];
-            $back_params[] = 'workspace=' . urlencode(getWorkspaceFilter());
             if ($note_id) {
                 $back_params[] = 'note=' . intval($note_id);
             }
-            $back_href = 'index.php?' . implode('&', $back_params);
+            $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
         <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             Back to Notes
@@ -138,6 +138,23 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
+    <script>
+    // Update Back to Notes link with workspace from localStorage
+    (function() {
+        try {
+            var workspace = localStorage.getItem('poznote_selected_workspace');
+            var backLink = document.getElementById('backToNotesLink');
+            if (backLink && workspace && workspace !== '') {
+                var url = new URL(backLink.href, window.location.origin);
+                url.searchParams.set('workspace', workspace);
+                backLink.href = url.toString();
+            }
+        } catch(e) {
+            // Ignore errors
+        }
+    })();
+    </script>
+    
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){

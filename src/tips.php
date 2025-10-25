@@ -208,14 +208,25 @@ $v = '20251021.1';
 
     <script>
     function goBack() {
-        // Build return URL with current workspace and note parameters
+        // Build return URL with workspace from localStorage and note parameters
         var url = 'index.php';
         var params = [];
         
-        // Add workspace parameter
-        var workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
-        if (workspace && workspace !== 'Poznote') {
-            params.push('workspace=' + encodeURIComponent(workspace));
+        // Get workspace from localStorage first, fallback to PHP value
+        try {
+            var workspace = localStorage.getItem('poznote_selected_workspace');
+            if (!workspace || workspace === '') {
+                workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
+            }
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
+        } catch(e) {
+            // Fallback to PHP workspace if localStorage fails
+            var workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
         }
         
         // Add note parameter if provided

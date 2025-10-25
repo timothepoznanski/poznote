@@ -65,7 +65,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <body class="tags-page">
 	<div class="tags-container">
 		<div class="tags-buttons-container">
-			<button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
+			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="Back to notes">
 				Back to notes
 			</button>
 			<h1 class="tags-header">Tags</h1>
@@ -110,6 +110,35 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 	<script>
 		// Expose current workspace to the tags page JS so redirects include it
 		var pageWorkspace = <?php echo $workspace !== null ? json_encode($workspace) : 'undefined'; ?>;
+		
+		function goBackToNotes() {
+			// Build return URL with workspace from localStorage
+			var url = 'index.php';
+			var params = [];
+			
+			// Get workspace from localStorage first, fallback to PHP value
+			try {
+				var workspace = localStorage.getItem('poznote_selected_workspace');
+				if (!workspace || workspace === '') {
+					workspace = pageWorkspace;
+				}
+				if (workspace && workspace !== '') {
+					params.push('workspace=' + encodeURIComponent(workspace));
+				}
+			} catch(e) {
+				// Fallback to PHP workspace if localStorage fails
+				if (pageWorkspace && pageWorkspace !== '') {
+					params.push('workspace=' + encodeURIComponent(pageWorkspace));
+				}
+			}
+			
+			// Build final URL
+			if (params.length > 0) {
+				url += '?' + params.join('&');
+			}
+			
+			window.location.href = url;
+		}
 	</script>
 </body>
 </html>
