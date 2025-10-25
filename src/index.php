@@ -93,7 +93,13 @@ initializeWorkspacesAndLabels($con);
 $search_params = initializeSearchParams();
 extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
-$displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
+// Display workspace name (for __last_opened__, get the actual workspace from localStorage via JavaScript)
+if ($workspace_filter === '__last_opened__') {
+    // Default to Poznote but will be updated by JavaScript from localStorage
+    $displayWorkspace = 'Poznote';
+} else {
+    $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
+}
 
 // Get the custom default folder name
 $defaultFolderName = getDefaultFolderName($workspace_filter);
@@ -298,6 +304,23 @@ $body_classes = trim($extra_body_classes);
             $json_output = json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
             echo $json_output ?: '{}';
         ?>;
+
+        // Update workspace title if using __last_opened__
+        <?php if ($workspace_filter === '__last_opened__'): ?>
+        try {
+            var lastWorkspace = localStorage.getItem('poznote_selected_workspace');
+            if (lastWorkspace && lastWorkspace !== '__last_opened__') {
+                var titleElement = document.querySelector('.workspace-title-text');
+                if (titleElement) {
+                    // Use the display map to get the proper label
+                    var displayName = window.workspaceDisplayMap[lastWorkspace] || lastWorkspace;
+                    titleElement.textContent = displayName;
+                }
+            }
+        } catch (e) {
+            console.error('Error updating workspace title:', e);
+        }
+        <?php endif; ?>
     });
     </script>
 
