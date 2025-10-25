@@ -931,23 +931,32 @@ body.dark-mode .resize-handle:hover {
 }
 
 /* Notification popup */
-html[data-theme='dark'] .notification-popup,
-body.dark-mode .notification-popup {
-    /* background-color: #242424; */
+html[data-theme='dark'] #notificationPopup,
+body.dark-mode #notificationPopup {
+    background-color: #242424;
     color: #e0e0e0;
     border-color: #404040;
 }
 
-html[data-theme='dark'] .notification-popup.success,
-body.dark-mode .notification-popup.success {
-    background-color: #1a4d2e;
-    border-color: #2a6d4e;
+html[data-theme='dark'] #notificationPopup.notification-success,
+body.dark-mode #notificationPopup.notification-success {
+    color: #4ade80;
+    border-color: #4ade80;
+    box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
 }
 
-html[data-theme='dark'] .notification-popup.error,
-body.dark-mode .notification-popup.error {
-    background-color: #4d1a1a;
-    border-color: #6d2a2a;
+html[data-theme='dark'] #notificationPopup.notification-error,
+body.dark-mode #notificationPopup.notification-error {
+    color: #f87171;
+    border-color: #f87171;
+    box-shadow: 0 4px 16px rgba(248, 113, 113, 0.2);
+}
+
+html[data-theme='dark'] #notificationPopup.notification-warning,
+body.dark-mode #notificationPopup.notification-warning {
+    color: #4a9eff;
+    border-color: #4a9eff;
+    box-shadow: 0 4px 16px rgba(74, 158, 255, 0.2);
 }
 
 /* Alert messages */

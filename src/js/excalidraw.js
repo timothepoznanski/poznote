@@ -137,7 +137,11 @@ function insertHtmlAtCursor(html) {
         selection.removeAllRanges();
         selection.addRange(range);
     } else {
-        alert('Please place cursor in the note content area first');
+        if (window.showNotificationPopup) {
+            showNotificationPopup('Please place cursor in the note content area first', 'warning');
+        } else {
+            alert('Please place cursor in the note content area first');
+        }
     }
 }
 
