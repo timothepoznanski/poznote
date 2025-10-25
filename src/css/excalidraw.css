@@ -90,22 +90,54 @@
 .excalidraw-preview-container {
     position: relative;
     width: 100%;
-    margin: 16px 0;
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
+    max-width: 800px; /* Limite la largeur maximale */
+    margin: 16px auto; /* Centré horizontalement */
+    border: none; /* Supprime le cadre */
+    border-radius: 0; /* Supprime les coins arrondis */
     overflow: hidden;
     cursor: pointer;
     transition: box-shadow 0.2s ease;
 }
 
 .excalidraw-preview-container:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: none; /* Supprime l'ombre au hover */
 }
 
 .excalidraw-preview-container img {
     width: 100%;
     height: auto;
     display: block;
+}
+
+/* Centrer les diagrammes Excalidraw dans les notes */
+.note-content .excalidraw-preview-container,
+#right_col .excalidraw-preview-container,
+.entry-content .excalidraw-preview-container,
+[id^="entry"] .excalidraw-preview-container {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+/* Pour les images Excalidraw standalone dans les notes */
+img[data-is-excalidraw="true"] {
+    display: block;
+    margin: 16px auto;
+    max-width: 800px;
+    width: auto;
+    height: auto;
+    border: none; /* Supprime le cadre */
+    border-radius: 0; /* Supprime les coins arrondis */
+    box-shadow: none; /* Supprime l'ombre */
+}
+
+/* Style global pour centrer toutes les previews Excalidraw */
+.excalidraw-preview-container,
+div[onclick*="openExcalidrawNote"] {
+    display: block;
+    margin: 20px auto !important;
+    text-align: center;
+    max-width: 800px;
 }
 
 .excalidraw-preview-overlay {
