@@ -150,6 +150,14 @@ $pageWorkspace = trim(getWorkspaceFilter());
 						// If JSON parse fails, escape raw content
 						$displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
 					}
+				} elseif (isset($row['type']) && $row['type'] === 'excalidraw') {
+					// For Excalidraw notes, display the PNG image
+					$pngPath = getEntriesRelativePath() . $id . ".png";
+					if (file_exists($pngPath)) {
+						$displayContent = '<div style="text-align: center; padding: 20px;"><img src="' . htmlspecialchars($pngPath, ENT_QUOTES) . '" alt="Excalidrax Diagram" style="max-width: 100%; height: auto;"></div>';
+					} else {
+						$displayContent = '<div style="text-align: center; padding: 20px; color: #666;"><i class="fa fa-draw-polygon" style="font-size: 48px; margin-bottom: 10px;"></i><br>Excalidrax diagram (preview not available)</div>';
+					}
 				} else {
 					// non-tasklist: keep raw HTML content
 					$displayContent = $entryfinal;
