@@ -113,8 +113,8 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 <body>
     <div class="info-page">
         <div class="info-buttons-back-container">
-            <button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
-                Back to notes
+            <button class="btn btn-secondary" onclick="window.location = 'index.php?note=<?php echo $note_id; ?><?php echo $workspace ? '&workspace=' . urlencode($workspace) : ''; ?>';" title="Back to note">
+                Back to note
             </button>
         </div>
         
