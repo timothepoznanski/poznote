@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 include 'db_connect.php';
 require_once 'default_folder_settings.php';
+require_once 'functions.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -45,7 +46,7 @@ try {
 $title = $note['heading'] ?: 'New note';
 
 // Format dates
-function formatDate($dateStr) {
+function formatDateString($dateStr) {
     if (empty($dateStr)) return 'Not available';
     try {
         $date = new DateTime($dateStr);
@@ -55,8 +56,8 @@ function formatDate($dateStr) {
     }
 }
 
-$createdText = formatDate($note['created']);
-$updatedText = formatDate($note['updated']);
+$createdText = formatDateString($note['created']);
+$updatedText = formatDateString($note['updated']);
 $folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
