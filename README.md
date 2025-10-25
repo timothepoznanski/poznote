@@ -235,7 +235,24 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
-⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files. 
+⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
+
+**🤖 Automated Backup Script**
+
+For automated backups via cron or manual execution, use the `backup-poznote.sh` script located at the repository root:
+
+```bash
+./backup-poznote.sh 'http://localhost:8040' 'admin' 'admin123!' '/var/backups'
+```
+
+The script will:
+- Create backups via the Poznote API
+- Download and verify backup files
+- Store backups in a `backups-poznote` folder
+- Automatically rotate backups (keeps 7 most recent by default)
+- Can be scheduled with cron for automatic daily/weekly backups
+
+See the script file for detailed usage instructions and examples. 
 
 ## Offline View
 
