@@ -147,7 +147,7 @@ if ($note_id > 0) {
             <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 8px 16px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
                 Return to notes
             </button>
-            <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 18px; font-family: 'Inter', sans-serif;"><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
+            <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 18px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
             <button id="saveBtn" class="excalidraw-save-btn" style="padding: 8px 16px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
                 Save
             </button>
@@ -155,8 +155,8 @@ if ($note_id > 0) {
         
         <!-- Excalidraw container -->
         <div id="app" style="flex: 1; background: #fff;">
-            <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 18px;">
-                Loading Excalidraw...
+            <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 18px; font-family: 'Inter', sans-serif;">
+                Loading Excalidraw Poznote...
             </div>
         </div>
     </div>

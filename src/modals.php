@@ -255,7 +255,7 @@
                         <i class="fa fa-file-alt"></i>
                         <div>
                             <span>HTML Note</span>
-                            <p>Rich text with formatting, images, and links</p>
+                            <p>Rich text with formatting, images, links, and Excalidraw diagrams</p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
@@ -276,13 +276,6 @@
                 
                 <!-- Other items section (only shown when creating from main button) -->
                 <div class="create-section" id="otherSection">
-                    <div class="create-note-option" data-type="excalidraw" onclick="selectCreateType('excalidraw')">
-                        <i class="fa fa-draw-polygon"></i>
-                        <div>
-                            <span>HTML Note with Excalidraw (experimental)</span>
-                            <p>Create diagrams, sketches, and visual notes</p>
-                        </div>
-                    </div>
                     <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')" style="margin-top: 14px;">
                         <i class="fa fa-folder"></i>
                         <div>

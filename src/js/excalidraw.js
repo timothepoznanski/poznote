@@ -1,12 +1,6 @@
 // Excalidraw integration for Poznote
 // Handles creation and opening of Excalidraw diagram notes
 
-// Create a new HTML note (instead of dedicated Excalidraw note)
-function createExcalidrawNote() {
-    // Create a regular HTML note using the standard creation process
-    createNewNote();
-}
-
 // Open existing Excalidraw note for editing
 function openExcalidrawNote(noteId) {
     var params = new URLSearchParams({
@@ -184,7 +178,6 @@ function downloadImageFromUrl(imageSrc, filename) {
 }
 
 // Make functions globally available
-window.createExcalidrawNote = createExcalidrawNote;
 window.openExcalidrawNote = openExcalidrawNote;
 window.downloadExcalidrawImage = downloadExcalidrawImage;
 window.insertExcalidrawDiagram = insertExcalidrawDiagram;
