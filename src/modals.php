@@ -275,8 +275,8 @@
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
-                <div class="create-section" id="otherSection">
-                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')" style="margin-top: 14px;">
+                <div class="create-section" id="otherSection" style="margin-top: 12px;">
+                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')">
                         <i class="fa fa-folder"></i>
                         <div>
                             <span>Folder</span>

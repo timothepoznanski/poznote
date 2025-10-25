@@ -645,8 +645,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
-                    // Excalidraw diagram button - insert at cursor position (hidden for markdown notes)
-                    if ($note_type !== 'markdown') {
+                    // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
+                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
                         echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
                     }
                 

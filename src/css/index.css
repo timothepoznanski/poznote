@@ -3195,7 +3195,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .create-options {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    /* gap: 14px; */
     margin-top: 16px;
 }
 
