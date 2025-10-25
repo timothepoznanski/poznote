@@ -23,6 +23,37 @@ function openExcalidrawNote(noteId) {
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }
 
+// Download Excalidraw diagram as PNG image
+function downloadExcalidrawImage(noteId) {
+    // Get the PNG file path for this note
+    const pngPath = `data/entries/${noteId}.png`;
+    
+    // Check if PNG exists by trying to load it
+    const img = new Image();
+    img.onload = function() {
+        // PNG exists, download it
+        downloadImageFromUrl(pngPath, `excalidraw-diagram-${noteId}.png`);
+    };
+    img.onerror = function() {
+        // PNG doesn't exist, show error message
+        console.error('Excalidraw PNG not found for note ' + noteId);
+        alert('Diagram image not found. Please open the diagram in the editor and save it first.');
+    };
+    img.src = pngPath;
+}
+
+// Helper function to download image from URL
+function downloadImageFromUrl(imageSrc, filename) {
+    // Use the same logic as the existing downloadImage function
+    const link = document.createElement('a');
+    link.href = imageSrc;
+    link.download = filename || 'excalidraw-diagram.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Make functions globally available
 window.createExcalidrawNote = createExcalidrawNote;
 window.openExcalidrawNote = openExcalidrawNote;
+window.downloadExcalidrawImage = downloadExcalidrawImage;
