@@ -388,7 +388,7 @@ body {
     height: 100vh;
     overflow-y: scroll;
     overflow-x: hidden;
-    padding: 6 16 16 16;
+    padding: 6px 16px 16px 16px;
     box-sizing: border-box;
     background: #f8f9fa;
     flex-shrink: 0;
