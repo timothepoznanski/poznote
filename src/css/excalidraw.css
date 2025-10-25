@@ -109,31 +109,26 @@
 }
 
 .excalidraw-preview-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0);
+    position: relative;
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 8px;
     transition: background 0.2s ease;
 }
 
 .excalidraw-preview-container:hover .excalidraw-preview-overlay {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.9);
 }
 
-.excalidraw-preview-overlay i {
-    font-size: 48px;
+.excalidraw-preview-overlay {
+    font-size: 16px;
     color: #ffffff;
-    opacity: 0;
-    transition: opacity 0.2s ease;
 }
 
-.excalidraw-preview-container:hover .excalidraw-preview-overlay i {
-    opacity: 0.9;
+.excalidraw-preview-container:hover .excalidraw-preview-overlay {
+    background: rgba(0, 0, 0, 0.9);
 }
 
 .excalidraw-badge {

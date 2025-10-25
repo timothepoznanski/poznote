@@ -22,7 +22,14 @@ if ($note_id > 0) {
     if ($note) {
         $note_title = $note['heading'];
         $existing_data = $note['entry']; // JSON data stored in entry field
+        
+        // Debug: log the data we're loading
+        error_log("Loading note $note_id: " . substr($existing_data, 0, 100) . "...");
+    } else {
+        error_log("Note $note_id not found");
     }
+} else {
+    error_log("Creating new note (note_id = 0)");
 }
 ?>
 <!DOCTYPE html>
@@ -45,19 +52,33 @@ if ($note_id > 0) {
     <link rel="stylesheet" href="css/excalidraw.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     
-    <!-- Official CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.min.css" />
-    <script src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.production.min.js"></script>
+    <style>
+    @font-face {
+        font-family: 'Inter';
+        src: url('webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    }
+    .excalidraw-toolbar-btn:hover {
+        background: #1e40af !important;
+    }
+    .excalidraw-save-btn:hover {
+        background: #2d7b3e !important;
+    }
+    </style>
+    
+    <!-- Excalidraw Bundle (compiled with Vite) -->
+    <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
 </head>
 <body>
     <div style="display: flex; flex-direction: column; height: 100vh;">
-        <!-- Simple toolbar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f0f0f0; border-bottom: 1px solid #ddd;">
-            <button id="backBtn" style="padding: 8px 16px;">Return to notes</button>
-            <h3 style="margin: 0;"><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
-            <button id="saveBtn" style="padding: 8px 16px;">Save</button>
+        <!-- Clean toolbar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 8px 16px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                Return to notes
+            </button>
+            <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 18px; font-family: 'Inter', sans-serif;"><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
+            <button id="saveBtn" class="excalidraw-save-btn" style="padding: 8px 16px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                Save
+            </button>
         </div>
         
         <!-- Excalidraw container -->
@@ -69,114 +90,152 @@ if ($note_id > 0) {
     </div>
 
     <script>
-    const noteId = <?php echo $note_id; ?>;
+    let noteId = <?php echo $note_id; ?>;
     const workspace = <?php echo json_encode($workspace); ?>;
-    const existingData = <?php echo $existing_data ? json_encode(json_decode($existing_data, true)) : 'null'; ?>;
+    let existingData = <?php echo $existing_data ? json_encode($existing_data) : 'null'; ?>;
     
-    let attempts = 0;
+    // Debug PHP values
+    console.log('PHP Debug:');
+    console.log('- note_id from PHP:', <?php echo $note_id; ?>);
+    console.log('- existing_data from PHP (raw):', <?php echo json_encode($existing_data); ?>);
+    console.log('- existing_data length:', <?php echo $existing_data ? strlen($existing_data) : 0; ?>);
     
-    function init() {
-        attempts++;
-        console.log('Attempt', attempts, 'checking libraries...');
-        console.log('React:', typeof window.React);
-        console.log('ReactDOM:', typeof window.ReactDOM);
-        console.log('ExcalidrawLib:', typeof window.ExcalidrawLib);
-        console.log('window.ExcalidrawLib:', window.ExcalidrawLib);
-        
-        if (!window.React || !window.ReactDOM || !window.ExcalidrawLib) {
-            if (attempts < 50) {
-                setTimeout(init, 200);
-                return;
-            } else {
-                document.getElementById('loading').innerHTML = 'Error: Failed to load libraries. Please refresh.';
-                return;
-            }
-        }
-        
-        console.log('All libraries loaded, initializing Excalidraw...');
-        
+    // Parse and simplify existing data to avoid loading issues
+    if (existingData) {
         try {
-            const app = document.getElementById('app');
-            const { Excalidraw } = window.ExcalidrawLib;
+            console.log('Parsing existing data...');
+            existingData = JSON.parse(existingData);
+            console.log('Parsed data:', existingData);
             
-            console.log('Excalidraw component:', Excalidraw);
-            
-            let api = null;
-            
-            const element = React.createElement(Excalidraw, {
-                ref: (excalidrawAPI) => { 
-                    api = excalidrawAPI;
-                    console.log('Excalidraw API set:', api);
-                },
-                initialData: existingData || { elements: [], appState: {} }
-            });
-            
-            console.log('Rendering Excalidraw element...');
-            ReactDOM.render(element, app);
-            
-            // Hide loading
-            const loading = document.getElementById('loading');
-            if (loading) loading.style.display = 'none';
-            
-            console.log('Excalidraw should be rendered now');
-            
-            // Save button handler
-            document.getElementById('saveBtn').onclick = async function() {
-                if (!api) {
-                    alert('Editor not ready');
-                    return;
-                }
-                
-                this.textContent = 'Saving...';
-                
-                try {
-                    const elements = api.getSceneElements();
-                    const appState = api.getAppState();
-                    const data = { elements, appState };
-                    
-                    // PNG
-                    const canvas = await window.ExcalidrawLib.exportToCanvas({
-                        elements: elements,
-                        appState: appState,
-                        files: api.getFiles()
-                    });
-                    
-                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                    
-                    // Send
-                    const formData = new FormData();
-                    formData.append('note_id', noteId);
-                    formData.append('workspace', workspace);
-                    formData.append('heading', document.querySelector('h3').textContent);
-                    formData.append('diagram_data', JSON.stringify(data));
-                    formData.append('preview_image', blob, 'preview.png');
-                    
-                    const response = await fetch('api_save_excalidraw.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        this.textContent = 'Saved!';
-                        setTimeout(() => { this.textContent = 'Save'; }, 2000);
-                    } else {
-                        alert('Save failed');
-                        this.textContent = 'Save';
-                    }
-                } catch (e) {
-                    console.error('Save error:', e);
-                    alert('Error: ' + e.message);
-                    this.textContent = 'Save';
-                }
-            };
-            
-        } catch (error) {
-            console.error('Error initializing Excalidraw:', error);
-            document.getElementById('loading').innerHTML = 'Error initializing Excalidraw: ' + error.message;
+            if (existingData && existingData.elements) {
+                console.log('Simplifying existing data to avoid loading errors...');
+                existingData = {
+                    elements: existingData.elements,
+                    appState: {} // Simplified app state
+                };
+                console.log('Simplified data:', existingData);
+            }
+        } catch (e) {
+            console.error('Error parsing existing data:', e);
+            existingData = null;
         }
     }
+    
+    let excalidrawAPI = null;
+
+    window.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, checking PoznoteExcalidraw...');
+        
+        // Wait for bundle to load
+        setTimeout(function() {
+            console.log('PoznoteExcalidraw:', typeof window.PoznoteExcalidraw);
+            
+            if (!window.PoznoteExcalidraw) {
+                console.error('PoznoteExcalidraw not found');
+                document.getElementById('loading').innerHTML = 'Error: Failed to load Excalidraw. Please refresh the page.';
+                return;
+            }
+            
+            try {
+                console.log('Initializing Excalidraw...');
+                console.log('Initial data:', existingData);
+                
+                // Initialize Excalidraw
+                excalidrawAPI = window.PoznoteExcalidraw.init('app', {
+                    initialData: existingData || { elements: [], appState: {} },
+                    theme: getTheme()
+                });
+                
+                // Hide loading message
+                const loading = document.getElementById('loading');
+                if (loading) loading.style.display = 'none';
+                
+                console.log('Excalidraw initialized successfully');
+                
+            } catch (error) {
+                console.error('Error initializing Excalidraw:', error);
+                document.getElementById('loading').innerHTML = 'Error initializing Excalidraw: ' + error.message;
+            }
+        }, 1000);
+    });
+
+    function getTheme() {
+        try {
+            return localStorage.getItem('poznote-theme') || 'light';
+        } catch (e) {
+            return 'light';
+        }
+    }
+
+    // Save button handler
+    document.getElementById('saveBtn').onclick = async function() {
+        if (!excalidrawAPI) {
+            alert('Editor not ready');
+            return;
+        }
+        
+        this.textContent = 'Saving...';
+        
+        try {
+            const elements = excalidrawAPI.getSceneElements();
+            const appState = excalidrawAPI.getAppState();
+            const files = excalidrawAPI.getFiles();
+            const data = { elements, appState };
+            
+            console.log('Saving data:', { elements: elements.length, appState, files });
+            
+            // Generate PNG preview
+            const canvas = await excalidrawAPI.exportToCanvas({
+                elements: elements,
+                appState: appState,
+                files: files
+            });
+            
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            console.log('Generated PNG blob:', blob.size, 'bytes');
+            
+            // Send to server
+            const formData = new FormData();
+            formData.append('note_id', noteId);
+            formData.append('workspace', workspace);
+            formData.append('heading', document.querySelector('h3').textContent);
+            formData.append('diagram_data', JSON.stringify(data));
+            formData.append('preview_image', blob, 'preview.png');
+            
+            console.log('Sending to server...');
+            const response = await fetch('api_save_excalidraw.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            console.log('Server response:', result);
+            
+            if (result.success) {
+                this.textContent = 'Saved!';
+                setTimeout(() => { this.textContent = 'Save'; }, 2000);
+                
+                // Update the note ID if it was a new note
+                if (result.note_id && noteId === 0) {
+                    noteId = result.note_id;
+                    console.log('New note ID:', noteId);
+                    
+                    // Update URL to include note_id for future reloads
+                    const url = new URL(window.location);
+                    url.searchParams.set('note_id', noteId);
+                    window.history.replaceState({}, '', url);
+                    console.log('Updated URL:', url.toString());
+                }
+            } else {
+                alert('Save failed: ' + (result.message || 'Unknown error'));
+                this.textContent = 'Save';
+            }
+        } catch (e) {
+            console.error('Save error:', e);
+            alert('Error: ' + e.message);
+            this.textContent = 'Save';
+        }
+    };
         
     // Back button
     document.getElementById('backBtn').onclick = function() {
@@ -184,9 +243,6 @@ if ($note_id > 0) {
         if (noteId > 0) params.append('note', noteId);
         window.location.href = 'index.php?' + params.toString();
     };
-    
-    console.log('Starting initialization...');
-    init();
     </script>
 </body>
 </html>

@@ -578,7 +578,12 @@ function handleImageClick(event) {
     // Create simple dropdown menu
     const menu = document.createElement('div');
     menu.className = 'image-menu';
-    menu.innerHTML = `
+    
+    // Check if this is an Excalidraw image
+    const isExcalidraw = img.getAttribute('data-is-excalidraw') === 'true';
+    const excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
+    
+    let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-maximize"></i>
             View Large
@@ -588,6 +593,18 @@ function handleImageClick(event) {
             Download
         </div>
     `;
+    
+    // Add Edit option for Excalidraw images
+    if (isExcalidraw && excalidrawNoteId) {
+        menuHTML = `
+            <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
+                <i class="fa-edit"></i>
+                Edit
+            </div>
+        ` + menuHTML;
+    }
+    
+    menu.innerHTML = menuHTML;
 
     // Position the menu at click coordinates
     const clickX = event.clientX;
@@ -636,6 +653,15 @@ function handleImageClick(event) {
             }
         } else if (action === 'download') {
             downloadImage(src);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'edit-excalidraw') {
+            const noteId = e.target.closest('.image-menu-item')?.getAttribute('data-note-id');
+            if (noteId) {
+                openExcalidrawNote(noteId);
+            }
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
