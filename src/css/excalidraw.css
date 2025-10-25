@@ -229,3 +229,23 @@ div[onclick*="openExcalidrawNote"] {
         height: calc(100vh - 50px);
     }
 }
+
+/* ------------------------------------------------------------------
+   Masquer le bouton "Library" de l'éditeur Excalidraw
+   
+   Cible spécifiquement la zone top-right où se trouve le bouton Library
+   ------------------------------------------------------------------ */
+.layer-ui__wrapper__top-right.zen-mode-transition {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Sélecteurs alternatifs au cas où les classes varient */
+.layer-ui__wrapper__top-right,
+div[class*="layer-ui__wrapper__top-right"],
+div[class*="zen-mode-transition"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
