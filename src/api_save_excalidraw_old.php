@@ -22,26 +22,6 @@ $heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New note';
 $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
 $preview_image = isset($_FILES['preview_image']) ? $_FILES['preview_image'] : null;
 
-// Convert preview image to base64 HTML if provided
-$base64_image = '';
-$mime_type = '';
-if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
-    // Validate it's an image
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = finfo_file($finfo, $preview_image['tmp_name']);
-    finfo_close($finfo);
-    
-    if (!in_array($mime_type, ['image/png', 'image/jpeg', 'image/gif'])) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid image type']);
-        exit;
-    }
-    
-    // Convert image to base64
-    $image_data = file_get_contents($preview_image['tmp_name']);
-    $base64_image = base64_encode($image_data);
-}
-
 // If note_id is 0, we need to create a new note
 if ($note_id === 0) {
     // Get folder from POST or use default
@@ -61,7 +41,7 @@ if ($note_id === 0) {
     // Generate unique title
     $uniqueTitle = generateUniqueTitle($heading, null, $workspace);
     
-    // Create new note - store diagram data in entry column for backward compatibility
+    // Create new note
     $created_date = date("Y-m-d H:i:s");
     $query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, 'excalidraw', ?, ?)";
     $stmt = $con->prepare($query);
@@ -83,33 +63,51 @@ if ($note_id === 0) {
     }
 }
 
-// Save HTML content to file (same as other note types)
-if ($note_id > 0) {
-    // Generate HTML content now that we have the note_id
-    if (!empty($base64_image)) {
-        $html_content = '<div class="excalidraw-container">';
-        $html_content .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" />';
-        $html_content .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $html_content .= '</div>';
-    } else {
-        // If no image, create a placeholder with just the diagram data
-        $html_content = '<div class="excalidraw-container">';
-        $html_content .= '<p style="text-align:center; padding: 40px; color: #999;">Excalidraw diagram</p>';
-        $html_content .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
-        $html_content .= '</div>';
+// Save preview image if provided
+if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK && $note_id > 0) {
+    // Validate it's an image
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime_type = finfo_file($finfo, $preview_image['tmp_name']);
+    finfo_close($finfo);
+    
+    if (!in_array($mime_type, ['image/png', 'image/jpeg', 'image/gif'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid image type']);
+        exit;
     }
     
-    $filename = getEntriesRelativePath() . $note_id . ".html";
+    // Save to entries directory as PNG (for backward compatibility)
+    $png_filename = getEntriesRelativePath() . $note_id . ".png";
     
     // Ensure the entries directory exists
-    $entriesDir = dirname($filename);
+    $entriesDir = dirname($png_filename);
     if (!is_dir($entriesDir)) {
         mkdir($entriesDir, 0755, true);
     }
     
-    // Write HTML content to file
-    if (file_put_contents($filename, $html_content) === false) {
-        error_log("Failed to write HTML file for Excalidraw note ID $note_id: $filename");
+    // Move uploaded file to PNG location
+    if (!move_uploaded_file($preview_image['tmp_name'], $png_filename)) {
+        error_log("Failed to save PNG file for note ID $note_id: $png_filename");
+    } else {
+        // Create HTML file with base64 embedded image
+        $html_filename = getEntriesRelativePath() . $note_id . ".html";
+        
+        // Convert PNG to base64
+        $image_data = file_get_contents($png_filename);
+        if ($image_data !== false) {
+            $base64_image = base64_encode($image_data);
+            $data_url = 'data:image/png;base64,' . $base64_image;
+            
+            // Create HTML content with embedded image
+            $html_content = '<div class="excalidraw-preview-container" data-excalidraw-note-id="' . $note_id . '" data-is-excalidraw="true">';
+            $html_content .= '<img src="' . $data_url . '" alt="Excalidraw diagram" style="max-width: 100%; height: auto;" />';
+            $html_content .= '</div>';
+            
+            // Save HTML file
+            if (!file_put_contents($html_filename, $html_content)) {
+                error_log("Failed to save HTML file for note ID $note_id: $html_filename");
+            }
+        }
     }
 }
 

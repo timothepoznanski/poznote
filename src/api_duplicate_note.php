@@ -50,40 +50,11 @@ $attachments = $originalNote['attachments'] ?? null;
 if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['tags'], $originalNote['folder'], $originalNote['workspace'], $originalNote['type'], $attachments])) {
     $newId = $con->lastInsertId();
     
-    // Copy the HTML file content and handle Excalidraw notes
+    // Copy the HTML file content for all note types
     $originalFilename = getEntriesRelativePath() . $noteId . ".html";
     $newFilename = getEntriesRelativePath() . $newId . ".html";
     
-    // For Excalidraw notes, copy the PNG file (independent of HTML file existence)
-    if ($originalNote['type'] === 'excalidraw') {
-        $originalPngPath = getEntriesRelativePath() . $noteId . ".png";
-        $newPngPath = getEntriesRelativePath() . $newId . ".png";
-        
-        error_log("Duplicating Excalidraw note: $noteId -> $newId");
-        error_log("Original PNG: $originalPngPath - " . (file_exists($originalPngPath) ? 'EXISTS' : 'MISSING'));
-        error_log("Target PNG: $newPngPath");
-        
-        // Copy the PNG file if it exists
-        if (file_exists($originalPngPath)) {
-            // Ensure the entries directory exists
-            $entriesDir = getEntriesRelativePath();
-            if (!is_dir($entriesDir)) {
-                mkdir($entriesDir, 0755, true);
-            }
-            
-            $copyResult = copy($originalPngPath, $newPngPath);
-            error_log("PNG copy result: " . ($copyResult ? 'SUCCESS' : 'FAILED'));
-            if (!$copyResult) {
-                error_log("Failed to copy PNG file for duplicated Excalidraw note ID $newId");
-            } else {
-                error_log("PNG successfully copied to: $newPngPath");
-            }
-        } else {
-            error_log("Original PNG file not found: $originalPngPath");
-        }
-    }
-    
-    // Copy HTML file content if it exists (for regular notes)
+    // Copy HTML file content if it exists
     if (file_exists($originalFilename)) {
         $content = file_get_contents($originalFilename);
         if ($content !== false) {

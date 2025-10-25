@@ -60,15 +60,9 @@ $updatedText = formatDate($note['updated']);
 $folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
-// Build full path of the note based on type
+// Build full path of the note - all notes use HTML files now
 $noteType = $note['type'] ?? 'note';
-if ($noteType === 'excalidraw') {
-    // For Excalidraw notes, show the PNG file path (the visual representation)
-    $fullPath = "./data/entries/{$note_id}.png";
-} else {
-    // For regular notes, show the HTML file path
-    $fullPath = "./data/entries/{$note_id}.html";
-}
+$fullPath = "./data/entries/{$note_id}.html";
 
 // Process tags
 $tags = [];

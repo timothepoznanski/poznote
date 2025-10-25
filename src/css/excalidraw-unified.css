@@ -1,0 +1,47 @@
+/* Styles pour les notes Excalidraw avec images base64 intégrées */
+
+.excalidraw-container {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+    margin: 10px 0;
+}
+
+.excalidraw-image {
+    max-width: 80%;
+    max-height: 400px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: block;
+    margin: 0 auto;
+}
+
+.excalidraw-image:hover {
+    transform: scale(1.02);
+}
+
+.excalidraw-data {
+    display: none !important;
+}
+
+/* Mode sombre */
+[data-theme="dark"] .excalidraw-container {
+    background-color: #2a2a2a;
+    border-color: #404040;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .excalidraw-container {
+        padding: 5px;
+    }
+    
+    .excalidraw-image {
+        max-width: 100%;
+    }
+}

@@ -153,6 +153,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -587,7 +588,7 @@ $body_classes = trim($extra_body_classes);
                         $entryfinal = '';
                         $tasklist_json = htmlspecialchars($row['entry'] ?? '', ENT_QUOTES);
                     } else {
-                        // For regular notes, use the HTML file content
+                        // For all other notes (including Excalidraw), use the HTML file content
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                         $tasklist_json = '';
                     }
@@ -858,26 +859,16 @@ $body_classes = trim($extra_body_classes);
                         $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
                         // Start with the raw markdown displayed
                         $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
-                    } elseif ($note_type === 'excalidraw') {
-                        // For Excalidraw notes, show preview image
-                        $preview_image = getEntriesRelativePath() . $row['id'] . ".png";
-                        if (file_exists($preview_image)) {
-                            $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
-                            $display_content .= '<img src="'.$preview_image.'" alt="Excalidrax diagram" data-excalidraw-note-id="'.$row['id'].'" data-is-excalidraw="true" />';
-                            $display_content .= '</div>';
-                        } else {
-                            $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
-                            $display_content .= '<p style="text-align:center; padding: 40px; color: #999;">Click to open Excalidrax</p>';
-                            $display_content .= '</div>';
-                        }
                     } else {
+                        // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
                     }
                     
-                    // Make Excalidraw notes non-editable
-                    $editable = $note_type === 'excalidraw' ? 'false' : 'true';
+                    // Make Excalidraw notes non-editable but clickable
+                    $editable = ($note_type === 'excalidraw') ? 'false' : 'true';
+                    $excalidraw_attr = ($note_type === 'excalidraw') ? ' onclick="openExcalidrawNote('.$row['id'].')" style="cursor: pointer;"' : '';
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';

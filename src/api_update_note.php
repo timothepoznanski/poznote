@@ -30,23 +30,8 @@ $tags = isset($input['tags']) ? trim($input['tags']) : '';
 $folder = isset($input['folder']) ? trim($input['folder']) : 'Poznote';
 $workspace = isset($input['workspace']) && $input['workspace'] !== '' ? $input['workspace'] : null;
 
-// Check if this is an Excalidraw note to preserve its data
-$isExcalidrawNote = false;
-if ($id > 0) {
-    $typeStmt = $con->prepare('SELECT type, entry FROM entries WHERE id = ?');
-    $typeStmt->execute([$id]);
-    $existingNote = $typeStmt->fetch(PDO::FETCH_ASSOC);
-    if ($existingNote && $existingNote['type'] === 'excalidraw') {
-        $isExcalidrawNote = true;
-        // For Excalidraw notes, preserve the existing JSON data in entry column
-        $entrycontent = $existingNote['entry'];
-    }
-}
-
-// For non-Excalidraw notes, use the provided entry content
-if (!$isExcalidrawNote) {
-    $entrycontent = $entry;
-}
+// Use the provided entry content for all note types
+$entrycontent = $entry;
 
 if (empty($id)) {
     http_response_code(400);
@@ -130,20 +115,18 @@ if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     exit;
 }
 
-// Ensure entry file path exists and write HTML if provided (only for non-Excalidraw notes)
-if (!$isExcalidrawNote) {
-    $filename = getEntriesRelativePath() . $id . ".html";
-    $entriesDir = dirname($filename);
-    if (!is_dir($entriesDir)) {
-        mkdir($entriesDir, 0755, true);
-    }
-    if (!empty($entry)) {
-        $write_result = file_put_contents($filename, $entry);
-        if ($write_result === false) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Failed to write HTML file']);
-            exit;
-        }
+// Ensure entry file path exists and write HTML file for all note types
+$filename = getEntriesRelativePath() . $id . ".html";
+$entriesDir = dirname($filename);
+if (!is_dir($entriesDir)) {
+    mkdir($entriesDir, 0755, true);
+}
+if (!empty($entry)) {
+    $write_result = file_put_contents($filename, $entry);
+    if ($write_result === false) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Failed to write HTML file']);
+        exit;
     }
 }
 
