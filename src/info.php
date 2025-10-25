@@ -21,10 +21,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -60,8 +60,15 @@ $updatedText = formatDate($note['updated']);
 $folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
-// Build full path of the note
-$fullPath = "./data/entries/{$note_id}.html";
+// Build full path of the note based on type
+$noteType = $note['type'] ?? 'note';
+if ($noteType === 'excalidraw') {
+    // For Excalidraw notes, show the PNG file path (the visual representation)
+    $fullPath = "./data/entries/{$note_id}.png";
+} else {
+    // For regular notes, show the HTML file path
+    $fullPath = "./data/entries/{$note_id}.html";
+}
 
 // Process tags
 $tags = [];
