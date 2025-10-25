@@ -55,9 +55,10 @@ if ($note_id > 0) {
     <link rel="stylesheet" href="css/dark-mode.css">
     
     <!-- Excalidraw from CDN -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@excalidraw/excalidraw@0.17.0/dist/excalidraw.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@excalidraw/excalidraw@0.17.0/dist/excalidraw.min.css" />
+    <script src="https://unpkg.com/@excalidraw/excalidraw@0.17.0/dist/excalidraw.min.js"></script>
 </head>
 <body>
     <div class="excalidraw-container">
@@ -88,130 +89,153 @@ if ($note_id > 0) {
     const workspace = <?php echo json_encode($workspace); ?>;
     const existingData = <?php echo $existing_data ? json_encode(json_decode($existing_data, true)) : 'null'; ?>;
     
-    // Initialize Excalidraw
-    const excalidrawWrapper = document.getElementById('excalidraw-app');
-    const { Excalidraw } = window.ExcalidrawLib;
-    
-    let excalidrawAPI = null;
-    
-    // Create React component
-    const App = () => {
-        return React.createElement(Excalidraw, {
-            ref: (api) => excalidrawAPI = api,
-            initialData: existingData || {
-                elements: [],
-                appState: {
-                    viewBackgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e1e1e' : '#ffffff'
-                }
-            },
-            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
-        });
-    };
-    
-    // Mount Excalidraw
-    ReactDOM.render(React.createElement(App), excalidrawWrapper);
-    
-    // Save button handler
-    document.getElementById('saveButton').addEventListener('click', async function() {
-        if (!excalidrawAPI) {
-            alert('Editor not ready');
+    // Wait for Excalidraw to be loaded
+    window.addEventListener('DOMContentLoaded', function() {
+        // Check if Excalidraw is available
+        if (typeof window.ExcalidrawLib === 'undefined') {
+            console.error('Excalidraw library not loaded');
+            alert('Error: Excalidraw library failed to load. Please refresh the page.');
             return;
         }
         
-        const saveBtn = this;
-        const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<i class="fa-spinner fa-spin"></i> Saving...';
-        saveBtn.disabled = true;
+        // Initialize Excalidraw
+        const excalidrawWrapper = document.getElementById('excalidraw-app');
+        const { Excalidraw } = window.ExcalidrawLib;
         
-        try {
-            // Get the scene data
-            const elements = excalidrawAPI.getSceneElements();
-            const appState = excalidrawAPI.getAppState();
-            const files = excalidrawAPI.getFiles();
+        let excalidrawAPI = null;
+        
+        // Initial data
+        const initialData = existingData || {
+            elements: [],
+            appState: {
+                viewBackgroundColor: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e1e1e' : '#ffffff'
+            }
+        };
+        
+        // Create Excalidraw instance
+        const excalidrawInstance = React.createElement(Excalidraw, {
+            ref: (api) => { 
+                if (api) {
+                    excalidrawAPI = api;
+                    console.log('Excalidraw API initialized');
+                }
+            },
+            initialData: initialData,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light',
+            UIOptions: {
+                canvasActions: {
+                    loadScene: true,
+                    saveAsImage: true,
+                    export: true,
+                }
+            }
+        });
+        
+        // Mount Excalidraw
+        ReactDOM.render(excalidrawInstance, excalidrawWrapper);
+        
+        // Save button handler
+        document.getElementById('saveButton').addEventListener('click', async function() {
+            if (!excalidrawAPI) {
+                alert('Editor not ready. Please wait a moment and try again.');
+                return;
+            }
             
-            // Prepare data to save
-            const sceneData = {
-                elements: elements,
-                appState: {
-                    viewBackgroundColor: appState.viewBackgroundColor,
-                    currentItemFontFamily: appState.currentItemFontFamily,
-                    currentItemFontSize: appState.currentItemFontSize,
-                    currentItemStrokeColor: appState.currentItemStrokeColor,
-                    currentItemBackgroundColor: appState.currentItemBackgroundColor,
-                    currentItemFillStyle: appState.currentItemFillStyle,
-                    currentItemStrokeWidth: appState.currentItemStrokeWidth,
-                    currentItemRoughness: appState.currentItemRoughness,
-                    currentItemOpacity: appState.currentItemOpacity,
-                },
-                files: files
-            };
+            const saveBtn = this;
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
             
-            // Export as PNG for preview
-            const blob = await excalidrawAPI.exportToBlob({
-                mimeType: 'image/png',
-                quality: 0.9,
-                exportPadding: 20
-            });
-            
-            // Convert blob to base64
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = async function() {
-                const base64data = reader.result;
+            try {
+                // Get the scene data
+                const elements = excalidrawAPI.getSceneElements();
+                const appState = excalidrawAPI.getAppState();
+                const files = excalidrawAPI.getFiles();
                 
-                // Send to server
-                const formData = new FormData();
-                formData.append('note_id', noteId);
-                formData.append('workspace', workspace);
-                formData.append('scene_data', JSON.stringify(sceneData));
-                formData.append('preview_image', base64data);
+                // Prepare data to save
+                const sceneData = {
+                    elements: elements,
+                    appState: {
+                        viewBackgroundColor: appState.viewBackgroundColor,
+                        currentItemFontFamily: appState.currentItemFontFamily,
+                        currentItemFontSize: appState.currentItemFontSize,
+                        currentItemStrokeColor: appState.currentItemStrokeColor,
+                        currentItemBackgroundColor: appState.currentItemBackgroundColor,
+                        currentItemFillStyle: appState.currentItemFillStyle,
+                        currentItemStrokeWidth: appState.currentItemStrokeWidth,
+                        currentItemRoughness: appState.currentItemRoughness,
+                        currentItemOpacity: appState.currentItemOpacity,
+                    },
+                    files: files
+                };
                 
-                const response = await fetch('api_save_excalidraw.php', {
-                    method: 'POST',
-                    body: formData
+                // Export as PNG for preview
+                const blob = await excalidrawAPI.exportToBlob({
+                    mimeType: 'image/png',
+                    quality: 0.9,
+                    exportPadding: 20
                 });
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    saveBtn.innerHTML = '<i class="fa-check"></i> Saved!';
-                    setTimeout(() => {
-                        saveBtn.innerHTML = originalText;
-                        saveBtn.disabled = false;
-                    }, 2000);
-                } else {
-                    throw new Error(result.message || 'Save failed');
-                }
-            };
-        } catch (error) {
-            console.error('Save error:', error);
-            alert('Error saving diagram: ' + error.message);
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-        }
-    });
-    
-    // Back button handler
-    document.getElementById('backButton').addEventListener('click', function() {
-        const params = new URLSearchParams({
-            workspace: workspace
+                // Convert blob to base64
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = async function() {
+                    const base64data = reader.result;
+                    
+                    // Send to server
+                    const formData = new FormData();
+                    formData.append('note_id', noteId);
+                    formData.append('workspace', workspace);
+                    formData.append('scene_data', JSON.stringify(sceneData));
+                    formData.append('preview_image', base64data);
+                    
+                    const response = await fetch('api_save_excalidraw.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        saveBtn.innerHTML = '<i class="fa-check"></i> Saved!';
+                        setTimeout(() => {
+                            saveBtn.innerHTML = originalText;
+                            saveBtn.disabled = false;
+                        }, 2000);
+                    } else {
+                        throw new Error(result.message || 'Save failed');
+                    }
+                };
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('Error saving diagram: ' + error.message);
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
         });
-        if (noteId > 0) {
-            params.append('note', noteId);
-        }
-        window.location.href = 'index.php?' + params.toString();
-    });
-    
-    // Update theme when it changes
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'poznote-theme' && excalidrawAPI) {
-            const newTheme = e.newValue === 'dark' ? 'dark' : 'light';
-            excalidrawAPI.updateScene({
-                appState: {
-                    theme: newTheme
-                }
+        
+        // Back button handler
+        document.getElementById('backButton').addEventListener('click', function() {
+            const params = new URLSearchParams({
+                workspace: workspace
             });
-        }
+            if (noteId > 0) {
+                params.append('note', noteId);
+            }
+            window.location.href = 'index.php?' + params.toString();
+        });
+        
+        // Update theme when it changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'poznote-theme' && excalidrawAPI) {
+                const newTheme = e.newValue === 'dark' ? 'dark' : 'light';
+                excalidrawAPI.updateScene({
+                    appState: {
+                        theme: newTheme
+                    }
+                });
+            }
+        });
     });
     </script>
 </body>
