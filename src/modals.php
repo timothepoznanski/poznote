@@ -272,6 +272,13 @@
                             <p>Checklist with checkboxes for tasks and items</p>
                         </div>
                     </div>
+                    <div class="create-note-option" data-type="excalidraw" onclick="selectCreateType('excalidraw')">
+                        <i class="fa fa-draw-polygon"></i>
+                        <div>
+                            <span>Excalidraw Diagram</span>
+                            <p>Create diagrams, sketches, and visual notes</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->

@@ -841,11 +841,29 @@ $body_classes = trim($extra_body_classes);
                         $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
                         // Start with the raw markdown displayed
                         $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
+                    } elseif ($note_type === 'excalidraw') {
+                        // For Excalidraw notes, show preview image
+                        $preview_image = getEntriesRelativePath() . $row['id'] . ".png";
+                        if (file_exists($preview_image)) {
+                            $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
+                            $display_content .= '<span class="excalidraw-badge"><i class="fa-draw-polygon"></i> Excalidraw Diagram</span>';
+                            $display_content .= '<img src="'.$preview_image.'" alt="Excalidraw diagram" />';
+                            $display_content .= '<div class="excalidraw-preview-overlay"><i class="fa-edit"></i></div>';
+                            $display_content .= '</div>';
+                        } else {
+                            $display_content = '<div class="excalidraw-preview-container" onclick="openExcalidrawNote('.$row['id'].')">';
+                            $display_content .= '<span class="excalidraw-badge"><i class="fa-draw-polygon"></i> Excalidraw Diagram</span>';
+                            $display_content .= '<p style="text-align:center; padding: 40px; color: #999;">Click to open diagram</p>';
+                            $display_content .= '</div>';
+                        }
                     } else {
                         $display_content = $entryfinal;
                     }
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$display_content.'</div>';
+                    // Make Excalidraw notes non-editable
+                    $editable = $note_type === 'excalidraw' ? 'false' : 'true';
+                    
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
@@ -1042,6 +1060,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
+<script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 
 <script>

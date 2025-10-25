@@ -1467,6 +1467,13 @@ function executeCreateAction() {
         case 'list':
             createTaskListNoteInUtils();
             break;
+        case 'excalidraw':
+            if (typeof createExcalidrawNote === 'function') {
+                createExcalidrawNote();
+            } else {
+                console.error('createExcalidrawNote function not found');
+            }
+            break;
         case 'folder':
             newFolder();
             break;
