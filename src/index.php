@@ -44,6 +44,48 @@ try {
     error_log("Error checking for welcome note: " . $e->getMessage());
 }
 
+// Check if we need to redirect to include workspace from localStorage or default_workspace setting
+// Only redirect if no workspace parameter is present in GET
+if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
+    // Check for default workspace in database
+    $defaultWorkspace = null;
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['default_workspace']);
+        $defaultWorkspace = $stmt->fetchColumn();
+        if ($defaultWorkspace === false || $defaultWorkspace === '') {
+            $defaultWorkspace = null;
+        }
+    } catch (Exception $e) {
+        $defaultWorkspace = null;
+    }
+    
+    // If default workspace is set to a specific workspace (not __last_opened__), redirect with it
+    if ($defaultWorkspace !== null && $defaultWorkspace !== '__last_opened__') {
+        // Build redirect URL preserving other parameters
+        $params = $_GET;
+        $params['workspace'] = $defaultWorkspace;
+        $queryString = http_build_query($params);
+        header('Location: index.php?' . $queryString);
+        exit;
+    } else {
+        // Use localStorage (either because default is __last_opened__ or no default is set)
+        echo '<!DOCTYPE html><html><head><script>
+        (function(){
+            try {
+                var workspace = localStorage.getItem("poznote_selected_workspace");
+                if (workspace && workspace !== "" && workspace !== "Poznote") {
+                    var params = new URLSearchParams(window.location.search);
+                    params.set("workspace", workspace);
+                    window.location.href = "index.php?" + params.toString();
+                }
+            } catch(e) {}
+        })();
+        </script></head><body></body></html>';
+        // Don't exit here - let the page continue loading with Poznote as default
+    }
+}
+
 // Initialization of workspaces and labels
 initializeWorkspacesAndLabels($con);
 

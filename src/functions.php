@@ -93,10 +93,42 @@ function getAttachmentsRelativePath() {
 
 /**
  * Get the current workspace filter from GET/POST parameters
- * @return string The workspace name, defaults to 'Poznote'
+ * Priority order:
+ * 1. GET/POST parameter (highest priority)
+ * 2. Database setting 'default_workspace' (if set to a specific workspace name)
+ *    Special value '__last_opened__' means use localStorage
+ * 3. localStorage 'poznote_selected_workspace' (handled by index.php redirect)
+ * 4. Fallback to 'Poznote' (default)
+ * 
+ * @return string The workspace name
  */
 function getWorkspaceFilter() {
-    return $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+    // First check URL parameters
+    if (isset($_GET['workspace'])) {
+        return $_GET['workspace'];
+    }
+    if (isset($_POST['workspace'])) {
+        return $_POST['workspace'];
+    }
+    
+    // If no parameter, check for default workspace setting in database
+    global $con;
+    if (isset($con)) {
+        try {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['default_workspace']);
+            $defaultWorkspace = $stmt->fetchColumn();
+            if ($defaultWorkspace !== false && $defaultWorkspace !== '') {
+                return $defaultWorkspace;
+            }
+        } catch (Exception $e) {
+            // If settings table doesn't exist or query fails, continue to default
+        }
+    }
+    
+    // Final fallback
+    // Note: localStorage is checked by index.php before this function is called
+    return 'Poznote';
 }
 
 /**

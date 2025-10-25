@@ -435,6 +435,19 @@ try {
             </div>
         </div>
 
+        <!-- Default Workspace Setting -->
+        <div class="settings-section">
+            <h3> Default Workspace</h3>
+            <p>Choose which workspace opens when you start Poznote.<br>Select "Last workspace opened" to always open the workspace you were using previously.</p>
+            <div class="form-group">
+                <select id="defaultWorkspaceSelect" style="width: 300px; padding: 8px; font-size: 14px; margin-right: 10px;">
+                    <option value="">Loading...</option>
+                </select>
+                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> Save Default</button>
+            </div>
+            <div id="defaultWorkspaceStatus" style="margin-top: 8px; color: #10b981; display: none;"></div>
+        </div>
+
     <div id="ajaxAlert" style="display:none; margin-top:12px;"></div>
     <div style="padding-bottom: 50px;"></div>
     </div>
@@ -585,6 +598,92 @@ try {
             }
             echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
         ?>;
+
+        // Default Workspace Management
+        (function(){
+            function loadDefaultWorkspaceSetting() {
+                var select = document.getElementById('defaultWorkspaceSelect');
+                if (!select) return;
+                
+                // Populate select with workspaces from PHP
+                select.innerHTML = '';
+                
+                // Add special option for last workspace opened
+                var optLast = document.createElement('option');
+                optLast.value = '__last_opened__';
+                optLast.textContent = 'Last workspace opened';
+                select.appendChild(optLast);
+                
+                <?php foreach ($workspaces as $w): ?>
+                    var opt = document.createElement('option');
+                    opt.value = <?php echo json_encode($w); ?>;
+                    opt.textContent = <?php echo json_encode($w); ?>;
+                    select.appendChild(opt);
+                <?php endforeach; ?>
+                
+                // Load current default workspace setting
+                var form = new FormData();
+                form.append('action', 'get');
+                form.append('key', 'default_workspace');
+                
+                fetch('api_settings.php', {method: 'POST', body: form})
+                    .then(function(r) { return r.json(); })
+                    .then(function(j) {
+                        if (j && j.success && j.value) {
+                            select.value = j.value;
+                        } else {
+                            // Default to "Last workspace opened" if not set
+                            select.value = '__last_opened__';
+                        }
+                    })
+                    .catch(function() {
+                        select.value = '__last_opened__';
+                    });
+            }
+            
+            function saveDefaultWorkspaceSetting() {
+                var select = document.getElementById('defaultWorkspaceSelect');
+                var status = document.getElementById('defaultWorkspaceStatus');
+                if (!select) return;
+                
+                var selectedWorkspace = select.value;
+                var setForm = new FormData();
+                setForm.append('action', 'set');
+                setForm.append('key', 'default_workspace');
+                setForm.append('value', selectedWorkspace);
+                
+                fetch('api_settings.php', {method: 'POST', body: setForm})
+                    .then(function(r) { return r.json(); })
+                    .then(function(result) {
+                        if (result && result.success) {
+                            if (status) {
+                                var displayText = selectedWorkspace === '__last_opened__' 
+                                    ? 'Last workspace opened' 
+                                    : selectedWorkspace;
+                                status.textContent = '✓ Default workspace set to: ' + displayText;
+                                status.style.display = 'block';
+                                setTimeout(function() {
+                                    status.style.display = 'none';
+                                }, 3000);
+                            }
+                        } else {
+                            alert('Error saving default workspace');
+                        }
+                    })
+                    .catch(function() {
+                        alert('Error saving default workspace');
+                    });
+            }
+            
+            // Initialize on page load
+            loadDefaultWorkspaceSetting();
+            
+            // Attach save button handler
+            var saveBtn = document.getElementById('saveDefaultWorkspaceBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveDefaultWorkspaceSetting);
+            }
+        })();
     </script>
     
     <?php include 'modals.php'; ?>
