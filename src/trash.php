@@ -123,7 +123,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		if ($stmt) {
 			while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 				$id = $row['id'];
-				$filename = getEntriesRelativePath() . $id . ".html";
+				$filename = getEntryFilename($id, $row['type'] ?? 'note');
 				$entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
 				$heading = $row['heading'];
 				$updated = formatDateTime(strtotime($row['updated']));

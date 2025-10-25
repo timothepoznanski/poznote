@@ -104,8 +104,8 @@ $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, worksp
 if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace, $type])) {
     $id = $con->lastInsertId();
     
-    // Create the HTML file for the note content
-    $filename = getEntriesRelativePath() . $id . ".html";
+    // Create the file for the note content with appropriate extension
+    $filename = getEntryFilename($id, $type);
     
     // Ensure the entries directory exists
     $entriesDir = dirname($filename);
@@ -113,12 +113,12 @@ if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace, $type])
         mkdir($entriesDir, 0755, true);
     }
     
-    // Write HTML content to file
+    // Write content to file with appropriate format
     if (!empty($entry)) {
         $write_result = file_put_contents($filename, $entry);
         if ($write_result === false) {
             // Log error but don't fail the creation since DB entry was successful
-            error_log("Failed to write HTML file for note ID $id: $filename");
+            error_log("Failed to write file for note ID $id: $filename");
         }
     }
     

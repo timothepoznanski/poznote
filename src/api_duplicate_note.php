@@ -50,11 +50,11 @@ $attachments = $originalNote['attachments'] ?? null;
 if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['tags'], $originalNote['folder'], $originalNote['workspace'], $originalNote['type'], $attachments])) {
     $newId = $con->lastInsertId();
     
-    // Copy the HTML file content for all note types
-    $originalFilename = getEntriesRelativePath() . $noteId . ".html";
-    $newFilename = getEntriesRelativePath() . $newId . ".html";
+    // Copy the file content for all note types
+    $originalFilename = getEntryFilename($noteId, $originalNote['type']);
+    $newFilename = getEntryFilename($newId, $originalNote['type']);
     
-    // Copy HTML file content if it exists
+    // Copy file content if it exists
     if (file_exists($originalFilename)) {
         $content = file_get_contents($originalFilename);
         if ($content !== false) {

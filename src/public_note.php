@@ -37,8 +37,8 @@ try {
 }
 
 // Render read-only page
-// If an HTML file was saved for this note (data/entries/<id>.html), prefer using it so we preserve the exact HTML (images, formatting).
-$htmlFile = getEntriesRelativePath() . $note_id . '.html';
+// If a file was saved for this note, prefer using it so we preserve the exact content (images, formatting).
+$htmlFile = getEntryFilename($note_id, $note['type'] ?? 'note');
 $content = '';
 if (is_readable($htmlFile)) {
     $content = file_get_contents($htmlFile);

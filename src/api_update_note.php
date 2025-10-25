@@ -96,6 +96,16 @@ if (!empty($tags)) {
     $tags = implode(',', $validTags);
 }
 
+// Get the current note type to determine file extension
+$typeStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+$typeStmt->execute([$id]);
+$noteType = $typeStmt->fetchColumn();
+if ($noteType === false) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'message' => 'Note not found']);
+    exit;
+}
+
 // Enforce uniqueness of heading within workspace (exclude current id)
 $checkQuery = "SELECT id FROM entries WHERE heading = ? AND trash = 0";
 $params = [$originalHeading];
@@ -115,8 +125,8 @@ if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     exit;
 }
 
-// Ensure entry file path exists and write HTML file for all note types
-$filename = getEntriesRelativePath() . $id . ".html";
+// Ensure entry file path exists and write file with appropriate extension
+$filename = getEntryFilename($id, $noteType);
 $entriesDir = dirname($filename);
 if (!is_dir($entriesDir)) {
     mkdir($entriesDir, 0755, true);
@@ -125,7 +135,7 @@ if (!empty($entry)) {
     $write_result = file_put_contents($filename, $entry);
     if ($write_result === false) {
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Failed to write HTML file']);
+        echo json_encode(['success' => false, 'message' => 'Failed to write file']);
         exit;
     }
 }

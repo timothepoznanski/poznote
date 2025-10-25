@@ -93,8 +93,10 @@ if ($note_id === 0) {
     }
 }
 
-// Save HTML content to file (same as other note types)
+// Save HTML content to file (Excalidraw notes always use HTML files due to embedded diagrams)
 if ($note_id > 0) {
+    // Excalidraw notes always use .html extension regardless of the getFileExtensionForType function
+    // because they contain complex HTML with embedded SVG/PNG diagrams
     $filename = getEntriesRelativePath() . $note_id . ".html";
     
     // Ensure the entries directory exists
@@ -172,7 +174,7 @@ function saveEmbeddedDiagram() {
     }
     
     try {
-        // Load the existing note HTML
+        // Load the existing note HTML (Excalidraw always uses .html files)
         require_once 'functions.php';
         $html_file = getEntriesRelativePath() . $note_id . '.html';
         

@@ -83,7 +83,7 @@
 		die('Note not found');
 	}
 	
-    $filename = getEntriesRelativePath() . $id . ".html";
+    $filename = getEntryFilename($id, $row['type'] ?? 'note');
 	
 	// Ensure the entries directory exists
 	$entriesDir = dirname($filename);

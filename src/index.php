@@ -575,7 +575,7 @@ $body_classes = trim($extra_body_classes);
                     // Check if note is shared for CSS class
                     $share_class = $is_shared ? ' is-shared' : '';
                 
-                    $filename = getEntriesRelativePath() . $row["id"] . ".html";
+                    $filename = getEntryFilename($row["id"], $row["type"] ?? 'note');
                     $title = $row['heading'];
                     // Ensure we have a safe JSON-encoded title for JavaScript
                     $title_safe = $title ?? 'Note';

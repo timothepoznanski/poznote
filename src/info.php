@@ -60,9 +60,9 @@ $updatedText = formatDate($note['updated']);
 $folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
-// Build full path of the note - all notes use HTML files now
+// Build full path of the note with appropriate extension
 $noteType = $note['type'] ?? 'note';
-$fullPath = "./data/entries/{$note_id}.html";
+$fullPath = "./data/entries/{$note_id}" . getFileExtensionForType($noteType);
 
 // Process tags
 $tags = [];

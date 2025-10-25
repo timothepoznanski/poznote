@@ -29,7 +29,7 @@ if ($note_id > 0) {
         $existing_data = null; // This will hold the extracted JSON
         
         if ($is_embedded_diagram) {
-            // Embedded diagram mode: look for specific diagram data
+            // Embedded diagram mode: look for specific diagram data (always in .html files)
             require_once 'functions.php';
             $html_file = getEntriesRelativePath() . $note_id . '.html';
             if (file_exists($html_file)) {
@@ -45,7 +45,7 @@ if ($note_id > 0) {
                 }
             }
         } else {
-            // Full note mode: extract from excalidraw-data div or legacy database
+            // Full note mode: extract from excalidraw-data div or legacy database (always in .html files)
             require_once 'functions.php';
             $html_file = getEntriesRelativePath() . $note_id . '.html';
             if (file_exists($html_file)) {
