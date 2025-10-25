@@ -17,8 +17,6 @@
     user-select: none;
     /* Prevent outline and focus indicators */
     outline: none !important;
-    /* Ensure no cursor appears */
-    pointer-events: none;
     /* Ensure container doesn't expand beyond content */
     overflow: hidden;
     line-height: 0;

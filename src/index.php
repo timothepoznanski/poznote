@@ -645,16 +645,17 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
-                    // Hide emoji button for tasklist and excalidraw notes
-                    if ($note_type !== 'tasklist' && $note_type !== 'excalidraw') {
+                    // Excalidraw diagram button - insert at cursor position
+                    echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fa-edit"></i></button>';
+                
+                    // Hide emoji button for tasklist notes
+                    if ($note_type !== 'tasklist') {
                         echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     }
                     
-                    // Hide table and separator buttons for Excalidraw notes
-                    if ($note_type !== 'excalidraw') {
-                        echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
-                        echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    }
+                    // Table and separator buttons
+                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                 
                     // Favorite / Share / Attachment buttons
                     $attachments_count = 0;
@@ -672,10 +673,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     $share_class = $is_shared ? ' is-shared' : '';
                     
-                    // Hide share button for Excalidraw notes
-                    if ($note_type !== 'excalidraw') {
-                        echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
-                    }
+                    // Share button
+                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                         

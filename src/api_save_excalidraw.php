@@ -16,6 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Check if this is an embedded diagram save
+$action = isset($_POST['action']) ? $_POST['action'] : 'save_full_note';
+
+if ($action === 'save_embedded_diagram') {
+    // Handle embedded diagram save
+    saveEmbeddedDiagram();
+    exit;
+}
+
+// Continue with regular full note save
 $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
 $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
 $heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New note';
@@ -101,37 +111,31 @@ if ($note_id > 0) {
     
     // Generate new Excalidraw HTML content
     if (!empty($base64_image)) {
-        $new_excalidraw_html = '<div><br></div>'; // Editable line above
-        $new_excalidraw_html .= '<div class="excalidraw-container">';
-        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" style="border: 1px solid #9ca3af; border-radius: 4px;" contenteditable="false" />';
+        $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" style="border: 1px solid #9ca3af; border-radius: 4px;" />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
-        $new_excalidraw_html .= '<div><br></div>'; // Editable line below
     } else {
         // If no image, create a placeholder with just the diagram data
-        $new_excalidraw_html = '<div><br></div>'; // Editable line above
-        $new_excalidraw_html .= '<div class="excalidraw-container">';
-        $new_excalidraw_html .= '<p style="text-align:center; padding: 40px; color: #999;" contenteditable="false">Excalidraw diagram</p>';
+        $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
+        $new_excalidraw_html .= '<p style="text-align:center; padding: 40px; color: #999;">Excalidraw diagram</p>';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
-        $new_excalidraw_html .= '<div><br></div>'; // Editable line below
     }
     
     // If we have existing content, replace just the Excalidraw part
     if (!empty($existing_content)) {
-        // Use regex to replace the existing excalidraw-container and surrounding divs
-        // This pattern matches: optional empty div + excalidraw-container + optional empty div
+        // Use regex to replace the existing excalidraw-container
         $updated_content = preg_replace(
-            '/(?:<div><br><\/div>)?\s*<div class="excalidraw-container"[^>]*>.*?<\/div>\s*(?:<div><br><\/div>)?/s',
+            '/<div class="excalidraw-container"[^>]*>.*?<\/div>/s',
             $new_excalidraw_html,
             $existing_content
         );
         
-        // If no replacement was made (no existing container), keep original content
+        // If no replacement was made (no existing container), append to content
         if ($updated_content === $existing_content) {
-            // No existing Excalidraw container found, this shouldn't happen for updates
-            // but let's handle it gracefully by replacing all content
-            $html_content = $new_excalidraw_html;
+            // No existing Excalidraw container found, append the new content
+            $html_content = $existing_content . $new_excalidraw_html;
         } else {
             $html_content = $updated_content;
         }
@@ -151,3 +155,87 @@ echo json_encode([
     'note_id' => $note_id,
     'message' => 'Diagram saved successfully'
 ]);
+
+function saveEmbeddedDiagram() {
+    global $con;
+    
+    $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
+    $diagram_id = isset($_POST['diagram_id']) ? trim($_POST['diagram_id']) : '';
+    $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
+    $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
+    $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
+    
+    if ($note_id <= 0 || empty($diagram_id)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid note ID or diagram ID']);
+        return;
+    }
+    
+    try {
+        // Load the existing note HTML
+        require_once 'functions.php';
+        $html_file = getEntriesRelativePath() . $note_id . '.html';
+        
+        if (!file_exists($html_file)) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Note HTML file not found']);
+            return;
+        }
+        
+        $html_content = file_get_contents($html_file);
+        
+        // Extract preview image data (remove data:image/png;base64, prefix)
+        $image_data = '';
+        if (!empty($preview_image_base64) && strpos($preview_image_base64, 'data:image/png;base64,') === 0) {
+            $image_data = substr($preview_image_base64, strlen('data:image/png;base64,'));
+        }
+        
+        // Create the updated diagram HTML with embedded data and preview
+        $diagram_html = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
+                              style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; background-color: #f9f9f9; cursor: pointer; text-align: center;" 
+                              onclick="openExcalidrawEditor(\'' . htmlspecialchars($diagram_id) . '\')"
+                              data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
+        
+        if (!empty($image_data)) {
+            $diagram_html .= '<img src="data:image/png;base64,' . $image_data . '" style="max-width: 100%; height: auto;" alt="Excalidraw diagram" />';
+        } else {
+            $diagram_html .= '<i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
+                              <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
+        }
+        
+        $diagram_html .= '<p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">Click to edit</p></div>';
+        
+        // Find and replace the existing diagram container or insert if not found
+        $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<\/div>/s';
+        
+        if (preg_match($pattern, $html_content)) {
+            // Replace existing diagram
+            $html_content = preg_replace($pattern, $diagram_html, $html_content);
+        } else {
+            // This shouldn't happen normally, but handle it gracefully
+            echo json_encode(['success' => false, 'message' => 'Diagram container not found in note']);
+            return;
+        }
+        
+        // Save the updated HTML
+        if (file_put_contents($html_file, $html_content) === false) {
+            throw new Exception('Failed to write HTML file');
+        }
+        
+        // Update the last modified time in database
+        $stmt = $con->prepare("UPDATE entries SET updated = datetime('now') WHERE id = ?");
+        $stmt->execute([$note_id]);
+        
+        echo json_encode([
+            'success' => true,
+            'note_id' => $note_id,
+            'diagram_id' => $diagram_id,
+            'message' => 'Embedded diagram saved successfully'
+        ]);
+        
+    } catch (Exception $e) {
+        error_log("Error saving embedded diagram: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+    }
+}

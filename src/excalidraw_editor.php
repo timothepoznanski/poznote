@@ -6,13 +6,17 @@ require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'page_init.php';
 
-// Get note ID and workspace
+// Get parameters
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
+$diagram_id = isset($_GET['diagram_id']) ? $_GET['diagram_id'] : null;
 $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : 'Poznote';
+
+// Determine if we're in embedded diagram mode
+$is_embedded_diagram = !empty($diagram_id);
 
 // Load existing note data if editing
 $existing_data = null;
-$note_title = 'New note';
+$note_title = $is_embedded_diagram ? 'Embedded Diagram' : 'New note';
 
 if ($note_id > 0) {
     $stmt = $con->prepare('SELECT heading, entry FROM entries WHERE id = ?');
@@ -24,52 +28,70 @@ if ($note_id > 0) {
         $entry_content = $note['entry']; // Full content from database
         $existing_data = null; // This will hold the extracted JSON
         
-        // For the unified system, always try to extract JSON from the HTML file first
-        require_once 'functions.php';
-        $html_file = getEntriesRelativePath() . $note_id . '.html';
-        if (file_exists($html_file)) {
-            $html_content = file_get_contents($html_file);
-            // Extract JSON from the hidden excalidraw-data div
-            if (preg_match('/<div class="excalidraw-data"[^>]*>(.*?)<\/div>/s', $html_content, $matches)) {
-                $extracted_json = $matches[1];
-                // Decode HTML entities
-                $extracted_json = html_entity_decode($extracted_json, ENT_QUOTES | ENT_HTML5);
-                // Trim whitespace
-                $extracted_json = trim($extracted_json);
-                
-                // Validate JSON before using it
-                if (!empty($extracted_json) && $extracted_json !== '{}') {
-                    $json_test = json_decode($extracted_json, true);
-                    if (json_last_error() === JSON_ERROR_NONE && $json_test !== null) {
-                        $existing_data = $extracted_json;
-                        error_log("Successfully extracted JSON from HTML for note $note_id");
-                    } else {
-                        error_log("Invalid JSON extracted for note $note_id: " . json_last_error_msg());
-                        $existing_data = null;
-                    }
+        if ($is_embedded_diagram) {
+            // Embedded diagram mode: look for specific diagram data
+            require_once 'functions.php';
+            $html_file = getEntriesRelativePath() . $note_id . '.html';
+            if (file_exists($html_file)) {
+                $html_content = file_get_contents($html_file);
+                // Look for the specific diagram container
+                $pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*data-excalidraw="([^"]*)"[^>]*>/';
+                if (preg_match($pattern, $html_content, $matches)) {
+                    $existing_data = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5);
+                    error_log("Found embedded diagram data for $diagram_id in note $note_id");
                 } else {
-                    error_log("Empty JSON extracted for note $note_id");
-                    $existing_data = null;
-                }
-            } else {
-                // No excalidraw-data div found in HTML, try database as fallback
-                if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
-                    // Legacy system: entry field contains direct JSON data
-                    $existing_data = $entry_content;
-                    error_log("Using legacy JSON from database for note $note_id");
-                } else {
-                    error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
+                    error_log("No existing data found for diagram $diagram_id in note $note_id");
                     $existing_data = null;
                 }
             }
         } else {
-            // HTML file doesn't exist, use database content as fallback
-            if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
-                $existing_data = $entry_content;
-                error_log("HTML file not found, using database content for note $note_id");
+            // Full note mode: extract from excalidraw-data div or legacy database
+            require_once 'functions.php';
+            $html_file = getEntriesRelativePath() . $note_id . '.html';
+            if (file_exists($html_file)) {
+                $html_content = file_get_contents($html_file);
+                // Extract JSON from the hidden excalidraw-data div
+                if (preg_match('/<div class="excalidraw-data"[^>]*>(.*?)<\/div>/s', $html_content, $matches)) {
+                    $extracted_json = $matches[1];
+                    // Decode HTML entities
+                    $extracted_json = html_entity_decode($extracted_json, ENT_QUOTES | ENT_HTML5);
+                    // Trim whitespace
+                    $extracted_json = trim($extracted_json);
+                    
+                    // Validate JSON before using it
+                    if (!empty($extracted_json) && $extracted_json !== '{}') {
+                        $json_test = json_decode($extracted_json, true);
+                        if (json_last_error() === JSON_ERROR_NONE && $json_test !== null) {
+                            $existing_data = $extracted_json;
+                            error_log("Successfully extracted JSON from HTML for note $note_id");
+                        } else {
+                            error_log("Invalid JSON extracted for note $note_id: " . json_last_error_msg());
+                            $existing_data = null;
+                        }
+                    } else {
+                        error_log("Empty JSON extracted for note $note_id");
+                        $existing_data = null;
+                    }
+                } else {
+                    // No excalidraw-data div found in HTML, try database as fallback
+                    if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                        // Legacy system: entry field contains direct JSON data
+                        $existing_data = $entry_content;
+                        error_log("Using legacy JSON from database for note $note_id");
+                    } else {
+                        error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
+                        $existing_data = null;
+                    }
+                }
             } else {
-                error_log("HTML file not found and database content is HTML for note $note_id");
-                $existing_data = null;
+                // HTML file doesn't exist, use database content as fallback
+                if ($entry_content && !strpos($entry_content, '<div class="excalidraw-container"')) {
+                    $existing_data = $entry_content;
+                    error_log("HTML file not found, using database content for note $note_id");
+                } else {
+                    error_log("HTML file not found and database content is HTML for note $note_id");
+                    $existing_data = null;
+                }
             }
         }
         
@@ -142,6 +164,8 @@ if ($note_id > 0) {
     <script>
     let noteId = <?php echo $note_id; ?>;
     const workspace = <?php echo json_encode($workspace); ?>;
+    const diagramId = <?php echo json_encode($diagram_id); ?>;
+    const isEmbeddedDiagram = <?php echo $is_embedded_diagram ? 'true' : 'false'; ?>;
     
     // Safer data handling
     let existingData = null;
@@ -249,58 +273,113 @@ if ($note_id > 0) {
             
             console.log('Saving data:', { elements: elements.length, appState, files });
             
-            // Generate PNG preview
-            const canvas = await excalidrawAPI.exportToCanvas({
-                elements: elements,
-                appState: appState,
-                files: files
-            });
-            
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            console.log('Generated PNG blob:', blob.size, 'bytes');
-            
-            // Send to server
-            const formData = new FormData();
-            formData.append('note_id', noteId);
-            formData.append('workspace', workspace);
-            formData.append('heading', document.querySelector('h3').textContent);
-            formData.append('diagram_data', JSON.stringify(data));
-            formData.append('preview_image', blob, 'preview.png');
-            
-            console.log('Sending to server...');
-            const response = await fetch('api_save_excalidraw.php', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            console.log('Server response:', result);
-            
-            if (result.success) {
-                this.textContent = 'Saved!';
-                setTimeout(() => { this.textContent = 'Save'; }, 2000);
-                
-                // Update the note ID if it was a new note
-                if (result.note_id && noteId === 0) {
-                    noteId = result.note_id;
-                    console.log('New note ID:', noteId);
-                    
-                    // Update URL to include note_id for future reloads
-                    const url = new URL(window.location);
-                    url.searchParams.set('note_id', noteId);
-                    window.history.replaceState({}, '', url);
-                    console.log('Updated URL:', url.toString());
-                }
+            if (isEmbeddedDiagram) {
+                // Embedded diagram mode: save to existing note HTML
+                await saveEmbeddedDiagram(data, elements, appState, files);
             } else {
-                alert('Save failed: ' + (result.message || 'Unknown error'));
-                this.textContent = 'Save';
+                // Full note mode: save as complete Excalidraw note
+                await saveFullNote(data, elements, appState, files);
             }
+            
+            this.textContent = 'Saved!';
+            setTimeout(() => { this.textContent = 'Save'; }, 2000);
+            
         } catch (e) {
             console.error('Save error:', e);
             alert('Error: ' + e.message);
             this.textContent = 'Save';
         }
     };
+    
+    // Save embedded diagram
+    async function saveEmbeddedDiagram(data, elements, appState, files) {
+        // Generate preview canvas
+        const canvas = await excalidrawAPI.exportToCanvas({
+            elements: elements,
+            appState: appState,
+            files: files
+        });
+        
+        // Convert to base64 image for embedding
+        const base64Image = canvas.toDataURL('image/png');
+        
+        const formData = new FormData();
+        formData.append('action', 'save_embedded_diagram');
+        formData.append('note_id', noteId);
+        formData.append('diagram_id', diagramId);
+        formData.append('workspace', workspace);
+        formData.append('diagram_data', JSON.stringify(data));
+        formData.append('preview_image_base64', base64Image);
+        
+        console.log('Saving embedded diagram to note', noteId, 'diagram', diagramId);
+        
+        const response = await fetch('api_save_excalidraw.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        console.log('Server response:', result);
+        
+        if (result.success) {
+            // Return to parent note
+            const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
+            if (context.returnUrl) {
+                window.location.href = context.returnUrl;
+            } else {
+                const params = new URLSearchParams({ workspace: workspace, note: noteId });
+                window.location.href = 'index.php?' + params.toString();
+            }
+        } else {
+            throw new Error(result.message || 'Save failed');
+        }
+    }
+    
+    // Save full note
+    async function saveFullNote(data, elements, appState, files) {
+        // Generate PNG preview
+        const canvas = await excalidrawAPI.exportToCanvas({
+            elements: elements,
+            appState: appState,
+            files: files
+        });
+        
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        console.log('Generated PNG blob:', blob.size, 'bytes');
+        
+        // Send to server
+        const formData = new FormData();
+        formData.append('note_id', noteId);
+        formData.append('workspace', workspace);
+        formData.append('heading', document.querySelector('h3').textContent);
+        formData.append('diagram_data', JSON.stringify(data));
+        formData.append('preview_image', blob, 'preview.png');
+        
+        console.log('Sending to server...');
+        const response = await fetch('api_save_excalidraw.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        console.log('Server response:', result);
+        
+        if (result.success) {
+            // Update the note ID if it was a new note
+            if (result.note_id && noteId === 0) {
+                noteId = result.note_id;
+                console.log('New note ID:', noteId);
+                
+                // Update URL to include note_id for future reloads
+                const url = new URL(window.location);
+                url.searchParams.set('note_id', noteId);
+                window.history.replaceState({}, '', url);
+                console.log('Updated URL:', url.toString());
+            }
+        } else {
+            throw new Error(result.message || 'Save failed');
+        }
+    }
         
     // Back button
     document.getElementById('backBtn').onclick = function() {

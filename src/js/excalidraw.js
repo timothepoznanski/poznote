@@ -1,15 +1,10 @@
 // Excalidraw integration for Poznote
 // Handles creation and opening of Excalidrax diagram notes
 
-// Create a new Excalidraw note
+// Create a new HTML note (instead of dedicated Excalidraw note)
 function createExcalidrawNote() {
-    var params = new URLSearchParams({
-        workspace: selectedWorkspace || 'Poznote',
-        folder: selectedFolder || 'Default'
-    });
-    
-    // Redirect to Excalidraw editor
-    window.location.href = 'excalidraw_editor.php?' + params.toString();
+    // Create a regular HTML note using the standard creation process
+    createNewNote();
 }
 
 // Open existing Excalidraw note for editing
@@ -21,6 +16,102 @@ function openExcalidrawNote(noteId) {
     
     // Redirect to Excalidraw editor
     window.location.href = 'excalidraw_editor.php?' + params.toString();
+}
+
+// Insert Excalidraw diagram at cursor position in a note
+function insertExcalidrawDiagram() {
+    // Create a unique ID for this diagram
+    const diagramId = 'excalidraw-' + Date.now();
+    
+    // Create HTML container for the Excalidraw diagram
+    const diagramHTML = `
+        <div class="excalidraw-container" id="${diagramId}" style="border: 2px dashed #ccc; padding: 20px; margin: 10px 0; min-height: 300px; text-align: center; background-color: #f9f9f9; cursor: pointer;" onclick="openExcalidrawEditor('${diagramId}')">
+            <i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
+            <p style="color: #666; font-size: 16px; margin: 0;">Click to create/edit diagram</p>
+            <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">Excalidraw diagram placeholder</p>
+        </div>
+    `;
+    
+    // Insert at cursor position
+    insertHtmlAtCursor(diagramHTML);
+}
+
+// Open Excalidraw editor for a specific diagram
+function openExcalidrawEditor(diagramId) {
+    // Store the current note context
+    const currentNoteId = getCurrentNoteId();
+    if (!currentNoteId) {
+        alert('Please save the note first before editing diagrams');
+        return;
+    }
+    
+    // Store diagram context in sessionStorage
+    sessionStorage.setItem('excalidraw_context', JSON.stringify({
+        noteId: currentNoteId,
+        diagramId: diagramId,
+        returnUrl: window.location.href
+    }));
+    
+    // Redirect to Excalidraw editor with diagram context
+    const params = new URLSearchParams({
+        diagram_id: diagramId,
+        note_id: currentNoteId,
+        workspace: selectedWorkspace || 'Poznote'
+    });
+    
+    window.location.href = 'excalidraw_editor.php?' + params.toString();
+}
+
+// Helper function to get current note ID
+function getCurrentNoteId() {
+    // Try to get note ID from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const noteId = urlParams.get('note');
+    if (noteId) {
+        return noteId;
+    }
+    
+    // Try to get from focused note element
+    const focusedNote = document.querySelector('.note-item.focused');
+    if (focusedNote) {
+        const noteElement = focusedNote.closest('[id^="note"]');
+        if (noteElement) {
+            return noteElement.id.replace('note', '');
+        }
+    }
+    
+    return null;
+}
+
+// Helper function to insert HTML at cursor position
+function insertHtmlAtCursor(html) {
+    let selection = window.getSelection();
+    if (selection.rangeCount === 0) {
+        // No selection, try to find the focused editable element
+        const focusedElement = document.querySelector('.note-content[contenteditable="true"]:focus') || 
+                              document.querySelector('.note-content[contenteditable="true"]');
+        if (focusedElement) {
+            focusedElement.focus();
+            selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(focusedElement);
+            range.collapse(false); // Move to end
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+    
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const fragment = range.createContextualFragment(html);
+        range.deleteContents();
+        range.insertNode(fragment);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    } else {
+        alert('Please place cursor in the note content area first');
+    }
 }
 
 // Download Excalidrax diagram as PNG image
@@ -57,3 +148,5 @@ function downloadImageFromUrl(imageSrc, filename) {
 window.createExcalidrawNote = createExcalidrawNote;
 window.openExcalidrawNote = openExcalidrawNote;
 window.downloadExcalidrawImage = downloadExcalidrawImage;
+window.insertExcalidrawDiagram = insertExcalidrawDiagram;
+window.openExcalidrawEditor = openExcalidrawEditor;
