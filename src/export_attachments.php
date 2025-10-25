@@ -64,7 +64,7 @@ if (!$hasAttachments) {
             </div>
             
             <div class="action-buttons">
-                <a href="index.php" class="btn btn-primary">
+                <a id="backToNotesLink" href="index.php" class="btn btn-primary">
                     Back to notes
                 </a>
                 <a href="backup_export.php" class="btn btn-secondary">
@@ -72,6 +72,17 @@ if (!$hasAttachments) {
                 </a>
             </div>
         </div>
+        
+        <script>
+        // Ensure Back to Notes opens the stored workspace if present
+        (function(){ try {
+            var stored = localStorage.getItem('poznote_selected_workspace');
+            if (stored) {
+                var a = document.getElementById('backToNotesLink'); 
+                if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+            }
+        } catch(e){} })();
+        </script>
     </body>
     </html>
     <?php

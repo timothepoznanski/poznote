@@ -820,7 +820,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 // Ensure Back to Notes opens the stored workspace if present
 (function(){ try {
     var stored = localStorage.getItem('poznote_selected_workspace');
-    if (stored && stored !== 'Poznote') {
+    if (stored) {
         var a = document.getElementById('backToNotesLink'); 
         if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
     }
