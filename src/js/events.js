@@ -58,13 +58,13 @@ function handleNoteEditEvent(e) {
     
     if (target.classList.contains('name_doss')) {
         if (updateNoteEnCours == 1) {
-            showNotificationPopup("Save in progress...");
+            // Save in progress - silently ignore
         } else {
             updateNote();
         }
     } else if (target.classList.contains('noteentry')) {
         if (updateNoteEnCours == 1) {
-            showNotificationPopup("Auto-save in progress, please do not modify the note.");
+            // Auto-save in progress - silently ignore
         } else {
             updateNote();
         }
@@ -86,7 +86,7 @@ function handleNoteEditEvent(e) {
         // Process other note fields (tags, etc.)
         if (target.id && target.id.startsWith('tags')) {
             if (updateNoteEnCours == 1) {
-                showNotificationPopup("Save in progress...");
+                // Save in progress - silently ignore
             } else {
                 updateNote();
             }

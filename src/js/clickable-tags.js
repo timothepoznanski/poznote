@@ -396,9 +396,12 @@ function handleTagInput(e, noteId, container) {
             // Check if there's a visible suggestions dropdown
             const suggestionsDropdown = container.querySelector('.tag-suggestions');
             if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
-                // If suggestions are visible, don't process the input text
-                // The suggestion selection should be handled by the navigation handler
-                return false;
+                // For Enter key, let the navigation handler handle suggestion selection
+                if (e.key === 'Enter') {
+                    return false;
+                }
+                // For space and comma, hide suggestions and allow creating the typed tag
+                suggestionsDropdown.style.display = 'none';
             }
             
             // If user types words separated by spaces, treat them as separate tags
@@ -465,9 +468,8 @@ function handleTagInputBlur(e, noteId, container) {
         // Check if there's a visible suggestions dropdown
         const suggestionsDropdown = container.querySelector('.tag-suggestions');
         if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
-            // If suggestions are visible, don't process the input text on blur
-            // This prevents adding the typed text when user clicks away from suggestions
-            return;
+            // Hide suggestions and process the typed text
+            suggestionsDropdown.style.display = 'none';
         }
         
         // If user types words separated by spaces, treat them as separate tags
