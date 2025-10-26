@@ -252,12 +252,93 @@ if ($note_id > 0) {
                 const loading = document.getElementById('loading');
                 if (loading) loading.style.display = 'none';
                 
+                // Initialize library button popup handler
+                initializeLibraryPopup();
+                
             } catch (error) {
                 console.error('Error initializing Excalidraw:', error);
                 document.getElementById('loading').innerHTML = 'Error initializing Excalidraw: ' + error.message;
             }
         }, 1000);
     });
+
+    // Function to initialize the library popup handler
+    function initializeLibraryPopup() {
+        // Create the popup HTML
+        const popupHTML = `
+            <div id="libraryPopup" class="library-popup-overlay">
+                <div class="library-popup">
+                    <h3>Feature Not Available</h3>
+                    <p>The Excalidraw library is not available at the moment. This feature will be added in a future update.</p>
+                    <button class="library-popup-button" onclick="closeLibraryPopup()">Got it</button>
+                </div>
+            </div>
+        `;
+        
+        // Add popup to body
+        document.body.insertAdjacentHTML('beforeend', popupHTML);
+        
+        // Function to show popup
+        window.showLibraryPopup = function() {
+            const popup = document.getElementById('libraryPopup');
+            if (popup) {
+                popup.classList.add('show');
+            }
+        };
+        
+        // Function to close popup
+        window.closeLibraryPopup = function() {
+            const popup = document.getElementById('libraryPopup');
+            if (popup) {
+                popup.classList.remove('show');
+            }
+        };
+        
+        // Close popup when clicking overlay
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'libraryPopup') {
+                closeLibraryPopup();
+            }
+        });
+        
+        // Monitor for library button clicks using event delegation
+        document.addEventListener('click', function(e) {
+            // Check for library button clicks (various possible selectors)
+            if (e.target.closest('[data-testid="library-button"]') || 
+                e.target.closest('.library-button') ||
+                e.target.closest('[aria-label*="Library"]') ||
+                e.target.closest('[aria-label*="library"]') ||
+                (e.target.closest('.layer-ui__wrapper__top-right') && 
+                 (e.target.textContent && e.target.textContent.toLowerCase().includes('library')))) {
+                
+                e.preventDefault();
+                e.stopPropagation();
+                showLibraryPopup();
+                return false;
+            }
+        }, true); // Use capture phase to intercept before Excalidraw handles it
+        
+        // Also monitor for any clicks in the top-right area as a fallback
+        setTimeout(() => {
+            const topRightArea = document.querySelector('.layer-ui__wrapper__top-right');
+            if (topRightArea) {
+                topRightArea.addEventListener('click', function(e) {
+                    // Only intercept if it looks like a library-related click
+                    const clickedElement = e.target;
+                    const isLibraryClick = clickedElement.closest('[title*="Library"]') ||
+                                         clickedElement.closest('[title*="library"]') ||
+                                         clickedElement.textContent.toLowerCase().includes('library');
+                    
+                    if (isLibraryClick) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showLibraryPopup();
+                        return false;
+                    }
+                }, true);
+            }
+        }, 2000); // Wait a bit for Excalidraw to fully load
+    }
 
     function getTheme() {
         try {
