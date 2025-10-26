@@ -6,7 +6,7 @@ function startDownload() {
 
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
     if (!noteId) {
-        alert('Error: No note ID provided');
+        window.showError('Aucun ID de note fourni', 'Erreur');
         return;
     }
     
@@ -22,7 +22,7 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
         window.location.href = url;
     } catch (error) {
-        alert('Error displaying information: ' + error.message);
+        window.showError('Erreur lors de l\'affichage des informations: ' + error.message, 'Erreur');
     }
 }
 
@@ -388,14 +388,16 @@ function deleteCurrentWorkspace() {
         return; 
     }
     
-    if (confirm('Delete workspace "' + name + '"? Notes will be moved to the default workspace.')) {
-        var params = new URLSearchParams({ action: 'delete', name: name });
-        
-        fetch('api_workspaces.php', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
-            body: params.toString() 
-        })
+    window.modalAlert.confirm('Supprimer l\'espace de travail "' + name + '"? Les notes seront déplacées vers l\'espace de travail par défaut.', 'Confirmer la suppression')
+        .then(function(confirmed) {
+            if (confirmed) {
+                var params = new URLSearchParams({ action: 'delete', name: name });
+                
+                fetch('api_workspaces.php', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
+                    body: params.toString() 
+                })
         .then(function(response) { return response.json(); })
         .then(function(res) {
             if (res.success) {
@@ -467,7 +469,8 @@ function deleteCurrentWorkspace() {
         .catch(function(err) { 
             showNotificationPopup('Network error', 'error'); 
         });
-    }
+            }
+        });
 }
 
 function createFolder() {

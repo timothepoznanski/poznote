@@ -37,17 +37,6 @@ function isCursorInEditableNote() {
     return editableElement && noteEntry;
 }
 
-/**
- * Show warning if cursor is not in editable note
- */
-function showCursorWarning() {
-    if (window.showNotificationPopup) {
-        showNotificationPopup('Please click inside a note before adding an Excalidraw diagram.', 'warning');
-    } else {
-        alert('Please click inside a note before adding an Excalidraw diagram.');
-    }
-}
-
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
     // Check if cursor is in editable note first
@@ -59,14 +48,14 @@ function insertExcalidrawDiagram() {
     // Check if the current note has content
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        alert('Please save the note first before adding diagrams');
+        window.showError('Veuillez sauvegarder la note avant d\'ajouter des diagrammes', 'Note non sauvegardée');
         return;
     }
     
     // Get the current note content
     const noteEntry = document.getElementById('entry' + currentNoteId);
     if (!noteEntry) {
-        alert('Note editor not found');
+        window.showError('Éditeur de note non trouvé', 'Erreur');
         return;
     }
     
@@ -81,7 +70,7 @@ function insertExcalidrawDiagram() {
         if (window.showNotificationPopup) {
             showNotificationPopup('Please add some content to the note before inserting an Excalidraw diagram.', 'warning');
         } else {
-            alert('Please add some content to the note before inserting an Excalidraw diagram.');
+            window.showWarning('Veuillez ajouter du contenu à la note avant d\'insérer un diagramme Excalidraw.');
         }
         return;
     }
@@ -113,7 +102,7 @@ function openExcalidrawEditor(diagramId) {
     // Store the current note context
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        alert('Please save the note first before editing diagrams');
+        window.showError('Veuillez sauvegarder la note avant d\'éditer les diagrammes', 'Note non sauvegardée');
         return;
     }
     
@@ -203,7 +192,7 @@ function insertHtmlAtCursor(html) {
         if (window.showNotificationPopup) {
             showNotificationPopup('Could not find note content area to insert diagram', 'warning');
         } else {
-            alert('Could not find note content area to insert diagram');
+            window.showError('Impossible de trouver la zone de contenu de la note pour insérer le diagramme', 'Erreur d\'insertion');
         }
     }
 }
@@ -222,7 +211,7 @@ function downloadExcalidrawImage(noteId) {
     img.onerror = function() {
         // PNG doesn't exist, show error message
         console.error('Excalidraw PNG not found for note ' + noteId);
-        alert('Excalidraw image not found. Please open the diagram in the editor and save it first.');
+        window.showError('Image Excalidraw non trouvée. Veuillez ouvrir le diagramme dans l\'éditeur et le sauvegarder d\'abord.', 'Image introuvable');
     };
     img.src = pngPath;
 }

@@ -16,37 +16,6 @@ function isCursorInEditableNote() {
     );
 }
 
-function showCursorWarning() {
-    // Afficher un message d'avertissement
-    const message = "Veuillez placer le curseur dans la zone d'édition de la note avant d'insérer du contenu.";
-    
-    // Créer une notification temporaire
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #ff6b6b;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        font-size: 14px;
-        max-width: 300px;
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Supprimer après 3 secondes
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 3000);
-}
-
 function showAttachmentDialog(noteId) {
     var ws = selectedWorkspace || 'Poznote';
     var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
@@ -377,7 +346,7 @@ function insertMarkdownAtCursor(text, dropTarget) {
     // Vérifier si le curseur est dans une zone éditable pour les insertions manuelles
     // (dropTarget indique un glisser-déposer, donc on ne vérifie pas)
     if (!dropTarget && !isCursorInEditableNote()) {
-        showCursorWarning();
+        window.showCursorWarning();
         return;
     }
     
@@ -479,7 +448,7 @@ function handleHTMLImageInsert(file, dropTarget) {
 function insertHTMLAtSelection(html) {
     // Vérifier si le curseur est dans une zone éditable
     if (!isCursorInEditableNote()) {
-        showCursorWarning();
+        window.showCursorWarning();
         return false;
     }
     

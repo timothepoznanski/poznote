@@ -121,6 +121,7 @@ if ($note_id > 0) {
     })();
     </script>
     
+    <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/excalidraw.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     
@@ -137,6 +138,8 @@ if ($note_id > 0) {
     }
     </style>
     
+    <!-- Modal alerts system -->
+    <script src="js/modal-alerts.js"></script>
     <!-- Excalidraw Bundle (compiled with Vite) -->
     <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
 </head>

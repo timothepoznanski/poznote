@@ -561,21 +561,10 @@ function isCursorInEditableNote() {
     return editableElement && noteEntry;
 }
 
-/**
- * Show warning if cursor is not in editable note
- */
-function showCursorWarning() {
-    if (window.showNotificationPopup) {
-        showNotificationPopup('Please click inside a note before inserting content.', 'warning');
-    } else {
-        alert('Please click inside a note before inserting content.');
-    }
-}
-
 function insertSeparator() {
   // Check if cursor is in editable note
   if (!isCursorInEditableNote()) {
-    showCursorWarning();
+    window.showCursorWarning();
     return;
   }
   
@@ -747,7 +736,7 @@ function toggleEmojiPicker() {
 function insertEmoji(emoji) {
   // Vérifier si le curseur est dans une zone éditable
   if (!isCursorInEditableNote()) {
-    showCursorWarning();
+    window.showCursorWarning();
     return;
   }
   
@@ -1085,7 +1074,7 @@ function toggleTablePicker() {
 function insertTable(rows, cols) {
   // Check if cursor is in editable note
   if (!isCursorInEditableNote()) {
-    showCursorWarning();
+    window.showCursorWarning();
     return;
   }
   

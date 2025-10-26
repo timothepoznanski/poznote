@@ -161,10 +161,12 @@ window.loadNoteDirectly = function(url, noteId, event) {
             if (!confirm(confirmationMessage)) {
                 return false;
             }
-            
-            // User confirmed - reset the unsaved changes flag and update note ID
-            editedButNotSaved = 0;
-            noteid = noteId;
+        }
+        
+        // Navigate to the note URL directly
+        window.location.href = url;
+        
+    } catch (error) {
         }
         
         // Prevent multiple simultaneous loads

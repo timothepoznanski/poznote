@@ -29,6 +29,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/all.css">
+    <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/display.css">
     <link rel="stylesheet" href="css/modals.css">
@@ -140,6 +141,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     </div>
 
     <?php include 'modals.php'; ?>
+    <script src="js/modal-alerts.js"></script>
     <script src="js/theme-manager.js"></script>
     <script src="js/globals.js"></script>
     <script src="js/ui.js"></script>
