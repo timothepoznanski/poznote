@@ -396,10 +396,10 @@ if (!$note) {
                 <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
                 <div class="pdf-preview-actions">
                     <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
-                        Ouvrir dans un nouvel onglet
+                        Open in new tab
                     </button>
                     <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
-                        Télécharger
+                        Download
                     </button>
                 </div>
             </div>
