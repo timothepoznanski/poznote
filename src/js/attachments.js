@@ -272,6 +272,11 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     var loadingText = '![Uploading ' + file.name + '...]()';
     insertMarkdownAtCursor(loadingText, dropTarget);
     
+    // Trigger initial save for loading text
+    if (typeof updateNote === 'function') {
+        updateNote(); // Mark note as edited
+    }
+    
     // Uploader le fichier
     var formData = new FormData();
     formData.append('action', 'upload');
@@ -298,6 +303,13 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             if (typeof markNoteAsModified === 'function') {
                 markNoteAsModified(noteId);
             }
+            
+            // Trigger automatic save after a short delay
+            setTimeout(function() {
+                if (typeof updatenote === 'function') {
+                    updatenote(); // Save to server
+                }
+            }, 500); // Longer delay for markdown to allow upload completion
         } else {
             // Supprimer le texte de chargement en cas d'erreur
             replaceLoadingText(loadingText, '', dropTarget);
@@ -383,6 +395,18 @@ function handleHTMLImageInsert(file, dropTarget) {
         if (!inserted && dropTarget) {
             dropTarget.innerHTML += imgHtml;
         }
+        
+        // Trigger automatic save after image insertion
+        if (typeof updateNote === 'function') {
+            updateNote(); // Mark note as edited
+        }
+        
+        // Trigger immediate save after a short delay to allow DOM to update
+        setTimeout(function() {
+            if (typeof updatenote === 'function') {
+                updatenote(); // Save to server
+            }
+        }, 100);
     };
     reader.readAsDataURL(file);
 }
