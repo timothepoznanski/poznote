@@ -64,23 +64,6 @@ if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['ta
                 mkdir($entriesDir, 0755, true);
             }
             
-            // For Excalidraw notes, update HTML references (if HTML exists)
-            if ($originalNote['type'] === 'excalidraw') {
-                // Update the HTML content to reference the new PNG file
-                $content = str_replace(
-                    "data/entries/$noteId.png", 
-                    "data/entries/$newId.png", 
-                    $content
-                );
-                
-                // Also update any onclick references to the new note ID
-                $content = str_replace(
-                    "openExcalidrawNote($noteId)",
-                    "openExcalidrawNote($newId)",
-                    $content
-                );
-            }
-            
             $write_result = file_put_contents($newFilename, $content);
             if ($write_result === false) {
                 error_log("Failed to write HTML file for duplicated note ID $newId: $newFilename");

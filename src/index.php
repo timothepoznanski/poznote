@@ -742,12 +742,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-copy"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-folder-open"></i></button>';
                     
-                    // Special download behavior for Excalidraw notes
-                    if ($note_type === 'excalidraw') {
-                        echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download diagram as PNG" onclick="downloadExcalidrawImage(\''.$row['id'].'\')" data-note-type="excalidraw"><i class="fa-download"></i></button>';
-                    } else {
-                        echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
-                    }
+                    // Download button for all note types
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';

@@ -93,7 +93,7 @@ function getAttachmentsRelativePath() {
 
 /**
  * Get the appropriate file extension based on note type
- * @param string $type The note type (markdown, note, list, excalidraw, etc.)
+ * @param string $type The note type (note, markdown, tasklist)
  * @return string The file extension (.md or .html)
  */
 function getFileExtensionForType($type) {

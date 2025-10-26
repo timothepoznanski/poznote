@@ -73,7 +73,7 @@ if ($note_id === 0) {
     
     // Create new note - store diagram data in entry column for backward compatibility
     $created_date = date("Y-m-d H:i:s");
-    $query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, 'excalidraw', ?, ?)";
+    $query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, 'note', ?, ?)";
     $stmt = $con->prepare($query);
     
     if ($stmt->execute([$uniqueTitle, $diagram_data, $folder, $workspace, $created_date, $created_date])) {

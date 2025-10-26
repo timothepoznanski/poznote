@@ -62,7 +62,7 @@ components:
           enum: [0, 1]
         type:
           type: string
-          enum: [note, task]
+          enum: [note, markdown, tasklist]
         created_at:
           type: string
           format: date-time
@@ -164,7 +164,7 @@ paths:
                   example: "Personal"
                 type:
                   type: string
-                  enum: [note, task]
+                  enum: [note, markdown, tasklist]
                   description: "Note type (optional, default: note)"
                   example: "note"
                 location:

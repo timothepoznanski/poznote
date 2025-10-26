@@ -151,7 +151,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 						$displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
 					}
 				} else {
-					// For all other note types (HTML, Markdown, Excalidraw), use the HTML file content
+					// For all other note types (HTML, Markdown), use the HTML file content
 					$displayContent = $entryfinal;
 				}
 
