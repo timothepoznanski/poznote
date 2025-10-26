@@ -36,36 +36,19 @@ function getTipsFromGitHub() {
         }
     }
     
-    // Fallback to default tips if GitHub is unavailable
-    return getFallbackTips();
-}
-
-// Fallback tips in case GitHub is unavailable
-function getFallbackTips() {
+    // Return empty structure if GitHub is unavailable
     return [
         'header' => [
-            'title' => 'Did you know?',
-            'subtitle' => 'Please check all these quick tips. There might be a few things here you didn\'t know Poznote could do.'
+            'title' => 'Tips unavailable',
+            'subtitle' => 'Unable to load tips from GitHub.'
         ],
-        'tips' => [
-            [
-                'icon' => 'fa-list-check',
-                'text' => 'Create tasklist notes with drag-and-drop reordering and clickable links.',
-                'images' => ['tip3.png']
-            ],
-            [
-                'icon' => 'fa-image',
-                'text' => 'Add images by dragging and dropping files or pasting screenshots directly.',
-                'images' => ['tip4.png']
-            ]
-            // Add more fallback tips as needed
-        ]
+        'tips' => []
     ];
 }
 
 // Get tips data
 $tips_data = getTipsFromGitHub();
-$header = $tips_data['header'] ?? ['title' => 'Did you know?', 'subtitle' => ''];
+$header = $tips_data['header'] ?? ['title' => 'Tips unavailable', 'subtitle' => ''];
 $tips = $tips_data['tips'] ?? [];
 ?>
 <html>
