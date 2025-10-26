@@ -611,6 +611,14 @@ function handleImageClick(event) {
                 ${borderText}
             </div>
         `;
+        
+        // Add delete option for Excalidraw images
+        menuHTML += `
+            <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
+                <i class="fas fa-trash"></i>
+                Delete Image
+            </div>
+        `;
     }
     
     // Add Edit option for Excalidraw images (standalone notes)
@@ -706,6 +714,12 @@ function handleImageClick(event) {
             }
         } else if (action === 'toggle-border') {
             toggleExcalidrawBorder(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'delete-excalidraw') {
+            deleteExcalidrawImage(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -992,5 +1006,57 @@ function applyExcalidrawBorderPreferences() {
         });
     } catch (e) {
         console.warn('Could not apply border preferences:', e);
+    }
+}
+
+/**
+ * Delete an Excalidraw image after confirmation
+ */
+function deleteExcalidrawImage(img) {
+    if (!img) return;
+    
+    // Show confirmation dialog
+    const confirmed = confirm('Are you sure you want to delete this Excalidraw image? This action cannot be undone.');
+    
+    if (!confirmed) return;
+    
+    try {
+        // Find the container (could be excalidraw-container or just the img itself)
+        const container = img.closest('.excalidraw-container');
+        const elementToRemove = container || img;
+        
+        // Remove the element from DOM
+        elementToRemove.remove();
+        
+        // Clean up any following empty elements or line breaks
+        const nextElement = elementToRemove.nextElementSibling;
+        if (nextElement && (nextElement.tagName === 'BR' || 
+                          (nextElement.tagName === 'DIV' && nextElement.innerHTML.trim() === '') ||
+                          nextElement.innerHTML === '&nbsp;')) {
+            nextElement.remove();
+        }
+        
+        // Trigger note update to save changes
+        if (typeof updateNote === 'function') {
+            updateNote(); // Mark note as edited
+        }
+        
+        // Trigger automatic save after a short delay
+        setTimeout(function() {
+            if (typeof updatenote === 'function') {
+                updatenote(); // Save to server
+            }
+        }, 100);
+        
+        // Show success notification
+        if (window.showNotificationPopup) {
+            showNotificationPopup('Excalidraw image deleted successfully', 'success');
+        }
+        
+    } catch (error) {
+        console.warn('Error deleting Excalidraw image:', error);
+        if (window.showNotificationPopup) {
+            showNotificationPopup('Error deleting image. Please try again.', 'error');
+        }
     }
 }
