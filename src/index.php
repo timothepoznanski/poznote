@@ -185,11 +185,8 @@ try {
     $v4 = $stmt->fetchColumn();
     if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
 
-    $stmt->execute(['show_excalidraw_border_toggle']);
-    $excalidraw_border_toggle_enabled = $stmt->fetchColumn();
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
-    $excalidraw_border_toggle_enabled = '1'; // Default to enabled
 }
 
 // Load note list sort preference to affect server-side note listing
@@ -405,7 +402,6 @@ $body_classes = trim($extra_body_classes);
         }
     ?>;
     window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>;
-    window.excalidrawBorderToggleEnabled = <?php echo json_encode(getExcalidrawBorderToggleEnabled($con)); ?>;
     </script>
                     
     <?php

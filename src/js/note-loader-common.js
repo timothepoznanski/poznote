@@ -1006,7 +1006,7 @@ function applyExcalidrawBorderPreferences() {
                 }
             }
             
-            // Apply preference if exists, otherwise use global default
+            // Apply preference only if user has explicitly set one
             if (identifier && borderPrefs.hasOwnProperty(identifier)) {
                 // Use user's specific preference
                 if (borderPrefs[identifier]) {
@@ -1015,12 +1015,8 @@ function applyExcalidrawBorderPreferences() {
                     img.classList.remove('excalidraw-with-border');
                 }
             } else {
-                // No specific preference - use global default
-                if (window.excalidrawBorderToggleEnabled === true) {
-                    img.classList.add('excalidraw-with-border');
-                } else {
-                    img.classList.remove('excalidraw-with-border');
-                }
+                // No specific preference - no border by default
+                img.classList.remove('excalidraw-with-border');
             }
         });
     } catch (e) {
