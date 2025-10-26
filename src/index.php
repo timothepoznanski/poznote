@@ -619,8 +619,8 @@ $body_classes = trim($extra_body_classes);
                         $home_params[] = 'folder=' . urlencode($folder_filter);
                     }
 
-                    // Always preserve workspace if it's not the default
-                    if (!empty($workspace_filter) && $workspace_filter !== 'Poznote') {
+                    // Always preserve workspace parameter 
+                    if (!empty($workspace_filter)) {
                         $home_params[] = 'workspace=' . urlencode($workspace_filter);
                     }
                     if (!empty($home_params)) {
