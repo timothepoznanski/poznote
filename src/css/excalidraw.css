@@ -402,9 +402,4 @@ body {
         cursor: not-allowed !important;
         background: #6c757d !important;
     }
-    
-    /* Hide elements with hide-on-mobile class on mobile screens */
-    .hide-on-mobile {
-        display: none !important;
-    }
 }
