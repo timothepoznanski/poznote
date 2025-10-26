@@ -25,7 +25,7 @@ class ModalAlert {
                 alertType: type,
                 title: title || this.getDefaultTitle(type),
                 buttons: [
-                    { text: 'Fermer', type: 'primary', action: () => resolve() }
+                    { text: 'Close', type: 'primary', action: () => resolve() }
                 ]
             };
             
