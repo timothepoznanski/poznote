@@ -283,7 +283,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
         dd.style.display = 'block';
         dd.style.left = inputEl.offsetLeft + 'px';
         dd.style.top = (inputEl.offsetTop + inputEl.offsetHeight + 4) + 'px';
-        dd.firstChild && dd.firstChild.classList.add('highlight');
+        // Note: No item is highlighted by default, user must use arrow keys to highlight
         
         // Only add navigation handler once per input element
         if (!inputEl.hasNavigationHandler) {
@@ -294,11 +294,17 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                 if (ev.key === 'ArrowDown') {
                     ev.preventDefault(); 
                     highlighted = Math.min(highlighted + 1, items.length - 1);
-                    items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+                    items.forEach((it, i) => {
+                        it.classList.toggle('highlighted', i === highlighted);
+                        it.style.background = i === highlighted ? '#f0f7ff' : '';
+                    });
                 } else if (ev.key === 'ArrowUp') {
                     ev.preventDefault(); 
                     highlighted = Math.max(highlighted - 1, 0);
-                    items.forEach((it, i) => it.style.background = i === highlighted ? '#f0f7ff' : '');
+                    items.forEach((it, i) => {
+                        it.classList.toggle('highlighted', i === highlighted);
+                        it.style.background = i === highlighted ? '#f0f7ff' : '';
+                    });
                 } else if (ev.key === 'Enter' && highlighted >= 0) {
                     ev.preventDefault(); 
                     ev.stopPropagation();
@@ -396,11 +402,17 @@ function handleTagInput(e, noteId, container) {
             // Check if there's a visible suggestions dropdown
             const suggestionsDropdown = container.querySelector('.tag-suggestions');
             if (suggestionsDropdown && suggestionsDropdown.style.display !== 'none') {
-                // For Enter key, let the navigation handler handle suggestion selection
+                // For Enter key, check if any suggestion is highlighted
                 if (e.key === 'Enter') {
-                    return false;
+                    // Check if there's a highlighted item
+                    const highlightedItem = suggestionsDropdown.querySelector('.tag-suggestion-item.highlighted');
+                    if (highlightedItem) {
+                        // Let the navigation handler handle the highlighted suggestion
+                        return false;
+                    }
+                    // No item highlighted, proceed to create the typed tag
                 }
-                // For space and comma, hide suggestions and allow creating the typed tag
+                // For space, comma, or Enter with no highlighted item, hide suggestions and allow creating the typed tag
                 suggestionsDropdown.style.display = 'none';
             }
             
