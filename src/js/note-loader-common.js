@@ -597,10 +597,6 @@ function handleImageClick(event) {
             <i class="fa-download"></i>
             Download
         </div>
-        <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
-            <i class="fas fa-trash"></i>
-            Delete Image
-        </div>
     `;
     
     // Add border toggle for Excalidraw images (both standalone and embedded)
@@ -636,6 +632,14 @@ function handleImageClick(event) {
             </div>
         ` + menuHTML;
     }
+    
+    // Add Delete option at the end
+    menuHTML += `
+        <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
+            <i class="fas fa-trash"></i>
+            Delete Image
+        </div>
+    `;
     
     menu.innerHTML = menuHTML;
 
