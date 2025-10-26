@@ -609,8 +609,11 @@ function handleImageClick(event) {
         `;
     }
     
-    // Add Edit option for Excalidraw images (standalone notes)
-    if (isExcalidraw && excalidrawNoteId) {
+    // Check if we're on mobile (width < 800px)
+    const isMobile = window.innerWidth < 800;
+    
+    // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
+    if (isExcalidraw && excalidrawNoteId && !isMobile) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
                 <i class="fa-edit"></i>
@@ -619,8 +622,8 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Add Edit option for embedded Excalidraw diagrams
-    if (isEmbeddedExcalidraw && diagramId) {
+    // Add Edit option for embedded Excalidraw diagrams - hide on mobile
+    if (isEmbeddedExcalidraw && diagramId && !isMobile) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
                 <i class="fa-edit"></i>

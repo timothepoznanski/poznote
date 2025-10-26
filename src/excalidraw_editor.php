@@ -233,7 +233,7 @@ if ($note_id > 0) {
 
     window.addEventListener('DOMContentLoaded', function() {
         // Mobile optimizations
-        if (window.innerWidth <= 768) {
+        if (window.innerWidth < 800) {
             // Prevent zoom on double tap for better touch experience
             let lastTouchEnd = 0;
             document.addEventListener('touchend', function (event) {

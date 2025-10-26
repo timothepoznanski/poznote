@@ -650,7 +650,7 @@ $body_classes = trim($extra_body_classes);
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
                     if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn hide-on-mobile" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
                     }
                 
                     // Hide emoji button for tasklist notes

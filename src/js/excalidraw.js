@@ -3,6 +3,16 @@
 
 // Open existing Excalidraw note for editing
 function openExcalidrawNote(noteId) {
+    // Disable Excalidraw editing on mobile devices (< 800px)
+    if (window.innerWidth < 800) {
+        if (typeof window.showError === 'function') {
+            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+        } else {
+            alert('Excalidraw editing is disabled on mobile devices.');
+        }
+        return false;
+    }
+    
     var params = new URLSearchParams({
         note_id: noteId,
         workspace: selectedWorkspace || 'Poznote'
@@ -41,6 +51,16 @@ function isCursorInEditableNote() {
 
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
+    // Disable Excalidraw insertion on mobile devices (< 800px)
+    if (window.innerWidth < 800) {
+        if (typeof window.showError === 'function') {
+            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+        } else {
+            alert('Excalidraw editing is disabled on screens smaller than 800px.');
+        }
+        return false;
+    }
+    
     // Check if cursor is in editable note first
     if (!isCursorInEditableNote()) {
         showCursorWarning();
@@ -81,8 +101,18 @@ function insertExcalidrawDiagram() {
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
     
+    // Check if we're on mobile to adapt the button behavior
+    const isMobile = window.innerWidth < 800;
+    
     // Create simple button for the Excalidraw diagram
-    const diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007DB8; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click here to create your Excalidraw image here</button><br><br>`;
+    let diagramHTML;
+    if (isMobile) {
+        // On mobile, create a disabled button with a different onclick that shows an alert
+        diagramHTML = `<button class="excalidraw-btn excalidraw-btn-mobile" id="${diagramId}" onclick="showMobileExcalidrawAlert()" style="cursor: not-allowed; background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px; opacity: 0.7;" title="Excalidraw editing disabled on mobile">Excalidraw (Mobile editing disabled)</button><br><br>`;
+    } else {
+        // On desktop, normal behavior
+        diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007DB8; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click here to create your Excalidraw image here</button><br><br>`;
+    }
     
     // Insert at cursor position
     insertHtmlAtCursor(diagramHTML);
@@ -101,6 +131,16 @@ function insertExcalidrawDiagram() {
 
 // Open Excalidraw editor for a specific diagram
 function openExcalidrawEditor(diagramId) {
+    // Disable Excalidraw editing on mobile devices (< 800px)
+    if (window.innerWidth < 800) {
+        if (typeof window.showError === 'function') {
+            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+        } else {
+            alert('Excalidraw editing is disabled on mobile devices.');
+        }
+        return false;
+    }
+    
     // Store the current note context
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
@@ -229,8 +269,18 @@ function downloadImageFromUrl(imageSrc, filename) {
     document.body.removeChild(link);
 }
 
+// Function to show alert when trying to edit Excalidraw on mobile
+function showMobileExcalidrawAlert() {
+    if (typeof window.showError === 'function') {
+        window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+    } else {
+        alert('Excalidraw editing is disabled on screens smaller than 800px.');
+    }
+}
+
 // Make functions globally available
 window.openExcalidrawNote = openExcalidrawNote;
 window.downloadExcalidrawImage = downloadExcalidrawImage;
 window.insertExcalidrawDiagram = insertExcalidrawDiagram;
+window.showMobileExcalidrawAlert = showMobileExcalidrawAlert;
 window.openExcalidrawEditor = openExcalidrawEditor;

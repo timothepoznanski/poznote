@@ -212,7 +212,7 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .excalidraw-toolbar,
     div[style*="justify-content: space-between"][style*="align-items: center"] {
         padding: 8px 12px !important;
@@ -360,7 +360,7 @@ body {
 }
 
 /* Optimiser l'affichage en mode paysage sur mobile */
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 800px) and (orientation: landscape) {
     .excalidraw-toolbar,
     div[style*="justify-content: space-between"][style*="align-items: center"] {
         padding: 4px 8px !important;
@@ -377,5 +377,34 @@ body {
     #app {
         height: calc(100vh - 40px) !important;
         margin-top: 40px !important;
+    }
+}
+
+/* Disable Excalidraw editing interactions on mobile (< 800px) */
+@media (max-width: 800px) {
+    /* Hide edit buttons for Excalidraw on mobile */
+    .image-menu-item[data-action="edit-excalidraw"],
+    .image-menu-item[data-action="edit-embedded-excalidraw"] {
+        display: none !important;
+    }
+    
+    /* Visual feedback that Excalidraw images are not editable on mobile */
+    .excalidraw-preview-container,
+    img[data-is-excalidraw="true"],
+    div[onclick*="openExcalidrawNote"] {
+        cursor: default !important;
+        position: relative;
+    }
+    
+    /* Style for disabled Excalidraw buttons */
+    .excalidraw-btn-mobile {
+        opacity: 0.6 !important;
+        cursor: not-allowed !important;
+        background: #6c757d !important;
+    }
+    
+    /* Hide elements with hide-on-mobile class on mobile screens */
+    .hide-on-mobile {
+        display: none !important;
     }
 }
