@@ -931,7 +931,6 @@ function toggleExcalidrawBorder(img) {
     if (!img) return;
     
     const hasBorder = img.classList.contains('excalidraw-with-border');
-    console.log('Toggle border - before:', hasBorder, 'for image:', img.src);
     
     if (hasBorder) {
         // Remove border
@@ -956,8 +955,6 @@ function toggleExcalidrawBorder(img) {
         }
         
         localStorage.setItem('excalidraw_border_preferences', JSON.stringify(borderPrefs));
-        console.log('Saved border preference:', borderPrefs[imgSrc], 'for:', imgSrc);
-        console.log('Full preferences:', borderPrefs);
     } catch (e) {
         console.warn('Could not save border preference:', e);
     }
@@ -969,12 +966,9 @@ function toggleExcalidrawBorder(img) {
 function applyExcalidrawBorderPreferences() {
     try {
         const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
-        console.log('Applying border preferences:', borderPrefs);
-        console.log('Global border toggle enabled:', window.excalidrawBorderToggleEnabled);
         
         // Find all Excalidraw images
         const excalidrawImages = document.querySelectorAll('img[data-is-excalidraw="true"], .excalidraw-container img');
-        console.log('Found Excalidraw images:', excalidrawImages.length);
         
         excalidrawImages.forEach(img => {
             const imgSrc = img.src;
@@ -982,7 +976,6 @@ function applyExcalidrawBorderPreferences() {
             // Check if user has a specific preference for this image
             if (borderPrefs.hasOwnProperty(imgSrc)) {
                 // Use user's specific preference
-                console.log('Using saved preference for:', imgSrc, '=', borderPrefs[imgSrc]);
                 if (borderPrefs[imgSrc]) {
                     img.classList.add('excalidraw-with-border');
                 } else {
@@ -990,7 +983,6 @@ function applyExcalidrawBorderPreferences() {
                 }
             } else {
                 // No specific preference - use global default
-                console.log('Using global default for:', imgSrc, '=', window.excalidrawBorderToggleEnabled);
                 if (window.excalidrawBorderToggleEnabled === true) {
                     img.classList.add('excalidraw-with-border');
                 } else {

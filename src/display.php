@@ -111,7 +111,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             <div class="settings-card" id="excalidraw-border-card">
                 <div class="settings-card-icon"><i class="fa-border-outer"></i></div>
                 <div class="settings-card-content">
-                    <h3>Show Excalidraw Images Border<span id="excalidraw-border-status" class="setting-status enabled">enabled</span></h3>
+                    <h3>Show Excalidraw Images Default Border<span id="excalidraw-border-status" class="setting-status enabled">enabled</span></h3>
                 </div>
             </div>
 
