@@ -50,10 +50,11 @@ $attachments = $originalNote['attachments'] ?? null;
 if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['tags'], $originalNote['folder'], $originalNote['workspace'], $originalNote['type'], $attachments])) {
     $newId = $con->lastInsertId();
     
-    // Copy the HTML file content
-    $originalFilename = getEntriesRelativePath() . $noteId . ".html";
-    $newFilename = getEntriesRelativePath() . $newId . ".html";
+    // Copy the file content for all note types
+    $originalFilename = getEntryFilename($noteId, $originalNote['type']);
+    $newFilename = getEntryFilename($newId, $originalNote['type']);
     
+    // Copy file content if it exists
     if (file_exists($originalFilename)) {
         $content = file_get_contents($originalFilename);
         if ($content !== false) {
@@ -61,6 +62,23 @@ if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['ta
             $entriesDir = dirname($newFilename);
             if (!is_dir($entriesDir)) {
                 mkdir($entriesDir, 0755, true);
+            }
+            
+            // For Excalidraw notes, update HTML references (if HTML exists)
+            if ($originalNote['type'] === 'excalidraw') {
+                // Update the HTML content to reference the new PNG file
+                $content = str_replace(
+                    "data/entries/$noteId.png", 
+                    "data/entries/$newId.png", 
+                    $content
+                );
+                
+                // Also update any onclick references to the new note ID
+                $content = str_replace(
+                    "openExcalidrawNote($noteId)",
+                    "openExcalidrawNote($newId)",
+                    $content
+                );
             }
             
             $write_result = file_put_contents($newFilename, $content);

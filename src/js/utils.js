@@ -11,7 +11,14 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
     }
     
     try {
-        var wsParam = selectedWorkspace ? ('&workspace=' + encodeURIComponent(selectedWorkspace)) : '';
+        // Get current workspace using robust method
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentWorkspace = urlParams.get('workspace') ||
+                                (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
+                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
+                                'Poznote';
+        
+        var wsParam = currentWorkspace ? ('&workspace=' + encodeURIComponent(currentWorkspace)) : '';
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
         window.location.href = url;
     } catch (error) {

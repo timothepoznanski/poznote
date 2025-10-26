@@ -152,6 +152,8 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/modals.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -180,8 +182,12 @@ try {
     $stmt->execute(['hide_folder_counts']);
     $v4 = $stmt->fetchColumn();
     if ($v4 === '0' || $v4 === 'false') $extra_body_classes .= ' hide-folder-counts';
+
+    $stmt->execute(['show_excalidraw_border_toggle']);
+    $excalidraw_border_toggle_enabled = $stmt->fetchColumn();
 } catch (Exception $e) {
     // ignore errors and continue without extra classes
+    $excalidraw_border_toggle_enabled = '1'; // Default to enabled
 }
 
 // Load note list sort preference to affect server-side note listing
@@ -397,6 +403,7 @@ $body_classes = trim($extra_body_classes);
         }
     ?>;
     window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>;
+    window.excalidrawBorderToggleEnabled = <?php echo json_encode(getExcalidrawBorderToggleEnabled($con)); ?>;
     </script>
                     
     <?php
@@ -573,7 +580,7 @@ $body_classes = trim($extra_body_classes);
                     // Check if note is shared for CSS class
                     $share_class = $is_shared ? ' is-shared' : '';
                 
-                    $filename = getEntriesRelativePath() . $row["id"] . ".html";
+                    $filename = getEntryFilename($row["id"], $row["type"] ?? 'note');
                     $title = $row['heading'];
                     // Ensure we have a safe JSON-encoded title for JavaScript
                     $title_safe = $title ?? 'Note';
@@ -586,7 +593,7 @@ $body_classes = trim($extra_body_classes);
                         $entryfinal = '';
                         $tasklist_json = htmlspecialchars($row['entry'] ?? '', ENT_QUOTES);
                     } else {
-                        // For regular notes, use the HTML file content
+                        // For all other notes (including Excalidraw), use the HTML file content
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                         $tasklist_json = '';
                     }
@@ -643,10 +650,17 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
+                    // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
+                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
+                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
+                    }
+                
                     // Hide emoji button for tasklist notes
                     if ($note_type !== 'tasklist') {
                         echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     }
+                    
+                    // Table and separator buttons
                     echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
                 
@@ -665,7 +679,10 @@ $body_classes = trim($extra_body_classes);
 
                     echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     $share_class = $is_shared ? ' is-shared' : '';
+                    
+                    // Share button
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
+                    
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                         
                     // Generate dates safely for JavaScript with robust encoding
@@ -722,7 +739,14 @@ $body_classes = trim($extra_body_classes);
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-copy"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-folder-open"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
+                    
+                    // Special download behavior for Excalidraw notes
+                    if ($note_type === 'excalidraw') {
+                        echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download diagram as PNG" onclick="downloadExcalidrawImage(\''.$row['id'].'\')" data-note-type="excalidraw"><i class="fa-download"></i></button>';
+                    } else {
+                        echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
+                    }
+                    
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
                 
@@ -842,10 +866,15 @@ $body_classes = trim($extra_body_classes);
                         // Start with the raw markdown displayed
                         $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
                     } else {
+                        // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
                     }
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="true" data-note-type="'.$note_type.'"'.$data_attr.'>'.$display_content.'</div>';
+                    // All notes are now editable, including Excalidraw notes
+                    $editable = 'true';
+                    $excalidraw_attr = '';
+                    
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
@@ -1042,6 +1071,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
+<script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 
 <script>

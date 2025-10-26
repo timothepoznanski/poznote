@@ -1,0 +1,109 @@
+/* Styles pour les notes Excalidraw avec images base64 intégrées */
+
+.excalidraw-container {
+    text-align: center;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    margin: 5px 0;
+    display: block;
+    max-width: 100%;
+    width: fit-content;
+    height: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    /* Prevent the container itself from being editable and avoid cursor artifacts */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent outline and focus indicators */
+    outline: none !important;
+    /* Ensure container doesn't expand beyond content */
+    overflow: hidden;
+    line-height: 0;
+}
+
+.excalidraw-image {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #9ca3af !important;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    margin: 0;
+    object-fit: contain;
+    /* Keep image selectable for context menu but prevent editing */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Re-enable pointer events for context menu */
+    pointer-events: auto;
+    /* Prevent any outline or focus indicators */
+    outline: none !important;
+}
+
+.excalidraw-image:hover {
+    border-color: #9ca3af;
+}
+
+.excalidraw-data {
+    display: none !important;
+}
+
+/* Ensure all images inside Excalidraw containers respect width limits */
+.excalidraw-container img {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    display: block;
+}
+
+/* Mode sombre */
+[data-theme="dark"] .excalidraw-container {
+    background-color: #2a2a2a;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .excalidraw-image {
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] .excalidraw-image:hover {
+    border-color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .excalidraw-container {
+        padding: 5px;
+    }
+    
+    .excalidraw-image {
+        max-width: 100%;
+    }
+}
+
+/* Prevent cursor and caret artifacts around Excalidraw content */
+.noteentry .excalidraw-container::before,
+.noteentry .excalidraw-container::after {
+    display: none !important;
+}
+
+/* Hide any potential cursor/caret near Excalidraw elements */
+.excalidraw-container + br,
+.excalidraw-container + div:empty {
+    display: none;
+}
+
+/* Ensure no caret appears near Excalidraw content */
+[contenteditable] .excalidraw-container {
+    caret-color: transparent;
+}
+
+/* Global rule to prevent any image from overflowing note content area */
+.note-content img,
+.entry-content img,
+[id^="entry"] img,
+.noteentry img {
+    max-width: 100% !important;
+    height: auto !important;
+    box-sizing: border-box;
+}

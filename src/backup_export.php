@@ -341,8 +341,9 @@ function createBackup() {
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored && stored !== 'Poznote') {
-            var a = document.getElementById('backToNotesLink'); if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        if (stored) {
+            var a = document.getElementById('backToNotesLink'); 
+            if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
         }
     } catch(e){} })();
     </script>

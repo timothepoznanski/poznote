@@ -578,7 +578,17 @@ function handleImageClick(event) {
     // Create simple dropdown menu
     const menu = document.createElement('div');
     menu.className = 'image-menu';
-    menu.innerHTML = `
+    
+    // Check if this is an Excalidraw image
+    const isExcalidraw = img.getAttribute('data-is-excalidraw') === 'true';
+    const excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
+    
+    // Also check if this image is inside an Excalidraw container
+    const excalidrawContainer = img.closest('.excalidraw-container');
+    const isEmbeddedExcalidraw = excalidrawContainer !== null;
+    const diagramId = excalidrawContainer ? excalidrawContainer.id : null;
+    
+    let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-maximize"></i>
             View Large
@@ -587,7 +597,47 @@ function handleImageClick(event) {
             <i class="fa-download"></i>
             Download
         </div>
+        <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
+            <i class="fas fa-trash"></i>
+            Delete Image
+        </div>
     `;
+    
+    // Add border toggle for Excalidraw images (both standalone and embedded)
+    if (isExcalidraw || isEmbeddedExcalidraw) {
+        const hasBorder = img.classList.contains('excalidraw-with-border');
+        const borderText = hasBorder ? 'Remove Border' : 'Add Border';
+        const borderIcon = hasBorder ? 'fa-border-none' : 'fa-border-outer';
+        
+        menuHTML += `
+            <div class="image-menu-item" data-action="toggle-border">
+                <i class="fas ${borderIcon}"></i>
+                ${borderText}
+            </div>
+        `;
+    }
+    
+    // Add Edit option for Excalidraw images (standalone notes)
+    if (isExcalidraw && excalidrawNoteId) {
+        menuHTML = `
+            <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
+                <i class="fa-edit"></i>
+                Edit
+            </div>
+        ` + menuHTML;
+    }
+    
+    // Add Edit option for embedded Excalidraw diagrams
+    if (isEmbeddedExcalidraw && diagramId) {
+        menuHTML = `
+            <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
+                <i class="fa-edit"></i>
+                Edit
+            </div>
+        ` + menuHTML;
+    }
+    
+    menu.innerHTML = menuHTML;
 
     // Position the menu at click coordinates
     const clickX = event.clientX;
@@ -636,6 +686,36 @@ function handleImageClick(event) {
             }
         } else if (action === 'download') {
             downloadImage(src);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'edit-excalidraw') {
+            const noteId = e.target.closest('.image-menu-item')?.getAttribute('data-note-id');
+            if (noteId) {
+                openExcalidrawNote(noteId);
+            }
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'edit-embedded-excalidraw') {
+            const diagramId = e.target.closest('.image-menu-item')?.getAttribute('data-diagram-id');
+            if (diagramId && window.openExcalidrawEditor) {
+                openExcalidrawEditor(diagramId);
+            }
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'toggle-border') {
+            toggleExcalidrawBorder(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'delete-excalidraw') {
+            deleteImage(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -748,6 +828,9 @@ function reinitializeNoteContent() {
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
 
+    // Apply saved Excalidraw border preferences
+    applyExcalidrawBorderPreferences();
+
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
 
@@ -849,4 +932,114 @@ function reinitializeNoteContent() {
  */
 function isNoteUrl(url) {
     return url.includes('note=') && url.includes('index.php');
+}
+
+/**
+ * Toggle border on Excalidraw images
+ */
+function toggleExcalidrawBorder(img) {
+    if (!img) return;
+    
+    const hasBorder = img.classList.contains('excalidraw-with-border');
+    
+    if (hasBorder) {
+        // Remove border
+        img.classList.remove('excalidraw-with-border');
+    } else {
+        // Add border
+        img.classList.add('excalidraw-with-border');
+    }
+    
+    // Save preference to localStorage
+    try {
+        const imgSrc = img.src;
+        const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
+        
+        // Save explicit preference (true or false)
+        if (hasBorder) {
+            // Image had border, now removing it
+            borderPrefs[imgSrc] = false;
+        } else {
+            // Image had no border, now adding it
+            borderPrefs[imgSrc] = true;
+        }
+        
+        localStorage.setItem('excalidraw_border_preferences', JSON.stringify(borderPrefs));
+    } catch (e) {
+        console.warn('Could not save border preference:', e);
+    }
+}
+
+/**
+ * Apply saved border preferences to Excalidraw images
+ */
+function applyExcalidrawBorderPreferences() {
+    try {
+        const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
+        
+        // Find all Excalidraw images
+        const excalidrawImages = document.querySelectorAll('img[data-is-excalidraw="true"], .excalidraw-container img');
+        
+        excalidrawImages.forEach(img => {
+            const imgSrc = img.src;
+            
+            // Check if user has a specific preference for this image
+            if (borderPrefs.hasOwnProperty(imgSrc)) {
+                // Use user's specific preference
+                if (borderPrefs[imgSrc]) {
+                    img.classList.add('excalidraw-with-border');
+                } else {
+                    img.classList.remove('excalidraw-with-border');
+                }
+            } else {
+                // No specific preference - use global default
+                if (window.excalidrawBorderToggleEnabled === true) {
+                    img.classList.add('excalidraw-with-border');
+                } else {
+                    img.classList.remove('excalidraw-with-border');
+                }
+            }
+        });
+    } catch (e) {
+        console.warn('Could not apply border preferences:', e);
+    }
+}
+
+/**
+ * Delete an image (works for both Excalidraw and regular images)
+ */
+function deleteImage(img) {
+    if (!img) return;
+    
+    try {
+        // Find the container (could be excalidraw-container or just the img itself)
+        const container = img.closest('.excalidraw-container');
+        const elementToRemove = container || img;
+        
+        // Remove the element from DOM
+        elementToRemove.remove();
+        
+        // Clean up any following empty elements or line breaks
+        const nextElement = elementToRemove.nextElementSibling;
+        if (nextElement && (nextElement.tagName === 'BR' || 
+                          (nextElement.tagName === 'DIV' && nextElement.innerHTML.trim() === '') ||
+                          nextElement.innerHTML === '&nbsp;')) {
+            nextElement.remove();
+        }
+        
+        // Trigger note update to save changes
+        if (typeof updateNote === 'function') {
+            updateNote(); // Mark note as edited
+        }
+        
+        // Trigger automatic save after a short delay
+        setTimeout(function() {
+            if (typeof updatenote === 'function') {
+                updatenote(); // Save to server
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.warn('Error deleting image:', error);
+    }
 }

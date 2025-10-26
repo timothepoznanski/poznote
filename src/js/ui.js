@@ -15,11 +15,13 @@ function showNotificationPopup(message, type) {
     popup.innerText = message;
     
     // Remove existing classes
-    popup.classList.remove('notification-success', 'notification-error');
+    popup.classList.remove('notification-success', 'notification-error', 'notification-warning');
     
     // Add appropriate class
     if (type === 'error') {
         popup.classList.add('notification-error');
+    } else if (type === 'warning') {
+        popup.classList.add('notification-warning');
     } else {
         popup.classList.add('notification-success');
     }

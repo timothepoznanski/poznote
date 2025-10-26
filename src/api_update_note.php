@@ -19,17 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $input = json_decode(file_get_contents('php://input'), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
+    echo json_encode(['success' => false, 'message' => 'Invalid JSON in request body']);
     exit;
 }
 
-$id = isset($input['id']) ? trim($input['id']) : '';
+$id = isset($input['id']) ? intval($input['id']) : 0;
 $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $entry = isset($input['entry']) ? $input['entry'] : '';
-$entrycontent = isset($input['entrycontent']) ? $input['entrycontent'] : '';
-$workspace = isset($input['workspace']) ? trim($input['workspace']) : null;
-$folder = isset($input['folder']) ? trim($input['folder']) : getDefaultFolderForNewNotes($workspace);
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
+$folder = isset($input['folder']) ? trim($input['folder']) : 'Poznote';
+$workspace = isset($input['workspace']) && $input['workspace'] !== '' ? $input['workspace'] : null;
+
+// Use the provided entry content for all note types
+$entrycontent = $entry;
 
 if (empty($id)) {
     http_response_code(400);
@@ -94,6 +96,16 @@ if (!empty($tags)) {
     $tags = implode(',', $validTags);
 }
 
+// Get the current note type to determine file extension
+$typeStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+$typeStmt->execute([$id]);
+$noteType = $typeStmt->fetchColumn();
+if ($noteType === false) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'message' => 'Note not found']);
+    exit;
+}
+
 // Enforce uniqueness of heading within workspace (exclude current id)
 $checkQuery = "SELECT id FROM entries WHERE heading = ? AND trash = 0";
 $params = [$originalHeading];
@@ -113,8 +125,8 @@ if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     exit;
 }
 
-// Ensure entry file path exists and write HTML if provided
-$filename = getEntriesRelativePath() . $id . ".html";
+// Ensure entry file path exists and write file with appropriate extension
+$filename = getEntryFilename($id, $noteType);
 $entriesDir = dirname($filename);
 if (!is_dir($entriesDir)) {
     mkdir($entriesDir, 0755, true);
@@ -123,7 +135,7 @@ if (!empty($entry)) {
     $write_result = file_put_contents($filename, $entry);
     if ($write_result === false) {
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Failed to write HTML file']);
+        echo json_encode(['success' => false, 'message' => 'Failed to write file']);
         exit;
     }
 }

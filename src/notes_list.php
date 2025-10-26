@@ -70,6 +70,11 @@ if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
 
 // Display folders and notes
 foreach($folders as $folderName => $notes) {
+    // Debug: log empty folders
+    if (empty($notes)) {
+        error_log("Empty folder found: $folderName (search mode: " . ($is_search_mode ? 'yes' : 'no') . ")");
+    }
+    
     // In search mode, don't display empty folders
     if ($is_search_mode && empty($notes)) {
         continue;

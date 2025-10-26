@@ -85,9 +85,9 @@ try {
             }
         }
         
-        // Delete HTML file
+        // Delete HTML file and PNG file (for Excalidraw notes)
         $html_file_path = __DIR__ . '/entries/';
-    if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
+        if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
             $html_file_path .= $note['folder'] . '/';
         }
         $html_file_path .= $note_id . '.html';
@@ -95,6 +95,13 @@ try {
         $html_deleted = false;
         if (file_exists($html_file_path)) {
             $html_deleted = unlink($html_file_path);
+        }
+        
+        // For Excalidraw notes, also delete the PNG file
+        $png_deleted = false;
+        $png_file_path = getEntriesRelativePath() . $note_id . '.png';
+        if (file_exists($png_file_path)) {
+            $png_deleted = unlink($png_file_path);
         }
         
         // Delete database entry (respect workspace if provided)
@@ -115,6 +122,7 @@ try {
                     'id' => $note_id,
                     'title' => $note['heading'],
                     'html_file_deleted' => $html_deleted,
+                    'png_file_deleted' => $png_deleted,
                     'attachments_deleted' => $deleted_attachments
                 ]
             ]);

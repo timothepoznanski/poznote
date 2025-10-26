@@ -21,19 +21,20 @@
 	}
 	$heading = $checkStmt->fetchColumn();
 
-	// Get note data before deletion to access attachments
+	// Get note data before deletion to access attachments and type
 
 	if ($workspace) {
-		$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+		$stmt = $con->prepare("SELECT attachments, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
 		$stmt->execute([$id, $workspace, $workspace]);
 	} else {
-		$stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
+		$stmt = $con->prepare("SELECT attachments, type FROM entries WHERE id = ?");
 		$stmt->execute([$id]);
 	}
 	$result = $stmt->fetch(PDO::FETCH_ASSOC);
 	
 	if ($result) {
 		$attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
+		$noteType = $result['type'] ?? 'note';
 		
 		// Delete attachment files from filesystem
 		if (is_array($attachments) && !empty($attachments)) {
@@ -46,11 +47,11 @@
 				}
 			}
 		}
-	}
 	
-	// Delete HTML file
-	$filename = getEntriesRelativePath() . $id . ".html";
-	if (file_exists($filename)) unlink($filename);
+		// Delete file with appropriate extension
+		$filename = getEntryFilename($id, $noteType);
+		if (file_exists($filename)) unlink($filename);
+	}
 	
 	// Delete database entry (respect workspace if provided)
 	if ($workspace) {

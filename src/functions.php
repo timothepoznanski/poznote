@@ -92,6 +92,26 @@ function getAttachmentsRelativePath() {
 }
 
 /**
+ * Get the appropriate file extension based on note type
+ * @param string $type The note type (markdown, note, list, excalidraw, etc.)
+ * @return string The file extension (.md or .html)
+ */
+function getFileExtensionForType($type) {
+    return ($type === 'markdown') ? '.md' : '.html';
+}
+
+/**
+ * Get the full filename for a note entry
+ * @param int $id The note ID
+ * @param string $type The note type
+ * @return string The complete filename with path and extension
+ */
+function getEntryFilename($id, $type) {
+    $extension = getFileExtensionForType($type);
+    return getEntriesRelativePath() . $id . $extension;
+}
+
+/**
  * Get the current workspace filter from GET/POST parameters
  * Priority order:
  * 1. GET/POST parameter (highest priority)
@@ -203,8 +223,8 @@ function createNote($con, $heading, $content, $folder = 'Default', $workspace = 
         
         $noteId = $con->lastInsertId();
         
-        // Create the HTML file for the note content
-        $filename = getEntriesRelativePath() . $noteId . ".html";
+        // Create the file for the note content with appropriate extension
+        $filename = getEntryFilename($noteId, $type);
         
         // Ensure the entries directory exists
         $entriesDir = dirname($filename);
@@ -212,12 +232,12 @@ function createNote($con, $heading, $content, $folder = 'Default', $workspace = 
             mkdir($entriesDir, 0755, true);
         }
         
-        // Write HTML content to file
+        // Write content to file
         if (!empty($content)) {
             $write_result = file_put_contents($filename, $content);
             if ($write_result === false) {
                 // Log error but don't fail since DB entry was successful
-                error_log("Failed to write HTML file for note ID $noteId: $filename");
+                error_log("Failed to write file for note ID $noteId: $filename");
                 return ['success' => false, 'error' => 'Failed to create HTML file', 'id' => $noteId];
             }
             

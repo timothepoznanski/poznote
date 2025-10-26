@@ -28,6 +28,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';if(t==='dark'){document.documentElement.classList.add('theme-dark');}else{document.documentElement.classList.add('theme-light');}}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/all.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/display.css">
     <link rel="stylesheet" href="css/modals.css">
@@ -37,12 +38,12 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <div class="settings-container">
         <br>
         <?php 
+            // Build basic URL - workspace will be handled by JavaScript
             $back_params = [];
-            $back_params[] = 'workspace=' . urlencode(getWorkspaceFilter());
             if ($note_id) {
                 $back_params[] = 'note=' . intval($note_id);
             }
-            $back_href = 'index.php?' . implode('&', $back_params);
+            $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
         <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             Back to Notes
@@ -107,6 +108,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <div class="settings-card" id="excalidraw-border-card">
+                <div class="settings-card-icon"><i class="fa-border-outer"></i></div>
+                <div class="settings-card-content">
+                    <h3>Show Excalidraw Images Default Border<span id="excalidraw-border-status" class="setting-status enabled">enabled</span></h3>
+                </div>
+            </div>
+
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
@@ -138,6 +146,23 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
+    <script>
+    // Update Back to Notes link with workspace from localStorage
+    (function() {
+        try {
+            var workspace = localStorage.getItem('poznote_selected_workspace');
+            var backLink = document.getElementById('backToNotesLink');
+            if (backLink && workspace && workspace !== '') {
+                var url = new URL(backLink.href, window.location.origin);
+                url.searchParams.set('workspace', workspace);
+                backLink.href = url.toString();
+            }
+        } catch(e) {
+            // Ignore errors
+        }
+    })();
+    </script>
+    
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){
@@ -176,6 +201,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         function refreshSub(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusSub){ statusSub.textContent = enabled ? 'enabled' : 'disabled'; statusSub.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
         if(cardSub){ cardSub.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_subheading'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshSub(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshSub();
+
+        // Excalidraw border toggle
+        var cardExcalidrawBorder = document.getElementById('excalidraw-border-card');
+        var statusExcalidrawBorder = document.getElementById('excalidraw-border-status');
+        function refreshExcalidrawBorder(){ var form = new FormData(); form.append('action','get'); form.append('key','show_excalidraw_border_toggle'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value === '1' || j.value === 'true' || j.value === ''); if(statusExcalidrawBorder){ statusExcalidrawBorder.textContent = enabled ? 'enabled' : 'disabled'; statusExcalidrawBorder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
+        if(cardExcalidrawBorder){ cardExcalidrawBorder.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_excalidraw_border_toggle'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === ''); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_excalidraw_border_toggle'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshExcalidrawBorder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
+        refreshExcalidrawBorder();
 
         // Folder counts (database)
         var cardFolder = document.getElementById('folder-counts-card');

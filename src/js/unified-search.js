@@ -904,8 +904,13 @@ class SearchManager {
         const urlParams = new URLSearchParams(window.location.search);
         const newParams = new URLSearchParams();
         
-        const currentWorkspace = urlParams.get('workspace') || selectedWorkspace || 'Poznote';
-        if (currentWorkspace && currentWorkspace !== 'Poznote') {
+        const currentWorkspace = urlParams.get('workspace') ||
+                                (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
+                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
+                                'Poznote';
+        
+        // Always preserve workspace parameter if it exists, regardless of its name
+        if (currentWorkspace) {
             newParams.set('workspace', currentWorkspace);
         }
         
