@@ -12,8 +12,50 @@ function openExcalidrawNote(noteId) {
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }
 
+/**
+ * Check if cursor is in an editable note area
+ */
+function isCursorInEditableNote() {
+    const selection = window.getSelection();
+    
+    // Check if there's a selection/cursor
+    if (!selection.rangeCount) {
+        return false;
+    }
+    
+    // Get the current element
+    const range = selection.getRangeAt(0);
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) { // Text node
+        container = container.parentNode;
+    }
+    
+    // Check if we're inside a contenteditable note area
+    const editableElement = container.closest && container.closest('[contenteditable="true"]');
+    const noteEntry = container.closest && container.closest('.noteentry');
+    
+    return editableElement && noteEntry;
+}
+
+/**
+ * Show warning if cursor is not in editable note
+ */
+function showCursorWarning() {
+    if (window.showNotificationPopup) {
+        showNotificationPopup('Please click inside a note before adding an Excalidraw diagram.', 'warning');
+    } else {
+        alert('Please click inside a note before adding an Excalidraw diagram.');
+    }
+}
+
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
+    // Check if cursor is in editable note first
+    if (!isCursorInEditableNote()) {
+        showCursorWarning();
+        return;
+    }
+    
     // Check if the current note has content
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {

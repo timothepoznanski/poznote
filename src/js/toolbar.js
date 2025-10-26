@@ -536,7 +536,49 @@ function toggleInlineCode() {
   document.execCommand('insertHTML', false, codeHTML);
 }
 
+/**
+ * Check if cursor is in an editable note area
+ */
+function isCursorInEditableNote() {
+    const selection = window.getSelection();
+    
+    // Check if there's a selection/cursor
+    if (!selection.rangeCount) {
+        return false;
+    }
+    
+    // Get the current element
+    const range = selection.getRangeAt(0);
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) { // Text node
+        container = container.parentNode;
+    }
+    
+    // Check if we're inside a contenteditable note area
+    const editableElement = container.closest && container.closest('[contenteditable="true"]');
+    const noteEntry = container.closest && container.closest('.noteentry');
+    
+    return editableElement && noteEntry;
+}
+
+/**
+ * Show warning if cursor is not in editable note
+ */
+function showCursorWarning() {
+    if (window.showNotificationPopup) {
+        showNotificationPopup('Please click inside a note before inserting content.', 'warning');
+    } else {
+        alert('Please click inside a note before inserting content.');
+    }
+}
+
 function insertSeparator() {
+  // Check if cursor is in editable note
+  if (!isCursorInEditableNote()) {
+    showCursorWarning();
+    return;
+  }
+  
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   
@@ -703,6 +745,12 @@ function toggleEmojiPicker() {
 }
 
 function insertEmoji(emoji) {
+  // Vérifier si le curseur est dans une zone éditable
+  if (!isCursorInEditableNote()) {
+    showCursorWarning();
+    return;
+  }
+  
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   
@@ -1035,6 +1083,12 @@ function toggleTablePicker() {
 }
 
 function insertTable(rows, cols) {
+  // Check if cursor is in editable note
+  if (!isCursorInEditableNote()) {
+    showCursorWarning();
+    return;
+  }
+  
   // Find the active note editor
   const noteentry = document.querySelector('.noteentry[contenteditable="true"]');
   
