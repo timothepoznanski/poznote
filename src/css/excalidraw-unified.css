@@ -8,7 +8,7 @@
     margin: 5px 0;
     display: block;
     max-width: 100%;
-    width: 100%;
+    width: fit-content;
     height: fit-content;
     margin-left: auto;
     margin-right: auto;
@@ -24,7 +24,6 @@
 
 .excalidraw-image {
     max-width: 100%;
-    width: 100%;
     height: auto;
     border: 1px solid #9ca3af !important;
     border-radius: 4px;
@@ -52,7 +51,6 @@
 /* Ensure all images inside Excalidraw containers respect width limits */
 .excalidraw-container img {
     max-width: 100% !important;
-    width: 100% !important;
     height: auto !important;
     object-fit: contain;
     display: block;
