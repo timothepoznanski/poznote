@@ -70,7 +70,7 @@ function insertExcalidrawDiagram() {
     // Check if the current note has content
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        window.showError('Veuillez sauvegarder la note avant d\'ajouter des diagrammes', 'Note non sauvegardée');
+        window.showError('Please save the note before adding diagrams', 'Unsaved note');
         return;
     }
     
@@ -80,23 +80,6 @@ function insertExcalidrawDiagram() {
         window.showError('Éditeur de note non trouvé', 'Erreur');
         return;
     }
-    
-    // Check if note is empty (no content or just whitespace/empty tags)
-    // COMMENTED OUT: Allow creating Excalidraw diagrams in empty notes
-    /*
-    const noteContent = noteEntry.innerHTML.trim();
-    const hasOnlyEmptyTags = /^(<br\s*\/?>|\s|&nbsp;)*$/.test(noteContent);
-    
-    if (!noteContent || hasOnlyEmptyTags) {
-        // Show popup message
-        if (window.showNotificationPopup) {
-            showNotificationPopup('Please add some content to the note before inserting an Excalidraw diagram.', 'warning');
-        } else {
-            window.showWarning('Veuillez ajouter du contenu à la note avant d\'insérer un diagramme Excalidraw.');
-        }
-        return;
-    }
-    */
     
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
@@ -144,7 +127,7 @@ function openExcalidrawEditor(diagramId) {
     // Store the current note context
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        window.showError('Veuillez sauvegarder la note avant d\'éditer les diagrammes', 'Note non sauvegardée');
+        window.showError('Please save the note before editing diagrams', 'Unsaved note');
         return;
     }
     
@@ -253,7 +236,7 @@ function downloadExcalidrawImage(noteId) {
     img.onerror = function() {
         // PNG doesn't exist, show error message
         console.error('Excalidraw PNG not found for note ' + noteId);
-        window.showError('Image Excalidraw non trouvée. Veuillez ouvrir le diagramme dans l\'éditeur et le sauvegarder d\'abord.', 'Image introuvable');
+        window.showError('Excalidraw image not found. Please open the diagram in the editor and save it first.', 'Image not found');
     };
     img.src = pngPath;
 }
