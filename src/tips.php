@@ -17,7 +17,7 @@ $v = '20251021.1';
 // Function to get tips content from GitHub
 function getTipsFromGitHub() {
     // GitHub raw content URL for tips.json
-    $github_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips.json';
+    $github_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tips.json';
     
     // Try to fetch from GitHub
     $context = stream_context_create([
