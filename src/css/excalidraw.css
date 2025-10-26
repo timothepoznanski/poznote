@@ -213,29 +213,96 @@ div[onclick*="openExcalidrawNote"] {
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-    .excalidraw-toolbar {
-        padding: 8px 12px;
+    .excalidraw-toolbar,
+    div[style*="justify-content: space-between"][style*="align-items: center"] {
+        padding: 8px 12px !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: #ffffff !important;
+        border-bottom: 1px solid #e1e4e8 !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
     }
     
-    .excalidraw-toolbar h3 {
-        font-size: 16px;
-        max-width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .excalidraw-toolbar h3,
+    div[style*="justify-content: space-between"] h3 {
+        font-size: 14px !important;
+        max-width: 120px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
     }
     
-    .excalidraw-toolbar .toolbar-btn {
-        padding: 6px 12px;
-        font-size: 13px;
+    .excalidraw-toolbar .toolbar-btn,
+    button[class*="excalidraw-toolbar-btn"],
+    button[class*="excalidraw-save-btn"] {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+        border-radius: 4px !important;
     }
     
     .excalidraw-toolbar .toolbar-btn i {
         font-size: 14px;
     }
     
-    .excalidraw-editor {
-        height: calc(100vh - 50px);
+    .excalidraw-editor,
+    #app {
+        height: calc(100vh - 50px) !important;
+        margin-top: 50px !important;
+        width: 100% !important;
+        overflow: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Force the Excalidraw canvas to be responsive */
+    .excalidraw .excalidraw-canvas,
+    canvas[data-testid="excalidraw-canvas"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        touch-action: pan-x pan-y !important;
+    }
+    
+    /* Ensure the main container is mobile friendly */
+    div[style*="height: 100vh"] {
+        height: 100vh !important;
+        width: 100vw !important;
+        overflow: hidden !important;
+    }
+    
+    /* Dark mode adjustments for mobile */
+    [data-theme="dark"] .excalidraw-toolbar,
+    [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
+        background: #1e1e1e !important;
+        border-bottom-color: #333333 !important;
+    }
+}
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 480px) {
+    .excalidraw-toolbar,
+    div[style*="justify-content: space-between"][style*="align-items: center"] {
+        padding: 6px 8px !important;
+    }
+    
+    .excalidraw-toolbar h3,
+    div[style*="justify-content: space-between"] h3 {
+        font-size: 12px !important;
+        max-width: 80px !important;
+    }
+    
+    .excalidraw-toolbar .toolbar-btn,
+    button[class*="excalidraw-toolbar-btn"],
+    button[class*="excalidraw-save-btn"] {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+    
+    .excalidraw-editor,
+    #app {
+        height: calc(100vh - 45px) !important;
+        margin-top: 45px !important;
     }
 }
 
@@ -257,4 +324,58 @@ div[class*="zen-mode-transition"] {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
+}
+
+/* ------------------------------------------------------------------
+   Améliorations pour la responsivité d'Excalidraw
+   ------------------------------------------------------------------ */
+
+/* Forcer la barre d'outils custom à rester visible */
+.poznote-toolbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    background: var(--bg-primary, #ffffff) !important;
+    border-bottom: 1px solid var(--border-color, #e0e0e0) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* S'assurer que le conteneur Excalidraw gère le touch */
+.excalidraw,
+.excalidraw .excalidraw-canvas-container,
+.excalidraw canvas {
+    touch-action: pan-x pan-y !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-touch-callout: none !important;
+}
+
+/* Empêcher le zoom de la page sur mobile mais permettre les gestes Excalidraw */
+body {
+    touch-action: pan-x pan-y !important;
+    -webkit-text-size-adjust: 100% !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+
+/* Optimiser l'affichage en mode paysage sur mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .excalidraw-toolbar,
+    div[style*="justify-content: space-between"][style*="align-items: center"] {
+        padding: 4px 8px !important;
+        height: 40px !important;
+    }
+    
+    .excalidraw-toolbar h3,
+    div[style*="justify-content: space-between"] h3 {
+        font-size: 12px !important;
+        max-width: 100px !important;
+    }
+    
+    .excalidraw-editor,
+    #app {
+        height: calc(100vh - 40px) !important;
+        margin-top: 40px !important;
+    }
 }

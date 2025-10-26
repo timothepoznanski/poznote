@@ -108,6 +108,7 @@ if ($note_id > 0) {
 <html>
 <head>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0"/>
     <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
     <!-- Theme -->
@@ -146,7 +147,7 @@ if ($note_id > 0) {
 <body>
     <div style="display: flex; flex-direction: column; height: 100vh;">
         <!-- Clean toolbar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 9999;">
             <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 8px 16px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
                 Return to notes
             </button>
@@ -231,6 +232,36 @@ if ($note_id > 0) {
     let excalidrawAPI = null;
 
     window.addEventListener('DOMContentLoaded', function() {
+        // Mobile optimizations
+        if (window.innerWidth <= 768) {
+            // Prevent zoom on double tap for better touch experience
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Force toolbar to stay visible
+            const toolbar = document.querySelector('.poznote-toolbar');
+            if (toolbar) {
+                toolbar.style.position = 'fixed';
+                toolbar.style.top = '0';
+                toolbar.style.left = '0';
+                toolbar.style.right = '0';
+                toolbar.style.zIndex = '10000';
+            }
+            
+            // Adjust app container for mobile
+            const app = document.getElementById('app');
+            if (app) {
+                app.style.marginTop = '50px';
+                app.style.height = 'calc(100vh - 50px)';
+            }
+        }
+        
         // Wait for bundle to load
         setTimeout(function() {
             if (!window.PoznoteExcalidraw) {
