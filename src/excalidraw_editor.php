@@ -19,7 +19,7 @@ $existing_data = null;
 $note_title = $is_embedded_diagram ? 'Embedded Diagram' : 'New note';
 
 if ($note_id > 0) {
-    $stmt = $con->prepare('SELECT heading, entry FROM entries WHERE id = ?');
+    $stmt = $con->prepare('SELECT heading, entry, type FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     

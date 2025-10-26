@@ -232,8 +232,10 @@ function restoreEntriesFromDir($sourceDir) {
         if (!$file->isDir()) {
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($sourceDir) + 1);
+            $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
             
-            if (pathinfo($relativePath, PATHINFO_EXTENSION) === 'html') {
+            // Include both HTML and Markdown files
+            if ($extension === 'html' || $extension === 'md') {
                 $targetFile = $entriesPath . '/' . basename($relativePath);
                 if (copy($filePath, $targetFile)) {
                     chmod($targetFile, 0644);
@@ -347,6 +349,8 @@ function restoreBackup($uploadedFile) {
 }
 
 function importNotesZip($uploadedFile) {
+    global $con;
+    
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
         return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
@@ -377,32 +381,113 @@ function importNotesZip($uploadedFile) {
     }
     
     $importedCount = 0;
+    $updatedCount = 0;
+    $errors = [];
     
-    // Extract each file
+    // Extract each file and create/update database entries
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $filename = $stat['name'];
         
-        // Skip directories and non-HTML files
-        if (substr($filename, -1) === '/' || !preg_match('/\.html$/i', $filename)) {
+        // Skip directories and non-note files
+        if (substr($filename, -1) === '/' || !preg_match('/\.(html|md)$/i', $filename)) {
             continue;
         }
         
         // Get the base filename without path
         $baseFilename = basename($filename);
         
+        // Extract note ID from filename (e.g., "123.html" -> 123)
+        $noteId = null;
+        if (preg_match('/^(\d+)\.(html|md)$/i', $baseFilename, $matches)) {
+            $noteId = intval($matches[1]);
+            $fileExtension = strtolower($matches[2]);
+        } else {
+            // Skip files that don't follow the ID.extension pattern
+            continue;
+        }
+        
         // Extract file content
         $content = $zip->getFromIndex($i);
-        if ($content !== false) {
-            $targetFile = $entriesPath . '/' . $baseFilename;
-            if (file_put_contents($targetFile, $content) !== false) {
-                chmod($targetFile, 0644);
+        if ($content === false) {
+            $errors[] = "Failed to extract content from {$baseFilename}";
+            continue;
+        }
+        
+        // Determine note type based on file extension
+        $noteType = ($fileExtension === 'md') ? 'markdown' : 'note';
+        
+        // Extract title from content
+        $title = 'Imported Note';
+        if ($noteType === 'markdown') {
+            // For markdown files, try to extract title from first line if it's a heading
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (preg_match('/^#\s+(.+)$/', $line, $matches)) {
+                    $title = trim($matches[1]);
+                    break;
+                }
+            }
+        } else {
+            // For HTML files, try to extract title from <title> or <h1> tags
+            if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $content, $matches)) {
+                $extractedTitle = trim(strip_tags($matches[1]));
+                if (!empty($extractedTitle)) {
+                    $title = $extractedTitle;
+                }
+            } elseif (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $content, $matches)) {
+                $extractedTitle = trim(strip_tags($matches[1]));
+                if (!empty($extractedTitle)) {
+                    $title = $extractedTitle;
+                }
+            }
+        }
+        
+        // Write file to entries directory
+        $targetFile = $entriesPath . '/' . $baseFilename;
+        if (file_put_contents($targetFile, $content) === false) {
+            $errors[] = "Failed to write file {$baseFilename}";
+            continue;
+        }
+        chmod($targetFile, 0644);
+        
+        try {
+            // Check if entry exists in database and get current type
+            $checkStmt = $con->prepare("SELECT id, type FROM entries WHERE id = ?");
+            $checkStmt->execute([$noteId]);
+            $existingEntry = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existingEntry) {
+                $oldType = $existingEntry['type'] ?? 'note';
+                
+                // If type is changing, remove old file with old extension
+                if ($oldType !== $noteType) {
+                    $oldExtension = ($oldType === 'markdown') ? '.md' : '.html';
+                    $oldFile = $entriesPath . '/' . $noteId . $oldExtension;
+                    if (file_exists($oldFile)) {
+                        @unlink($oldFile);
+                    }
+                }
+                
+                // Update existing entry
+                $updateStmt = $con->prepare("UPDATE entries SET heading = ?, type = ?, updated = datetime('now') WHERE id = ?");
+                $updateStmt->execute([$title, $noteType, $noteId]);
+                $updatedCount++;
+            } else {
+                // Insert new entry with specific ID
+                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, workspace, type, created, updated, trash, favorite) VALUES (?, ?, '', 'Default', 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
+                $insertStmt->execute([$noteId, $title, $noteType]);
                 $importedCount++;
             }
+        } catch (Exception $e) {
+            $errors[] = "Database error for {$baseFilename}: " . $e->getMessage();
+            continue;
         }
     }
     
     $zip->close();
+    
     // If the ZIP contained an index.html that was restored into the entries folder,
     // remove it to avoid showing a generic index page among notes.
     $indexFile = rtrim($entriesPath, '/') . '/index.html';
@@ -412,7 +497,12 @@ function importNotesZip($uploadedFile) {
 
     unlink($tempFile);
     
-    return ['success' => true, 'message' => "Imported {$importedCount} HTML files."];
+    $message = "Processed note files: {$importedCount} imported, {$updatedCount} updated (HTML and Markdown).";
+    if (!empty($errors)) {
+        $message .= " Errors: " . implode('; ', $errors);
+    }
+    
+    return ['success' => true, 'message' => $message];
 }
 
 function importAttachmentsZip($uploadedFile) {
@@ -572,10 +662,12 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             $stmt->execute([$title, $folder, $workspace, $noteType]);
             $noteId = $con->lastInsertId();
             
-            // Save content to file
-            $noteFile = $entriesPath . '/' . $noteId . '.html';
+            // Save content to file with correct extension
+            $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
+            $noteFile = $entriesPath . '/' . $noteId . $fileExtension;
+            
             if ($noteType === 'markdown') {
-                // For markdown notes, wrap content in basic structure if needed
+                // For markdown notes, save content as-is
                 $wrappedContent = $content;
             } else {
                 // For HTML notes, ensure it's properly formatted

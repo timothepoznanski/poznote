@@ -51,10 +51,10 @@ try {
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, trash, attachments, folder, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, trash, attachments, folder FROM entries WHERE id = ?");
+        $stmt = $con->prepare("SELECT heading, trash, attachments, folder, type FROM entries WHERE id = ?");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -85,16 +85,19 @@ try {
             }
         }
         
-        // Delete HTML file and PNG file (for Excalidraw notes)
-        $html_file_path = __DIR__ . '/entries/';
-        if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
-            $html_file_path .= $note['folder'] . '/';
-        }
-        $html_file_path .= $note_id . '.html';
+        // Delete note file (HTML or Markdown based on type)
+        $noteType = $note['type'] ?? 'note';
+        $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
         
-        $html_deleted = false;
-        if (file_exists($html_file_path)) {
-            $html_deleted = unlink($html_file_path);
+        $note_file_path = __DIR__ . '/entries/';
+        if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
+            $note_file_path .= $note['folder'] . '/';
+        }
+        $note_file_path .= $note_id . $fileExtension;
+        
+        $file_deleted = false;
+        if (file_exists($note_file_path)) {
+            $file_deleted = unlink($note_file_path);
         }
         
         // For Excalidraw notes, also delete the PNG file

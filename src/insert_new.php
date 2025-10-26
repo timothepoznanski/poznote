@@ -63,6 +63,22 @@
 	if ($stmt->execute([$uniqueTitle, $folder, $workspace, $type, $created_date, $created_date])) {
 		$id = $con->lastInsertId();
 
+		// Create the file for the note content with appropriate extension
+		$filename = getEntryFilename($id, $type);
+		
+		// Ensure the entries directory exists
+		$entriesDir = dirname($filename);
+		if (!is_dir($entriesDir)) {
+			mkdir($entriesDir, 0755, true);
+		}
+		
+		// Write empty content to file (new notes start empty)
+		$write_result = file_put_contents($filename, '');
+		if ($write_result === false) {
+			// Log error but don't fail since DB entry was successful
+			error_log("Failed to write file for new note ID $id: $filename");
+		}
+
 		// Detect AJAX/Fetch requests (prefer JSON response) versus direct browser open
 		$isAjax = false;
 		if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {

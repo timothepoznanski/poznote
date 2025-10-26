@@ -44,7 +44,7 @@ if ($_POST) {
             }
 
                 // Delete all entries for this workspace (including trashed notes)
-                $selectEntries = $con->prepare('SELECT id, attachments FROM entries WHERE workspace = ?');
+                $selectEntries = $con->prepare('SELECT id, attachments, type FROM entries WHERE workspace = ?');
                 $selectEntries->execute([$name]);
                 $entries = $selectEntries->fetchAll(PDO::FETCH_ASSOC);
 
@@ -69,11 +69,20 @@ if ($_POST) {
                         }
                     }
 
-                    // Delete entry HTML export file if present (entries are stored under data/entries/<id>.html)
+                    // Delete entry files if present (entries can be .html or .md based on type)
                     if (!empty($entry['id'])) {
-                        $htmlFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . '.html';
-                        if (file_exists($htmlFile)) {
-                            @unlink($htmlFile);
+                        $entryType = $entry['type'] ?? 'note';
+                        $fileExtension = ($entryType === 'markdown') ? '.md' : '.html';
+                        $entryFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $fileExtension;
+                        if (file_exists($entryFile)) {
+                            @unlink($entryFile);
+                        }
+                        
+                        // Also check for the other extension in case of type changes
+                        $otherExtension = ($entryType === 'markdown') ? '.html' : '.md';
+                        $otherFile = rtrim($entriesPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry['id'] . $otherExtension;
+                        if (file_exists($otherFile)) {
+                            @unlink($otherFile);
                         }
                     }
                 }
@@ -82,9 +91,9 @@ if ($_POST) {
                 $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
                 $delEntries->execute([$name]);
 
-                // Additional cleanup: remove orphan HTML files from data/entries
-                // Some HTML export files can remain on disk if the DB row was missing or inconsistent.
-                // Scan the entries directory and remove any <id>.html files that are no longer present in the entries table.
+                // Additional cleanup: remove orphan files from data/entries
+                // Some files can remain on disk if the DB row was missing or inconsistent.
+                // Scan the entries directory and remove any <id>.html or <id>.md files that are no longer present in the entries table.
                 try {
                     $entriesDir = getEntriesPath();
                     if ($entriesDir && is_dir($entriesDir)) {
@@ -92,9 +101,15 @@ if ($_POST) {
                         $checkStmt = $con->prepare('SELECT COUNT(*) FROM entries WHERE id = ?');
                         foreach ($files as $f) {
                             if (!is_string($f)) continue;
-                            if (substr($f, -5) !== '.html') continue;
+                            
+                            // Check for both .html and .md files
+                            $isHtml = substr($f, -5) === '.html';
+                            $isMd = substr($f, -3) === '.md';
+                            
+                            if (!$isHtml && !$isMd) continue;
                             if ($f === 'index.html') continue; // keep generic index
-                            $base = basename($f, '.html');
+                            
+                            $base = $isHtml ? basename($f, '.html') : basename($f, '.md');
                             // Only consider numeric IDs (legacy behavior uses numeric ids for exported files)
                             if (!preg_match('/^\d+$/', $base)) continue;
                             // If no DB row exists for this id, delete the file

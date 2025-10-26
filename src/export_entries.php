@@ -46,10 +46,15 @@ $res_right = $con->query($query_right);
 if ($res_right && $res_right) {
     $indexContent .= '<ul>';
     while($row = $res_right->fetch(PDO::FETCH_ASSOC)) {
-    $title = htmlspecialchars($row["heading"] ?: 'New note', ENT_QUOTES, 'UTF-8');
-    $folder = htmlspecialchars($row["folder"] ?: 'Default', ENT_QUOTES, 'UTF-8');
+        $title = htmlspecialchars($row["heading"] ?: 'New note', ENT_QUOTES, 'UTF-8');
+        $folder = htmlspecialchars($row["folder"] ?: 'Default', ENT_QUOTES, 'UTF-8');
         $tags = $row["tags"] ? ' - ' . htmlspecialchars($row["tags"], ENT_QUOTES, 'UTF-8') : '';
-        $indexContent .= '<li><a href="./'.$row['id'].'.html">'.$title.'</a> (' . $folder . $tags.')</li>';
+        
+        // Determine the correct file extension based on note type
+        $noteType = $row["type"] ?? 'note';
+        $fileExtension = ($noteType === 'markdown') ? 'md' : 'html';
+        
+        $indexContent .= '<li><a href="./'.$row['id'].'.'.$fileExtension.'">'.$title.'</a> (' . $folder . $tags.')</li>';
     }
     $indexContent .= '</ul>';
 } else {
@@ -60,7 +65,7 @@ $indexContent .= '<p>Export date: ' . date('Y-m-d H:i:s') . '</p>';
 $indexContent .= '</body></html>';
 $zip->addFromString('index.html', $indexContent);
 
-// Add all HTML files from entries directory
+// Add all note files (HTML and Markdown) from entries directory
 $files = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($rootPath), 
     RecursiveIteratorIterator::LEAVES_ONLY
@@ -70,9 +75,10 @@ foreach ($files as $name => $file) {
     if (!$file->isDir()) {
         $filePath = $file->getRealPath();
         $relativePath = substr($filePath, strlen($rootPath) + 1);
+        $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
         
-        // Only add HTML files, skip index.php and other non-HTML files
-        if (pathinfo($relativePath, PATHINFO_EXTENSION) === 'html') {
+        // Include both HTML and Markdown files, skip index.php and other non-note files
+        if ($extension === 'html' || $extension === 'md') {
             if (file_exists($filePath) && is_readable($filePath)) {
                 $zip->addFile($filePath, $relativePath);
                 $fileCount++;
