@@ -597,6 +597,10 @@ function handleImageClick(event) {
             <i class="fa-download"></i>
             Download
         </div>
+        <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
+            <i class="fas fa-trash"></i>
+            Delete Image
+        </div>
     `;
     
     // Add border toggle for Excalidraw images (both standalone and embedded)
@@ -609,14 +613,6 @@ function handleImageClick(event) {
             <div class="image-menu-item" data-action="toggle-border">
                 <i class="fas ${borderIcon}"></i>
                 ${borderText}
-            </div>
-        `;
-        
-        // Add delete option for Excalidraw images
-        menuHTML += `
-            <div class="image-menu-item" data-action="delete-excalidraw" style="color: #dc3545;">
-                <i class="fas fa-trash"></i>
-                Delete Image
             </div>
         `;
     }
@@ -719,7 +715,7 @@ function handleImageClick(event) {
                 document.body.removeChild(menu);
             }
         } else if (action === 'delete-excalidraw') {
-            deleteExcalidrawImage(img);
+            deleteImage(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -1010,15 +1006,10 @@ function applyExcalidrawBorderPreferences() {
 }
 
 /**
- * Delete an Excalidraw image after confirmation
+ * Delete an image (works for both Excalidraw and regular images)
  */
-function deleteExcalidrawImage(img) {
+function deleteImage(img) {
     if (!img) return;
-    
-    // Show confirmation dialog
-    const confirmed = confirm('Are you sure you want to delete this Excalidraw image? This action cannot be undone.');
-    
-    if (!confirmed) return;
     
     try {
         // Find the container (could be excalidraw-container or just the img itself)
@@ -1048,15 +1039,7 @@ function deleteExcalidrawImage(img) {
             }
         }, 100);
         
-        // Show success notification
-        if (window.showNotificationPopup) {
-            showNotificationPopup('Excalidraw image deleted successfully', 'success');
-        }
-        
     } catch (error) {
-        console.warn('Error deleting Excalidraw image:', error);
-        if (window.showNotificationPopup) {
-            showNotificationPopup('Error deleting image. Please try again.', 'error');
-        }
+        console.warn('Error deleting image:', error);
     }
 }
