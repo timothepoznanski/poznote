@@ -49,7 +49,7 @@ function insertExcalidrawDiagram() {
     const diagramId = 'excalidraw-' + Date.now();
     
     // Create simple button for the Excalidraw diagram
-    const diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007DB8; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click to create your Excalidraw image here</button><br><br>`;
+    const diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007DB8; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click here to create your Excalidraw image here</button><br><br>`;
     
     // Insert at cursor position
     insertHtmlAtCursor(diagramHTML);
