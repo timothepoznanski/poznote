@@ -74,12 +74,23 @@ if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
         (function(){
             try {
                 var workspace = localStorage.getItem("poznote_selected_workspace");
-                if (workspace && workspace !== "" && workspace !== "Poznote") {
+                // Always redirect to include workspace parameter, even for Poznote
+                if (workspace && workspace !== "") {
                     var params = new URLSearchParams(window.location.search);
                     params.set("workspace", workspace);
                     window.location.href = "index.php?" + params.toString();
+                } else {
+                    // No workspace in localStorage, redirect with default Poznote
+                    var params = new URLSearchParams(window.location.search);
+                    params.set("workspace", "Poznote");
+                    window.location.href = "index.php?" + params.toString();
                 }
-            } catch(e) {}
+            } catch(e) {
+                // If localStorage fails, redirect with default Poznote workspace
+                var params = new URLSearchParams(window.location.search);
+                params.set("workspace", "Poznote");
+                window.location.href = "index.php?" + params.toString();
+            }
         })();
         </script></head><body></body></html>';
         // Don't exit here - let the page continue loading with Poznote as default

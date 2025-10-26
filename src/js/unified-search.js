@@ -764,6 +764,10 @@ class SearchManager {
             if (typeof reinitializeNoteContent === 'function') {
                 reinitializeNoteContent();
             }
+            // Reinitialize note click handlers for mobile navigation
+            if (typeof window.initializeNoteClickHandlers === 'function') {
+                window.initializeNoteClickHandlers();
+            }
 
             // Reinitialize search (set up listeners/DOM hooks)
             // Prevent restore-from-URL happening during this reinit which may override saved state

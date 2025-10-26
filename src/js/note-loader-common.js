@@ -234,6 +234,11 @@ window.loadNoteDirectly = function(url, noteId, event) {
 
                                     // Apply selection after content is loaded and initialized
                                     updateSelectedNote(clickedLink);
+                                    
+                                    // Reinitialize note click handlers for mobile navigation after loading individual note
+                                    if (typeof window.initializeNoteClickHandlers === 'function') {
+                                        window.initializeNoteClickHandlers();
+                                    }
                                 } else {
                                     throw new Error('Could not find current right column');
                                 }
