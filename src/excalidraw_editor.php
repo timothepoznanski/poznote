@@ -183,7 +183,6 @@ if ($note_id > 0) {
                 let jsonMatch = cleanedData.match(/^(\{.*\}\})/);
                 if (jsonMatch) {
                     cleanedData = jsonMatch[1];
-                    console.log('Found JSON pattern, using cleaned data:', cleanedData.substring(0, 100) + '...');
                 }
                 
                 existingData = JSON.parse(cleanedData);
@@ -271,8 +270,6 @@ if ($note_id > 0) {
             const files = excalidrawAPI.getFiles();
             const data = { elements, appState };
             
-            console.log('Saving data:', { elements: elements.length, appState, files });
-            
             if (isEmbeddedDiagram) {
                 // Embedded diagram mode: save to existing note HTML
                 await saveEmbeddedDiagram(data, elements, appState, files);
@@ -311,19 +308,15 @@ if ($note_id > 0) {
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_image_base64', base64Image);
         
-        console.log('Saving embedded diagram to note', noteId, 'diagram', diagramId);
-        
         const response = await fetch('api_save_excalidraw.php', {
             method: 'POST',
             body: formData
         });
         
         const result = await response.json();
-        console.log('Server response:', result);
         
         if (result.success) {
             // Stay in editor after save - don't redirect
-            console.log('Diagram saved successfully');
             
             // Optional: You could add a visual notification here
             // For now, the "Saved!" text in the button is sufficient
@@ -351,7 +344,6 @@ if ($note_id > 0) {
         });
         
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        console.log('Generated PNG blob:', blob.size, 'bytes');
         
         // Send to server
         const formData = new FormData();
@@ -361,26 +353,22 @@ if ($note_id > 0) {
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_image', blob, 'preview.png');
         
-        console.log('Sending to server...');
         const response = await fetch('api_save_excalidraw.php', {
             method: 'POST',
             body: formData
         });
         
         const result = await response.json();
-        console.log('Server response:', result);
         
         if (result.success) {
             // Update the note ID if it was a new note
             if (result.note_id && noteId === 0) {
                 noteId = result.note_id;
-                console.log('New note ID:', noteId);
                 
                 // Update URL to include note_id for future reloads
                 const url = new URL(window.location);
                 url.searchParams.set('note_id', noteId);
                 window.history.replaceState({}, '', url);
-                console.log('Updated URL:', url.toString());
             }
         } else {
             throw new Error(result.message || 'Save failed');

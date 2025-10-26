@@ -13,6 +13,32 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
     
+    // Register custom SQLite function to clean HTML content for search
+    $con->sqliteCreateFunction('search_clean_entry', function($html) {
+        if (empty($html)) {
+            return '';
+        }
+        
+        // Remove Excalidraw containers with their data-excalidraw attributes and base64 images
+        $html = preg_replace(
+            '/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s',
+            '[Excalidraw diagram]',
+            $html
+        );
+        
+        // Remove any remaining base64 image data
+        $html = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $html);
+        
+        // Strip remaining HTML tags but keep the text content
+        $text = strip_tags($html);
+        
+        // Clean up extra whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        return $text;
+    }, 1);
+    
     // Create entries table
     $con->exec('CREATE TABLE IF NOT EXISTS entries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

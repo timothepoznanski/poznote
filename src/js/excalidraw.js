@@ -116,21 +116,9 @@ function getCurrentNoteId() {
 // Helper function to insert HTML at cursor position
 function insertHtmlAtCursor(html) {
     let selection = window.getSelection();
-    if (selection.rangeCount === 0) {
-        // No selection, try to find the focused editable element
-        const focusedElement = document.querySelector('.note-content[contenteditable="true"]:focus') || 
-                              document.querySelector('.note-content[contenteditable="true"]');
-        if (focusedElement) {
-            focusedElement.focus();
-            selection = window.getSelection();
-            const range = document.createRange();
-            range.selectNodeContents(focusedElement);
-            range.collapse(false); // Move to end
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-    }
+    let insertionSuccessful = false;
     
+    // If there's a current selection, use it
     if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         const fragment = range.createContextualFragment(html);
@@ -139,11 +127,41 @@ function insertHtmlAtCursor(html) {
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
+        insertionSuccessful = true;
     } else {
+        // No selection, try to find the note content area and insert at the end
+        const noteContentElement = document.querySelector('.note-content[contenteditable="true"]') || 
+                                   document.querySelector('#note-content[contenteditable="true"]') ||
+                                   document.querySelector('[contenteditable="true"]');
+        
+        if (noteContentElement) {
+            noteContentElement.focus();
+            
+            // Create a range at the end of the content
+            const range = document.createRange();
+            range.selectNodeContents(noteContentElement);
+            range.collapse(false); // Move to end
+            
+            // Insert the HTML
+            const fragment = range.createContextualFragment(html);
+            range.insertNode(fragment);
+            range.collapse(false);
+            
+            // Update selection
+            selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            insertionSuccessful = true;
+        }
+    }
+    
+    // If we still couldn't insert, show a notification
+    if (!insertionSuccessful) {
         if (window.showNotificationPopup) {
-            showNotificationPopup('Please place cursor in the note content area first', 'warning');
+            showNotificationPopup('Could not find note content area to insert diagram', 'warning');
         } else {
-            alert('Please place cursor in the note content area first');
+            alert('Could not find note content area to insert diagram');
         }
     }
 }
