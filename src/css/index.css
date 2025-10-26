@@ -2723,6 +2723,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-list-check::before { content: "\f0ae"; }
 .fa-image::before { content: "\f03e"; }
 .fa-tags::before { content: "\f02c"; }
+.fa-border-outer::before { content: "\f851"; }
 .fa-code::before { content: "\f121"; }
 .fa-share::before { content: "\f064"; }
 .fa-arrows-up-down::before { content: "\f07d"; }
@@ -2770,6 +2771,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 
+.fa-border-outer,
 .fa-share-nodes,
 .fa-smile,
 .fa-folder,

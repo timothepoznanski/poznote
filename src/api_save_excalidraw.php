@@ -114,7 +114,7 @@ if ($note_id > 0) {
     // Generate new Excalidraw HTML content
     if (!empty($base64_image)) {
         $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
-        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" style="border: 1px solid #9ca3af; border-radius: 4px;" />';
+        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
     } else {
@@ -213,7 +213,7 @@ function saveEmbeddedDiagram() {
         
         // Create the updated diagram HTML with embedded data and preview
         $diagram_html = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
-                              style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
+                              style="padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
                               data-diagram-id="' . htmlspecialchars($diagram_id) . '"
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         

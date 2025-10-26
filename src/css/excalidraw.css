@@ -131,6 +131,15 @@ img[data-is-excalidraw="true"] {
     box-shadow: none; /* Supprime l'ombre */
 }
 
+/* Bordure optionnelle pour les images Excalidraw */
+img[data-is-excalidraw="true"].excalidraw-with-border,
+.excalidraw-container img.excalidraw-with-border {
+    border: 2px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
+}
+
 /* Style global pour centrer toutes les previews Excalidraw */
 .excalidraw-preview-container,
 div[onclick*="openExcalidrawNote"] {

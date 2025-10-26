@@ -29,6 +29,8 @@ function insertExcalidrawDiagram() {
     }
     
     // Check if note is empty (no content or just whitespace/empty tags)
+    // COMMENTED OUT: Allow creating Excalidraw diagrams in empty notes
+    /*
     const noteContent = noteEntry.innerHTML.trim();
     const hasOnlyEmptyTags = /^(<br\s*\/?>|\s|&nbsp;)*$/.test(noteContent);
     
@@ -41,6 +43,7 @@ function insertExcalidrawDiagram() {
         }
         return;
     }
+    */
     
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();

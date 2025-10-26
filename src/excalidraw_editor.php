@@ -322,14 +322,20 @@ if ($note_id > 0) {
         console.log('Server response:', result);
         
         if (result.success) {
-            // Return to parent note
-            const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
-            if (context.returnUrl) {
-                window.location.href = context.returnUrl;
-            } else {
-                const params = new URLSearchParams({ workspace: workspace, note: noteId });
-                window.location.href = 'index.php?' + params.toString();
-            }
+            // Stay in editor after save - don't redirect
+            console.log('Diagram saved successfully');
+            
+            // Optional: You could add a visual notification here
+            // For now, the "Saved!" text in the button is sufficient
+            
+            // Commented out auto-redirect to stay in editor:
+            // const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
+            // if (context.returnUrl) {
+            //     window.location.href = context.returnUrl;
+            // } else {
+            //     const params = new URLSearchParams({ workspace: workspace, note: noteId });
+            //     window.location.href = 'index.php?' + params.toString();
+            // }
         } else {
             throw new Error(result.message || 'Save failed');
         }
