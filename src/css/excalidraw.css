@@ -220,10 +220,11 @@ div[onclick*="openExcalidrawNote"] {
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        z-index: 9999 !important;
+        z-index: 10000 !important; /* Cohérent avec la hiérarchie z-index */
         background: #ffffff !important;
         border-bottom: 1px solid #e1e4e8 !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        height: 50px !important; /* Hauteur réduite sur mobile */
     }
     
     .excalidraw-toolbar h3,
@@ -250,10 +251,15 @@ div[onclick*="openExcalidrawNote"] {
     .excalidraw-editor,
     #app {
         height: calc(100vh - 50px) !important;
-        margin-top: 50px !important;
+        margin-top: 50px !important; /* Décale en dessous du bandeau mobile */
         width: 100% !important;
         overflow: auto !important;
         -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Ajuster la position des éléments Excalidraw sur mobile */
+    .excalidraw .layer-ui__wrapper {
+        top: 50px !important; /* Décale en dessous du bandeau mobile */
     }
     
     /* Force the Excalidraw canvas to be responsive */
@@ -330,19 +336,38 @@ div[class*="zen-mode-transition"] {
    Améliorations pour la responsivité d'Excalidraw
    ------------------------------------------------------------------ */
 
-/* Forcer la barre d'outils custom à rester visible */
+/* Force the custom toolbar to stay visible */
 .poznote-toolbar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    z-index: 10000 !important;
+    z-index: 10000 !important; /* Keep high to stay above everything */
     background: var(--bg-primary, #ffffff) !important;
     border-bottom: 1px solid var(--border-color, #e0e0e0) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    height: 40px !important; /* Reduced height from 60px to 40px */
+    padding: 8px 20px !important; /* Reduced padding to fit new height */
 }
 
-/* S'assurer que le conteneur Excalidraw gère le touch */
+/* Position Excalidraw interface elements below the toolbar */
+.excalidraw .layer-ui__wrapper {
+    top: 45px !important; /* Offset Excalidraw toolbar just below the banner */
+    z-index: 1000 !important; /* Lower z-index than Poznote banner */
+}
+
+/* Adjust the position of the main Excalidraw toolbar */
+.excalidraw .layer-ui__wrapper .Island {
+    position: relative !important;
+    top: 0 !important;
+}
+
+/* Ensure the Excalidraw canvas takes up all available space */
+.excalidraw .excalidraw__canvas {
+    height: calc(100vh - 45px) !important;
+}
+
+/* Ensure the Excalidraw container handles touch */
 .excalidraw,
 .excalidraw .excalidraw-canvas-container,
 .excalidraw canvas {
@@ -352,14 +377,14 @@ div[class*="zen-mode-transition"] {
     -webkit-touch-callout: none !important;
 }
 
-/* Empêcher le zoom de la page sur mobile mais permettre les gestes Excalidraw */
+/* Prevent page zoom on mobile but allow Excalidraw gestures */
 body {
     touch-action: pan-x pan-y !important;
     -webkit-text-size-adjust: 100% !important;
     -webkit-font-smoothing: antialiased !important;
 }
 
-/* Optimiser l'affichage en mode paysage sur mobile */
+/* Optimize display in landscape mode on mobile */
 @media (max-width: 800px) and (orientation: landscape) {
     .excalidraw-toolbar,
     div[style*="justify-content: space-between"][style*="align-items: center"] {
