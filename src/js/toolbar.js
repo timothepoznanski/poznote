@@ -536,7 +536,40 @@ function toggleInlineCode() {
   document.execCommand('insertHTML', false, codeHTML);
 }
 
+/**
+ * Check if cursor is in an editable note area
+ */
+function isCursorInEditableNote() {
+    const selection = window.getSelection();
+    
+    // Check if there's a selection/cursor
+    if (!selection.rangeCount) {
+        return false;
+    }
+    
+    // Get the current element
+    const range = selection.getRangeAt(0);
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) { // Text node
+        container = container.parentNode;
+    }
+    
+    // Check if we're inside a contenteditable note area
+    const editableElement = container.closest && container.closest('[contenteditable="true"]');
+    const noteEntry = container.closest && container.closest('.noteentry');
+    const markdownEditor = container.closest && container.closest('.markdown-editor');
+    
+    // Return true if we're in any editable note context
+    return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
+}
+
 function insertSeparator() {
+  // Check if cursor is in editable note
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
+    return;
+  }
+  
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   
@@ -703,6 +736,12 @@ function toggleEmojiPicker() {
 }
 
 function insertEmoji(emoji) {
+  // Vérifier si le curseur est dans une zone éditable
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
+    return;
+  }
+  
   const sel = window.getSelection();
   if (!sel.rangeCount) return;
   
@@ -862,6 +901,12 @@ function toggleTablePicker() {
   
   if (existingPicker) {
     existingPicker.remove();
+    return;
+  }
+  
+  // Check if cursor is in editable note BEFORE opening picker
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
     return;
   }
   
@@ -1035,6 +1080,23 @@ function toggleTablePicker() {
 }
 
 function insertTable(rows, cols) {
+  // Use saved range if available, otherwise check current cursor position
+  if (window.savedTableRange) {
+    // Restore the saved selection
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(window.savedTableRange);
+    
+    // Clear the saved range
+    window.savedTableRange = null;
+  } else {
+    // Fallback: check if cursor is in editable note
+    if (!isCursorInEditableNote()) {
+      window.showCursorWarning();
+      return;
+    }
+  }
+  
   // Find the active note editor
   const noteentry = document.querySelector('.noteentry[contenteditable="true"]');
   

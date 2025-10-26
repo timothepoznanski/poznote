@@ -44,10 +44,10 @@ $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 try {
     // Verify that note exists (respect workspace if provided)
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, workspace FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, workspace, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, workspace FROM entries WHERE id = ?");
+        $stmt = $con->prepare("SELECT heading, folder, workspace, type FROM entries WHERE id = ?");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -92,16 +92,20 @@ try {
     // Determine file paths
     // Decide default folder logic using workspace if available
     $note_workspace = $note['workspace'] ?? null;
+    // Determine file extension based on note type
+    $noteType = $note['type'] ?? 'note';
+    $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
+    
     // Workspace-specific filesystem segments
     $oldWsSegment = $note_workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($note_workspace))) : 'workspace_default';
     $newWsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
 
-    $old_file_path = __DIR__ . '/entries/' . ($note_workspace && !isDefaultFolder($current_folder, $note_workspace) ? ($oldWsSegment . '/' . $current_folder . '/' . $note_id . '.html') : ($oldWsSegment . '/' . $note_id . '.html'));
+    $old_file_path = __DIR__ . '/entries/' . ($note_workspace && !isDefaultFolder($current_folder, $note_workspace) ? ($oldWsSegment . '/' . $current_folder . '/' . $note_id . $fileExtension) : ($oldWsSegment . '/' . $note_id . $fileExtension));
     if (isDefaultFolder($folder_name, $workspace)) {
-        $new_file_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $note_id . '.html';
+        $new_file_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $note_id . $fileExtension;
     } else {
         $new_folder_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $folder_name;
-        $new_file_path = $new_folder_path . '/' . $note_id . '.html';
+        $new_file_path = $new_folder_path . '/' . $note_id . $fileExtension;
     }
     
     // Verify that note file exists

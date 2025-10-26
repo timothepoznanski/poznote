@@ -12,16 +12,16 @@
 
     // Delete all files and attachments from trash entries (scoped by workspace when provided)
     if ($workspace) {
-        $res_stmt = $con->prepare('SELECT id, attachments FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = \'Poznote\'))');
+        $res_stmt = $con->prepare('SELECT id, attachments, type FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = \'Poznote\'))');
         $res_stmt->execute([$workspace, $workspace]);
         $rows = $res_stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
-        $res = $con->query('SELECT id, attachments FROM entries WHERE trash = 1');
+        $res = $con->query('SELECT id, attachments, type FROM entries WHERE trash = 1');
         $rows = $res ? $res->fetchAll(PDO::FETCH_ASSOC) : [];
     }
     foreach($rows as $row) {
-        // Delete HTML file
-        $file_path = getEntriesRelativePath() . $row["id"] . ".html";
+        // Delete file with appropriate extension
+        $file_path = getEntryFilename($row["id"], $row["type"] ?? 'note');
         if(file_exists($file_path)) unlink($file_path);
         
         // Delete attachment files

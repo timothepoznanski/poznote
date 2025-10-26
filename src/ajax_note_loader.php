@@ -87,8 +87,8 @@ try {
         exit;
     }
     
-    // Get note content
-    $filename = getEntriesRelativePath() . $row["id"] . ".html";
+    // Get note content with appropriate file extension
+    $filename = getEntryFilename($row["id"], $row["type"]);
     $title = $row['heading'];             
     $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
     

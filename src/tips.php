@@ -13,6 +13,43 @@ $note_id = $_GET['note'] ?? '';
 
 // Version for cache busting
 $v = '20251021.1';
+
+// Function to get tips content from GitHub
+function getTipsFromGitHub() {
+    // GitHub raw content URL for tips.json
+    $github_url = 'https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tips.json';
+    
+    // Try to fetch from GitHub
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 10,
+            'user_agent' => 'Poznote-Tips-Loader/1.0'
+        ]
+    ]);
+    
+    $content = @file_get_contents($github_url, false, $context);
+    
+    if ($content !== false) {
+        $tips_data = json_decode($content, true);
+        if ($tips_data !== null) {
+            return $tips_data;
+        }
+    }
+    
+    // Return empty structure if GitHub is unavailable
+    return [
+        'header' => [
+            'title' => 'Tips unavailable',
+            'subtitle' => 'Unable to load tips from GitHub.'
+        ],
+        'tips' => []
+    ];
+}
+
+// Get tips data
+$tips_data = getTipsFromGitHub();
+$header = $tips_data['header'] ?? ['title' => 'Tips unavailable', 'subtitle' => ''];
+$tips = $tips_data['tips'] ?? [];
 ?>
 <html>
 <head>
@@ -49,8 +86,8 @@ $v = '20251021.1';
     <div class="tips-container">
         <div class="tips-header">
             <div class="tips-header-left">
-                <h1>Did you know?</h1>
-                <p>Please check all these quick tips. There might be a few things here you didn’t know Poznote could do.</p>
+                <h1><?php echo htmlspecialchars($header['title']); ?></h1>
+                <p><?php echo htmlspecialchars($header['subtitle']); ?></p>
             </div>
             <div class="tips-header-right">
                 <button class="btn-back" onclick="goBack()">
@@ -61,161 +98,46 @@ $v = '20251021.1';
 
         <div class="tips-content">
             <div class="tips-list">
+                <?php foreach ($tips as $tip): ?>
                 <div class="tip-item">
-                    <i class="fa-list-check"></i> Create tasklist notes with drag-and-drop reordering and clickable links.
+                    <i class="<?php echo htmlspecialchars($tip['icon']); ?>"></i> <?php echo htmlspecialchars($tip['text']); ?>
                 </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip3.png" alt="Create tasklist notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. HTML notes embed them inline.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip4.png" alt="Add images - drag and drop" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-image"></i> Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip5.png" alt="Add images - paste screenshots" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-tags"></i> Click on any tag in a displayed note to filter your note list by that tag.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip6.png" alt="Click on tag to filter" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-tags"></i> Search in tags list.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip7.png" alt="Search in tags list" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip8.png" alt="Search in tags list" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-search"></i> Search across multiple keywords simultaneously.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip2.png" alt="Search across multiple keywords" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-search"></i> Search across multiple tags simultaneously.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip1.png" alt="Search across multiple tags" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-share"></i> Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip9.png" alt="Generate public links" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip10.png" alt="Public link access" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-arrows-up-down"></i> Drag notes into folders, favorites or trash.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip11.png" alt="Drag notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-download"></i> Export notes as ZIP backup that includes an HTML index for offline browsing and search.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip12.png" alt="Export backup" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip13.png" alt="Export backup" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip14.png" alt="Offline browsing" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-smile"></i> Add emojis to note titles using Ctrl + ; on Windows.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip15.png" alt="Add emojis" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-arrows-h"></i> Resize the left sidebar by dragging its border.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip16.png" alt="Resize sidebar" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-layer-group"></i> Create separate workspaces.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip17.png" alt="Create workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip18.png" alt="Separate workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-layer-group"></i> Transfer notes one by one or all at a time between workspaces.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip19.png" alt="Transfer notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip20.png" alt="Transfer notes between workspaces" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip21.png" alt="Transfer all notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-sort"></i> Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip22.png" alt="Toggle markdown preview" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip23.png" alt="Markdown toolbar buttons" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip24.png" alt="Preview edit buttons" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-mobile"></i> On mobile, swipe between notes list and note view.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip25.png" alt="Mobile swipe navigation" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-file-import"></i> Import existing HTML and Markdown notes directly into Poznote.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip26.png" alt="Import existing notes" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-code"></i> Copy code from VSCode and paste it into an HTML note to automatically create a code block. You can also highlight, bold, italicize, underline, and colorize text within the code block.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip27.png" alt="VSCode code paste with formatting" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
-                <div class="tip-item">
-                    <i class="fa-image"></i> Click on any image in a note to open a menu with options to view it in full size or download it.
-                </div>
-                <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
-                    <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/tip28.png" alt="Click image menu" class="tip-image" style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                </div>
+                <?php if (isset($tip['images']) && is_array($tip['images'])): ?>
+                    <?php foreach ($tip['images'] as $image): ?>
+                    <div style="padding-left: 40px; margin-top: 10px; margin-bottom: 15px;">
+                        <img src="https://raw.githubusercontent.com/timothepoznanski/poznote/main/readme/tips/<?php echo htmlspecialchars($image); ?>" 
+                             alt="<?php echo htmlspecialchars($tip['text']); ?>" 
+                             class="tip-image" 
+                             style="display: block; max-width: 60%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
 
     <script>
     function goBack() {
-        // Build return URL with current workspace and note parameters
+        // Build return URL with workspace from localStorage and note parameters
         var url = 'index.php';
         var params = [];
         
-        // Add workspace parameter
-        var workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
-        if (workspace && workspace !== 'Poznote') {
-            params.push('workspace=' + encodeURIComponent(workspace));
+        // Get workspace from localStorage first, fallback to PHP value
+        try {
+            var workspace = localStorage.getItem('poznote_selected_workspace');
+            if (!workspace || workspace === '') {
+                workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
+            }
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
+        } catch(e) {
+            // Fallback to PHP workspace if localStorage fails
+            var workspace = '<?php echo htmlspecialchars($workspace, ENT_QUOTES); ?>';
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
         }
         
         // Add note parameter if provided

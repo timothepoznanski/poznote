@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 include 'db_connect.php';
 require_once 'default_folder_settings.php';
+require_once 'functions.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -21,10 +22,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -45,7 +46,7 @@ try {
 $title = $note['heading'] ?: 'New note';
 
 // Format dates
-function formatDate($dateStr) {
+function formatDateString($dateStr) {
     if (empty($dateStr)) return 'Not available';
     try {
         $date = new DateTime($dateStr);
@@ -55,13 +56,14 @@ function formatDate($dateStr) {
     }
 }
 
-$createdText = formatDate($note['created']);
-$updatedText = formatDate($note['updated']);
+$createdText = formatDateString($note['created']);
+$updatedText = formatDateString($note['updated']);
 $folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
 $isFavorite = (int)$note['favorite'] === 1;
 
-// Build full path of the note
-$fullPath = "./data/entries/{$note_id}.html";
+// Build full path of the note with appropriate extension
+$noteType = $note['type'] ?? 'note';
+$fullPath = "./data/entries/{$note_id}" . getFileExtensionForType($noteType);
 
 // Process tags
 $tags = [];
@@ -106,8 +108,8 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 <body>
     <div class="info-page">
         <div class="info-buttons-back-container">
-            <button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $workspace ? '?workspace=' . urlencode($workspace) : ''; ?>';" title="Back to notes">
-                Back to notes
+            <button id="backToNoteBtn" class="btn btn-secondary" onclick="goBackToNote()" title="Back to note">
+                Back to note
             </button>
         </div>
         
@@ -257,6 +259,41 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
                 cancelSubheadingEdit();
             }
         });
+    </script>
+    
+    <script>
+    function goBackToNote() {
+        // Build return URL with workspace from localStorage and note parameter
+        var url = 'index.php';
+        var params = [];
+        
+        // Add note parameter
+        params.push('note=<?php echo $note_id; ?>');
+        
+        // Get workspace from localStorage first, fallback to PHP value
+        try {
+            var workspace = localStorage.getItem('poznote_selected_workspace');
+            if (!workspace || workspace === '') {
+                workspace = '<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES); ?>';
+            }
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
+        } catch(e) {
+            // Fallback to PHP workspace if localStorage fails
+            var workspace = '<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES); ?>';
+            if (workspace && workspace !== '') {
+                params.push('workspace=' + encodeURIComponent(workspace));
+            }
+        }
+        
+        // Build final URL
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+        
+        window.location.href = url;
+    }
     </script>
 </body>
 </html>

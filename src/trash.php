@@ -50,7 +50,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<?php if (!empty($search)): ?>
 			<div class="trash-search-notice">
 				Results for "<?php echo htmlspecialchars($search); ?>"
-		<span class="trash-clear-search" onclick="window.location='trash.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>'">
+		<span class="trash-clear-search" onclick="clearSearchAndReturn()">
 					<i class="fa-times"></i>
 				</span>
 			</div>
@@ -69,7 +69,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		</form>
 		
 		<div class="trash-buttons-container">
-			<button class="btn btn-secondary" onclick="window.location = 'index.php<?php echo $pageWorkspace ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>';" title="Back to notes">
+			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="Back to notes">
 				Back to notes
 			</button>
 			<button class="btn btn-danger" id="emptyTrashBtn" title="Empty trash">
@@ -123,7 +123,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 		if ($stmt) {
 			while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 				$id = $row['id'];
-				$filename = getEntriesRelativePath() . $id . ".html";
+				$filename = getEntryFilename($id, $row['type'] ?? 'note');
 				$entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
 				$heading = $row['heading'];
 				$updated = formatDateTime(strtotime($row['updated']));
@@ -151,7 +151,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 						$displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
 					}
 				} else {
-					// non-tasklist: keep raw HTML content
+					// For all other note types (HTML, Markdown), use the HTML file content
 					$displayContent = $entryfinal;
 				}
 
@@ -235,6 +235,64 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<script src="js/trash.js"></script>
 	<script>
 		var pageWorkspace = <?php echo $pageWorkspace ? json_encode($pageWorkspace) : 'undefined'; ?>;
+		
+		function goBackToNotes() {
+			// Build return URL with workspace from localStorage
+			var url = 'index.php';
+			var params = [];
+			
+			// Get workspace from localStorage first, fallback to PHP value
+			try {
+				var workspace = localStorage.getItem('poznote_selected_workspace');
+				if (!workspace || workspace === '') {
+					workspace = pageWorkspace;
+				}
+				if (workspace && workspace !== '') {
+					params.push('workspace=' + encodeURIComponent(workspace));
+				}
+			} catch(e) {
+				// Fallback to PHP workspace if localStorage fails
+				if (pageWorkspace && pageWorkspace !== '') {
+					params.push('workspace=' + encodeURIComponent(pageWorkspace));
+				}
+			}
+			
+			// Build final URL
+			if (params.length > 0) {
+				url += '?' + params.join('&');
+			}
+			
+			window.location.href = url;
+		}
+		
+		function clearSearchAndReturn() {
+			// Clear search and return to trash page with correct workspace
+			var url = 'trash.php';
+			var params = [];
+			
+			// Get workspace from localStorage first, fallback to PHP value
+			try {
+				var workspace = localStorage.getItem('poznote_selected_workspace');
+				if (!workspace || workspace === '') {
+					workspace = pageWorkspace;
+				}
+				if (workspace && workspace !== '') {
+					params.push('workspace=' + encodeURIComponent(workspace));
+				}
+			} catch(e) {
+				// Fallback to PHP workspace if localStorage fails
+				if (pageWorkspace && pageWorkspace !== '') {
+					params.push('workspace=' + encodeURIComponent(pageWorkspace));
+				}
+			}
+			
+			// Build final URL
+			if (params.length > 0) {
+				url += '?' + params.join('&');
+			}
+			
+			window.location.href = url;
+		}
 	</script>
 </body>
 </html>

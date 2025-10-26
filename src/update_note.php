@@ -23,6 +23,19 @@
 	$workspace = $_POST['workspace'] ?? null; // optional
 	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
 	
+	// Check if this is an Excalidraw note - in the new unified system, treat as regular HTML
+	$isExcalidrawNote = false;
+	$originalEntryContent = $entrycontent;
+	
+	// Clean Excalidraw JSON data from entrycontent if present
+	// This happens when user edits text around Excalidraw diagrams
+	if (strpos($entry, 'excalidraw-data') !== false) {
+		// This note contains Excalidraw content
+		// Remove any JSON data that may have leaked into entrycontent
+		$cleaned_entrycontent = preg_replace('/\{"elements":\[.*?\]\}/', '', $entrycontent);
+		$entrycontent = trim($cleaned_entrycontent);
+	}
+	
 	// Enforce uniqueness: if another non-trashed note in the same workspace has the same heading, fail.
 	// Allow the same heading if it belongs to this note (by id).
 	$heading = $originalHeading;
@@ -70,7 +83,7 @@
 		die('Note not found');
 	}
 	
-    $filename = getEntriesRelativePath() . $id . ".html";
+    $filename = getEntryFilename($id, $row['type'] ?? 'note');
 	
 	// Ensure the entries directory exists
 	$entriesDir = dirname($filename);

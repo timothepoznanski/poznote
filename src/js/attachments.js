@@ -1,5 +1,21 @@
 // Attached file and image drag management
 
+// Fonctions utilitaires pour vérifier la position du curseur
+function isCursorInEditableNote() {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return false;
+    
+    const range = selection.getRangeAt(0);
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) container = container.parentNode;
+    
+    return container.closest && (
+        container.closest('[contenteditable="true"]') ||
+        container.closest('.noteentry') ||
+        container.closest('.markdown-editor')
+    );
+}
+
 function showAttachmentDialog(noteId) {
     var ws = selectedWorkspace || 'Poznote';
     var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
@@ -272,6 +288,11 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     var loadingText = '![Uploading ' + file.name + '...]()';
     insertMarkdownAtCursor(loadingText, dropTarget);
     
+    // Trigger initial save for loading text
+    if (typeof updateNote === 'function') {
+        updateNote(); // Mark note as edited
+    }
+    
     // Uploader le fichier
     var formData = new FormData();
     formData.append('action', 'upload');
@@ -298,6 +319,13 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             if (typeof markNoteAsModified === 'function') {
                 markNoteAsModified(noteId);
             }
+            
+            // Trigger automatic save after a short delay
+            setTimeout(function() {
+                if (typeof updatenote === 'function') {
+                    updatenote(); // Save to server
+                }
+            }, 500); // Longer delay for markdown to allow upload completion
         } else {
             // Supprimer le texte de chargement en cas d'erreur
             replaceLoadingText(loadingText, '', dropTarget);
@@ -315,8 +343,26 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
 }
 
 function insertMarkdownAtCursor(text, dropTarget) {
+    // Vérifier si le curseur est dans une zone éditable pour les insertions manuelles
+    // (dropTarget indique un glisser-déposer, donc on ne vérifie pas)
+    if (!dropTarget && !isCursorInEditableNote()) {
+        window.showCursorWarning();
+        return;
+    }
+    
     // Pour les notes markdown, insérer dans l'éditeur markdown
-    var editor = dropTarget.querySelector('.markdown-editor');
+    var editor = dropTarget ? dropTarget.querySelector('.markdown-editor') : null;
+    if (!editor) {
+        // Si pas de dropTarget, chercher l'éditeur actuel
+        var sel = window.getSelection();
+        if (sel.rangeCount) {
+            var range = sel.getRangeAt(0);
+            var container = range.commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentNode;
+            editor = container.closest('.markdown-editor');
+        }
+    }
+    
     if (editor) {
         var sel = window.getSelection();
         if (sel.rangeCount) {
@@ -383,11 +429,29 @@ function handleHTMLImageInsert(file, dropTarget) {
         if (!inserted && dropTarget) {
             dropTarget.innerHTML += imgHtml;
         }
+        
+        // Trigger automatic save after image insertion
+        if (typeof updateNote === 'function') {
+            updateNote(); // Mark note as edited
+        }
+        
+        // Trigger immediate save after a short delay to allow DOM to update
+        setTimeout(function() {
+            if (typeof updatenote === 'function') {
+                updatenote(); // Save to server
+            }
+        }, 100);
     };
     reader.readAsDataURL(file);
 }
 
 function insertHTMLAtSelection(html) {
+    // Vérifier si le curseur est dans une zone éditable
+    if (!isCursorInEditableNote()) {
+        window.showCursorWarning();
+        return false;
+    }
+    
     try {
         var sel = window.getSelection();
         if (!sel || !sel.rangeCount) return false;

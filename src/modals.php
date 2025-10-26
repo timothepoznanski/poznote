@@ -255,7 +255,7 @@
                         <i class="fa fa-file-alt"></i>
                         <div>
                             <span>HTML Note</span>
-                            <p>Rich text with formatting, images, and links</p>
+                            <p>Rich text with formatting, images, links, and Excalidraw diagrams</p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
@@ -275,7 +275,7 @@
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
-                <div class="create-section" id="otherSection">
+                <div class="create-section" id="otherSection" style="margin-top: 12px;">
                     <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')">
                         <i class="fa fa-folder"></i>
                         <div>

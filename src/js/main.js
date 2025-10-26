@@ -21,6 +21,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore folder states from localStorage
     restoreFolderStates();
     
+    // Initialize Excalidraw border preferences
+    if (typeof applyExcalidrawBorderPreferences === 'function') {
+        applyExcalidrawBorderPreferences();
+        
+        // Re-apply border preferences when window gets focus (after returning from settings)
+        window.addEventListener('focus', function() {
+            applyExcalidrawBorderPreferences();
+        });
+    }
+    
 });
 
 // Global functions available for HTML (compatibility)

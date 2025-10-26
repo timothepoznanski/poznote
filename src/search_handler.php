@@ -40,21 +40,21 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
     $where_conditions = ["trash = 0"];
     $search_params = [];
     
-    // Simple secure search (basic version)
+    // Intelligent search that excludes Excalidraw content
     if (!empty($search)) {
         // Split search string into individual terms (whitespace separated)
         $search_terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
 
         if (count($search_terms) <= 1) {
-            // Single term: preserve previous behavior
-            $where_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+            // Single term: search in heading or clean entry content
+            $where_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
             $search_params[] = '%' . $search . '%';
             $search_params[] = '%' . $search . '%';
         } else {
             // Multiple terms: require ALL terms to appear (AND)
             $term_conditions = [];
             foreach ($search_terms as $t) {
-                $term_conditions[] = "(heading LIKE ? OR entry LIKE ?)";
+                $term_conditions[] = "(heading LIKE ? OR search_clean_entry(entry) LIKE ?)";
                 $search_params[] = '%' . $t . '%';
                 $search_params[] = '%' . $t . '%';
             }

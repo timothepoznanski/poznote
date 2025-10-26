@@ -1219,6 +1219,25 @@ img {
     min-width: 200px;
 }
 
+/* Notification types */
+#notificationPopup.notification-error {
+    color: #dc3545;
+    border-color: #dc3545;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2);
+}
+
+#notificationPopup.notification-warning {
+    color: #007DB8;
+    border-color: #007DB8;
+    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+}
+
+#notificationPopup.notification-success {
+    color: #198754;
+    border-color: #198754;
+    box-shadow: 0 4px 16px rgba(25, 135, 84, 0.2);
+}
+
 /* Image menu styles (similar to settings menu) */
 .image-menu {
     position: absolute;
@@ -2704,6 +2723,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-list-check::before { content: "\f0ae"; }
 .fa-image::before { content: "\f03e"; }
 .fa-tags::before { content: "\f02c"; }
+.fa-border-outer::before { content: "\f851"; }
 .fa-code::before { content: "\f121"; }
 .fa-share::before { content: "\f064"; }
 .fa-arrows-up-down::before { content: "\f07d"; }
@@ -2751,6 +2771,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 
+.fa-border-outer,
 .fa-share-nodes,
 .fa-smile,
 .fa-folder,
@@ -3195,7 +3216,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .create-options {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    /* gap: 14px; */
     margin-top: 16px;
 }
 

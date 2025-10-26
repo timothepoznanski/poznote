@@ -336,6 +336,28 @@ class SearchManager {
         this.setupButtonListeners(true);
         this.setupIconListeners(false);
         this.setupIconListeners(true);
+        this.setupInputListeners(false);
+        this.setupInputListeners(true);
+    }
+
+    /**
+     * Setup input listeners to handle typing in search field
+     */
+    setupInputListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.searchInput) return;
+
+        // Remove existing listener if exists
+        const handlerKey = `input-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingHandler = this.eventHandlers.get(handlerKey);
+        if (existingHandler) {
+            elements.searchInput.removeEventListener('input', existingHandler);
+        }
+
+        // Create new handler
+        const handler = () => this.hideValidationError(isMobile);
+        this.eventHandlers.set(handlerKey, handler);
+        elements.searchInput.addEventListener('input', handler);
     }
 
     /**
@@ -432,6 +454,15 @@ class SearchManager {
 
             // Trigger behavior similar to clicking the pill
             if (elements.searchInput?.value.trim()) {
+                const searchValue = elements.searchInput.value.trim();
+                
+                // Validate search terms before auto-searching (use the NEW 'next' type)
+                if (!this.validateSearchTerms(searchValue, next, effectiveIsMobile)) {
+                    // Validation failed, don't proceed with search
+                    elements.searchInput?.focus();
+                    return;
+                }
+                
                 this.updateHiddenInputs(effectiveIsMobile);
                 this.hideSpecialFolders(effectiveIsMobile);
                 this.performAjaxSearch(elements.form, effectiveIsMobile);
@@ -513,7 +544,16 @@ class SearchManager {
 
         // Handle search if there's content
         if (elements.searchInput?.value.trim()) {
-            // Auto-search if there's content
+            const searchValue = elements.searchInput.value.trim();
+            
+            // Validate search terms before auto-searching (use the NEW searchType, not the current one)
+            if (!this.validateSearchTerms(searchValue, searchType, isMobile)) {
+                // Validation failed, don't proceed with search
+                elements.searchInput?.focus();
+                return;
+            }
+            
+            // Auto-search if there's content and validation passed
             this.updateHiddenInputs(isMobile);
             this.hideSpecialFolders(isMobile);
             this.performAjaxSearch(elements.form, isMobile);
@@ -539,6 +579,11 @@ class SearchManager {
 
         // Validate that exactly one search type is active
         if (!this.validateSearchState(isMobile)) {
+            return;
+        }
+
+        // Validate search terms length
+        if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
             return;
         }
 
@@ -586,10 +631,36 @@ class SearchManager {
     }
 
     /**
+     * Validate search terms length
+     */
+    validateSearchTerms(searchValue, activeType, isMobile) {
+        // Only validate for notes search
+        if (activeType !== 'notes') {
+            return true;
+        }
+
+        // Split search string into individual terms (whitespace separated)
+        const searchTerms = searchValue.split(/\s+/).filter(term => term.trim().length > 0);
+        
+        // Check if all terms are single characters
+        const allSingleChar = searchTerms.every(term => term.length === 1);
+        
+        if (allSingleChar && searchTerms.length > 0) {
+            this.showValidationError(isMobile, 'Searching with single-letter words may return too many results. Try using longer words for more precise search.');
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
      * Perform AJAX search
      */
     performAjaxSearch(form, isMobile) {
         try {
+            // Hide any validation errors since we're performing a valid search
+            this.hideValidationError(isMobile);
+            
             const formData = new FormData(form);
             const params = new URLSearchParams();
             
@@ -904,8 +975,13 @@ class SearchManager {
         const urlParams = new URLSearchParams(window.location.search);
         const newParams = new URLSearchParams();
         
-        const currentWorkspace = urlParams.get('workspace') || selectedWorkspace || 'Poznote';
-        if (currentWorkspace && currentWorkspace !== 'Poznote') {
+        const currentWorkspace = urlParams.get('workspace') ||
+                                (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
+                                (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
+                                'Poznote';
+        
+        // Always preserve workspace parameter if it exists, regardless of its name
+        if (currentWorkspace) {
             newParams.set('workspace', currentWorkspace);
         }
         
@@ -953,13 +1029,13 @@ class SearchManager {
     /**
      * Show validation error
      */
-    showValidationError(isMobile) {
+    showValidationError(isMobile, message = 'Please select at least one search option (Notes or Tags)') {
         const elements = this.getElements(isMobile);
         this.hideValidationError(isMobile);
 
         const errorDiv = document.createElement('div');
         errorDiv.className = 'search-validation-error';
-        errorDiv.textContent = 'Please select at least one search option (Notes or Tags)';
+        errorDiv.textContent = message;
 
         const searchBar = elements.container?.querySelector('.searchbar-row');
         if (searchBar) {
@@ -971,7 +1047,7 @@ class SearchManager {
             if (button) button.classList.add('search-type-btn-error');
         });
 
-        setTimeout(() => this.hideValidationError(isMobile), 3000);
+        // Ne plus masquer automatiquement - le message reste visible jusqu'à ce que l'utilisateur tape ou lance une recherche valide
     }
 
     /**
