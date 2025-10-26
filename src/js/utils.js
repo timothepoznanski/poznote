@@ -589,6 +589,7 @@ function showUpdateInstructions(hasUpdate = false) {
         var titleEl = modal.querySelector('h3');
         var messageEl = modal.querySelector('#updateMessage');
         var updateButtonsContainer = modal.querySelector('.update-instructions-buttons');
+        var backupWarning = document.getElementById('updateBackupWarning');
         
         if (hasUpdate) {
             if (titleEl) titleEl.textContent = '🎉 New Update Available!';
@@ -596,11 +597,17 @@ function showUpdateInstructions(hasUpdate = false) {
             if (updateButtonsContainer) {
                 updateButtonsContainer.style.display = 'flex';
             }
+            if (backupWarning) {
+                backupWarning.style.display = 'block';
+            }
         } else {
             if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
             if (updateButtonsContainer) {
                 updateButtonsContainer.style.display = 'none';
+            }
+            if (backupWarning) {
+                backupWarning.style.display = 'none';
             }
         }
         
