@@ -144,7 +144,7 @@ function findNoteLinkById(noteId) {
  */
 window.loadNoteDirectly = function(url, noteId, event) {
     try {
-    // loadNoteDirectly start
+        // loadNoteDirectly start
         // Prevent default link behavior
         if (event) {
             event.preventDefault();
@@ -161,12 +161,6 @@ window.loadNoteDirectly = function(url, noteId, event) {
             if (!confirm(confirmationMessage)) {
                 return false;
             }
-        }
-        
-        // Navigate to the note URL directly
-        window.location.href = url;
-        
-    } catch (error) {
         }
         
         // Prevent multiple simultaneous loads
@@ -186,7 +180,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
             document.body.classList.add('note-open');
         }
 
-    // Create XMLHttpRequest
+        // Create XMLHttpRequest
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -302,7 +296,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
         xhr.timeout = 10000; // 10 seconds
 
         xhr.send();
-    // xhr sent
+        // xhr sent
         return false;
     } catch (error) {
         console.error('Error in loadNoteDirectly:', error);
