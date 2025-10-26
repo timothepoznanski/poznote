@@ -7,6 +7,10 @@
     <div class="modal-content">
         <h3>📱 Application Version</h3>
         <p id="updateMessage"></p>
+        <div class="backup-warning" id="updateBackupWarning" style="display: none;">
+            <p><strong>⚠️ </strong> <span style="color: #dc3545;">Make a backup of your data before updating</span></p>
+            <p style="color: #6c757d; font-size: 14px; margin-top: 8px;">You can create a backup in <strong>Settings > Backup</strong></p>
+        </div>
         <div class="version-info">
             <p><strong>Current version:</strong> <span id="currentVersion">Loading...</span></p>
             <p><strong>Latest available:</strong> <span id="availableVersion">Loading...</span></p>

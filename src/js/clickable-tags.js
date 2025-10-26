@@ -864,12 +864,68 @@ if (document.readyState !== 'loading') {
  * Redirect to notes with specific tag
  */
 function redirectToTag(tag) {
-    const currentWorkspace = new URLSearchParams(window.location.search).get('workspace') ||
-                           (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
-                           (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                           'Poznote';
-    const wsParam = (currentWorkspace && currentWorkspace !== 'Poznote') ? '&workspace=' + encodeURIComponent(currentWorkspace) : '';
-    window.location.href = 'index.php?tags_search=' + encodeURIComponent(tag) + wsParam;
+    // Get current workspace from multiple sources, prioritizing URL then localStorage then global variables
+    let currentWorkspace = null;
+    let workspaceSource = 'none';
+    
+    // 1. Check URL parameters first
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentWorkspace = urlParams.get('workspace');
+        if (currentWorkspace) {
+            workspaceSource = 'URL';
+        }
+    } catch (e) {
+        console.warn('redirectToTag: Error reading URL params:', e);
+    }
+    
+    // 2. If not found in URL, check localStorage
+    if (!currentWorkspace) {
+        try {
+            currentWorkspace = localStorage.getItem('poznote_selected_workspace');
+            if (currentWorkspace && currentWorkspace !== '') {
+                workspaceSource = 'localStorage';
+            } else {
+                currentWorkspace = null;
+            }
+        } catch (e) {
+            console.warn('redirectToTag: Error reading localStorage:', e);
+        }
+    }
+    
+    // 3. If not found in localStorage, check global variables (including pageWorkspace from list_tags.php)
+    if (!currentWorkspace) {
+        if (typeof pageWorkspace !== 'undefined' && pageWorkspace && pageWorkspace !== 'undefined') {
+            currentWorkspace = pageWorkspace;
+            workspaceSource = 'pageWorkspace';
+        } else if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+            currentWorkspace = selectedWorkspace;
+            workspaceSource = 'selectedWorkspace';
+        } else if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) {
+            currentWorkspace = window.selectedWorkspace;
+            workspaceSource = 'window.selectedWorkspace';
+        } else if (typeof window.pageWorkspace !== 'undefined' && window.pageWorkspace && window.pageWorkspace !== 'undefined') {
+            currentWorkspace = window.pageWorkspace;
+            workspaceSource = 'window.pageWorkspace';
+        }
+    }
+    
+    // 4. Fallback to default
+    if (!currentWorkspace || currentWorkspace === '' || currentWorkspace === 'undefined') {
+        currentWorkspace = 'Poznote';
+        workspaceSource = 'default';
+    }
+    
+    // Build URL with workspace parameter - FORCE inclusion of workspace parameter
+    let finalUrl;
+    if (currentWorkspace) {
+        finalUrl = 'index.php?tags_search=' + encodeURIComponent(tag) + '&workspace=' + encodeURIComponent(currentWorkspace);
+    } else {
+        finalUrl = 'index.php?tags_search=' + encodeURIComponent(tag) + '&workspace=Poznote';
+    }
+    
+    // Navigate to the URL
+    window.location.href = finalUrl;
 }
 
 

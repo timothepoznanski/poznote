@@ -144,7 +144,7 @@ function findNoteLinkById(noteId) {
  */
 window.loadNoteDirectly = function(url, noteId, event) {
     try {
-    // loadNoteDirectly start
+        // loadNoteDirectly start
         // Prevent default link behavior
         if (event) {
             event.preventDefault();
@@ -161,12 +161,6 @@ window.loadNoteDirectly = function(url, noteId, event) {
             if (!confirm(confirmationMessage)) {
                 return false;
             }
-        }
-        
-        // Navigate to the note URL directly
-        window.location.href = url;
-        
-    } catch (error) {
         }
         
         // Prevent multiple simultaneous loads
@@ -186,7 +180,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
             document.body.classList.add('note-open');
         }
 
-    // Create XMLHttpRequest
+        // Create XMLHttpRequest
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -302,7 +296,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
         xhr.timeout = 10000; // 10 seconds
 
         xhr.send();
-    // xhr sent
+        // xhr sent
         return false;
     } catch (error) {
         console.error('Error in loadNoteDirectly:', error);
@@ -958,19 +952,29 @@ function toggleExcalidrawBorder(img) {
     
     // Save preference to localStorage
     try {
-        const imgSrc = img.src;
-        const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
+        // Use note ID or diagram ID as identifier
+        let identifier = null;
         
-        // Save explicit preference (true or false)
-        if (hasBorder) {
-            // Image had border, now removing it
-            borderPrefs[imgSrc] = false;
+        // For standalone Excalidraw notes
+        const noteId = img.getAttribute('data-excalidraw-note-id');
+        if (noteId) {
+            identifier = 'note_' + noteId;
         } else {
-            // Image had no border, now adding it
-            borderPrefs[imgSrc] = true;
+            // For embedded diagrams
+            const container = img.closest('.excalidraw-container');
+            if (container && container.id) {
+                identifier = 'diagram_' + container.id;
+            }
         }
         
-        localStorage.setItem('excalidraw_border_preferences', JSON.stringify(borderPrefs));
+        if (identifier) {
+            const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
+            
+            // Save explicit preference (true or false)
+            borderPrefs[identifier] = !hasBorder;
+            
+            localStorage.setItem('excalidraw_border_preferences', JSON.stringify(borderPrefs));
+        }
     } catch (e) {
         console.warn('Could not save border preference:', e);
     }
@@ -987,23 +991,32 @@ function applyExcalidrawBorderPreferences() {
         const excalidrawImages = document.querySelectorAll('img[data-is-excalidraw="true"], .excalidraw-container img');
         
         excalidrawImages.forEach(img => {
-            const imgSrc = img.src;
+            // Determine identifier
+            let identifier = null;
             
-            // Check if user has a specific preference for this image
-            if (borderPrefs.hasOwnProperty(imgSrc)) {
+            // For standalone Excalidraw notes
+            const noteId = img.getAttribute('data-excalidraw-note-id');
+            if (noteId) {
+                identifier = 'note_' + noteId;
+            } else {
+                // For embedded diagrams
+                const container = img.closest('.excalidraw-container');
+                if (container && container.id) {
+                    identifier = 'diagram_' + container.id;
+                }
+            }
+            
+            // Apply preference only if user has explicitly set one
+            if (identifier && borderPrefs.hasOwnProperty(identifier)) {
                 // Use user's specific preference
-                if (borderPrefs[imgSrc]) {
+                if (borderPrefs[identifier]) {
                     img.classList.add('excalidraw-with-border');
                 } else {
                     img.classList.remove('excalidraw-with-border');
                 }
             } else {
-                // No specific preference - use global default
-                if (window.excalidrawBorderToggleEnabled === true) {
-                    img.classList.add('excalidraw-with-border');
-                } else {
-                    img.classList.remove('excalidraw-with-border');
-                }
+                // No specific preference - no border by default
+                img.classList.remove('excalidraw-with-border');
             }
         });
     } catch (e) {

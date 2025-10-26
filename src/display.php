@@ -109,13 +109,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
-            <div class="settings-card" id="excalidraw-border-card">
-                <div class="settings-card-icon"><i class="fa-border-outer"></i></div>
-                <div class="settings-card-content">
-                    <h3>Show Excalidraw Images Default Border<span id="excalidraw-border-status" class="setting-status enabled">enabled</span></h3>
-                </div>
-            </div>
-
             <div class="settings-card" id="folder-counts-card">
                 <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                 <div class="settings-card-content">
@@ -203,13 +196,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         function refreshSub(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value==='1' || j.value==='true'); if(statusSub){ statusSub.textContent = enabled ? 'enabled' : 'disabled'; statusSub.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
         if(cardSub){ cardSub.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_note_subheading'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true'); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_note_subheading'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshSub(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
         refreshSub();
-
-        // Excalidraw border toggle
-        var cardExcalidrawBorder = document.getElementById('excalidraw-border-card');
-        var statusExcalidrawBorder = document.getElementById('excalidraw-border-status');
-        function refreshExcalidrawBorder(){ var form = new FormData(); form.append('action','get'); form.append('key','show_excalidraw_border_toggle'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{var enabled = j && j.success && (j.value === '1' || j.value === 'true' || j.value === ''); if(statusExcalidrawBorder){ statusExcalidrawBorder.textContent = enabled ? 'enabled' : 'disabled'; statusExcalidrawBorder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }}).catch(()=>{}); }
-        if(cardExcalidrawBorder){ cardExcalidrawBorder.addEventListener('click', function(){ var form = new FormData(); form.append('action','get'); form.append('key','show_excalidraw_border_toggle'); fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === ''); var toSet = currently ? '0' : '1'; var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_excalidraw_border_toggle'); setForm.append('value', toSet); return fetch('api_settings.php',{method:'POST',body:setForm}); }).then(function(){ refreshExcalidrawBorder(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e)); }); }
-        refreshExcalidrawBorder();
 
         // Folder counts (database)
         var cardFolder = document.getElementById('folder-counts-card');

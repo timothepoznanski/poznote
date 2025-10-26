@@ -25,7 +25,7 @@
 .excalidraw-image {
     max-width: 100%;
     height: auto;
-    border: 1px solid #9ca3af !important;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     display: block;
@@ -38,10 +38,6 @@
     pointer-events: auto;
     /* Prevent any outline or focus indicators */
     outline: none !important;
-}
-
-.excalidraw-image:hover {
-    border-color: #9ca3af;
 }
 
 .excalidraw-data {
@@ -60,14 +56,6 @@
 [data-theme="dark"] .excalidraw-container {
     background-color: #2a2a2a;
     border-color: #404040;
-}
-
-[data-theme="dark"] .excalidraw-image {
-    border-color: #4b5563;
-}
-
-[data-theme="dark"] .excalidraw-image:hover {
-    border-color: #6b7280;
 }
 
 /* Responsive */
