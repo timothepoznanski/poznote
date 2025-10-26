@@ -454,6 +454,15 @@ class SearchManager {
 
             // Trigger behavior similar to clicking the pill
             if (elements.searchInput?.value.trim()) {
+                const searchValue = elements.searchInput.value.trim();
+                
+                // Validate search terms before auto-searching (use the NEW 'next' type)
+                if (!this.validateSearchTerms(searchValue, next, effectiveIsMobile)) {
+                    // Validation failed, don't proceed with search
+                    elements.searchInput?.focus();
+                    return;
+                }
+                
                 this.updateHiddenInputs(effectiveIsMobile);
                 this.hideSpecialFolders(effectiveIsMobile);
                 this.performAjaxSearch(elements.form, effectiveIsMobile);
@@ -535,7 +544,16 @@ class SearchManager {
 
         // Handle search if there's content
         if (elements.searchInput?.value.trim()) {
-            // Auto-search if there's content
+            const searchValue = elements.searchInput.value.trim();
+            
+            // Validate search terms before auto-searching (use the NEW searchType, not the current one)
+            if (!this.validateSearchTerms(searchValue, searchType, isMobile)) {
+                // Validation failed, don't proceed with search
+                elements.searchInput?.focus();
+                return;
+            }
+            
+            // Auto-search if there's content and validation passed
             this.updateHiddenInputs(isMobile);
             this.hideSpecialFolders(isMobile);
             this.performAjaxSearch(elements.form, isMobile);
@@ -640,6 +658,9 @@ class SearchManager {
      */
     performAjaxSearch(form, isMobile) {
         try {
+            // Hide any validation errors since we're performing a valid search
+            this.hideValidationError(isMobile);
+            
             const formData = new FormData(form);
             const params = new URLSearchParams();
             
@@ -1026,7 +1047,7 @@ class SearchManager {
             if (button) button.classList.add('search-type-btn-error');
         });
 
-        setTimeout(() => this.hideValidationError(isMobile), 3000);
+        // Ne plus masquer automatiquement - le message reste visible jusqu'à ce que l'utilisateur tape ou lance une recherche valide
     }
 
     /**
