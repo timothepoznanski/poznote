@@ -240,82 +240,21 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 /* ------------------------------------------------------------------
-   Décacher le bouton "Library" de l'éditeur Excalidraw
-   et ajouter un handler pour afficher un popup "fonctionnalité pas disponible"
+   Masquer le bouton "Library" de l'éditeur Excalidraw
+   
+   Cible spécifiquement la zone top-right où se trouve le bouton Library
    ------------------------------------------------------------------ */
-
-/* Le bouton Library est maintenant visible mais nous allons intercepter les clics */
-.layer-ui__wrapper__top-right {
-    position: relative;
+.layer-ui__wrapper__top-right.zen-mode-transition {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
-/* Style pour le popup de notification */
-.library-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.library-popup-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.library-popup {
-    background: white;
-    border-radius: 8px;
-    padding: 24px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.library-popup-overlay.show .library-popup {
-    transform: scale(1);
-}
-
-.library-popup h3 {
-    margin: 0 0 12px 0;
-    color: #333;
-    font-size: 18px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-weight: 600;
-}
-
-.library-popup p {
-    margin: 0 0 20px 0;
-    color: #666;
-    line-height: 1.4;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.library-popup-button {
-    background: #007cba;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-weight: 500;
-}
-
-.library-popup-button:hover {
-    background: #005a8a;
+/* Sélecteurs alternatifs au cas où les classes varient */
+.layer-ui__wrapper__top-right,
+div[class*="layer-ui__wrapper__top-right"],
+div[class*="zen-mode-transition"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
