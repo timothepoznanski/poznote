@@ -336,6 +336,28 @@ class SearchManager {
         this.setupButtonListeners(true);
         this.setupIconListeners(false);
         this.setupIconListeners(true);
+        this.setupInputListeners(false);
+        this.setupInputListeners(true);
+    }
+
+    /**
+     * Setup input listeners to handle typing in search field
+     */
+    setupInputListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.searchInput) return;
+
+        // Remove existing listener if exists
+        const handlerKey = `input-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingHandler = this.eventHandlers.get(handlerKey);
+        if (existingHandler) {
+            elements.searchInput.removeEventListener('input', existingHandler);
+        }
+
+        // Create new handler
+        const handler = () => this.hideValidationError(isMobile);
+        this.eventHandlers.set(handlerKey, handler);
+        elements.searchInput.addEventListener('input', handler);
     }
 
     /**
@@ -542,6 +564,11 @@ class SearchManager {
             return;
         }
 
+        // Validate search terms length
+        if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
+            return;
+        }
+
         // Update hidden inputs and hide special folders immediately so UI reflects search
     // debug info removed
     // Save caret pos and request focus restoration after AJAX
@@ -583,6 +610,29 @@ class SearchManager {
         // As a last resort, reset to notes
         this.setActiveSearchType('notes', isMobile);
         return false;
+    }
+
+    /**
+     * Validate search terms length
+     */
+    validateSearchTerms(searchValue, activeType, isMobile) {
+        // Only validate for notes search
+        if (activeType !== 'notes') {
+            return true;
+        }
+
+        // Split search string into individual terms (whitespace separated)
+        const searchTerms = searchValue.split(/\s+/).filter(term => term.trim().length > 0);
+        
+        // Check if all terms are single characters
+        const allSingleChar = searchTerms.every(term => term.length === 1);
+        
+        if (allSingleChar && searchTerms.length > 0) {
+            this.showValidationError(isMobile, 'Searching with single-letter words may return too many results. Try using longer words for more precise search.');
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -958,13 +1008,13 @@ class SearchManager {
     /**
      * Show validation error
      */
-    showValidationError(isMobile) {
+    showValidationError(isMobile, message = 'Please select at least one search option (Notes or Tags)') {
         const elements = this.getElements(isMobile);
         this.hideValidationError(isMobile);
 
         const errorDiv = document.createElement('div');
         errorDiv.className = 'search-validation-error';
-        errorDiv.textContent = 'Please select at least one search option (Notes or Tags)';
+        errorDiv.textContent = message;
 
         const searchBar = elements.container?.querySelector('.searchbar-row');
         if (searchBar) {
