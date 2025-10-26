@@ -33,8 +33,10 @@ function isCursorInEditableNote() {
     // Check if we're inside a contenteditable note area
     const editableElement = container.closest && container.closest('[contenteditable="true"]');
     const noteEntry = container.closest && container.closest('.noteentry');
+    const markdownEditor = container.closest && container.closest('.markdown-editor');
     
-    return editableElement && noteEntry;
+    // Return true if we're in any editable note context
+    return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
 
 // Insert Excalidraw diagram at cursor position in a note

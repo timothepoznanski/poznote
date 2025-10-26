@@ -557,8 +557,10 @@ function isCursorInEditableNote() {
     // Check if we're inside a contenteditable note area
     const editableElement = container.closest && container.closest('[contenteditable="true"]');
     const noteEntry = container.closest && container.closest('.noteentry');
+    const markdownEditor = container.closest && container.closest('.markdown-editor');
     
-    return editableElement && noteEntry;
+    // Return true if we're in any editable note context
+    return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
 
 function insertSeparator() {
@@ -902,6 +904,12 @@ function toggleTablePicker() {
     return;
   }
   
+  // Check if cursor is in editable note BEFORE opening picker
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
+    return;
+  }
+  
   // Save current selection/cursor position
   const sel = window.getSelection();
   if (sel.rangeCount > 0) {
@@ -1072,10 +1080,21 @@ function toggleTablePicker() {
 }
 
 function insertTable(rows, cols) {
-  // Check if cursor is in editable note
-  if (!isCursorInEditableNote()) {
-    window.showCursorWarning();
-    return;
+  // Use saved range if available, otherwise check current cursor position
+  if (window.savedTableRange) {
+    // Restore the saved selection
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(window.savedTableRange);
+    
+    // Clear the saved range
+    window.savedTableRange = null;
+  } else {
+    // Fallback: check if cursor is in editable note
+    if (!isCursorInEditableNote()) {
+      window.showCursorWarning();
+      return;
+    }
   }
   
   // Find the active note editor
