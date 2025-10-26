@@ -218,7 +218,7 @@ function saveEmbeddedDiagram() {
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if (!empty($image_data)) {
-            $diagram_html .= '<img src="data:image/png;base64,' . $image_data . '" style="max-width: 100%; height: auto;" alt="Excalidraw diagram" />';
+            $diagram_html .= '<img src="data:image/png;base64,' . $image_data . '" class="excalidraw-image" data-is-excalidraw="true" style="max-width: 100%; height: auto;" alt="Excalidraw diagram" />';
         } else {
             $diagram_html .= '<i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
