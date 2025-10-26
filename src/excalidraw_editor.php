@@ -190,18 +190,24 @@ if ($note_id > 0) {
         }
         
         // Validate and clean the data structure for Excalidraw
-        if (existingData && existingData.elements) {
+        if (existingData) {
+            // Ensure we have proper structure
+            if (!existingData.elements) {
+                existingData.elements = [];
+            }
+            if (!existingData.appState) {
+                existingData.appState = {};
+            }
+            if (!existingData.files) {
+                existingData.files = {};
+            }
+            
             // Ensure elements is an array
             if (!Array.isArray(existingData.elements)) {
                 existingData.elements = [];
             }
             
-            // Ensure appState exists and has minimal required properties
-            if (!existingData.appState || typeof existingData.appState !== 'object') {
-                existingData.appState = {};
-            }
-            
-            // Create a clean data structure with only essential properties
+            // Create a clean data structure with essential properties
             existingData = {
                 elements: existingData.elements,
                 appState: {
@@ -209,7 +215,8 @@ if ($note_id > 0) {
                     zoom: existingData.appState.zoom || { value: 1 },
                     scrollX: existingData.appState.scrollX || 0,
                     scrollY: existingData.appState.scrollY || 0
-                }
+                },
+                files: existingData.files || {}
             };
         }
         
@@ -230,9 +237,11 @@ if ($note_id > 0) {
             }
             
             try {
-                // Initialize Excalidraw
+                // Initialize Excalidraw with safe fallback
+                const safeInitialData = existingData || { elements: [], appState: {}, files: {} };
+                
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
-                    initialData: existingData || { elements: [], appState: {} },
+                    initialData: safeInitialData,
                     theme: getTheme()
                 });
                 
@@ -268,7 +277,22 @@ if ($note_id > 0) {
             const elements = excalidrawAPI.getSceneElements();
             const appState = excalidrawAPI.getAppState();
             const files = excalidrawAPI.getFiles();
-            const data = { elements, appState };
+            
+            // Convert files to serializable format with minimal required properties
+            const serializableFiles = {};
+            for (const [id, file] of Object.entries(files)) {
+                if (file && file.dataURL) {
+                    serializableFiles[id] = {
+                        id: file.id || id,
+                        dataURL: file.dataURL,
+                        mimeType: file.mimeType || 'image/png',
+                        created: file.created || Date.now()
+                    };
+                }
+            }
+            
+            // Include files in the data object
+            const data = { elements, appState, files: serializableFiles };
             
             if (isEmbeddedDiagram) {
                 // Embedded diagram mode: save to existing note HTML
