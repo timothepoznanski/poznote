@@ -21,5 +21,95 @@ body {
     font-size: 0.9em;
     margin-bottom: 12px;
 }
-.public-note .content { /* container for note HTML */ }
+.public-note .content {
+    /* container for note HTML */
+    line-height: 1.6;
+}
 .public-note img { max-width: 100%; height: auto; }
+
+/* FORCE TABLE STYLES - VERY AGGRESSIVE */
+* table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+    border-spacing: 0 !important;
+}
+
+* table td,
+* table th {
+    border: 2px solid #333 !important;
+    padding: 12px !important;
+    min-width: 60px !important;
+    text-align: left !important;
+    background: white !important;
+    color: black !important;
+}
+
+* table th {
+    background-color: #e0e0e0 !important;
+    font-weight: bold !important;
+}
+
+/* Table styles for public notes */
+table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+}
+
+table td,
+table th {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    min-width: 50px !important;
+    text-align: left !important;
+}
+
+table th {
+    background-color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
+
+/* Also target with more specific selectors */
+.public-note table,
+.public-note table.inserted-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+}
+
+.public-note table td,
+.public-note table th,
+.public-note table.inserted-table td,
+.public-note table.inserted-table th {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    min-width: 50px !important;
+    text-align: left !important;
+}
+
+.public-note table th,
+.public-note table.inserted-table th {
+    background-color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
+
+/* Fallback styles for any table in public notes */
+.public-note .content table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+}
+
+.public-note .content table td,
+.public-note .content table th {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    min-width: 50px !important;
+    text-align: left !important;
+}
+
+.public-note .content table th {
+    background-color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
