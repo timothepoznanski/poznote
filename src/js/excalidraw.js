@@ -150,6 +150,11 @@ function openExcalidrawEditor(diagramId) {
 
 // Helper function to get current note ID
 function getCurrentNoteId() {
+    // Try to get from global noteid variable first (most reliable)
+    if (typeof noteid !== 'undefined' && noteid !== -1 && noteid !== null && noteid !== 'search') {
+        return noteid;
+    }
+    
     // Try to get note ID from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const noteId = urlParams.get('note');
