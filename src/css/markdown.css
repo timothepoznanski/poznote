@@ -91,16 +91,16 @@
 }
 
 .markdown-preview code {
-    background-color: #f5f5f5;
+    background-color: #f4f4f4;
     padding: 2px 6px;
     /* border-radius: 3px; */
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
-    color: #d63384;
+    color: #333;
 }
 
 .markdown-preview pre {
-    background-color: #f5f5f5;
+    background-color: #f4f4f4;
     padding: 12px;
     border-radius: 4px;
     overflow-x: auto;
@@ -190,7 +190,7 @@
 }
 
 .markdown-preview table th {
-    background-color: #f5f5f5;
+    background-color: #f4f4f4;
     font-weight: bold;
 }
 

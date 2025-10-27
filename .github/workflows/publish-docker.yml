@@ -205,12 +205,24 @@ jobs:
           KEEP_COUNT=10
           PACKAGE_NAME="poznote"
           
-          # Get all package versions (excluding 'latest' tag)
+          # Debug: Get all package versions with their tags for analysis
+          echo "🔍 Analyzing all Docker image versions..."
+          all_versions_debug=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq '.[] | {id: .id, tags: .metadata.container.tags, created_at: .created_at}' \
+            2>/dev/null || echo "[]")
+          
+          echo "📋 All versions found:"
+          echo "$all_versions_debug" | head -20  # Show first 20 for debugging
+          
+          # Get all package versions (excluding 'latest' tag and untagged versions)
           versions=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
-            --jq '[.[] | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
+            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
           
           if [ -z "$versions" ]; then
@@ -247,15 +259,42 @@ jobs:
             echo "ℹ️  No Docker images cleanup needed (only $total_versions versions, keeping $KEEP_COUNT)"
           fi
           
-          # Final count
+          # Final count with detailed breakdown
           echo ""
-          final_versions=$(gh api \
+          echo "📊 Final analysis:"
+          
+          final_versions_tagged=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | length' \
+            2>/dev/null || echo "Unknown")
+            
+          final_versions_latest=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq '[.[] | select(.metadata.container.tags[]? == "latest")] | length' \
+            2>/dev/null || echo "Unknown")
+            
+          final_versions_untagged=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq '[.[] | select(.metadata.container.tags | length == 0)] | length' \
+            2>/dev/null || echo "Unknown")
+            
+          final_versions_total=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq 'length' \
             2>/dev/null || echo "Unknown")
-          echo "📈 Final Docker images count: $final_versions"
+            
+          echo "  📈 Tagged versions (managed by cleanup): $final_versions_tagged"
+          echo "  🏷️  Latest tagged versions: $final_versions_latest"
+          echo "  🚫 Untagged versions: $final_versions_untagged"
+          echo "  📦 Total versions: $final_versions_total"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

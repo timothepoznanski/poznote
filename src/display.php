@@ -371,7 +371,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                         badge.textContent = value + 'px';
                         badge.className = 'setting-status enabled';
                     } else {
-                        badge.textContent = 'default (16px)';
+                        badge.textContent = 'default (15px)';
                         badge.className = 'setting-status disabled';
                     }
                 }

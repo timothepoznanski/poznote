@@ -1940,7 +1940,7 @@ pre.code-block,
     white-space: pre-wrap;
     word-wrap: break-word;
     overflow-x: auto;
-    font-size: 14px !important;
+    font-size: inherit; /* inherit font size from parent (.noteentry) */
     position: relative;
 }
 
@@ -2036,7 +2036,7 @@ code b, code strong, code i, code em, code u, code s, code span,
 .noteentry code b, .noteentry code strong, .noteentry code i, .noteentry code em, .noteentry code u, .noteentry code s, .noteentry code span,
 .noteentry .code-block b, .noteentry .code-block strong, .noteentry .code-block i, .noteentry .code-block em, .noteentry .code-block u, .noteentry .code-block s, .noteentry .code-block span {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: 14px !important;
+    font-size: inherit; /* inherit font size from parent */
 }
 
 /* Préserver le background gris même avec du surlignage dans les blocs de code */
@@ -2049,7 +2049,7 @@ code *[style*="background"],
 .noteentry .code-block *[style*="background"] {
     background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #f4f4f4 !important;
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: 14px !important;
+    font-size: inherit; /* inherit font size from parent */
 }
 
 /* Force la même police pour les éléments avec couleur dans les blocs de code */
@@ -2060,7 +2060,7 @@ code *[style*="color"],
 .noteentry code *[style*="color"],
 .noteentry .code-block *[style*="color"] {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: 14px !important;
+    font-size: inherit; /* inherit font size from parent */
 }
 
 /* Style plugin code block (optionnel, garder la taille et couleur si besoin) */
@@ -2073,7 +2073,7 @@ code *[style*="color"],
 .noteentry span[style*='Consolas'] u,
 .noteentry span[style*='Consolas'] s {
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
-    font-size: 14px !important;
+    font-size: inherit; /* inherit font size from parent */
     font-style: normal !important;
     font-weight: normal !important;
     color: #333 !important;

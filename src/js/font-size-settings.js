@@ -78,7 +78,7 @@ function updateFontSizePreview() {
         
         // Show/hide default info based on value
         if (defaultInfo) {
-            if (fontSize == 16) {
+            if (fontSize == 15) {
                 defaultInfo.style.display = 'block';
             } else {
                 defaultInfo.style.display = 'none';
@@ -107,8 +107,8 @@ function loadCurrentFontSizes() {
             // Set input value
             const fontSizeInput = document.getElementById('fontSizeInput');
             if (fontSizeInput) {
-                // Default to 16px if not set
-                fontSizeInput.value = data.value || '16';
+                // Default to 15px if not set
+                fontSizeInput.value = data.value || '15';
                 
                 // Update preview
                 updateFontSizePreview();

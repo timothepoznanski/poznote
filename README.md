@@ -370,10 +370,11 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **HTML5** - Markup and structure
 - **CSS3** - Styling and responsive design
 - **JavaScript (Vanilla)** - Interactive features and dynamic content
+- **React + Vite** - Excalidraw drawing component (bundled as IIFE)
 - **AJAX** - Asynchronous data loading
 
 ### Storage
-- **HTML files** - Notes are stored as plain HTML files in the filesystem
+- **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
 - **SQLite database** - Metadata, tags, relationships, and user data
 - **File attachments** - Stored directly in the filesystem
 
