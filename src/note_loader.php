@@ -4,7 +4,7 @@
  */
 
 /**
- * Détermine la note à afficher et prépare les requêtes
+ * Determine the note to display and prepare queries
  */
 function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
     $default_note_folder = null;

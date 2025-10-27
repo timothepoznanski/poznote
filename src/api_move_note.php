@@ -60,7 +60,7 @@ try {
     
     $current_folder = $note['folder'];
     
-    // Verify that destination folder exists (dans la table folders ou comme dossier utilisé dans entries)
+    // Verify that destination folder exists (in folders table or as a folder used in entries)
     // Check folders table respecting workspace
     if ($workspace) {
         $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");

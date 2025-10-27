@@ -119,19 +119,19 @@
     max-width: 800px;
 }
 
-/* Pour les images Excalidraw standalone dans les notes */
+/* For standalone Excalidraw images in notes */
 img[data-is-excalidraw="true"] {
     display: block;
     margin: 16px auto;
     max-width: 800px;
     width: auto;
     height: auto;
-    border: none; /* Supprime le cadre */
-    border-radius: 0; /* Supprime les coins arrondis */
-    box-shadow: none; /* Supprime l'ombre */
+    border: none; /* Remove frame */
+    border-radius: 0; /* Remove rounded corners */
+    box-shadow: none; /* Remove shadow */
 }
 
-/* Bordure optionnelle pour les images Excalidraw */
+/* Optional border for Excalidraw images */
 img[data-is-excalidraw="true"].excalidraw-with-border,
 .excalidraw-container img.excalidraw-with-border {
     border: 2px solid #e1e4e8;
@@ -140,7 +140,7 @@ img[data-is-excalidraw="true"].excalidraw-with-border,
     background: #fff;
 }
 
-/* Style global pour centrer toutes les previews Excalidraw */
+/* Global style to center all Excalidraw previews */
 .excalidraw-preview-container,
 div[onclick*="openExcalidrawNote"] {
     display: block;
@@ -251,15 +251,15 @@ div[onclick*="openExcalidrawNote"] {
     .excalidraw-editor,
     #app {
         height: calc(100vh - 50px) !important;
-        margin-top: 50px !important; /* Décale en dessous du bandeau mobile */
+        margin-top: 50px !important; /* Offset below mobile banner */
         width: 100% !important;
         overflow: auto !important;
         -webkit-overflow-scrolling: touch !important;
     }
     
-    /* Ajuster la position des éléments Excalidraw sur mobile */
+    /* Adjust position of Excalidraw elements on mobile */
     .excalidraw .layer-ui__wrapper {
-        top: 50px !important; /* Décale en dessous du bandeau mobile */
+        top: 50px !important; /* Offset below mobile banner */
     }
     
     /* Force the Excalidraw canvas to be responsive */
@@ -333,7 +333,7 @@ div[class*="zen-mode-transition"] {
 }
 
 /* ------------------------------------------------------------------
-   Améliorations pour la responsivité d'Excalidraw
+   Improvements for Excalidraw responsiveness
    ------------------------------------------------------------------ */
 
 /* Force the custom toolbar to stay visible */

@@ -1,5 +1,5 @@
 <?php
-// Supprimer l'affichage des erreurs pour éviter de corrompre le JSON
+// Disable error display to avoid corrupting JSON
 error_reporting(E_ERROR | E_PARSE);
 ini_set('display_errors', 0);
 

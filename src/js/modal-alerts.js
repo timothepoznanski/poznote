@@ -47,8 +47,8 @@ class ModalAlert {
                 alertType: 'warning',
                 title,
                 buttons: [
-                    { text: 'Annuler', type: 'secondary', action: () => resolve(false) },
-                    { text: 'Confirmer', type: 'primary', action: () => resolve(true) }
+                    { text: 'Cancel', type: 'secondary', action: () => resolve(false) },
+                    { text: 'Confirm', type: 'primary', action: () => resolve(true) }
                 ]
             };
             
@@ -240,7 +240,7 @@ class ModalAlert {
         const titles = {
             info: 'Information',
             warning: 'Attention',
-            error: 'Erreur',
+            error: 'Error',
             success: 'Succès'
         };
         return titles[type] || 'Information';
@@ -273,15 +273,15 @@ window.confirm = function(message) {
 };
 
 // Convenience functions
-window.showWarning = function(message, title = 'Attention') {
+window.showWarning = function(message, title = 'Warning') {
     return window.modalAlert.alert(message, 'warning', title);
 };
 
-window.showError = function(message, title = 'Erreur') {
+window.showError = function(message, title = 'Error') {
     return window.modalAlert.alert(message, 'error', title);
 };
 
-window.showSuccess = function(message, title = 'Succès') {
+window.showSuccess = function(message, title = 'Success') {
     return window.modalAlert.alert(message, 'success', title);
 };
 

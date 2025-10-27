@@ -77,7 +77,7 @@ function insertExcalidrawDiagram() {
     // Get the current note content
     const noteEntry = document.getElementById('entry' + currentNoteId);
     if (!noteEntry) {
-        window.showError('Éditeur de note non trouvé', 'Erreur');
+        window.showError('Note editor not found', 'Error');
         return;
     }
     
@@ -234,7 +234,7 @@ function insertHtmlAtCursor(html) {
         if (window.showNotificationPopup) {
             showNotificationPopup('Could not find note content area to insert diagram', 'warning');
         } else {
-            window.showError('Impossible de trouver la zone de contenu de la note pour insérer le diagramme', 'Erreur d\'insertion');
+            window.showError('Unable to find note content area to insert diagram', 'Insertion Error');
         }
     }
 }

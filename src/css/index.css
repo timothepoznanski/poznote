@@ -169,7 +169,7 @@ body {
     height: 100%;
 }
 
-/* Supprimer les marges du h4 du titre de la note */
+/* Remove margins from h4 note title */
 h4 {
     margin: 0 !important;
     padding: 0 !important;
@@ -736,7 +736,7 @@ body {
     color: #007DB8;
 }
 
-/* Override pour les icônes Font Awesome dans le menu create */
+/* Override for Font Awesome icons in create menu */
 .create-menu-item i[class*="fa-"],
 .create-menu-item [class*="fa-"] {
     font-size: 18px !important;
@@ -776,7 +776,7 @@ body {
     box-sizing: border-box;
 }
 
-/* Header note : contient uniquement la barre d'outils */
+/* Note header: contains only the toolbar */
 
 .note-header {
     display: flex;
@@ -859,12 +859,12 @@ body {
     display: inline-flex;
 }
 
-/* Boutons d'actions sur la note : visibles par défaut, cachés lors de sélection */
+/* Note action buttons: visible by default, hidden during selection */
 .note-action-btn {
     display: inline-flex;
 }
 
-/* Ajustement de la toolbar pour les écrans desktop */
+/* Toolbar adjustment for desktop screens */
 /* Use flex-wrap to allow toolbar buttons to wrap on multiple lines if needed */
 .note-edit-toolbar {
     gap: 2px;
@@ -1391,7 +1391,7 @@ img {
     color: rgb(55, 53, 47) !important;
 }
 
-/* Retirer la bordure lors du focus sur l'input des tags */
+/* Remove border on focus for tags input */
 .name_tags input:focus {
     border: none !important;
     outline: none;
@@ -1699,7 +1699,7 @@ img {
     border-bottom: 1px solid #32a1ce;
 }
 
-/* ICONES TRASH pour interface principale */
+/* TRASH ICONS for main interface */
 
 /* Share / Export dropdown styles */
 .share-dropdown {
@@ -1902,7 +1902,7 @@ textarea:focus{
     font-size: 15px;
 }
 
-/* Appliquer Inter sur les éléments textuels, sauf dans les blocs de code */
+/* Apply Inter to text elements, except in code blocks */
 .noteentry p,
 .noteentry div,
 .noteentry ul,
@@ -1926,7 +1926,7 @@ textarea:focus{
 
 /* CODE BLOCKS */
 
-/* Style simplifié pour les blocs de code */
+/* Simplified style for code blocks */
 .code-block, 
 pre.code-block,
 .noteentry pre {
@@ -2002,7 +2002,7 @@ pre.code-block .code-block-copy-btn,
     height: 14px;
 }
 
-/* Règle spécifique supplémentaire pour s'assurer que le padding est appliqué */
+/* Additional specific rule to ensure padding is applied */
 .noteentry pre, pre.code-block, .code-block {
     padding: 30px !important;
 }
@@ -2018,7 +2018,7 @@ code {
     color: #333;
 }
 
-/* Force la même police pour tous les éléments avec styles inline dans les blocs de code */
+/* Force same font for all elements with inline styles in code blocks */
 pre span[style],
 code span[style],
 .noteentry pre span[style],
@@ -2028,7 +2028,7 @@ code span[style],
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
 }
 
-/* Force la même police pour tous les éléments de formatage dans les blocs de code */
+/* Force same font for all formatting elements in code blocks */
 pre b, pre strong, pre i, pre em, pre u, pre s, pre span,
 code b, code strong, code i, code em, code u, code s, code span,
 .code-block b, .code-block strong, .code-block i, .code-block em, .code-block u, .code-block s, .code-block span,
@@ -2040,7 +2040,7 @@ code b, code strong, code i, code em, code u, code s, code span,
 }
 
 /* Préserver le background gris même avec du surlignage dans les blocs de code */
-/* Solution simple et efficace : override du background pour les éléments surlignés */
+/* Simple and effective solution: background override for highlighted elements */
 pre *[style*="background"],
 code *[style*="background"],
 .code-block *[style*="background"],
@@ -2397,13 +2397,13 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     display: block !important;
-    margin-left: 0px !important; /* Récupérer l'espace de l'icône supprimée */
-    transition: margin-left 0.2s ease; /* Animation fluide */
+    margin-left: 0px !important; /* Recover space from removed icon */
+    transition: margin-left 0.2s ease; /* Smooth animation */
 }
 
-/* Au survol, garder le titre à gauche (pas de changement) */
+/* On hover, keep title on the left (no change) */
 .note-in-folder:hover a.links_arbo_left .note-title {
-    margin-left: 0px !important; /* Reste à gauche */
+    margin-left: 0px !important; /* Stay on the left */
 }
 
 /* Drag and drop styles for notes */

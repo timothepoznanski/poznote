@@ -43,10 +43,10 @@ jobs:
               echo "needs_update=true" >> $GITHUB_OUTPUT
               echo "version=$new_version" >> $GITHUB_OUTPUT
               echo "version_clean=$new_version" >> $GITHUB_OUTPUT
-              echo "📦 Nouvelle version détectée: $new_version (dernier tag: $latest_version)"
+              echo "📦 New version detected: $new_version (latest tag: $latest_version)"
           else
               echo "needs_update=false" >> $GITHUB_OUTPUT
-              echo "✅ Aucune nouvelle version à publier (version.txt: $new_version, dernier tag: $latest_version)"
+              echo "✅ No new version to publish (version.txt: $new_version, latest tag: $latest_version)"
           fi
 
       - name: Create and push tag

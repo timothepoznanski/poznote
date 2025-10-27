@@ -570,6 +570,14 @@ function importAttachmentsZip($uploadedFile) {
 function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = 'Default') {
     global $con;
     
+    // Check file count limit
+    $maxFiles = 20;
+    $fileCount = count($uploadedFiles['name']);
+    
+    if ($fileCount > $maxFiles) {
+        return ['success' => false, 'error' => "Too many files selected. Maximum allowed: {$maxFiles}. You selected: {$fileCount}."];
+    }
+    
     // Validate workspace exists
     $stmt = $con->prepare("SELECT name FROM workspaces WHERE name = ?");
     $stmt->execute([$workspace]);
@@ -794,7 +802,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 
                 <div class="form-group">
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
-                    <small class="form-text text-muted">You can select multiple files at once. Supported formats: .html, .md, .markdown</small>
+                    <small class="form-text text-muted">You can select multiple files at once (maximum 20 files). Supported formats: .html, .md, .markdown</small>
                 </div>
                 <br>
                 
