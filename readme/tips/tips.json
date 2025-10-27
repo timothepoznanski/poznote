@@ -94,7 +94,11 @@
       "text": "Import existing HTML and Markdown notes directly into Poznote.",
       "images": ["tips-images/tip26.png"]
     },
-
+    {
+      "icon": "fa-code",
+      "text": "You can highlight, bold, italicize, underline, and colorize text within code blocks for better readability.",
+      "images": ["tips-images/tip27.png"]
+    },
     {
       "icon": "fa-image",
       "text": "Click on any image in a note to open a menu with options to view it in full size or download it.",
