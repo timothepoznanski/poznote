@@ -11,9 +11,11 @@ RUN apk add --no-cache \
     sqlite \
     sqlite-dev \
     libzip-dev \
+    libzip \
     supervisor \
+    && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_sqlite zip \
-    && apk del --no-cache libzip-dev sqlite-dev
+    && apk del --no-cache sqlite-dev libzip-dev
 
 # Create nginx configuration
 RUN mkdir -p /etc/nginx/http.d && \
