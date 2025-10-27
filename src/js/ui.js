@@ -230,7 +230,7 @@ function initializeBrowserHistory() {
 function toggleSettingsMenu(event) {
     event.stopPropagation();
     
-    // Essayer de trouver le menu disponible (mobile ou desktop)
+    // Try to find the available menu (mobile or desktop)
     var menu = document.getElementById('settingsMenuMobile');
     if (!menu) {
         menu = document.getElementById('settingsMenu');

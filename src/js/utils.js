@@ -986,7 +986,7 @@ function cleanupRenamedFolderInLocalStorage(oldName, newName) {
 
  
 
-// Fonction de gestion des dossiers (icône dossier ouvert/fermé)
+// Folder management function (open/closed folder icon)
 function toggleFolder(folderId) {
     var content = document.getElementById(folderId);
     var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');

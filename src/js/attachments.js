@@ -284,7 +284,7 @@ function handleSingleImageFile(file, dropTarget) {
 function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     var noteId = noteEntry.id.replace('entry', '');
     
-    // Montrer un indicateur de chargement
+    // Show loading indicator
     var loadingText = '![Uploading ' + file.name + '...]()';
     insertMarkdownAtCursor(loadingText, dropTarget);
     
@@ -293,7 +293,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
         updateNote(); // Mark note as edited
     }
     
-    // Uploader le fichier
+    // Upload the file
     var formData = new FormData();
     formData.append('action', 'upload');
     formData.append('note_id', noteId);
@@ -327,7 +327,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                 }
             }, 500); // Longer delay for markdown to allow upload completion
         } else {
-            // Supprimer le texte de chargement en cas d'erreur
+            // Remove loading text in case of error
             replaceLoadingText(loadingText, '', dropTarget);
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Upload failed: ' + data.message, 'error');
@@ -343,17 +343,17 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
 }
 
 function insertMarkdownAtCursor(text, dropTarget) {
-    // Vérifier si le curseur est dans une zone éditable pour les insertions manuelles
-    // (dropTarget indique un glisser-déposer, donc on ne vérifie pas)
+    // Check if cursor is in an editable area for manual insertions
+    // (dropTarget indicates a drag-and-drop, so we don't check)
     if (!dropTarget && !isCursorInEditableNote()) {
         window.showCursorWarning();
         return;
     }
     
-    // Pour les notes markdown, insérer dans l'éditeur markdown
+    // For markdown notes, insert into the markdown editor
     var editor = dropTarget ? dropTarget.querySelector('.markdown-editor') : null;
     if (!editor) {
-        // Si pas de dropTarget, chercher l'éditeur actuel
+        // If no dropTarget, look for current editor
         var sel = window.getSelection();
         if (sel.rangeCount) {
             var range = sel.getRangeAt(0);
@@ -456,7 +456,7 @@ function handleHTMLImageInsert(file, dropTarget) {
 }
 
 function insertHTMLAtSelection(html) {
-    // Vérifier si le curseur est dans une zone éditable
+    // Check if cursor is in an editable area
     if (!isCursorInEditableNote()) {
         window.showCursorWarning();
         return false;

@@ -21,7 +21,7 @@ body {
     height: 100%;
 }
 
-/* Conteneur principal pour les pages de sauvegarde */
+/* Main container for backup pages */
 .backup-container {
     max-width: 1000px;
     margin: 20px auto;

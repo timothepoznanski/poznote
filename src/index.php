@@ -138,7 +138,7 @@ $using_unified_search = handleUnifiedSearch();
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
-    <?php $v = '20251020.6'; // Version cache pour forcer le rechargement ?>
+    <?php $v = '20251020.6'; // Cache version to force reload ?>
     <script>
     (function(){
         try {

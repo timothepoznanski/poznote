@@ -1,10 +1,10 @@
 <?php
 /**
- * Gestion de l'affichage des dossiers et notes
+ * Management of folder and note display
  */
 
 /**
- * Organise les notes par dossier
+ * Organize notes by folder
  */
 function organizeNotesByFolder($stmt_left, $defaultFolderName) {
     $folders = [];
@@ -23,7 +23,7 @@ function organizeNotesByFolder($stmt_left, $defaultFolderName) {
 }
 
 /**
- * Ajoute les dossiers vides de la table folders
+ * Add empty folders from the folders table
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
     $folders_sql = "SELECT name FROM folders";
@@ -58,7 +58,7 @@ function sortFolders($folders, $defaultFolderName, $workspace_filter) {
 }
 
 /**
- * Détermine si un dossier doit être ouvert
+ * Determines if a folder should be open
  */
 function shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
     if($total_notes <= 3) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Initialisation des paramètres et variables globales
+ * Initialization of global parameters and variables
  */
 
 require_once 'functions.php';
@@ -33,7 +33,7 @@ function initializeWorkspacesAndLabels($con) {
 }
 
 /**
- * Initialise les paramètres de recherche
+ * Initialize search parameters
  */
 function initializeSearchParams() {
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
@@ -56,7 +56,7 @@ function initializeSearchParams() {
 }
 
 /**
- * Génère la map d'affichage des workspaces pour JavaScript
+ * Generate workspace display map for JavaScript
  */
 function generateWorkspaceDisplayMap($workspaces, $labels) {
     $display_map = [];
