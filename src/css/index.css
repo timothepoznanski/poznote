@@ -2741,6 +2741,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-eraser::before { content: "\f12d"; }
 .fa-strikethrough::before { content: "\f0cc"; }
 .fa-palette::before { content: "\f53f"; }
+.fa-paint-brush::before { content: "\f1fc"; }
 .fa-fill-drip::before { content: "\f576"; }
 .fa-list-ul::before { content: "\f0ca"; }
 .fa-list-ol::before { content: "\f0cb"; }
@@ -2772,6 +2773,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-grip-vertical::before { content: "\f58e"; }
 
 .fa-border-outer,
+.fa-paint-brush,
 .fa-share-nodes,
 .fa-smile,
 .fa-folder,
