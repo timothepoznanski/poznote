@@ -156,7 +156,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
             typeof updateNoteEnCours !== 'undefined' && updateNoteEnCours === 0 &&
             typeof noteid !== 'undefined' && noteid !== -1 && noteid !== 'search') {
             
-            var confirmationMessage = 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment changer de note sans sauvegarder ?';
+            var confirmationMessage = 'You have unsaved changes. Are you sure you want to switch notes without saving?';
 
             if (!confirm(confirmationMessage)) {
                 return false;

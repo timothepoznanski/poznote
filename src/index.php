@@ -130,6 +130,7 @@ $using_unified_search = handleUnifiedSearch();
 
 ?>
 
+<!DOCTYPE html>
 <html>
 
 <head>

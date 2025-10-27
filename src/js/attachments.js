@@ -1,6 +1,6 @@
 // Attached file and image drag management
 
-// Fonctions utilitaires pour vérifier la position du curseur
+// Utility functions to check cursor position
 function isCursorInEditableNote() {
     const selection = window.getSelection();
     if (!selection.rangeCount) return false;
@@ -149,7 +149,7 @@ function displayAttachments(attachments) {
     html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="View">';
     html += '<i class="fa-eye"></i>';
         html += '</button>';
-        html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Supprimer" class="delete-btn">';
+        html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Delete" class="delete-btn">';
         html += '<i class="fa-trash"></i>';
         html += '</button>';
         html += '</div>';
@@ -269,7 +269,7 @@ function handleImageFilesAndInsert(files, dropTarget) {
 function handleSingleImageFile(file, dropTarget) {
     if (!file.type || !file.type.startsWith('image/')) return;
     
-    // Vérifier si c'est une note markdown
+    // Check if it's a markdown note
     var noteEntry = dropTarget;
     var isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') && 
                      noteEntry.getAttribute('data-note-type') === 'markdown';
