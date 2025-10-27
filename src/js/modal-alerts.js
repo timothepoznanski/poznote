@@ -57,6 +57,62 @@ class ModalAlert {
     }
 
     /**
+     * Show a loading spinner modal
+     * @param {string} message - The message to display
+     * @param {string} title - Optional title
+     * @returns {Object} - Object with close method
+     */
+    showSpinner(message = 'Loading...', title = 'Please wait') {
+        const overlay = document.createElement('div');
+        overlay.className = 'alert-modal-overlay spinner-overlay';
+        
+        const modal = document.createElement('div');
+        modal.className = 'alert-modal spinner-modal';
+        
+        const header = document.createElement('div');
+        header.className = 'alert-modal-header';
+        
+        const titleElement = document.createElement('h3');
+        titleElement.className = 'alert-modal-title';
+        titleElement.innerHTML = `
+            <span class="alert-modal-icon spinner-icon">
+                <div class="spinner"></div>
+            </span>
+            ${title}
+        `;
+        
+        const body = document.createElement('div');
+        body.className = 'alert-modal-body';
+        body.textContent = message;
+        
+        // Assemble modal
+        header.appendChild(titleElement);
+        modal.appendChild(header);
+        modal.appendChild(body);
+        overlay.appendChild(modal);
+        
+        // Add to DOM
+        document.body.appendChild(overlay);
+        
+        // Show with animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('show');
+        });
+
+        // Return close function
+        return {
+            close: () => {
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 300);
+            }
+        };
+    }
+
+    /**
      * Show a custom modal
      * @param {Object} config - Modal configuration
      */
@@ -236,8 +292,13 @@ window.showInfo = function(message, title = 'Information') {
 // Special function for cursor warnings
 window.showCursorWarning = function() {
     return window.modalAlert.alert(
-        'Please place the cursor in the note editing area before inserting content.',
+        'Please place the cursor in the note editing area where you want to insert content.',
         'warning',
         'Cursor Position Required'
     );
+};
+
+// Loading spinner function
+window.showLoadingSpinner = function(message = 'Loading...', title = 'Please wait') {
+    return window.modalAlert.showSpinner(message, title);
 };

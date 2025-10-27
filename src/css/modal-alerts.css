@@ -146,3 +146,38 @@
         width: 100%;
     }
 }
+
+/* Loading Spinner Modal */
+.spinner-modal {
+    text-align: center;
+}
+
+.spinner-overlay {
+    pointer-events: none; /* Prevent interaction with background */
+}
+
+.spinner-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color, #e0e0e0);
+    border-top: 2px solid var(--primary-color, #007bff);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Dark mode spinner */
+.dark-mode .spinner {
+    border-color: var(--border-color-dark, #4a5568);
+    border-top-color: var(--primary-color, #007bff);
+}
