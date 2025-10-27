@@ -70,7 +70,11 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 Open Powershell and run the following commands:
 
 ```powershell
-mkdir poznote && cd poznote
+mkdir poznote
+```
+
+```powershell
+cd poznote
 ```
 
 ```powershell
@@ -100,7 +104,11 @@ services:
 ```
 
 ```powershell
-docker compose pull && docker compose up -d
+docker compose pull
+```
+
+```powershell
+docker compose up -d
 ```
 
 </details>
@@ -118,7 +126,11 @@ docker compose pull && docker compose up -d
 Open a Terminal and run the following commands:
 
 ```bash
-mkdir poznote && cd poznote
+mkdir poznote
+```
+
+```bash
+cd poznote
 ```
 
 ```bash
@@ -148,7 +160,11 @@ EOF
 ```
 
 ```bash
-docker compose pull && docker compose up -d
+docker compose pull
+```
+
+```bash
+docker compose up -d
 ```
 
 </details>
@@ -171,7 +187,11 @@ After installation, access Poznote in your web browser:
 To modify your username, password, or port:
 
 ```bash
-cd poznote && docker compose down
+cd poznote
+```
+
+```bash
+docker compose down
 ```
 
 Edit the `.env` file with your preferred text editor and modify the values:
@@ -201,7 +221,23 @@ To retrieve your password:
 To update Poznote to the latest version:
 
 ```bash
-cd poznote && docker compose down && docker rmi ghcr.io/timothepoznanski/poznote:latest && docker compose pull && docker compose up -d
+cd poznote
+```
+
+```bash
+docker compose down
+```
+
+```bash
+docker rmi ghcr.io/timothepoznanski/poznote:latest
+```
+
+```bash
+docker compose pull
+```
+
+```bash
+docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
@@ -291,68 +327,8 @@ Server: my-server.com
 
 Simply repeat the installation steps in different directories with different ports.
 
-#### Example: Creating Tom's instance
+And then you will have two completely isolated instances, for example:
 
-```bash
-mkdir poznote-tom && cd poznote-tom
-
-cat <<EOF > .env
-POZNOTE_USERNAME=tom
-POZNOTE_PASSWORD=tom_password123!
-HTTP_WEB_PORT=8040
-EOF
-
-cat <<'EOF' > docker-compose.yml
-services:
-  webserver:
-    image: ghcr.io/timothepoznanski/poznote:latest
-    restart: always
-    environment:
-      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
-    ports:
-      - "${HTTP_WEB_PORT}:80"
-    volumes:
-      - "./data:/var/www/html/data"
-EOF
-
-docker compose pull && docker compose up -d
-```
-
-#### Example: Creating Alice's instance
-
-```bash
-cd .. # Go back to parent directory
-mkdir poznote-alice && cd poznote-alice
-
-cat <<EOF > .env
-POZNOTE_USERNAME=alice
-POZNOTE_PASSWORD=alice_password123!
-HTTP_WEB_PORT=8041
-EOF
-
-cat <<'EOF' > docker-compose.yml
-services:
-  webserver:
-    image: ghcr.io/timothepoznanski/poznote:latest
-    restart: always
-    environment:
-      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
-    ports:
-      - "${HTTP_WEB_PORT}:80"
-    volumes:
-      - "./data:/var/www/html/data"
-EOF
-
-docker compose pull && docker compose up -d
-```
-
-Now you have two completely isolated instances:
 - Tom's Poznote: http://localhost:8040
 - Alice's Poznote: http://localhost:8041
 
