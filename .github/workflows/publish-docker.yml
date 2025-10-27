@@ -81,7 +81,7 @@ jobs:
           
           # Count total releases
           total_releases=$(echo "$all_releases" | wc -l)
-          echo "� Total releases: $total_releases"
+          echo "📊 Total releases: $total_releases"
           
           if [ "$total_releases" -gt "$KEEP_COUNT" ]; then
             # Get releases to delete (everything after the first KEEP_COUNT)
@@ -97,10 +97,14 @@ jobs:
                 # Delete the release
                 gh release delete "$tag" --yes 2>/dev/null || echo "    ⚠️  Failed to delete release $tag"
                 
-                # Delete the tag remotely
-                git push origin --delete "$tag" 2>/dev/null || echo "    ⚠️  Tag $tag not found on remote"
+                # Delete the tag remotely (with better error handling)
+                if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
+                  git push origin --delete "$tag" 2>/dev/null && echo "    ✅ Deleted remote tag: $tag" || echo "    ⚠️  Failed to delete remote tag: $tag"
+                else
+                  echo "    ℹ️  Remote tag $tag not found (already deleted or never existed)"
+                fi
                 
-                echo "    ✅ Deleted: $tag"
+                echo "    ✅ Processed: $tag"
               fi
             done <<< "$releases_to_delete"
             
@@ -108,6 +112,50 @@ jobs:
           else
             echo "ℹ️  No cleanup needed (only $total_releases releases, keeping $KEEP_COUNT)"
           fi
+          
+          # Additional cleanup: Remove orphaned tags (tags without releases)
+          echo ""
+          echo "🧹 Cleaning up orphaned tags..."
+          
+          # Get all remote tags
+          all_tags=$(git ls-remote --tags origin | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/.*refs\/tags\///' | sort -V)
+          total_tags=$(echo "$all_tags" | wc -l)
+          echo "📊 Total version tags found: $total_tags"
+          
+          # Get all current release tags
+          current_release_tags=$(gh release list --limit 1000 --json tagName --jq '.[].tagName' | sort)
+          
+          # Find orphaned tags (tags that don't have corresponding releases)
+          orphaned_tags=""
+          while IFS= read -r tag; do
+            if [ -n "$tag" ] && ! echo "$current_release_tags" | grep -q "^$tag$"; then
+              orphaned_tags="$orphaned_tags$tag\n"
+            fi
+          done <<< "$all_tags"
+          
+          if [ -n "$orphaned_tags" ] && [ "$orphaned_tags" != "\n" ]; then
+            orphaned_count=$(echo -e "$orphaned_tags" | grep -v '^$' | wc -l)
+            echo "🗑️  Found $orphaned_count orphaned tags to delete:"
+            
+            echo -e "$orphaned_tags" | grep -v '^$' | while IFS= read -r tag; do
+              if [ -n "$tag" ]; then
+                echo "  - Deleting orphaned tag: $tag"
+                git push origin --delete "$tag" 2>/dev/null && echo "    ✅ Deleted orphaned tag: $tag" || echo "    ⚠️  Failed to delete orphaned tag: $tag"
+              fi
+            done
+            
+            echo "✅ Orphaned tags cleanup completed"
+          else
+            echo "ℹ️  No orphaned tags found"
+          fi
+          
+          # Final summary
+          echo ""
+          echo "📈 Summary:"
+          final_releases=$(gh release list --limit 1000 --json tagName --jq '.[].tagName' | wc -l)
+          final_tags=$(git ls-remote --tags origin | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$' | wc -l)
+          echo "  - Releases: $final_releases"
+          echo "  - Version tags: $final_tags"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
