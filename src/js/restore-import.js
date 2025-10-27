@@ -154,8 +154,16 @@ function showIndividualNotesImportConfirmation() {
         return;
     }
     
-    // Update summary text
+    // Check file count limit
+    const maxFiles = 20;
     const fileCount = fileInput.files.length;
+    
+    if (fileCount > maxFiles) {
+        showCustomAlert('Too Many Files Selected', `You can import a maximum of ${maxFiles} files at once. You have selected ${fileCount} files. Please select fewer files and try again.`);
+        return;
+    }
+    
+    // Update summary text
     const fileText = fileCount === 1 ? '1 note' : `${fileCount} notes`;
     const summary = `This will import ${fileText} into the Default folder of the Poznote workspace.`;
     document.getElementById('individualNotesImportSummary').textContent = summary;
