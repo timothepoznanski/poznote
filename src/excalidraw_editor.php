@@ -148,13 +148,16 @@ if ($note_id > 0) {
     <div style="display: flex; flex-direction: column; height: 100vh;">
         <!-- Clean toolbar -->
         <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 5000;">
-            <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
-                Return to notes
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                    Save
+                </button>
+                <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                    Return to notes
+                </button>
+            </div>
             <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
-            <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
-                Save
-            </button>
+            <div style="width: 100px;"></div> <!-- Spacer pour équilibrer le layout -->
         </div>
         
         <!-- Excalidraw container -->
