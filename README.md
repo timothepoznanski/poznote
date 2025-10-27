@@ -378,7 +378,8 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **File attachments** - Stored directly in the filesystem
 
 ### Infrastructure
-- **Apache HTTP Server** - Web server
+- **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
+- **Alpine Linux** - Secure, lightweight base image
 - **Docker** - Containerization for easy deployment and portability
 </details>
 
