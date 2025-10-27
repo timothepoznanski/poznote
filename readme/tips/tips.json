@@ -5,99 +5,104 @@
   },
   "tips": [
     {
+      "icon": "fa-polygon",
+      "text": "Create schemas, drawings and diagrams in Excalidraw. Use the context menu by clicking on the image to delete or add a border or edit the drawing again.",
+      "images": ["tips-images/tip29.png", "tips-images/tip30.png"]
+    },
+    {
       "icon": "fa-list-check",
       "text": "Create tasklist notes with drag-and-drop reordering and clickable links.",
-      "images": ["tip3.png"]
+      "images": ["tips-images/tip3.png"]
     },
     {
       "icon": "fa-image",
       "text": "Add images by dragging and dropping files or pasting screenshots directly. HTML notes embed them inline.",
-      "images": ["tip4.png"]
+      "images": ["tips-images/tip4.png"]
     },
     {
       "icon": "fa-image",
       "text": "Add images by dragging and dropping files or pasting screenshots directly. Markdown notes store images as attachments.",
-      "images": ["tip5.png"]
+      "images": ["tips-images/tip5.png"]
     },
     {
       "icon": "fa-tags",
       "text": "Click on any tag in a displayed note to filter your note list by that tag.",
-      "images": ["tip6.png"]
+      "images": ["tips-images/tip6.png"]
     },
     {
       "icon": "fa-tags",
       "text": "Search in tags list.",
-      "images": ["tip7.png", "tip8.png"]
+      "images": ["tips-images/tip7.png", "tips-images/tip8.png"]
     },
     {
       "icon": "fa-search",
       "text": "Search across multiple keywords simultaneously.",
-      "images": ["tip2.png"]
+      "images": ["tips-images/tip2.png"]
     },
     {
       "icon": "fa-search",
       "text": "Search across multiple tags simultaneously.",
-      "images": ["tip1.png"]
+      "images": ["tips-images/tip1.png"]
     },
     {
       "icon": "fa-share",
       "text": "Generate read-only public links for your notes with the ability to revoke access or regenerate URLs.",
-      "images": ["tip9.png", "tip10.png"]
+      "images": ["tips-images/tip9.png", "tips-images/tip10.png"]
     },
     {
       "icon": "fa-arrows-up-down",
       "text": "Drag notes into folders, favorites or trash.",
-      "images": ["tip11.png"]
+      "images": ["tips-images/tip11.png"]
     },
     {
       "icon": "fa-download",
       "text": "Export notes as ZIP backup that includes an HTML index for offline browsing and search.",
-      "images": ["tip12.png", "tip13.png", "tip14.png"]
+      "images": ["tips-images/tip12.png", "tips-images/tip13.png", "tips-images/tip14.png"]
     },
     {
       "icon": "fa-smile",
       "text": "Add emojis to note titles using Ctrl + ; on Windows.",
-      "images": ["tip15.png"]
+      "images": ["tips-images/tip15.png"]
     },
     {
       "icon": "fa-arrows-h",
       "text": "Resize the left sidebar by dragging its border.",
-      "images": ["tip16.png"]
+      "images": ["tips-images/tip16.png"]
     },
     {
       "icon": "fa-layer-group",
       "text": "Create separate workspaces.",
-      "images": ["tip17.png", "tip18.png"]
+      "images": ["tips-images/tip17.png", "tips-images/tip18.png"]
     },
     {
       "icon": "fa-layer-group",
       "text": "Transfer notes one by one or all at a time between workspaces.",
-      "images": ["tip19.png", "tip20.png", "tip21.png"]
+      "images": ["tips-images/tip19.png", "tips-images/tip20.png", "tips-images/tip21.png"]
     },
     {
       "icon": "fa-sort",
       "text": "Toggle the markdown preview panel or use only the toolbar's preview/edit buttons.",
-      "images": ["tip22.png", "tip23.png", "tip24.png"]
+      "images": ["tips-images/tip22.png", "tips-images/tip23.png", "tips-images/tip24.png"]
     },
     {
       "icon": "fa-mobile",
       "text": "On mobile, swipe between notes list and note view.",
-      "images": ["tip25.png"]
+      "images": ["tips-images/tip25.png"]
     },
     {
       "icon": "fa-file-import",
       "text": "Import existing HTML and Markdown notes directly into Poznote.",
-      "images": ["tip26.png"]
+      "images": ["tips-images/tip26.png"]
     },
     {
       "icon": "fa-code",
       "text": "Copy code from VSCode and paste it into an HTML note to automatically create a code block. You can also highlight, bold, italicize, underline, and colorize text within the code block.",
-      "images": ["tip27.png"]
+      "images": ["tips-images/tip27.png"]
     },
     {
       "icon": "fa-image",
       "text": "Click on any image in a note to open a menu with options to view it in full size or download it.",
-      "images": ["tip28.png"]
+      "images": ["tips-images/tip28.png"]
     }
   ]
 }
