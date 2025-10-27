@@ -104,10 +104,22 @@ function insertExcalidrawDiagram() {
     if (typeof updateNote === 'function') {
         updateNote(); // Mark note as edited
     }
-    // Then trigger immediate save after a short delay to allow DOM to update
+    
+    // Then trigger immediate save and open editor after a short delay to allow DOM to update
     setTimeout(function() {
         if (typeof updatenote === 'function') {
             updatenote(); // Save to server
+        }
+        
+        // Automatically open the editor after creating the button (unless on mobile)
+        if (!isMobile) {
+            // Show loading spinner
+            const spinner = window.showLoadingSpinner('Opening Excalidraw editor...', 'Loading');
+            
+            setTimeout(function() {
+                openExcalidrawEditor(diagramId);
+                // Note: spinner will be closed when page navigates to editor
+            }, 200); // Additional delay to ensure save is complete
         }
     }, 100);
 }

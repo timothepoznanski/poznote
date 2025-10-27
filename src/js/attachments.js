@@ -411,6 +411,9 @@ function handleHTMLImageInsert(file, dropTarget) {
         var dataUrl = ev.target.result;
         var imgHtml = '<img src="' + dataUrl + '" alt="image" />';
         
+        // Get the note ID from the drop target
+        var targetNoteId = dropTarget.id.replace('entry', '');
+        
         var sel = window.getSelection();
         var inserted = false;
         
@@ -430,6 +433,11 @@ function handleHTMLImageInsert(file, dropTarget) {
             dropTarget.innerHTML += imgHtml;
         }
         
+        // Update the global noteid to the target note for proper saving
+        if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
+            window.noteid = targetNoteId;
+        }
+        
         // Trigger automatic save after image insertion
         if (typeof updateNote === 'function') {
             updateNote(); // Mark note as edited
@@ -437,8 +445,10 @@ function handleHTMLImageInsert(file, dropTarget) {
         
         // Trigger immediate save after a short delay to allow DOM to update
         setTimeout(function() {
-            if (typeof updatenote === 'function') {
-                updatenote(); // Save to server
+            if (typeof saveNoteToServer === 'function') {
+                saveNoteToServer(); // Direct call to save function
+            } else if (typeof updatenote === 'function') {
+                updatenote(); // Fallback to updatenote
             }
         }, 100);
     };
