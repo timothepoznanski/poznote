@@ -5,7 +5,7 @@
   },
   "tips": [
     {
-      "icon": "fa-polygon",
+      "icon": "fa-paint-brush",
       "text": "Create schemas, drawings and diagrams in Excalidraw. Use the context menu by clicking on the image to delete or add a border or edit the drawing again.",
       "images": ["tips-images/tip29.png", "tips-images/tip30.png"]
     },
