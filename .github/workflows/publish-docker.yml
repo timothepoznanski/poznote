@@ -200,3 +200,66 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/poznote:${{ steps.check_version.outputs.version_clean }}
             ghcr.io/${{ github.repository_owner }}/poznote:latest
 
+      - name: Clean up old Docker images
+        if: steps.check_version.outputs.needs_update == 'true'
+        run: |
+          echo "🧹 Cleaning up old Docker images..."
+          
+          # Keep only the 10 most recent Docker image versions
+          KEEP_COUNT=10
+          PACKAGE_NAME="poznote"
+          
+          # Get all package versions (excluding 'latest' tag)
+          versions=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq '[.[] | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
+            2>/dev/null || echo "")
+          
+          if [ -z "$versions" ]; then
+            echo "ℹ️  No Docker image versions found or failed to fetch"
+            exit 0
+          fi
+          
+          # Convert to array and count
+          versions_array=($versions)
+          total_versions=${#versions_array[@]}
+          
+          echo "📊 Total Docker image versions: $total_versions"
+          
+          if [ "$total_versions" -gt "$KEEP_COUNT" ]; then
+            # Calculate how many to delete
+            to_delete_count=$((total_versions - KEEP_COUNT))
+            echo "🗑️  Deleting $to_delete_count old Docker image versions (keeping $KEEP_COUNT most recent):"
+            
+            # Delete the oldest versions (they're at the end of our reversed array)
+            for ((i=KEEP_COUNT; i<total_versions; i++)); do
+              version_id=${versions_array[$i]}
+              echo "  - Deleting Docker image version ID: $version_id"
+              
+              gh api \
+                --method DELETE \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "/user/packages/container/${PACKAGE_NAME}/versions/${version_id}" \
+                2>/dev/null && echo "    ✅ Deleted version ID: $version_id" || echo "    ⚠️  Failed to delete version ID: $version_id"
+            done
+            
+            echo "✅ Docker images cleanup completed - kept $KEEP_COUNT most recent versions"
+          else
+            echo "ℹ️  No Docker images cleanup needed (only $total_versions versions, keeping $KEEP_COUNT)"
+          fi
+          
+          # Final count
+          echo ""
+          final_versions=$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${PACKAGE_NAME}/versions" \
+            --jq 'length' \
+            2>/dev/null || echo "Unknown")
+          echo "📈 Final Docker images count: $final_versions"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
