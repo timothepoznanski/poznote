@@ -137,6 +137,12 @@ if ($note_id > 0) {
     .excalidraw-save-btn:hover {
         background: #2d7b3e !important;
     }
+    #cancelBtn:hover {
+        background: #b91c1c !important;
+    }
+    #saveAndExitBtn:hover {
+        background: #1d4ed8 !important;
+    }
     </style>
     
     <!-- Modal alerts system -->
@@ -152,8 +158,11 @@ if ($note_id > 0) {
                 <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
                     Save
                 </button>
-                <button id="backBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
-                    Return to notes
+                <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                    Save and exit
+                </button>
+                <button id="cancelBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #dc2626; border: 1px solid #dc2626; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                    Exit
                 </button>
             </div>
             <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
@@ -301,7 +310,7 @@ if ($note_id > 0) {
         }
     }
 
-    // Save button handler
+        // Save button handler
     document.getElementById('saveBtn').onclick = async function() {
         if (!excalidrawAPI) {
             alert('Editor not ready');
@@ -347,6 +356,63 @@ if ($note_id > 0) {
             alert('Error: ' + e.message);
             this.textContent = 'Save';
         }
+    };
+
+    // Save and exit button handler
+    document.getElementById('saveAndExitBtn').onclick = async function() {
+        if (!excalidrawAPI) {
+            alert('Editor not ready');
+            return;
+        }
+        
+        this.textContent = 'Saving...';
+        
+        try {
+            const elements = excalidrawAPI.getSceneElements();
+            const appState = excalidrawAPI.getAppState();
+            const files = excalidrawAPI.getFiles();
+            
+            // Convert files to serializable format with minimal required properties
+            const serializableFiles = {};
+            for (const [id, file] of Object.entries(files)) {
+                if (file && file.dataURL) {
+                    serializableFiles[id] = {
+                        id: file.id || id,
+                        dataURL: file.dataURL,
+                        mimeType: file.mimeType || 'image/png',
+                        created: file.created || Date.now()
+                    };
+                }
+            }
+            
+            // Include files in the data object
+            const data = { elements, appState, files: serializableFiles };
+            
+            if (isEmbeddedDiagram) {
+                // Embedded diagram mode: save to existing note HTML
+                await saveEmbeddedDiagram(data, elements, appState, files);
+            } else {
+                // Full note mode: save as complete Excalidraw note
+                await saveFullNote(data, elements, appState, files);
+            }
+            
+            // After saving, redirect back to notes
+            const params = new URLSearchParams({ workspace: workspace });
+            if (noteId > 0) params.append('note', noteId);
+            window.location.href = 'index.php?' + params.toString();
+            
+        } catch (e) {
+            console.error('Save error:', e);
+            alert('Error: ' + e.message);
+            this.textContent = 'Save and exit';
+        }
+    };
+        
+    // Cancel button (previously back button)
+    document.getElementById('cancelBtn').onclick = function() {
+        const params = new URLSearchParams({ workspace: workspace });
+        if (noteId > 0) params.append('note', noteId);
+        window.location.href = 'index.php?' + params.toString();
     };
     
     // Save embedded diagram

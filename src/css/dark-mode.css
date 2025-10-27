@@ -1243,11 +1243,4 @@ body.dark-mode .markdown-preview-btn:hover .fa-eye {
     transform: scale(1.18);
 }
 
-/* Excalidraw borders in dark mode */
-html[data-theme='dark'] img[data-is-excalidraw="true"].excalidraw-with-border,
-html[data-theme='dark'] .excalidraw-container img.excalidraw-with-border,
-body.dark-mode img[data-is-excalidraw="true"].excalidraw-with-border,
-body.dark-mode .excalidraw-container img.excalidraw-with-border {
-    border-color: #404040;
-    background: #1a1a1a;
-}
+

@@ -31,6 +31,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Initialize regular image border preferences
+    if (typeof applyRegularImageBorderPreferences === 'function') {
+        applyRegularImageBorderPreferences();
+        
+        // Re-apply border preferences when window gets focus (after returning from settings)
+        window.addEventListener('focus', function() {
+            applyRegularImageBorderPreferences();
+        });
+    }
+    
 });
 
 // Global functions available for HTML (compatibility)

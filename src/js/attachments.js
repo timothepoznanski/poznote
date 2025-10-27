@@ -320,6 +320,13 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                 markNoteAsModified(noteId);
             }
             
+            // Re-initialize image click handlers after markdown image insertion
+            if (typeof reinitializeImageClickHandlers === 'function') {
+                setTimeout(function() {
+                    reinitializeImageClickHandlers();
+                }, 200); // Wait for markdown rendering
+            }
+            
             // Trigger automatic save after a short delay
             setTimeout(function() {
                 if (typeof updatenote === 'function') {
@@ -441,6 +448,13 @@ function handleHTMLImageInsert(file, dropTarget) {
         // Trigger automatic save after image insertion
         if (typeof updateNote === 'function') {
             updateNote(); // Mark note as edited
+        }
+        
+        // Re-initialize image click handlers for the newly inserted image
+        if (typeof reinitializeImageClickHandlers === 'function') {
+            setTimeout(function() {
+                reinitializeImageClickHandlers();
+            }, 50);
         }
         
         // Trigger immediate save after a short delay to allow DOM to update
