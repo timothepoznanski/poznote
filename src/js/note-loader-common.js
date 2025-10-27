@@ -600,26 +600,6 @@ function handleImageClick(event) {
         </div>
     `;
     
-    // Add border toggle for all images (Excalidraw and regular images)
-    let hasBorder, borderText, borderIcon;
-    
-    if (isExcalidraw || isEmbeddedExcalidraw) {
-        hasBorder = img.classList.contains('excalidraw-with-border');
-    } else {
-        // For regular images
-        hasBorder = img.classList.contains('regular-image-with-border');
-    }
-    
-    borderText = hasBorder ? 'Remove Border' : 'Add Border';
-    borderIcon = hasBorder ? 'fa-border-none' : 'fa-border-outer';
-    
-    menuHTML += `
-        <div class="image-menu-item" data-action="toggle-border">
-            <i class="fas ${borderIcon}"></i>
-            ${borderText}
-        </div>
-    `;
-    
     // Check if we're on mobile (width < 800px)
     const isMobile = window.innerWidth < 800;
     
@@ -717,16 +697,6 @@ function handleImageClick(event) {
             const diagramId = e.target.closest('.image-menu-item')?.getAttribute('data-diagram-id');
             if (diagramId && window.openExcalidrawEditor) {
                 openExcalidrawEditor(diagramId);
-            }
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'toggle-border') {
-            if (isExcalidraw || isEmbeddedExcalidraw) {
-                toggleExcalidrawBorder(img);
-            } else {
-                toggleRegularImageBorder(img);
             }
             // Remove menu safely
             if (document.body.contains(menu)) {
@@ -846,12 +816,6 @@ function reinitializeNoteContent() {
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
 
-    // Apply saved Excalidraw border preferences
-    applyExcalidrawBorderPreferences();
-    
-    // Apply saved regular image border preferences
-    applyRegularImageBorderPreferences();
-
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
 
@@ -953,172 +917,6 @@ function reinitializeNoteContent() {
  */
 function isNoteUrl(url) {
     return url.includes('note=') && url.includes('index.php');
-}
-
-/**
- * Toggle border on Excalidraw images
- */
-function toggleExcalidrawBorder(img) {
-    if (!img) return;
-    
-    const hasBorder = img.classList.contains('excalidraw-with-border');
-    
-    if (hasBorder) {
-        // Remove border
-        img.classList.remove('excalidraw-with-border');
-    } else {
-        // Add border
-        img.classList.add('excalidraw-with-border');
-    }
-    
-    // Save preference to localStorage
-    try {
-        // Use note ID or diagram ID as identifier
-        let identifier = null;
-        
-        // For standalone Excalidraw notes
-        const noteId = img.getAttribute('data-excalidraw-note-id');
-        if (noteId) {
-            identifier = 'note_' + noteId;
-        } else {
-            // For embedded diagrams
-            const container = img.closest('.excalidraw-container');
-            if (container && container.id) {
-                identifier = 'diagram_' + container.id;
-            }
-        }
-        
-        if (identifier) {
-            const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
-            
-            // Save explicit preference (true or false)
-            borderPrefs[identifier] = !hasBorder;
-            
-            localStorage.setItem('excalidraw_border_preferences', JSON.stringify(borderPrefs));
-        }
-    } catch (e) {
-        console.warn('Could not save border preference:', e);
-    }
-}
-
-/**
- * Toggle border on regular images
- */
-function toggleRegularImageBorder(img) {
-    if (!img) return;
-    
-    const hasBorder = img.classList.contains('regular-image-with-border');
-    
-    if (hasBorder) {
-        // Remove border
-        img.classList.remove('regular-image-with-border');
-    } else {
-        // Add border
-        img.classList.add('regular-image-with-border');
-    }
-    
-    // Save preference to localStorage
-    try {
-        // Use image src as identifier for regular images
-        const imageSrc = img.src;
-        if (imageSrc) {
-            // Create a simple hash of the image source for the identifier
-            let identifier = 'regular_image_' + btoa(imageSrc).replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
-            
-            const borderPrefs = JSON.parse(localStorage.getItem('regular_image_border_preferences') || '{}');
-            
-            // Save explicit preference (true or false)
-            borderPrefs[identifier] = !hasBorder;
-            
-            localStorage.setItem('regular_image_border_preferences', JSON.stringify(borderPrefs));
-        }
-    } catch (e) {
-        console.warn('Could not save regular image border preference:', e);
-    }
-}
-
-/**
- * Apply saved border preferences to Excalidraw images
- */
-function applyExcalidrawBorderPreferences() {
-    try {
-        const borderPrefs = JSON.parse(localStorage.getItem('excalidraw_border_preferences') || '{}');
-        
-        // Find all Excalidraw images
-        const excalidrawImages = document.querySelectorAll('img[data-is-excalidraw="true"], .excalidraw-container img');
-        
-        excalidrawImages.forEach(img => {
-            // Determine identifier
-            let identifier = null;
-            
-            // For standalone Excalidraw notes
-            const noteId = img.getAttribute('data-excalidraw-note-id');
-            if (noteId) {
-                identifier = 'note_' + noteId;
-            } else {
-                // For embedded diagrams
-                const container = img.closest('.excalidraw-container');
-                if (container && container.id) {
-                    identifier = 'diagram_' + container.id;
-                }
-            }
-            
-            // Apply preference only if user has explicitly set one
-            if (identifier && borderPrefs.hasOwnProperty(identifier)) {
-                // Use user's specific preference
-                if (borderPrefs[identifier]) {
-                    img.classList.add('excalidraw-with-border');
-                } else {
-                    img.classList.remove('excalidraw-with-border');
-                }
-            } else {
-                // No specific preference - no border by default
-                img.classList.remove('excalidraw-with-border');
-            }
-        });
-    } catch (e) {
-        console.warn('Could not apply border preferences:', e);
-    }
-}
-
-/**
- * Apply saved border preferences to regular images
- */
-function applyRegularImageBorderPreferences() {
-    try {
-        const borderPrefs = JSON.parse(localStorage.getItem('regular_image_border_preferences') || '{}');
-        
-        // Find all regular images (not Excalidraw)
-        const regularImages = document.querySelectorAll('img:not([data-is-excalidraw="true"]):not(.excalidraw-container img)');
-        
-        regularImages.forEach(img => {
-            // Skip if image doesn't have a valid src
-            if (!img.src) return;
-            
-            // Create identifier using the same method as in toggleRegularImageBorder
-            try {
-                let identifier = 'regular_image_' + btoa(img.src).replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
-                
-                // Apply preference only if user has explicitly set one
-                if (borderPrefs.hasOwnProperty(identifier)) {
-                    // Use user's specific preference
-                    if (borderPrefs[identifier]) {
-                        img.classList.add('regular-image-with-border');
-                    } else {
-                        img.classList.remove('regular-image-with-border');
-                    }
-                } else {
-                    // No specific preference - no border by default
-                    img.classList.remove('regular-image-with-border');
-                }
-            } catch (e) {
-                // If btoa fails (e.g., for data URLs), skip this image
-                console.debug('Could not process image identifier:', e);
-            }
-        });
-    } catch (e) {
-        console.warn('Could not apply regular image border preferences:', e);
-    }
 }
 
 /**

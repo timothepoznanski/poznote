@@ -24,7 +24,7 @@ window.PoznoteExcalidraw = {
     const ExcalidrawWrapper = () => (
       <Excalidraw 
         initialData={options.initialData || { elements: [], appState: {} }}
-        theme={options.theme || 'light'}
+        theme='light'
         ref={(api) => {
           excalidrawAPI = api;
         }}

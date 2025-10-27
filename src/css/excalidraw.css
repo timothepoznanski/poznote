@@ -131,15 +131,6 @@ img[data-is-excalidraw="true"] {
     box-shadow: none; /* Remove shadow */
 }
 
-/* Optional border for Excalidraw images */
-img[data-is-excalidraw="true"].excalidraw-with-border,
-.excalidraw-container img.excalidraw-with-border {
-    border: 2px solid #e1e4e8;
-    border-radius: 8px;
-    padding: 8px;
-    background: #fff;
-}
-
 /* Global style to center all Excalidraw previews */
 .excalidraw-preview-container,
 div[onclick*="openExcalidrawNote"] {
@@ -427,4 +418,28 @@ body {
         cursor: not-allowed !important;
         background: #6c757d !important;
     }
+}
+
+/* ------------------------------------------------------------------
+   Force light theme for Excalidraw editor even in dark mode
+   ------------------------------------------------------------------ */
+
+/* Force light theme on Excalidraw editor container */
+.excalidraw-editor,
+.excalidraw-container,
+#app,
+.excalidraw {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Force light theme on all Excalidraw editor elements */
+body.dark-mode .excalidraw-editor *,
+body.dark-mode .excalidraw-container *,
+body.dark-mode #app *,
+html[data-theme='dark'] .excalidraw-editor *,
+html[data-theme='dark'] .excalidraw-container *,
+html[data-theme='dark'] #app * {
+    color-scheme: light !important;
 }

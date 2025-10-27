@@ -1189,14 +1189,6 @@ img {
     max-width:100%; /* To prevent screenshots from exceeding their container when they are too large */
 }
 
-/* Regular image border styles */
-img.regular-image-with-border {
-    border: 2px solid #e1e4e8;
-    border-radius: 8px;
-    padding: 8px;
-    background: #fff;
-}
-
 .notification-overlay {
     display: none;
     position: fixed;
