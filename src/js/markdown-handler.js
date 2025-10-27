@@ -397,6 +397,9 @@ function parseMarkdown(text) {
     return result.join('\n');
 }
 
+/**
+ * Initialize markdown note functionality
+ */
 function initializeMarkdownNote(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
