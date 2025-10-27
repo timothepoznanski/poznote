@@ -69,14 +69,17 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 
 Open Powershell and run the following commands:
 
+Create a new directory for Poznote:
 ```powershell
 mkdir poznote
 ```
 
+Navigate to the Poznote directory:
 ```powershell
 cd poznote
 ```
 
+Create environment file with default credentials and port configuration:
 ```powershell
 @"
 POZNOTE_USERNAME=admin
@@ -85,6 +88,7 @@ HTTP_WEB_PORT=8040
 "@ | Out-File -FilePath .env -Encoding UTF8
 ```
 
+Create Docker Compose configuration file for Poznote service:
 ```powershell
 @"
 services:
@@ -103,10 +107,12 @@ services:
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
+Download the latest Poznote Docker image:
 ```powershell
 docker compose pull
 ```
 
+Start Poznote container in detached mode (runs in background):
 ```powershell
 docker compose up -d
 ```
@@ -125,14 +131,17 @@ docker compose up -d
 
 Open a Terminal and run the following commands:
 
+Create a new directory for Poznote:
 ```bash
 mkdir poznote
 ```
 
+Navigate to the Poznote directory:
 ```bash
 cd poznote
 ```
 
+Create environment file with default credentials and port configuration:
 ```bash
 cat <<EOF > .env
 POZNOTE_USERNAME=admin
@@ -141,6 +150,7 @@ HTTP_WEB_PORT=8040
 EOF
 ```
 
+Create Docker Compose configuration file for Poznote service:
 ```bash
 cat <<'EOF' > docker-compose.yml
 services:
@@ -159,10 +169,12 @@ services:
 EOF
 ```
 
+Download the latest Poznote Docker image:
 ```bash
 docker compose pull
 ```
 
+Start Poznote container in detached mode (runs in background):
 ```bash
 docker compose up -d
 ```
@@ -186,10 +198,12 @@ After installation, access Poznote in your web browser:
 
 To modify your username, password, or port:
 
+Navigate to your Poznote directory:
 ```bash
 cd poznote
 ```
 
+Stop the running Poznote container:
 ```bash
 docker compose down
 ```
@@ -202,6 +216,7 @@ POZNOTE_PASSWORD=your_new_password
 HTTP_WEB_PORT=8040
 ```
 
+Restart Poznote with new configuration:
 ```bash
 docker compose up -d
 ```
@@ -220,22 +235,27 @@ To retrieve your password:
 
 To update Poznote to the latest version:
 
+Navigate to your Poznote directory:
 ```bash
 cd poznote
 ```
 
+Stop the running container before updating:
 ```bash
 docker compose down
 ```
 
+Remove the current image to force download of latest version:
 ```bash
 docker rmi ghcr.io/timothepoznanski/poznote:latest
 ```
 
+Download the latest Poznote image:
 ```bash
 docker compose pull
 ```
 
+Start the updated container:
 ```bash
 docker compose up -d
 ```
@@ -277,6 +297,7 @@ Upload the complete backup ZIP to restore everything:
 
 For automated backups via cron or manual execution, use the `backup-poznote.sh` script located at the repository root:
 
+Execute backup script with your server details and destination path:
 ```bash
 ./backup-poznote.sh 'http://localhost:8040' 'admin' 'admin123!' '/var/backups'
 ```
@@ -378,17 +399,22 @@ Ready-to-use curl commands for every API operation.
 <br>
 
 **List Notes**
+
+List all notes in the system:
 ```bash
-# List all notes
 curl -u 'username:password' \
   http://YOUR_SERVER/api_list_notes.php
+```
 
-# Filter by workspace
+Filter notes by specific workspace:
+```bash
 curl -u 'username:password' \
   "http://YOUR_SERVER/api_list_notes.php?workspace=Personal"
 ```
 
 **Create Note**
+
+Create a new note with title, content, tags, folder and workspace:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -403,6 +429,8 @@ curl -X POST -u 'username:password' \
 ```
 
 **Update Note**
+
+Update an existing note by ID with new content:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -417,6 +445,8 @@ curl -X POST -u 'username:password' \
 ```
 
 **Delete Note**
+
+Move a note to trash by ID:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -425,6 +455,8 @@ curl -X POST -u 'username:password' \
 ```
 
 **Move Note**
+
+Move a note to a different folder or workspace:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -437,8 +469,9 @@ curl -X POST -u 'username:password' \
 ```
 
 **Share Note**
+
+Enable public sharing for a note (generates public link):
 ```bash
-# Enable sharing
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{"id": 123, "shared": 1}' \
@@ -452,12 +485,16 @@ curl -X POST -u 'username:password' \
 <br>
 
 **List Trash**
+
+Get all notes currently in the trash:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_list_trash.php
 ```
 
 **Restore Note**
+
+Restore a note from trash back to its original location:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -472,6 +509,8 @@ curl -X POST -u 'username:password' \
 <br>
 
 **Create Folder**
+
+Create a new folder in the specified workspace:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -483,6 +522,8 @@ curl -X POST -u 'username:password' \
 ```
 
 **Delete Folder**
+
+Delete a folder and move its contents to Default folder:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -500,6 +541,8 @@ curl -X POST -u 'username:password' \
 <br>
 
 **List Workspaces**
+
+Get all available workspaces in your Poznote instance:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_workspaces.php
@@ -512,12 +555,16 @@ curl -u 'username:password' \
 <br>
 
 **List Tags**
+
+Get all tags used across all notes:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_list_tags.php
 ```
 
 **Apply Tags**
+
+Add or update tags for a specific note (replaces existing tags):
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -535,6 +582,8 @@ curl -X POST -u 'username:password' \
 <br>
 
 **Add to Favorites**
+
+Mark a note as favorite for quick access:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -543,6 +592,8 @@ curl -X POST -u 'username:password' \
 ```
 
 **Remove from Favorites**
+
+Remove favorite status from a note:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -557,12 +608,16 @@ curl -X POST -u 'username:password' \
 <br>
 
 **List Attachments**
+
+Get all file attachments for a specific note:
 ```bash
 curl -u 'username:password' \
   "http://YOUR_SERVER/api_attachments.php?note_id=123"
 ```
 
 **Upload Attachment**
+
+Upload a file and attach it to a note:
 ```bash
 curl -X POST -u 'username:password' \
   -F "note_id=123" \
@@ -577,6 +632,8 @@ curl -X POST -u 'username:password' \
 <br>
 
 **Create Backup**
+
+Create a complete backup of all notes, attachments and database:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -584,12 +641,16 @@ curl -X POST -u 'username:password' \
 ```
 
 **List Backups**
+
+Get a list of all available backup files:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_list_backups.php
 ```
 
 **Download Backup**
+
+Download a specific backup file by filename:
 ```bash
 curl -u 'username:password' \
   "http://YOUR_SERVER/api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip" \
@@ -605,6 +666,8 @@ Backups are stored in the `data/backups/` directory with the naming pattern: `po
 <br>
 
 **Check Version**
+
+Get the current Poznote version and system information:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_version.php
