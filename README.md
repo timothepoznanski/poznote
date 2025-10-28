@@ -23,9 +23,8 @@
 
 ## Introduction
 
-Poznote is a free, self-hosted, and beautifully simple note manager built for speed and clarity.<br><br>
+Poznote is a lightweight yet powerful web app for taking notes.<br>
 Capture, organize, and access your notes while keeping full ownership of your data.<br>
-Created for those who put efficiency and control of their data first.<br>
 
 **→ [View all features on poznote.com here](https://poznote.com/index.html#features)**
 
