@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedValue = input.getAttribute('data-value');
             if (savedValue !== null && savedValue !== undefined) {
                 input.value = savedValue;
-                console.log('Restored checklist input value:', savedValue);
             }
         });
         
@@ -41,10 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedChecked = checkbox.getAttribute('data-checked');
             if (savedChecked === '1') {
                 checkbox.checked = true;
-                console.log('Restored checklist checkbox state: checked');
             } else if (savedChecked === '0') {
                 checkbox.checked = false;
-                console.log('Restored checklist checkbox state: unchecked');
             }
         });
     }

@@ -1329,16 +1329,27 @@ function insertChecklist() {
     const success = document.execCommand('insertHTML', false, checklistHTML);
     
     if (success) {
-      // Attach event listeners
-      setTimeout(() => {
-        attachChecklistListeners(noteentry);
-        // Focus on the input
-        const lastInput = noteentry.querySelector('.checklist-input:last-of-type');
-        if (lastInput) lastInput.focus();
+      // Find the checklist that was just inserted and focus on its input
+      const allChecklists = noteentry.querySelectorAll('.checklist');
+      if (allChecklists.length > 0) {
+        const insertedChecklist = allChecklists[allChecklists.length - 1];
+        const input = insertedChecklist.querySelector('.checklist-input');
         
-        // Trigger save with 15-second delay (same as regular text editing)
-        window.editedButNotSaved = 1;
-      }, 10);
+        setTimeout(() => {
+          attachChecklistListeners(noteentry);
+          // Focus on the input
+          if (input) input.focus();
+          
+          // Trigger save with 15-second delay (same as regular text editing)
+          if (typeof window.updateNote === 'function') {
+            window.updateNote();
+          } else if (typeof window.updatenote === 'function') {
+            window.updatenote();
+          } else {
+            window.editedButNotSaved = 1;
+          }
+        }, 10);
+      }
       
       return;
     }
@@ -1358,10 +1369,12 @@ function insertChecklist() {
     sel.removeAllRanges();
     sel.addRange(range);
     
+    const input = checklist.querySelector('.checklist-input');
+    
     setTimeout(() => {
       attachChecklistListeners(noteentry);
-      const lastInput = noteentry.querySelector('.checklist-input:last-of-type');
-      if (lastInput) lastInput.focus();
+      // Focus on the input of the checklist we just inserted
+      if (input) input.focus();
     }, 10);
     
     noteentry.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1375,46 +1388,43 @@ function insertChecklist() {
  * Attach event listeners to checklist items for auto-save and Enter to add new item
  */
 function attachChecklistListeners(noteentry) {
-  if (!noteentry) {
-    console.warn('attachChecklistListeners: noteentry is null!');
-    return;
-  }
+  if (!noteentry) return;
   
   const checkboxes = noteentry.querySelectorAll('.checklist-checkbox');
   const inputs = noteentry.querySelectorAll('.checklist-input');
   
-  console.log('attachChecklistListeners: Found', checkboxes.length, 'checkboxes and', inputs.length, 'inputs');
-  
   // Checkbox change listeners
-  checkboxes.forEach((checkbox, idx) => {
-    if (checkbox._hasChecklistListener) {
-      console.log('Checkbox', idx, 'already has listener');
-      return;
-    }
+  checkboxes.forEach((checkbox) => {
+    if (checkbox._hasChecklistListener) return;
     
     checkbox._hasChecklistListener = true;
-    console.log('Attaching listener to checkbox', idx);
     
     checkbox.addEventListener('change', function(e) {
-      console.log('✓ Checkbox CHANGED event fired! Marking for save...');
-      window.editedButNotSaved = 1;
+      if (typeof window.updateNote === 'function') {
+        window.updateNote();
+      } else if (typeof window.updatenote === 'function') {
+        window.updatenote();
+      } else {
+        window.editedButNotSaved = 1;
+      }
     });
   });
   
   // Input listeners for Enter and auto-save
-  inputs.forEach((input, idx) => {
-    if (input._hasChecklistListener) {
-      console.log('Input', idx, 'already has listener');
-      return;
-    }
+  inputs.forEach((input) => {
+    if (input._hasChecklistListener) return;
     
     input._hasChecklistListener = true;
-    console.log('Attaching listeners to input', idx);
     
     // Mark as edited on input change (will trigger save after 15 seconds)
     input.addEventListener('input', function(e) {
-      console.log('✓ Input CHANGED event fired! Marking for save...');
-      window.editedButNotSaved = 1;
+      if (typeof window.updateNote === 'function') {
+        window.updateNote();
+      } else if (typeof window.updatenote === 'function') {
+        window.updatenote();
+      } else {
+        window.editedButNotSaved = 1;
+      }
     });
     
     // Enter key to add new item or delete empty item
@@ -1428,7 +1438,6 @@ function attachChecklistListeners(noteentry) {
         if (checklistItem && checklist) {
           // If input is empty, delete this item and create a regular line
           if (this.value.trim().length === 0) {
-            console.log('✓ Enter on EMPTY input - creating paragraph');
             // Create a regular paragraph
             const newPara = document.createElement('p');
             newPara.contentEditable = 'true';
@@ -1450,11 +1459,16 @@ function attachChecklistListeners(noteentry) {
             sel.addRange(range);
             
             // Mark for save
-            window.editedButNotSaved = 1;
+            if (typeof window.updateNote === 'function') {
+              window.updateNote();
+            } else if (typeof window.updatenote === 'function') {
+              window.updatenote();
+            } else {
+              window.editedButNotSaved = 1;
+            }
             return;
           }
           
-          console.log('✓ Enter on INPUT with text - creating new item');
           // If input has text, create new item
           const newItem = document.createElement('li');
           newItem.className = 'checklist-item';
@@ -1472,7 +1486,13 @@ function attachChecklistListeners(noteentry) {
           if (newItemInput) newItemInput.focus();
           
           // Mark for save
-          window.editedButNotSaved = 1;
+          if (typeof window.updateNote === 'function') {
+            window.updateNote();
+          } else if (typeof window.updatenote === 'function') {
+            window.updatenote();
+          } else {
+            window.editedButNotSaved = 1;
+          }
         }
       }
     });

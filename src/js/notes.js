@@ -140,11 +140,9 @@ function saveNoteToServer() {
     
     // Prepare data
     var headi = titleInput.value || '';
-    var ent = cleanSearchHighlightsFromElement(entryElem);
-    ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     
     // IMPORTANT: Serialize checklist input values into the HTML before saving
-    // This ensures checklist text is preserved when the page is reloaded
+    // This ensures checklist text AND checkbox state is preserved when the page is reloaded
     var checklists = entryElem.querySelectorAll('.checklist');
     checklists.forEach(function(checklist) {
         var items = checklist.querySelectorAll('.checklist-item');
@@ -152,18 +150,16 @@ function saveNoteToServer() {
             var checkbox = item.querySelector('.checklist-checkbox');
             var input = item.querySelector('.checklist-input');
             if (checkbox && input) {
-                // Create a text node with the checkbox state and input value
-                var checkMark = checkbox.checked ? '☑' : '☐';
-                var text = input.value || '(empty)';
-                // Store the value in a data attribute so it survives serialization
-                input.setAttribute('data-value', input.value);
+                // Store the current values in data attributes
                 checkbox.setAttribute('data-checked', checkbox.checked ? '1' : '0');
+                input.setAttribute('data-value', input.value);
+                // Also store in input.value attribute so it gets serialized with innerHTML
+                input.setAttribute('value', input.value);
             }
         });
     });
     
-    // Re-get the cleaned content with updated data attributes
-    ent = cleanSearchHighlightsFromElement(entryElem);
+    var ent = cleanSearchHighlightsFromElement(entryElem);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     
     var entcontent = getTextContentFromElement(entryElem);
