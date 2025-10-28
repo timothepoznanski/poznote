@@ -229,7 +229,6 @@ To retrieve your password:
 3. Look for the `POZNOTE_PASSWORD` value
 
 ## Update to the latest version
-<br>
 
 ---
 
