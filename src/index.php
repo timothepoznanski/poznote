@@ -1034,29 +1034,9 @@ $body_classes = trim($extra_body_classes);
         window.location.href = url;
     }
     
-    // Navigate to tips page with current workspace and note parameters
+    // Navigate to tips page
     function navigateToTips() {
-        var url = 'tips.php';
-        var params = [];
-        
-        // Add workspace parameter if selected
-        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
-            params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
-        }
-        
-        // Add note parameter if currently viewing a note
-        var urlParams = new URLSearchParams(window.location.search);
-        var noteId = urlParams.get('note');
-        if (noteId) {
-            params.push('note=' + encodeURIComponent(noteId));
-        }
-        
-        // Build final URL
-        if (params.length > 0) {
-            url += '?' + params.join('&');
-        }
-        
-        window.location.href = url;
+        window.open('https://poznote.com/tips.html', '_blank');
     }
 </script>
 <script src="js/index-config.js"></script>
