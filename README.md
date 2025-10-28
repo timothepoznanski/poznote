@@ -193,7 +193,7 @@ After installation, access Poznote in your web browser:
 
 ## Change Settings
 
-To modify your username, password, or port:
+To modify your username, password, or port.
 
 Navigate to your Poznote directory:
 ```bash
@@ -230,16 +230,11 @@ To retrieve your password:
 
 ## Update to the latest version
 
-To update Poznote to the latest version:
-
-Set your Poznote directory name (replace with your actual directory name):
-```bash
-POZNOTE_DIR="poznote"
-```
+To update Poznote to the latest version.
 
 Navigate to your Poznote directory:
 ```bash
-cd $POZNOTE_DIR
+cd poznote
 ```
 
 Stop the running container before updating:
