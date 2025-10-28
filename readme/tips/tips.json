@@ -5,7 +5,7 @@
   },
   "tips": [
     {
-      "icon": "fa-mobile-alt",
+      "icon": "fa-mobile",
       "text": "Poznote is fully responsive and works seamlessly across all devices - desktop, tablet, and mobile.",
       "images": ["tips-images/tip31.png"]
     },
