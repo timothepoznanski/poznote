@@ -21,12 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore folder states from localStorage
     restoreFolderStates();
     
-    // Initialize checklist listeners (for checkboxes that auto-save)
+    // Restore checklist values from data attributes (after page reload)
     const noteentry = document.querySelector('.noteentry');
-    if (noteentry && typeof attachChecklistListeners === 'function') {
-        attachChecklistListeners(noteentry);
-        
-        // Restore checklist values from data attributes (after page reload)
+    if (noteentry) {
         const checklistInputs = noteentry.querySelectorAll('.checklist-input');
         checklistInputs.forEach(function(input) {
             const savedValue = input.getAttribute('data-value');
@@ -37,11 +34,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const checklistCheckboxes = noteentry.querySelectorAll('.checklist-checkbox');
         checklistCheckboxes.forEach(function(checkbox) {
-            const savedChecked = checkbox.getAttribute('data-checked');
-            if (savedChecked === '1') {
+            // First check if the 'checked' attribute exists in HTML
+            if (checkbox.hasAttribute('checked')) {
                 checkbox.checked = true;
-            } else if (savedChecked === '0') {
-                checkbox.checked = false;
+            } else {
+                // Fallback to data-checked attribute for compatibility
+                const savedChecked = checkbox.getAttribute('data-checked');
+                if (savedChecked === '1') {
+                    checkbox.checked = true;
+                } else if (savedChecked === '0') {
+                    checkbox.checked = false;
+                }
             }
         });
     }
@@ -65,6 +68,49 @@ document.addEventListener('DOMContentLoaded', function() {
             applyRegularImageBorderPreferences();
         });
     }
+    
+    
+    // Listen for note content changes via mutation observer to restore checklist values
+    const handleNoteLoad = function() {
+        setTimeout(function() {
+            const ne = document.querySelector('.noteentry');
+            if (ne) {
+                // Restore checklist values when new content loads
+                const inputs = ne.querySelectorAll('.checklist-input');
+                const checkboxes = ne.querySelectorAll('.checklist-checkbox');
+                
+                inputs.forEach(function(input) {
+                    const savedValue = input.getAttribute('data-value');
+                    if (savedValue !== null && savedValue !== undefined) {
+                        input.value = savedValue;
+                    }
+                });
+                
+                checkboxes.forEach(function(checkbox) {
+                    // First check if the 'checked' attribute exists in HTML
+                    if (checkbox.hasAttribute('checked')) {
+                        checkbox.checked = true;
+                    } else {
+                        // Fallback to data-checked attribute for compatibility
+                        const savedChecked = checkbox.getAttribute('data-checked');
+                        if (savedChecked === '1') {
+                            checkbox.checked = true;
+                        } else if (savedChecked === '0') {
+                            checkbox.checked = false;
+                        }
+                    }
+                });
+            }
+        }, 50);
+    };
+    
+    // Listen for note content changes via mutation observer  
+    const contentDiv = document.querySelector('.noteentry');
+    if (contentDiv) {
+        const observer = new MutationObserver(handleNoteLoad);
+        observer.observe(contentDiv, { childList: true, subtree: true });
+    }
+    
     
 });
 

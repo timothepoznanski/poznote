@@ -155,6 +155,12 @@ function saveNoteToServer() {
                 input.setAttribute('data-value', input.value);
                 // Also store in input.value attribute so it gets serialized with innerHTML
                 input.setAttribute('value', input.value);
+                // IMPORTANT: Set the 'checked' attribute so it persists in the HTML
+                if (checkbox.checked) {
+                    checkbox.setAttribute('checked', 'checked');
+                } else {
+                    checkbox.removeAttribute('checked');
+                }
             }
         });
     });
