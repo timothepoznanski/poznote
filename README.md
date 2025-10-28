@@ -143,6 +143,28 @@ docker compose up -d
 
 </details>
 
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+#### Help Needed from the Community! 
+
+Unfortunately, I don't have access to a Mac to test and document the installation procedure for macOS.
+
+**If you're a macOS user and successfully install Poznote, I would greatly appreciate your help!** Please consider:
+
+- Testing the installation process on your Mac
+- Documenting any macOS-specific steps or requirements
+- Sharing your experience via [GitHub Issues](https://github.com/timothepoznanski/poznote/issues) or [Pull Request](https://github.com/timothepoznanski/poznote/pulls)
+
+**Expected process** (untested):
+1. Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
+2. Install Git (usually pre-installed, or via `brew install git`)
+3. Follow similar steps to Linux using Terminal
+
+Your contribution would help make Poznote accessible to the entire macOS community! 🙏
+
+</details>
+
 ## Access
 
 After installation, access Poznote in your web browser:
