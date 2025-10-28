@@ -33,9 +33,9 @@
     height: 100%;
     background-color: rgba(0,0,0,0.4);
     /* When opened by JS, the script sets display:flex so the modal uses flex layout */
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 16px;
+    padding: 80px 16px 16px 16px;
     box-sizing: border-box;
     overflow: auto;
 }
@@ -85,7 +85,7 @@
     border-radius: 8px;
     width: 90%;
     max-width: var(--modal-max-width);
-    margin: -80px auto 0 auto; /* negative top margin to move modal higher */
+    margin: 0 auto;
     font-family: 'Inter', sans-serif;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     box-sizing: border-box;
