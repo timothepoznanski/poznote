@@ -5,6 +5,11 @@
   },
   "tips": [
     {
+      "icon": "fa-mobile-screen",
+      "text": "Poznote is fully responsive and works seamlessly across all devices - desktop, tablet, and mobile.",
+      "images": ["tips-images/tip31.png"]
+    },
+    {
       "icon": "fa-paint-brush",
       "text": "Create schemas, drawings and diagrams in Excalidraw. Use the context menu by clicking on the image to delete, download or edit the drawing again.",
       "images": ["tips-images/tip29.png", "tips-images/tip30.png"]
