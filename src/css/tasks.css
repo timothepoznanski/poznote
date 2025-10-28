@@ -262,6 +262,7 @@
 
 /* Tasklist note styles - Hide separator and table buttons for tasklist notes */
 .innernote[data-tasklist-note="true"] .btn-separator,
-.innernote[data-tasklist-note="true"] .btn-table {
+.innernote[data-tasklist-note="true"] .btn-table,
+.innernote[data-tasklist-note="true"] .btn-checklist {
     display: none !important;
 }

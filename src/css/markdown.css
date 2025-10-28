@@ -3,7 +3,8 @@
 /* Hide separator, emoji and table buttons for markdown notes */
 .innernote[data-markdown-note="true"] .btn-separator,
 .innernote[data-markdown-note="true"] .btn-emoji,
-.innernote[data-markdown-note="true"] .btn-table {
+.innernote[data-markdown-note="true"] .btn-table,
+.innernote[data-markdown-note="true"] .btn-checklist {
     display: none !important;
 }
 

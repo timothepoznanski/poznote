@@ -80,7 +80,7 @@
 /* Base modal content styles */
 .modal-content {
     background-color: #fefefe;
-    padding: 20px;
+    padding: 28px;
     border: none;
     border-radius: 8px;
     width: 90%;
@@ -942,7 +942,7 @@
 
 #confirmModal .modal-content {
     text-align: center;
-    max-width: 420px;
+    max-width: 520px;
 }
 
 #confirmModal .modal-content h3 {
@@ -951,19 +951,18 @@
 }
 
 #confirmModal .modal-content p {
-    margin: 15px 0;
     line-height: 1.5;
     color: #555;
     font-size: 16px;
 }
 
-#confirmModal .btn-primary {
+#confirmModal .btn-secondary {
     background-color: #007DB8 !important;
     color: white !important;
     border: none !important;
 }
 
-#confirmModal .btn-primary:hover {
+#confirmModal .btn-secondary:hover {
     background-color: #0056b3 !important;
 }
 
@@ -997,6 +996,53 @@
 
 #confirmModal #confirmButton.btn-primary:hover {
     background-color: #0056b3 !important;
+}
+
+/* Ensure confirmation modal buttons are vertically aligned and same height */
+#confirmModal .modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center; /* vertical alignment */
+    flex-wrap: nowrap;
+    margin-top: 6px; /* small safeguard spacing from content */
+    padding-top: 6px;
+}
+
+#confirmModal .modal-buttons button {
+    /* ensure good touch target and avoid wrapping: larger horizontal padding and slightly bigger vertical padding */
+    height: auto !important;
+    min-height: 44px !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important; /* prefer truncation/expansion instead of wrapping */
+}
+
+/* Make confirm modal buttons flexible so they fit inside the modal without overflowing.
+   Primary/secondary buttons expand/shrink equally; cancel stays a compact fixed size. */
+#confirmModal .modal-buttons .btn-danger,
+#confirmModal .modal-buttons .btn-secondary {
+    /* prefer to keep enough width to avoid wrapping, but remain flexible to fit modal */
+    min-width: 140px !important;
+    flex: 1 1 140px !important;  /* base width 140px, then grow/shrink as needed */
+    max-width: 380px !important; /* cap so they don't become huge on wide screens */
+}
+#confirmModal .modal-buttons .btn-cancel {
+    min-width: 90px !important;  /* compact cancel */
+    flex: 0 0 110px !important;  /* keep a predictable small width */
+}
+
+/* On very small screens let them shrink but keep vertical alignment */
+@media (max-width: 420px) {
+    #confirmModal .modal-buttons { gap: 8px; }
+    #confirmModal .modal-buttons .btn-danger,
+    #confirmModal .modal-buttons .btn-secondary,
+    #confirmModal .modal-buttons .btn-cancel { min-width: 0 !important; flex: 1 1 auto !important; }
 }
 
 #deleteFolderModal .btn-cancel {
@@ -1466,6 +1512,17 @@
         flex-direction: column !important;
         gap: 10px !important;
         align-items: stretch !important;
+    }
+
+    /* Keep confirm modal buttons side by side on mobile */
+    #confirmModal .modal-buttons {
+        flex-direction: row !important;
+        gap: 10px !important;
+    }
+    #confirmModal .modal-buttons button {
+        width: auto !important;
+        flex: 1 !important;
+        min-width: 120px !important;
     }
 
     /* Modal footers: stacked buttons */

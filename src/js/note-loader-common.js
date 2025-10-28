@@ -180,6 +180,21 @@ window.loadNoteDirectly = function(url, noteId, event) {
                     window.pendingNoteLoadUrl = null;
                     window.pendingNoteLoadId = null;
                     window.pendingNoteLoadEvent = null;
+                }, { danger: true }, function() {
+                    // User clicked "Save and Exit" - save first, then proceed with loading the note
+                    if (typeof updatenote === 'function') {
+                        updatenote(); // Save the current note
+                    }
+                    
+                    // After saving, proceed with loading the note (skip the unsaved check this time)
+                    window._skipUnsavedCheck = true;
+                    window.loadNoteDirectly(window.pendingNoteLoadUrl, window.pendingNoteLoadId, null);
+                    window._skipUnsavedCheck = false;
+                    
+                    // Clean up
+                    window.pendingNoteLoadUrl = null;
+                    window.pendingNoteLoadId = null;
+                    window.pendingNoteLoadEvent = null;
                 });
             } else {
                 // Fallback to browser confirm
