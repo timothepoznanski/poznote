@@ -1337,7 +1337,7 @@ function insertChecklist() {
   // Create checklist HTML with 1 item only - using simple input
   const checklistHTML = `
 <ul class="checklist" style="list-style: none; padding-left: 0; margin: 8px 0;">
-  <li class="checklist-item" style="margin: 6px 0;"><input type="checkbox" class="checklist-checkbox"> <input type="text" class="checklist-input" style="border: none; background: none; padding: 0; font-family: inherit; font-size: inherit; width: calc(100% - 30px);"></li>
+  <li class="checklist-item"><input type="checkbox" class="checklist-checkbox"> <input type="text" class="checklist-input" style="border: none; background: none; padding: 0; font-family: inherit; font-size: inherit; width: calc(100% - 30px);"></li>
 </ul>
 <p><br></p>`;
 

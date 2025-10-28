@@ -178,6 +178,125 @@ function handleChecklistKeydown(e) {
         if (typeof window.updateNote === 'function') {
             window.updateNote();
         }
+    } else if (e.key === 'Backspace') {
+        // Handle Backspace key
+        var checklistItem = input.closest('.checklist-item');
+        if (!checklistItem) return;
+        
+        var checklist = checklistItem.closest('.checklist');
+        if (!checklist) return;
+        
+        // Check if cursor is at the beginning of the input
+        var cursorPos = input.selectionStart;
+        var textValue = input.value;
+        
+        if (cursorPos === 0 && textValue === '') {
+            // Empty item at the beginning - delete it
+            e.preventDefault();
+            
+            // IMPORTANT: Set noteid from the noteentry element
+            var noteentry = checklist.closest('.noteentry');
+            if (noteentry) {
+                var noteIdFromEntry = noteentry.id.replace('entry', '');
+                if (noteIdFromEntry) {
+                    noteid = noteIdFromEntry;
+                }
+            }
+            
+            // Get the previous item to focus on
+            var previousItem = checklistItem.previousElementSibling;
+            
+            // Remove current item
+            checklistItem.remove();
+            
+            // If there are no more items in the checklist, remove the entire checklist
+            var remainingItems = checklist.querySelectorAll('.checklist-item');
+            if (remainingItems.length === 0) {
+                // Create a paragraph before removing the checklist
+                var paragraph = document.createElement('p');
+                paragraph.textContent = '';
+                
+                checklist.parentNode.insertBefore(paragraph, checklist);
+                checklist.remove();
+                
+                // Focus the new paragraph
+                var range = document.createRange();
+                range.selectNodeContents(paragraph);
+                range.collapse(true);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                paragraph.focus();
+            } else if (previousItem && previousItem.classList.contains('checklist-item')) {
+                // Focus on the previous item's input
+                var previousInput = previousItem.querySelector('.checklist-input');
+                if (previousInput) {
+                    previousInput.focus();
+                    // Move cursor to the end of the previous item
+                    previousInput.setSelectionRange(previousInput.value.length, previousInput.value.length);
+                }
+            } else {
+                // Focus on the first remaining item
+                var firstInput = checklist.querySelector('.checklist-input');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }
+            
+            // Serialize and trigger save
+            if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
+                serializeChecklistsBeforeSave(noteentry);
+            }
+            
+            if (typeof window.updateNote === 'function') {
+                window.updateNote();
+            }
+        }
+        // Note: We do NOT prevent default for non-empty items or when cursor is not at start
+        // This allows normal text deletion to work
+    } else if (e.key === 'ArrowDown' || e.key === 'Down') {
+        // Handle arrow down - navigate to next checklist item
+        var checklistItem = input.closest('.checklist-item');
+        if (!checklistItem) return;
+        
+        var cursorPos = input.selectionStart;
+        var textLength = input.value.length;
+        
+        // Only intercept if cursor is at the end of the line
+        if (cursorPos === textLength) {
+            var nextItem = checklistItem.nextElementSibling;
+            if (nextItem && nextItem.classList.contains('checklist-item')) {
+                e.preventDefault();
+                var nextInput = nextItem.querySelector('.checklist-input');
+                if (nextInput) {
+                    nextInput.focus();
+                    // Move cursor to the beginning of the next item
+                    nextInput.setSelectionRange(0, 0);
+                }
+            }
+            // If there's no next item, allow default behavior to exit the checklist
+        }
+    } else if (e.key === 'ArrowUp' || e.key === 'Up') {
+        // Handle arrow up - navigate to previous checklist item
+        var checklistItem = input.closest('.checklist-item');
+        if (!checklistItem) return;
+        
+        var cursorPos = input.selectionStart;
+        
+        // Only intercept if cursor is at the beginning of the line
+        if (cursorPos === 0) {
+            var previousItem = checklistItem.previousElementSibling;
+            if (previousItem && previousItem.classList.contains('checklist-item')) {
+                e.preventDefault();
+                var previousInput = previousItem.querySelector('.checklist-input');
+                if (previousInput) {
+                    previousInput.focus();
+                    // Move cursor to the end of the previous item
+                    previousInput.setSelectionRange(previousInput.value.length, previousInput.value.length);
+                }
+            }
+            // If there's no previous item, allow default behavior to exit the checklist
+        }
     }
 }
 
