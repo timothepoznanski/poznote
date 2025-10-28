@@ -232,7 +232,7 @@ To retrieve your password:
 
 > **⚠️ Upgrading from 1.3.X to 1.4.X?**
 >
-> Is it is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
+> If this is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
 
 To update Poznote to the latest version.
 
