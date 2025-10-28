@@ -234,6 +234,8 @@ To retrieve your password:
 >
 > If this is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
 
+---
+
 To update Poznote to the latest version.
 
 Navigate to your Poznote directory:
