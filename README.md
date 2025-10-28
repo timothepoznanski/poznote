@@ -26,7 +26,7 @@
 Poznote is a lightweight yet powerful web app for taking notes.<br>
 Capture, organize, and access your notes while keeping full ownership of your data.<br>
 
-**→ [View all features on poznote.com here](https://poznote.com/index.html#features)**
+[View all features on poznote.com here](https://poznote.com/index.html#features)
 
 <br>
 
