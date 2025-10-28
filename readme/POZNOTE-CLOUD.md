@@ -91,14 +91,7 @@ Watch this video tutorial:
 
 To update your Poznote instance to the latest version:
 
-**Video Tutorial**
-
-**[Update Poznote on Railway](https://youtu.be/jbUlCEWndoo)**
-
-Railway will automatically:
-- Pull the latest Poznote image
-- Redeploy your instance
-- Preserve all your data (notes, attachments, database)
+![Update Poznote on Railway](readme/update-poznote-on-railway.gif)
 
 ## Option 2: Other Cloud Providers
 
