@@ -232,7 +232,9 @@ To retrieve your password:
 
 > **⚠️ Upgrading from 1.3.X to 1.4.X?**
 <br>
+
 ---
+
 >
 > If this is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
 
