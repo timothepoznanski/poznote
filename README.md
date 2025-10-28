@@ -230,9 +230,9 @@ To retrieve your password:
 
 ## Update to the latest version
 
-> **⚠️ IMPORTANT: Upgrading from 1.3.X to 1.4.X?**
+> **⚠️ Upgrading from 1.3.X to 1.4.X?**
 >
-> If you're upgrading from version 1.3.X to 1.4.X, please follow the special migration instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
+> Is it is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
 
 To update Poznote to the latest version.
 
