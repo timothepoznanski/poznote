@@ -8,7 +8,6 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Features](#features)
 - [Play with Poznote demo](#play-with-poznote-demo)
 - [Install](#install)
 - [Access](#access)
@@ -26,25 +25,13 @@
 
 Poznote is a free, self-hosted, and beautifully simple note manager built for speed and clarity.<br><br>
 Capture, organize, and access your notes while keeping full ownership of your data.<br>
-Created for those who put efficiency and control of their data first.<br><br>
+Created for those who put efficiency and control of their data first.<br>
+
+**→ [View all features on poznote.com here](https://poznote.com/index.html#features)**
+
+<br>
 
 ![poznote](readme/poznote.png)
-
-## Features
-
-- 📝 Rich Text Editor
-- 🔍 Powerful Search
-- 🏷️ Tag system
-- 📎 File Attachments
-- 📱 Responsive design
-- 🖥️ Multi-instance support
-- 🗂️ Workspaces
-- 🏠 Self-hosted
-- 💾 Built-in backup and restore tools
-- 📖 Export tool for offline reading
-- 🗑️ Trash system with restore functionality
-- 🔗 Public note sharing
-- 🌐 REST API for automation
 
 ## Play with Poznote demo
 
