@@ -229,12 +229,11 @@ To retrieve your password:
 3. Look for the `POZNOTE_PASSWORD` value
 
 ## Update to the latest version
-
-> **⚠️ Upgrading from 1.3.X to 1.4.X?**
 <br>
 
 ---
 
+> **⚠️ Upgrading from 1.3.X to 1.4.X?**
 >
 > If this is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
 
