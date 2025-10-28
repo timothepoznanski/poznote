@@ -91,7 +91,7 @@ Watch this video tutorial:
 
 To update your Poznote instance to the latest version:
 
-![Update Poznote on Railway](readme/update-poznote-on-railway.gif)
+![Update Poznote on Railway](update-poznote-on-railway.gif)
 
 ## Option 2: Other Cloud Providers
 
