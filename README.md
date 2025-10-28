@@ -19,7 +19,6 @@
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
-- [Poznote on the Cloud](#poznote-on-the-cloud)
 
 ## Introduction
 
@@ -162,6 +161,21 @@ Unfortunately, I don't have access to a Mac to test and document the installatio
 3. Follow similar steps to Linux using Terminal
 
 Your contribution would help make Poznote accessible to the entire macOS community! 🙏
+
+</details>
+
+<details>
+<summary><strong>☁️ Cloud</strong></summary>
+
+If you:
+
+- Want access from anywhere (phone, tablet, computer) with almost zero setup
+- Have no experience with server management or don't want to manage server and security
+- Don't know how to use command line or don't want to use command line 
+- Prefer one-click updates
+- Are okay with approximately $5/month (Cloud provider fees)
+
+**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
 
 </details>
 
@@ -668,16 +682,4 @@ curl -u 'username:password' \
 ```
 
 </details>
-
-## Poznote on the Cloud
-
-If you:
-
-- Want access from anywhere (phone, tablet, computer) with almost zero setup
-- Have no experience with server management or don't want to manage server and security
-- Don't know how to use command line or don't want to use command line 
-- Prefer one-click updates
-- Are okay with approximately $5/month (Cloud provider fees)
-
-**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
 
