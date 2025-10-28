@@ -10,11 +10,19 @@
 - [Introduction](#introduction)
 - [Play with Poznote demo](#play-with-poznote-demo)
 - [Install](#install)
+  - [Windows](#windows)
+  - [Linux](#linux)
+  - [macOS](#macos)
+  - [Cloud](#cloud)
 - [Access](#access)
 - [Change Settings](#change-settings)
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
+  - [Complete Backup](#complete-backup)
+  - [Import Individual Notes](#import-individual-notes)
+  - [Complete Restore](#complete-restore)
+  - [Automated Backup Script](#automated-backup-script)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
@@ -44,6 +52,7 @@ Password: `poznote`
 
 Choose your preferred installation method below.
 
+<a id="windows"></a>
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
 
@@ -108,6 +117,7 @@ docker compose up -d
 
 </details>
 
+<a id="linux"></a>
 <details>
 <summary><strong>🐧 Linux</strong></summary>
 
@@ -170,6 +180,7 @@ docker compose up -d
 
 </details>
 
+<a id="macos"></a>
 <details>
 <summary><strong>🍎 macOS</strong></summary>
 
@@ -192,6 +203,7 @@ Your contribution would help make Poznote accessible to the entire macOS communi
 
 </details>
 
+<a id="cloud"></a>
 <details>
 <summary><strong>☁️ Cloud</strong></summary>
 <br>
@@ -291,6 +303,7 @@ Your data is preserved in the `./data` directory and will not be affected by the
 
 Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
+<a id="complete-backup"></a>
 **📦 Complete Backup**
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
@@ -299,6 +312,7 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
+<a id="import-individual-notes"></a>
 **📥 Import Individual Notes**
 
 Import one or more HTML or Markdown notes directly:
@@ -309,6 +323,7 @@ Import one or more HTML or Markdown notes directly:
   - Titles are automatically extracted from file content or filename
   - Supports both full HTML documents and simple fragments
 
+<a id="complete-restore"></a>
 **🔄 Complete Restore** 
 
 Upload the complete backup ZIP to restore everything:
@@ -318,6 +333,7 @@ Upload the complete backup ZIP to restore everything:
 
 ⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
+<a id="automated-backup-script"></a>
 **🤖 Automated Backup Script**
 
 For automated backups via cron or manual execution, use the `backup-poznote.sh` script located at the repository root:
