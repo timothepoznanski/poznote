@@ -140,6 +140,31 @@ function saveNoteToServer() {
     
     // Prepare data
     var headi = titleInput.value || '';
+    
+    // IMPORTANT: Serialize checklist input values into the HTML before saving
+    // This ensures checklist text AND checkbox state is preserved when the page is reloaded
+    var checklists = entryElem.querySelectorAll('.checklist');
+    checklists.forEach(function(checklist) {
+        var items = checklist.querySelectorAll('.checklist-item');
+        items.forEach(function(item) {
+            var checkbox = item.querySelector('.checklist-checkbox');
+            var input = item.querySelector('.checklist-input');
+            if (checkbox && input) {
+                // Store the current values in data attributes
+                checkbox.setAttribute('data-checked', checkbox.checked ? '1' : '0');
+                input.setAttribute('data-value', input.value);
+                // Also store in input.value attribute so it gets serialized with innerHTML
+                input.setAttribute('value', input.value);
+                // IMPORTANT: Set the 'checked' attribute so it persists in the HTML
+                if (checkbox.checked) {
+                    checkbox.setAttribute('checked', 'checked');
+                } else {
+                    checkbox.removeAttribute('checked');
+                }
+            }
+        });
+    });
+    
     var ent = cleanSearchHighlightsFromElement(entryElem);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     

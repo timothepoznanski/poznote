@@ -26,6 +26,9 @@ server {
     root /var/www/html;
     index index.php index.html;
 
+    # Allow large file uploads (matches PHP post_max_size)
+    client_max_body_size 300M;
+
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;

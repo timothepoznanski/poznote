@@ -152,13 +152,59 @@ window.loadNoteDirectly = function(url, noteId, event) {
         }
         
         // Check for unsaved changes before navigating
-        if (typeof editedButNotSaved !== 'undefined' && editedButNotSaved === 1 &&
+        // Skip this check if we're being called recursively from the confirmation modal callback
+        if (!window._skipUnsavedCheck &&
+            typeof editedButNotSaved !== 'undefined' && editedButNotSaved === 1 &&
             typeof updateNoteEnCours !== 'undefined' && updateNoteEnCours === 0 &&
             typeof noteid !== 'undefined' && noteid !== -1 && noteid !== 'search') {
             
+            // Use modal instead of browser confirm to prevent race conditions
+            // and ensure the UI doesn't change until user responds
             var confirmationMessage = 'You have unsaved changes. Are you sure you want to switch notes without saving?';
-
-            if (!confirm(confirmationMessage)) {
+            
+            // Store the parameters for use in the callback
+            window.pendingNoteLoadUrl = url;
+            window.pendingNoteLoadId = noteId;
+            window.pendingNoteLoadEvent = event;
+            
+            // Use the modal-based confirmation if available, otherwise use browser confirm
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal('Confirmation', confirmationMessage, function() {
+                    // User clicked OK - proceed with loading the note
+                    // Call the main loading logic (skip the unsaved check this time)
+                    window._skipUnsavedCheck = true;
+                    window.loadNoteDirectly(window.pendingNoteLoadUrl, window.pendingNoteLoadId, null);
+                    window._skipUnsavedCheck = false;
+                    
+                    // Clean up
+                    window.pendingNoteLoadUrl = null;
+                    window.pendingNoteLoadId = null;
+                    window.pendingNoteLoadEvent = null;
+                }, { danger: true }, function() {
+                    // User clicked "Save and Exit" - save first, then proceed with loading the note
+                    if (typeof updatenote === 'function') {
+                        updatenote(); // Save the current note
+                    }
+                    
+                    // After saving, proceed with loading the note (skip the unsaved check this time)
+                    window._skipUnsavedCheck = true;
+                    window.loadNoteDirectly(window.pendingNoteLoadUrl, window.pendingNoteLoadId, null);
+                    window._skipUnsavedCheck = false;
+                    
+                    // Clean up
+                    window.pendingNoteLoadUrl = null;
+                    window.pendingNoteLoadId = null;
+                    window.pendingNoteLoadEvent = null;
+                });
+            } else {
+                // Fallback to browser confirm
+                if (!confirm(confirmationMessage)) {
+                    return false;
+                }
+            }
+            
+            // If modal is used, we return here and let the modal callback handle the rest
+            if (typeof showConfirmModal === 'function') {
                 return false;
             }
         }
@@ -207,6 +253,15 @@ window.loadNoteDirectly = function(url, noteId, event) {
                                     }
 
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
+                                    
+                                    // Reset edit flags for the new note since it just loaded fresh
+                                    if (typeof editedButNotSaved !== 'undefined') {
+                                        editedButNotSaved = 0;
+                                    }
+                                    if (typeof updateNoteEnCours !== 'undefined') {
+                                        updateNoteEnCours = 0;
+                                    }
+                                    
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
                                     updateBrowserUrl(url, noteId);
@@ -360,6 +415,14 @@ function loadNoteViaAjax(url, noteId, clickedLink) {
                             }
 
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
+
+                            // Reset edit flags for the new note since it just loaded fresh
+                            if (typeof editedButNotSaved !== 'undefined') {
+                                editedButNotSaved = 0;
+                            }
+                            if (typeof updateNoteEnCours !== 'undefined') {
+                                updateNoteEnCours = 0;
+                            }
 
                             // Update URL before reinitializing so reinitializeNoteContent
                             // can detect the 'note' param and keep the right column visible

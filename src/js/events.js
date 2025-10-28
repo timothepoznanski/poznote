@@ -29,28 +29,156 @@ function initializeEventListeners() {
 }
 
 function setupNoteEditingEvents() {
-    var eventTypes = ['keyup', 'input', 'paste'];
+    var eventTypes = ['keyup', 'input', 'paste', 'change'];
     
     for (var i = 0; i < eventTypes.length; i++) {
         var eventType = eventTypes[i];
         document.body.addEventListener(eventType, function(e) {
+            // Handle checklist checkbox changes (auto-save)
+            if (e.target && e.target.classList && e.target.classList.contains('checklist-checkbox')) {
+                // IMPORTANT: Set noteid from the noteentry element
+                var noteentry = e.target.closest('.noteentry');
+                if (noteentry) {
+                    var noteIdFromEntry = noteentry.id.replace('entry', '');
+                    if (noteIdFromEntry) {
+                        noteid = noteIdFromEntry;
+                    }
+                }
+                
+                // Serialize checklist state BEFORE save
+                if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
+                    serializeChecklistsBeforeSave(noteentry);
+                }
+                
+                if (typeof window.updateNote === 'function') {
+                    window.updateNote();
+                }
+                return;
+            }
+            
+            // Handle checklist text input changes (auto-save)
+            if (e.target && e.target.classList && e.target.classList.contains('checklist-input')) {
+                if (eventType === 'input' || eventType === 'keyup' || eventType === 'change') {
+                    // IMPORTANT: Set noteid from the noteentry element
+                    var noteentry = e.target.closest('.noteentry');
+                    if (noteentry) {
+                        var noteIdFromEntry = noteentry.id.replace('entry', '');
+                        if (noteIdFromEntry) {
+                            noteid = noteIdFromEntry;
+                        }
+                    }
+                    
+                    // Serialize checklist state BEFORE save
+                    if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
+                        serializeChecklistsBeforeSave(noteentry);
+                    }
+                    
+                    if (typeof window.updateNote === 'function') {
+                        window.updateNote();
+                    }
+                }
+                return;
+            }
+            
             handleNoteEditEvent(e);
         });
     }
     
-    // Special handling for tags with the space bar
+    // Handle Enter key and delete empty checklists
     document.body.addEventListener('keydown', function(e) {
+        if (e.target && e.target.classList && e.target.classList.contains('checklist-input')) {
+            handleChecklistKeydown(e);
+            return;
+        }
+        
         handleTagsKeydown(e);
+        handleTitleKeydown(e);
     });
     
     // Special handling for title blur and keydown events (Enter/Escape)
     document.body.addEventListener('blur', function(e) {
         handleTitleBlur(e);
     }, true); // Use capture phase to ensure we catch the event
+}
+
+function handleChecklistKeydown(e) {
+    var input = e.target;
     
-    document.body.addEventListener('keydown', function(e) {
-        handleTitleKeydown(e);
-    });
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        
+        var checklistItem = input.closest('.checklist-item');
+        if (!checklistItem) return;
+        
+        var checklist = checklistItem.closest('.checklist');
+        if (!checklist) return;
+        
+        // IMPORTANT: Set noteid from the noteentry element
+        var noteentry = checklist.closest('.noteentry');
+        if (noteentry) {
+            var noteIdFromEntry = noteentry.id.replace('entry', '');
+            if (noteIdFromEntry) {
+                noteid = noteIdFromEntry;
+            }
+        }
+        
+        var textValue = input.value.trim();
+        
+        if (textValue === '') {
+            // Empty item - delete it and create a paragraph
+            var paragraph = document.createElement('p');
+            paragraph.textContent = '';
+            
+            checklist.parentNode.insertBefore(paragraph, checklist.nextSibling);
+            checklistItem.remove();
+            
+            // Focus the new paragraph
+            var range = document.createRange();
+            range.selectNodeContents(paragraph);
+            range.collapse(false);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            paragraph.focus();
+        } else {
+            // Create new item with text from current input
+            var newLi = document.createElement('li');
+            newLi.className = 'checklist-item';
+            
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'checklist-checkbox';
+            
+            var newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.className = 'checklist-input';
+            newInput.style.border = 'none';
+            newInput.style.background = 'none';
+            newInput.style.padding = '0';
+            newInput.style.fontFamily = 'inherit';
+            newInput.style.fontSize = 'inherit';
+            newInput.style.width = 'calc(100% - 30px)';
+            
+            newLi.appendChild(checkbox);
+            newLi.appendChild(document.createTextNode(' '));
+            newLi.appendChild(newInput);
+            
+            checklistItem.parentNode.insertBefore(newLi, checklistItem.nextSibling);
+            
+            // Focus the new input
+            newInput.focus();
+        }
+        
+        // Serialize and trigger save
+        var noteentry = checklist.closest('.noteentry');
+        if (noteentry && typeof serializeChecklistsBeforeSave === 'function') {
+            serializeChecklistsBeforeSave(noteentry);
+        }
+        
+        if (typeof window.updateNote === 'function') {
+            window.updateNote();
+        }
+    }
 }
 
 function handleNoteEditEvent(e) {

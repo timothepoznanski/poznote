@@ -2220,8 +2220,8 @@ hr {
 }
 
 .noteentry label span[contenteditable="true"]:focus {
-    background-color: rgba(0, 123, 255, 0.1);
-    border-radius: 2px;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .noteentry label span[contenteditable="true"]:empty:before {
@@ -3317,5 +3317,85 @@ body.dark-mode .create-note-option p {
 html[data-theme='dark'] .create-section h4,
 body.dark-mode .create-section h4 {
     color: #aaa;
+}
+
+/* ===== CHECKLIST STYLES ===== */
+.checklist {
+    list-style: none;
+    padding-left: 0;
+    margin: 8px 0;
+}
+
+.checklist-item {
+    /* margin: 6px 0; */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checklist-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin: 2px 0;
+}
+
+.checklist-text {
+    cursor: text;
+    flex: 1;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.checklist-text:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.checklist-input {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.checklist-input:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+/* Remove focus styles from all checklist-related elements */
+.checklist * {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+}
+
+.checklist *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.checklist-checkbox:checked + .checklist-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #999;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .checklist-checkbox:checked + .checklist-text,
+body.dark-mode .checklist-checkbox:checked + .checklist-text {
+    color: #666;
 }
 

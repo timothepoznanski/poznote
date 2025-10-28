@@ -414,16 +414,19 @@ function closeLoginDisplayModal() {
 
 // Confirmation modal functions
 var confirmedActionCallback = null;
+var saveAndExitActionCallback = null;
 
-function showConfirmModal(title, message, callback, options) {
+function showConfirmModal(title, message, callback, options, saveAndExitCallback) {
     var modal = document.getElementById('confirmModal');
     var titleElement = document.getElementById('confirmTitle');
     var messageElement = document.getElementById('confirmMessage');
     var confirmBtn = document.getElementById('confirmButton');
+    var saveAndExitBtn = document.getElementById('saveAndExitButton');
     
     titleElement.textContent = title;
     messageElement.textContent = message;
     confirmedActionCallback = callback;
+    saveAndExitActionCallback = saveAndExitCallback;
 
     // Reset button classes first
     if (confirmBtn) {
@@ -453,17 +456,34 @@ function showConfirmModal(title, message, callback, options) {
         } catch (e) {}
     }
     
+    // Show or hide the save and exit button
+    if (saveAndExitBtn) {
+        if (saveAndExitCallback) {
+            saveAndExitBtn.style.display = 'inline-block';
+        } else {
+            saveAndExitBtn.style.display = 'none';
+        }
+    }
+    
     modal.style.display = 'flex';
 }
 
 function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
     confirmedActionCallback = null;
+    saveAndExitActionCallback = null;
 }
 
 function executeConfirmedAction() {
     if (confirmedActionCallback) {
         confirmedActionCallback();
+    }
+    closeConfirmModal();
+}
+
+function executeSaveAndExitAction() {
+    if (saveAndExitActionCallback) {
+        saveAndExitActionCallback();
     }
     closeConfirmModal();
 }
