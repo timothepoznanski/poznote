@@ -166,6 +166,7 @@ Your contribution would help make Poznote accessible to the entire macOS communi
 
 <details>
 <summary><strong>☁️ Cloud</strong></summary>
+<br>
 
 If you:
 
