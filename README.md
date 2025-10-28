@@ -54,7 +54,7 @@ Choose your preferred installation method below.
 
 #### Step 2: Deploy Poznote
 
-Open Powershell and run the following commands:
+Open Powershell and run the following commands.
 
 Choose a directory name for your Poznote installation:
 ```powershell
@@ -76,7 +76,10 @@ Create environment file from template:
 Copy-Item .env.template .env
 ```
 
-> 💡 **Optional:** Edit the `.env` file to customize your username, password, or port before starting.
+Edit the environment file to customize your username, password, or port:
+```powershell
+notepad .env
+```
 
 Download the latest Poznote Docker image:
 ```powershell
@@ -101,7 +104,7 @@ docker compose up -d
 
 #### Step 2: Install Poznote
 
-Open a Terminal and run the following commands:
+Open a Terminal and run the following commands.
 
 Choose a directory name for your Poznote installation:
 ```bash
@@ -123,7 +126,10 @@ Create environment file from template:
 cp .env.template .env
 ```
 
-> 💡 **Optional:** Edit the `.env` file to customize your username, password, or port before starting.
+Edit the environment file to customize your username, password, or port:
+```bash
+vi .env
+```
 
 Download the latest Poznote Docker image:
 ```bash
@@ -147,8 +153,6 @@ After installation, access Poznote in your web browser:
 - Username: `admin`
 - Password: `admin123!`
 - Port: `8040`
-
-> ⚠️ **Important:** Change these default credentials after your first login!
 
 ## Change Settings
 
