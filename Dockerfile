@@ -1,4 +1,4 @@
-# Dockerfile for Poznote - Alpine Linux (Ultra-Secure)
+# Dockerfile for Poznote - Alpine Linux
 # Use Alpine Linux for minimal, secure image
 FROM php:8.3.27-fpm-alpine
 

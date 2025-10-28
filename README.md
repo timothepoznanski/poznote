@@ -19,14 +19,13 @@
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
-- [Poznote on the Cloud](#poznote-on-the-cloud)
 
 ## Introduction
 
 Poznote is a lightweight yet powerful web app for taking notes.<br>
 Capture, organize, and access your notes while keeping full ownership of your data.<br>
 
-**→ [View all features on poznote.com here](https://poznote.com/index.html#features)**
+[View all features on poznote.com here](https://poznote.com/index.html#features)
 
 <br>
 
@@ -143,6 +142,44 @@ docker compose up -d
 
 </details>
 
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+#### Help Needed from the Community! 
+
+Unfortunately, I don't have access to a Mac to test and document the installation procedure for macOS.
+
+**If you're a macOS user and successfully install Poznote, I would greatly appreciate your help!** Please consider:
+
+- Testing the installation process on your Mac
+- Documenting any macOS-specific steps or requirements
+- Sharing your experience via [GitHub Issues](https://github.com/timothepoznanski/poznote/issues) or [Pull Request](https://github.com/timothepoznanski/poznote/pulls)
+
+**Expected process** (untested):
+1. Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
+2. Install Git (usually pre-installed, or via `brew install git`)
+3. Follow similar steps to Linux using Terminal
+
+Your contribution would help make Poznote accessible to the entire macOS community! 🙏
+
+</details>
+
+<details>
+<summary><strong>☁️ Cloud</strong></summary>
+<br>
+
+If you:
+
+- Want access from anywhere (phone, tablet, computer) with almost zero setup
+- Have no experience with server management or don't want to manage server and security
+- Don't know how to use command line or don't want to use command line 
+- Prefer one-click updates
+- Are okay with approximately $5/month (Cloud provider fees)
+
+**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
+
+</details>
+
 ## Access
 
 After installation, access Poznote in your web browser:
@@ -156,7 +193,7 @@ After installation, access Poznote in your web browser:
 
 ## Change Settings
 
-To modify your username, password, or port:
+To modify your username, password, or port.
 
 Navigate to your Poznote directory:
 ```bash
@@ -193,16 +230,11 @@ To retrieve your password:
 
 ## Update to the latest version
 
-To update Poznote to the latest version:
-
-Set your Poznote directory name (replace with your actual directory name):
-```bash
-POZNOTE_DIR="poznote"
-```
+To update Poznote to the latest version.
 
 Navigate to your Poznote directory:
 ```bash
-cd $POZNOTE_DIR
+cd poznote
 ```
 
 Stop the running container before updating:
@@ -646,16 +678,4 @@ curl -u 'username:password' \
 ```
 
 </details>
-
-## Poznote on the Cloud
-
-If you:
-
-- Want access from anywhere (phone, tablet, computer) with almost zero setup
-- Have no experience with server management or don't want to manage server and security
-- Don't know how to use command line or don't want to use command line 
-- Prefer one-click updates
-- Are okay with approximately $5/month (Cloud provider fees)
-
-**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
 
