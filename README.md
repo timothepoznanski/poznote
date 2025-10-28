@@ -219,6 +219,16 @@ To retrieve your password:
 
 ## Update to the latest version
 
+> **2025-10-28 — ⚠️ IMPORTANT: Migration from 1.3.X to 1.4.X**
+>
+> **Before upgrading from version 1.3.X to 1.4.X, you MUST update your `docker-compose.yml` file!**
+>
+> Remove the last command line from your existing `docker-compose.yml` to avoid deployment errors. The new `docker-compose.yml` structure (available in the README) no longer includes this line.
+>
+> This is a one-time migration step required for the infrastructure upgrade to Alpine Linux & Nginx.
+>
+> [See updated docker-compose.yml file in README](https://github.com/timothepoznanski/poznote?tab=readme-ov-file#poznote)
+
 To update Poznote to the latest version:
 
 Navigate to your Poznote directory:
