@@ -1242,3 +1242,242 @@ window.toggleEmojiPicker = toggleEmojiPicker;
 window.insertEmoji = insertEmoji;
 window.toggleTablePicker = toggleTablePicker;
 window.insertTable = insertTable;
+
+// ===== CHECKLIST FEATURE =====
+
+/**
+ * Serialize checklist inputs into the HTML content before saving
+ * This converts <input> values into displayable text so they persist after page reload
+ */
+function serializeChecklistsBeforeSave(noteentry) {
+  if (!noteentry) return;
+  
+  const checklists = noteentry.querySelectorAll('.checklist');
+  checklists.forEach(function(checklist) {
+    const items = checklist.querySelectorAll('.checklist-item');
+    items.forEach(function(item) {
+      const checkbox = item.querySelector('.checklist-checkbox');
+      const input = item.querySelector('.checklist-input');
+      if (checkbox && input) {
+        // Create visual representation of checklist item
+        const isChecked = checkbox.checked;
+        const text = input.value || '';
+        
+        // Store in data attributes for recovery on reload
+        checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
+        input.setAttribute('data-value', text);
+        
+        // Also set the placeholder or class to indicate content
+        if (isChecked) {
+          item.classList.add('checklist-item-checked');
+        } else {
+          item.classList.remove('checklist-item-checked');
+        }
+      }
+    });
+  });
+}
+
+// Hook into the save process - wrap the original updatenote to serialize checklists first
+if (!window._checklistSaveHookInstalled) {
+  window._checklistSaveHookInstalled = true;
+  const originalUpdateNote = window.updatenote;
+  window.updatenote = function() {
+    const noteentry = document.querySelector('.noteentry');
+    if (noteentry) {
+      serializeChecklistsBeforeSave(noteentry);
+    }
+    
+    if (typeof originalUpdateNote === 'function') {
+      originalUpdateNote();
+    } else if (typeof saveNoteToServer === 'function') {
+      saveNoteToServer();
+    }
+  };
+}
+
+/**
+ * Insert a checklist at the cursor position (starts with 1 item)
+ */
+function insertChecklist() {
+  // Check if cursor is in editable note
+  const sel = window.getSelection();
+  if (!sel.rangeCount) {
+    window.showError('Please place your cursor in the note', 'Error');
+    return;
+  }
+  
+  const range = sel.getRangeAt(0);
+  let container = range.commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  const noteentry = container.closest && container.closest('.noteentry');
+  
+  if (!noteentry) {
+    window.showError('Please place your cursor inside the note', 'Error');
+    return;
+  }
+  
+  // Create checklist HTML with 1 item only - using simple input
+  const checklistHTML = `
+<ul class="checklist" style="list-style: none; padding-left: 0; margin: 8px 0;">
+  <li class="checklist-item" style="margin: 6px 0;"><input type="checkbox" class="checklist-checkbox"> <input type="text" class="checklist-input" style="border: none; background: none; padding: 0; font-family: inherit; font-size: inherit; width: calc(100% - 30px);"></li>
+</ul>
+<p><br></p>`;
+
+  try {
+    // Try to insert using execCommand
+    const success = document.execCommand('insertHTML', false, checklistHTML);
+    
+    if (success) {
+      // Attach event listeners
+      setTimeout(() => {
+        attachChecklistListeners(noteentry);
+        // Focus on the input
+        const lastInput = noteentry.querySelector('.checklist-input:last-of-type');
+        if (lastInput) lastInput.focus();
+        
+        // Trigger save with 15-second delay (same as regular text editing)
+        window.editedButNotSaved = 1;
+      }, 10);
+      
+      return;
+    }
+  } catch (e) {
+    console.error('execCommand failed:', e);
+  }
+  
+  // Fallback: manual insertion
+  try {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = checklistHTML;
+    const checklist = tempDiv.firstChild;
+    
+    range.insertNode(checklist);
+    range.setStartAfter(checklist);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    
+    setTimeout(() => {
+      attachChecklistListeners(noteentry);
+      const lastInput = noteentry.querySelector('.checklist-input:last-of-type');
+      if (lastInput) lastInput.focus();
+    }, 10);
+    
+    noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+  } catch (e) {
+    console.error('Manual insertion failed:', e);
+    window.showError('Failed to insert checklist', 'Error');
+  }
+}
+
+/**
+ * Attach event listeners to checklist items for auto-save and Enter to add new item
+ */
+function attachChecklistListeners(noteentry) {
+  if (!noteentry) {
+    console.warn('attachChecklistListeners: noteentry is null!');
+    return;
+  }
+  
+  const checkboxes = noteentry.querySelectorAll('.checklist-checkbox');
+  const inputs = noteentry.querySelectorAll('.checklist-input');
+  
+  console.log('attachChecklistListeners: Found', checkboxes.length, 'checkboxes and', inputs.length, 'inputs');
+  
+  // Checkbox change listeners
+  checkboxes.forEach((checkbox, idx) => {
+    if (checkbox._hasChecklistListener) {
+      console.log('Checkbox', idx, 'already has listener');
+      return;
+    }
+    
+    checkbox._hasChecklistListener = true;
+    console.log('Attaching listener to checkbox', idx);
+    
+    checkbox.addEventListener('change', function(e) {
+      console.log('✓ Checkbox CHANGED event fired! Marking for save...');
+      window.editedButNotSaved = 1;
+    });
+  });
+  
+  // Input listeners for Enter and auto-save
+  inputs.forEach((input, idx) => {
+    if (input._hasChecklistListener) {
+      console.log('Input', idx, 'already has listener');
+      return;
+    }
+    
+    input._hasChecklistListener = true;
+    console.log('Attaching listeners to input', idx);
+    
+    // Mark as edited on input change (will trigger save after 15 seconds)
+    input.addEventListener('input', function(e) {
+      console.log('✓ Input CHANGED event fired! Marking for save...');
+      window.editedButNotSaved = 1;
+    });
+    
+    // Enter key to add new item or delete empty item
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        
+        const checklistItem = this.closest('.checklist-item');
+        const checklist = this.closest('.checklist');
+        
+        if (checklistItem && checklist) {
+          // If input is empty, delete this item and create a regular line
+          if (this.value.trim().length === 0) {
+            console.log('✓ Enter on EMPTY input - creating paragraph');
+            // Create a regular paragraph
+            const newPara = document.createElement('p');
+            newPara.contentEditable = 'true';
+            newPara.innerHTML = '<br>';
+            
+            // Insert after the checklist
+            checklist.parentNode.insertBefore(newPara, checklist.nextSibling);
+            
+            // Remove the empty item
+            checklistItem.remove();
+            
+            // Focus and position cursor in the new paragraph
+            newPara.focus();
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(newPara, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            
+            // Mark for save
+            window.editedButNotSaved = 1;
+            return;
+          }
+          
+          console.log('✓ Enter on INPUT with text - creating new item');
+          // If input has text, create new item
+          const newItem = document.createElement('li');
+          newItem.className = 'checklist-item';
+          newItem.style.margin = '6px 0';
+          newItem.innerHTML = '<input type="checkbox" class="checklist-checkbox"> <input type="text" class="checklist-input" style="border: none; background: none; padding: 0; font-family: inherit; font-size: inherit; width: calc(100% - 30px);">';
+          
+          // Insert after current item
+          checklistItem.parentNode.insertBefore(newItem, checklistItem.nextSibling);
+          
+          // Re-attach listeners to all (will skip ones already attached)
+          attachChecklistListeners(noteentry);
+          
+          // Focus on new input
+          const newItemInput = newItem.querySelector('.checklist-input');
+          if (newItemInput) newItemInput.focus();
+          
+          // Mark for save
+          window.editedButNotSaved = 1;
+        }
+      }
+    });
+  });
+}
+
+// Export function
+window.insertChecklist = insertChecklist;

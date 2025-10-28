@@ -21,6 +21,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore folder states from localStorage
     restoreFolderStates();
     
+    // Initialize checklist listeners (for checkboxes that auto-save)
+    const noteentry = document.querySelector('.noteentry');
+    if (noteentry && typeof attachChecklistListeners === 'function') {
+        attachChecklistListeners(noteentry);
+        
+        // Restore checklist values from data attributes (after page reload)
+        const checklistInputs = noteentry.querySelectorAll('.checklist-input');
+        checklistInputs.forEach(function(input) {
+            const savedValue = input.getAttribute('data-value');
+            if (savedValue !== null && savedValue !== undefined) {
+                input.value = savedValue;
+                console.log('Restored checklist input value:', savedValue);
+            }
+        });
+        
+        const checklistCheckboxes = noteentry.querySelectorAll('.checklist-checkbox');
+        checklistCheckboxes.forEach(function(checkbox) {
+            const savedChecked = checkbox.getAttribute('data-checked');
+            if (savedChecked === '1') {
+                checkbox.checked = true;
+                console.log('Restored checklist checkbox state: checked');
+            } else if (savedChecked === '0') {
+                checkbox.checked = false;
+                console.log('Restored checklist checkbox state: unchecked');
+            }
+        });
+    }
+    
     // Initialize Excalidraw border preferences
     if (typeof applyExcalidrawBorderPreferences === 'function') {
         applyExcalidrawBorderPreferences();

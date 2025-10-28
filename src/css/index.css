@@ -3319,3 +3319,42 @@ body.dark-mode .create-section h4 {
     color: #aaa;
 }
 
+/* ===== CHECKLIST STYLES ===== */
+.checklist {
+    list-style: none;
+    padding-left: 0;
+    margin: 8px 0;
+}
+
+.checklist-item {
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checklist-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin: 2px 0;
+}
+
+.checklist-text {
+    cursor: text;
+    flex: 1;
+}
+
+.checklist-checkbox:checked + .checklist-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #999;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .checklist-checkbox:checked + .checklist-text,
+body.dark-mode .checklist-checkbox:checked + .checklist-text {
+    color: #666;
+}
+
