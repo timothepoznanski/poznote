@@ -167,8 +167,9 @@ Your contribution would help make Poznote accessible to the entire macOS communi
 
 <details>
 <summary><strong>☁️ Cloud</strong></summary>
+<br>
 
-**👉 [Use Poznote in the Cloud](#use-poznote-in-the-cloud)**
+**See section [Use Poznote in the Cloud](#use-poznote-in-the-cloud)**
 
 </details>
 
