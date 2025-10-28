@@ -50,7 +50,7 @@ Choose your preferred installation method below.
 #### Step 1: Prerequisite
 
 1. Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
-2. Install [Git for Windows](https://git-scm.com/download/win)
+2. Install [Git for Windows](https://git-scm.com/install/windows)
 
 #### Step 2: Deploy Poznote
 
@@ -100,7 +100,7 @@ docker compose up -d
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/linux)
-3. Install Git (usually pre-installed, or use `sudo apt install git` / `sudo yum install git`)
+2. Install [Git for Linux](https://git-scm.com/install/linux)
 
 #### Step 2: Install Poznote
 
