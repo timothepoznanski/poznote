@@ -49,49 +49,34 @@ Choose your preferred installation method below.
 
 #### Step 1: Prerequisite
 
-Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+1. Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/windows-install/)
+2. Install [Git for Windows](https://git-scm.com/download/win)
 
 #### Step 2: Deploy Poznote
 
 Open Powershell and run the following commands:
 
-Create a new directory for Poznote:
+Choose a directory name for your Poznote installation:
 ```powershell
-mkdir poznote
+$POZNOTE_DIR = "poznote"
+```
+
+Clone Poznote repository to get the latest configuration files:
+```powershell
+git clone https://github.com/timothepoznanski/poznote.git $POZNOTE_DIR
 ```
 
 Navigate to the Poznote directory:
 ```powershell
-cd poznote
+cd $POZNOTE_DIR
 ```
 
-Create environment file with default credentials and port configuration:
+Create environment file from template:
 ```powershell
-@"
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-"@ | Out-File -FilePath .env -Encoding UTF8
+Copy-Item .env.template .env
 ```
 
-Create Docker Compose configuration file for Poznote service:
-```powershell
-@"
-services:
-  webserver:
-    image: ghcr.io/timothepoznanski/poznote:latest
-    restart: always
-    environment:
-      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: `${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: `${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: `${HTTP_WEB_PORT}
-    ports:
-      - "`${HTTP_WEB_PORT}:80"
-    volumes:
-      - "./data:/var/www/html/data"
-"@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
-```
+> 💡 **Optional:** Edit the `.env` file to customize your username, password, or port before starting.
 
 Download the latest Poznote Docker image:
 ```powershell
@@ -112,48 +97,33 @@ docker compose up -d
 
 1. Install [Docker engine](https://docs.docker.com/engine/install/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/linux)
+3. Install Git (usually pre-installed, or use `sudo apt install git` / `sudo yum install git`)
 
 #### Step 2: Install Poznote
 
 Open a Terminal and run the following commands:
 
-Create a new directory for Poznote:
+Choose a directory name for your Poznote installation:
 ```bash
-mkdir poznote
+POZNOTE_DIR="poznote"
+```
+
+Clone Poznote repository to get the latest configuration files:
+```bash
+git clone https://github.com/timothepoznanski/poznote.git $POZNOTE_DIR
 ```
 
 Navigate to the Poznote directory:
 ```bash
-cd poznote
+cd $POZNOTE_DIR
 ```
 
-Create environment file with default credentials and port configuration:
+Create environment file from template:
 ```bash
-cat <<EOF > .env
-POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
-HTTP_WEB_PORT=8040
-EOF
+cp .env.template .env
 ```
 
-Create Docker Compose configuration file for Poznote service:
-```bash
-cat <<'EOF' > docker-compose.yml
-services:
-  webserver:
-    image: ghcr.io/timothepoznanski/poznote:latest
-    restart: always
-    environment:
-      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
-      POZNOTE_USERNAME: ${POZNOTE_USERNAME}
-      POZNOTE_PASSWORD: ${POZNOTE_PASSWORD}
-      HTTP_WEB_PORT: ${HTTP_WEB_PORT}
-    ports:
-      - "${HTTP_WEB_PORT}:80"
-    volumes:
-      - "./data:/var/www/html/data"
-EOF
-```
+> 💡 **Optional:** Edit the `.env` file to customize your username, password, or port before starting.
 
 Download the latest Poznote Docker image:
 ```bash
@@ -219,24 +189,26 @@ To retrieve your password:
 
 ## Update to the latest version
 
-> **2025-10-28 — ⚠️ IMPORTANT: Migration from 1.3.X to 1.4.X**
->
-> **Before upgrading from version 1.3.X to 1.4.X, you MUST update your `docker-compose.yml` file!**
->
-> Remove the last command line from your existing `docker-compose.yml` to avoid deployment errors. The new `docker-compose.yml` structure no longer includes this line.
->>
-> [See updated docker-compose.yml file in README](https://github.com/timothepoznanski/poznote?tab=readme-ov-file#install)
-
 To update Poznote to the latest version:
+
+Set your Poznote directory name (replace with your actual directory name):
+```bash
+POZNOTE_DIR="poznote"
+```
 
 Navigate to your Poznote directory:
 ```bash
-cd poznote
+cd $POZNOTE_DIR
 ```
 
 Stop the running container before updating:
 ```bash
 docker compose down
+```
+
+Pull the latest configuration files from the repository:
+```bash
+git pull origin main
 ```
 
 Remove the current image to force download of latest version:
