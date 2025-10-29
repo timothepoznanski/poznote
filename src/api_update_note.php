@@ -180,7 +180,24 @@ if (!is_dir($entriesDir)) {
     mkdir($entriesDir, 0755, true);
 }
 if (!empty($entry)) {
-    $write_result = file_put_contents($filename, $entry);
+    // For markdown notes, ensure we save clean markdown content, not HTML
+    $contentToSave = $entry;
+    if ($noteType === 'markdown') {
+        // If the entry contains HTML elements (like <div class="markdown-editor">), extract the text content
+        if (strpos($entry, '<div class="markdown-editor"') !== false) {
+            // Extract text from between the editor tags
+            if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
+                $contentToSave = strip_tags($matches[1]);
+                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } else {
+                // Fallback: strip all HTML tags
+                $contentToSave = strip_tags($entry);
+                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+        }
+    }
+    
+    $write_result = file_put_contents($filename, $contentToSave);
     if ($write_result === false) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Failed to write file']);

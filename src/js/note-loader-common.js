@@ -144,18 +144,15 @@ function findNoteLinkById(noteId) {
  */
 window.loadNoteDirectly = function(url, noteId, event) {
     try {
-        console.log('[Poznote Auto-Save Debug] loadNoteDirectly called for note #' + noteId);
         
         // Check for unsaved changes in current note before proceeding
         var currentNoteId = window.noteid;
         if (currentNoteId && currentNoteId !== noteId && typeof window.hasUnsavedChanges === 'function') {
             if (window.hasUnsavedChanges(currentNoteId)) {
-                console.log('[Poznote Auto-Save] BLOCKING loadNoteDirectly due to unsaved changes in note #' + currentNoteId);
                 
                 // Show save in progress notification
                 if (typeof window.showSaveInProgressNotification === 'function') {
                     window.showSaveInProgressNotification(function() {
-                        console.log('[Poznote Auto-Save] Save completed, retrying loadNoteDirectly for note #' + noteId);
                         window.loadNoteDirectly(url, noteId, null);
                     });
                     return false;
@@ -163,7 +160,6 @@ window.loadNoteDirectly = function(url, noteId, event) {
             }
         }
         
-        console.log('[Poznote Auto-Save Debug] Proceeding with loadNoteDirectly - no unsaved changes detected');
         
         // loadNoteDirectly start
         // Prevent default link behavior
@@ -182,7 +178,6 @@ window.loadNoteDirectly = function(url, noteId, event) {
         if (typeof notesNeedingRefresh !== 'undefined') {
             needsRefresh = notesNeedingRefresh.has(String(noteId));
             if (needsRefresh) {
-                console.log('[Poznote Auto-Save] Note #' + noteId + ' needs refresh - forcing reload from server');
                 notesNeedingRefresh.delete(String(noteId)); // Remove from list
             }
         }
@@ -250,7 +245,6 @@ window.loadNoteDirectly = function(url, noteId, event) {
 
                                     // If this was a forced refresh, skip auto-draft restore
                                     if (needsRefresh && typeof checkForUnsavedDraft === 'function') {
-                                        console.log('[Poznote Auto-Save] Forced refresh completed, skipping draft restore');
                                         setTimeout(() => {
                                             checkForUnsavedDraft(noteId, true); // true = skip auto restore
                                         }, 100);
@@ -972,7 +966,6 @@ function reinitializeNoteContent() {
 
     // Force interface refresh to sync with loaded content - but don't trigger auto-save
     // since content was just loaded from server and is already saved
-    console.log('[Poznote Auto-Save] Content loaded from server for note #' + (window.noteid || 'unknown') + ' - no auto-save needed');
 
     // Mark that note loading is complete
     window.isLoadingNote = false;
