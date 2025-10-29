@@ -144,6 +144,23 @@ function findNoteLinkById(noteId) {
  */
 window.loadNoteDirectly = function(url, noteId, event) {
     try {
+        
+        // Check for unsaved changes in current note before proceeding
+        var currentNoteId = window.noteid;
+        if (currentNoteId && currentNoteId !== noteId && typeof window.hasUnsavedChanges === 'function') {
+            if (window.hasUnsavedChanges(currentNoteId)) {
+                
+                // Show save in progress notification
+                if (typeof window.showSaveInProgressNotification === 'function') {
+                    window.showSaveInProgressNotification(function() {
+                        window.loadNoteDirectly(url, noteId, null);
+                    });
+                    return false;
+                }
+            }
+        }
+        
+        
         // loadNoteDirectly start
         // Prevent default link behavior
         if (event) {
@@ -151,63 +168,21 @@ window.loadNoteDirectly = function(url, noteId, event) {
             event.stopPropagation();
         }
         
-        // Check for unsaved changes before navigating
-        // Skip this check if we're being called recursively from the confirmation modal callback
-        if (!window._skipUnsavedCheck &&
-            typeof editedButNotSaved !== 'undefined' && editedButNotSaved === 1 &&
-            typeof updateNoteEnCours !== 'undefined' && updateNoteEnCours === 0 &&
-            typeof noteid !== 'undefined' && noteid !== -1 && noteid !== 'search') {
-            
-            // Use modal instead of browser confirm to prevent race conditions
-            // and ensure the UI doesn't change until user responds
-            var confirmationMessage = 'You have unsaved changes. Are you sure you want to switch notes without saving?';
-            
-            // Store the parameters for use in the callback
-            window.pendingNoteLoadUrl = url;
-            window.pendingNoteLoadId = noteId;
-            window.pendingNoteLoadEvent = event;
-            
-            // Use the modal-based confirmation if available, otherwise use browser confirm
-            if (typeof showConfirmModal === 'function') {
-                showConfirmModal('Confirmation', confirmationMessage, function() {
-                    // User clicked OK - proceed with loading the note
-                    // Call the main loading logic (skip the unsaved check this time)
-                    window._skipUnsavedCheck = true;
-                    window.loadNoteDirectly(window.pendingNoteLoadUrl, window.pendingNoteLoadId, null);
-                    window._skipUnsavedCheck = false;
-                    
-                    // Clean up
-                    window.pendingNoteLoadUrl = null;
-                    window.pendingNoteLoadId = null;
-                    window.pendingNoteLoadEvent = null;
-                }, { danger: true }, function() {
-                    // User clicked "Save and Exit" - save first, then proceed with loading the note
-                    if (typeof updatenote === 'function') {
-                        updatenote(); // Save the current note
-                    }
-                    
-                    // After saving, proceed with loading the note (skip the unsaved check this time)
-                    window._skipUnsavedCheck = true;
-                    window.loadNoteDirectly(window.pendingNoteLoadUrl, window.pendingNoteLoadId, null);
-                    window._skipUnsavedCheck = false;
-                    
-                    // Clean up
-                    window.pendingNoteLoadUrl = null;
-                    window.pendingNoteLoadId = null;
-                    window.pendingNoteLoadEvent = null;
-                });
-            } else {
-                // Fallback to browser confirm
-                if (!confirm(confirmationMessage)) {
-                    return false;
-                }
-            }
-            
-            // If modal is used, we return here and let the modal callback handle the rest
-            if (typeof showConfirmModal === 'function') {
-                return false;
+        // Cancel any pending auto-save operations for the previous note
+        if (typeof saveTimeout !== 'undefined') {
+            clearTimeout(saveTimeout);
+        }
+        
+        // Check if this note needs a refresh (was left before auto-save completed)
+        var needsRefresh = false;
+        if (typeof notesNeedingRefresh !== 'undefined') {
+            needsRefresh = notesNeedingRefresh.has(String(noteId));
+            if (needsRefresh) {
+                notesNeedingRefresh.delete(String(noteId)); // Remove from list
             }
         }
+        
+        // Auto-save ensures no changes are lost during navigation
         
         // Prevent multiple simultaneous loads
         if (window.isLoadingNote) {
@@ -221,6 +196,13 @@ window.loadNoteDirectly = function(url, noteId, event) {
         // Show loading state immediately
         showNoteLoadingState();
         
+        // If note needs refresh, add cache-busting parameter
+        var finalUrl = url;
+        if (needsRefresh) {
+            var separator = url.includes('?') ? '&' : '?';
+            finalUrl = url + separator + '_refresh=' + Date.now();
+        }
+        
         // On mobile, add note-open class
         if (isMobileDevice()) {
             document.body.classList.add('note-open');
@@ -228,7 +210,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
 
         // Create XMLHttpRequest
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
+        xhr.open('GET', finalUrl, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         xhr.onreadystatechange = function() {
@@ -254,18 +236,27 @@ window.loadNoteDirectly = function(url, noteId, event) {
 
                                     currentRightColumn.innerHTML = rightColumn.innerHTML;
                                     
-                                    // Reset edit flags for the new note since it just loaded fresh
-                                    if (typeof editedButNotSaved !== 'undefined') {
-                                        editedButNotSaved = 0;
-                                    }
-                                    if (typeof updateNoteEnCours !== 'undefined') {
-                                        updateNoteEnCours = 0;
-                                    }
+                                    // Auto-save handles all state management automatically
                                     
                                     // Update URL before reinitializing so reinitializeNoteContent
                                     // can detect the 'note' param and keep the right column visible
                                     updateBrowserUrl(url, noteId);
                                     reinitializeNoteContent();
+
+                                    // If this was a forced refresh, skip auto-draft restore
+                                    if (needsRefresh && typeof checkForUnsavedDraft === 'function') {
+                                        setTimeout(() => {
+                                            checkForUnsavedDraft(noteId, true); // true = skip auto restore
+                                        }, 100);
+                                        
+                                        // Clean up the URL by removing the _refresh parameter
+                                        if (window.history && window.history.replaceState) {
+                                            var cleanUrl = url.replace(/[?&]_refresh=\d+/, '');
+                                            // Remove trailing ? or & if they exist
+                                            cleanUrl = cleanUrl.replace(/[?&]$/, '');
+                                            window.history.replaceState(null, '', cleanUrl);
+                                        }
+                                    }
 
                                     // Auto-scroll to right column on mobile after note is loaded
                                     // Only if the user clicked on a note (sessionStorage flag)
@@ -416,13 +407,7 @@ function loadNoteViaAjax(url, noteId, clickedLink) {
 
                             currentRightColumn.innerHTML = rightColumn.innerHTML;
 
-                            // Reset edit flags for the new note since it just loaded fresh
-                            if (typeof editedButNotSaved !== 'undefined') {
-                                editedButNotSaved = 0;
-                            }
-                            if (typeof updateNoteEnCours !== 'undefined') {
-                                updateNoteEnCours = 0;
-                            }
+                            // Auto-save handles all state management automatically
 
                             // Update URL before reinitializing so reinitializeNoteContent
                             // can detect the 'note' param and keep the right column visible
@@ -861,6 +846,11 @@ function downloadImage(imageSrc) {
 function reinitializeNoteContent() {
     // Re-initialize any JavaScript components that might be in the loaded content
 
+    // Re-initialize auto-save state for the current note
+    if (typeof window.reinitializeAutoSaveState === 'function') {
+        window.reinitializeAutoSaveState();
+    }
+
     // Re-initialize search highlighting if in search mode.
     // Prefer the centralized helper which knows about notes/tags/folders.
     if (isSearchMode) {
@@ -973,6 +963,12 @@ function reinitializeNoteContent() {
             }
         }
     }
+
+    // Force interface refresh to sync with loaded content - but don't trigger auto-save
+    // since content was just loaded from server and is already saved
+
+    // Mark that note loading is complete
+    window.isLoadingNote = false;
 }
 
 /**
@@ -1005,14 +1001,14 @@ function deleteImage(img) {
         }
         
         // Trigger note update to save changes
-        if (typeof updateNote === 'function') {
-            updateNote(); // Mark note as edited
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified(); // Mark note as edited
         }
         
         // Trigger automatic save after a short delay
         setTimeout(function() {
-            if (typeof updatenote === 'function') {
-                updatenote(); // Save to server
+            if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately(); // Save to server
             }
         }, 100);
         

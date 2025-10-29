@@ -1,8 +1,5 @@
 // Variables globales de l'application
-var editedButNotSaved = 0;
-var lastudpdate;
 var noteid = -1;
-var updateNoteEnCours = 0;
 var selectedFolder = 'Default';
 var defaultFolderName = 'Default';
 var selectedWorkspace = 'Poznote';

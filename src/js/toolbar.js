@@ -812,8 +812,8 @@ function addLinkToNote() {
           
           // Save the note automatically
           const noteentry = document.querySelector('.noteentry');
-          if (noteentry && typeof window.updatenote === 'function') {
-            window.updatenote();
+          if (noteentry && typeof window.saveNoteImmediately === 'function') {
+            window.saveNoteImmediately();
           }
         }
         
@@ -878,8 +878,8 @@ function addLinkToNote() {
       
       // Save the note automatically
       const noteentry = document.querySelector('.noteentry');
-      if (noteentry && typeof window.updatenote === 'function') {
-        window.updatenote();
+      if (noteentry && typeof window.saveNoteImmediately === 'function') {
+        window.saveNoteImmediately();
       }
       
       // Clean up saved range and existing link reference
@@ -1284,31 +1284,30 @@ function serializeChecklistsBeforeSave(noteentry) {
 if (!window._checklistSaveHookInstalled) {
   window._checklistSaveHookInstalled = true;
   
-  // Hook for lowercase updatenote
-  const originalUpdateNote = window.updatenote;
-  window.updatenote = function() {
+  // Hook for legacy updatenote function
+  const originalSaveNoteImmediately = window.saveNoteImmediately;
+  window.saveNoteImmediately = function() {
     const noteentry = document.querySelector('.noteentry');
     if (noteentry) {
       serializeChecklistsBeforeSave(noteentry);
     }
     
-    if (typeof originalUpdateNote === 'function') {
-      originalUpdateNote();
+    if (typeof originalSaveNoteImmediately === 'function') {
+      originalSaveNoteImmediately();
     } else if (typeof saveNoteToServer === 'function') {
       saveNoteToServer();
     }
   };
   
-  // Hook for capital UpdateNote - IMPORTANT: find the actual updateNote function first
-  // It's called from notes.js, so we need to wrap it too
-  if (typeof window.updateNote === 'function') {
-    const originalCapitalUpdateNote = window.updateNote;
-    window.updateNote = function() {
+  // Hook for markNoteAsModified function
+  if (typeof window.markNoteAsModified === 'function') {
+    const originalMarkNoteAsModified = window.markNoteAsModified;
+    window.markNoteAsModified = function() {
       const noteentry = document.querySelector('.noteentry');
       if (noteentry) {
         serializeChecklistsBeforeSave(noteentry);
       }
-      return originalCapitalUpdateNote();
+      return originalMarkNoteAsModified();
     };
   }
 }
@@ -1357,12 +1356,12 @@ function insertChecklist() {
           if (input) input.focus();
           
           // Trigger save with 15-second delay (same as regular text editing)
-          if (typeof window.updateNote === 'function') {
-            window.updateNote();
-          } else if (typeof window.updatenote === 'function') {
-            window.updatenote();
+          if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+          } else if (typeof window.saveNoteImmediately === 'function') {
+            window.saveNoteImmediately();
           } else {
-            window.editedButNotSaved = 1;
+            // Auto-save handles state management automatically
           }
         }, 10);
       }
