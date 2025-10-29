@@ -599,9 +599,9 @@ $body_classes = trim($extra_body_classes);
                     $note_type = $row['type'] ?? 'note';
                     
                     if ($note_type === 'tasklist') {
-                        // For task list notes, use the database content (JSON) instead of HTML file
-                        $entryfinal = '';
-                        $tasklist_json = htmlspecialchars($row['entry'] ?? '', ENT_QUOTES);
+                        // For task list notes, use the JSON content from file
+                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        $tasklist_json = htmlspecialchars($entryfinal, ENT_QUOTES);
                     } else {
                         // For all other notes (including Excalidraw), use the HTML file content
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
@@ -864,10 +864,12 @@ $body_classes = trim($extra_body_classes);
                     $data_attr = '';
                     
                     if ($note_type === 'tasklist') {
-                        // For tasklist, properly encode JSON for HTML attribute
-                        $tasklist_json_raw = $row['entry'] ?? '';
+                        // For tasklist, properly encode JSON for HTML attribute from file content
+                        $tasklist_json_raw = $entryfinal; // Use file content instead of database
                         $tasklist_json_encoded = htmlspecialchars($tasklist_json_raw, ENT_QUOTES);
                         $data_attr = ' data-tasklist-json="'.$tasklist_json_encoded.'"';
+                        // Display empty content initially, will be replaced by JavaScript
+                        $display_content = '';
                     }
                     
                     // For markdown notes, store the markdown content in a data attribute

@@ -348,6 +348,39 @@ function restoreBackup($uploadedFile) {
     }
 }
 
+function extractTaskListFromHTML($htmlContent) {
+    $tasks = [];
+    
+    // Use DOMDocument to parse HTML
+    $dom = new DOMDocument();
+    @$dom->loadHTML($htmlContent, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    
+    $xpath = new DOMXPath($dom);
+    $taskItems = $xpath->query('//div[contains(@class, "task-item")]');
+    
+    foreach ($taskItems as $taskItem) {
+        $taskId = $taskItem->getAttribute('data-task-id');
+        if (!$taskId) continue;
+        
+        $classes = $taskItem->getAttribute('class');
+        $completed = strpos($classes, 'completed') !== false;
+        $important = strpos($classes, 'important') !== false;
+        
+        // Find task text
+        $textSpan = $xpath->query('.//span[contains(@class, "task-text")]', $taskItem)->item(0);
+        $text = $textSpan ? trim($textSpan->textContent) : '';
+        
+        $tasks[] = [
+            'id' => floatval($taskId),
+            'text' => $text,
+            'completed' => $completed,
+            'important' => $important
+        ];
+    }
+    
+    return json_encode($tasks);
+}
+
 function importNotesZip($uploadedFile) {
     global $con;
     
@@ -414,8 +447,26 @@ function importNotesZip($uploadedFile) {
             continue;
         }
         
-        // Determine note type based on file extension
+        // Determine note type based on file extension and content
         $noteType = ($fileExtension === 'md') ? 'markdown' : 'note';
+        
+        // Check if content is valid JSON (indicates tasklist)
+        $trimmedContent = trim($content);
+        if ($noteType === 'note' && $trimmedContent !== '' && 
+            ($trimmedContent[0] === '[' || $trimmedContent[0] === '{')) {
+            // Try to decode as JSON
+            $jsonTest = json_decode($trimmedContent, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonTest)) {
+                $noteType = 'tasklist';
+            }
+        } elseif ($noteType === 'note' && strpos($content, 'task-item') !== false) {
+            // Check if HTML content contains task items (exported tasklist)
+            if (preg_match('/<div[^>]*class="[^"]*task-item[^"]*"/', $content)) {
+                $noteType = 'tasklist';
+                // Convert HTML tasklist to JSON
+                $content = extractTaskListFromHTML($content);
+            }
+        }
         
         // Extract title from content
         $title = 'Imported Note';
@@ -429,6 +480,9 @@ function importNotesZip($uploadedFile) {
                     break;
                 }
             }
+        } elseif ($noteType === 'tasklist') {
+            // For tasklist files, use the filename without extension as title
+            $title = pathinfo($baseFilename, PATHINFO_FILENAME);
         } else {
             // For HTML files, try to extract title from <title> or <h1> tags
             if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $content, $matches)) {
@@ -471,13 +525,13 @@ function importNotesZip($uploadedFile) {
                 }
                 
                 // Update existing entry
-                $updateStmt = $con->prepare("UPDATE entries SET heading = ?, type = ?, updated = datetime('now') WHERE id = ?");
-                $updateStmt->execute([$title, $noteType, $noteId]);
+                $updateStmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, type = ?, updated = datetime('now') WHERE id = ?");
+                $updateStmt->execute([$title, $content, $noteType, $noteId]);
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
-                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, workspace, type, created, updated, trash, favorite) VALUES (?, ?, '', 'Default', 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $noteType]);
+                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, 'Default', 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
+                $insertStmt->execute([$noteId, $title, $content, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
@@ -497,7 +551,7 @@ function importNotesZip($uploadedFile) {
 
     unlink($tempFile);
     
-    $message = "Processed note files: {$importedCount} imported, {$updatedCount} updated (HTML and Markdown).";
+    $message = "Processed note files: {$importedCount} imported, {$updatedCount} updated (HTML, Markdown, and Tasklist).";
     if (!empty($errors)) {
         $message .= " Errors: " . implode('; ', $errors);
     }

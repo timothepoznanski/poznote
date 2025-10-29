@@ -406,3 +406,7 @@ function updateTitleInElement(linkElement, newTitle) {
         linkElement.setAttribute('data-note-id', newTitle);
     }
 }
+
+// Expose functions globally
+window.saveNoteToServer = saveNoteToServer;
+window.deleteNote = deleteNote;

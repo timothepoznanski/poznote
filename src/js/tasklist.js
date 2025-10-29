@@ -10,7 +10,6 @@ function initializeTaskList(noteId, noteType) {
     // Get existing tasks from the data attribute or initialize empty array
     let tasks = [];
     const tasklistJson = noteEntry.dataset.tasklistJson;
-    console.log('[Tasklist Debug] Raw tasklistJson:', tasklistJson);
     
     if (tasklistJson && tasklistJson.trim() !== '') {
         // Check if it looks like JSON (starts with [ or {)
@@ -18,7 +17,6 @@ function initializeTaskList(noteId, noteType) {
         if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
             try {
                 tasks = JSON.parse(tasklistJson);
-                console.log('[Tasklist Debug] Successfully parsed tasks:', tasks);
             } catch (e) {
                 console.error('Failed to parse tasklist JSON:', e);
                 console.error('Problematic JSON content:', tasklistJson);
@@ -26,16 +24,8 @@ function initializeTaskList(noteId, noteType) {
                 tasks = [];
             }
         } else {
-            console.warn('[Tasklist Debug] tasklistJson does not look like JSON, attempting to recover from HTML or initializing empty list');
-            
             // Try to extract tasks from existing HTML if present
             tasks = extractTasksFromHTML(noteEntry) || [];
-            
-            if (tasks.length === 0) {
-                console.log('[Tasklist Debug] No tasks found in HTML, initializing empty list');
-            } else {
-                console.log('[Tasklist Debug] Recovered', tasks.length, 'tasks from HTML');
-            }
         }
     }
 
@@ -74,7 +64,7 @@ function extractTasksFromHTML(noteEntry) {
         
         return tasks.length > 0 ? tasks : null;
     } catch (e) {
-        console.error('[Tasklist Debug] Error extracting tasks from HTML:', e);
+        console.error('Error extracting tasks from HTML:', e);
         return null;
     }
 }
@@ -427,7 +417,7 @@ function getTaskListData(noteId) {
         const tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
         return JSON.stringify(tasks);
     } catch (e) {
-        console.error('[Tasklist Debug] Error getting task list data:', e);
+        console.error('Error getting task list data:', e);
         return '';
     }
 }
