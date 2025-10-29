@@ -331,8 +331,6 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
-⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
-
 <a id="automated-backup-script"></a>
 **🤖 Automated Backup Script**
 

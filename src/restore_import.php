@@ -788,19 +788,22 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 <body>
     <div class="backup-container">
         <h1>Restore / Import</h1>
-        
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
             Back to Notes
         </a>
         <a href="settings.php" class="btn btn-secondary">
             Back to Settings
         </a>
+
         <br><br>
-        
-        <!-- Complete Import Section -->
+        <div>⚠️ Complete Restore will restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces.</div>
+        <br>
+        <div> If you want to know more about why we have several retore methods : <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <br><br>
+        <!-- Standard Complete Restore Section -->
         <div class="backup-section">
-            <h3>Complete Restore</h3>
-            <p>Upload a complete backup ZIP file to restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            <h3>Backup file sizes less than 500MB - Standard Complete Restore</h3>
+            <p>Upload a complete backup ZIP file. This method is fast and simple.</p>
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
                 <div class="alert alert-success">
@@ -818,10 +821,11 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 <input type="hidden" name="action" value="complete_restore">
                 <div class="form-group">
                     <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
+                    <small class="form-text text-muted">Maximum recommended size: 500MB. For larger files, use chunked upload below.</small>
                 </div>
                 
                 <button type="button" id="completeRestoreBtn" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
-                    <span> Complete Restore
+                    <span> Start Complete Restore (Standard)
                 </button>
                 <!-- Spinner shown while processing restore -->
                 <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
@@ -830,6 +834,86 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
                 </div>
             </form>
+        </div>
+
+        <!-- Chunked Complete Restore Section -->
+        <div class="backup-section">
+            <h3>Backup file sizes between 500MB and 800MB - Chunked Complete Restore</h3>
+            <p>Upload a complete backup ZIP file. Use this method to avoid HTTP timeouts and memory issues.</p>            <div id="chunkedUploadStatus" style="display: none;">
+                <div class="progress-bar">
+                    <div id="chunkedProgress" class="progress-fill" style="width: 0%;">0%</div>
+                </div>
+                <div id="chunkedStatusText">Preparing upload...</div>
+            </div>
+
+            <div id="chunkedUploadForm">
+                <div class="form-group">
+                    <input type="file" id="chunked_backup_file" accept=".zip">
+                    <small class="form-text text-muted">Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.</small>
+                </div>
+                
+                <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" onclick="startChunkedRestore()" disabled>
+                    Start Complete Restore (Chunked)
+                </button>
+            </div>
+        </div>
+
+        <!-- Direct File Copy Section -->
+        <div class="backup-section">
+            <h3>Backup file sizes more than 800MB - Direct File Copy</h3>
+            <p>For very large backup files, use this simple direct file copy method. <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
+
+            <form method="post">
+                <input type="hidden" name="action" value="check_cli_upload">
+                <button type="submit" class="btn btn-primary">
+                    Start Complete Restore (Direct copy)
+                </button>
+            </form>
+
+            <?php if (isset($_POST['action']) && $_POST['action'] === 'check_cli_upload'): ?>
+                <?php
+                $cliBackupPath = '/tmp/backup_restore.zip';
+                if (file_exists($cliBackupPath)) {
+                    $fileSize = filesize($cliBackupPath);
+                    $fileSizeMB = round($fileSize / 1024 / 1024, 2);
+                    echo "<div class='alert alert-info'>";
+                    echo "<strong>Backup file found:</strong> {$fileSizeMB}MB<br>";
+                    echo "<strong>Ready to restore?</strong> This will replace all data in ALL workspaces.";
+                    echo "</div>";
+
+                    // Show confirmation form
+                    echo "<form method='post' style='margin-top: 10px;'>";
+                    echo "<input type='hidden' name='action' value='restore_cli_upload'>";
+                    echo "<button type='submit' class='btn btn-warning' onclick='return confirm(\"Are you sure you want to restore from the direct-copied file?\\n\\nThis will replace your database, restore all notes, and attachments for ALL workspaces.\\n\\nThis action cannot be undone!\")'>";
+                    echo "Yes, Restore from Direct Copy";
+                    echo "</button>";
+                    echo "</form>";
+                } else {
+                    echo "<div class='alert alert-warning'>";
+                    echo "No backup file found in container at <code>/tmp/backup_restore.zip</code><br>";
+                    echo "Please run the docker cp command first.";
+                    echo "</div>";
+                }
+                ?>
+            <?php endif; ?>
+
+            <?php if (isset($_POST['action']) && $_POST['action'] === 'restore_cli_upload'): ?>
+                <?php
+                $cliBackupPath = '/tmp/backup_restore.zip';
+                if (file_exists($cliBackupPath)) {
+                    $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip']);
+                    if ($result['success']) {
+                        echo "<div class='alert alert-success'>Direct file copy restore completed successfully! " . htmlspecialchars($result['message']) . "</div>";
+                        // Clean up the file after successful restore
+                        unlink($cliBackupPath);
+                    } else {
+                        echo "<div class='alert alert-danger'>Direct file copy restore failed: " . htmlspecialchars($result['error']) . "</div>";
+                    }
+                } else {
+                    echo "<div class='alert alert-danger'>Backup file not found for restoration.</div>";
+                }
+                ?>
+            <?php endif; ?>
         </div>
         
         <!-- Individual Notes Import Section -->
@@ -861,7 +945,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 <br>
                 
                 <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()">
-                    Import Notes
+                    Start Import Individual Notes
                 </button>
             </form>
         </div>
@@ -967,6 +1051,130 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     </div>
     
     <script src="js/restore-import.js"></script>
+    <script src="js/chunked-uploader.js"></script>
+    <script>
+        // Standard upload file size check
+        document.getElementById('complete_backup_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const button = document.getElementById('completeRestoreBtn');
+            const sizeText = document.querySelector('#completeRestoreBtn').parentElement.querySelector('small');
+            
+            if (file && file.name.toLowerCase().endsWith('.zip')) {
+                const sizeMB = file.size / (1024 * 1024);
+                
+                if (sizeMB > 500) {
+                    button.disabled = true;
+                    button.textContent = 'File too large - use chunked upload';
+                    sizeText.textContent = '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Use chunked upload below for files over 500MB to 800MB.';
+                    sizeText.style.color = '#dc3545';
+                } else {
+                    button.disabled = false;
+                    button.textContent = 'Complete Restore';
+                    sizeText.textContent = 'Maximum recommended size: 500MB. For larger files, use chunked upload below.';
+                    sizeText.style.color = '#6c757d';
+                }
+            }
+        });
+
+        // Chunked upload functionality
+        let chunkedUploader = null;
+
+        // Enable/disable chunked restore button based on file selection
+        document.getElementById('chunked_backup_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const button = document.getElementById('chunkedRestoreBtn');
+            const sizeText = document.querySelector('#chunkedUploadForm small');
+            
+            if (file && file.name.toLowerCase().endsWith('.zip')) {
+                const sizeMB = file.size / (1024 * 1024);
+                
+                if (sizeMB < 500) {
+                    button.disabled = true;
+                    button.textContent = 'Use Standard Upload (smaller files)';
+                    sizeText.textContent = 'For files under 500MB, use the standard upload method above.';
+                } else {
+                    button.disabled = false;
+                    button.textContent = `Start Chunked Restore (${formatFileSize(file.size)})`;
+                    sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
+                }
+            } else {
+                button.disabled = true;
+                button.textContent = 'Start Chunked Restore';
+                sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
+            }
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function startChunkedRestore() {
+            const fileInput = document.getElementById('chunked_backup_file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a backup file first.');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to restore from "${file.name}"?\n\nThis will replace your database, restore all notes, and attachments for ALL workspaces.\n\nThis action cannot be undone!`)) {
+                return;
+            }
+
+            // Show progress UI
+            document.getElementById('chunkedUploadForm').style.display = 'none';
+            document.getElementById('chunkedUploadStatus').style.display = 'block';
+            
+            const progressBar = document.getElementById('chunkedProgress');
+            const statusText = document.getElementById('chunkedStatusText');
+            
+            // Initialize uploader
+            chunkedUploader = new ChunkedUploader({
+                chunkSize: 5 * 1024 * 1024, // 5MB chunks
+                onProgress: (percent) => {
+                    progressBar.style.width = percent + '%';
+                    progressBar.textContent = Math.round(percent) + '%';
+                    statusText.textContent = `Uploading... ${Math.round(percent)}% complete`;
+                },
+                onComplete: () => {
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100%';
+                    statusText.textContent = 'Restoration completed successfully!';
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                },
+                onError: (error) => {
+                    statusText.textContent = `Error: ${error.message}`;
+                    progressBar.style.backgroundColor = '#dc3545';
+                    
+                    // Show retry option
+                    const retryBtn = document.createElement('button');
+                    retryBtn.className = 'btn btn-secondary';
+                    retryBtn.textContent = 'Retry';
+                    retryBtn.onclick = () => {
+                        location.reload();
+                    };
+                    document.getElementById('chunkedUploadStatus').appendChild(retryBtn);
+                }
+            });
+
+            // Start upload
+            chunkedUploader.uploadFile(file, 'api_chunked_restore.php');
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (chunkedUploader) {
+                chunkedUploader.cleanup();
+            }
+        });
+    </script>
 </body>
 </html>
 
