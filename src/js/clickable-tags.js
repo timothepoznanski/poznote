@@ -99,7 +99,11 @@ function convertTagsToEditable(noteId) {
     });
     // Hide suggestions on focus out (but allow click into suggestion via mousedown handler)
     tagInput.addEventListener('focus', function() {
-        try { showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId); } catch(e){}
+        try { 
+            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId); 
+        } catch(e) {
+            console.warn('Failed to show tag suggestions on focus:', e);
+        }
     });
     tagInput.addEventListener('blur', function() {
         setTimeout(() => {

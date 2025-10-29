@@ -10,20 +10,29 @@ var notesNeedingRefresh = new Set(); // Track notes that were left before auto-s
 
 // Expose critical functions globally early to prevent ReferenceError during HTML event handlers
 // These may be called before events.js is fully loaded due to inline onfocus handlers
+
+// Generic function to update noteid based on element ID with prefix
+function updateNoteIdFromElement(element, prefixLength) {
+    if (element && element.id) {
+        noteid = element.id.substr(prefixLength);
+    }
+}
+
+// Legacy compatibility functions
 function updateident(el) {
-    if (el && el.id) noteid = el.id.substr(5);
+    updateNoteIdFromElement(el, 5); // 'entry'.length
 }
 function updateidhead(el) {
-    if (el && el.id) noteid = el.id.substr(3);
+    updateNoteIdFromElement(el, 3); // 'inp'.length
 }
 function updateidtags(el) {
-    if (el && el.id) noteid = el.id.substr(4);
+    updateNoteIdFromElement(el, 4); // 'tags'.length
 }
 function updateidfolder(el) {
-    if (el && el.id) noteid = el.id.substr(6);
+    updateNoteIdFromElement(el, 6); // 'folder'.length  
 }
 function updateidsearch(el) {
-    if (el && el.id) noteid = el.id.substr(5);
+    updateNoteIdFromElement(el, 5); // 'search'.length or similar
 }
 
 // Expose to window early
@@ -32,6 +41,11 @@ window.updateidhead = updateidhead;
 window.updateidtags = updateidtags;
 window.updateidfolder = updateidfolder;
 window.updateidsearch = updateidsearch;
+
+// Utility function to extract note ID from entry element
+function extractNoteIdFromEntry(entryElement) {
+    return entryElement && entryElement.id ? entryElement.id.replace('entry', '') : null;
+}
 
 // Utility function to serialize checklist data
 function serializeChecklists(entryElement) {
@@ -96,7 +110,7 @@ function setupNoteEditingEvents() {
                 // IMPORTANT: Set noteid from the noteentry element
                 var noteentry = e.target.closest('.noteentry');
                 if (noteentry) {
-                    var noteIdFromEntry = noteentry.id.replace('entry', '');
+                    var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
                     if (noteIdFromEntry) {
                         noteid = noteIdFromEntry;
                     }
@@ -119,7 +133,7 @@ function setupNoteEditingEvents() {
                     // IMPORTANT: Set noteid from the noteentry element
                     var noteentry = e.target.closest('.noteentry');
                     if (noteentry) {
-                        var noteIdFromEntry = noteentry.id.replace('entry', '');
+                        var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
                         if (noteIdFromEntry) {
                             noteid = noteIdFromEntry;
                         }
@@ -173,7 +187,7 @@ function handleChecklistKeydown(e) {
         // IMPORTANT: Set noteid from the noteentry element
         var noteentry = checklist.closest('.noteentry');
         if (noteentry) {
-            var noteIdFromEntry = noteentry.id.replace('entry', '');
+            var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
             if (noteIdFromEntry) {
                 noteid = noteIdFromEntry;
             }
@@ -254,7 +268,7 @@ function handleChecklistKeydown(e) {
             // IMPORTANT: Set noteid from the noteentry element
             var noteentry = checklist.closest('.noteentry');
             if (noteentry) {
-                var noteIdFromEntry = noteentry.id.replace('entry', '');
+                var noteIdFromEntry = extractNoteIdFromEntry(noteentry);
                 if (noteIdFromEntry) {
                     noteid = noteIdFromEntry;
                 }
@@ -1770,7 +1784,7 @@ function reinitializeAutoSaveState() {
     var currentNoteId = null;
     var entryElem = document.querySelector('[id^="entry"]:not([id*="search"])');
     if (entryElem) {
-        currentNoteId = entryElem.id.replace('entry', '');
+        currentNoteId = extractNoteIdFromEntry(entryElem);
     }
     
     if (currentNoteId && currentNoteId !== 'search' && currentNoteId !== '-1') {

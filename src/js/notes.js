@@ -1,5 +1,16 @@
 // Note management (creation, editing, saving)
 
+// Utility functions for DOM element access
+function getNoteElements(noteId) {
+    return {
+        entry: document.getElementById("entry" + noteId),
+        title: document.getElementById("inp" + noteId),
+        tags: document.getElementById("tags" + noteId),
+        folder: document.getElementById("folder" + noteId),
+        lastUpdated: document.getElementById("lastupdated" + noteId)
+    };
+}
+
 function createNewNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
@@ -110,10 +121,11 @@ function saveNoteToServer() {
     }
 
     // Get note elements of the note
-    var titleInput = document.getElementById("inp" + noteid);
-    var entryElem = document.getElementById("entry" + noteid);
-    var tagsElem = document.getElementById("tags" + noteid);
-    var folderElem = document.getElementById("folder" + noteid);
+    var elements = getNoteElements(noteid);
+    var titleInput = elements.title;
+    var entryElem = elements.entry;
+    var tagsElem = elements.tags;
+    var folderElem = elements.folder;
 
     // Check that elements exist
     if (!titleInput || !entryElem) {
@@ -195,25 +207,23 @@ function handleSaveResponse(data) {
             // Title modified to ensure uniqueness
             updateLastSavedTime(jsonData.date);
             
-            var titleInput = document.getElementById('inp'+noteid);
-            if (titleInput && jsonData.title !== jsonData.original_title) {
-                titleInput.value = jsonData.title;
+            var elements = getNoteElements(noteid);
+            if (elements.title && jsonData.title !== jsonData.original_title) {
+                elements.title.value = jsonData.title;
             }
             
             updateNoteTitleInLeftColumn();
             
             // Update last saved content for change detection with the content that was just saved
-            var entryElem = document.getElementById("entry" + noteid);
-            var titleInput = document.getElementById("inp" + noteid);
-            var tagsElem = document.getElementById("tags" + noteid);
-            if (entryElem) {
-                lastSavedContent = entryElem.innerHTML;
+            var elements = getNoteElements(noteid);
+            if (elements.entry) {
+                lastSavedContent = elements.entry.innerHTML;
             }
-            if (titleInput) {
-                lastSavedTitle = titleInput.value;
+            if (elements.title) {
+                lastSavedTitle = elements.title.value;
             }
-            if (tagsElem) {
-                lastSavedTags = tagsElem.value;
+            if (elements.tags) {
+                lastSavedTags = elements.tags.value;
             }
             updateConnectionStatus(true);
             
@@ -239,17 +249,15 @@ function handleSaveResponse(data) {
         updateNoteTitleInLeftColumn();
         
         // Update last saved content for change detection with the content that was just saved
-        var entryElem = document.getElementById("entry" + noteid);
-        var titleInput = document.getElementById("inp" + noteid);
-        var tagsElem = document.getElementById("tags" + noteid);
-        if (entryElem) {
-            lastSavedContent = entryElem.innerHTML;
+        var elements = getNoteElements(noteid);
+        if (elements.entry) {
+            lastSavedContent = elements.entry.innerHTML;
         }
-        if (titleInput) {
-            lastSavedTitle = titleInput.value;
+        if (elements.title) {
+            lastSavedTitle = elements.title.value;
         }
-        if (tagsElem) {
-            lastSavedTags = tagsElem.value;
+        if (elements.tags) {
+            lastSavedTags = elements.tags.value;
         }
         updateConnectionStatus(true);
         
@@ -345,19 +353,19 @@ function getTextContentFromElement(element) {
 }
 
 function updateLastSavedTime(timeText) {
-    var lastUpdatedElem = document.getElementById('lastupdated' + noteid);
-    if (lastUpdatedElem) {
-        lastUpdatedElem.innerHTML = timeText;
+    var elements = getNoteElements(noteid);
+    if (elements.lastUpdated) {
+        elements.lastUpdated.innerHTML = timeText;
     }
 }
 
 function updateNoteTitleInLeftColumn() {
     if(noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
     
-    var titleInput = document.getElementById('inp' + noteid);
-    if (!titleInput) return;
+    var elements = getNoteElements(noteid);
+    if (!elements.title) return;
     
-    var newTitle = titleInput.value.trim();
+    var newTitle = elements.title.value.trim();
     if (newTitle === '') newTitle = 'Note sans titre';
     
     // Search elements to update
