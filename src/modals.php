@@ -64,7 +64,7 @@
                     <label for="fontSizeInput">Font size (px):</label>
                     <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="15">
                     <div id="defaultFontSizeInfo" class="default-info" style="display: block;">
-                        16 px is the Default value
+                        15 px is the Default value
                     </div>
                     <div class="font-size-preview">
                         <p id="fontSizePreview">This is a preview text</p>

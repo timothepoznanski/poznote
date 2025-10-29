@@ -38,7 +38,7 @@ Capture, organize, and access your notes while keeping full ownership of your da
 
 <br>
 
-![poznote](readme/poznote.png)
+![poznote](poznote.png)
 
 ## Play with Poznote demo
 
@@ -262,14 +262,6 @@ To retrieve your password:
 
 ## Update to the latest version
 
----
-
-> **⚠️ Upgrading to 1.6.X?**
->
-> If this is your case, please follow the instructions at: [https://poznote.com/news.html](https://poznote.com/news.html)
-
----
-
 To update Poznote to the latest version.
 
 Navigate to your Poznote directory:
@@ -330,8 +322,6 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
-
-⚠️ Database import completely replaces current data. The database contains metadata (titles, tags, dates) while actual note content is stored in HTML files.
 
 <a id="automated-backup-script"></a>
 **🤖 Automated Backup Script**
@@ -728,5 +718,5 @@ If you:
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
+**👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
 

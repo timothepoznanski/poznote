@@ -26,8 +26,7 @@ server {
     root /var/www/html;
     index index.php index.html;
 
-    # Allow large file uploads (matches PHP post_max_size)
-    client_max_body_size 300M;
+    client_max_body_size 800M;
 
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -76,13 +75,12 @@ display_errors = Off
 log_errors = On
 error_log = /var/log/php_errors.log
 
-; File upload settings for Poznote
-upload_max_filesize = 200M
-post_max_size = 250M
+upload_max_filesize = 750M
+post_max_size = 800M
 max_file_uploads = 20
-max_input_time = 300
-max_execution_time = 300
-memory_limit = 256M
+max_input_time = 600
+max_execution_time = 600
+memory_limit = 512M
 
 ; Temporary file settings
 upload_tmp_dir = /tmp
@@ -141,6 +139,10 @@ COPY ${copy_src_files:+./src} /var/www/html
 COPY migration-script.sh /usr/local/bin/migration-script.sh
 RUN chmod +x /usr/local/bin/migration-script.sh
 
+# Copy initialization script
+COPY init-permissions.sh /usr/local/bin/init-permissions.sh
+RUN chmod +x /usr/local/bin/init-permissions.sh
+
 # Set proper ownership
 RUN chown -R www-data:www-data /var/www/html
 
@@ -159,5 +161,4 @@ EXPOSE 80
 WORKDIR /var/www/html
 
 # Use supervisor to manage multiple processes (nginx + php-fpm)
-# First run migration script to handle legacy installations
-CMD ["/bin/sh", "-c", "/usr/local/bin/migration-script.sh && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/bin/sh", "-c", "/usr/local/bin/init-permissions.sh && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
