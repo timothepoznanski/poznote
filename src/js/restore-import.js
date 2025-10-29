@@ -306,9 +306,13 @@ function startChunkedRestore() {
             progressBar.textContent = '100%';
             statusText.textContent = 'Restoration completed successfully!';
             
+            // Add a success message and manual reload option instead of auto-reload
             setTimeout(() => {
-                location.reload();
-            }, 2000);
+                const successMsg = document.createElement('div');
+                successMsg.className = 'alert alert-success';
+                successMsg.innerHTML = '<strong>Success!</strong> Your backup has been restored. <button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-left: 10px;">Refresh Page</button>';
+                document.getElementById('chunkedUploadStatus').appendChild(successMsg);
+            }, 500);
         },
         onError: (error) => {
             statusText.textContent = `Error: ${error.message}`;
