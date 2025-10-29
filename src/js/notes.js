@@ -99,28 +99,14 @@ function createMarkdownNote() {
 }
 
 function saveNote() {
-    if(noteid == -1 || noteid === null || noteid === undefined || noteid == '') {
-        return;
-    }
-    
-    if(updateNoteEnCours == 1) {
-        return;
-    }
-    
-    if(editedButNotSaved == 1) {
-        displaySavingInProgress();
-        saveNoteToServer();
-    }
-    // Note: removed "No changes to save" popup per user request
+    // Auto-save handles everything automatically now
+    console.log('[Poznote Auto-Save] Manual save requested - auto-save already running');
 }
 
 function saveNoteToServer() {
-    updateNoteEnCours = 1;
-
     // Check that noteid is valid
     if (!noteid || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
         console.error('saveNoteToServer: invalid noteid', noteid);
-        updateNoteEnCours = 0;
         return;
     }
 
@@ -132,38 +118,15 @@ function saveNoteToServer() {
 
     // Check that elements exist
     if (!titleInput || !entryElem) {
-        console.error('saveNoteToServer: missing elements for noteid=', noteid);
-        updateNoteEnCours = 0;
-        // Don't set editedButNotSaved = 1 since the note elements no longer exist
+        console.log('[Poznote Auto-Save] Note #' + noteid + ' elements not found, skipping save (likely user navigated away)');
         return;
     }
     
     // Prepare data
     var headi = titleInput.value || '';
     
-    // IMPORTANT: Serialize checklist input values into the HTML before saving
-    // This ensures checklist text AND checkbox state is preserved when the page is reloaded
-    var checklists = entryElem.querySelectorAll('.checklist');
-    checklists.forEach(function(checklist) {
-        var items = checklist.querySelectorAll('.checklist-item');
-        items.forEach(function(item) {
-            var checkbox = item.querySelector('.checklist-checkbox');
-            var input = item.querySelector('.checklist-input');
-            if (checkbox && input) {
-                // Store the current values in data attributes
-                checkbox.setAttribute('data-checked', checkbox.checked ? '1' : '0');
-                input.setAttribute('data-value', input.value);
-                // Also store in input.value attribute so it gets serialized with innerHTML
-                input.setAttribute('value', input.value);
-                // IMPORTANT: Set the 'checked' attribute so it persists in the HTML
-                if (checkbox.checked) {
-                    checkbox.setAttribute('checked', 'checked');
-                } else {
-                    checkbox.removeAttribute('checked');
-                }
-            }
-        });
-    });
+    // Serialize checklist data before saving
+    serializeChecklists(entryElem);
     
     var ent = cleanSearchHighlightsFromElement(entryElem);
     ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
@@ -194,31 +157,33 @@ function saveNoteToServer() {
     var tags = tagsElem ? tagsElem.value : '';
     var folder = folderElem ? folderElem.value : getDefaultFolderName();
 
-    var params = new URLSearchParams({
+    var params = {
         id: noteid,
-        tags: tags,
-        folder: folder,
         heading: headi,
         entry: ent,
-        workspace: selectedWorkspace || 'Poznote',
-        entrycontent: entcontent,
-        now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60
-    });
+        tags: tags,
+        folder: folder,
+        workspace: selectedWorkspace || 'Poznote'
+    };
     
-    fetch("update_note.php", {
+    fetch("api_update_note.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
+        headers: { 
+            "Content-Type": "application/json",
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(params)
     })
-    .then(function(response) { return response.text(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        handleSaveResponse(data);
+        if (data.success) {
+            handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
+        } else {
+            console.error('[Poznote Auto-Save] Save error:', data.message || 'Unknown error');
+        }
     })
     .catch(function(error) {
-        showNotificationPopup('Network error while saving: ' + error.message, 'error');
-        editedButNotSaved = 1;
-        updateNoteEnCours = 0;
-        setSaveButtonRed(true);
+        console.error('[Poznote Auto-Save] Network error:', error.message);
     });
 }
 
@@ -226,39 +191,70 @@ function handleSaveResponse(data) {
     try {
         var jsonData = JSON.parse(data);
         if (jsonData.status === 'error') {
-            showNotificationPopup('Save error: ' + jsonData.message, 'error');
-            editedButNotSaved = 1;
-            updateNoteEnCours = 0;
-            setSaveButtonRed(true);
+            console.error('[Poznote Auto-Save] Save error:', jsonData.message);
             return;
         } else if (jsonData.date && jsonData.title) {
             // Title modified to ensure uniqueness
-            editedButNotSaved = 0;
             updateLastSavedTime(jsonData.date);
             
             var titleInput = document.getElementById('inp'+noteid);
             if (titleInput && jsonData.title !== jsonData.original_title) {
                 titleInput.value = jsonData.title;
-                showNotificationPopup('Title modified to ensure uniqueness: ' + jsonData.title);
+                console.log('[Poznote Auto-Save] Title modified to ensure uniqueness: ' + jsonData.title);
             }
             
             updateNoteTitleInLeftColumn();
-            updateNoteEnCours = 0;
-            setSaveButtonRed(false);
+            
+            // Update last saved content for change detection with the content that was just saved
+            var entryElem = document.getElementById("entry" + noteid);
+            if (entryElem) {
+                lastSavedContent = entryElem.innerHTML;
+                console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
+            }
+            updateConnectionStatus(true);
+            
+            // Remove unsaved changes indicator from page title
+            if (document.title.startsWith('*')) {
+                document.title = document.title.substring(1);
+                console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
+            }
+            
+            // Mark note as saved (remove from pending refresh list)
+            if (typeof notesNeedingRefresh !== 'undefined') {
+                notesNeedingRefresh.delete(String(noteid));
+                console.log('[Poznote Auto-Save] ✓ Note #' + noteid + ' removed from refresh list');
+            }
+            
             return;
         }
     } catch(e) {
         // Normal response (not JSON)
         if(data == '1') {
-            editedButNotSaved = 0;
             updateLastSavedTime('Saved today');
         } else {
-            editedButNotSaved = 0;
             updateLastSavedTime(data);
         }
         updateNoteTitleInLeftColumn();
-        updateNoteEnCours = 0;
-        setSaveButtonRed(false);
+        
+        // Update last saved content for change detection with the content that was just saved
+        var entryElem = document.getElementById("entry" + noteid);
+        if (entryElem) {
+            lastSavedContent = entryElem.innerHTML;
+            console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
+        }
+        updateConnectionStatus(true);
+        
+        // Remove unsaved changes indicator from page title
+        if (document.title.startsWith('*')) {
+            document.title = document.title.substring(1);
+            console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
+        }
+        
+        // Mark note as saved (remove from pending refresh list)
+        if (typeof notesNeedingRefresh !== 'undefined') {
+            notesNeedingRefresh.delete(String(noteid));
+            console.log('[Poznote Auto-Save] ✓ Note #' + noteid + ' removed from refresh list');
+        }
     }
 }
 

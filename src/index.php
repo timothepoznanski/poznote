@@ -642,10 +642,7 @@ $body_classes = trim($extra_body_classes);
                     // Home button (mobile only)
                     echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="Back to notes" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
                     
-                    // Save button (first for easy access)
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                    
-                    // Text formatting buttons
+                    // Text formatting buttons (save button removed - auto-save is now automatic)
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
@@ -1135,6 +1132,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof reinitializeImageClickHandlers === 'function') {
         reinitializeImageClickHandlers();
     }
+    
+    // Check for unsaved drafts after note loads
+    <?php if ($note && is_numeric($note)): ?>
+    setTimeout(function() {
+        if (typeof checkForUnsavedDraft === 'function') {
+            // Check if this was a forced refresh (skip auto-restore in that case)
+            var isRefresh = window.location.search.includes('_refresh=');
+            checkForUnsavedDraft('<?php echo $note; ?>', isRefresh);
+        }
+    }, 500); // Small delay to ensure content is fully loaded
+    <?php endif; ?>
 });
 
 // Initialize markdown split view state from database

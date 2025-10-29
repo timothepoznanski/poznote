@@ -1362,7 +1362,7 @@ function insertChecklist() {
           } else if (typeof window.updatenote === 'function') {
             window.updatenote();
           } else {
-            window.editedButNotSaved = 1;
+            // Auto-save handles state management automatically
           }
         }, 10);
       }

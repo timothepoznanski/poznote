@@ -249,30 +249,18 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                 inputEl.value = '';
                 const targetNoteId = noteId;
                 updateTagsInput(targetNoteId, container);
-                // Ensure edit flags and noteid are set, then trigger save
+                // Set global noteid and trigger auto-save
                 try {
                     if (typeof window !== 'undefined' && targetNoteId) {
                         window.noteid = targetNoteId;
-                        window.editedButNotSaved = 1;
-                        try { console.debug('clickable-tags: set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
-                        // Show modification indicator immediately
-                        if (typeof displayModificationsDone === 'function') {
-                            displayModificationsDone();
+                        // Auto-save will handle the modification automatically
+                        if (typeof updateNote === 'function') {
+                            updateNote();
                         }
                     }
-                    // Immediately save tags via AJAX to avoid relying on global save button/state
-                    try {
-                        const tagsInput = document.getElementById('tags' + targetNoteId);
-                        const tagsValue = tagsInput ? tagsInput.value : '';
-                        if (targetNoteId && typeof saveTagsDirectly === 'function') {
-                            saveTagsDirectly(targetNoteId, tagsValue);
-                        } else if (targetNoteId && typeof updatenote === 'function') {
-                            setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
-                        } else {
-                            console.warn('No save function available for tag selection');
-                        }
-                    } catch (inner) { console.error('Error in tag selection save:', inner); }
-                } catch (err) { /* ignore */ }
+                } catch (err) { 
+                    console.warn('Auto-save trigger failed:', err);
+                }
                 dd.style.display = 'none';
                 setTimeout(() => inputEl.focus(), 10);
             });
@@ -310,30 +298,19 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                     ev.stopPropagation();
                     // Dispatch mousedown to reuse the same handler which also triggers save
                     items[highlighted].dispatchEvent(new MouseEvent('mousedown'));
-                                        // Also ensure flags are set and trigger save for keyboard selection
+                    // Trigger auto-save for keyboard selection
                     try {
                         const targetNoteId = noteId;
                         if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
-                            window.editedButNotSaved = 1;
-                            try { console.debug('clickable-tags (keyboard): set window.noteid=', window.noteid, 'editedButNotSaved=', window.editedButNotSaved); } catch(e){}
-                            // Show modification indicator immediately
-                            if (typeof displayModificationsDone === 'function') {
-                                displayModificationsDone();
+                            // Auto-save will handle the modification automatically
+                            if (typeof updateNote === 'function') {
+                                updateNote();
                             }
                         }
-                        try {
-                            const tagsInput = document.getElementById('tags' + targetNoteId);
-                            const tagsValue = tagsInput ? tagsInput.value : '';
-                            if (targetNoteId && typeof saveTagsDirectly === 'function') {
-                                saveTagsDirectly(targetNoteId, tagsValue);
-                            } else if (targetNoteId && typeof updatenote === 'function') {
-                                setTimeout(() => { try { updatenote(); } catch(e){} }, 50);
-                            } else {
-                                console.warn('No save function available for keyboard tag selection');
-                            }
-                        } catch (inner) { console.error('Error in keyboard tag selection save:', inner); }
-                    } catch (err) { /* ignore */ }
+                    } catch (err) { 
+                        console.warn('Auto-save trigger failed for keyboard selection:', err);
+                    }
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
                 }
@@ -589,24 +566,13 @@ function updateTagsInput(noteId, container) {
     tagsInput.value = tags.join(' ');
     
     // Set the global noteid to the note being modified
-    // Don't restore the old noteid - we want the system to know this note is active
     window.noteid = noteId;
     
-    // Use the existing update() function that properly sets all flags
-    if (typeof update === 'function') {
+    // Trigger auto-save system
+    if (typeof updateNote === 'function') {
+        updateNote();
+    } else if (typeof update === 'function') {
         update();
-    } else {
-        // Fallback: set flags manually
-        if (typeof editedButNotSaved !== 'undefined') {
-            window.editedButNotSaved = 1;
-        }
-        if (typeof lastudpdate !== 'undefined') {
-            window.lastudpdate = new Date().getTime();
-        }
-        // Show modification indicator
-        if (typeof displayModificationsDone === 'function') {
-            displayModificationsDone();
-        }
     }
     
     // Trigger the input change event to notify any other listeners
@@ -615,218 +581,18 @@ function updateTagsInput(noteId, container) {
 }
 
 /**
- * Fallback function to save tags directly via AJAX
+ * Trigger auto-save for tag changes
+ * @deprecated - auto-save system handles this automatically
  */
 function saveTagsDirectly(noteId, tagsValue) {
-    
-    // Get note title and content for the update
-    const titleInput = document.getElementById('inp' + noteId);
-    const contentDiv = document.getElementById('entry' + noteId);
-    const folderInput = document.getElementById('folder' + noteId);
-    
-    if (!titleInput || !contentDiv) {
-        return;
+    // Auto-save handles all saving automatically
+    if (typeof updateNote === 'function') {
+        updateNote();
     }
-    
-    // Set saving in progress
-    if (typeof updateNoteEnCours !== 'undefined') {
-        window.updateNoteEnCours = 1;
-    }
-    
-    // Check if this is a task list note or markdown note (same logic as in notes.js)
-    let cleanContent = '';
-    let textContent = '';
-    const noteType = contentDiv.getAttribute('data-note-type') || 'note';
-    
-    if (noteType === 'tasklist') {
-        // For task list notes, save the JSON data instead of HTML
-        textContent = typeof getTaskListData === 'function' ? getTaskListData(noteId) || '' : '';
-        cleanContent = textContent; // Also save JSON to HTML file for consistency
-    } else if (noteType === 'markdown') {
-        // For markdown notes, save the raw markdown content
-        if (typeof getMarkdownContentForNote === 'function') {
-            const markdownContent = getMarkdownContentForNote(noteId);
-            if (markdownContent !== null) {
-                cleanContent = markdownContent;
-                textContent = markdownContent;
-            } else {
-                // Fallback to regular content handling if markdown function fails
-                cleanContent = contentDiv.innerHTML;
-                textContent = contentDiv.textContent || '';
-            }
-        } else {
-            // Fallback to regular content handling if markdown function not available
-            cleanContent = contentDiv.innerHTML;
-            textContent = contentDiv.textContent || '';
-        }
-    } else {
-        // For regular notes, clean search highlights from content before saving (same as updatenote)
-        cleanContent = contentDiv.innerHTML;
-        if (typeof cleanSearchHighlightsFromElement === 'function') {
-            cleanContent = cleanSearchHighlightsFromElement(contentDiv);
-        }
-        
-        // Get text content for entrycontent (also clean highlights)
-        textContent = contentDiv.textContent || '';
-        if (typeof cleanSearchHighlightsFromElement === 'function') {
-            const clonedForText = contentDiv.cloneNode(true);
-            const highlights = clonedForText.querySelectorAll('.search-highlight');
-            highlights.forEach(highlight => {
-                const parent = highlight.parentNode;
-                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-                parent.normalize();
-            });
-            textContent = clonedForText.textContent || '';
-        }
-    }
-    
-    const params = new URLSearchParams({
-        id: noteId,
-        tags: tagsValue,
-        folder: folderInput ? folderInput.value : '',
-        heading: titleInput.value,
-        entry: cleanContent,
-        entrycontent: textContent,
-    workspace: (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : 'Poznote'),
-        now: (new Date().getTime()/1000)-new Date().getTimezoneOffset()*60
-    });
-    
-    fetch("update_note.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
-    })
-    .then(response => response.text())
-    .then(function(data) {
-        try {
-            // Try to parse as JSON first
-            var jsonData = JSON.parse(data);
-            
-            if (jsonData.status === 'error') {
-                console.error('saveTagsDirectly: server returned error:', jsonData.message);
-                // Keep edited flag on error
-                if (typeof editedButNotSaved !== 'undefined') {
-                    window.editedButNotSaved = 1;
-                }
-                if (typeof updateNoteEnCours !== 'undefined') {
-                    window.updateNoteEnCours = 0;
-                }
-                if (typeof setSaveButtonRed === 'function') {
-                    setSaveButtonRed(true);
-                }
-                // Show modification indicator for error state
-                if (typeof displayModificationsDone === 'function') {
-                    displayModificationsDone();
-                }
-                return;
-            } else if (jsonData.date && jsonData.title) {
-                // Handle response with date and title
-                if (typeof editedButNotSaved !== 'undefined') {
-                    window.editedButNotSaved = 0;
-                }
-                var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
-                if (lastUpdatedElem) lastUpdatedElem.innerHTML = jsonData.date;
-                
-                // Update the title input field with the unique title
-                var titleInput = document.getElementById('inp' + noteId);
-                if (titleInput && jsonData.title !== jsonData.original_title) {
-                    titleInput.value = jsonData.title;
-                }
-                
-                // Update the title in the left column
-                if (typeof updateNoteTitleInLeftColumn === 'function') {
-                    updateNoteTitleInLeftColumn();
-                }
-                if (typeof setSaveButtonRed === 'function') {
-                    setSaveButtonRed(false);
-                }
-                return;
-            }
-        } catch(e) {
-            // If not JSON, treat as normal response
-            if (typeof editedButNotSaved !== 'undefined') {
-                window.editedButNotSaved = 0;
-            }
-            var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
-            if (lastUpdatedElem) {
-                if (data == '1') {
-                    lastUpdatedElem.innerHTML = 'Last Saved Today';
-                } else {
-                    lastUpdatedElem.innerHTML = data;
-                }
-            }
-            
-            // Update the title in the left column
-            if (typeof updateNoteTitleInLeftColumn === 'function') {
-                updateNoteTitleInLeftColumn();
-            } else {
-                console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
-            }
-            if (typeof setSaveButtonRed === 'function') {
-                setSaveButtonRed(false);
-            } else {
-                console.warn('saveTagsDirectly: setSaveButtonRed function not found');
-            }
-        }
-        
-        // Clear the flags after successful save
-        if (typeof editedButNotSaved !== 'undefined') {
-            window.editedButNotSaved = 0;
-        }
-        if (typeof updateNoteEnCours !== 'undefined') {
-            window.updateNoteEnCours = 0;
-        }
-        
-        // Update UI elements
-        var lastUpdatedElem = document.getElementById('lastupdated' + noteId);
-        if (lastUpdatedElem) {
-            lastUpdatedElem.innerHTML = data;
-        }
-        
-        // Update title in left column
-        if (typeof updateNoteTitleInLeftColumn === 'function') {
-            updateNoteTitleInLeftColumn();
-        } else {
-            console.warn('saveTagsDirectly: updateNoteTitleInLeftColumn function not found');
-        }
-        
-        // Update save button
-        if (typeof setSaveButtonRed === 'function') {
-            setSaveButtonRed(false);
-        } else {
-            console.warn('saveTagsDirectly: setSaveButtonRed function not found');
-        }
-        
-    })
-    .catch(function(error) {
-        console.error('saveTagsDirectly: network error:', error);
-        // Keep edited flag on error, clear saving flag
-        if (typeof editedButNotSaved !== 'undefined') {
-            window.editedButNotSaved = 1;
-        }
-        if (typeof updateNoteEnCours !== 'undefined') {
-            window.updateNoteEnCours = 0;
-        }
-        if (typeof setSaveButtonRed === 'function') {
-            setSaveButtonRed(true);
-        }
-        if (typeof showNotificationPopup === 'function') {
-            showNotificationPopup('Network error while saving: ' + error.message, 'error');
-        }
-        // Show modification indicator for error state
-        if (typeof displayModificationsDone === 'function') {
-            displayModificationsDone();
-        }
-    });
 }
 
 // Make saveTagsDirectly globally available immediately after definition
 window.saveTagsDirectly = saveTagsDirectly;
-
-/**
- * Get excluded folders from localStorage (copied from list_tags.js)
- */
- 
 
 /**
  * Setup handlers (minimal now since we use inline editing)

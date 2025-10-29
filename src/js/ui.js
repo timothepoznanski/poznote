@@ -109,81 +109,12 @@ function resetAttachmentForm() {
     }
 }
 
-function displaySavingInProgress() {
-    var elem = document.getElementById('lastupdated' + noteid);
-    if (elem) {
-        elem.innerHTML = '<span style="color:#FF0000;">Saving in progress...</span>';
-    }
-    setSaveButtonRed(true);
-}
-
-function displayEditInProgress() {
-    var elem = document.getElementById('lastupdated' + noteid);
-    if (elem) {
-        elem.innerHTML = '<span>Modification en cours...</span>';
-    }
-    setSaveButtonRed(true);
-}
-
 function setSaveButtonRed(isRed) {
-    // Search the save button within the current note's container
-    var noteContainer = document.getElementById('note' + noteid);
-    var saveBtn = null;
-    
-    if (noteContainer) {
-        // Search for btn-save class directly (more reliable with Font Awesome)
-        saveBtn = noteContainer.querySelector('.btn-save');
-        
-        if (!saveBtn) {
-            // Fallback: search using the icon
-            saveBtn = noteContainer.querySelector('.toolbar-btn > .fa-save');
-            if (saveBtn) {
-                saveBtn = saveBtn.parentElement;
-            }
-        }
-        
-        if (!saveBtn) {
-            // Fallback: search among all toolbar buttons in this note
-            var btns = noteContainer.querySelectorAll('.toolbar-btn');
-            for (var i = 0; i < btns.length; i++) {
-                var btn = btns[i];
-                if (btn.querySelector('.fa-save')) {
-                    saveBtn = btn;
-                    break;
-                }
-            }
-        }
-    }
-    
-    if (!saveBtn) {
-        // Global fallback for cases where noteid is not set or container not found
-        saveBtn = document.querySelector('.btn-save');
-        
-        if (!saveBtn) {
-            saveBtn = document.querySelector('.toolbar-btn > .fa-save');
-            if (saveBtn) {
-                saveBtn = saveBtn.parentElement;
-            }
-        }
-        
-        if (!saveBtn) {
-            var btns = document.querySelectorAll('.toolbar-btn');
-            for (var i = 0; i < btns.length; i++) {
-                var btn = btns[i];
-                if (btn.querySelector('.fa-save')) {
-                    saveBtn = btn;
-                    break;
-                }
-            }
-        }
-    }
-    
-    if (saveBtn) {
-        if (isRed) {
-            saveBtn.classList.add('save-modified');
-        } else {
-            saveBtn.classList.remove('save-modified');
-        }
+    // Auto-save is now automatic - log status to console only
+    if (isRed) {
+        console.log('[Poznote Auto-Save] Changes detected for note #' + noteid);
+    } else {
+        console.log('[Poznote Auto-Save] Note #' + noteid + ' saved successfully');
     }
 }
 

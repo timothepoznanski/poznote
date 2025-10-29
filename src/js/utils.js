@@ -27,75 +27,8 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
 }
 
 function toggleFavorite(noteId) {
-    // Check if there are unsaved modifications and save them first
-    if (editedButNotSaved === 1 && updateNoteEnCours === 0 && noteid && noteid == noteId) {
-        var entryElement = document.getElementById('inp' + noteId);
-        var tagsElement = document.getElementById('tags' + noteId);
-        var folderElement = document.getElementById('folder' + noteId);
-        var contentElement = document.getElementById('entry' + noteId);
-        
-        if (entryElement && tagsElement && folderElement && contentElement) {
-            displaySavingInProgress();
-            
-            var ent = cleanSearchHighlightsFromElement(contentElement);
-            ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
-            
-            var entcontent = getTextContentFromElement(contentElement);
-            
-            var params = new URLSearchParams({
-                id: noteId,
-                heading: entryElement.value,
-                entry: ent,
-                tags: tagsElement.value,
-                folder: folderElement.value,
-                workspace: selectedWorkspace || 'Poznote',
-                entrycontent: entcontent,
-                now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60
-            });
-            
-            fetch("update_note.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: params.toString()
-            })
-            .then(function(response) { return response.text(); })
-            .then(function(data) {
-                try {
-                    var jsonData = JSON.parse(data);
-                    if (jsonData.status === 'error') {
-                        showNotificationPopup('Save error: ' + jsonData.message, 'error');
-                        editedButNotSaved = 1;
-                        updateNoteEnCours = 0;
-                        setSaveButtonRed(true);
-                    } else {
-                        editedButNotSaved = 0;
-                        updateNoteEnCours = 0;
-                        setSaveButtonRed(false);
-                        performFavoriteToggle(noteId);
-                    }
-                } catch(e) {
-                    editedButNotSaved = 0;
-                    var lastUpdatedElem = document.getElementById('lastupdated' + noteid);
-                    if (lastUpdatedElem) {
-                        lastUpdatedElem.innerHTML = data == '1' ? 'Saved today' : data;
-                    }
-                    updateNoteEnCours = 0;
-                    setSaveButtonRed(false);
-                    performFavoriteToggle(noteId);
-                }
-            })
-            .catch(function(error) {
-                showNotificationPopup('Network error while saving: ' + error.message, 'error');
-                editedButNotSaved = 1;
-                updateNoteEnCours = 0;
-                setSaveButtonRed(true);
-            });
-        } else {
-            performFavoriteToggle(noteId);
-        }
-    } else {
-        performFavoriteToggle(noteId);
-    }
+    // Auto-save handles any pending changes automatically
+    performFavoriteToggle(noteId);
 }
 
 function performFavoriteToggle(noteId) {
@@ -108,9 +41,7 @@ function performFavoriteToggle(noteId) {
             try {
                 var response = JSON.parse(xhr.responseText);
                 if (response.success) {
-                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');                    
-                    editedButNotSaved = 0;
-                    updateNoteEnCours = 0;
+                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');
                     
                     setTimeout(function() {
                         window.location.reload();

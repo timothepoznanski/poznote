@@ -329,12 +329,7 @@ function clearRightColumn() {
     if (typeof noteid !== 'undefined') {
         noteid = -1;
     }
-    if (typeof editedButNotSaved !== 'undefined') {
-        editedButNotSaved = 0;
-    }
-    if (typeof updateNoteEnCours !== 'undefined') {
-        updateNoteEnCours = 0;
-    }
+    // Auto-save system handles all state management automatically
 }
 
 // Modal management functions for workspaces
