@@ -135,10 +135,6 @@ RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.tx
 # Handle source files based on build argument
 COPY ${copy_src_files:+./src} /var/www/html
 
-# Copy migration script
-COPY migration-script.sh /usr/local/bin/migration-script.sh
-RUN chmod +x /usr/local/bin/migration-script.sh
-
 # Copy initialization script
 COPY init-permissions.sh /usr/local/bin/init-permissions.sh
 RUN chmod +x /usr/local/bin/init-permissions.sh
