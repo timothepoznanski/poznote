@@ -116,7 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Global functions available for HTML (compatibility)
 window.newnote = createNewNote;
-window.updatenote = saveNoteToServer;
+window.saveNoteImmediately = saveNoteToServer;
+window.updatenote = saveNoteToServer; // Legacy alias
 window.saveFocusedNoteJS = function() { 
     console.log('[Poznote Auto-Save] Manual save not needed - auto-save active'); 
 };

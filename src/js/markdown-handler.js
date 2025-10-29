@@ -663,8 +663,8 @@ function switchToPreviewMode(noteId) {
     
     // Only mark as edited and trigger save if content has changed
     if (previousContent !== currentContent) {
-        if (typeof updateNote === 'function') {
-            updateNote();
+        if (typeof markNoteAsModified === 'function') {
+            markNoteAsModified();
         }
     }
 }
@@ -751,8 +751,8 @@ function setupMarkdownEditorListeners(noteId) {
         window.noteid = noteId;
         
         // Mark as edited
-        if (typeof updateNote === 'function') {
-            updateNote();
+        if (typeof markNoteAsModified === 'function') {
+            markNoteAsModified();
         }
     });
 }

@@ -102,7 +102,7 @@ function insertExcalidrawDiagram() {
     
     // Trigger automatic save to ensure placeholder is saved before opening editor
     if (typeof updateNote === 'function') {
-        updateNote(); // Mark note as edited and start debounce timer (2 seconds)
+        markNoteAsModified(); // Mark note as edited and start debounce timer (2 seconds)
     }
     
     // Wait for the debounced save to complete before opening editor

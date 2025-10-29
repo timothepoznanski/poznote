@@ -107,8 +107,8 @@ function setupNoteEditingEvents() {
                     serializeChecklistsBeforeSave(noteentry);
                 }
                 
-                if (typeof window.updateNote === 'function') {
-                    window.updateNote();
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
                 }
                 return;
             }
@@ -130,8 +130,8 @@ function setupNoteEditingEvents() {
                         serializeChecklistsBeforeSave(noteentry);
                     }
                     
-                    if (typeof window.updateNote === 'function') {
-                        window.updateNote();
+                    if (typeof window.markNoteAsModified === 'function') {
+                        window.markNoteAsModified();
                     }
                 }
                 return;
@@ -232,8 +232,8 @@ function handleChecklistKeydown(e) {
             serializeChecklistsBeforeSave(noteentry);
         }
         
-        if (typeof window.updateNote === 'function') {
-            window.updateNote();
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
         }
     } else if (e.key === 'Backspace') {
         // Handle Backspace key
@@ -305,8 +305,8 @@ function handleChecklistKeydown(e) {
                 serializeChecklistsBeforeSave(noteentry);
             }
             
-            if (typeof window.updateNote === 'function') {
-                window.updateNote();
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
             }
         }
         // Note: We do NOT prevent default for non-empty items or when cursor is not at start
@@ -361,9 +361,9 @@ function handleNoteEditEvent(e) {
     var target = e.target;
     
     if (target.classList.contains('name_doss')) {
-        updateNote();
+        markNoteAsModified();
     } else if (target.classList.contains('noteentry')) {
-        updateNote();
+        markNoteAsModified();
     } else if (target.tagName === 'INPUT') {
         // Ignore search fields
         if (target.classList.contains('searchbar') ||
@@ -381,7 +381,7 @@ function handleNoteEditEvent(e) {
         
         // Process other note fields (tags, etc.)
         if (target.id && target.id.startsWith('tags')) {
-            updateNote();
+            markNoteAsModified();
         }
     }
 }
@@ -415,7 +415,7 @@ function handleTagsKeydown(e) {
                     input.setSelectionRange(cursorPos + 1, cursorPos + 1);
                 }
                 
-                updateNote();
+                markNoteAsModified();
             }
         }
     }
@@ -1087,8 +1087,8 @@ function setupLinkEvents() {
                         }
                         
                         // Trigger update
-                        if (typeof updateNote === 'function') {
-                            updateNote();
+                        if (typeof markNoteAsModified === 'function') {
+                            markNoteAsModified();
                         }
                     }
                 }
@@ -1166,7 +1166,7 @@ function setupPageUnloadWarning() {
 }
 
 // Utility functions
-function updateNote() {
+function markNoteAsModified() {
     if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
     
     // Check if there are actually changes before triggering save process
@@ -1287,7 +1287,7 @@ function newnote() {
     createNewNote();
 }
 
-function updatenote() {
+function saveNoteImmediately() {
     saveNoteToServer();
 }
 
@@ -1608,8 +1608,9 @@ function emergencySave(noteId) {
     }
 }
 
-// Expose updateNote globally for use in other modules
-window.updateNote = updateNote;
+// Expose markNoteAsModified globally for use in other modules
+window.markNoteAsModified = markNoteAsModified;
+window.saveNoteImmediately = saveNoteImmediately;
 window.checkUnsavedBeforeLeaving = checkUnsavedBeforeLeaving;
 window.hasUnsavedChanges = hasUnsavedChanges;
 

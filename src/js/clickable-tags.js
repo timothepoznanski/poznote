@@ -254,8 +254,8 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                     if (typeof window !== 'undefined' && targetNoteId) {
                         window.noteid = targetNoteId;
                         // Auto-save will handle the modification automatically
-                        if (typeof updateNote === 'function') {
-                            updateNote();
+                        if (typeof markNoteAsModified === 'function') {
+                            markNoteAsModified();
                         }
                     }
                 } catch (err) { 
@@ -304,8 +304,8 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                         if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
                             // Auto-save will handle the modification automatically
-                            if (typeof updateNote === 'function') {
-                                updateNote();
+                            if (typeof markNoteAsModified === 'function') {
+                                markNoteAsModified();
                             }
                         }
                     } catch (err) { 
@@ -579,7 +579,7 @@ function updateNoteById(noteId) {
     
     // Initialize lastSaved variables if this is the current note to prevent infinite loops
     if (window.noteid == noteId) {
-        // Initialize the global lastSaved variables to prevent updateNote() infinite loops
+        // Initialize the global lastSaved variables to prevent markNoteAsModified() infinite loops
         if (typeof lastSavedContent === 'undefined' || lastSavedContent === null) {
             lastSavedContent = currentContent;
         }
@@ -636,8 +636,8 @@ function saveNoteToServerById(noteId) {
  */
 function saveTagsDirectly(noteId, tagsValue) {
     // Auto-save handles all saving automatically
-    if (typeof updateNote === 'function') {
-        updateNote();
+    if (typeof markNoteAsModified === 'function') {
+        markNoteAsModified();
     }
 }
 

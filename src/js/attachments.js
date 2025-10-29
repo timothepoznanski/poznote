@@ -289,8 +289,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     insertMarkdownAtCursor(loadingText, dropTarget);
     
     // Trigger initial save for loading text
-    if (typeof updateNote === 'function') {
-        updateNote(); // Mark note as edited
+    if (typeof markNoteAsModified === 'function') {
+        markNoteAsModified(); // Mark note as edited
     }
     
     // Upload the file
@@ -330,7 +330,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             // Trigger automatic save after a short delay
             setTimeout(function() {
                 if (typeof updatenote === 'function') {
-                    updatenote(); // Save to server
+                    saveNoteImmediately(); // Save to server
                 }
             }, 500); // Longer delay for markdown to allow upload completion
         } else {
@@ -446,8 +446,8 @@ function handleHTMLImageInsert(file, dropTarget) {
         }
         
         // Trigger automatic save after image insertion
-        if (typeof updateNote === 'function') {
-            updateNote(); // Mark note as edited
+        if (typeof markNoteAsModified === 'function') {
+            markNoteAsModified(); // Mark note as edited
         }
         
         // Re-initialize image click handlers for the newly inserted image
@@ -462,7 +462,7 @@ function handleHTMLImageInsert(file, dropTarget) {
             if (typeof saveNoteToServer === 'function') {
                 saveNoteToServer(); // Direct call to save function
             } else if (typeof updatenote === 'function') {
-                updatenote(); // Fallback to updatenote
+                saveNoteImmediately(); // Fallback to saveNoteImmediately
             }
         }, 100);
     };
