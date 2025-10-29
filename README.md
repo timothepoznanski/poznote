@@ -38,7 +38,7 @@ Capture, organize, and access your notes while keeping full ownership of your da
 
 <br>
 
-![poznote](readme/poznote.png)
+![poznote](poznote.png)
 
 ## Play with Poznote demo
 
@@ -726,5 +726,5 @@ If you:
 - Prefer one-click updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Poznote Cloud Install and Manage Guide](readme/POZNOTE-CLOUD.md)**
+**👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
 
