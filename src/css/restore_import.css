@@ -119,9 +119,10 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.4);
-    /* Use flex centering when the element is shown (JS sets inline display:flex) */
-    align-items: center;
+    /* Position modal higher on screen */
+    align-items: flex-start;
     justify-content: center;
+    padding: 40px 16px 16px 16px;
 }
 
 .import-confirm-modal-content {

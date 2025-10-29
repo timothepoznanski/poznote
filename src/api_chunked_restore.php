@@ -151,100 +151,115 @@ function assembleChunks() {
 
     $chunksDir = sys_get_temp_dir() . '/poznote_chunks_' . $fileId;
     $metadataFile = $chunksDir . '/metadata.json';
+    $finalFile = null;
 
-    if (!file_exists($metadataFile)) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Upload session not found']);
-        return;
-    }
-
-    $metadata = json_decode(file_get_contents($metadataFile), true);
-    if (!$metadata) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Invalid metadata']);
-        return;
-    }
-
-    // Check if all chunks are present
-    if (count($metadata['uploaded_chunks']) !== $metadata['total_chunks']) {
-        http_response_code(400);
-        echo json_encode([
-            'error' => 'Not all chunks uploaded',
-            'uploaded' => count($metadata['uploaded_chunks']),
-            'total' => $metadata['total_chunks']
-        ]);
-        return;
-    }
-
-    // Create final file
-    $finalFile = tempnam(sys_get_temp_dir(), 'poznote_restore_') . '.zip';
-
-    $finalHandle = fopen($finalFile, 'wb');
-    if (!$finalHandle) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Failed to create final file']);
-        return;
-    }
-
-    // Assemble chunks in order
-    for ($i = 0; $i < $metadata['total_chunks']; $i++) {
-        $chunkFile = $chunksDir . '/chunk_' . str_pad($i, 6, '0', STR_PAD_LEFT);
-        if (!file_exists($chunkFile)) {
-            fclose($finalHandle);
-            unlink($finalFile);
-            http_response_code(500);
-            echo json_encode(['error' => 'Missing chunk file: ' . $i]);
+    try {
+        if (!file_exists($metadataFile)) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Upload session not found']);
             return;
         }
 
-        $chunkData = file_get_contents($chunkFile);
-        if ($chunkData === false || fwrite($finalHandle, $chunkData) === false) {
-            fclose($finalHandle);
-            unlink($finalFile);
+        $metadata = json_decode(file_get_contents($metadataFile), true);
+        if (!$metadata) {
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to write chunk data']);
+            echo json_encode(['error' => 'Invalid metadata']);
             return;
         }
-    }
 
-    fclose($finalHandle);
+        // Check if all chunks are present
+        if (count($metadata['uploaded_chunks']) !== $metadata['total_chunks']) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Not all chunks uploaded',
+                'uploaded' => count($metadata['uploaded_chunks']),
+                'total' => $metadata['total_chunks']
+            ]);
+            return;
+        }
 
-    // Verify the assembled file
-    if (!file_exists($finalFile) || filesize($finalFile) === 0) {
-        unlink($finalFile);
+        // Create final file
+        $finalFile = tempnam(sys_get_temp_dir(), 'poznote_restore_') . '.zip';
+        $finalHandle = fopen($finalFile, 'wb');
+        if (!$finalHandle) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to create final file']);
+            return;
+        }
+
+        // Assemble chunks in order
+        for ($i = 0; $i < $metadata['total_chunks']; $i++) {
+            $chunkFile = $chunksDir . '/chunk_' . str_pad($i, 6, '0', STR_PAD_LEFT);
+            if (!file_exists($chunkFile)) {
+                fclose($finalHandle);
+                unlink($finalFile);
+                http_response_code(500);
+                echo json_encode(['error' => 'Missing chunk file: ' . $i]);
+                return;
+            }
+
+            $chunkData = file_get_contents($chunkFile);
+            if ($chunkData === false || fwrite($finalHandle, $chunkData) === false) {
+                fclose($finalHandle);
+                unlink($finalFile);
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to write chunk data']);
+                return;
+            }
+        }
+
+        fclose($finalHandle);
+
+        // Verify the assembled file
+        if (!file_exists($finalFile) || filesize($finalFile) === 0) {
+            unlink($finalFile);
+            http_response_code(500);
+            echo json_encode(['error' => 'Assembled file is invalid']);
+            return;
+        }
+
+        // Clean up chunks directory
+        deleteDirectory($chunksDir);
+
+        // Now perform the restoration
+        $uploadedFile = [
+            'tmp_name' => $finalFile,
+            'name' => $metadata['file_name'],
+            'error' => UPLOAD_ERR_OK
+        ];
+
+        $result = restoreCompleteBackup($uploadedFile, true);
+
+        // Clean up final file
+        if (file_exists($finalFile)) {
+            unlink($finalFile);
+        }
+        $finalFile = null; // Mark as cleaned
+
+        if ($result['success']) {
+            echo json_encode([
+                'success' => true,
+                'message' => $result['message']
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode([
+                'error' => $result['error'],
+                'details' => $result['message'] ?? ''
+            ]);
+        }
+        
+    } catch (Exception $e) {
+        // Clean up on error
+        if ($finalFile && file_exists($finalFile)) {
+            unlink($finalFile);
+        }
+        if (is_dir($chunksDir)) {
+            deleteDirectory($chunksDir);
+        }
+        
         http_response_code(500);
-        echo json_encode(['error' => 'Assembled file is invalid']);
-        return;
-    }
-
-    // Clean up chunks directory
-    deleteDirectory($chunksDir);
-
-    // Now perform the restoration
-    $uploadedFile = [
-        'tmp_name' => $finalFile,
-        'name' => $metadata['file_name'],
-        'error' => UPLOAD_ERR_OK
-    ];
-
-    $result = restoreCompleteBackup($uploadedFile);
-
-    // Clean up final file
-    if (file_exists($finalFile)) {
-        unlink($finalFile);
-    }
-
-    if ($result['success']) {
-        echo json_encode([
-            'success' => true,
-            'message' => $result['message']
-        ]);
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            'error' => $result['error'],
-            'details' => $result['message'] ?? ''
-        ]);
+        echo json_encode(['error' => 'Exception during chunk assembly: ' . $e->getMessage()]);
     }
 }
 
@@ -266,21 +281,4 @@ function cleanupChunks() {
     echo json_encode(['success' => true]);
 }
 
-function deleteDirectory($dir) {
-    if (!is_dir($dir)) {
-        return;
-    }
-
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
-
-    foreach ($files as $fileinfo) {
-        $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-        $todo($fileinfo->getRealPath());
-    }
-
-    rmdir($dir);
-}
 ?>
