@@ -796,9 +796,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </a>
 
         <br><br>
-        <div>⚠️ Complete Restore will restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces.</div>
-        <br>
-        <div> If you want to know more about why we have several retore methods : <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <div> If you want to know more about why we have several retore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
         <!-- Standard Complete Restore Section -->
         <div class="backup-section">
@@ -858,10 +856,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </div>
         </div>
 
-        <!-- Direct File Copy Section -->
-        <div class="backup-section">
-            <h3>Backup file sizes more than 800MB - Direct File Copy</h3>
-            <p>For very large backup files, use this simple direct file copy method. <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
+            <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
