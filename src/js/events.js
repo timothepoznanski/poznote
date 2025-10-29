@@ -3,6 +3,8 @@
 // Auto-save system variables
 var saveTimeout;
 var lastSavedContent = null;
+var lastSavedTitle = null;
+var lastSavedTags = null;
 var isOnline = navigator.onLine;
 var notesNeedingRefresh = new Set(); // Track notes that were left before auto-save completed
 
@@ -1197,17 +1199,35 @@ function updateNote() {
     
     // Check if there are actually changes before triggering save process
     var entryElem = document.getElementById("entry" + noteid);
-    if (entryElem) {
-        var currentContent = entryElem.innerHTML;
-        console.log('[Poznote Auto-Save Debug] updateNote() - current content length:', currentContent.length);
-        console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedContent length:', lastSavedContent ? lastSavedContent.length : 'null');
-        console.log('[Poznote Auto-Save Debug] updateNote() - contents equal:', currentContent === lastSavedContent);
-        
-        if (currentContent === lastSavedContent) {
-            console.log('[Poznote Auto-Save] No changes detected in updateNote() for note #' + noteid + ', skipping save process');
-            return;
-        }
+    var titleInput = document.getElementById("inp" + noteid);
+    var tagsElem = document.getElementById("tags" + noteid);
+    
+    var currentContent = entryElem ? entryElem.innerHTML : '';
+    var currentTitle = titleInput ? titleInput.value : '';
+    var currentTags = tagsElem ? tagsElem.value : '';
+    
+    // Initialize lastSaved states if not set
+    if (typeof lastSavedContent === 'undefined') lastSavedContent = null;
+    if (typeof lastSavedTitle === 'undefined') lastSavedTitle = null;
+    if (typeof lastSavedTags === 'undefined') lastSavedTags = null;
+    
+    console.log('[Poznote Auto-Save Debug] updateNote() - current content length:', currentContent.length);
+    console.log('[Poznote Auto-Save Debug] updateNote() - current title:', currentTitle);
+    console.log('[Poznote Auto-Save Debug] updateNote() - current tags:', currentTags);
+    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedContent length:', lastSavedContent ? lastSavedContent.length : 'null');
+    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedTitle:', lastSavedTitle);
+    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedTags:', lastSavedTags);
+    
+    var contentChanged = currentContent !== lastSavedContent;
+    var titleChanged = currentTitle !== lastSavedTitle;
+    var tagsChanged = currentTags !== lastSavedTags;
+    
+    if (!contentChanged && !titleChanged && !tagsChanged) {
+        console.log('[Poznote Auto-Save] No changes detected in updateNote() for note #' + noteid + ' (content, title, or tags), skipping save process');
+        return;
     }
+    
+    console.log('[Poznote Auto-Save] Changes detected - content:', contentChanged, 'title:', titleChanged, 'tags:', tagsChanged);
     
     // Modern auto-save: save to localStorage immediately
     saveToLocalStorage();
@@ -1280,13 +1300,24 @@ function saveToServerDebounced() {
     
     // Check if content has actually changed
     var draftKey = 'poznote_draft_' + noteid;
-    var currentDraft = localStorage.getItem(draftKey);
+    var titleKey = 'poznote_title_' + noteid;
+    var tagsKey = 'poznote_tags_' + noteid;
     
-    if (currentDraft === lastSavedContent) {
+    var currentDraft = localStorage.getItem(draftKey);
+    var currentTitle = localStorage.getItem(titleKey);
+    var currentTags = localStorage.getItem(tagsKey);
+    
+    var contentChanged = currentDraft !== lastSavedContent;
+    var titleChanged = currentTitle !== lastSavedTitle;
+    var tagsChanged = currentTags !== lastSavedTags;
+    
+    if (!contentChanged && !titleChanged && !tagsChanged) {
         // No changes detected
-        console.log('[Poznote Auto-Save] No changes detected for note #' + noteid);
+        console.log('[Poznote Auto-Save] No changes detected for note #' + noteid + ' (content, title, tags all match)');
         return;
     }
+    
+    console.log('[Poznote Auto-Save] Changes detected for server save - content:', contentChanged, 'title:', titleChanged, 'tags:', tagsChanged);
     
     // Trigger server save
     console.log('[Poznote Auto-Save] Triggering server sync for note #' + noteid);
@@ -1752,19 +1783,44 @@ function checkForUnsavedDraft(noteId, skipAutoRestore) {
                 clearDraft(noteId);
                 // Initialize with current server content
                 var entryElem = document.getElementById('entry' + noteId);
+                var titleInput = document.getElementById('inp' + noteId);
+                var tagsElem = document.getElementById('tags' + noteId);
                 if (entryElem) {
                     lastSavedContent = entryElem.innerHTML;
                 }
+                if (titleInput) {
+                    lastSavedTitle = titleInput.value;
+                }
+                if (tagsElem) {
+                    lastSavedTags = tagsElem.value;
+                }
             } else {
-                // No unsaved changes, initialize lastSavedContent
+                // No unsaved changes, initialize lastSaved* variables
                 lastSavedContent = draftContent;
+                
+                var titleInput = document.getElementById('inp' + noteId);
+                var tagsElem = document.getElementById('tags' + noteId);
+                if (titleInput) {
+                    lastSavedTitle = titleInput.value;
+                }
+                if (tagsElem) {
+                    lastSavedTags = tagsElem.value;
+                }
                 console.log('[Poznote Auto-Save] No draft changes detected for note #' + noteId);
             }
         } else {
-            // Initialize lastSavedContent with current content
+            // Initialize lastSaved* variables with current content
             var entryElem = document.getElementById('entry' + noteId);
+            var titleInput = document.getElementById('inp' + noteId);
+            var tagsElem = document.getElementById('tags' + noteId);
             if (entryElem) {
                 lastSavedContent = entryElem.innerHTML;
+            }
+            if (titleInput) {
+                lastSavedTitle = titleInput.value;
+            }
+            if (tagsElem) {
+                lastSavedTags = tagsElem.value;
             }
             console.log('[Poznote Auto-Save] No draft found for note #' + noteId);
         }
@@ -1818,10 +1874,19 @@ function reinitializeAutoSaveState() {
             window.noteid = currentNoteId;
         }
         
-        // Initialize lastSavedContent with current server content (freshly loaded)
+        // Initialize lastSaved* variables with current server content (freshly loaded)
         var entryContent = entryElem.innerHTML;
+        var titleInput = document.getElementById('inp' + currentNoteId);
+        var tagsElem = document.getElementById('tags' + currentNoteId);
+        
         if (typeof lastSavedContent !== 'undefined') {
             lastSavedContent = entryContent;
+        }
+        if (typeof lastSavedTitle !== 'undefined' && titleInput) {
+            lastSavedTitle = titleInput.value;
+        }
+        if (typeof lastSavedTags !== 'undefined' && tagsElem) {
+            lastSavedTags = tagsElem.value;
         }
         
         // Clear any stale draft for this note since we just loaded fresh content

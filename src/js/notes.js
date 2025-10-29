@@ -207,9 +207,19 @@ function handleSaveResponse(data) {
             
             // Update last saved content for change detection with the content that was just saved
             var entryElem = document.getElementById("entry" + noteid);
+            var titleInput = document.getElementById("inp" + noteid);
+            var tagsElem = document.getElementById("tags" + noteid);
             if (entryElem) {
                 lastSavedContent = entryElem.innerHTML;
                 console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
+            }
+            if (titleInput) {
+                lastSavedTitle = titleInput.value;
+                console.log('[Poznote Auto-Save] lastSavedTitle updated with current value for note #' + noteid);
+            }
+            if (tagsElem) {
+                lastSavedTags = tagsElem.value;
+                console.log('[Poznote Auto-Save] lastSavedTags updated with current value for note #' + noteid);
             }
             updateConnectionStatus(true);
             
@@ -238,9 +248,19 @@ function handleSaveResponse(data) {
         
         // Update last saved content for change detection with the content that was just saved
         var entryElem = document.getElementById("entry" + noteid);
+        var titleInput = document.getElementById("inp" + noteid);
+        var tagsElem = document.getElementById("tags" + noteid);
         if (entryElem) {
             lastSavedContent = entryElem.innerHTML;
             console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
+        }
+        if (titleInput) {
+            lastSavedTitle = titleInput.value;
+            console.log('[Poznote Auto-Save] lastSavedTitle updated with current value for note #' + noteid);
+        }
+        if (tagsElem) {
+            lastSavedTags = tagsElem.value;
+            console.log('[Poznote Auto-Save] lastSavedTags updated with current value for note #' + noteid);
         }
         updateConnectionStatus(true);
         

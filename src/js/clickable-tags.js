@@ -414,20 +414,7 @@ function handleTagInput(e, noteId, container) {
             input.value = '';
             updateTagsInput(noteId, container);
             
-            // Trigger save after adding tags manually
-            setTimeout(() => {
-                try {
-                    const tagsInput = document.getElementById('tags' + noteId);
-                    const tagsValue = tagsInput ? tagsInput.value : '';
-                    if (noteId && typeof saveTagsDirectly === 'function') {
-                        saveTagsDirectly(noteId, tagsValue);
-                    } else if (noteId && typeof updatenote === 'function') {
-                        updatenote();
-                    }
-                } catch (error) {
-                    console.error('Error saving after manual tag addition:', error);
-                }
-            }, 100);
+            // updateTagsInput() already triggers auto-save via triggerAutoSaveForNote()
             
             // Keep focus on input to continue typing
             setTimeout(() => {
@@ -482,20 +469,7 @@ function handleTagInputBlur(e, noteId, container) {
         input.value = '';
         updateTagsInput(noteId, container);
         
-        // Trigger save after adding tags on blur
-        setTimeout(() => {
-            try {
-                const tagsInput = document.getElementById('tags' + noteId);
-                const tagsValue = tagsInput ? tagsInput.value : '';
-                if (noteId && typeof saveTagsDirectly === 'function') {
-                    saveTagsDirectly(noteId, tagsValue);
-                } else if (noteId && typeof updatenote === 'function') {
-                    updatenote();
-                }
-            } catch (error) {
-                console.error('Error saving after blur tag addition:', error);
-            }
-        }, 100);
+        // updateTagsInput() already triggers auto-save via triggerAutoSaveForNote()
     }
 }
 
@@ -507,20 +481,7 @@ function removeTagElement(tagWrapper, noteId) {
     tagWrapper.remove();
     updateTagsInput(noteId, container);
     
-    // Trigger save after removing tag
-    setTimeout(() => {
-        try {
-            const tagsInput = document.getElementById('tags' + noteId);
-            const tagsValue = tagsInput ? tagsInput.value : '';
-            if (noteId && typeof saveTagsDirectly === 'function') {
-                saveTagsDirectly(noteId, tagsValue);
-            } else if (noteId && typeof updatenote === 'function') {
-                updatenote();
-            }
-        } catch (error) {
-            console.error('Error saving after tag removal:', error);
-        }
-    }, 100);
+    // updateTagsInput() already triggers auto-save via triggerAutoSaveForNote()
 }
 
 /**
@@ -565,19 +526,115 @@ function updateTagsInput(noteId, container) {
     
     tagsInput.value = tags.join(' ');
     
-    // Set the global noteid to the note being modified
-    window.noteid = noteId;
-    
-    // Trigger auto-save system
-    if (typeof updateNote === 'function') {
-        updateNote();
-    } else if (typeof update === 'function') {
-        update();
-    }
+    // Trigger auto-save for this specific note (without changing global noteid)
+    triggerAutoSaveForNote(noteId);
     
     // Trigger the input change event to notify any other listeners
     const changeEvent = new Event('input', { bubbles: true });
     tagsInput.dispatchEvent(changeEvent);
+}
+
+/**
+ * Trigger auto-save for a specific note without relying on global noteid
+ */
+function triggerAutoSaveForNote(targetNoteId) {
+    if (targetNoteId == 'search' || targetNoteId == -1 || targetNoteId === null || targetNoteId === undefined) return;
+    
+    console.log('[Poznote Auto-Save] Triggering auto-save for tags change in note #' + targetNoteId);
+    
+    // Use dedicated function that doesn't depend on global noteid
+    updateNoteById(targetNoteId);
+}
+
+/**
+ * Update note by specific ID without relying on global noteid variable
+ */
+function updateNoteById(noteId) {
+    if (noteId == 'search' || noteId == -1 || noteId === null || noteId === undefined) return;
+    
+    // Get elements for this specific note
+    var entryElem = document.getElementById("entry" + noteId);
+    var titleInput = document.getElementById("inp" + noteId);
+    var tagsElem = document.getElementById("tags" + noteId);
+    
+    var currentContent = entryElem ? entryElem.innerHTML : '';
+    var currentTitle = titleInput ? titleInput.value : '';
+    var currentTags = tagsElem ? tagsElem.value : '';
+    
+    console.log('[Poznote Auto-Save] updateNoteById(#' + noteId + ') - tags:', currentTags);
+    
+    // Save to localStorage immediately
+    try {
+        if (entryElem) {
+            var draftKey = 'poznote_draft_' + noteId;
+            localStorage.setItem(draftKey, currentContent);
+            
+            if (titleInput) {
+                localStorage.setItem('poznote_title_' + noteId, currentTitle);
+            }
+            if (tagsElem) {
+                localStorage.setItem('poznote_tags_' + noteId, currentTags);
+            }
+            console.log('[Poznote Auto-Save] Saved to localStorage for note #' + noteId);
+        }
+    } catch (err) {
+        console.log('Error saving to localStorage for note #' + noteId + ':', err);
+    }
+    
+    // Initialize lastSaved variables if this is the current note to prevent infinite loops
+    if (window.noteid == noteId) {
+        // Initialize the global lastSaved variables to prevent updateNote() infinite loops
+        if (typeof lastSavedContent === 'undefined' || lastSavedContent === null) {
+            lastSavedContent = currentContent;
+        }
+        if (typeof lastSavedTitle === 'undefined' || lastSavedTitle === null) {
+            lastSavedTitle = currentTitle;
+        }
+        if (typeof lastSavedTags === 'undefined' || lastSavedTags === null) {
+            lastSavedTags = currentTags;
+        }
+        console.log('[Poznote Auto-Save] Initialized lastSaved variables for current note #' + noteId);
+    }
+    
+    // Visual indicator: add red dot to page title when there are unsaved changes
+    if (!document.title.startsWith('🔴')) {
+        document.title = '🔴 ' + document.title;
+    }
+    
+    // Debounced server save with preserved noteId context
+    var saveKey = 'saveTimeout_' + noteId;
+    if (window[saveKey]) {
+        clearTimeout(window[saveKey]);
+    }
+    
+    window[saveKey] = setTimeout(() => {
+        console.log('[Poznote Auto-Save] Triggering server save for note #' + noteId);
+        saveNoteToServerById(noteId);
+        delete window[saveKey]; // Clean up
+    }, 2000);
+}
+
+/**
+ * Save specific note to server by ID
+ */
+function saveNoteToServerById(noteId) {
+    console.log('[Poznote Auto-Save] saveNoteToServerById(#' + noteId + ')');
+    
+    // Temporarily set global noteid for saveNoteToServer compatibility
+    var originalNoteid = window.noteid;
+    window.noteid = noteId;
+    
+    try {
+        // Call the existing saveNoteToServer function
+        if (typeof saveNoteToServer === 'function') {
+            saveNoteToServer();
+        } else {
+            console.error('saveNoteToServer function not found');
+        }
+    } finally {
+        // Restore original noteid
+        window.noteid = originalNoteid;
+    }
 }
 
 /**
