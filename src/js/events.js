@@ -511,39 +511,33 @@ function setupNavigationDebugger() {
     var originalReplaceState = history.replaceState;
     
     history.pushState = function() {
-        console.log('[Poznote Auto-Save Debug] history.pushState called with:', arguments);
         return originalPushState.apply(history, arguments);
     };
     
     history.replaceState = function() {
-        console.log('[Poznote Auto-Save Debug] history.replaceState called with:', arguments);
         return originalReplaceState.apply(history, arguments);
     };
     
     // Monitor popstate events
     window.addEventListener('popstate', function(e) {
-        console.log('[Poznote Auto-Save Debug] popstate event:', e);
     });
     
     // Monitor all link clicks
     document.addEventListener('click', function(e) {
         if (e.target.tagName === 'A' || e.target.closest('a')) {
             var link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
-            console.log('[Poznote Auto-Save Debug] Any link clicked:', link.href);
         }
     }, true);
 }
 
 // Global click interceptor for note navigation links
 function setupNoteNavigationInterceptor() {
-    console.log('[Poznote Auto-Save] Setting up navigation interceptor');
     
     document.addEventListener('click', function(e) {
         // Check if this is a note link
         var link = e.target.closest('a.links_arbo_left, a[href*="note="]');
         if (!link) return;
         
-        console.log('[Poznote Auto-Save Debug] Link clicked:', link.href);
         
         // Extract target note ID from href
         var href = link.getAttribute('href');
@@ -555,21 +549,17 @@ function setupNoteNavigationInterceptor() {
         var targetNoteId = noteMatch[1];
         var currentNoteId = window.noteid;
         
-        console.log('[Poznote Auto-Save Debug] Intercepted click - current:', currentNoteId, 'target:', targetNoteId);
         
         // Check for unsaved changes BEFORE allowing navigation
         if (currentNoteId && currentNoteId !== targetNoteId && hasUnsavedChanges(currentNoteId)) {
-            console.log('[Poznote Auto-Save] BLOCKING navigation due to unsaved changes');
             // Prevent default navigation
             e.preventDefault();
             e.stopPropagation();
             
-            console.log('[Poznote Auto-Save] Delaying navigation - saving in progress...');
             
             // Show temporary notification
             showSaveInProgressNotification(function() {
                 // Callback when save is complete - proceed with navigation
-                console.log('[Poznote Auto-Save] Save completed, proceeding with navigation to note #' + targetNoteId);
                 window.location.href = href;
             });
             
@@ -577,7 +567,6 @@ function setupNoteNavigationInterceptor() {
         }
         
         // No unsaved changes, allow normal navigation
-        console.log('[Poznote Auto-Save Debug] No unsaved changes, allowing navigation');
     }, true); // Use capture phase to intercept before other handlers
 }
 
@@ -660,18 +649,12 @@ function showSaveInProgressNotification(onCompleteCallback) {
         var notInRefreshList = !notesNeedingRefresh.has(String(currentNoteId));
         var noRedDot = !document.title.startsWith('🔴');
         
-        console.log('[Poznote Auto-Save Debug] Save completion check:');
-        console.log('  - noTimeout:', noTimeout, '(saveTimeout:', saveTimeout, ')');
-        console.log('  - notInRefreshList:', notInRefreshList, '(size:', notesNeedingRefresh.size, ')');
-        console.log('  - noRedDot:', noRedDot, '(title:', document.title, ')');
         
         var saveComplete = noTimeout && notInRefreshList && noRedDot;
-        console.log('  - saveComplete:', saveComplete);
         
         if (saveComplete) {
             clearInterval(checkInterval);
             clearTimeout(fallbackTimeoutId);
-            console.log('[Poznote Auto-Save] Save detected as complete - showing "Saved!" message');
             
             // Change notification to success
             notification.innerHTML = `
@@ -699,7 +682,6 @@ function showSaveInProgressNotification(onCompleteCallback) {
     // Fallback timeout (in case something goes wrong)
     var fallbackTimeoutId = setTimeout(function() {
         clearInterval(checkInterval);
-        console.log('[Poznote Auto-Save] Fallback timeout reached - assuming save is complete');
         
         // Show "Saved!" even if detection failed
         notification.innerHTML = `
@@ -812,7 +794,6 @@ function setupDragDropEvents() {
                 handleImageFilesAndInsert(dt.files, note);
             }
         } catch (err) {
-            console.log('Error during drop:', err);
         }
     });
 }
@@ -945,7 +926,6 @@ function handleFolderDrop(e) {
             moveNoteToTargetFolder(data.noteId, targetFolder);
         }
     } catch (err) {
-        console.log('Error parsing drag data:', err);
     }
 }
 
@@ -1019,7 +999,6 @@ function setupLinkEvents() {
                     try {
                         localStorage.setItem('poznote_selected_workspace', targetWorkspace);
                     } catch (e) {
-                        console.log('Could not save workspace to localStorage:', e);
                     }
                     
                     // Navigate to the new workspace with the target note
@@ -1115,7 +1094,6 @@ function setupLinkEvents() {
                 }
             }
         } catch (err) {
-            console.log('Error during paste:', err);
         }
     });
 }
@@ -1137,7 +1115,6 @@ function setupAutoSaveCheck() {
     // Setup online/offline detection
     window.addEventListener('online', function() {
         isOnline = true;
-        console.log('Connection restored - syncing pending changes');
         // Try to sync any pending changes
         if (noteid !== -1 && noteid !== 'search' && noteid !== null && noteid !== undefined) {
             var draftKey = 'poznote_draft_' + noteid;
@@ -1154,7 +1131,6 @@ function setupAutoSaveCheck() {
     
     window.addEventListener('offline', function() {
         isOnline = false;
-        console.log('Connection lost - changes will be saved locally');
         updateConnectionStatus(false);
     });
 }
@@ -1162,11 +1138,9 @@ function setupAutoSaveCheck() {
 function updateConnectionStatus(online) {
     // Auto-save status - console only, no visual indicators
     if (online) {
-        console.log('[Poznote Auto-Save] ✓ Note #' + noteid + ' synced with server');
         // Remove from refresh list since it's now saved
         notesNeedingRefresh.delete(String(noteid));
     } else {
-        console.log('[Poznote Auto-Save] ⚠️  Offline - local draft saved, will sync when back online');
     }
 }
 
@@ -1182,11 +1156,9 @@ function setupPageUnloadWarning() {
                 var draft = localStorage.getItem(draftKey);
                 if (draft) {
                     // Use emergency save for reliable final save
-                    console.log('[Poznote Auto-Save] Emergency save triggered for note #' + noteid);
                     emergencySave(noteid);
                 }
             } catch (err) {
-                console.log('Error during beacon save:', err);
             }
         }
         // No confirmation popup needed - auto-save handles everything
@@ -1211,23 +1183,15 @@ function updateNote() {
     if (typeof lastSavedTitle === 'undefined') lastSavedTitle = null;
     if (typeof lastSavedTags === 'undefined') lastSavedTags = null;
     
-    console.log('[Poznote Auto-Save Debug] updateNote() - current content length:', currentContent.length);
-    console.log('[Poznote Auto-Save Debug] updateNote() - current title:', currentTitle);
-    console.log('[Poznote Auto-Save Debug] updateNote() - current tags:', currentTags);
-    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedContent length:', lastSavedContent ? lastSavedContent.length : 'null');
-    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedTitle:', lastSavedTitle);
-    console.log('[Poznote Auto-Save Debug] updateNote() - lastSavedTags:', lastSavedTags);
     
     var contentChanged = currentContent !== lastSavedContent;
     var titleChanged = currentTitle !== lastSavedTitle;
     var tagsChanged = currentTags !== lastSavedTags;
     
     if (!contentChanged && !titleChanged && !tagsChanged) {
-        console.log('[Poznote Auto-Save] No changes detected in updateNote() for note #' + noteid + ' (content, title, or tags), skipping save process');
         return;
     }
     
-    console.log('[Poznote Auto-Save] Changes detected - content:', contentChanged, 'title:', titleChanged, 'tags:', tagsChanged);
     
     // Modern auto-save: save to localStorage immediately
     saveToLocalStorage();
@@ -1248,7 +1212,6 @@ function updateNote() {
         if (noteid === currentNoteId && isOnline) {
             saveToServerDebounced();
         } else if (noteid !== currentNoteId) {
-            console.log('[Poznote Auto-Save] Note changed from #' + currentNoteId + ' to #' + noteid + ', cancelling save');
         }
     }, 2000); // 2 second debounce
 }
@@ -1278,7 +1241,6 @@ function saveToLocalStorage() {
             }
         }
     } catch (err) {
-        console.log('Error saving to localStorage:', err);
     }
 }
 
@@ -1288,13 +1250,11 @@ function saveToServerDebounced() {
     // Clear the timeout since we're executing the save now
     clearTimeout(saveTimeout);
     saveTimeout = null;
-    console.log('[Poznote Auto-Save] Cleared saveTimeout for note #' + noteid);
     
     // Check that the note elements still exist (user might have navigated away)
     var titleInput = document.getElementById("inp" + noteid);
     var entryElem = document.getElementById("entry" + noteid);
     if (!titleInput || !entryElem) {
-        console.log('[Poznote Auto-Save] Note #' + noteid + ' no longer active, skipping save');
         return;
     }
     
@@ -1313,14 +1273,11 @@ function saveToServerDebounced() {
     
     if (!contentChanged && !titleChanged && !tagsChanged) {
         // No changes detected
-        console.log('[Poznote Auto-Save] No changes detected for note #' + noteid + ' (content, title, tags all match)');
         return;
     }
     
-    console.log('[Poznote Auto-Save] Changes detected for server save - content:', contentChanged, 'title:', titleChanged, 'tags:', tagsChanged);
     
     // Trigger server save
-    console.log('[Poznote Auto-Save] Triggering server sync for note #' + noteid);
     saveNoteToServer();
 }
 
@@ -1356,7 +1313,6 @@ function updatenote() {
 
 function saveFocusedNoteJS() {
     // Manual save button removed - auto-save handles everything automatically
-    console.log('[Poznote Auto-Save] Note is being auto-saved continuously');
 }
 
 // Text selection management for formatting toolbar
@@ -1543,40 +1499,28 @@ function switchWorkspace(targetWorkspace, callback) {
 function hasUnsavedChanges(noteId) {
     if (!noteId || noteId == -1 || noteId == 'search') return false;
     
-    console.log('[Poznote Auto-Save Debug] Checking unsaved changes for note #' + noteId);
-    console.log('[Poznote Auto-Save Debug] - saveTimeout:', saveTimeout);
-    console.log('[Poznote Auto-Save Debug] - notesNeedingRefresh size:', notesNeedingRefresh.size);
-    console.log('[Poznote Auto-Save Debug] - notesNeedingRefresh contents:', Array.from(notesNeedingRefresh));
-    console.log('[Poznote Auto-Save Debug] - note in refresh list:', notesNeedingRefresh.has(String(noteId)));
-    console.log('[Poznote Auto-Save Debug] - page title:', document.title);
-    console.log('[Poznote Auto-Save Debug] - title starts with 🔴:', document.title.startsWith('🔴'));
     
     // Check if there's a pending server save timeout
     if (saveTimeout !== null && saveTimeout !== undefined) {
-        console.log('[Poznote Auto-Save] Note #' + noteId + ' has pending server save (timeout active)');
         return true;
     }
     
     // Check if note is marked as needing refresh (has pending changes)
     if (notesNeedingRefresh.has(String(noteId))) {
-        console.log('[Poznote Auto-Save] Note #' + noteId + ' marked as needing refresh');
         return true;
     }
     
     // Also check if page title still has unsaved indicator
     if (document.title.startsWith('🔴')) {
-        console.log('[Poznote Auto-Save] Note #' + noteId + ' has unsaved indicator in page title: ' + document.title);
         return true;
     }
     
-    console.log('[Poznote Auto-Save] Note #' + noteId + ' has no unsaved changes');
     return false;
 }
 
 // Check before leaving a note with unsaved changes
 function checkUnsavedBeforeLeaving(targetNoteId) {
     var currentNoteId = window.noteid;
-    console.log('[Poznote Auto-Save Debug] checkUnsavedBeforeLeaving called - current:', currentNoteId, 'target:', targetNoteId);
     
     if (!currentNoteId || currentNoteId == -1 || currentNoteId == 'search') return true;
     
@@ -1591,7 +1535,6 @@ function checkUnsavedBeforeLeaving(targetNoteId) {
         
         if (confirm(message)) {
             // Force immediate save
-            console.log('[Poznote Auto-Save] User confirmed save - forcing immediate server sync');
             clearTimeout(saveTimeout);
             saveTimeout = null;
             
@@ -1607,7 +1550,6 @@ function checkUnsavedBeforeLeaving(targetNoteId) {
             
             return true;
         } else {
-            console.log('[Poznote Auto-Save] User cancelled navigation to preserve unsaved changes');
             return false;
         }
     }
@@ -1625,7 +1567,6 @@ function emergencySave(noteId) {
     var folderElem = document.getElementById("folder" + noteId);
     
     if (!entryElem || !titleInput) {
-        console.log('[Poznote Auto-Save] Emergency save: elements not found for note #' + noteId);
         return;
     }
     
@@ -1657,12 +1598,10 @@ function emergencySave(noteId) {
             body: JSON.stringify(params),
             keepalive: true
         }).then(function() {
-            console.log('[Poznote Auto-Save] Emergency save via fetch+keepalive successful for note #' + noteId);
         }).catch(function(err) {
             console.error('[Poznote Auto-Save] Emergency fetch failed:', err);
         });
     } catch (err) {
-        console.log('[Poznote Auto-Save] Fetch+keepalive not supported, trying sendBeacon');
         
         // Strategy 2: Fallback to sendBeacon with FormData (some servers accept this)
         try {
@@ -1673,7 +1612,6 @@ function emergencySave(noteId) {
             formData.append('workspace', window.selectedWorkspace || 'Poznote');
             
             if (navigator.sendBeacon('api_update_note.php', formData)) {
-                console.log('[Poznote Auto-Save] Emergency save via sendBeacon successful for note #' + noteId);
             } else {
                 console.error('[Poznote Auto-Save] sendBeacon returned false');
             }
@@ -1687,7 +1625,6 @@ function emergencySave(noteId) {
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 xhr.send(JSON.stringify(params));
-                console.log('[Poznote Auto-Save] Emergency save via sync XHR for note #' + noteId);
             } catch (xhrErr) {
                 console.error('[Poznote Auto-Save] All emergency save strategies failed:', xhrErr);
             }
@@ -1748,7 +1685,6 @@ window.addEventListener('popstate', function(e) {
 function checkForUnsavedDraft(noteId, skipAutoRestore) {
     if (!noteId || noteId == -1 || noteId == 'search') return;
     
-    console.log('[Poznote Auto-Save] Checking for draft of note #' + noteId);
     
     try {
         var draftKey = 'poznote_draft_' + noteId;
@@ -1778,7 +1714,6 @@ function checkForUnsavedDraft(noteId, skipAutoRestore) {
                 restoreDraft(noteId, draftContent, draftTitle, draftTags);
             } else if (hasUnsavedChanges && skipAutoRestore) {
                 // Draft exists but we're skipping auto-restore (note was refreshed from server)
-                console.log('[Poznote Auto-Save] Draft found for note #' + noteId + ' but skipping auto-restore due to server refresh');
                 // Clear old draft since server content is more recent
                 clearDraft(noteId);
                 // Initialize with current server content
@@ -1806,7 +1741,6 @@ function checkForUnsavedDraft(noteId, skipAutoRestore) {
                 if (tagsElem) {
                     lastSavedTags = tagsElem.value;
                 }
-                console.log('[Poznote Auto-Save] No draft changes detected for note #' + noteId);
             }
         } else {
             // Initialize lastSaved* variables with current content
@@ -1822,10 +1756,8 @@ function checkForUnsavedDraft(noteId, skipAutoRestore) {
             if (tagsElem) {
                 lastSavedTags = tagsElem.value;
             }
-            console.log('[Poznote Auto-Save] No draft found for note #' + noteId);
         }
     } catch (err) {
-        console.log('Error checking for unsaved draft:', err);
     }
 }
 
@@ -1845,7 +1777,6 @@ function restoreDraft(noteId, content, title, tags) {
     }
     
     // Auto-save will handle the restored content automatically
-    console.log('[Poznote Auto-Save] ✓ Draft automatically restored for note #' + noteId + ' - no user action required');
 }
 
 function clearDraft(noteId) {
@@ -1854,7 +1785,6 @@ function clearDraft(noteId) {
         localStorage.removeItem('poznote_title_' + noteId);
         localStorage.removeItem('poznote_tags_' + noteId);
     } catch (err) {
-        console.log('Error clearing draft:', err);
     }
 }
 
@@ -1867,7 +1797,6 @@ function reinitializeAutoSaveState() {
     }
     
     if (currentNoteId && currentNoteId !== 'search' && currentNoteId !== '-1') {
-        console.log('[Poznote Auto-Save] Reinitializing auto-save state for note #' + currentNoteId);
         
         // Update global noteid
         if (typeof window !== 'undefined') {
@@ -1896,10 +1825,8 @@ function reinitializeAutoSaveState() {
         if (typeof notesNeedingRefresh !== 'undefined') {
             var wasInList = notesNeedingRefresh.has(String(currentNoteId));
             notesNeedingRefresh.delete(String(currentNoteId));
-            console.log('[Poznote Auto-Save] Note #' + currentNoteId + ' removed from refresh list (was in list:', wasInList + ')');
         }
         
-        console.log('[Poznote Auto-Save] Auto-save state reset for note #' + currentNoteId);
     }
 }
 

@@ -353,9 +353,7 @@ if ($note_id > 0) {
                 localStorage.removeItem('poznote_draft_' + noteId);
                 localStorage.removeItem('poznote_title_' + noteId);
                 localStorage.removeItem('poznote_tags_' + noteId);
-                console.log('Cleared localStorage draft for note #' + noteId + ' after Excalidraw save');
             } catch (err) {
-                console.log('Error clearing localStorage draft:', err);
             }
             
             this.textContent = 'Saved!';
@@ -411,9 +409,7 @@ if ($note_id > 0) {
                 localStorage.removeItem('poznote_draft_' + noteId);
                 localStorage.removeItem('poznote_title_' + noteId);
                 localStorage.removeItem('poznote_tags_' + noteId);
-                console.log('Cleared localStorage draft for note #' + noteId + ' after Excalidraw save');
             } catch (err) {
-                console.log('Error clearing localStorage draft:', err);
             }
             
             // After saving, redirect back to notes

@@ -100,7 +100,6 @@ function createMarkdownNote() {
 
 function saveNote() {
     // Auto-save handles everything automatically now
-    console.log('[Poznote Auto-Save] Manual save requested - auto-save already running');
 }
 
 function saveNoteToServer() {
@@ -118,7 +117,6 @@ function saveNoteToServer() {
 
     // Check that elements exist
     if (!titleInput || !entryElem) {
-        console.log('[Poznote Auto-Save] Note #' + noteid + ' elements not found, skipping save (likely user navigated away)');
         return;
     }
     
@@ -200,7 +198,6 @@ function handleSaveResponse(data) {
             var titleInput = document.getElementById('inp'+noteid);
             if (titleInput && jsonData.title !== jsonData.original_title) {
                 titleInput.value = jsonData.title;
-                console.log('[Poznote Auto-Save] Title modified to ensure uniqueness: ' + jsonData.title);
             }
             
             updateNoteTitleInLeftColumn();
@@ -211,28 +208,23 @@ function handleSaveResponse(data) {
             var tagsElem = document.getElementById("tags" + noteid);
             if (entryElem) {
                 lastSavedContent = entryElem.innerHTML;
-                console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
             }
             if (titleInput) {
                 lastSavedTitle = titleInput.value;
-                console.log('[Poznote Auto-Save] lastSavedTitle updated with current value for note #' + noteid);
             }
             if (tagsElem) {
                 lastSavedTags = tagsElem.value;
-                console.log('[Poznote Auto-Save] lastSavedTags updated with current value for note #' + noteid);
             }
             updateConnectionStatus(true);
             
             // Remove unsaved changes indicator from page title
             if (document.title.startsWith('🔴')) {
                 document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
-                console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
             }
             
             // Mark note as saved (remove from pending refresh list)
             if (typeof notesNeedingRefresh !== 'undefined') {
                 notesNeedingRefresh.delete(String(noteid));
-                console.log('[Poznote Auto-Save] ✓ Note #' + noteid + ' removed from refresh list');
             }
             
             return;
@@ -252,28 +244,23 @@ function handleSaveResponse(data) {
         var tagsElem = document.getElementById("tags" + noteid);
         if (entryElem) {
             lastSavedContent = entryElem.innerHTML;
-            console.log('[Poznote Auto-Save] lastSavedContent updated with current DOM content for note #' + noteid);
         }
         if (titleInput) {
             lastSavedTitle = titleInput.value;
-            console.log('[Poznote Auto-Save] lastSavedTitle updated with current value for note #' + noteid);
         }
         if (tagsElem) {
             lastSavedTags = tagsElem.value;
-            console.log('[Poznote Auto-Save] lastSavedTags updated with current value for note #' + noteid);
         }
         updateConnectionStatus(true);
         
         // Remove unsaved changes indicator from page title
         if (document.title.startsWith('🔴')) {
             document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
-            console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
         }
         
         // Mark note as saved (remove from pending refresh list)
         if (typeof notesNeedingRefresh !== 'undefined') {
             notesNeedingRefresh.delete(String(noteid));
-            console.log('[Poznote Auto-Save] ✓ Note #' + noteid + ' removed from refresh list');
         }
     }
 }

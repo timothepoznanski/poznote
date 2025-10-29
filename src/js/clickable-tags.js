@@ -540,7 +540,6 @@ function updateTagsInput(noteId, container) {
 function triggerAutoSaveForNote(targetNoteId) {
     if (targetNoteId == 'search' || targetNoteId == -1 || targetNoteId === null || targetNoteId === undefined) return;
     
-    console.log('[Poznote Auto-Save] Triggering auto-save for tags change in note #' + targetNoteId);
     
     // Use dedicated function that doesn't depend on global noteid
     updateNoteById(targetNoteId);
@@ -561,7 +560,6 @@ function updateNoteById(noteId) {
     var currentTitle = titleInput ? titleInput.value : '';
     var currentTags = tagsElem ? tagsElem.value : '';
     
-    console.log('[Poznote Auto-Save] updateNoteById(#' + noteId + ') - tags:', currentTags);
     
     // Save to localStorage immediately
     try {
@@ -575,10 +573,8 @@ function updateNoteById(noteId) {
             if (tagsElem) {
                 localStorage.setItem('poznote_tags_' + noteId, currentTags);
             }
-            console.log('[Poznote Auto-Save] Saved to localStorage for note #' + noteId);
         }
     } catch (err) {
-        console.log('Error saving to localStorage for note #' + noteId + ':', err);
     }
     
     // Initialize lastSaved variables if this is the current note to prevent infinite loops
@@ -593,7 +589,6 @@ function updateNoteById(noteId) {
         if (typeof lastSavedTags === 'undefined' || lastSavedTags === null) {
             lastSavedTags = currentTags;
         }
-        console.log('[Poznote Auto-Save] Initialized lastSaved variables for current note #' + noteId);
     }
     
     // Visual indicator: add red dot to page title when there are unsaved changes
@@ -608,7 +603,6 @@ function updateNoteById(noteId) {
     }
     
     window[saveKey] = setTimeout(() => {
-        console.log('[Poznote Auto-Save] Triggering server save for note #' + noteId);
         saveNoteToServerById(noteId);
         delete window[saveKey]; // Clean up
     }, 2000);
@@ -618,7 +612,6 @@ function updateNoteById(noteId) {
  * Save specific note to server by ID
  */
 function saveNoteToServerById(noteId) {
-    console.log('[Poznote Auto-Save] saveNoteToServerById(#' + noteId + ')');
     
     // Temporarily set global noteid for saveNoteToServer compatibility
     var originalNoteid = window.noteid;
