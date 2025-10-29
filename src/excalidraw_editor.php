@@ -408,7 +408,7 @@ if ($note_id > 0) {
         }
     };
         
-    // Cancel button (previously back button)
+    // Cancel button
     document.getElementById('cancelBtn').onclick = function() {
         const params = new URLSearchParams({ workspace: workspace });
         if (noteId > 0) params.append('note', noteId);
@@ -501,13 +501,6 @@ if ($note_id > 0) {
             throw new Error(result.message || 'Save failed');
         }
     }
-        
-    // Back button
-    document.getElementById('backBtn').onclick = function() {
-        const params = new URLSearchParams({ workspace: workspace });
-        if (noteId > 0) params.append('note', noteId);
-        window.location.href = 'index.php?' + params.toString();
-    };
     </script>
 </body>
 </html>
