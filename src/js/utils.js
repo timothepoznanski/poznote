@@ -998,7 +998,11 @@ function emptyFolder(folderName) {
         function() {
             executeEmptyFolder(folderName);
         },
-        { danger: true }
+        { 
+            danger: true,
+            confirmText: 'Send notes to trash',
+            hideSaveAndExit: true
+        }
     );
 }
 

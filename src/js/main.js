@@ -2,6 +2,7 @@
 // This file coordinates initialization of all modules
 
 document.addEventListener('DOMContentLoaded', function() {
+    
     // Initialize global variables and workspaces
     initializeWorkspaces();
     

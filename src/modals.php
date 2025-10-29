@@ -85,9 +85,9 @@
         <h3 id="confirmTitle">Confirm Action</h3>
         <p id="confirmMessage">Are you sure you want to proceed?</p>
         <div class="modal-buttons">
-            <button type="button" class="btn-primary" id="confirmButton" onclick="executeConfirmedAction()">Exit without saving</button>
-            <button type="button" class="btn-secondary" id="saveAndExitButton" onclick="executeSaveAndExitAction()" style="display: none;">Save and Exit</button>
             <button type="button" class="btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+            <button type="button" class="btn-secondary" id="saveAndExitButton" onclick="executeSaveAndExitAction()" style="display: none;">Save and Exit</button>
+            <button type="button" class="btn-primary" id="confirmButton" onclick="executeConfirmedAction()">Exit without saving</button>
         </div>
     </div>
 </div>

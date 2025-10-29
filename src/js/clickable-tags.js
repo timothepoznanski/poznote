@@ -258,8 +258,8 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                     if (typeof window !== 'undefined' && targetNoteId) {
                         window.noteid = targetNoteId;
                         // Auto-save will handle the modification automatically
-                        if (typeof markNoteAsModified === 'function') {
-                            markNoteAsModified();
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
                         }
                     }
                 } catch (err) { 
@@ -308,8 +308,8 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                         if (typeof window !== 'undefined' && targetNoteId) {
                             window.noteid = targetNoteId;
                             // Auto-save will handle the modification automatically
-                            if (typeof markNoteAsModified === 'function') {
-                                markNoteAsModified();
+                            if (typeof window.markNoteAsModified === 'function') {
+                                window.markNoteAsModified();
                             }
                         }
                     } catch (err) { 
@@ -640,8 +640,8 @@ function saveNoteToServerById(noteId) {
  */
 function saveTagsDirectly(noteId, tagsValue) {
     // Auto-save handles all saving automatically
-    if (typeof markNoteAsModified === 'function') {
-        markNoteAsModified();
+    if (typeof window.markNoteAsModified === 'function') {
+        window.markNoteAsModified();
     }
 }
 

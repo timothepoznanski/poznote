@@ -861,7 +861,14 @@ $body_classes = trim($extra_body_classes);
                     
                     // Note content with font size style
                     $note_type = $row['type'] ?? 'note';
-                    $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
+                    $data_attr = '';
+                    
+                    if ($note_type === 'tasklist') {
+                        // For tasklist, properly encode JSON for HTML attribute
+                        $tasklist_json_raw = $row['entry'] ?? '';
+                        $tasklist_json_encoded = htmlspecialchars($tasklist_json_raw, ENT_QUOTES);
+                        $data_attr = ' data-tasklist-json="'.$tasklist_json_encoded.'"';
+                    }
                     
                     // For markdown notes, store the markdown content in a data attribute
                     if ($note_type === 'markdown') {

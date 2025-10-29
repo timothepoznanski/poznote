@@ -1008,14 +1008,14 @@ function deleteImage(img) {
         }
         
         // Trigger note update to save changes
-        if (typeof updateNote === 'function') {
-            markNoteAsModified(); // Mark note as edited
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified(); // Mark note as edited
         }
         
         // Trigger automatic save after a short delay
         setTimeout(function() {
-            if (typeof updatenote === 'function') {
-                saveNoteImmediately(); // Save to server
+            if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately(); // Save to server
             }
         }, 100);
         

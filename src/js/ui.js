@@ -359,6 +359,14 @@ function showConfirmModal(title, message, callback, options, saveAndExitCallback
     confirmedActionCallback = callback;
     saveAndExitActionCallback = saveAndExitCallback;
 
+    // Set button text from options or use defaults
+    if (confirmBtn) {
+        confirmBtn.textContent = (options && options.confirmText) ? options.confirmText : 'Exit without saving';
+    }
+    if (saveAndExitBtn) {
+        saveAndExitBtn.textContent = (options && options.saveAndExitText) ? options.saveAndExitText : 'Save and Exit';
+    }
+
     // Reset button classes first
     if (confirmBtn) {
         confirmBtn.classList.remove('btn-danger');
@@ -389,10 +397,14 @@ function showConfirmModal(title, message, callback, options, saveAndExitCallback
     
     // Show or hide the save and exit button
     if (saveAndExitBtn) {
-        if (saveAndExitCallback) {
+        if (saveAndExitCallback && !(options && options.hideSaveAndExit)) {
             saveAndExitBtn.style.display = 'inline-block';
+            saveAndExitBtn.style.visibility = 'visible';
         } else {
             saveAndExitBtn.style.display = 'none';
+            saveAndExitBtn.style.visibility = 'hidden';
+            // Force hide with important style to override any CSS
+            saveAndExitBtn.setAttribute('style', 'display: none !important; visibility: hidden !important;');
         }
     }
     

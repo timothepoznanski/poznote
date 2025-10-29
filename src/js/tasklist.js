@@ -10,11 +10,32 @@ function initializeTaskList(noteId, noteType) {
     // Get existing tasks from the data attribute or initialize empty array
     let tasks = [];
     const tasklistJson = noteEntry.dataset.tasklistJson;
+    console.log('[Tasklist Debug] Raw tasklistJson:', tasklistJson);
+    
     if (tasklistJson && tasklistJson.trim() !== '') {
-        try {
-            tasks = JSON.parse(tasklistJson);
-        } catch (e) {
-            console.error('Failed to parse tasklist JSON:', e);
+        // Check if it looks like JSON (starts with [ or {)
+        const trimmed = tasklistJson.trim();
+        if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+            try {
+                tasks = JSON.parse(tasklistJson);
+                console.log('[Tasklist Debug] Successfully parsed tasks:', tasks);
+            } catch (e) {
+                console.error('Failed to parse tasklist JSON:', e);
+                console.error('Problematic JSON content:', tasklistJson);
+                // Initialize empty task list on parse error
+                tasks = [];
+            }
+        } else {
+            console.warn('[Tasklist Debug] tasklistJson does not look like JSON, attempting to recover from HTML or initializing empty list');
+            
+            // Try to extract tasks from existing HTML if present
+            tasks = extractTasksFromHTML(noteEntry) || [];
+            
+            if (tasks.length === 0) {
+                console.log('[Tasklist Debug] No tasks found in HTML, initializing empty list');
+            } else {
+                console.log('[Tasklist Debug] Recovered', tasks.length, 'tasks from HTML');
+            }
         }
     }
 
@@ -25,6 +46,37 @@ function initializeTaskList(noteId, noteType) {
 
     // Replace the contenteditable div with task list interface
     renderTaskList(noteId, tasks);
+}
+
+// Extract tasks from existing HTML (recovery function)
+function extractTasksFromHTML(noteEntry) {
+    try {
+        const taskItems = noteEntry.querySelectorAll('.task-item');
+        if (taskItems.length === 0) return null;
+        
+        const tasks = [];
+        taskItems.forEach(item => {
+            const taskId = item.dataset.taskId;
+            const textSpan = item.querySelector('.task-text');
+            const checkbox = item.querySelector('.task-checkbox');
+            const importantBtn = item.querySelector('.task-important-btn');
+            
+            if (taskId && textSpan) {
+                tasks.push({
+                    id: parseFloat(taskId) || Date.now() + Math.random(),
+                    text: textSpan.textContent || '',
+                    completed: checkbox ? checkbox.checked : false,
+                    noteId: parseInt(noteEntry.id.replace('entry', '')),
+                    important: importantBtn ? importantBtn.classList.contains('important') : false
+                });
+            }
+        });
+        
+        return tasks.length > 0 ? tasks : null;
+    } catch (e) {
+        console.error('[Tasklist Debug] Error extracting tasks from HTML:', e);
+        return null;
+    }
 }
 
 // Render the task list interface
@@ -58,7 +110,7 @@ function renderTaskList(noteId, tasks) {
     }
 
     // Store tasks data
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Enable drag & drop reordering after initial render
     enableDragAndDrop(noteId);
@@ -118,7 +170,7 @@ function addTask(noteId) {
 
     let tasks = [];
     try {
-        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
     } catch (e) {
         tasks = [];
     }
@@ -134,7 +186,7 @@ function addTask(noteId) {
     newTask.important = false;
 
     tasks.push(newTask);
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Re-render tasks
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
@@ -148,7 +200,7 @@ function addTask(noteId) {
     input.value = '';
 
     // Mark as modified
-    markNoteAsModified(noteId);
+    markTaskListAsModified(noteId);
 }
 
 // Toggle task completion
@@ -158,7 +210,7 @@ function toggleTask(taskId, noteId) {
 
     let tasks = [];
     try {
-        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
     } catch (e) {
         return;
     }
@@ -185,7 +237,7 @@ function toggleTask(taskId, noteId) {
         return 0;
     });
     
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Re-render tasks list with new order
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
@@ -195,7 +247,7 @@ function toggleTask(taskId, noteId) {
         enableDragAndDrop(noteId);
     }
 
-    markNoteAsModified(noteId);
+    markTaskListAsModified(noteId);
 }
 
 // Edit task text
@@ -240,7 +292,7 @@ function saveTaskEdit(taskId, noteId, newText) {
 
     let tasks = [];
     try {
-        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
     } catch (e) {
         return;
     }
@@ -249,7 +301,7 @@ function saveTaskEdit(taskId, noteId, newText) {
     if (taskIndex === -1) return;
 
     tasks[taskIndex].text = newText;
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Re-render task
     const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
@@ -270,7 +322,7 @@ function saveTaskEdit(taskId, noteId, newText) {
     // Ensure drag & drop still works after inline edit
     enableDragAndDrop(noteId);
 
-    markNoteAsModified(noteId);
+    markTaskListAsModified(noteId);
 }
 
 // Cancel task edit
@@ -297,13 +349,13 @@ function deleteTask(taskId, noteId) {
 
     let tasks = [];
     try {
-        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
     } catch (e) {
         return;
     }
 
     tasks = tasks.filter(task => task.id !== taskId);
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Remove from UI
     const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
@@ -314,7 +366,7 @@ function deleteTask(taskId, noteId) {
     // Ensure DnD state is consistent after deletion
     enableDragAndDrop(noteId);
 
-    markNoteAsModified(noteId);
+    markTaskListAsModified(noteId);
 }
 
 // Toggle important flag for a task and move it to top when important
@@ -324,7 +376,7 @@ function toggleImportant(taskId, noteId) {
 
     let tasks = [];
     try {
-        tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
     } catch (e) {
         return;
     }
@@ -341,7 +393,7 @@ function toggleImportant(taskId, noteId) {
         return (b.important ? 1 : 0) - (a.important ? 1 : 0);
     });
 
-    noteEntry.dataset.tasks = JSON.stringify(tasks);
+    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
     // Re-render tasks list
     const tasksList = document.getElementById(`tasks-list-${noteId}`);
@@ -351,11 +403,11 @@ function toggleImportant(taskId, noteId) {
         enableDragAndDrop(noteId);
     }
 
-    markNoteAsModified(noteId);
+    markTaskListAsModified(noteId);
 }
 
 // Mark note as modified (to trigger save)
-function markNoteAsModified(noteId) {
+function markTaskListAsModified(noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
     if (noteEntry) {
         // Ensure noteid is set correctly for task lists
@@ -371,9 +423,11 @@ function getTaskListData(noteId) {
     if (!noteEntry) return '';
 
     try {
-        const tasks = JSON.parse(noteEntry.dataset.tasks || '[]');
+        // Use the correct dataset attribute name
+        const tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
         return JSON.stringify(tasks);
     } catch (e) {
+        console.error('[Tasklist Debug] Error getting task list data:', e);
         return '';
     }
 }
@@ -446,7 +500,7 @@ function enableDragAndDrop(noteId) {
                     if (!noteEntry) return;
 
                     let tasks = [];
-                    try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { return; }
+                    try { tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]'); } catch (err) { return; }
 
                     const oldIndex = evt.oldIndex;
                     const newIndex = evt.newIndex;
@@ -456,12 +510,12 @@ function enableDragAndDrop(noteId) {
                     tasks.splice(newIndex, 0, moved);
 
                     // Save new order
-                    noteEntry.dataset.tasks = JSON.stringify(tasks);
+                    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
                     // sortable moved
 
                     // Mark note modified so it gets saved
-                    markNoteAsModified(noteId);
+                    markTaskListAsModified(noteId);
                 }
             });
 
@@ -551,7 +605,7 @@ function enableDragAndDrop(noteId) {
             if (!noteEntry) return;
 
             let tasks = [];
-            try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { return; }
+            try { tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]'); } catch (err) { return; }
 
             const draggedIdFromData = e.dataTransfer && e.dataTransfer.getData ? e.dataTransfer.getData('text/plain') : null;
             const idStr = draggedIdFromData || draggedId;
@@ -574,7 +628,7 @@ function enableDragAndDrop(noteId) {
             tasks.splice(targetIndex, 0, moved);
 
             // Save new order
-            noteEntry.dataset.tasks = JSON.stringify(tasks);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
             // Re-render and re-enable handlers
             const listEl = document.getElementById(`tasks-list-${noteId}`);
@@ -586,7 +640,7 @@ function enableDragAndDrop(noteId) {
 
             // dropped and reordered
             // Mark note modified so it gets saved
-            markNoteAsModified(noteId);
+            markTaskListAsModified(noteId);
         });
 
         tasksList.addEventListener('dragend', function(e) {
@@ -702,7 +756,7 @@ function enableDragAndDrop(noteId) {
                 if (noteEntry && state.placeholder) {
                     // Rebuild tasks array order according to DOM
                     let tasks = [];
-                    try { tasks = JSON.parse(noteEntry.dataset.tasks || '[]'); } catch (err) { tasks = []; }
+                    try { tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]'); } catch (err) { tasks = []; }
 
                     // Map DOM order to tasks order
                     const items = Array.from(document.getElementById(`tasks-list-${state.noteId}`).querySelectorAll('.task-item'));
@@ -724,13 +778,13 @@ function enableDragAndDrop(noteId) {
 
                     // Save new order
                     if (newTasks.length > 0) {
-                        noteEntry.dataset.tasks = JSON.stringify(newTasks);
+                        noteEntry.dataset.tasklistJson = JSON.stringify(newTasks);
                         const listEl = document.getElementById(`tasks-list-${state.noteId}`);
                         if (listEl) {
                             listEl.innerHTML = renderTasks(newTasks, state.noteId);
                             setTimeout(() => enableDragAndDrop(state.noteId), 0);
                         }
-                        markNoteAsModified(state.noteId);
+                        markTaskListAsModified(state.noteId);
                     }
                 }
 

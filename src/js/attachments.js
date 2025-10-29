@@ -289,8 +289,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     insertMarkdownAtCursor(loadingText, dropTarget);
     
     // Trigger initial save for loading text
-    if (typeof markNoteAsModified === 'function') {
-        markNoteAsModified(); // Mark note as edited
+    if (typeof window.markNoteAsModified === 'function') {
+        window.markNoteAsModified(); // Mark note as edited
     }
     
     // Upload the file
@@ -316,8 +316,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             replaceLoadingText(loadingText, imageMarkdown, dropTarget);
             
             // Marquer la note comme modifiée
-            if (typeof markNoteAsModified === 'function') {
-                markNoteAsModified(noteId);
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
             }
             
             // Re-initialize image click handlers after markdown image insertion
@@ -329,8 +329,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
             
             // Trigger automatic save after a short delay
             setTimeout(function() {
-                if (typeof updatenote === 'function') {
-                    saveNoteImmediately(); // Save to server
+                if (typeof window.saveNoteImmediately === 'function') {
+                    window.saveNoteImmediately(); // Save to server
                 }
             }, 500); // Longer delay for markdown to allow upload completion
         } else {
@@ -446,8 +446,8 @@ function handleHTMLImageInsert(file, dropTarget) {
         }
         
         // Trigger automatic save after image insertion
-        if (typeof markNoteAsModified === 'function') {
-            markNoteAsModified(); // Mark note as edited
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified(); // Mark note as edited
         }
         
         // Re-initialize image click handlers for the newly inserted image
@@ -461,8 +461,8 @@ function handleHTMLImageInsert(file, dropTarget) {
         setTimeout(function() {
             if (typeof saveNoteToServer === 'function') {
                 saveNoteToServer(); // Direct call to save function
-            } else if (typeof updatenote === 'function') {
-                saveNoteImmediately(); // Fallback to saveNoteImmediately
+            } else if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately(); // Fallback to saveNoteImmediately
             }
         }, 100);
     };

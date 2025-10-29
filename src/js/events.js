@@ -72,6 +72,7 @@ function serializeChecklists(entryElement) {
 }
 
 function initializeEventListeners() {
+    
     // Events for note modification
     setupNoteEditingEvents();
     
@@ -105,6 +106,7 @@ function setupNoteEditingEvents() {
     for (var i = 0; i < eventTypes.length; i++) {
         var eventType = eventTypes[i];
         document.body.addEventListener(eventType, function(e) {
+            
             // Handle checklist checkbox changes (auto-save)
             if (e.target && e.target.classList && e.target.classList.contains('checklist-checkbox')) {
                 // IMPORTANT: Set noteid from the noteentry element
@@ -383,9 +385,13 @@ function handleNoteEditEvent(e) {
     }
     
     if (target.classList.contains('name_doss')) {
-        markNoteAsModified();
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
     } else if (target.classList.contains('noteentry')) {
-        markNoteAsModified();
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
     } else if (target.tagName === 'INPUT') {
         // Ignore search fields
         if (target.classList.contains('searchbar') ||
@@ -408,7 +414,9 @@ function handleNoteEditEvent(e) {
             if (noteIdFromTag) {
                 noteid = noteIdFromTag;
             }
-            markNoteAsModified();
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
         }
     }
 }
@@ -442,7 +450,9 @@ function handleTagsKeydown(e) {
                     input.setSelectionRange(cursorPos + 1, cursorPos + 1);
                 }
                 
-                markNoteAsModified();
+                if (typeof window.markNoteAsModified === 'function') {
+                    window.markNoteAsModified();
+                }
             }
         }
     }
@@ -1114,8 +1124,8 @@ function setupLinkEvents() {
                         }
                         
                         // Trigger update
-                        if (typeof markNoteAsModified === 'function') {
-                            markNoteAsModified();
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
                         }
                     }
                 }
@@ -1194,7 +1204,9 @@ function setupPageUnloadWarning() {
 
 // Utility functions
 function markNoteAsModified() {
-    if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) return;
+    if (noteid == 'search' || noteid == -1 || noteid === null || noteid === undefined) {
+        return;
+    }
     
     // Check if there are actually changes before triggering save process
     var entryElem = document.getElementById("entry" + noteid);
