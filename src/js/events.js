@@ -374,6 +374,14 @@ function handleChecklistKeydown(e) {
 function handleNoteEditEvent(e) {
     var target = e.target;
     
+    // IMPORTANT: Set noteid from the noteentry element when editing
+    if (target.classList.contains('noteentry')) {
+        var noteIdFromEntry = extractNoteIdFromEntry(target);
+        if (noteIdFromEntry) {
+            noteid = noteIdFromEntry;
+        }
+    }
+    
     if (target.classList.contains('name_doss')) {
         markNoteAsModified();
     } else if (target.classList.contains('noteentry')) {
@@ -395,6 +403,11 @@ function handleNoteEditEvent(e) {
         
         // Process other note fields (tags, etc.)
         if (target.id && target.id.startsWith('tags')) {
+            // Extract noteid from tags element id (e.g., "tags123" -> "123")
+            var noteIdFromTag = target.id.replace('tags', '');
+            if (noteIdFromTag) {
+                noteid = noteIdFromTag;
+            }
             markNoteAsModified();
         }
     }
