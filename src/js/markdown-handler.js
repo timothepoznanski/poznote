@@ -405,15 +405,62 @@ function initializeMarkdownNote(noteId) {
     if (!noteEntry) return;
     
     var noteType = noteEntry.getAttribute('data-note-type');
-    if (noteType !== 'markdown') return;
-    
-    // Check if already initialized (prevent double initialization)
-    if (noteEntry.querySelector('.markdown-editor') && noteEntry.querySelector('.markdown-preview')) {
-        return; // Already initialized, skip
+    if (noteType !== 'markdown') {
+        return;
     }
     
-    // Get the markdown content from the data attribute or text content
-    var markdownContent = noteEntry.getAttribute('data-markdown-content') || noteEntry.textContent || '';
+    // Check for corrupted content (both editor and preview elements present)
+    var existingEditor = noteEntry.querySelector('.markdown-editor');
+    var existingPreview = noteEntry.querySelector('.markdown-preview');
+    
+    // Also check for escaped HTML content that contains editor/preview elements
+    var htmlContent = noteEntry.innerHTML;
+    var hasEscapedEditor = htmlContent.includes('&lt;div class="markdown-editor"');
+    var hasEscapedPreview = htmlContent.includes('&lt;div class="markdown-preview"');
+    
+    // Declare markdownContent variable once
+    var markdownContent = '';
+    
+    // Only treat as corrupted if we have ESCAPED HTML (not real elements)
+    if (hasEscapedEditor && hasEscapedPreview) {
+        var cleanContent = '';
+        
+        // Extract content from escaped HTML
+        // Look for the content between the escaped editor tags
+        var editorMatch = htmlContent.match(/&lt;div class="markdown-editor"[^&]*&gt;([^&]*?)&lt;\/div&gt;/);
+        if (editorMatch) {
+            cleanContent = editorMatch[1];
+            // Decode any HTML entities in the content
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = cleanContent;
+            cleanContent = tempDiv.textContent || tempDiv.innerText || '';
+        }
+        
+        // Clear the corrupted HTML and restore clean content
+        noteEntry.innerHTML = '';
+        noteEntry.textContent = cleanContent;
+        
+        // Update the data attribute with clean content
+        noteEntry.setAttribute('data-markdown-content', cleanContent);
+        
+        // Use the clean content for initialization
+        markdownContent = cleanContent;
+    } else if (existingEditor && existingPreview) {
+        // Real markdown elements exist - extract content and re-initialize
+        
+        // Extract the markdown content from the existing editor
+        markdownContent = normalizeContentEditableText(existingEditor);
+        
+        // Store in data attribute
+        noteEntry.setAttribute('data-markdown-content', markdownContent);
+        
+        // Clear existing elements to re-initialize cleanly
+        noteEntry.innerHTML = '';
+        noteEntry.textContent = markdownContent;
+    } else {
+        // No existing elements - get content from data attribute or text
+        markdownContent = noteEntry.getAttribute('data-markdown-content') || noteEntry.textContent || '';
+    }
     
     // Store the original markdown in a data attribute
     if (!noteEntry.getAttribute('data-markdown-content')) {
@@ -663,8 +710,8 @@ function switchToPreviewMode(noteId) {
     
     // Only mark as edited and trigger save if content has changed
     if (previousContent !== currentContent) {
-        if (typeof updateNote === 'function') {
-            updateNote();
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
         }
     }
 }
@@ -751,8 +798,8 @@ function setupMarkdownEditorListeners(noteId) {
         window.noteid = noteId;
         
         // Mark as edited
-        if (typeof updateNote === 'function') {
-            updateNote();
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
         }
     });
 }

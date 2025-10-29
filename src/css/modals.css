@@ -1029,8 +1029,8 @@
 #confirmModal .modal-buttons .btn-secondary {
     /* prefer to keep enough width to avoid wrapping, but remain flexible to fit modal */
     min-width: 140px !important;
-    flex: 1 1 140px !important;  /* base width 140px, then grow/shrink as needed */
-    max-width: 380px !important; /* cap so they don't become huge on wide screens */
+    flex: 0 1 auto !important;  /* don't grow, just shrink if needed */
+    max-width: 200px !important; /* smaller cap for better proportions */
 }
 #confirmModal .modal-buttons .btn-cancel {
     min-width: 90px !important;  /* compact cancel */

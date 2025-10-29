@@ -599,9 +599,9 @@ $body_classes = trim($extra_body_classes);
                     $note_type = $row['type'] ?? 'note';
                     
                     if ($note_type === 'tasklist') {
-                        // For task list notes, use the database content (JSON) instead of HTML file
-                        $entryfinal = '';
-                        $tasklist_json = htmlspecialchars($row['entry'] ?? '', ENT_QUOTES);
+                        // For task list notes, use the JSON content from file
+                        $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
+                        $tasklist_json = htmlspecialchars($entryfinal, ENT_QUOTES);
                     } else {
                         // For all other notes (including Excalidraw), use the HTML file content
                         $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
@@ -642,10 +642,7 @@ $body_classes = trim($extra_body_classes);
                     // Home button (mobile only)
                     echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="Back to notes" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
                     
-                    // Save button (first for easy access)
-                    echo '<button type="button" class="toolbar-btn btn-save note-action-btn" title="Save note" onclick="saveFocusedNoteJS()"><i class="fa-save"></i></button>';
-                    
-                    // Text formatting buttons
+                    // Text formatting buttons (save button removed - auto-save is now automatic)
                     echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
@@ -864,7 +861,16 @@ $body_classes = trim($extra_body_classes);
                     
                     // Note content with font size style
                     $note_type = $row['type'] ?? 'note';
-                    $data_attr = $note_type === 'tasklist' ? ' data-tasklist-json="'.$tasklist_json.'"' : '';
+                    $data_attr = '';
+                    
+                    if ($note_type === 'tasklist') {
+                        // For tasklist, properly encode JSON for HTML attribute from file content
+                        $tasklist_json_raw = $entryfinal; // Use file content instead of database
+                        $tasklist_json_encoded = htmlspecialchars($tasklist_json_raw, ENT_QUOTES);
+                        $data_attr = ' data-tasklist-json="'.$tasklist_json_encoded.'"';
+                        // Display empty content initially, will be replaced by JavaScript
+                        $display_content = '';
+                    }
                     
                     // For markdown notes, store the markdown content in a data attribute
                     if ($note_type === 'markdown') {
@@ -1135,6 +1141,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof reinitializeImageClickHandlers === 'function') {
         reinitializeImageClickHandlers();
     }
+    
+    // Check for unsaved drafts after note loads
+    <?php if ($note && is_numeric($note)): ?>
+    setTimeout(function() {
+        if (typeof checkForUnsavedDraft === 'function') {
+            // Check if this was a forced refresh (skip auto-restore in that case)
+            var isRefresh = window.location.search.includes('_refresh=');
+            checkForUnsavedDraft('<?php echo $note; ?>', isRefresh);
+        }
+    }, 500); // Small delay to ensure content is fully loaded
+    <?php endif; ?>
 });
 
 // Initialize markdown split view state from database

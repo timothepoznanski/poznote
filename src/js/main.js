@@ -2,6 +2,7 @@
 // This file coordinates initialization of all modules
 
 document.addEventListener('DOMContentLoaded', function() {
+    
     // Initialize global variables and workspaces
     initializeWorkspaces();
     
@@ -116,8 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Global functions available for HTML (compatibility)
 window.newnote = createNewNote;
-window.updatenote = saveNoteToServer;
-window.saveFocusedNoteJS = saveNote;
+window.saveNoteImmediately = saveNoteToServer;
+window.updatenote = saveNoteToServer; // Legacy alias
+window.saveFocusedNoteJS = function() { 
+    console.log('[Poznote Auto-Save] Manual save not needed - auto-save active'); 
+};
 window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
 window.duplicateNote = duplicateNote;
@@ -179,11 +183,3 @@ window.executeCreateAction = executeCreateAction;
 window.closeUpdateCheckModal = closeUpdateCheckModal;
 window.goToSelfHostedUpdateInstructions = goToSelfHostedUpdateInstructions;
 window.goToCloudUpdateInstructions = goToCloudUpdateInstructions;
-
-// Functions for element events for elements (compatibility)
-window.updateidsearch = updateidsearch;
-window.updateidhead = updateidhead;
-window.updateidtags = updateidtags;
-window.updateidfolder = updateidfolder;
-window.updateident = updateident;
-window.setupNoteDragDropEvents = setupNoteDragDropEvents;

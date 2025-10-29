@@ -15,7 +15,55 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Parse JSON body
+// Check if this is a beacon save
+$action = isset($_POST['action']) ? $_POST['action'] : (isset($_GET['action']) ? $_GET['action'] : null);
+if ($action === 'beacon_save') {
+    // Handle beacon save (minimal processing for reliability)
+    $id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
+    $content = isset($_POST['content']) ? $_POST['content'] : '';
+    $workspace = isset($_POST['workspace']) && $_POST['workspace'] !== '' ? $_POST['workspace'] : null;
+    
+    if (empty($id) || empty($content)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid beacon save data']);
+        exit;
+    }
+    
+    // Get note type
+    $typeStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+    $typeStmt->execute([$id]);
+    $noteType = $typeStmt->fetchColumn();
+    if ($noteType === false) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Note not found']);
+        exit;
+    }
+    
+    // Write file
+    $filename = getEntryFilename($id, $noteType);
+    $entriesDir = dirname($filename);
+    if (!is_dir($entriesDir)) {
+        mkdir($entriesDir, 0755, true);
+    }
+    $write_result = file_put_contents($filename, $content);
+    if ($write_result === false) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Failed to write file']);
+        exit;
+    }
+    
+    // Update database
+    $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
+    if ($stmt->execute([$content, $id])) {
+        echo json_encode(['success' => true, 'id' => $id]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+    exit;
+}
+
+// Parse JSON body for regular saves
 $input = json_decode(file_get_contents('php://input'), true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     http_response_code(400);
@@ -132,7 +180,24 @@ if (!is_dir($entriesDir)) {
     mkdir($entriesDir, 0755, true);
 }
 if (!empty($entry)) {
-    $write_result = file_put_contents($filename, $entry);
+    // For markdown notes, ensure we save clean markdown content, not HTML
+    $contentToSave = $entry;
+    if ($noteType === 'markdown') {
+        // If the entry contains HTML elements (like <div class="markdown-editor">), extract the text content
+        if (strpos($entry, '<div class="markdown-editor"') !== false) {
+            // Extract text from between the editor tags
+            if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
+                $contentToSave = strip_tags($matches[1]);
+                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } else {
+                // Fallback: strip all HTML tags
+                $contentToSave = strip_tags($entry);
+                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+        }
+    }
+    
+    $write_result = file_put_contents($filename, $contentToSave);
     if ($write_result === false) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Failed to write file']);
