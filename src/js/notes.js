@@ -214,8 +214,8 @@ function handleSaveResponse(data) {
             updateConnectionStatus(true);
             
             // Remove unsaved changes indicator from page title
-            if (document.title.startsWith('*')) {
-                document.title = document.title.substring(1);
+            if (document.title.startsWith('🔴')) {
+                document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
                 console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
             }
             
@@ -245,8 +245,8 @@ function handleSaveResponse(data) {
         updateConnectionStatus(true);
         
         // Remove unsaved changes indicator from page title
-        if (document.title.startsWith('*')) {
-            document.title = document.title.substring(1);
+        if (document.title.startsWith('🔴')) {
+            document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
             console.log('[Poznote Auto-Save] ✓ Removed unsaved indicator from page title: ' + document.title);
         }
         

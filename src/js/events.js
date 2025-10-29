@@ -653,17 +653,17 @@ function showSaveInProgressNotification(onCompleteCallback) {
     
     // Monitor for save completion
     var checkInterval = setInterval(function() {
-        // Check if save is complete (no timeout, not in refresh list, no asterisk)
+        // Check if save is complete (no timeout, not in refresh list, no red dot)
         var noTimeout = !saveTimeout || saveTimeout === null || saveTimeout === undefined;
         var notInRefreshList = !notesNeedingRefresh.has(String(currentNoteId));
-        var noAsterisk = !document.title.startsWith('*');
+        var noRedDot = !document.title.startsWith('🔴');
         
         console.log('[Poznote Auto-Save Debug] Save completion check:');
         console.log('  - noTimeout:', noTimeout, '(saveTimeout:', saveTimeout, ')');
         console.log('  - notInRefreshList:', notInRefreshList, '(size:', notesNeedingRefresh.size, ')');
-        console.log('  - noAsterisk:', noAsterisk, '(title:', document.title, ')');
+        console.log('  - noRedDot:', noRedDot, '(title:', document.title, ')');
         
-        var saveComplete = noTimeout && notInRefreshList && noAsterisk;
+        var saveComplete = noTimeout && notInRefreshList && noRedDot;
         console.log('  - saveComplete:', saveComplete);
         
         if (saveComplete) {
@@ -1215,9 +1215,9 @@ function updateNote() {
     // Mark this note as having pending changes (until server save completes)
     notesNeedingRefresh.add(String(noteid));
     
-    // Visual indicator: add asterisk to page title when there are unsaved changes
-    if (!document.title.startsWith('*')) {
-        document.title = '*' + document.title;
+    // Visual indicator: add red dot to page title when there are unsaved changes
+    if (!document.title.startsWith('🔴')) {
+        document.title = '🔴 ' + document.title;
     }
     
     // Debounced server save
@@ -1518,7 +1518,7 @@ function hasUnsavedChanges(noteId) {
     console.log('[Poznote Auto-Save Debug] - notesNeedingRefresh contents:', Array.from(notesNeedingRefresh));
     console.log('[Poznote Auto-Save Debug] - note in refresh list:', notesNeedingRefresh.has(String(noteId)));
     console.log('[Poznote Auto-Save Debug] - page title:', document.title);
-    console.log('[Poznote Auto-Save Debug] - title starts with *:', document.title.startsWith('*'));
+    console.log('[Poznote Auto-Save Debug] - title starts with 🔴:', document.title.startsWith('🔴'));
     
     // Check if there's a pending server save timeout
     if (saveTimeout !== null && saveTimeout !== undefined) {
@@ -1533,7 +1533,7 @@ function hasUnsavedChanges(noteId) {
     }
     
     // Also check if page title still has unsaved indicator
-    if (document.title.startsWith('*')) {
+    if (document.title.startsWith('🔴')) {
         console.log('[Poznote Auto-Save] Note #' + noteId + ' has unsaved indicator in page title: ' + document.title);
         return true;
     }
