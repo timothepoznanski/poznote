@@ -6,6 +6,31 @@ var lastSavedContent = null;
 var isOnline = navigator.onLine;
 var notesNeedingRefresh = new Set(); // Track notes that were left before auto-save completed
 
+// Expose critical functions globally early to prevent ReferenceError during HTML event handlers
+// These may be called before events.js is fully loaded due to inline onfocus handlers
+function updateident(el) {
+    if (el && el.id) noteid = el.id.substr(5);
+}
+function updateidhead(el) {
+    if (el && el.id) noteid = el.id.substr(3);
+}
+function updateidtags(el) {
+    if (el && el.id) noteid = el.id.substr(4);
+}
+function updateidfolder(el) {
+    if (el && el.id) noteid = el.id.substr(6);
+}
+function updateidsearch(el) {
+    if (el && el.id) noteid = el.id.substr(5);
+}
+
+// Expose to window early
+window.updateident = updateident;
+window.updateidhead = updateidhead;
+window.updateidtags = updateidtags;
+window.updateidfolder = updateidfolder;
+window.updateidsearch = updateidsearch;
+
 // Utility function to serialize checklist data
 function serializeChecklists(entryElement) {
     if (!entryElement) return;
@@ -562,7 +587,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #4CAF50;
+        background: #007DB8;
         color: white;
         padding: 15px 20px;
         border-radius: 8px;
@@ -1270,23 +1295,23 @@ function saveToServerDebounced() {
 
 // Functions for element IDs
 function updateidsearch(el) {
-    noteid = el.id.substr(5);
+    if (el && el.id) noteid = el.id.substr(5);
 }
 
 function updateidhead(el) {
-    noteid = el.id.substr(3); // 3 for 'inp'
+    if (el && el.id) noteid = el.id.substr(3); // 3 for 'inp'
 }
 
 function updateidtags(el) {
-    noteid = el.id.substr(4);
+    if (el && el.id) noteid = el.id.substr(4);
 }
 
 function updateidfolder(el) {
-    noteid = el.id.substr(6); // 6 for 'folder'
+    if (el && el.id) noteid = el.id.substr(6); // 6 for 'folder'
 }
 
 function updateident(el) {
-    noteid = el.id.substr(5);
+    if (el && el.id) noteid = el.id.substr(5);
 }
 
 // Alias for compatibility
