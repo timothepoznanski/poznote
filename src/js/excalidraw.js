@@ -102,26 +102,21 @@ function insertExcalidrawDiagram() {
     
     // Trigger automatic save to ensure placeholder is saved before opening editor
     if (typeof updateNote === 'function') {
-        updateNote(); // Mark note as edited
+        updateNote(); // Mark note as edited and start debounce timer (2 seconds)
     }
     
-    // Then trigger immediate save and open editor after a short delay to allow DOM to update
-    setTimeout(function() {
-        if (typeof updatenote === 'function') {
-            updatenote(); // Save to server
-        }
+    // Wait for the debounced save to complete before opening editor
+    // The auto-save system has a 2-second debounce, so we wait slightly longer to be safe
+    if (!isMobile) {
+        // Show loading spinner
+        const spinner = window.showLoadingSpinner('Saving diagram placeholder...', 'Loading');
         
-        // Automatically open the editor after creating the button (unless on mobile)
-        if (!isMobile) {
-            // Show loading spinner
-            const spinner = window.showLoadingSpinner('Opening Excalidraw editor...', 'Loading');
-            
-            setTimeout(function() {
-                openExcalidrawEditor(diagramId);
-                // Note: spinner will be closed when page navigates to editor
-            }, 200); // Additional delay to ensure save is complete
-        }
-    }, 100);
+        // Wait 2.5 seconds (accounting for 2-second debounce + small buffer)
+        setTimeout(function() {
+            openExcalidrawEditor(diagramId);
+            // Note: spinner will be closed when page navigates to editor
+        }, 2500); // Wait for debounced save to complete
+    }
 }
 
 // Open Excalidraw editor for a specific diagram

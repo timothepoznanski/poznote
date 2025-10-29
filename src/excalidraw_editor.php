@@ -348,6 +348,16 @@ if ($note_id > 0) {
                 await saveFullNote(data, elements, appState, files);
             }
             
+            // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
+            try {
+                localStorage.removeItem('poznote_draft_' + noteId);
+                localStorage.removeItem('poznote_title_' + noteId);
+                localStorage.removeItem('poznote_tags_' + noteId);
+                console.log('Cleared localStorage draft for note #' + noteId + ' after Excalidraw save');
+            } catch (err) {
+                console.log('Error clearing localStorage draft:', err);
+            }
+            
             this.textContent = 'Saved!';
             setTimeout(() => { this.textContent = 'Save'; }, 2000);
             
@@ -394,6 +404,16 @@ if ($note_id > 0) {
             } else {
                 // Full note mode: save as complete Excalidraw note
                 await saveFullNote(data, elements, appState, files);
+            }
+            
+            // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
+            try {
+                localStorage.removeItem('poznote_draft_' + noteId);
+                localStorage.removeItem('poznote_title_' + noteId);
+                localStorage.removeItem('poznote_tags_' + noteId);
+                console.log('Cleared localStorage draft for note #' + noteId + ' after Excalidraw save');
+            } catch (err) {
+                console.log('Error clearing localStorage draft:', err);
             }
             
             // After saving, redirect back to notes
