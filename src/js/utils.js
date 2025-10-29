@@ -121,7 +121,9 @@ function newFolder() {
             showNotificationPopup('Error creating folder: ' + error.message, 'error');
         });
     });
-}function deleteFolder(folderName) {
+}
+
+function deleteFolder(folderName) {
     // First, check how many notes sont dans ce dossier
     var params = new URLSearchParams({
         action: 'count_notes_in_folder',
