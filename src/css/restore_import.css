@@ -337,3 +337,60 @@ body {
     margin-top: 8px;
     font-weight: 500;
 }
+
+/* Backup list styles */
+.backup-list {
+    margin-top: 15px;
+}
+
+.backup-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 12px;
+    background: #f8f9fa;
+}
+
+.backup-item:last-child {
+    margin-bottom: 0;
+}
+
+.backup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.backup-header strong {
+    color: #333;
+    font-size: 16px;
+}
+
+.backup-size {
+    color: #666;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.backup-details {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.backup-details div {
+    margin-bottom: 2px;
+}
+
+.backup-location {
+    margin-top: 8px;
+}
+
+.backup-location code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #495057;
+}

@@ -324,7 +324,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
         
         // Ensure required data directories exist
-        $dataDir = __DIR__ . '/data';
+        $dataDir = dirname(__DIR__) . '/data';
         $requiredDirs = ['attachments', 'database', 'entries'];
         foreach ($requiredDirs as $dir) {
             $fullPath = $dataDir . '/' . $dir;
@@ -332,8 +332,10 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 mkdir($fullPath, 0755, true);
                 // Set proper ownership if running as root (Docker context)
                 if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                    chown($fullPath, 'www-data');
-                    chgrp($fullPath, 'www-data');
+                    $current_uid = posix_getuid();
+                    $current_gid = posix_getgid();
+                    chown($fullPath, $current_uid);
+                    chgrp($fullPath, $current_gid);
                 }
             }
         }
@@ -351,6 +353,54 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $zip->close();
         unlink($tempFile);
         $tempFile = null; // Mark as cleaned
+        
+        // CLEAR ENTRIES DIRECTORY BEFORE RESTORATION
+        $entriesPath = getEntriesAbsolutePath();
+        if (is_dir($entriesPath)) {
+            // Delete all files in entries directory
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($entriesPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+            
+            foreach ($files as $fileinfo) {
+                $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                $todo($fileinfo->getRealPath());
+            }
+        } else {
+            // Create entries directory if it doesn't exist
+            mkdir($entriesPath, 0755, true);
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                $current_uid = posix_getuid();
+                $current_gid = posix_getgid();
+                chown($entriesPath, $current_uid);
+                chgrp($entriesPath, $current_gid);
+            }
+        }
+        
+        // CLEAR ATTACHMENTS DIRECTORY BEFORE RESTORATION
+        $attachmentsPath = getAttachmentsAbsolutePath();
+        if (is_dir($attachmentsPath)) {
+            // Delete all files in attachments directory
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($attachmentsPath, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+            
+            foreach ($files as $fileinfo) {
+                $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+                $todo($fileinfo->getRealPath());
+            }
+        } else {
+            // Create attachments directory if it doesn't exist
+            mkdir($attachmentsPath, 0755, true);
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                $current_uid = posix_getuid();
+                $current_gid = posix_getgid();
+                chown($attachmentsPath, $current_uid);
+                chgrp($attachmentsPath, $current_gid);
+            }
+        }
         
         $results = [];
         $hasErrors = false;
@@ -388,6 +438,9 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         // Clean up temporary directory
         deleteDirectory($tempExtractDir);
         $tempExtractDir = null; // Mark as cleaned
+        
+        // Ensure proper permissions after restoration
+        ensureDataPermissions();
         
         return [
             'success' => !$hasErrors,
@@ -429,6 +482,14 @@ function restoreDatabaseFromFile($sqlFile) {
     exec($command, $output, $returnCode);
     
     if ($returnCode === 0) {
+        // Ensure proper permissions on restored database
+        if (function_exists('posix_getuid') && posix_getuid() === 0) {
+            $current_uid = posix_getuid();
+            $current_gid = posix_getgid();
+            chown($dbPath, $current_uid);
+            chgrp($dbPath, $current_gid);
+        }
+        chmod($dbPath, 0664);
         return ['success' => true];
     } else {
         $errorMessage = implode("\n", $output);
@@ -530,5 +591,24 @@ function deleteDirectory($dir) {
     }
     
     rmdir($dir);
+}
+
+// Helper function to ensure proper permissions on data directory
+function ensureDataPermissions() {
+    $dataDir = dirname(__DIR__) . '/data';
+    if (is_dir($dataDir)) {
+        // Recursively set ownership to match the data directory owner
+        $dataOwner = fileowner($dataDir);
+        $dataGroup = filegroup($dataDir);
+        
+        // Use shell command for recursive chown since PHP chown is not recursive
+        exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
+        
+        // Ensure database file has write permissions
+        $dbPath = $dataDir . '/database/poznote.db';
+        if (file_exists($dbPath)) {
+            chmod($dbPath, 0664);
+        }
+    }
 }
 ?>
