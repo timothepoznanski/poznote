@@ -22,7 +22,6 @@
   - [Complete Backup](#complete-backup)
   - [Import Individual Notes](#import-individual-notes)
   - [Complete Restore](#complete-restore)
-  - [Automated Backup Script](#automated-backup-script)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
@@ -322,25 +321,6 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
-
-<a id="automated-backup-script"></a>
-**🤖 Automated Backup Script**
-
-For automated backups via cron or manual execution, use the `backup-poznote.sh` script located at the repository root:
-
-Execute backup script with your server details and destination path:
-```bash
-./backup-poznote.sh 'http://localhost:8040' 'admin' 'admin123!' '/var/backups'
-```
-
-The script will:
-- Create backups via the Poznote API
-- Download and verify backup files
-- Store backups in a `backups-poznote` folder
-- Automatically rotate backups (keeps 7 most recent by default)
-- Can be scheduled with cron for automatic daily/weekly backups
-
-See the script file for detailed usage instructions and examples. 
 
 ## Offline View
 
