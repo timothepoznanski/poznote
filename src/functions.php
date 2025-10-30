@@ -363,10 +363,13 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 RecursiveIteratorIterator::CHILD_FIRST
             );
             
+            $entriesCleared = 0;
             foreach ($files as $fileinfo) {
                 $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
                 $todo($fileinfo->getRealPath());
+                $entriesCleared++;
             }
+            error_log("CLEARED $entriesCleared files from entries directory");
         } else {
             // Create entries directory if it doesn't exist
             mkdir($entriesPath, 0755, true);
@@ -387,10 +390,13 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 RecursiveIteratorIterator::CHILD_FIRST
             );
             
+            $attachmentsCleared = 0;
             foreach ($files as $fileinfo) {
                 $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
                 $todo($fileinfo->getRealPath());
+                $attachmentsCleared++;
             }
+            error_log("CLEARED $attachmentsCleared files from attachments directory");
         } else {
             // Create attachments directory if it doesn't exist
             mkdir($attachmentsPath, 0755, true);
@@ -415,24 +421,24 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $results[] = 'Database: No SQL file found in backup';
         }
         
-        // Restore entries if entries directory exists
+        // Restore entries if entries directory exists in backup
         $entriesDir = $tempExtractDir . '/entries';
         if (is_dir($entriesDir)) {
             $entriesResult = restoreEntriesFromDir($entriesDir);
             $results[] = 'Notes: ' . ($entriesResult['success'] ? 'Restored ' . $entriesResult['count'] . ' files' : 'Failed - ' . $entriesResult['error']);
             if (!$entriesResult['success']) $hasErrors = true;
         } else {
-            $results[] = 'Notes: No entries directory found in backup';
+            $results[] = 'Notes: No entries directory found in backup (entries directory cleared)';
         }
         
-        // Restore attachments if attachments directory exists
+        // Restore attachments if attachments directory exists in backup
         $attachmentsDir = $tempExtractDir . '/attachments';
         if (is_dir($attachmentsDir)) {
             $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
             $results[] = 'Attachments: ' . ($attachmentsResult['success'] ? 'Restored ' . $attachmentsResult['count'] . ' files' : 'Failed - ' . $attachmentsResult['error']);
             if (!$attachmentsResult['success']) $hasErrors = true;
         } else {
-            $results[] = 'Attachments: No attachments directory found in backup';
+            $results[] = 'Attachments: No attachments directory found in backup (attachments directory cleared)';
         }
         
         // Clean up temporary directory
