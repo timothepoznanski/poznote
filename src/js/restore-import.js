@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hideIndividualNotesImportConfirmation();
             hideCompleteRestoreConfirmation();
             hideChunkedRestoreConfirmation();
+            hideDirectCopyRestoreConfirmation();
             hideCustomAlert();
         }
     });
@@ -234,15 +235,19 @@ function proceedWithChunkedRestore() {
     startChunkedRestore();
 }
 
-// Custom Alert Functions
-function showCustomAlert(title = 'No File Selected', message = 'Please select a file before proceeding with the import.') {
-    document.getElementById('alertTitle').textContent = title;
-    document.getElementById('alertMessage').textContent = message;
-    document.getElementById('customAlert').style.display = 'flex';
+// Direct Copy Restore Functions
+function showDirectCopyRestoreConfirmation() {
+    document.getElementById('directCopyRestoreConfirmModal').style.display = 'flex';
 }
 
-function hideCustomAlert() {
-    document.getElementById('customAlert').style.display = 'none';
+function hideDirectCopyRestoreConfirmation() {
+    document.getElementById('directCopyRestoreConfirmModal').style.display = 'none';
+}
+
+function proceedWithDirectCopyRestore() {
+    hideDirectCopyRestoreConfirmation();
+    // Submit the direct copy restore form
+    document.getElementById('directCopyRestoreForm').submit();
 }
 
 // Restore spinner functions

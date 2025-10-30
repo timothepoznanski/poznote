@@ -612,7 +612,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
-                <button type="submit" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="showDirectCopyRestoreConfirmation()">
                     Start Complete Restore (Direct copy)
                 </button>
             </form>
@@ -629,9 +629,9 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     echo "</div>";
 
                     // Show confirmation form
-                    echo "<form method='post' style='margin-top: 10px;'>";
+                    echo "<form method='post' id='directCopyRestoreForm' style='margin-top: 10px;'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
-                    echo "<button type='submit' class='btn btn-warning' onclick='return confirm(\"Are you sure you want to restore from the direct-copied file?\\n\\nThis will replace your database, restore all notes, and attachments for ALL workspaces.\\n\\nThis action cannot be undone!\")'>";
+                    echo "<button type='button' class='btn btn-warning' onclick='showDirectCopyRestoreConfirmation()'>";
                     echo "Yes, Restore from Direct Copy";
                     echo "</button>";
                     echo "</form>";
@@ -648,7 +648,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 <?php
                 $cliBackupPath = '/tmp/backup_restore.zip';
                 if (file_exists($cliBackupPath)) {
-                    $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip']);
+                    $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip'], true);
                     if ($result['success']) {
                         echo "<div class='alert alert-success'>Direct file copy restore completed successfully! " . htmlspecialchars($result['message']) . "</div>";
                         // Clean up the file after successful restore
@@ -786,18 +786,18 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </div>
     </div>
 
-    <!-- Individual Notes Import Confirmation Modal -->
-    <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
+    <!-- Direct Copy Restore Confirmation Modal -->
+    <div id="directCopyRestoreConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Import Individual Notes?</h3>
-            <p id="individualNotesImportSummary">This will import the selected notes into the specified workspace and folder.</p>
+            <h3>Complete Restore (Direct Copy)?</h3>
+            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
+                <button type="button" class="btn-cancel" onclick="hideDirectCopyRestoreConfirmation()">
                     Cancel
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithIndividualNotesImport()">
-                    Yes, Import Notes
+                <button type="button" class="btn-confirm" onclick="proceedWithDirectCopyRestore()">
+                    Yes, Complete Restore
                 </button>
             </div>
         </div>
