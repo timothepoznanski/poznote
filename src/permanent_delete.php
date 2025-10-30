@@ -40,7 +40,7 @@
 		if (is_array($attachments) && !empty($attachments)) {
 			foreach ($attachments as $attachment) {
 				if (isset($attachment['filename'])) {
-					$attachmentFile = getAttachmentsRelativePath() . $attachment['filename'];
+					$attachmentFile = getAttachmentsPath() . '/' . $attachment['filename'];
 					if (file_exists($attachmentFile)) {
 						unlink($attachmentFile);
 					}

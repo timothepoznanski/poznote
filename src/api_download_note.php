@@ -86,11 +86,11 @@ try {
 
 // Build the file path
 $filename = getEntryFilename($noteId, $noteType);
-$filePath = __DIR__ . '/' . $filename;
+$filePath = $filename;
 
 // Security: ensure the path is within the entries directory
 $realPath = realpath($filePath);
-$expectedDir = realpath(__DIR__ . '/' . getEntriesRelativePath());
+$expectedDir = realpath(getEntriesPath());
 
 if ($realPath === false || strpos($realPath, $expectedDir) !== 0) {
     http_response_code(403);
