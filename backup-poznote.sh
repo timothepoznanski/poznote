@@ -68,7 +68,9 @@ log() {
 }
 
 log "Creating backup for: $BASE_URL"
+log "Using credentials: $USERNAME"
 log "Backup directory: $BACKUP_DIR"
+log "Maximum backups to keep: $MAX_BACKUPS"
 
 # Call API to create backup
 RESPONSE=$(curl -s -u "$USERNAME:$PASSWORD" -X POST "$BASE_URL/api_backup.php")
@@ -101,7 +103,8 @@ fi
 
 # Verify the downloaded file is a valid ZIP
 if file "$OUTPUT_FILE" | grep -q "Zip archive"; then
-    log "Backup is valid"
+    ZIP_FILE_COUNT=$(unzip -l "$OUTPUT_FILE" | tail -1 | awk '{print $2}')
+    log "Backup is valid ($ZIP_FILE_COUNT files)"
 else
     log "ERROR: Downloaded file is not a valid ZIP"
     exit 1
@@ -116,6 +119,15 @@ if [ "$BACKUP_COUNT" -gt "$MAX_BACKUPS" ]; then
 fi
 
 log "Total backups stored: $(ls -1 "$BACKUP_DIR"/poznote_backup_*.zip 2>/dev/null | wc -l)"
+
+# List all existing backups with details
+log "Existing backups:"
+if [ -d "$BACKUP_DIR" ]; then
+    ls -lh "$BACKUP_DIR"/poznote_backup_*.zip 2>/dev/null | while read -r line; do
+        log "  $line"
+    done
+fi
+
 log "SUCCESS"
 
 exit 0
