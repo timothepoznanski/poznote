@@ -486,12 +486,20 @@ function initializeMarkdownNote(noteId) {
     var isEmpty = markdownContent.trim() === '';
     var startInEditMode;
     
-    if (savedMode && !isMobile) {
-        if (savedMode === 'split') {
+    // If a saved mode exists, try to respect it. On mobile we still honor the
+    // user's last chosen mode, but we never enable the split view there —
+    // map any saved 'split' mode to 'preview' on small screens.
+    if (savedMode) {
+        var effectiveSavedMode = savedMode;
+        if (savedMode === 'split' && isMobile) {
+            effectiveSavedMode = 'preview';
+        }
+
+        if (effectiveSavedMode === 'split') {
             isSplitViewEnabled = true;
             document.body.classList.add('markdown-split-view-enabled');
             startInEditMode = false;
-        } else if (savedMode === 'edit') {
+        } else if (effectiveSavedMode === 'edit') {
             isSplitViewEnabled = false;
             document.body.classList.remove('markdown-split-view-enabled');
             startInEditMode = true;
@@ -870,8 +878,17 @@ function cycleMarkdownViewMode(noteId) {
 function applyViewModeChange(noteId, noteEntry, nextMode, isSplitViewEnabled) {
     
     // Save mode to localStorage (global for all notes)
+    // Ensure we don't attempt to set split mode on mobile devices; fallback to
+    // preview in that case. Also persist the effective mode.
     try {
-        localStorage.setItem('poznote-markdown-view-mode', nextMode);
+        var isMobileNow = window.innerWidth <= 800;
+        var effectiveNextMode = nextMode;
+        if (nextMode === 'split' && isMobileNow) {
+            effectiveNextMode = 'preview';
+        }
+        localStorage.setItem('poznote-markdown-view-mode', effectiveNextMode);
+        // Reflect back to nextMode so the rest of the function uses the effective value
+        nextMode = effectiveNextMode;
     } catch (e) {
         console.warn('Could not save view mode to localStorage:', e);
     }
