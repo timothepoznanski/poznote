@@ -123,8 +123,8 @@ log "Total backups stored: $(ls -1 "$BACKUP_DIR"/poznote_backup_*.zip 2>/dev/nul
 # List all existing backups with details
 log "Existing backups:"
 if [ -d "$BACKUP_DIR" ]; then
-    ls -lh "$BACKUP_DIR"/poznote_backup_*.zip 2>/dev/null | while read -r line; do
-        log "  $line"
+    ls -lh "$BACKUP_DIR"/poznote_backup_*.zip 2>/dev/null | awk '{print "  " $5 " " $6 " " $7 " " $8 " " $9}' | while read -r line; do
+        log "$line"
     done
 fi
 
