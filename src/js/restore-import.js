@@ -247,7 +247,23 @@ function hideDirectCopyRestoreConfirmation() {
 function proceedWithDirectCopyRestore() {
     hideDirectCopyRestoreConfirmation();
     // Submit the direct copy restore form
-    document.getElementById('directCopyRestoreForm').submit();
+    let form = document.getElementById('directCopyRestoreForm');
+    if (!form) {
+        // Create the form if it doesn't exist
+        form = document.createElement('form');
+        form.method = 'post';
+        form.id = 'directCopyRestoreForm';
+        form.style.display = 'none';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'restore_cli_upload';
+        
+        form.appendChild(actionInput);
+        document.body.appendChild(form);
+    }
+    form.submit();
 }
 
 // Restore spinner functions
