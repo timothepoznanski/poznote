@@ -91,8 +91,6 @@ function generateSQLDump() {
 function createAPIBackup() {
     global $con;
     
-    error_log("BACKUP: Starting backup creation");
-    
     // Create backups directory if it doesn't exist
     $backupsDir = __DIR__ . '/data/backups';
     if (!is_dir($backupsDir)) {
@@ -133,15 +131,12 @@ function createAPIBackup() {
     
     // Add all note entries (HTML and Markdown)
     $entriesPath = getEntriesPath();
-    error_log("BACKUP: Entries path: " . $entriesPath);
     if ($entriesPath && is_dir($entriesPath)) {
-        error_log("BACKUP: Entries directory exists");
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($entriesPath), 
             RecursiveIteratorIterator::LEAVES_ONLY
         );
         
-        $entriesCount = 0;
         foreach ($files as $name => $file) {
             if (!$file->isDir()) {
                 $filePath = $file->getRealPath();
@@ -151,13 +146,9 @@ function createAPIBackup() {
                 // Include both HTML and Markdown files
                 if ($extension === 'html' || $extension === 'md') {
                     $zip->addFile($filePath, 'entries/' . $relativePath);
-                    $entriesCount++;
                 }
             }
         }
-        error_log("BACKUP: Added $entriesCount entries files to ZIP");
-    } else {
-        error_log("BACKUP: Entries directory does not exist or path is invalid");
     }
     
     // Generate index.html for entries
@@ -238,15 +229,12 @@ function createAPIBackup() {
     
     // Add attachments
     $attachmentsPath = getAttachmentsPath();
-    error_log("BACKUP: Attachments path: " . $attachmentsPath);
     if ($attachmentsPath && is_dir($attachmentsPath)) {
-        error_log("BACKUP: Attachments directory exists");
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($attachmentsPath), 
             RecursiveIteratorIterator::LEAVES_ONLY
         );
         
-        $attachmentsCount = 0;
         foreach ($files as $name => $file) {
             if (!$file->isDir()) {
                 $filePath = $file->getRealPath();
@@ -254,13 +242,9 @@ function createAPIBackup() {
                 
                 if (!str_starts_with($relativePath, '.')) {
                     $zip->addFile($filePath, 'attachments/' . $relativePath);
-                    $attachmentsCount++;
                 }
             }
         }
-        error_log("BACKUP: Added $attachmentsCount attachments files to ZIP");
-    } else {
-        error_log("BACKUP: Attachments directory does not exist or path is invalid");
     }
     
     // Add metadata file for attachments
@@ -289,9 +273,6 @@ function createAPIBackup() {
         $metadataContent = json_encode($metadataInfo, JSON_PRETTY_PRINT);
         $zip->addFromString('attachments/poznote_attachments_metadata.json', $metadataContent);
     }
-    
-    $totalFiles = $zip->numFiles;
-    error_log("BACKUP: Total files in ZIP: $totalFiles");
     
     $zip->close();
     
