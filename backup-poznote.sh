@@ -45,7 +45,7 @@ BACKUP_PATH="$4"
 
 # Backup configuration
 BACKUP_DIR="$BACKUP_PATH/backups-poznote"
-MAX_BACKUPS=7
+MAX_BACKUPS=20
 
 # Check if parent path exists
 if [ ! -d "$BACKUP_PATH" ]; then
