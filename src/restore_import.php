@@ -97,257 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-function restoreCompleteBackup($uploadedFile) {
-    // Check file type
-    if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
-        return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
-    }
-    
-    $tempFile = '/tmp/poznote_complete_restore_' . uniqid() . '.zip';
-    
-    // Move uploaded file
-    if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
-        return ['success' => false, 'error' => 'Error uploading file'];
-    }
-    
-    // Extract ZIP to temporary directory
-    $tempExtractDir = '/tmp/poznote_restore_' . uniqid();
-    if (!mkdir($tempExtractDir, 0755, true)) {
-        unlink($tempFile);
-        return ['success' => false, 'error' => 'Cannot create temporary directory'];
-    }
-    
-    // Ensure required data directories exist
-    $dataDir = dirname(__DIR__) . '/data';
-    $requiredDirs = ['attachments', 'database', 'entries'];
-    foreach ($requiredDirs as $dir) {
-        $fullPath = $dataDir . '/' . $dir;
-        if (!is_dir($fullPath)) {
-            mkdir($fullPath, 0755, true);
-            // Set proper ownership if running as root (Docker context)
-            if (function_exists('posix_getuid') && posix_getuid() === 0) {
-                chown($fullPath, 'www-data');
-                chgrp($fullPath, 'www-data');
-            }
-        }
-    }
-    
-    $zip = new ZipArchive;
-    $res = $zip->open($tempFile);
-    
-    if ($res !== TRUE) {
-        unlink($tempFile);
-        rmdir($tempExtractDir);
-        return ['success' => false, 'error' => 'Cannot open ZIP file'];
-    }
-    
-    $zip->extractTo($tempExtractDir);
-    $zip->close();
-    unlink($tempFile);
-    
-    $results = [];
-    $hasErrors = false;
-    
-    // Restore database if SQL file exists
-    $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
-    if (file_exists($sqlFile)) {
-        $dbResult = restoreDatabaseFromFile($sqlFile);
-        $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
-        if (!$dbResult['success']) $hasErrors = true;
-    } else {
-        $results[] = 'Database: No SQL file found in backup';
-    }
-    
-    // Restore entries if entries directory exists
-    $entriesDir = $tempExtractDir . '/entries';
-    if (is_dir($entriesDir)) {
-        $entriesResult = restoreEntriesFromDir($entriesDir);
-        $results[] = 'Notes: ' . ($entriesResult['success'] ? 'Restored ' . $entriesResult['count'] . ' files' : 'Failed - ' . $entriesResult['error']);
-        if (!$entriesResult['success']) $hasErrors = true;
-    } else {
-        $results[] = 'Notes: No entries directory found in backup';
-    }
-    
-    // Restore attachments if attachments directory exists
-    $attachmentsDir = $tempExtractDir . '/attachments';
-    if (is_dir($attachmentsDir)) {
-        $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
-        $results[] = 'Attachments: ' . ($attachmentsResult['success'] ? 'Restored ' . $attachmentsResult['count'] . ' files' : 'Failed - ' . $attachmentsResult['error']);
-        if (!$attachmentsResult['success']) $hasErrors = true;
-    } else {
-        $results[] = 'Attachments: No attachments directory found in backup';
-    }
-    
-    // Clean up temporary directory
-    deleteDirectory($tempExtractDir);
-    
-    return [
-        'success' => !$hasErrors,
-        'message' => implode('; ', $results),
-        'error' => $hasErrors ? 'Some components failed to restore' : ''
-    ];
-}
-
-function restoreDatabaseFromFile($sqlFile) {
-    $content = file_get_contents($sqlFile);
-    if (!$content) {
-        return ['success' => false, 'error' => 'Cannot read SQL file'];
-    }
-    
-    $dbPath = SQLITE_DATABASE;
-    
-    // Remove current database
-    if (file_exists($dbPath)) {
-        unlink($dbPath);
-    }
-    
-    // Restore database
-    $command = "sqlite3 {$dbPath} < {$sqlFile} 2>&1";
-    
-    exec($command, $output, $returnCode);
-    
-    if ($returnCode === 0) {
-        return ['success' => true];
-    } else {
-        $errorMessage = implode("\n", $output);
-        return ['success' => false, 'error' => $errorMessage];
-    }
-}
-
-function restoreEntriesFromDir($sourceDir) {
-    $entriesPath = getEntriesPath();
-    
-    if (!$entriesPath || !is_dir($entriesPath)) {
-        return ['success' => false, 'error' => 'Cannot find entries directory'];
-    }
-    
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($sourceDir), 
-        RecursiveIteratorIterator::LEAVES_ONLY
-    );
-    
-    $importedCount = 0;
-    
-    foreach ($files as $name => $file) {
-        if (!$file->isDir()) {
-            $filePath = $file->getRealPath();
-            $relativePath = substr($filePath, strlen($sourceDir) + 1);
-            $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
-            
-            // Include both HTML and Markdown files
-            if ($extension === 'html' || $extension === 'md') {
-                $targetFile = $entriesPath . '/' . basename($relativePath);
-                if (copy($filePath, $targetFile)) {
-                    chmod($targetFile, 0644);
-                    $importedCount++;
-                }
-            }
-        }
-    }
-    
-    return ['success' => true, 'count' => $importedCount];
-}
-
-function restoreAttachmentsFromDir($sourceDir) {
-    $attachmentsPath = getAttachmentsPath();
-    
-    if (!$attachmentsPath || !is_dir($attachmentsPath)) {
-        return ['success' => false, 'error' => 'Cannot find attachments directory'];
-    }
-    
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($sourceDir), 
-        RecursiveIteratorIterator::LEAVES_ONLY
-    );
-    
-    $importedCount = 0;
-    
-    foreach ($files as $name => $file) {
-        if (!$file->isDir()) {
-            $filePath = $file->getRealPath();
-            $relativePath = substr($filePath, strlen($sourceDir) + 1);
-            
-            // Skip metadata file
-            if (basename($relativePath) === 'poznote_attachments_metadata.json') {
-                continue;
-            }
-            
-            $targetFile = $attachmentsPath . '/' . basename($relativePath);
-            if (copy($filePath, $targetFile)) {
-                chmod($targetFile, 0644);
-                $importedCount++;
-            }
-        }
-    }
-    
-    return ['success' => true, 'count' => $importedCount];
-}
-
-function deleteDirectory($dir) {
-    if (!is_dir($dir)) {
-        return;
-    }
-    
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
-    
-    foreach ($files as $fileinfo) {
-        $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-        $todo($fileinfo->getRealPath());
-    }
-    
-    rmdir($dir);
-}
-
-function restoreBackup($uploadedFile) {
-    // Check file type
-    if (!preg_match('/\.sql$/i', $uploadedFile['name'])) {
-        return ['success' => false, 'error' => 'File type not allowed. Use a .sql file'];
-    }
-    
-    $tempFile = '/tmp/poznote_restore_' . uniqid() . '.sql';
-    
-    // Move uploaded file
-    if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
-        return ['success' => false, 'error' => 'Error uploading file'];
-    }
-    
-    // Validate SQL file content
-    $content = file_get_contents($tempFile);
-    if (strpos($content, 'CREATE TABLE') === false && strpos($content, 'INSERT') === false) {
-        unlink($tempFile);
-        return ['success' => false, 'error' => 'File does not appear to be a valid SQL dump'];
-    }
-    
-    $dbPath = SQLITE_DATABASE;
-    
-    // Remove current database
-    if (file_exists($dbPath)) {
-        unlink($dbPath);
-    }
-    
-    // Restore database
-    $command = "sqlite3 {$dbPath} < {$tempFile} 2>&1";
-    
-    exec($command, $output, $returnCode);
-    
-    // Clean up temporary file
-    if (file_exists($tempFile)) {
-        unlink($tempFile);
-    }
-    
-    if ($returnCode === 0) {
-        return ['success' => true];
-    } else {
-        $errorMessage = implode("\n", $output);
-        // Clean up common SQL import error messages that might be in the file
-        $errorMessage = str_replace('SQLite Import Error:', 'SQL Import Error:', $errorMessage);
-        return ['success' => false, 'error' => $errorMessage];
-    }
-}
-
 function extractTaskListFromHTML($htmlContent) {
     $tasks = [];
     
@@ -639,7 +388,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         return ['success' => false, 'error' => 'Workspace does not exist'];
     }
     
-    $entriesPath = getEntriesPath();
+    $entriesPath = getEntriesAbsolutePath();
     if (!$entriesPath || !is_dir($entriesPath)) {
         return ['success' => false, 'error' => 'Cannot find entries directory'];
     }
@@ -796,9 +545,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </a>
 
         <br><br>
-        <div>⚠️ Complete Restore will restore database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces.</div>
-        <br>
-        <div> If you want to know more about why we have several retore methods : <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <div> If you want to know more about why we have several retore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
         <!-- Standard Complete Restore Section -->
         <div class="backup-section">
@@ -858,14 +605,14 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </div>
         </div>
 
-        <!-- Direct File Copy Section -->
+        <!-- Direct Copy Restore Section -->
         <div class="backup-section">
-            <h3>Backup file sizes more than 800MB - Direct File Copy</h3>
-            <p>For very large backup files, use this simple direct file copy method. <a href="../BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
+            <h3>Backup file sizes over 800MB - Direct File Copy Restore</h3>
+            <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
-                <button type="submit" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="showDirectCopyRestoreConfirmation()">
                     Start Complete Restore (Direct copy)
                 </button>
             </form>
@@ -882,9 +629,9 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     echo "</div>";
 
                     // Show confirmation form
-                    echo "<form method='post' style='margin-top: 10px;'>";
+                    echo "<form method='post' id='directCopyRestoreForm' style='margin-top: 10px;'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
-                    echo "<button type='submit' class='btn btn-warning' onclick='return confirm(\"Are you sure you want to restore from the direct-copied file?\\n\\nThis will replace your database, restore all notes, and attachments for ALL workspaces.\\n\\nThis action cannot be undone!\")'>";
+                    echo "<button type='button' class='btn btn-warning' onclick='showDirectCopyRestoreConfirmation()'>";
                     echo "Yes, Restore from Direct Copy";
                     echo "</button>";
                     echo "</form>";
@@ -901,7 +648,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 <?php
                 $cliBackupPath = '/tmp/backup_restore.zip';
                 if (file_exists($cliBackupPath)) {
-                    $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip']);
+                    $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip'], true);
                     if ($result['success']) {
                         echo "<div class='alert alert-success'>Direct file copy restore completed successfully! " . htmlspecialchars($result['message']) . "</div>";
                         // Clean up the file after successful restore
@@ -988,6 +735,23 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </div>
     </div>
 
+    <!-- Chunked Restore Confirmation Modal -->
+    <div id="chunkedRestoreConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Complete Restore (Chunked)?</h3>
+            <p id="chunkedRestoreWarning"><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideChunkedRestoreConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithChunkedRestore()">
+                    Yes, Complete Restore
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Notes Import Confirmation Modal -->
     <div id="notesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
@@ -1022,11 +786,28 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </div>
     </div>
 
+    <!-- Direct Copy Restore Confirmation Modal -->
+    <div id="directCopyRestoreConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Complete Restore (Direct Copy)?</h3>
+            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideDirectCopyRestoreConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithDirectCopyRestore()">
+                    Yes, Complete Restore
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Individual Notes Import Confirmation Modal -->
     <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
             <h3>Import Individual Notes?</h3>
-            <p id="individualNotesImportSummary">This will import the selected notes into the specified workspace and folder.</p>
+            <p id="individualNotesImportSummary">This will import notes into the Default folder of the Poznote workspace.</p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
@@ -1038,8 +819,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </div>
         </div>
     </div>
-
-    <!-- Custom Alert Modal -->
     <div id="customAlert" class="custom-alert">
         <div class="custom-alert-content">
             <h3 id="alertTitle">No File Selected</h3>
@@ -1062,14 +841,13 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             if (file && file.name.toLowerCase().endsWith('.zip')) {
                 const sizeMB = file.size / (1024 * 1024);
                 
+                button.disabled = false;
+                button.textContent = 'Start Complete Restore (Standard)';
+                
                 if (sizeMB > 500) {
-                    button.disabled = true;
-                    button.textContent = 'File too large - use chunked upload';
-                    sizeText.textContent = '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Use chunked upload below for files over 500MB to 800MB.';
+                    sizeText.textContent = '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.';
                     sizeText.style.color = '#dc3545';
                 } else {
-                    button.disabled = false;
-                    button.textContent = 'Complete Restore';
                     sizeText.textContent = 'Maximum recommended size: 500MB. For larger files, use chunked upload below.';
                     sizeText.style.color = '#6c757d';
                 }
@@ -1088,18 +866,19 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             if (file && file.name.toLowerCase().endsWith('.zip')) {
                 const sizeMB = file.size / (1024 * 1024);
                 
+                button.disabled = false;
+                button.textContent = `Start Chunked Restore (${formatFileSize(file.size)})`;
+                button.onclick = showChunkedRestoreConfirmation;
+                
                 if (sizeMB < 500) {
-                    button.disabled = true;
-                    button.textContent = 'Use Standard Upload (smaller files)';
-                    sizeText.textContent = 'For files under 500MB, use the standard upload method above.';
+                    sizeText.textContent = 'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.';
                 } else {
-                    button.disabled = false;
-                    button.textContent = `Start Chunked Restore (${formatFileSize(file.size)})`;
                     sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
                 }
             } else {
                 button.disabled = true;
                 button.textContent = 'Start Chunked Restore';
+                button.onclick = showChunkedRestoreConfirmation;
                 sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
             }
         });
@@ -1110,62 +889,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             const sizes = ['Bytes', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function startChunkedRestore() {
-            const fileInput = document.getElementById('chunked_backup_file');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('Please select a backup file first.');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to restore from "${file.name}"?\n\nThis will replace your database, restore all notes, and attachments for ALL workspaces.\n\nThis action cannot be undone!`)) {
-                return;
-            }
-
-            // Show progress UI
-            document.getElementById('chunkedUploadForm').style.display = 'none';
-            document.getElementById('chunkedUploadStatus').style.display = 'block';
-            
-            const progressBar = document.getElementById('chunkedProgress');
-            const statusText = document.getElementById('chunkedStatusText');
-            
-            // Initialize uploader
-            chunkedUploader = new ChunkedUploader({
-                chunkSize: 5 * 1024 * 1024, // 5MB chunks
-                onProgress: (percent) => {
-                    progressBar.style.width = percent + '%';
-                    progressBar.textContent = Math.round(percent) + '%';
-                    statusText.textContent = `Uploading... ${Math.round(percent)}% complete`;
-                },
-                onComplete: () => {
-                    progressBar.style.width = '100%';
-                    progressBar.textContent = '100%';
-                    statusText.textContent = 'Restoration completed successfully!';
-                    
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                },
-                onError: (error) => {
-                    statusText.textContent = `Error: ${error.message}`;
-                    progressBar.style.backgroundColor = '#dc3545';
-                    
-                    // Show retry option
-                    const retryBtn = document.createElement('button');
-                    retryBtn.className = 'btn btn-secondary';
-                    retryBtn.textContent = 'Retry';
-                    retryBtn.onclick = () => {
-                        location.reload();
-                    };
-                    document.getElementById('chunkedUploadStatus').appendChild(retryBtn);
-                }
-            });
-
-            // Start upload
-            chunkedUploader.uploadFile(file, 'api_chunked_restore.php');
         }
 
         // Cleanup on page unload
