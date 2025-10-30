@@ -92,6 +92,65 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <!-- Tips -->
+            <div class="settings-card" onclick="window.open('https://poznote.com/tips.html', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-lightbulb"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Tips & Tricks</h3>
+                </div>
+            </div>
+
+            <!-- API Documentation -->
+            <div class="settings-card" onclick="window.open('api-docs/', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-code"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Rest API</h3>
+                </div>
+            </div>
+
+            <!-- Github repository -->
+            <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-code-branch"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>GitHub Repository</h3>
+                </div>
+            </div>
+
+            <!-- News -->
+            <div class="settings-card" onclick="window.open('https://poznote.com/news.html', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-newspaper"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Poznote News</h3>
+                </div>
+            </div>
+
+            <!-- Poznote Website -->
+            <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-globe"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Poznote Website</h3>
+                </div>
+            </div>
+
+            <!-- Support Developer -->
+            <div class="settings-card" onclick="window.open('https://ko-fi.com/timothepoznanski', '_blank');">
+                <div class="settings-card-icon">
+                    <i class="fa-coffee"></i>
+                </div>
+                <div class="settings-card-content">
+                    <h3>Support Developer</h3>
+                </div>
+            </div>
         </div>
     </div>
     

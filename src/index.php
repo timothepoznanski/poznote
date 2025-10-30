@@ -366,7 +366,6 @@ $body_classes = trim($extra_body_classes);
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-tips" onclick="navigateToTips();" title="About"><i class="fa-info-circle"></i></button>
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
                 <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
                     <i class="fa-cog"></i>
@@ -1039,11 +1038,6 @@ $body_classes = trim($extra_body_classes);
         }
         
         window.location.href = url;
-    }
-    
-    // Navigate to about page
-    function navigateToTips() {
-        window.location.href = 'about.php';
     }
 </script>
 <script src="js/index-config.js"></script>
