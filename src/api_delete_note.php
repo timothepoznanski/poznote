@@ -75,7 +75,7 @@ try {
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {
                 if (isset($attachment['filename'])) {
-                    $attachment_file = getAttachmentsRelativePath() . $attachment['filename'];
+                    $attachment_file = getAttachmentsPath() . '/' . $attachment['filename'];
                     if (file_exists($attachment_file)) {
                         if (unlink($attachment_file)) {
                             $deleted_attachments[] = $attachment['filename'];
@@ -102,7 +102,7 @@ try {
         
         // For Excalidraw notes, also delete the PNG file
         $png_deleted = false;
-        $png_file_path = getEntriesRelativePath() . $note_id . '.png';
+        $png_file_path = getEntriesPath() . '/' . $note_id . '.png';
         if (file_exists($png_file_path)) {
             $png_deleted = unlink($png_file_path);
         }

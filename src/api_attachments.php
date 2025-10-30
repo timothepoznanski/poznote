@@ -24,7 +24,7 @@ include 'functions.php';
 include 'db_connect.php';
 
 // Get the correct attachments directory path
-$attachments_dir = rtrim(getAttachmentsRelativePath(), '/');
+$attachments_dir = getAttachmentsPath();
 
 // Enhanced directory creation and permissions handling
 if (!file_exists($attachments_dir)) {

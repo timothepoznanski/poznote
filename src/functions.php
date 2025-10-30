@@ -10,125 +10,17 @@ function formatDateTime($t) {
 }
 
 /**
- * Get the correct entries directory path
- * Now unified: always use 'data/entries' directory in webroot
+ * Get the entries directory path
  */
 function getEntriesPath() {
-    // In container context, data is at /var/www/html/data
-    $path = realpath(__DIR__ . '/data/entries');
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    // Fallback for development environment
-    $path = realpath(dirname(__DIR__) . '/data/entries');
-    
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    
-    // Fallback: create entries directory in data location
-    // This should rarely happen as Docker creates the directories
-    $entriesDir = dirname(__DIR__) . '/data/entries';
-    if (!is_dir($entriesDir)) {
-        if (!mkdir($entriesDir, 0755, true)) {
-            error_log("Failed to create data/entries directory");
-            return false;
-        }
-        
-        // Set proper permissions
-        chmod($entriesDir, 0755);
-        
-        // Set proper ownership if running as root (Docker context)
-        if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown($entriesDir, 'www-data');
-            chgrp($entriesDir, 'www-data');
-        }
-    }
-    return realpath($entriesDir);
+    return __DIR__ . '/data/entries';
 }
 
 /**
- * Get the correct attachments directory path (dev or prod environment)
- * Now unified: always use 'data/attachments' directory in webroot
+ * Get the attachments directory path
  */
 function getAttachmentsPath() {
-    // In container context, data is at /var/www/html/data
-    $path = realpath(__DIR__ . '/data/attachments');
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    // Fallback for development environment
-    $path = realpath(dirname(__DIR__) . '/data/attachments');
-    
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    
-    // Fallback: create attachments directory in data location
-    // This should rarely happen as Docker creates the directories
-    $attachmentsDir = dirname(__DIR__) . '/data/attachments';
-    if (!is_dir($attachmentsDir)) {
-        if (!mkdir($attachmentsDir, 0755, true)) {
-            error_log("Failed to create data/attachments directory");
-            return false;
-        }
-        
-        // Set proper permissions
-        chmod($attachmentsDir, 0755);
-        
-        // Set proper ownership if running as root (Docker context)
-        if (function_exists('posix_getuid') && posix_getuid() === 0) {
-            chown($attachmentsDir, 'www-data');
-            chgrp($attachmentsDir, 'www-data');
-        }
-        
-        error_log("Created attachments directory: " . realpath($attachmentsDir));
-    }
-    return realpath($attachmentsDir);
-}
-
-/**
- * Get the relative path for entries (for file operations)
- * Use relative path from webroot for Docker compatibility
- */
-function getEntriesRelativePath() {
-    return 'data/entries/';
-}
-
-/**
- * Get the relative path for attachments (for file operations)
- * Use relative path from webroot for Docker compatibility
- */
-function getAttachmentsRelativePath() {
-    return 'data/attachments/';
-}
-
-/**
- * Get absolute path for entries directory (for API operations)
- */
-function getEntriesAbsolutePath() {
-    // In container context, data is at /var/www/html/data
-    $path = realpath(__DIR__ . '/data/entries');
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    // Fallback for development environment
-    $path = realpath(dirname(__DIR__) . '/data/entries');
-    return $path ?: __DIR__ . '/data/entries';
-}
-
-/**
- * Get absolute path for attachments directory (for API operations)
- */
-function getAttachmentsAbsolutePath() {
-    // In container context, data is at /var/www/html/data
-    $path = realpath(__DIR__ . '/data/attachments');
-    if ($path && is_dir($path)) {
-        return $path;
-    }
-    // Fallback for development environment
-    $path = realpath(dirname(__DIR__) . '/data/attachments');
-    return $path ?: __DIR__ . '/data/attachments';
+    return __DIR__ . '/data/attachments';
 }
 
 /**
@@ -148,7 +40,7 @@ function getFileExtensionForType($type) {
  */
 function getEntryFilename($id, $type) {
     $extension = getFileExtensionForType($type);
-    return getEntriesRelativePath() . $id . $extension;
+    return getEntriesPath() . '/' . $id . $extension;
 }
 
 /**
@@ -365,7 +257,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $tempFile = null; // Mark as cleaned
         
         // CLEAR ENTRIES DIRECTORY BEFORE RESTORATION
-        $entriesPath = getEntriesAbsolutePath();
+        $entriesPath = getEntriesPath();
         if (is_dir($entriesPath)) {
             // Delete all files in entries directory
             $files = new RecursiveIteratorIterator(
@@ -392,7 +284,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
         
         // CLEAR ATTACHMENTS DIRECTORY BEFORE RESTORATION
-        $attachmentsPath = getAttachmentsAbsolutePath();
+        $attachmentsPath = getAttachmentsPath();
         if (is_dir($attachmentsPath)) {
             // Delete all files in attachments directory
             $files = new RecursiveIteratorIterator(
@@ -517,7 +409,7 @@ function restoreDatabaseFromFile($sqlFile) {
  * Restore entries from directory
  */
 function restoreEntriesFromDir($sourceDir) {
-    $entriesPath = getEntriesAbsolutePath();
+    $entriesPath = getEntriesPath();
     
     if (!$entriesPath || !is_dir($entriesPath)) {
         return ['success' => false, 'error' => 'Cannot find entries directory'];
@@ -554,7 +446,7 @@ function restoreEntriesFromDir($sourceDir) {
  * Restore attachments from directory
  */
 function restoreAttachmentsFromDir($sourceDir) {
-    $attachmentsPath = getAttachmentsAbsolutePath();
+    $attachmentsPath = getAttachmentsPath();
     
     if (!$attachmentsPath || !is_dir($attachmentsPath)) {
         return ['success' => false, 'error' => 'Cannot find attachments directory'];

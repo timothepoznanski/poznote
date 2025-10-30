@@ -31,7 +31,7 @@ if ($note_id > 0) {
         if ($is_embedded_diagram) {
             // Embedded diagram mode: look for specific diagram data (always in .html files)
             require_once 'functions.php';
-            $html_file = getEntriesRelativePath() . $note_id . '.html';
+            $html_file = getEntriesPath() . '/' . $note_id . '.html';
             if (file_exists($html_file)) {
                 $html_content = file_get_contents($html_file);
                 // Look for the specific diagram container
@@ -47,7 +47,7 @@ if ($note_id > 0) {
         } else {
             // Full note mode: extract from excalidraw-data div or legacy database (always in .html files)
             require_once 'functions.php';
-            $html_file = getEntriesRelativePath() . $note_id . '.html';
+            $html_file = getEntriesPath() . '/' . $note_id . '.html';
             if (file_exists($html_file)) {
                 $html_content = file_get_contents($html_file);
                 // Extract JSON from the hidden excalidraw-data div

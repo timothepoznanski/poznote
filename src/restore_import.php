@@ -388,7 +388,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         return ['success' => false, 'error' => 'Workspace does not exist'];
     }
     
-    $entriesPath = getEntriesAbsolutePath();
+    $entriesPath = getEntriesPath();
     if (!$entriesPath || !is_dir($entriesPath)) {
         return ['success' => false, 'error' => 'Cannot find entries directory'];
     }

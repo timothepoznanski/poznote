@@ -360,7 +360,7 @@ if ($scriptDir && $scriptDir !== '/') {
 }
 
 // Replace src and href references that point to relative attachments path
-$attachmentsRel = getAttachmentsRelativePath(); // returns 'data/attachments/'
+$attachmentsRel = 'data/attachments/';
 // Common patterns: src="data/attachments/..." or src='data/attachments/...' or src=/data/attachments/...
 $content = preg_replace_callback('#(src|href)=(["\']?)(/?' . preg_quote($attachmentsRel, '#') . ')([^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $attachmentsRel) {
     $attr = $m[1];
