@@ -515,7 +515,6 @@ window.simulateUpdateAvailable = simulateUpdateAvailable;
 window.restoreUpdateBadge = restoreUpdateBadge;
 
 function showUpdateInstructions(hasUpdate = false) {
-    console.log('showUpdateInstructions called with hasUpdate:', hasUpdate);
     var modal = document.getElementById('updateModal');
     if (modal) {
         // Update modal title and content based on whether there's an update
