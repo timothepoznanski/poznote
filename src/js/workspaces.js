@@ -184,6 +184,10 @@ function displayWorkspaceMenu(menu, workspaces) {
     
     // Add management link
     menuHtml += '<div class="workspace-menu-divider"></div>';
+    menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'workspaces.php\';">';
+    menuHtml += '<i class="fa-cog"></i>';
+    menuHtml += '<span>Workspaces</span>';
+    menuHtml += '</div>';
     // Add Logout right after Settings
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
     menuHtml += '<i class="fa-sign-out-alt"></i>';
