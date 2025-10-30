@@ -14,7 +14,12 @@ function formatDateTime($t) {
  * Now unified: always use 'data/entries' directory in webroot
  */
 function getEntriesPath() {
-    // Always use the data/entries path relative to the project root
+    // In container context, data is at /var/www/html/data
+    $path = realpath(__DIR__ . '/data/entries');
+    if ($path && is_dir($path)) {
+        return $path;
+    }
+    // Fallback for development environment
     $path = realpath(dirname(__DIR__) . '/data/entries');
     
     if ($path && is_dir($path)) {
@@ -47,7 +52,12 @@ function getEntriesPath() {
  * Now unified: always use 'data/attachments' directory in webroot
  */
 function getAttachmentsPath() {
-    // Always use the data/attachments path relative to the project root
+    // In container context, data is at /var/www/html/data
+    $path = realpath(__DIR__ . '/data/attachments');
+    if ($path && is_dir($path)) {
+        return $path;
+    }
+    // Fallback for development environment
     $path = realpath(dirname(__DIR__) . '/data/attachments');
     
     if ($path && is_dir($path)) {
