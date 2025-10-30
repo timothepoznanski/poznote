@@ -4,9 +4,10 @@
  * Allows uploading very large files by splitting them into smaller chunks
  */
 
-// Enable error reporting for debugging
+// Disable error display to prevent HTML output in JSON responses
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 require_once 'auth.php';
 require_once 'config.php';
@@ -30,114 +31,126 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $action = $_POST['action'] ?? '';
 
-switch ($action) {
-    case 'upload_chunk':
-        handleChunkUpload();
-        break;
-    case 'assemble_chunks':
-        assembleChunks();
-        break;
-    case 'cleanup_chunks':
-        cleanupChunks();
-        break;
-    default:
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid action']);
-        break;
+try {
+    switch ($action) {
+        case 'upload_chunk':
+            handleChunkUpload();
+            break;
+        case 'assemble_chunks':
+            assembleChunks();
+            break;
+        case 'cleanup_chunks':
+            cleanupChunks();
+            break;
+        default:
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid action']);
+            break;
+    }
+} catch (Exception $e) {
+    error_log('Chunked restore error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'Internal server error']);
 }
 
 function handleChunkUpload() {
-    $fileId = $_POST['file_id'] ?? '';
-    $chunkIndex = (int)($_POST['chunk_index'] ?? 0);
-    $totalChunks = (int)($_POST['total_chunks'] ?? 0);
-    $fileName = $_POST['file_name'] ?? '';
-    $chunkSize = (int)($_POST['chunk_size'] ?? 0);
+    try {
+        $fileId = $_POST['file_id'] ?? '';
+        $chunkIndex = (int)($_POST['chunk_index'] ?? 0);
+        $totalChunks = (int)($_POST['total_chunks'] ?? 0);
+        $fileName = $_POST['file_name'] ?? '';
+        $chunkSize = (int)($_POST['chunk_size'] ?? 0);
 
-    if (!$fileId || !$fileName || $totalChunks <= 0) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Missing required parameters']);
-        return;
-    }
-
-    // Validate file type (only ZIP files for restoration)
-    if (!preg_match('/\.zip$/i', $fileName)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Only ZIP files are allowed']);
-        return;
-    }
-
-    // Check if chunk file was uploaded
-    if (!isset($_FILES['chunk']) || $_FILES['chunk']['error'] !== UPLOAD_ERR_OK) {
-        http_response_code(400);
-        echo json_encode(['error' => 'No chunk file uploaded']);
-        return;
-    }
-
-    $chunkFile = $_FILES['chunk']['tmp_name'];
-    $chunkData = file_get_contents($chunkFile);
-
-    if ($chunkData === false) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Failed to read chunk data']);
-        return;
-    }
-
-    // Create chunks directory if it doesn't exist
-    $chunksDir = sys_get_temp_dir() . '/poznote_chunks_' . $fileId;
-    if (!is_dir($chunksDir)) {
-        if (!mkdir($chunksDir, 0755, true)) {
-            http_response_code(500);
-            echo json_encode(['error' => 'Failed to create chunks directory']);
+        if (!$fileId || !$fileName || $totalChunks <= 0) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required parameters']);
             return;
         }
-    }
 
-    // Save chunk to file
-    $chunkFilePath = $chunksDir . '/chunk_' . str_pad($chunkIndex, 6, '0', STR_PAD_LEFT);
-    if (file_put_contents($chunkFilePath, $chunkData) === false) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Failed to save chunk']);
-        return;
-    }
-
-    // Save metadata
-    $metadataFile = $chunksDir . '/metadata.json';
-    $metadata = [
-        'file_name' => $fileName,
-        'file_id' => $fileId,
-        'total_chunks' => $totalChunks,
-        'chunk_size' => $chunkSize,
-        'uploaded_chunks' => [],
-        'upload_start_time' => time()
-    ];
-
-    if (file_exists($metadataFile)) {
-        $existingMetadata = json_decode(file_get_contents($metadataFile), true);
-        if ($existingMetadata) {
-            $metadata = array_merge($metadata, $existingMetadata);
+        // Validate file type (only ZIP files for restoration)
+        if (!preg_match('/\.zip$/i', $fileName)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Only ZIP files are allowed']);
+            return;
         }
-    }
 
-    $metadata['uploaded_chunks'][] = $chunkIndex;
-    $metadata['uploaded_chunks'] = array_unique($metadata['uploaded_chunks']);
-    sort($metadata['uploaded_chunks']);
+        // Check if chunk file was uploaded
+        if (!isset($_FILES['chunk']) || $_FILES['chunk']['error'] !== UPLOAD_ERR_OK) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No chunk file uploaded']);
+            return;
+        }
 
-    if (file_put_contents($metadataFile, json_encode($metadata)) === false) {
+        $chunkFile = $_FILES['chunk']['tmp_name'];
+        $chunkData = file_get_contents($chunkFile);
+
+        if ($chunkData === false) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to read chunk data']);
+            return;
+        }
+
+        // Create chunks directory if it doesn't exist
+        $chunksDir = sys_get_temp_dir() . '/poznote_chunks_' . $fileId;
+        if (!is_dir($chunksDir)) {
+            if (!mkdir($chunksDir, 0755, true)) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to create chunks directory']);
+                return;
+            }
+        }
+
+        // Save chunk to file
+        $chunkFilePath = $chunksDir . '/chunk_' . str_pad($chunkIndex, 6, '0', STR_PAD_LEFT);
+        if (file_put_contents($chunkFilePath, $chunkData) === false) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save chunk']);
+            return;
+        }
+
+        // Save metadata
+        $metadataFile = $chunksDir . '/metadata.json';
+        $metadata = [
+            'file_name' => $fileName,
+            'file_id' => $fileId,
+            'total_chunks' => $totalChunks,
+            'chunk_size' => $chunkSize,
+            'uploaded_chunks' => [],
+            'upload_start_time' => time()
+        ];
+
+        if (file_exists($metadataFile)) {
+            $existingMetadata = json_decode(file_get_contents($metadataFile), true);
+            if ($existingMetadata) {
+                $metadata = array_merge($metadata, $existingMetadata);
+            }
+        }
+
+        $metadata['uploaded_chunks'][] = $chunkIndex;
+        $metadata['uploaded_chunks'] = array_unique($metadata['uploaded_chunks']);
+        sort($metadata['uploaded_chunks']);
+
+        if (file_put_contents($metadataFile, json_encode($metadata)) === false) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save metadata']);
+            return;
+        }
+
+        // Check if all chunks are uploaded
+        $allChunksUploaded = count($metadata['uploaded_chunks']) === $totalChunks;
+
+        echo json_encode([
+            'success' => true,
+            'chunk_index' => $chunkIndex,
+            'uploaded_chunks' => count($metadata['uploaded_chunks']),
+            'total_chunks' => $totalChunks,
+            'all_chunks_uploaded' => $allChunksUploaded
+        ]);
+    } catch (Exception $e) {
+        error_log('handleChunkUpload error: ' . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to save metadata']);
-        return;
+        echo json_encode(['error' => 'Internal server error during chunk upload']);
     }
-
-    // Check if all chunks are uploaded
-    $allChunksUploaded = count($metadata['uploaded_chunks']) === $totalChunks;
-
-    echo json_encode([
-        'success' => true,
-        'chunk_index' => $chunkIndex,
-        'uploaded_chunks' => count($metadata['uploaded_chunks']),
-        'total_chunks' => $totalChunks,
-        'all_chunks_uploaded' => $allChunksUploaded
-    ]);
 }
 
 function assembleChunks() {
@@ -258,27 +271,34 @@ function assembleChunks() {
             deleteDirectory($chunksDir);
         }
         
+        error_log('assembleChunks error: ' . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['error' => 'Exception during chunk assembly: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Internal server error during chunk assembly']);
     }
 }
 
 function cleanupChunks() {
-    $fileId = $_POST['file_id'] ?? '';
+    try {
+        $fileId = $_POST['file_id'] ?? '';
 
-    if (!$fileId) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Missing file_id']);
-        return;
+        if (!$fileId) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing file_id']);
+            return;
+        }
+
+        $chunksDir = sys_get_temp_dir() . '/poznote_chunks_' . $fileId;
+
+        if (is_dir($chunksDir)) {
+            deleteDirectory($chunksDir);
+        }
+
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        error_log('cleanupChunks error: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Internal server error during cleanup']);
     }
-
-    $chunksDir = sys_get_temp_dir() . '/poznote_chunks_' . $fileId;
-
-    if (is_dir($chunksDir)) {
-        deleteDirectory($chunksDir);
-    }
-
-    echo json_encode(['success' => true]);
 }
 
 ?>
