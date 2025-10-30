@@ -388,7 +388,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         return ['success' => false, 'error' => 'Workspace does not exist'];
     }
     
-    $entriesPath = getEntriesPath();
+    $entriesPath = getEntriesAbsolutePath();
     if (!$entriesPath || !is_dir($entriesPath)) {
         return ['success' => false, 'error' => 'Cannot find entries directory'];
     }
@@ -803,7 +803,22 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </div>
     </div>
 
-    <!-- Custom Alert Modal -->
+    <!-- Individual Notes Import Confirmation Modal -->
+    <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3>Import Individual Notes?</h3>
+            <p id="individualNotesImportSummary">This will import notes into the Default folder of the Poznote workspace.</p>
+            
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
+                    Cancel
+                </button>
+                <button type="button" class="btn-confirm" onclick="proceedWithIndividualNotesImport()">
+                    Yes, Import Notes
+                </button>
+            </div>
+        </div>
+    </div>
     <div id="customAlert" class="custom-alert">
         <div class="custom-alert-content">
             <h3 id="alertTitle">No File Selected</h3>
