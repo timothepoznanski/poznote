@@ -113,3 +113,197 @@ table th {
     background-color: #f5f5f5 !important;
     font-weight: 600 !important;
 }
+
+/* Code block styles for public notes */
+.public-note .content code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: #333;
+    border-radius: 3px;
+}
+
+.public-note .content pre {
+    background-color: #f4f4f4;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1em 0;
+    position: relative;
+    border: 1px solid #e0e0e0;
+}
+
+.public-note .content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+    border-radius: 0;
+    border: none;
+    display: block;
+    line-height: 1.5;
+}
+
+/* Copy button for code blocks */
+.public-note .content pre .code-block-copy-btn,
+.code-block-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    font-size: 12px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.public-note .content pre:hover .code-block-copy-btn,
+pre:hover .code-block-copy-btn {
+    opacity: 1;
+}
+
+.public-note .content pre .code-block-copy-btn:hover,
+.code-block-copy-btn:hover {
+    background-color: #fff;
+    color: #333;
+}
+
+.public-note .content pre .code-block-copy-btn.copied,
+.code-block-copy-btn.copied {
+    background-color: #4caf50;
+    color: white;
+    border-color: #4caf50;
+}
+
+.public-note .content pre .code-block-copy-btn svg,
+.code-block-copy-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Blockquote styles */
+.public-note .content blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 16px;
+    margin: 1em 0;
+    color: #666;
+    font-style: italic;
+}
+
+/* List styles */
+.public-note .content ul,
+.public-note .content ol {
+    margin: 1em 0;
+    padding-left: 2em;
+    line-height: 1.6;
+}
+
+.public-note .content li {
+    margin: 0.5em 0;
+}
+
+/* Task list styles */
+.public-note .content ul.task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.public-note .content li.task-list-item {
+    list-style: none;
+    position: relative;
+    padding-left: 0;
+}
+
+.public-note .content li.task-list-item input[type="checkbox"] {
+    margin-right: 0.5em;
+    cursor: default;
+    vertical-align: middle;
+}
+
+/* Horizontal rule */
+.public-note .content hr {
+    border: 0;
+    border-top: 2px solid #e0e0e0;
+    margin: 2em 0;
+}
+
+/* Text formatting */
+.public-note .content strong {
+    font-weight: bold;
+}
+
+.public-note .content em {
+    font-style: italic;
+}
+
+.public-note .content del {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Links */
+.public-note .content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.public-note .content a:hover {
+    text-decoration: underline;
+}
+
+/* Headings in content */
+.public-note .content h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0.3em;
+}
+
+.public-note .content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.75em 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.3em;
+}
+
+.public-note .content h3 {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0.83em 0;
+}
+
+.public-note .content h4 {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 1em 0;
+}
+
+.public-note .content h5 {
+    font-size: 0.875em;
+    font-weight: bold;
+    margin: 1.33em 0;
+}
+
+.public-note .content h6 {
+    font-size: 0.75em;
+    font-weight: bold;
+    margin: 1.67em 0;
+    color: #666;
+}
+
+/* Paragraphs */
+.public-note .content p {
+    margin: 0 0 1em 0;
+    line-height: 1.6;
+}
+
