@@ -5,7 +5,7 @@ This guide will help you **install and manage** Poznote on cloud platforms witho
 ## Table of Contents
 
 - [Option 1: Railway (Recommended)](#option-1-railway-recommended)
-  - [Installation on Railway](#poznote-installation-on-railway)
+  - [Installation on Railway](#installation-on-railway)
   - [Access](#access)
   - [Get Your Instance URL](#get-your-instance-url)
   - [Change Username or Password](#change-username-or-password)
