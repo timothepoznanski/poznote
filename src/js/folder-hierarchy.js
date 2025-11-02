@@ -33,9 +33,12 @@ function showCreateDropdown(folderId, folderName, event) {
     html += '<div class="dropdown-item" onclick="showCreateNoteInFolderModal(' + folderId + ', \'' + escapeForJs(folderName) + '\'); closeCreateDropdown();">';
     html += '<i class="fa fa-file"></i> Note';
     html += '</div>';
-    html += '<div class="dropdown-item" onclick="createSubfolder(\'' + folderKey + '\'); closeCreateDropdown();">';
-    html += '<i class="fa fa-folder"></i> Subfolder';
-    html += '</div>';
+    // Hide subfolder option for Default folder
+    if (folderName !== 'Default') {
+        html += '<div class="dropdown-item" onclick="createSubfolder(\'' + folderKey + '\'); closeCreateDropdown();">';
+        html += '<i class="fa fa-folder"></i> Subfolder';
+        html += '</div>';
+    }
     
     dropdown.innerHTML = html;
     
