@@ -145,18 +145,21 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
 function generateFolderActions($folderId, $folderName, $workspace_filter) {
     $actions = "";
     
+    // Escape folder name for use in JavaScript strings
+    $escapedFolderName = addslashes($folderName);
+    
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$folderName\")' title='Move all files to another folder'></i>";
-        $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$folderName\")' title='Move all notes to trash'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
+        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+        $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$escapedFolderName\")' title='Move all notes to trash'></i>";
     } else {
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$folderName\")' title='Move all files to another folder'></i>";
-        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$folderName\")' title='Rename folder'></i>";
-        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$folderName\")' title='Delete folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
+        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='Rename folder'></i>";
+        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='Delete folder'></i>";
     }
     
     return $actions;
