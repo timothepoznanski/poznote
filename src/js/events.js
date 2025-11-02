@@ -871,11 +871,13 @@ function handleNoteDragStart(e) {
     
     var noteId = noteLink.getAttribute('data-note-db-id');
     var currentFolder = noteLink.getAttribute('data-folder');
+    var currentFolderId = noteLink.getAttribute('data-folder-id');
     
     if (noteId) {
         e.dataTransfer.setData('text/plain', JSON.stringify({
             noteId: noteId,
-            currentFolder: currentFolder
+            currentFolder: currentFolder,
+            currentFolderId: currentFolderId
         }));
         e.dataTransfer.effectAllowed = 'move';
         
@@ -939,6 +941,7 @@ function handleFolderDrop(e) {
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
         var targetFolder = folderHeader.getAttribute('data-folder');
+        var targetFolderId = folderHeader.getAttribute('data-folder-id');
         
         // Prevent dropping notes into the Tags folder
         if (targetFolder === 'Tags') {
@@ -959,17 +962,28 @@ function handleFolderDrop(e) {
             return;
         }
         
-        if (data.noteId && targetFolder && data.currentFolder !== targetFolder) {
-            moveNoteToTargetFolder(data.noteId, targetFolder);
+        // Compare folder IDs instead of names to handle subfolders with same names
+        var currentFolderId = data.currentFolderId ? String(data.currentFolderId) : null;
+        var targetFolderIdStr = targetFolderId ? String(targetFolderId) : null;
+        
+        if (data.noteId && targetFolderId && currentFolderId !== targetFolderIdStr) {
+            moveNoteToTargetFolder(data.noteId, targetFolderId);
         }
     } catch (err) {
     }
 }
 
-function moveNoteToTargetFolder(noteId, targetFolder) {
-    // targetFolder is a folder name, get the folder_id
+function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
+    // targetFolderIdOrName can be either a folder ID (preferred) or folder name (legacy)
     var targetFolderId = null;
-    if (targetFolder && window.folderMap) {
+    var targetFolder = null;
+    
+    // Check if it's a numeric ID
+    if (targetFolderIdOrName && !isNaN(targetFolderIdOrName)) {
+        targetFolderId = parseInt(targetFolderIdOrName);
+    } else if (targetFolderIdOrName && window.folderMap) {
+        // Legacy: it's a folder name, try to find the ID
+        targetFolder = targetFolderIdOrName;
         for (var fid in window.folderMap) {
             if (window.folderMap[fid] === targetFolder) {
                 targetFolderId = parseInt(fid);
@@ -982,7 +996,6 @@ function moveNoteToTargetFolder(noteId, targetFolder) {
         action: 'move_to',
         note_id: noteId,
         folder_id: targetFolderId || '',
-        folder: targetFolder,
         workspace: selectedWorkspace || 'Poznote'
     });
     
