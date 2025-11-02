@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 
 require 'auth.php';
-requireAuth();
+requireApiAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
@@ -19,7 +19,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 if (!$input || !isset($input['note_id']) || !isset($input['tags'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Note ID and tags are required']);
+    echo json_encode(['error' => 'note_id and tags are required']);
     exit;
 }
 

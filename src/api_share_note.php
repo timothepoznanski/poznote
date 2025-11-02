@@ -1,6 +1,6 @@
 <?php
 require 'auth.php';
-requireAuth();
+requireApiAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 

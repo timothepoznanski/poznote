@@ -736,6 +736,19 @@ body.dark-mode .noteentry pre .code-block-copy-btn.copied {
     border-color: #28a745;
 }
 
+/* Text selection (when user highlights/selects text) */
+html[data-theme='dark'] ::selection,
+body.dark-mode ::selection {
+    background-color: #264f78;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] ::-moz-selection,
+body.dark-mode ::-moz-selection {
+    background-color: #264f78;
+    color: #ffffff;
+}
+
 /* Highlighted text in search */
 html[data-theme='dark'] mark,
 html[data-theme='dark'] .highlight,
@@ -743,6 +756,17 @@ body.dark-mode mark,
 body.dark-mode .highlight {
     background-color: #4d4d00;
     color: #ffff99;
+}
+
+/* Text highlighted with the highlighter tool (yellow background from toolbar) */
+html[data-theme='dark'] [style*="background-color: rgb(255, 224, 102)"],
+html[data-theme='dark'] [style*="background-color:#ffe066"],
+html[data-theme='dark'] [style*="background-color: #ffe066"],
+body.dark-mode [style*="background-color: rgb(255, 224, 102)"],
+body.dark-mode [style*="background-color:#ffe066"],
+body.dark-mode [style*="background-color: #ffe066"] {
+    background-color: #665500 !important;
+    color: #ffff99 !important;
 }
 
 /* Horizontal rules */
@@ -1243,4 +1267,14 @@ body.dark-mode .markdown-preview-btn:hover .fa-eye {
     transform: scale(1.18);
 }
 
+/* Image resize handle in dark mode */
+html[data-theme='dark'] .image-resize-handle,
+body.dark-mode .image-resize-handle {
+    background: #007DB8;
+    border-color: #2a2a2a;
+}
 
+html[data-theme='dark'] .image-resize-handle:hover,
+body.dark-mode .image-resize-handle:hover {
+    background: #0099e6;
+}

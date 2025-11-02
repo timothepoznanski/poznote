@@ -1224,6 +1224,43 @@ img {
     max-width:100%; /* To prevent screenshots from exceeding their container when they are too large */
 }
 
+/* Image resize wrapper and handle */
+.image-resize-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.image-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: #007DB8;
+    border: 2px solid white;
+    border-radius: 4px 0 4px 0;
+    cursor: nwse-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    transition: all 0.2s ease;
+}
+
+.image-resize-handle:hover {
+    background: #005a8a;
+    width: 24px;
+    height: 24px;
+}
+
+.image-resize-handle i {
+    color: white;
+    font-size: 10px;
+    pointer-events: none;
+}
+
 .notification-overlay {
     display: none;
     position: fixed;
@@ -2737,6 +2774,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-edit::before { content: "\f044"; }
 .fa-download::before { content: "\f019"; }
 .fa-maximize::before { content: "\f31e"; }
+.fa-expand::before { content: "\f065"; }
 .fa-trash::before { content: "\f2ed"; }
 .fa-save::before { content: "\f0c7"; }
 .fa-link::before { content: "\f0c1"; }
@@ -2817,6 +2855,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-edit,
 .fa-download,
 .fa-maximize,
+.fa-expand,
 .fa-trash,
 .fa-save,
 .fa-link,

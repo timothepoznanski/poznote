@@ -399,7 +399,11 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-### 📚 Interactive Documentation (Swagger)
+### Missing an API Endpoint?
+
+If you need additional REST API functionality that isn't currently available, feel free to [open an issue on GitHub](https://github.com/timothepoznanski/poznote/issues) describing your use case. We're always looking to improve the API based on community feedback!
+
+### Interactive Documentation (Swagger)
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
 
@@ -461,9 +465,9 @@ curl -X POST -u 'username:password' \
 
 Move a note to trash by ID:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X DELETE -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"id": 123}' \
+  -d '{"note_id": 123}' \
   http://YOUR_SERVER/api_delete_note.php
 ```
 
@@ -483,11 +487,27 @@ curl -X POST -u 'username:password' \
 
 **Share Note**
 
-Enable public sharing for a note (generates public link):
+Create or enable public sharing for a note (generates public link):
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"id": 123, "shared": 1}' \
+  -d '{"note_id": 123, "action": "create"}' \
+  http://YOUR_SERVER/api_share_note.php
+```
+
+Revoke sharing for a note:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": 123, "action": "revoke"}' \
+  http://YOUR_SERVER/api_share_note.php
+```
+
+Get existing share URL:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": 123, "action": "get"}' \
   http://YOUR_SERVER/api_share_note.php
 ```
 
@@ -538,7 +558,7 @@ curl -X POST -u 'username:password' \
 
 Delete a folder and move its contents to Default folder:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X DELETE -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "folder_name": "Old Projects",
@@ -558,6 +578,46 @@ curl -X POST -u 'username:password' \
 Get all available workspaces in your Poznote instance:
 ```bash
 curl -u 'username:password' \
+  "http://YOUR_SERVER/api_workspaces.php?action=list"
+```
+
+**Create Workspace**
+
+Create a new workspace:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "create",
+    "name": "MyProject"
+  }' \
+  http://YOUR_SERVER/api_workspaces.php
+```
+
+**Delete Workspace**
+
+Delete a workspace (notes are moved to Poznote default workspace):
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "delete",
+    "name": "OldWorkspace"
+  }' \
+  http://YOUR_SERVER/api_workspaces.php
+```
+
+**Rename Workspace**
+
+Rename an existing workspace:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "rename",
+    "old_name": "OldName",
+    "new_name": "NewName"
+  }' \
   http://YOUR_SERVER/api_workspaces.php
 ```
 
@@ -577,13 +637,26 @@ curl -u 'username:password' \
 
 **Apply Tags**
 
-Add or update tags for a specific note (replaces existing tags):
+Add or update tags for a specific note (replaces existing tags).
+
+Tags can be provided as a comma-separated string:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
-    "id": 123,
+    "note_id": 123,
     "tags": "work,urgent,meeting"
+  }' \
+  http://YOUR_SERVER/api_apply_tags.php
+```
+
+Or as an array:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "note_id": 123,
+    "tags": ["work", "urgent", "meeting"]
   }' \
   http://YOUR_SERVER/api_apply_tags.php
 ```
@@ -594,23 +667,17 @@ curl -X POST -u 'username:password' \
 <summary><strong>⭐ Favorites Management</strong></summary>
 <br>
 
-**Add to Favorites**
+**Toggle Favorite**
 
-Mark a note as favorite for quick access:
+Toggle favorite status for a note (add or remove):
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"id": 123, "favorite": 1}' \
-  http://YOUR_SERVER/api_favorites.php
-```
-
-**Remove from Favorites**
-
-Remove favorite status from a note:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"id": 123, "favorite": 0}' \
+  -d '{
+    "action": "toggle_favorite",
+    "note_id": 123,
+    "workspace": "Personal"
+  }' \
   http://YOUR_SERVER/api_favorites.php
 ```
 
@@ -625,7 +692,7 @@ curl -X POST -u 'username:password' \
 Get all file attachments for a specific note:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_attachments.php?note_id=123"
+  "http://YOUR_SERVER/api_attachments.php?action=list&note_id=123"
 ```
 
 **Upload Attachment**
@@ -633,6 +700,7 @@ curl -u 'username:password' \
 Upload a file and attach it to a note:
 ```bash
 curl -X POST -u 'username:password' \
+  -F "action=upload" \
   -F "note_id=123" \
   -F "file=@/path/to/file.pdf" \
   http://YOUR_SERVER/api_attachments.php

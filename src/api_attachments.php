@@ -28,21 +28,21 @@ $attachments_dir = getAttachmentsPath();
 
 // Enhanced directory creation and permissions handling
 if (!file_exists($attachments_dir)) {
-    if (!mkdir($attachments_dir, 0777, true)) {
+    if (!mkdir($attachments_dir, 0755, true)) {
         error_log("Failed to create attachments directory: $attachments_dir");
         echo json_encode(['success' => false, 'message' => 'Failed to create attachments directory']);
         exit;
     }
-    // Set permissions after creation
-    chmod($attachments_dir, 0777);
+    // Set permissions after creation (owner can write, others can read/execute)
+    chmod($attachments_dir, 0755);
     error_log("Created attachments directory: $attachments_dir");
 }
 
 // Verify directory is writable
 if (!is_writable($attachments_dir)) {
     error_log("Attachments directory is not writable: $attachments_dir");
-    // Try to fix permissions
-    if (!chmod($attachments_dir, 0777)) {
+    // Try to fix permissions (owner-writable only for better security)
+    if (!chmod($attachments_dir, 0755)) {
         error_log("Failed to set writable permissions on: $attachments_dir");
     }
 }

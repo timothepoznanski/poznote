@@ -5,7 +5,19 @@ header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
 
-$action = $_GET['action'] ?? $_POST['action'] ?? 'list';
+// For GET requests (list), use query params. For POST requests, require JSON.
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $action = $_GET['action'] ?? 'list';
+} else {
+    // POST/PUT/DELETE require JSON body
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON request body']);
+        exit;
+    }
+    $action = $input['action'] ?? '';
+}
 
 try {
     if ($action === 'list') {
@@ -14,9 +26,15 @@ try {
         echo json_encode(['success' => true, 'workspaces' => $rows]);
         exit;
     } else if ($action === 'create') {
-        $name = trim($_POST['name'] ?? '');
+        if (!isset($input)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'JSON body required for this action']);
+            exit;
+        }
+        $name = trim($input['name'] ?? '');
         if ($name === '') {
-            echo json_encode(['success' => false, 'message' => 'Name required']);
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'name is required']);
             exit;
         }
         if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) {
@@ -31,8 +49,14 @@ try {
         }
         exit;
     } else if ($action === 'delete') {
-        $name = trim($_POST['name'] ?? '');
+        if (!isset($input)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'JSON body required for this action']);
+            exit;
+        }
+        $name = trim($input['name'] ?? '');
         if ($name === '' || $name === 'Poznote') {
+            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid workspace']);
             exit;
         }
@@ -82,9 +106,15 @@ try {
         }
         exit;
     } else if ($action === 'rename') {
-        $old = trim($_POST['old_name'] ?? '');
-        $new = trim($_POST['new_name'] ?? '');
+        if (!isset($input)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'JSON body required for this action']);
+            exit;
+        }
+        $old = trim($input['old_name'] ?? '');
+        $new = trim($input['new_name'] ?? '');
         if ($old === '' || $new === '' || $old === 'Poznote' || $new === 'Poznote') {
+            http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid names']);
             exit;
         }
