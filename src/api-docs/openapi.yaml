@@ -190,12 +190,12 @@ paths:
                     description: ID of created note
                     example: 123
 
-  /api_update_note.php:
+  /api_apply_tags.php:
     post:
       tags:
-        - Notes Management
-      summary: Update note
-      description: Update an existing note (only ID is required, all other fields are optional)
+        - Tags Management
+      summary: Apply Tags
+      description: Add or update tags for a specific note (replaces existing tags). Tags can be provided as a comma-separated string or as an array.
       requestBody:
         required: true
         content:
@@ -203,44 +203,33 @@ paths:
             schema:
               type: object
               required:
-                - id
-                - heading
+                - note_id
+                - tags
               properties:
-                id:
+                note_id:
                   type: integer
                   description: "Note ID (required)"
                   example: 123
-                heading:
-                  type: string
-                  description: "Note title (required)"
-                  example: "Updated Title"
-                subheading:
-                  type: string
-                  description: "Note subtitle (optional)"
-                  example: "Updated subtitle"
-                entrycontent:
-                  type: string
-                  description: "Text content (optional)"
-                  example: "Updated content"
-                entry:
-                  type: string
-                  description: "HTML content (optional)"
                 tags:
-                  type: string
-                  description: "Comma-separated tags (optional)"
-                  example: "updated,modified"
-                folder:
-                  type: string
-                  description: "Folder name (optional)"
+                  oneOf:
+                    - type: string
+                      description: "Comma-separated tags"
+                      example: "work,urgent,meeting"
+                    - type: array
+                      description: "Array of tags"
+                      items:
+                        type: string
+                      example: ["work", "urgent", "meeting"]
                 workspace:
                   type: string
                   description: "Workspace name (optional)"
+                  example: "Personal"
       responses:
         '200':
-          description: Note updated successfully
+          description: Tags updated successfully
 
   /api_delete_note.php:
-    post:
+    delete:
       tags:
         - Notes Management
       summary: Delete note
@@ -252,15 +241,23 @@ paths:
             schema:
               type: object
               required:
-                - id
+                - note_id
               properties:
-                id:
+                note_id:
                   type: integer
                   description: "Note ID to delete (required)"
                   example: 123
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
+                permanent:
+                  type: boolean
+                  description: "If true, permanently delete the note (optional, default: false)"
+                  example: false
       responses:
         '200':
-          description: Note moved to trash successfully
+          description: Note moved to trash or permanently deleted successfully
 
   /api_list_trash.php:
     get:
@@ -369,7 +366,7 @@ paths:
       tags:
         - Notes Management
       summary: Share note
-      description: Enable or disable public sharing for a note
+      description: Manage public sharing for a note (create, get, revoke, or renew share link)
       requestBody:
         required: true
         content:
@@ -377,21 +374,21 @@ paths:
             schema:
               type: object
               required:
-                - id
-                - shared
+                - note_id
               properties:
-                id:
+                note_id:
                   type: integer
                   description: "Note ID (required)"
                   example: 123
-                shared:
-                  type: integer
-                  enum: [0, 1]
-                  description: "Enable or disable sharing - 1=enable, 0=disable (required)"
-                  example: 1
+                action:
+                  type: string
+                  enum: [create, get, revoke, renew]
+                  description: "Action to perform: 'create' (generate new link), 'get' (retrieve existing), 'revoke' (disable sharing), 'renew' (generate new token)"
+                  example: "create"
+                  default: "create"
       responses:
         '200':
-          description: Sharing status updated
+          description: Sharing action completed successfully
           content:
             application/json:
               schema:
@@ -399,14 +396,15 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  message:
+                  url:
                     type: string
-                  share_token:
-                    type: string
-                    description: Token for public access (if shared=1)
-                  share_url:
-                    type: string
-                    description: Public URL (if shared=1)
+                    description: Public share URL (for create/get/renew actions)
+                  shared:
+                    type: boolean
+                    description: Current sharing status
+                  revoked:
+                    type: boolean
+                    description: True if revoke action was successful
 
   /api_workspaces.php:
     get:
@@ -414,30 +412,96 @@ paths:
         - Workspaces Management
       summary: List workspaces
       description: Get all available workspaces
+      parameters:
+        - name: action
+          in: query
+          required: false
+          description: "Action to perform (default: list)"
+          schema:
+            type: string
+            enum: [list]
+            default: "list"
       responses:
         '200':
           description: List of workspaces returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  workspaces:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        created:
+                          type: string
+                          format: date-time
     post:
       tags:
         - Workspaces Management
-      summary: Create workspace
-      description: Create a new workspace
+      summary: Manage workspaces
+      description: Create, delete, or rename workspaces
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - name
-              properties:
-                name:
-                  type: string
-                  description: "Workspace name (required)"
-                  example: "My Project"
+              oneOf:
+                - type: object
+                  title: Create workspace
+                  required:
+                    - action
+                    - name
+                  properties:
+                    action:
+                      type: string
+                      enum: [create]
+                      example: "create"
+                    name:
+                      type: string
+                      description: "Workspace name (letters, numbers, dash, underscore only)"
+                      example: "MyProject"
+                - type: object
+                  title: Delete workspace
+                  required:
+                    - action
+                    - name
+                  properties:
+                    action:
+                      type: string
+                      enum: [delete]
+                      example: "delete"
+                    name:
+                      type: string
+                      description: "Workspace name to delete (cannot delete 'Poznote')"
+                      example: "OldWorkspace"
+                - type: object
+                  title: Rename workspace
+                  required:
+                    - action
+                    - old_name
+                    - new_name
+                  properties:
+                    action:
+                      type: string
+                      enum: [rename]
+                      example: "rename"
+                    old_name:
+                      type: string
+                      description: "Current workspace name"
+                      example: "OldName"
+                    new_name:
+                      type: string
+                      description: "New workspace name"
+                      example: "NewName"
       responses:
         '200':
-          description: Workspace created successfully
+          description: Workspace operation completed successfully
 
   /api_list_tags.php:
     get:
@@ -462,7 +526,7 @@ paths:
       tags:
         - Favorites Management
       summary: Toggle favorite
-      description: Add or remove a note from favorites
+      description: Toggle favorite status for a note (automatically adds or removes from favorites)
       requestBody:
         required: true
         content:
@@ -470,21 +534,36 @@ paths:
             schema:
               type: object
               required:
-                - id
-                - favorite
+                - action
+                - note_id
               properties:
-                id:
+                action:
+                  type: string
+                  enum: [toggle_favorite]
+                  description: "Action to perform (required)"
+                  example: "toggle_favorite"
+                note_id:
                   type: integer
                   description: "Note ID (required)"
                   example: 123
-                favorite:
-                  type: integer
-                  enum: [0, 1]
-                  description: "Add or remove from favorites - 1=add, 0=remove (required)"
-                  example: 1
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
       responses:
         '200':
-          description: Favorite status updated successfully
+          description: Favorite status toggled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  is_favorite:
+                    type: integer
+                    enum: [0, 1]
+                    description: "New favorite status: 1=favorite, 0=not favorite"
 
   /api_attachments.php:
     get:
@@ -493,6 +572,14 @@ paths:
       summary: List attachments
       description: Get all attachments for a specific note
       parameters:
+        - name: action
+          in: query
+          required: true
+          description: "Action to perform (required)"
+          schema:
+            type: string
+            enum: [list]
+            example: "list"
         - name: note_id
           in: query
           required: true
@@ -500,6 +587,13 @@ paths:
           schema:
             type: integer
             example: 123
+        - name: workspace
+          in: query
+          required: false
+          description: "Workspace name (optional)"
+          schema:
+            type: string
+            example: "Personal"
       responses:
         '200':
           description: List of attachments returned successfully
@@ -515,13 +609,23 @@ paths:
             schema:
               type: object
               required:
+                - action
                 - note_id
                 - file
               properties:
+                action:
+                  type: string
+                  enum: [upload]
+                  description: "Action to perform (required)"
+                  example: "upload"
                 note_id:
                   type: integer
                   description: "Note ID (required)"
                   example: 123
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
                 file:
                   type: string
                   format: binary
@@ -558,23 +662,39 @@ paths:
           description: Folder created successfully
 
   /api_delete_folder.php:
-    post:
+    delete:
       tags:
         - Folders Management
       summary: Delete folder
+      description: Delete a folder and move all its contents to the Default folder
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - folder_name
               properties:
                 folder_name:
                   type: string
+                  description: "Folder name to delete (required)"
+                  example: "Old Projects"
+                folder_id:
+                  type: integer
+                  description: "Folder ID (optional, alternative to folder_name)"
+                  example: 5
                 workspace:
                   type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
       responses:
         '200':
-          description: Folder deleted
+          description: Folder deleted successfully
+        '400':
+          description: Cannot delete default folder or invalid request
+        '404':
+          description: Folder not found
 
   /api_backup.php:
     post:

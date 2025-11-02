@@ -12,18 +12,28 @@ include 'db_connect.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    // Get JSON input
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON request body']);
+        exit;
+    }
+    
+    $action = $input['action'] ?? '';
     
     if ($action === 'toggle_favorite') {
-        $noteId = $_POST['note_id'] ?? '';
+        $noteId = $input['note_id'] ?? '';
         
         if (empty($noteId)) {
-            echo json_encode(['success' => false, 'message' => 'Note ID is required']);
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'note_id is required']);
             exit;
         }
         
         // Get workspace from request (to prevent cross-workspace toggles)
-        $workspace = $_POST['workspace'] ?? null;
+        $workspace = $input['workspace'] ?? null;
 
         // Get current favorite status limited to workspace if provided
         if ($workspace) {
