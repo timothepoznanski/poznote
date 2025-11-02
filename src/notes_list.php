@@ -122,11 +122,12 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
         $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
-        echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . count($notes) . ")</span>";
+        $noteCount = count($notes);
+        echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $workspace_filter);
+        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount);
         
         echo "</span>";
         echo "</div>";

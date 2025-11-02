@@ -142,7 +142,7 @@ function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $fold
 /**
  * Génère les actions disponibles pour un dossier
  */
-function generateFolderActions($folderId, $folderName, $workspace_filter) {
+function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
     $actions = "";
     
     // Escape folder name for use in JavaScript strings
@@ -153,11 +153,17 @@ function generateFolderActions($folderId, $folderName, $workspace_filter) {
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
         $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
-        $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$escapedFolderName\")' title='Move all notes to trash'></i>";
+        // Only show move/empty buttons if folder has notes
+        if ($noteCount > 0) {
+            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+            $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$escapedFolderName\")' title='Move all notes to trash'></i>";
+        }
     } else {
         $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+        // Only show move button if folder has notes
+        if ($noteCount > 0) {
+            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+        }
         $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='Rename folder'></i>";
         $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='Delete folder'></i>";
     }
