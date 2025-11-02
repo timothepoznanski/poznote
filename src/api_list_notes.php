@@ -28,11 +28,11 @@ try {
     }
 
     if ($get_folders) {
-        // Return list of folders with IDs
+        // Return list of folders with IDs and full paths
         $folders = [];
         
-        // Get folders from folders table (primary source)
-        $sql = "SELECT id, name FROM folders";
+        // Get folders from folders table (primary source) with parent_id
+        $sql = "SELECT id, name, parent_id FROM folders";
         $params = [];
         
         if ($workspace) {
@@ -46,11 +46,35 @@ try {
         $stmt = $con->prepare($sql);
         $stmt->execute($params);
         
+        $folderData = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $folderId = (int)$row['id'];
+            $folderData[$folderId] = [
+                'id' => $folderId,
+                'name' => $row['name'],
+                'parent_id' => $row['parent_id'] ? (int)$row['parent_id'] : null
+            ];
+        }
+        
+        // Build folder paths recursively
+        function getFolderPath($folderId, $folderData) {
+            if (!isset($folderData[$folderId])) {
+                return '';
+            }
+            $folder = $folderData[$folderId];
+            if ($folder['parent_id']) {
+                $parentPath = getFolderPath($folder['parent_id'], $folderData);
+                return $parentPath . '/' . $folder['name'];
+            }
+            return $folder['name'];
+        }
+        
+        // Add path to each folder
+        foreach ($folderData as $folderId => $folder) {
             $folders[$folderId] = [
                 'id' => $folderId,
-                'name' => $row['name']
+                'name' => $folder['name'],
+                'path' => getFolderPath($folderId, $folderData)
             ];
         }
         

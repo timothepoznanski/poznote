@@ -767,7 +767,8 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                 if (folderId != excludeFolderId && folderId !== 'favorites') {
                     var option = document.createElement('option');
                     option.value = folderId;
-                    option.textContent = folderData.name;
+                    // Use full path if available, fallback to name
+                    option.textContent = folderData.path || folderData.name;
                     select.appendChild(option);
                 }
             }
