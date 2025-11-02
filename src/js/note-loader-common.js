@@ -587,18 +587,37 @@ function updateBrowserUrl(url, noteId) {
     }
 }
 
+// Global flag to track if document-level handler is set
+var imageClickHandlerInitialized = false;
+
 /**
  * Re-initialize image click handlers for note content
  */
 function reinitializeImageClickHandlers() {
-    // Find all images in the document
+    // Remove any leftover resize handles that might have been saved in HTML
+    const leftoverHandles = document.querySelectorAll('.image-resize-handle');
+    leftoverHandles.forEach(handle => handle.remove());
+    
+    // Find all images in the note content
     const allImages = document.querySelectorAll('img');
 
-    allImages.forEach((img, index) => {
-        // Remove existing event listeners to avoid duplicates
-        img.removeEventListener('click', handleImageClick);
-        // Add new event listener
-        img.addEventListener('click', handleImageClick);
+    // Use event delegation on document level (only set once)
+    if (!imageClickHandlerInitialized) {
+        document.addEventListener('click', function(event) {
+            // Check if the click target or any parent is an image
+            const img = event.target.tagName === 'IMG' ? event.target : event.target.closest('img');
+            
+            if (img && img.tagName === 'IMG') {
+                handleImageClick(event);
+            }
+        }, true); // Use capture phase
+        
+        imageClickHandlerInitialized = true;
+    }
+    
+    // Ensure all images are clickable
+    allImages.forEach((img) => {
+        img.style.cursor = 'pointer';
     });
 }
 
@@ -615,6 +634,7 @@ function handleImageClick(event) {
 
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
 
     const src = img.src;
 
@@ -639,12 +659,16 @@ function handleImageClick(event) {
     
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
-            <i class="fa-maximize"></i>
+            <i class="fa-expand"></i>
             View Large
         </div>
         <div class="image-menu-item" data-action="download">
             <i class="fa-download"></i>
             Download
+        </div>
+        <div class="image-menu-item" data-action="resize">
+            <i class="fa-maximize"></i>
+            Resize
         </div>
     `;
     
@@ -746,6 +770,12 @@ function handleImageClick(event) {
             if (diagramId && window.openExcalidrawEditor) {
                 openExcalidrawEditor(diagramId);
             }
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'resize') {
+            enableImageResize(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -989,6 +1019,30 @@ function isNoteUrl(url) {
 function deleteImage(img) {
     if (!img) return;
     
+    // Show confirmation modal
+    if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
+        window.modalAlert.confirm(
+            'Are you sure you want to delete this image? This action cannot be undone.',
+            'Delete Image'
+        ).then(function(confirmed) {
+            if (confirmed) {
+                performImageDeletion(img);
+            }
+        });
+    } else {
+        // Fallback to native confirm if modal not available
+        if (confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+            performImageDeletion(img);
+        }
+    }
+}
+
+/**
+ * Perform the actual image deletion
+ */
+function performImageDeletion(img) {
+    if (!img) return;
+    
     try {
         // Find the container (could be excalidraw-container or just the img itself)
         const container = img.closest('.excalidraw-container');
@@ -1021,3 +1075,120 @@ function deleteImage(img) {
         console.warn('Error deleting image:', error);
     }
 }
+
+/**
+ * Enable resize mode for an image with a handle in the bottom-right corner
+ */
+function enableImageResize(img) {
+    if (!img) return;
+    
+    // Remove any existing resize handles first
+    const existingHandles = document.querySelectorAll('.image-resize-handle');
+    existingHandles.forEach(handle => handle.remove());
+    
+    // Create resize handle
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'image-resize-handle';
+    resizeHandle.innerHTML = '<i class="fas fa-grip-lines-vertical"></i>';
+    
+    // Position the image as relative so the handle can be positioned absolutely
+    const originalPosition = img.style.position;
+    img.style.position = 'relative';
+    img.style.display = 'inline-block';
+    
+    // Create a wrapper if the image doesn't have one
+    let wrapper = img.parentElement;
+    if (!wrapper || wrapper.tagName === 'DIV' && !wrapper.classList.contains('image-resize-wrapper')) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'image-resize-wrapper';
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        wrapper.style.maxWidth = '100%';
+        img.parentNode.insertBefore(wrapper, img);
+        wrapper.appendChild(img);
+    }
+    
+    // Add the handle to the wrapper
+    wrapper.appendChild(resizeHandle);
+    
+    // Store original dimensions
+    const originalWidth = img.width || img.naturalWidth;
+    const aspectRatio = img.naturalHeight / img.naturalWidth;
+    
+    let isResizing = false;
+    let startX, startWidth;
+    
+    // Mouse down on handle
+    resizeHandle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = img.offsetWidth;
+        
+        document.body.style.cursor = 'nwse-resize';
+        document.body.style.userSelect = 'none';
+    });
+    
+    // Mouse move
+    document.addEventListener('mousemove', function handleMouseMove(e) {
+        if (!isResizing) return;
+        
+        const deltaX = e.clientX - startX;
+        const newWidth = Math.max(50, startWidth + deltaX); // Minimum 50px
+        
+        img.style.width = newWidth + 'px';
+        img.style.height = 'auto';
+        img.setAttribute('width', Math.round(newWidth));
+        
+        // Update wrapper size
+        wrapper.style.width = newWidth + 'px';
+    });
+    
+    // Mouse up
+    document.addEventListener('mouseup', function handleMouseUp(e) {
+        if (!isResizing) return;
+        
+        isResizing = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        
+        // Save the final width
+        const finalWidth = Math.round(img.offsetWidth);
+        img.setAttribute('width', finalWidth);
+        img.removeAttribute('height'); // Let browser calculate height from aspect ratio
+        
+        // Remove the handle immediately to prevent it from being saved
+        resizeHandle.remove();
+        
+        // Trigger note save
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+        
+        setTimeout(function() {
+            if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately();
+            }
+        }, 100);
+    });
+    
+    // Click outside to remove handle
+    setTimeout(() => {
+        document.addEventListener('click', function closeResize(e) {
+            if (!wrapper.contains(e.target) && e.target !== resizeHandle) {
+                resizeHandle.remove();
+                document.removeEventListener('click', closeResize);
+            }
+        });
+    }, 10);
+}
+
+// Initialize image click handlers when this script loads
+(function initImageHandlers() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', reinitializeImageClickHandlers);
+    } else {
+        reinitializeImageClickHandlers();
+    }
+})();

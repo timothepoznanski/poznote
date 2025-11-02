@@ -1267,4 +1267,14 @@ body.dark-mode .markdown-preview-btn:hover .fa-eye {
     transform: scale(1.18);
 }
 
+/* Image resize handle in dark mode */
+html[data-theme='dark'] .image-resize-handle,
+body.dark-mode .image-resize-handle {
+    background: #007DB8;
+    border-color: #2a2a2a;
+}
 
+html[data-theme='dark'] .image-resize-handle:hover,
+body.dark-mode .image-resize-handle:hover {
+    background: #0099e6;
+}
