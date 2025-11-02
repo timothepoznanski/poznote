@@ -91,6 +91,9 @@ try {
     }
 
     // Ensure all folder names from entries exist in folders table (one-time migration)
+    // DISABLED: This auto-creation causes duplicates with subfolder support
+    // Now that we use folder_id, we should not auto-create folders based on names
+    /*
     try {
         // Use INSERT OR IGNORE to create missing folders in one query per folder
         $con->exec("
@@ -106,6 +109,7 @@ try {
     } catch(PDOException $e) {
         error_log("Folder creation warning: " . $e->getMessage());
     }
+    */
     
     // Migrate existing folder names to folder_id
     try {

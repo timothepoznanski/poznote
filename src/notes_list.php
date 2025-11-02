@@ -104,10 +104,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
         $folder_display = $should_be_open ? 'block' : 'none';
         
-        // Add indentation style for subfolders
-        $indentStyle = $depth > 0 ? " style='padding-left: " . ($depth * 20) . "px;'" : "";
-        
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' onclick='selectFolder($folderId, \"$folderName\", this)'$indentStyle>";
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' onclick='selectFolder($folderId, \"$folderName\", this)'>";
         echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderDomId\")' data-folder-id='$folderDomId'>";
         
         // Use an empty star icon for the Favorites pseudo-folder
