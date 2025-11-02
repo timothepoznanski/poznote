@@ -5,18 +5,41 @@
 
 /**
  * Organize notes by folder
+ * Now returns array indexed by folder_id instead of folder name
  */
-function organizeNotesByFolder($stmt_left, $defaultFolderName) {
+function organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_filter) {
     $folders = [];
     $folders_with_results = [];
     
+    // Get default folder ID
+    $defaultFolderId = null;
+    $defaultFolderQuery = "SELECT id FROM folders WHERE name = ?";
+    $params = [$defaultFolderName];
+    if ($workspace_filter) {
+        $defaultFolderQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $params[] = $workspace_filter;
+        $params[] = $workspace_filter;
+    }
+    $stmt = $con->prepare($defaultFolderQuery);
+    $stmt->execute($params);
+    $defaultFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($defaultFolderData) {
+        $defaultFolderId = (int)$defaultFolderData['id'];
+    }
+    
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
-        $folder = $row1["folder"] ?: $defaultFolderName;
-        if (!isset($folders[$folder])) {
-            $folders[$folder] = [];
+        $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : $defaultFolderId;
+        $folderName = $row1["folder"] ?: $defaultFolderName;
+        
+        if (!isset($folders[$folderId])) {
+            $folders[$folderId] = [
+                'id' => $folderId,
+                'name' => $folderName,
+                'notes' => []
+            ];
         }
         
-        $folders[$folder][] = $row1;
+        $folders[$folderId]['notes'][] = $row1;
     }
     
     return $folders;
@@ -24,9 +47,14 @@ function organizeNotesByFolder($stmt_left, $defaultFolderName) {
 
 /**
  * Add empty folders from the folders table
+ * Now uses folder_id as key
+ * Note: Default folder is excluded if empty (it exists in DB but not shown)
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT name FROM folders";
+    require_once 'default_folder_settings.php';
+    $defaultFolderName = getDefaultFolderForNewNotes($workspace_filter);
+    
+    $folders_sql = "SELECT id, name FROM folders";
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
     }
@@ -34,8 +62,21 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
     
     $empty_folders_query = $con->query($folders_sql);
     while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
-        if (!isset($folders[$folder_row['name']])) {
-            $folders[$folder_row['name']] = [];
+        $folderId = (int)$folder_row['id'];
+        $folderName = $folder_row['name'];
+        
+        // Skip adding empty Default folder (it exists in DB but shouldn't be displayed when empty)
+        if (!isset($folders[$folderId])) {
+            if (isDefaultFolder($folderName, $workspace_filter)) {
+                // Don't add Default folder if it's empty
+                continue;
+            }
+            
+            $folders[$folderId] = [
+                'id' => $folderId,
+                'name' => $folderName,
+                'notes' => []
+            ];
         }
     }
     
@@ -43,15 +84,47 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
 }
 
 /**
+ * Ensure Favorites folder always exists (even if empty)
+ */
+function ensureFavoritesFolder($folders) {
+    // Check if Favorites folder exists
+    $hasFavorites = false;
+    foreach ($folders as $folder) {
+        if (isset($folder['name']) && $folder['name'] === 'Favorites') {
+            $hasFavorites = true;
+            break;
+        }
+    }
+    
+    // Add empty Favorites folder if it doesn't exist
+    if (!$hasFavorites) {
+        // Use 'favorites' as special key (lowercase) to distinguish from regular folders
+        $folders['favorites'] = [
+            'id' => null,  // No real DB ID for Favorites pseudo-folder
+            'name' => 'Favorites',
+            'notes' => []
+        ];
+    }
+    
+    return $folders;
+}
+
+/**
  * Trie les dossiers (Favorites en premier, puis dossier par défaut, puis autres)
+ * Now works with folder arrays containing 'id' and 'name'
  */
 function sortFolders($folders, $defaultFolderName, $workspace_filter) {
-    uksort($folders, function($a, $b) use ($defaultFolderName, $workspace_filter) {
-        if ($a === 'Favorites') return -1;
-        if ($b === 'Favorites') return 1;
-        if (isDefaultFolder($a, $workspace_filter)) return -1;
-        if (isDefaultFolder($b, $workspace_filter)) return 1;
-        return strcasecmp($a, $b);
+    uksort($folders, function($a, $b) use ($folders, $defaultFolderName, $workspace_filter) {
+        $folderA = $folders[$a];
+        $folderB = $folders[$b];
+        $nameA = $folderA['name'];
+        $nameB = $folderB['name'];
+        
+        if ($nameA === 'Favorites') return -1;
+        if ($nameB === 'Favorites') return 1;
+        if (isDefaultFolder($nameA, $workspace_filter)) return -1;
+        if (isDefaultFolder($nameB, $workspace_filter)) return 1;
+        return strcasecmp($nameA, $nameB);
     });
     
     return $folders;
@@ -59,8 +132,17 @@ function sortFolders($folders, $defaultFolderName, $workspace_filter) {
 
 /**
  * Determines if a folder should be open
+ * Now accepts both folder ID and name
  */
-function shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    // Check if this folder was explicitly requested to be opened (e.g., after creating a subfolder)
+    if (isset($_GET['open_folder'])) {
+        $openFolderKey = $_GET['open_folder'];
+        if ($openFolderKey === 'folder_' . $folderId) {
+            return true;
+        }
+    }
+    
     if($total_notes <= 3) {
         // If we have very few notes (demo notes just created), open all folders
         return true;
@@ -86,21 +168,30 @@ function shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_re
 /**
  * Génère les actions disponibles pour un dossier
  */
-function generateFolderActions($folderName, $workspace_filter) {
+function generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount = 0) {
     $actions = "";
+    
+    // Escape folder name for use in JavaScript strings
+    $escapedFolderName = addslashes($folderName);
     
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal(\"$folderName\")' title='Create note in folder'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
-        $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder(\"$folderName\")' title='Move all notes to trash'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
+        // Only show move/empty buttons if folder has notes
+        if ($noteCount > 0) {
+            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+            $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$escapedFolderName\")' title='Move all notes to trash'></i>";
+        }
     } else {
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal(\"$folderName\")' title='Create note in folder'></i>";
-        $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog(\"$folderName\")' title='Move all files to another folder'></i>";
-        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName(\"$folderName\")' title='Rename folder'></i>";
-        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder(\"$folderName\")' title='Delete folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
+        // Only show move button if folder has notes
+        if ($noteCount > 0) {
+            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+        }
+        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='Rename folder'></i>";
+        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='Delete folder'></i>";
     }
     
     return $actions;
@@ -132,4 +223,61 @@ function getTotalNotesCount($con, $workspace_filter) {
     }
     $total_notes_result = $con->query($total_notes_query);
     return $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
+}
+
+/**
+ * Organize folders into hierarchical structure
+ */
+function buildFolderHierarchy($folders) {
+    $folderMap = [];
+    $rootFolders = [];
+    
+    // Create a map of all folders by ID and add children array
+    foreach ($folders as $folderId => $folderData) {
+        $folderMap[$folderId] = $folderData;
+        $folderMap[$folderId]['children'] = [];
+    }
+    
+    // Build the hierarchy by linking children to parents
+    foreach ($folderMap as $folderId => $folderData) {
+        // Check if folder has parent_id in database
+        $parentId = isset($folderData['parent_id']) ? $folderData['parent_id'] : null;
+        
+        if ($parentId === null || !isset($folderMap[$parentId])) {
+            // This is a root folder
+            $rootFolders[$folderId] = &$folderMap[$folderId];
+        } else {
+            // This is a child folder
+            $folderMap[$parentId]['children'][$folderId] = &$folderMap[$folderId];
+        }
+    }
+    
+    return $rootFolders;
+}
+
+/**
+ * Get parent_id for folders from database
+ */
+function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
+    foreach ($folders as $folderId => &$folderData) {
+        $query = "SELECT parent_id FROM folders WHERE id = ?";
+        $params = [$folderId];
+        if ($workspace_filter) {
+            $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $params[] = $workspace_filter;
+            $params[] = $workspace_filter;
+        }
+        
+        $stmt = $con->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result) {
+            $folderData['parent_id'] = $result['parent_id'] ? (int)$result['parent_id'] : null;
+        } else {
+            $folderData['parent_id'] = null;
+        }
+    }
+    
+    return $folders;
 }

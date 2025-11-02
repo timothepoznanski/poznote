@@ -277,6 +277,13 @@
                             <p>Checklist with checkboxes for tasks and items</p>
                         </div>
                     </div>
+                    <div class="create-note-option" data-type="subfolder" onclick="selectCreateType('subfolder')" id="subfolderOption" style="display: none;">
+                        <i class="fal fa-folder-plus"></i>
+                        <div>
+                            <span>Subfolder</span>
+                            <p>Create a subfolder within this folder</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->

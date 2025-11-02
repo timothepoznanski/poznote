@@ -13,6 +13,9 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
     
+    // Note: Database schema migrations are handled by init-permissions.sh at container startup
+    // This ensures the migration happens before any PHP processes start, avoiding locking issues
+    
     // Register custom SQLite function to clean HTML content for search
     $con->sqliteCreateFunction('search_clean_entry', function($html) {
         if (empty($html)) {
@@ -83,17 +86,77 @@ try {
         // ignore migration errors
     }
 
+    // Add folder_id column to reference folders by ID instead of name
+    try {
+        $con->exec('ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL');
+    } catch(PDOException $e) {
+        // ignore if already exists
+    }
+
+    // Ensure all folder names from entries exist in folders table (one-time migration)
+    // DISABLED: This auto-creation causes duplicates with subfolder support
+    // Now that we use folder_id, we should not auto-create folders based on names
+    /*
+    try {
+        // Use INSERT OR IGNORE to create missing folders in one query per folder
+        $con->exec("
+            INSERT OR IGNORE INTO folders (name, workspace)
+            SELECT DISTINCT 
+                folder as name, 
+                COALESCE(workspace, 'Poznote') as workspace
+            FROM entries 
+            WHERE folder IS NOT NULL 
+            AND folder != '' 
+            AND folder != 'Favorites'
+        ");
+    } catch(PDOException $e) {
+        error_log("Folder creation warning: " . $e->getMessage());
+    }
+    */
+    
+    // Migrate existing folder names to folder_id
+    try {
+        // For each unique folder name in entries, find or create a corresponding folder ID
+        $con->exec("
+            UPDATE entries 
+            SET folder_id = (
+                SELECT f.id 
+                FROM folders f 
+                WHERE f.name = entries.folder 
+                AND (f.workspace = entries.workspace OR (f.workspace IS NULL AND entries.workspace = 'Poznote'))
+                LIMIT 1
+            )
+            WHERE folder_id IS NULL AND folder IS NOT NULL AND folder != ''
+        ");
+    } catch(PDOException $e) {
+        // ignore migration errors
+        error_log("folder_id migration warning: " . $e->getMessage());
+    }
+
     // Create folders table for empty folders (scoped by workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         workspace TEXT DEFAULT "Poznote",
-        created DATETIME DEFAULT CURRENT_TIMESTAMP
+        parent_id INTEGER DEFAULT NULL,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
 
+    // Drop old index if it exists
+    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace');
+    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace_parent');
 
-    // Ensure unique folder names per workspace
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace ON folders(name, workspace)');
+    // Ensure unique folder names per workspace and parent
+    // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
+                ON folders(name, workspace, parent_id) 
+                WHERE parent_id IS NOT NULL');
+    
+    // For root folders (parent_id IS NULL): same name NOT allowed
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
+                ON folders(name, workspace) 
+                WHERE parent_id IS NULL');
 
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
@@ -104,6 +167,24 @@ try {
 
     // Insert default workspace
     $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
+
+    // Ensure every workspace has a Default folder (even if empty)
+    try {
+        require_once __DIR__ . '/default_folder_settings.php';
+        
+        // Get all workspaces
+        $workspaceStmt = $con->query("SELECT name FROM workspaces");
+        $workspaces = $workspaceStmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        // For each workspace, ensure the default folder exists
+        $insertDefaultFolder = $con->prepare("INSERT OR IGNORE INTO folders (name, workspace) VALUES (?, ?)");
+        foreach ($workspaces as $ws) {
+            $defaultFolderName = getDefaultFolderForNewNotes($ws);
+            $insertDefaultFolder->execute([$defaultFolderName, $ws]);
+        }
+    } catch(PDOException $e) {
+        error_log("Error creating default folders: " . $e->getMessage());
+    }
 
     // Create settings table for configuration
     $con->exec('CREATE TABLE IF NOT EXISTS settings (

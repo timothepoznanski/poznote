@@ -871,11 +871,13 @@ function handleNoteDragStart(e) {
     
     var noteId = noteLink.getAttribute('data-note-db-id');
     var currentFolder = noteLink.getAttribute('data-folder');
+    var currentFolderId = noteLink.getAttribute('data-folder-id');
     
     if (noteId) {
         e.dataTransfer.setData('text/plain', JSON.stringify({
             noteId: noteId,
-            currentFolder: currentFolder
+            currentFolder: currentFolder,
+            currentFolderId: currentFolderId
         }));
         e.dataTransfer.effectAllowed = 'move';
         
@@ -939,6 +941,7 @@ function handleFolderDrop(e) {
     try {
         var data = JSON.parse(e.dataTransfer.getData('text/plain'));
         var targetFolder = folderHeader.getAttribute('data-folder');
+        var targetFolderId = folderHeader.getAttribute('data-folder-id');
         
         // Prevent dropping notes into the Tags folder
         if (targetFolder === 'Tags') {
@@ -959,18 +962,40 @@ function handleFolderDrop(e) {
             return;
         }
         
-        if (data.noteId && targetFolder && data.currentFolder !== targetFolder) {
-            moveNoteToTargetFolder(data.noteId, targetFolder);
+        // Compare folder IDs instead of names to handle subfolders with same names
+        var currentFolderId = data.currentFolderId ? String(data.currentFolderId) : null;
+        var targetFolderIdStr = targetFolderId ? String(targetFolderId) : null;
+        
+        if (data.noteId && targetFolderId && currentFolderId !== targetFolderIdStr) {
+            moveNoteToTargetFolder(data.noteId, targetFolderId);
         }
     } catch (err) {
     }
 }
 
-function moveNoteToTargetFolder(noteId, targetFolder) {
+function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
+    // targetFolderIdOrName can be either a folder ID (preferred) or folder name (legacy)
+    var targetFolderId = null;
+    var targetFolder = null;
+    
+    // Check if it's a numeric ID
+    if (targetFolderIdOrName && !isNaN(targetFolderIdOrName)) {
+        targetFolderId = parseInt(targetFolderIdOrName);
+    } else if (targetFolderIdOrName && window.folderMap) {
+        // Legacy: it's a folder name, try to find the ID
+        targetFolder = targetFolderIdOrName;
+        for (var fid in window.folderMap) {
+            if (window.folderMap[fid] === targetFolder) {
+                targetFolderId = parseInt(fid);
+                break;
+            }
+        }
+    }
+    
     var params = new URLSearchParams({
         action: 'move_to',
         note_id: noteId,
-        folder: targetFolder,
+        folder_id: targetFolderId || '',
         workspace: selectedWorkspace || 'Poznote'
     });
     
@@ -1593,12 +1618,24 @@ function emergencySave(noteId) {
     var tags = tagsElem ? tagsElem.value : '';
     var folder = folderElem ? folderElem.value : (window.getDefaultFolderName ? window.getDefaultFolderName() : 'General');
     
+    // Get folder_id from hidden input field
+    var folderIdElem = document.getElementById("folderId" + noteId);
+    var folder_id = null;
+    if (folderIdElem && folderIdElem.value !== '') {
+        folder_id = parseInt(folderIdElem.value);
+        // Ensure it's a valid number, not NaN or 0
+        if (isNaN(folder_id) || folder_id === 0) {
+            folder_id = null;
+        }
+    }
+    
     var params = {
         id: noteId,
         heading: headi,
         entry: ent,
         tags: tags,
         folder: folder,
+        folder_id: folder_id,
         workspace: (window.selectedWorkspace || 'Poznote')
     };
     

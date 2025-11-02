@@ -28,7 +28,7 @@ if (empty($noteId)) {
 }
 
 // Get the original note data
-$stmt = $con->prepare("SELECT heading, entry, tags, folder, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
+$stmt = $con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
 $stmt->execute([$noteId]);
 $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -43,11 +43,11 @@ $originalHeading = $originalNote['heading'];
 $newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace']);
 
 // Insert the duplicate note
-$insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, attachments, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+$insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
 
 $attachments = $originalNote['attachments'] ?? null;
 
-if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['tags'], $originalNote['folder'], $originalNote['workspace'], $originalNote['type'], $attachments])) {
+if ($insertStmt->execute([$newHeading, $originalNote['entry'], $originalNote['tags'], $originalNote['folder'], $originalNote['folder_id'], $originalNote['workspace'], $originalNote['type'], $attachments])) {
     $newId = $con->lastInsertId();
     
     // Copy the file content for all note types

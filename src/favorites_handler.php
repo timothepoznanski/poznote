@@ -5,13 +5,14 @@
 
 /**
  * Traite les favoris et les ajoute au tableau des dossiers
+ * Now works with folder arrays containing 'id', 'name', and 'notes'
  */
 function handleFavorites($folders) {
     $favorites = [];
     
     // Parcourir tous les dossiers pour extraire les favoris
-    foreach ($folders as $folderName => $notes) {
-        foreach ($notes as $note) {
+    foreach ($folders as $folderId => $folderData) {
+        foreach ($folderData['notes'] as $note) {
             if ($note["favorite"]) {
                 $favorites[] = $note;
             }
@@ -19,8 +20,13 @@ function handleFavorites($folders) {
     }
     
     // Add favorites as a special folder if there are any favorites
+    // Use a special ID for Favorites (0 or negative to distinguish from real folders)
     if (!empty($favorites)) {
-        $folders = ['Favorites' => $favorites] + $folders;
+        $folders = ['favorites' => [
+            'id' => 'favorites',
+            'name' => 'Favorites',
+            'notes' => $favorites
+        ]] + $folders;
     }
     
     return $folders;
@@ -43,10 +49,11 @@ function isNoteFavorite($con, $note, $workspace_filter) {
 
 /**
  * Met à jour les dossiers avec résultats de recherche pour les favoris
+ * Now works with folder arrays containing 'id', 'name', and 'notes'
  */
 function updateFavoritesSearchResults($folders_with_results, $folders) {
-    foreach ($folders as $folderName => $notes) {
-        foreach ($notes as $note) {
+    foreach ($folders as $folderId => $folderData) {
+        foreach ($folderData['notes'] as $note) {
             if ($note["favorite"]) {
                 $folders_with_results['Favorites'] = true;
                 break;

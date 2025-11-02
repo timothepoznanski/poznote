@@ -64,8 +64,14 @@ try {
         if ($folder_filter === 'Favorites') {
             $where_conditions[] = "favorite = 1";
         } else {
-            $where_conditions[] = "folder = ?";
-            $search_params[] = $folder_filter;
+            // Try to interpret folder_filter as ID first, fallback to name
+            if (is_numeric($folder_filter)) {
+                $where_conditions[] = "folder_id = ?";
+                $search_params[] = intval($folder_filter);
+            } else {
+                $where_conditions[] = "folder = ?";
+                $search_params[] = $folder_filter;
+            }
         }
     }
     // Workspace filter

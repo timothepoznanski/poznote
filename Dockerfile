@@ -136,8 +136,8 @@ RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.tx
 COPY ${copy_src_files:+./src} /var/www/html
 
 # Copy initialization script
-COPY init-permissions.sh /usr/local/bin/init-permissions.sh
-RUN chmod +x /usr/local/bin/init-permissions.sh
+COPY init.sh /usr/local/bin/init.sh
+RUN chmod +x /usr/local/bin/init.sh
 
 # Set proper ownership
 RUN chown -R www-data:www-data /var/www/html
@@ -157,4 +157,4 @@ EXPOSE 80
 WORKDIR /var/www/html
 
 # Use supervisor to manage multiple processes (nginx + php-fpm)
-CMD ["/bin/sh", "-c", "/usr/local/bin/init-permissions.sh && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/bin/sh", "-c", "/usr/local/bin/init.sh && exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]

@@ -545,7 +545,6 @@ function handleDeleteButtonClick(e) {
                         // Remove keys by prefix
                         var keysToRemove = [];
                         try {
-                            try { console.debug && console.debug('workspaces: starting aggressive localStorage scan'); } catch(e){}
                             for (var i = 0; i < localStorage.length; i++) {
                                 var key = localStorage.key(i);
                                 if (!key) continue;
@@ -553,13 +552,11 @@ function handleDeleteButtonClick(e) {
                                     keysToRemove.push(key);
                                 }
                             }
-                            try { console.debug && console.debug('workspaces: keys to remove', keysToRemove); } catch(e){}
                         } catch(e) { keysToRemove = []; }
 
                         for (var j = 0; j < keysToRemove.length; j++) {
                             try { localStorage.removeItem(keysToRemove[j]); } catch(e) {}
                         }
-                        try { console.debug && console.debug('workspaces: aggressive cleanup complete'); } catch(e){}
 
                     } catch(e) {}
                     // Reload page to show updated workspace list

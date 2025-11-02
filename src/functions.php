@@ -146,10 +146,21 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
  */
 function createNote($con, $heading, $content, $folder = 'Default', $workspace = 'Poznote', $favorite = 0, $tags = '', $type = 'note') {
     try {
-        // Insert note into database
-        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+        // Get folder_id from folder name
+        $folder_id = null;
+        if ($folder !== null) {
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $fStmt->execute([$folder, $workspace, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folder_id = (int)$folderData['id'];
+            }
+        }
         
-        if (!$stmt->execute([$heading, $content, $tags, $folder, $workspace, $type, $favorite])) {
+        // Insert note into database
+        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+        
+        if (!$stmt->execute([$heading, $content, $tags, $folder, $folder_id, $workspace, $type, $favorite])) {
             return ['success' => false, 'error' => 'Failed to insert note into database'];
         }
         
@@ -319,6 +330,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $dbResult = restoreDatabaseFromFile($sqlFile);
             $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
             if (!$dbResult['success']) $hasErrors = true;
+            // Note: Schema migration is now handled inside restoreDatabaseFromFile()
         } else {
             $results[] = 'Database: No SQL file found in backup';
         }
@@ -398,12 +410,34 @@ function restoreDatabaseFromFile($sqlFile) {
             chgrp($dbPath, $current_gid);
         }
         chmod($dbPath, 0664);
+        
+        // CRITICAL: Run database schema migration IMMEDIATELY after restore
+        // Use standalone migration to avoid db_connect.php circular dependency
+        require_once __DIR__ . '/db_migration.php';
+        $migrationResult = migrateDatabase($dbPath);
+        
+        if ($migrationResult['success'] && $migrationResult['migrated']) {
+            error_log('Database migration completed after restore: parent_id column added');
+        } else if (!$migrationResult['success']) {
+            error_log('Database migration warning after restore: ' . ($migrationResult['error'] ?? 'Unknown error'));
+            // Don't fail the restore, just log the warning
+        }
+        
+        // Remove migration marker so init-permissions.sh can also verify
+        $markerFile = dirname($dbPath) . '/.parent_id_migrated';
+        if (file_exists($markerFile)) {
+            unlink($markerFile);
+        }
+        
         return ['success' => true];
     } else {
         $errorMessage = implode("\n", $output);
         return ['success' => false, 'error' => $errorMessage];
     }
 }
+
+// Note: migrateDatabaseSchema has been moved to db_migration.php as migrateDatabase()
+// to avoid circular dependencies with db_connect.php
 
 /**
  * Restore entries from directory

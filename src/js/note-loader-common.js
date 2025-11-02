@@ -931,6 +931,11 @@ function reinitializeNoteContent() {
     if (typeof initializeToolbarHandlers === 'function') {
         initializeToolbarHandlers();
     }
+
+    // Re-initialize copy buttons for code blocks
+    if (typeof window.reinitializeCodeCopyButtons === 'function') {
+        window.reinitializeCodeCopyButtons();
+    }
     
     // On mobile, ensure the right column is properly displayed only when a specific note is selected
     if (isMobileDevice()) {

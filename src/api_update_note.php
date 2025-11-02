@@ -75,7 +75,12 @@ $id = isset($input['id']) ? intval($input['id']) : 0;
 $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $entry = isset($input['entry']) ? $input['entry'] : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
-$folder = isset($input['folder']) ? trim($input['folder']) : 'Poznote';
+$folder_id = isset($input['folder_id']) ? intval($input['folder_id']) : null;
+// If folder_id is 0, treat it as null
+if ($folder_id === 0) {
+    $folder_id = null;
+}
+$folder = isset($input['folder']) ? trim($input['folder']) : null;
 $workspace = isset($input['workspace']) && $input['workspace'] !== '' ? $input['workspace'] : null;
 
 // Use the provided entry content for all note types
@@ -104,31 +109,45 @@ if (!empty($workspace)) {
     }
 }
 
-// Validate folder existence for non-default folders
-if (!isDefaultFolder($folder, $workspace)) {
+// If no folder specified, use default
+if ($folder_id === null && ($folder === null || $folder === '')) {
+    $folder = getDefaultFolderForNewNotes($workspace);
+}
+
+// If folder_id is provided, verify it exists and fetch the folder name
+if ($folder_id !== null && $folder_id > 0) {
     if ($workspace) {
-        $fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $fStmt->execute([$folder_id, $workspace, $workspace]);
+    } else {
+        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
+        $fStmt->execute([$folder_id]);
+    }
+    $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+    if ($folderData) {
+        $folder = $folderData['name'];
+    } else {
+        // Folder ID provided but doesn't exist - reset to null to avoid FK constraint violation
+        $folder_id = null;
+        if ($folder === null || $folder === '') {
+            $folder = getDefaultFolderForNewNotes($workspace);
+        }
+    }
+} elseif ($folder !== null && $folder !== '') {
+    // If folder name is provided, get folder_id
+    if ($workspace) {
+        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $fStmt->execute([$folder, $workspace, $workspace]);
     } else {
-        $fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
+        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
         $fStmt->execute([$folder]);
     }
-    $folderExists = $fStmt->fetchColumn() > 0;
-    if (!$folderExists) {
-        if ($workspace) {
-            $eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $eStmt->execute([$folder, $workspace, $workspace]);
-        } else {
-            $eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
-            $eStmt->execute([$folder]);
-        }
-        $folderExists = $eStmt->fetchColumn() > 0;
+    $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+    if ($folderData) {
+        $folder_id = (int)$folderData['id'];
     }
-    if (!$folderExists) {
-        http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Folder not found']);
-        exit;
-    }
+    // Note: If folder not found in folders table but folder name is set,
+    // folder_id will remain null which is acceptable for default folders
 }
 
 // Validate tags format
@@ -207,13 +226,11 @@ if (!empty($entry)) {
 
 // Prepare update query
 if ($workspace !== null) {
-    $query = "UPDATE entries SET heading = ?, entry = ?, updated = datetime('now'), tags = ?, folder = ?, workspace = ?, entry = ? WHERE id = ?";
-    // Note: entrycontent saved into 'entry' column for compatibility with other APIs
-    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, workspace = ?, updated = datetime('now') WHERE id = ?");
-    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $workspace, $id];
+    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, workspace = ?, updated = datetime('now') WHERE id = ?");
+    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $workspace, $id];
 } else {
-    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, updated = datetime('now') WHERE id = ?");
-    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $id];
+    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, updated = datetime('now') WHERE id = ?");
+    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $id];
 }
 
 try {

@@ -68,33 +68,48 @@ if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
     echo "<div class='favorites-separator' aria-hidden='true'></div>";
 }
 
-// Display folders and notes
-foreach($folders as $folderName => $notes) {
-    // Debug: log empty folders
-    if (empty($notes)) {
-        error_log("Empty folder found: $folderName (search mode: " . ($is_search_mode ? 'yes' : 'no') . ")");
+/**
+ * Recursive function to display folders and their subfolders
+ */
+function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags) {
+    $folderName = $folderData['name'];
+    $notes = $folderData['notes'];
+    
+    // In search mode, don't display empty folders (unless they have children with results)
+    $hasChildrenWithNotes = false;
+    if (isset($folderData['children']) && !empty($folderData['children'])) {
+        foreach ($folderData['children'] as $childData) {
+            if (!empty($childData['notes']) || (isset($childData['children']) && !empty($childData['children']))) {
+                $hasChildrenWithNotes = true;
+                break;
+            }
+        }
     }
     
-    // In search mode, don't display empty folders
-    if ($is_search_mode && empty($notes)) {
-        continue;
+    if ($is_search_mode && empty($notes) && !$hasChildrenWithNotes) {
+        return;
     }
     
     // Show folder header only if not filtering by folder
     if (empty($folder_filter)) {
         $folderClass = 'folder-header';
         if (isDefaultFolder($folderName, $workspace_filter)) $folderClass .= ' default-folder';
-        $folderId = 'folder-' . md5($folderName);
+        if ($depth > 0) $folderClass .= ' subfolder subfolder-level-' . $depth;
+        $folderDomId = 'folder-' . $folderId;
         
         // Determine if this folder should be open
-        $should_be_open = shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
+        $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
-    // Set appropriate folder icon (open/closed) and display style
-    $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
-    $folder_display = $should_be_open ? 'block' : 'none';
+        // Set appropriate folder icon (open/closed) and display style
+        $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
+        $folder_display = $should_be_open ? 'block' : 'none';
         
-        echo "<div class='$folderClass' data-folder='$folderName' onclick='selectFolder(\"$folderName\", this)'>";
-        echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
+        // Escape folder name for use in JavaScript
+        $escapedFolderName = addslashes($folderName);
+        
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' onclick='selectFolder($folderId, \"$escapedFolderName\", this)'>";
+        echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderDomId\")' data-folder-id='$folderDomId'>";
+        
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
             echo "<i class='fa-star-light folder-icon'></i>";
@@ -105,17 +120,18 @@ foreach($folders as $folderName => $notes) {
         // Workspace-aware default folder handling in UI
         // Disable double-click rename for default folder and system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
-        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName("' . $folderName . '")';
+        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
-        echo "<span class='folder-note-count' id='count-" . md5($folderName) . "'>(" . count($notes) . ")</span>";
+        $noteCount = count($notes);
+        echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderName, $workspace_filter);
+        echo generateFolderActions($folderId, $folderName, $workspace_filter, $noteCount);
         
         echo "</span>";
         echo "</div>";
-        echo "<div class='folder-content' id='$folderId' style='display: $folder_display;'>";
+        echo "<div class='folder-content' id='$folderDomId' style='display: $folder_display;'>";
     }
     
     // Display notes in folder
@@ -126,23 +142,24 @@ foreach($folders as $folderName => $notes) {
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
         
         $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
+        if ($depth > 0) $noteClass .= ' note-in-subfolder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add onclick handler for AJAX loading (desktop only, mobile uses touch handlers)
-        $escapedHeading = htmlspecialchars($row1["heading"], ENT_QUOTES, 'UTF-8');
-        $escapedLink = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
-        
-        // Escape for JavaScript (for onclick handler) - use json_encode but without outer quotes
-        $jsEscapedHeading = json_encode($row1["heading"], JSON_HEX_APOS | JSON_HEX_QUOT);
+        // Add onclick handler for AJAX loading
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        
-        // Detect if mobile (simple server-side detection)
         $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
+    }
+    
+    // Recursively display subfolders
+    if (isset($folderData['children']) && !empty($folderData['children'])) {
+        foreach ($folderData['children'] as $childId => $childData) {
+            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
+        }
     }
     
     if (empty($folder_filter)) {
@@ -153,5 +170,16 @@ foreach($folders as $folderName => $notes) {
             echo "<div class='favorites-separator' aria-hidden='true'></div>";
         }
     }
+}
+
+// Enrich folders with parent_id from database
+$folders = enrichFoldersWithParentId($folders, $con, $workspace_filter);
+
+// Build hierarchical structure
+$hierarchicalFolders = buildFolderHierarchy($folders);
+
+// Display folders and notes hierarchically
+foreach($hierarchicalFolders as $folderId => $folderData) {
+    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
 }
 ?>

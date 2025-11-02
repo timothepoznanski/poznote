@@ -55,7 +55,37 @@ if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
 // If note_id is 0, we need to create a new note
 if ($note_id === 0) {
     // Get folder from POST or use default
-    $folder = isset($_POST['folder']) ? trim($_POST['folder']) : getDefaultFolderForNewNotes($workspace);
+    $folder_id = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+    // If folder_id is 0, treat it as null
+    if ($folder_id === 0) {
+        $folder_id = null;
+    }
+    $folder = isset($_POST['folder']) ? trim($_POST['folder']) : null;
+    
+    if ($folder_id === null && $folder === null) {
+        $folder = getDefaultFolderForNewNotes($workspace);
+    }
+    
+    // If folder_id is provided, get folder name
+    if ($folder_id !== null && $folder === null) {
+        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $fStmt->execute([$folder_id, $workspace, $workspace]);
+        $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+        if ($folderData) {
+            $folder = $folderData['name'];
+        } else {
+            $folder = getDefaultFolderForNewNotes($workspace);
+            $folder_id = null;
+        }
+    } elseif ($folder !== null && $folder_id === null) {
+        // If folder name is provided, get folder_id
+        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $fStmt->execute([$folder, $workspace, $workspace]);
+        $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+        if ($folderData) {
+            $folder_id = (int)$folderData['id'];
+        }
+    }
     
     // Validate workspace exists
     if (!empty($workspace)) {
@@ -73,10 +103,10 @@ if ($note_id === 0) {
     
     // Create new note - store diagram data in entry column for backward compatibility
     $created_date = date("Y-m-d H:i:s");
-    $query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, 'note', ?, ?)";
+    $query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, 'note', ?, ?)";
     $stmt = $con->prepare($query);
     
-    if ($stmt->execute([$uniqueTitle, $diagram_data, $folder, $workspace, $created_date, $created_date])) {
+    if ($stmt->execute([$uniqueTitle, $diagram_data, $folder, $folder_id, $workspace, $created_date, $created_date])) {
         $note_id = $con->lastInsertId();
     } else {
         http_response_code(500);

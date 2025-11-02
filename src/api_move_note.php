@@ -31,15 +31,52 @@ if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
     exit;
 }
 
-if (!isset($data['folder_name']) || empty(trim($data['folder_name']))) {
+// Accept either folder_id or folder_name (preferring folder_id)
+$folder_id = isset($data['folder_id']) ? intval($data['folder_id']) : null;
+$folder_name = isset($data['folder_name']) ? trim($data['folder_name']) : null;
+
+if ($folder_id === null && ($folder_name === null || $folder_name === '')) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'folder_name is required']);
+    echo json_encode(['success' => false, 'message' => 'folder_id or folder_name is required']);
     exit;
 }
 
 $note_id = trim($data['note_id']);
-$folder_name = trim($data['folder_name']);
 $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
+
+// If folder_id is provided, fetch the folder name
+if ($folder_id !== null && $folder_id > 0) {
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_id, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
+        $stmt->execute([$folder_id]);
+    }
+    $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$folderData) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Folder not found']);
+        exit;
+    }
+    $folder_name = $folderData['name'];
+} elseif ($folder_id === 0 || $folder_id === null) {
+    // folder_id 0 or null means default folder
+    require_once 'default_folder_settings.php';
+    $folder_name = getDefaultFolderName($workspace);
+    // Get the folder_id for the default folder
+    if ($workspace) {
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_name, $workspace, $workspace]);
+    } else {
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+        $stmt->execute([$folder_name]);
+    }
+    $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($folderData) {
+        $folder_id = (int)$folderData['id'];
+    }
+}
 
 try {
     // Verify that note exists (respect workspace if provided)
@@ -176,12 +213,54 @@ try {
     
     // Mettre à jour la base de données (inclure workspace si fourni)
     if ($workspace) {
-        // set folder and workspace for the moved note
-        $stmt = $con->prepare("UPDATE entries SET folder = ?, workspace = ?, updated = datetime('now') WHERE id = ?");
-        $stmt->execute([$folder_name, $workspace, $note_id]);
+        // When moving to a different workspace, need to remap folder_id to the target workspace's folder
+        // The folder_id we have might be from the source workspace
+        $target_folder_id = null;
+        
+        // Find or create the folder in the target workspace
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $targetFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($targetFolderData) {
+            $target_folder_id = (int)$targetFolderData['id'];
+        } else {
+            // Folder doesn't exist in target workspace, create it
+            $insertStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
+            $insertStmt->execute([$folder_name, $workspace]);
+            $target_folder_id = (int)$con->lastInsertId();
+            
+            // Verify the folder was created
+            if ($target_folder_id === 0) {
+                // Failed to get last insert ID, query for it
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$folder_name, $workspace]);
+                $verifyData = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($verifyData) {
+                    $target_folder_id = (int)$verifyData['id'];
+                } else {
+                    // Still couldn't find it, set to null
+                    $target_folder_id = null;
+                }
+            }
+        }
+        
+        // Note: Don't convert valid IDs to null - only use null if folder creation failed
+        if ($target_folder_id === 0 || $target_folder_id === null) {
+            $target_folder_id = null;
+        }
+        
+        // set folder, folder_id and workspace for the moved note
+        $stmt = $con->prepare("UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, updated = datetime('now') WHERE id = ?");
+        $stmt->execute([$folder_name, $target_folder_id, $workspace, $note_id]);
     } else {
-        $stmt = $con->prepare("UPDATE entries SET folder = ?, updated = datetime('now') WHERE id = ?");
-        $stmt->execute([$folder_name, $note_id]);
+        // Convert 0 to null for foreign key constraint
+        if ($folder_id === 0) {
+            $folder_id = null;
+        }
+        
+        $stmt = $con->prepare("UPDATE entries SET folder = ?, folder_id = ?, updated = datetime('now') WHERE id = ?");
+        $stmt->execute([$folder_name, $folder_id, $note_id]);
     }
     
     http_response_code(200);
