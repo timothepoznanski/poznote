@@ -1436,6 +1436,10 @@ function executeCreateAction() {
 
 function createHtmlNote() {
     if (isCreatingInFolder && targetFolderId) {
+        // Mark folder as open in localStorage to keep it open after page reload
+        var folderDomId = 'folder-' + targetFolderId;
+        localStorage.setItem('folder_' + folderDomId, 'open');
+        
         // Set the selected folder temporarily so the existing functions use it
         var originalSelectedFolderId = selectedFolderId;
         var originalSelectedFolder = selectedFolder;
@@ -1469,6 +1473,10 @@ function createHtmlNote() {
 
 function createTaskListNoteInUtils() {
     if (isCreatingInFolder && targetFolderId) {
+        // Mark folder as open in localStorage to keep it open after page reload
+        var folderDomId = 'folder-' + targetFolderId;
+        localStorage.setItem('folder_' + folderDomId, 'open');
+        
         var originalSelectedFolderId = selectedFolderId;
         var originalSelectedFolder = selectedFolder;
         selectedFolderId = targetFolderId;
@@ -1498,6 +1506,10 @@ function createTaskListNoteInUtils() {
 
 function createMarkdownNoteInUtils() {
     if (isCreatingInFolder && targetFolderId) {
+        // Mark folder as open in localStorage to keep it open after page reload
+        var folderDomId = 'folder-' + targetFolderId;
+        localStorage.setItem('folder_' + folderDomId, 'open');
+        
         var originalSelectedFolderId = selectedFolderId;
         var originalSelectedFolder = selectedFolder;
         selectedFolderId = targetFolderId;
