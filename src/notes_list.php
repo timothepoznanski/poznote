@@ -69,10 +69,13 @@ if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
 }
 
 // Display folders and notes
-foreach($folders as $folderName => $notes) {
+foreach($folders as $folderId => $folderData) {
+    $folderName = $folderData['name'];
+    $notes = $folderData['notes'];
+    
     // Debug: log empty folders
     if (empty($notes)) {
-        error_log("Empty folder found: $folderName (search mode: " . ($is_search_mode ? 'yes' : 'no') . ")");
+        error_log("Empty folder found: $folderName (ID: $folderId) (search mode: " . ($is_search_mode ? 'yes' : 'no') . ")");
     }
     
     // In search mode, don't display empty folders
@@ -84,17 +87,17 @@ foreach($folders as $folderName => $notes) {
     if (empty($folder_filter)) {
         $folderClass = 'folder-header';
         if (isDefaultFolder($folderName, $workspace_filter)) $folderClass .= ' default-folder';
-        $folderId = 'folder-' . md5($folderName);
+        $folderDomId = 'folder-' . $folderId; // Use folder ID for DOM
         
         // Determine if this folder should be open
-        $should_be_open = shouldFolderBeOpen($con, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
+        $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
     // Set appropriate folder icon (open/closed) and display style
     $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
     $folder_display = $should_be_open ? 'block' : 'none';
         
-        echo "<div class='$folderClass' data-folder='$folderName' onclick='selectFolder(\"$folderName\", this)'>";
-        echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderId\")' data-folder-id='$folderId'>";
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' onclick='selectFolder($folderId, \"$folderName\", this)'>";
+        echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderDomId\")' data-folder-id='$folderDomId'>";
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
             echo "<i class='fa-star-light folder-icon'></i>";
@@ -105,17 +108,17 @@ foreach($folders as $folderName => $notes) {
         // Workspace-aware default folder handling in UI
         // Disable double-click rename for default folder and system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
-        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName("' . $folderName . '")';
+        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
-        echo "<span class='folder-note-count' id='count-" . md5($folderName) . "'>(" . count($notes) . ")</span>";
+        echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . count($notes) . ")</span>";
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderName, $workspace_filter);
+        echo generateFolderActions($folderId, $folderName, $workspace_filter);
         
         echo "</span>";
         echo "</div>";
-        echo "<div class='folder-content' id='$folderId' style='display: $folder_display;'>";
+        echo "<div class='folder-content' id='$folderDomId' style='display: $folder_display;'>";
     }
     
     // Display notes in folder
@@ -139,7 +142,7 @@ foreach($folders as $folderName => $notes) {
         // Detect if mobile (simple server-side detection)
         $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder='$folderName'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

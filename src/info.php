@@ -22,10 +22,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$note_id, $workspace, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);

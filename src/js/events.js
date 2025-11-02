@@ -967,9 +967,21 @@ function handleFolderDrop(e) {
 }
 
 function moveNoteToTargetFolder(noteId, targetFolder) {
+    // targetFolder is a folder name, get the folder_id
+    var targetFolderId = null;
+    if (targetFolder && window.folderMap) {
+        for (var fid in window.folderMap) {
+            if (window.folderMap[fid] === targetFolder) {
+                targetFolderId = parseInt(fid);
+                break;
+            }
+        }
+    }
+    
     var params = new URLSearchParams({
         action: 'move_to',
         note_id: noteId,
+        folder_id: targetFolderId || '',
         folder: targetFolder,
         workspace: selectedWorkspace || 'Poznote'
     });
@@ -1593,12 +1605,24 @@ function emergencySave(noteId) {
     var tags = tagsElem ? tagsElem.value : '';
     var folder = folderElem ? folderElem.value : (window.getDefaultFolderName ? window.getDefaultFolderName() : 'General');
     
+    // Get folder_id from hidden input field
+    var folderIdElem = document.getElementById("folderId" + noteId);
+    var folder_id = null;
+    if (folderIdElem && folderIdElem.value !== '') {
+        folder_id = parseInt(folderIdElem.value);
+        // Ensure it's a valid number, not NaN or 0
+        if (isNaN(folder_id) || folder_id === 0) {
+            folder_id = null;
+        }
+    }
+    
     var params = {
         id: noteId,
         heading: headi,
         entry: ent,
         tags: tags,
         folder: folder,
+        folder_id: folder_id,
         workspace: (window.selectedWorkspace || 'Poznote')
     };
     

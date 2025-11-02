@@ -14,7 +14,7 @@ function getNoteElements(noteId) {
 function createNewNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder: selectedFolder,
+        folder_id: selectedFolderId,
         workspace: selectedWorkspace || 'Poznote'
     });
     
@@ -46,7 +46,7 @@ function createNewNote() {
 function createTaskListNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder: selectedFolder,
+        folder_id: selectedFolderId,
         workspace: selectedWorkspace || 'Poznote',
         type: 'tasklist'
     });
@@ -79,7 +79,7 @@ function createTaskListNote() {
 function createMarkdownNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-        folder: selectedFolder,
+        folder_id: selectedFolderId,
         workspace: selectedWorkspace || 'Poznote',
         type: 'markdown'
     });
@@ -165,14 +165,22 @@ function saveNoteToServer() {
     }
     
     var tags = tagsElem ? tagsElem.value : '';
-    var folder = folderElem ? folderElem.value : getDefaultFolderName();
+    var folderIdElem = document.getElementById('folderId' + noteid);
+    var folderId = null;
+    if (folderIdElem && folderIdElem.value !== '') {
+        folderId = parseInt(folderIdElem.value);
+        // Ensure it's a valid number, not NaN or 0
+        if (isNaN(folderId) || folderId === 0) {
+            folderId = null;
+        }
+    }
 
     var params = {
         id: noteid,
         heading: headi,
         entry: ent,
         tags: tags,
-        folder: folder,
+        folder_id: folderId,
         workspace: selectedWorkspace || 'Poznote'
     };
     

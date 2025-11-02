@@ -13,7 +13,7 @@ try {
     $search = $_GET['search'] ?? null;
     
     // Base query - only trash notes
-    $sql = "SELECT id, heading, subheading, tags, folder, workspace, type, updated, created 
+    $sql = "SELECT id, heading, subheading, tags, folder, folder_id, workspace, type, updated, created 
             FROM entries WHERE trash = 1";
     
     $params = [];

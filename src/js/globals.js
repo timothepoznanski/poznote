@@ -1,15 +1,26 @@
 // Variables globales de l'application
 var noteid = -1;
-var selectedFolder = 'Default';
+var selectedFolderId = null; // ID du dossier sélectionné
+var selectedFolder = 'Default'; // Nom du dossier (pour affichage uniquement)
+var defaultFolderId = null; // ID du dossier par défaut
 var defaultFolderName = 'Default';
 var selectedWorkspace = 'Poznote';
 var currentNoteFolder = null;
+var currentNoteFolderId = null; // ID du dossier de la note actuelle
 var currentNoteIdForAttachments = null;
 
 // Variables for moving notes to folders
+// allFolders contient maintenant des objets {id, name, is_default}
 var allFolders = [];
 
+// Map pour accès rapide folder ID -> folder data
+var folderMap = new Map();
+
 // Utility functions for global variables
+function getDefaultFolderId() {
+    return defaultFolderId;
+}
+
 function getDefaultFolderName() {
     return defaultFolderName;
 }
@@ -19,6 +30,32 @@ function updateDefaultFolderName(newName) {
     if (selectedFolder === 'Uncategorized' || selectedFolder === 'Default') {
         selectedFolder = newName;
     }
+}
+
+function updateDefaultFolderId(id) {
+    defaultFolderId = id;
+}
+
+// Obtenir un dossier par son ID
+function getFolderById(id) {
+    return folderMap.get(parseInt(id));
+}
+
+// Mettre à jour le cache des dossiers
+function updateFolderCache(folders) {
+    folderMap.clear();
+    if (Array.isArray(folders)) {
+        folders.forEach(function(folder) {
+            if (folder && folder.id !== undefined) {
+                folderMap.set(parseInt(folder.id), folder);
+                if (folder.is_default) {
+                    defaultFolderId = parseInt(folder.id);
+                    defaultFolderName = folder.name;
+                }
+            }
+        });
+    }
+    allFolders = folders || [];
 }
 
 function getSelectedWorkspace() {

@@ -68,40 +68,26 @@ if ($originalHeading === '') {
     }
 }
 
-// Validate folder existence: if a non-default folder is provided, ensure it exists
-if (!isDefaultFolder($folder, $workspace)) {
-    // First check the folders table scoped by workspace (if provided)
-    if ($workspace) {
-        $fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $fStmt->execute([$folder, $workspace, $workspace]);
-    } else {
-        $fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-        $fStmt->execute([$folder]);
-    }
-    $folderExists = $fStmt->fetchColumn() > 0;
-
-    // Optionally allow folders that already exist as values in entries table
-    if (!$folderExists) {
-        if ($workspace) {
-            $eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $eStmt->execute([$folder, $workspace, $workspace]);
-        } else {
-            $eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
-            $eStmt->execute([$folder]);
-        }
-        $folderExists = $eStmt->fetchColumn() > 0;
-    }
-
-    if (!$folderExists) {
-        http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Folder not found']);
-        exit;
-    }
+// Get folder_id if needed
+$folder_id = null;
+// Always try to get folder_id from folders table, even for default folders
+if ($workspace) {
+    $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+    $fStmt->execute([$folder, $workspace, $workspace]);
+} else {
+    $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+    $fStmt->execute([$folder]);
 }
+$folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
 
-$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+if ($folderData) {
+    $folder_id = (int)$folderData['id'];
+}
+// Note: If folder not found in folders table, folder_id remains null which is acceptable
 
-if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $workspace, $type])) {
+$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+
+if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type])) {
     $id = $con->lastInsertId();
     
     // Create the file for the note content with appropriate extension

@@ -21,7 +21,12 @@
 	$entry = $_POST['entry'] ?? ''; // Save the HTML content (including images) in an HTML file.
 	$entrycontent = $_POST['entrycontent'] ?? ''; // Save the text content (without images) in the database.
 	$workspace = $_POST['workspace'] ?? null; // optional
-	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
+	$folder_id = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+	// If folder_id is 0, treat it as null
+	if ($folder_id === 0) {
+		$folder_id = null;
+	}
+	$folder = $_POST['folder'] ?? null;
 	
 	// Check if this is an Excalidraw note - in the new unified system, treat as regular HTML
 	$isExcalidrawNote = false;
@@ -111,15 +116,35 @@
     
 	$updated_date = date("Y-m-d H:i:s", $seconds);
 	
+	// Get folder name if folder_id is provided
+	if ($folder_id !== null && $folder === null) {
+		if ($workspace) {
+			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+			$fStmt->execute([$folder_id, $workspace, $workspace]);
+		} else {
+			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
+			$fStmt->execute([$folder_id]);
+		}
+		$folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+		if ($folderData) {
+			$folder = $folderData['name'];
+		} else {
+			$folder = getDefaultFolderForNewNotes($workspace);
+			$folder_id = null;
+		}
+	} elseif ($folder_id === null && $folder === null) {
+		$folder = getDefaultFolderForNewNotes($workspace);
+	}
+	
 	// If workspace provided, include it in update
 	if ($workspace !== null) {
-		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ?, workspace = ? WHERE id = ?";
+		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ?, folder_id = ?, workspace = ? WHERE id = ?";
 		$stmt = $con->prepare($query);
-		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $workspace, $id];
+		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $folder_id, $workspace, $id];
 	} else {
-		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ? WHERE id = ?";
+		$query = "UPDATE entries SET heading = ?, entry = ?, created = created, updated = ?, tags = ?, folder = ?, folder_id = ? WHERE id = ?";
 		$stmt = $con->prepare($query);
-		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $id];
+		$executeParams = [$heading, $entrycontent, $updated_date, $tags, $folder, $folder_id, $id];
 	}
 	
 	if($stmt->execute($executeParams)) {

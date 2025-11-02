@@ -279,8 +279,14 @@ function importNotesZip($uploadedFile) {
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
-                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, 'Default', 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $content, $noteType]);
+                // Get folder_id for 'Default' folder in 'Poznote' workspace
+                $folderIdStmt = $con->prepare("SELECT id FROM folders WHERE name = 'Default' AND (workspace = 'Poznote' OR (workspace IS NULL AND 'Poznote' = 'Poznote'))");
+                $folderIdStmt->execute();
+                $folderData = $folderIdStmt->fetch(PDO::FETCH_ASSOC);
+                $folderId = $folderData ? (int)$folderData['id'] : null;
+                
+                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, 'Default', ?, 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
+                $insertStmt->execute([$noteId, $title, $content, $folderId, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
@@ -468,9 +474,20 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         }
         
         try {
+            // Get folder_id if folder is not default
+            $folder_id = null;
+            if ($folder !== 'Default' && $folder !== 'Uncategorized') {
+                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $fStmt->execute([$folder, $workspace, $workspace]);
+                $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+                if ($folderData) {
+                    $folder_id = (int)$folderData['id'];
+                }
+            }
+            
             // Insert note into database
-            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, datetime('now'), datetime('now'))");
-            $stmt->execute([$title, $folder, $workspace, $noteType]);
+            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, datetime('now'), datetime('now'))");
+            $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType]);
             $noteId = $con->lastInsertId();
             
             // Save content to file with correct extension

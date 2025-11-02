@@ -28,32 +28,11 @@ try {
     }
 
     if ($get_folders) {
-        // Return list of folders
+        // Return list of folders with IDs
         $folders = [];
         
-        // Get folders from entries table
-        $sql = "SELECT DISTINCT folder FROM entries WHERE trash = 0 AND folder IS NOT NULL AND folder != ''";
-        $params = [];
-        
-        if ($workspace) {
-            $sql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace;
-            $params[] = $workspace;
-        }
-        
-        $sql .= " ORDER BY folder";
-        
-        $stmt = $con->prepare($sql);
-        $stmt->execute($params);
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['folder']) {
-                $folders[] = $row['folder'];
-            }
-        }
-        
-        // Also get empty folders from folders table
-        $sql = "SELECT name FROM folders";
+        // Get folders from folders table (primary source)
+        $sql = "SELECT id, name FROM folders";
         $params = [];
         
         if ($workspace) {
@@ -68,24 +47,31 @@ try {
         $stmt->execute($params);
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if (!in_array($row['name'], $folders)) {
-                $folders[] = $row['name'];
+            $folderId = (int)$row['id'];
+            $folders[$folderId] = [
+                'id' => $folderId,
+                'name' => $row['name']
+            ];
+        }
+        
+        // Add default folder if not present (ID 0 for default/uncategorized)
+        $hasDefault = false;
+        foreach ($folders as $f) {
+            if ($f['name'] === 'Default' || $f['name'] === 'Uncategorized') {
+                $hasDefault = true;
+                break;
             }
         }
-        
-        // Add default folder name if not present
-        if (!in_array('Default', $folders) && !in_array('Uncategorized', $folders)) {
-            array_unshift($folders, 'Default');
+        if (!$hasDefault) {
+            $folders[0] = ['id' => 0, 'name' => 'Default'];
         }
         
-        sort($folders);
-        
-        echo json_encode(['success' => true, 'folders' => $folders]);
+        echo json_encode(['success' => true, 'folders' => $folders], JSON_FORCE_OBJECT);
         exit;
     }
 
     // Get notes
-    $sql = "SELECT id, heading, tags, folder, workspace, updated FROM entries WHERE trash = 0";
+    $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated FROM entries WHERE trash = 0";
     $params = [];
     
     if ($workspace) {

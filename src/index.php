@@ -353,7 +353,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, favorite, created, location, subheading, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, location, subheading, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -431,8 +431,8 @@ $body_classes = trim($extra_body_classes);
         }
         // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
-        // Group notes by folder for hierarchical display
-        $folders = organizeNotesByFolder($stmt_left, $defaultFolderName);
+        // Group notes by folder for hierarchical display (now uses folder_id)
+        $folders = organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_filter);
         
         // Handle favorites
         $folders = handleFavorites($folders);
@@ -440,9 +440,9 @@ $body_classes = trim($extra_body_classes);
         // Track folders with search results for favorites
         $folders_with_results = [];
         if($is_search_mode) {
-            foreach($folders as $folderName => $notes) {
-                if (!empty($notes)) {
-                    $folders_with_results[$folderName] = true;
+            foreach($folders as $folderId => $folderData) {
+                if (!empty($folderData['notes'])) {
+                    $folders_with_results[$folderData['name']] = true;
                 }
             }
             $folders_with_results = updateFavoritesSearchResults($folders_with_results, $folders);
@@ -788,6 +788,7 @@ $body_classes = trim($extra_body_classes);
                     
                     // Hidden folder value for the note
                     echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
+                    echo '<input type="hidden" id="folderId'.$row['id'].'" value="'.htmlspecialchars($row['folder_id'] ?: '', ENT_QUOTES).'"/>';
                     
                     // Title - disable for protected note
                     echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'New note'), ENT_QUOTES, 'UTF-8').'"/></h4>';

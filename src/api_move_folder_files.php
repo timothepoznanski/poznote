@@ -17,26 +17,50 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$source_folder = $_POST['source_folder'] ?? '';
-$target_folder = $_POST['target_folder'] ?? '';
+$source_folder_id = isset($_POST['source_folder_id']) ? intval($_POST['source_folder_id']) : null;
+$target_folder_id = isset($_POST['target_folder_id']) ? intval($_POST['target_folder_id']) : null;
 $workspace = $_POST['workspace'] ?? 'Poznote';
 
-if (empty($source_folder) || empty($target_folder)) {
+if ($source_folder_id === null) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Source and target folders are required']);
+    echo json_encode(['success' => false, 'error' => 'Source folder ID is required']);
     exit;
 }
 
-if ($source_folder === $target_folder) {
+if ($target_folder_id === null) {
+    ob_clean();
+    echo json_encode(['success' => false, 'error' => 'Target folder ID is required']);
+    exit;
+}
+
+// If target is 0 (Default folder), find the real ID or use null
+if ($target_folder_id === 0) {
+    require_once 'default_folder_settings.php';
+    $defaultFolderName = getDefaultFolderForNewNotes($workspace);
+    
+    // Try to find the default folder in the folders table
+    $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+    $stmt->execute([$defaultFolderName, $workspace, $workspace]);
+    $defaultFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($defaultFolderData) {
+        $target_folder_id = (int)$defaultFolderData['id'];
+    } else {
+        // Default folder doesn't exist in folders table, set to null
+        $target_folder_id = null;
+    }
+}
+
+// Convert 0 to null for source as well (edge case)
+if ($source_folder_id === 0) {
+    ob_clean();
+    echo json_encode(['success' => false, 'error' => 'Cannot move files from Default folder using folder actions']);
+    exit;
+}
+
+if ($source_folder_id === $target_folder_id) {
     ob_clean();
     echo json_encode(['success' => false, 'error' => 'Source and target folders cannot be the same']);
-    exit;
-}
-
-// Prevent moving files from Favorites folder
-if ($source_folder === 'Favorites') {
-    ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Cannot move files from Favorites folder']);
     exit;
 }
 
@@ -44,9 +68,45 @@ try {
     // Start transaction
     $con->beginTransaction();
     
+    // Verify source folder exists
+    $folderStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
+    $folderStmt->execute([$source_folder_id]);
+    $sourceFolderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$sourceFolderData) {
+        $con->rollBack();
+        ob_clean();
+        echo json_encode(['success' => false, 'error' => 'Source folder not found']);
+        exit;
+    }
+    $source_folder_name = $sourceFolderData['name'];
+    
+    // Verify target folder exists AND belongs to the correct workspace
+    $folderStmt = $con->prepare("SELECT name, workspace FROM folders WHERE id = ?");
+    $folderStmt->execute([$target_folder_id]);
+    $targetFolderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$targetFolderData) {
+        $con->rollBack();
+        ob_clean();
+        error_log("Target folder ID $target_folder_id not found in folders table");
+        echo json_encode(['success' => false, 'error' => 'Target folder not found (ID: ' . $target_folder_id . ')']);
+        exit;
+    }
+    
+    // Verify workspace match
+    $targetWorkspace = $targetFolderData['workspace'] ?: 'Poznote';
+    if ($targetWorkspace !== $workspace && !($targetWorkspace === null && $workspace === 'Poznote')) {
+        $con->rollBack();
+        ob_clean();
+        error_log("Target folder ID $target_folder_id belongs to workspace '$targetWorkspace', not '$workspace'");
+        echo json_encode(['success' => false, 'error' => 'Target folder belongs to a different workspace']);
+        exit;
+    }
+    
+    $target_folder_name = $targetFolderData['name'];
+    
     // Get all notes in source folder (excluding trash)
-    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND folder = ?";
-    $params = [$source_folder];
+    $sql = "SELECT id, heading, folder FROM entries WHERE trash = 0 AND folder_id = ?";
+    $params = [$source_folder_id];
     
     // Apply workspace filter
     if (!empty($workspace)) {
@@ -66,13 +126,13 @@ try {
         exit;
     }
     
-    // Update all notes to move them to target folder
-    $update_sql = "UPDATE entries SET folder = ?, updated = CURRENT_TIMESTAMP WHERE id = ?";
+    // Update all notes to move them to target folder (update both folder_id and folder name)
+    $update_sql = "UPDATE entries SET folder_id = ?, folder = ?, updated = CURRENT_TIMESTAMP WHERE id = ?";
     $update_stmt = $con->prepare($update_sql);
     
     $moved_count = 0;
     foreach ($notes as $note) {
-        if ($update_stmt->execute([$target_folder, $note['id']])) {
+        if ($update_stmt->execute([$target_folder_id, $target_folder_name, $note['id']])) {
             $moved_count++;
         }
     }
@@ -85,7 +145,7 @@ try {
     echo json_encode([
         'success' => true, 
         'moved_count' => $moved_count,
-        'message' => "Successfully moved {$moved_count} files from '{$source_folder}' to '{$target_folder}'"
+        'message' => "Successfully moved {$moved_count} files from '{$source_folder_name}' to '{$target_folder_name}'"
     ]);
 
 } catch (Exception $e) {

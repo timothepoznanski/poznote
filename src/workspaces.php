@@ -30,6 +30,13 @@ if ($_POST) {
             if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) throw new Exception('Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).');
             $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $stmt->execute([$name]);
+            
+            // Create the default folder for this workspace
+            require_once 'default_folder_settings.php';
+            $defaultFolderName = getDefaultFolderForNewNotes($name);
+            $folderStmt = $con->prepare('INSERT OR IGNORE INTO folders (name, workspace) VALUES (?, ?)');
+            $folderStmt->execute([$defaultFolderName, $name]);
+            
             $message = 'Workspace created';
         } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');
@@ -273,9 +280,60 @@ if ($_POST) {
             $updTrashed = $con->prepare('UPDATE entries SET workspace = ? WHERE workspace = ? AND trash != 0');
             $updTrashed->execute([$target, $name]);
 
-            // Move folders scope
-            $updF = $con->prepare('UPDATE folders SET workspace = ? WHERE workspace = ?');
-            $updF->execute([$target, $name]);
+            // Remap folder_id for moved notes to match folders in destination workspace
+            // Instead of moving folders (which causes UNIQUE constraint violation),
+            // we update folder_id to point to existing folders in target workspace
+            try {
+                // Get mapping of folder names to IDs in source workspace
+                $sourceFolders = [];
+                $srcStmt = $con->prepare('SELECT id, name FROM folders WHERE workspace = ?');
+                $srcStmt->execute([$name]);
+                while ($row = $srcStmt->fetch(PDO::FETCH_ASSOC)) {
+                    $sourceFolders[(int)$row['id']] = $row['name'];
+                }
+
+                // Get mapping of folder names to IDs in target workspace
+                $targetFolders = [];
+                $tgtStmt = $con->prepare('SELECT id, name FROM folders WHERE workspace = ?');
+                $tgtStmt->execute([$target]);
+                while ($row = $tgtStmt->fetch(PDO::FETCH_ASSOC)) {
+                    $targetFolders[$row['name']] = (int)$row['id'];
+                }
+
+                // For each source folder, find or create corresponding folder in target
+                $folderIdMap = []; // source_id => target_id
+                $insertFolder = $con->prepare('INSERT OR IGNORE INTO folders (name, workspace) VALUES (?, ?)');
+                $getNewId = $con->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ?');
+                
+                foreach ($sourceFolders as $srcId => $folderName) {
+                    if (isset($targetFolders[$folderName])) {
+                        // Folder already exists in target
+                        $folderIdMap[$srcId] = $targetFolders[$folderName];
+                    } else {
+                        // Create folder in target workspace
+                        $insertFolder->execute([$folderName, $target]);
+                        $getNewId->execute([$folderName, $target]);
+                        $newId = $getNewId->fetchColumn();
+                        if ($newId) {
+                            $folderIdMap[$srcId] = (int)$newId;
+                        }
+                    }
+                }
+
+                // Update folder_id for all moved entries
+                $updFolderId = $con->prepare('UPDATE entries SET folder_id = ? WHERE folder_id = ? AND workspace = ?');
+                foreach ($folderIdMap as $oldId => $newId) {
+                    $updFolderId->execute([$newId, $oldId, $target]);
+                }
+
+                // Delete empty folders from source workspace
+                $delFolders = $con->prepare('DELETE FROM folders WHERE workspace = ?');
+                $delFolders->execute([$name]);
+            } catch (Exception $e) {
+                // Non-fatal: folder remapping failed but notes were moved
+                // Log error but don't fail the whole operation
+                error_log('Folder remapping failed during workspace move: ' . $e->getMessage());
+            }
 
             $message = 'Notes moved to ' . htmlspecialchars($target);
 
@@ -530,8 +588,11 @@ try {
                 document.getElementById('confirmMoveBtn').onclick = function(){
                     var target = sel.value;
                     if (!target) { alert('Choose a target'); return; }
+                    
                     // disable to prevent double clicks
-                    try { document.getElementById('confirmMoveBtn').disabled = true; } catch(e) {}
+                    var confirmBtn = document.getElementById('confirmMoveBtn');
+                    try { confirmBtn.disabled = true; } catch(e) {}
+                    
                     var params = new URLSearchParams({ action: 'move_notes', name: source, target: target });
                     fetch('workspaces.php', {
                         method: 'POST',
@@ -542,10 +603,15 @@ try {
                         },
                         body: params.toString()
                     })
-                    .then(function(resp){ return resp.json(); })
+                    .then(function(resp){ 
+                        if (!resp.ok) {
+                            throw new Error('HTTP error ' + resp.status);
+                        }
+                        return resp.json(); 
+                    })
                     .then(function(json){
                         // Re-enable button
-                        try { document.getElementById('confirmMoveBtn').disabled = false; } catch(e) {}
+                        try { confirmBtn.disabled = false; } catch(e) {}
                         if (json && json.success) {
                             showAjaxAlert('Moved ' + (json.moved||0) + ' notes to ' + json.target, 'success');
                             // Update counts in the displayed workspace list
@@ -597,9 +663,9 @@ try {
                         } else {
                             showAjaxAlert('Error: ' + (json.error || 'Unknown'), 'danger');
                         }
-                    }).catch(function(){
-                        try { document.getElementById('confirmMoveBtn').disabled = false; } catch(e) {}
-                        showAjaxAlert('Error moving notes', 'danger');
+                    }).catch(function(err){
+                        try { confirmBtn.disabled = false; } catch(e) {}
+                        showAjaxAlert('Error moving notes: ' + (err.message || 'Unknown error'), 'danger');
                     });
                 };
             }

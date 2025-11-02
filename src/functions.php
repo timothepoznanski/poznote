@@ -146,10 +146,21 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
  */
 function createNote($con, $heading, $content, $folder = 'Default', $workspace = 'Poznote', $favorite = 0, $tags = '', $type = 'note') {
     try {
-        // Insert note into database
-        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+        // Get folder_id from folder name
+        $folder_id = null;
+        if ($folder !== null) {
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $fStmt->execute([$folder, $workspace, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folder_id = (int)$folderData['id'];
+            }
+        }
         
-        if (!$stmt->execute([$heading, $content, $tags, $folder, $workspace, $type, $favorite])) {
+        // Insert note into database
+        $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+        
+        if (!$stmt->execute([$heading, $content, $tags, $folder, $folder_id, $workspace, $type, $favorite])) {
             return ['success' => false, 'error' => 'Failed to insert note into database'];
         }
         

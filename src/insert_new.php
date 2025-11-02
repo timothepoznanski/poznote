@@ -8,11 +8,22 @@
 	include 'db_connect.php';
 	require_once 'default_folder_settings.php';
 	
-	$now = $_POST['now'];
-	$workspace = $_POST['workspace'] ?? 'Poznote';
-	$folder = $_POST['folder'] ?? getDefaultFolderForNewNotes($workspace);
-	$type = $_POST['type'] ?? 'note';
-	$created_date = date("Y-m-d H:i:s", (int)$now);
+	// Enable error reporting for debugging
+	error_reporting(E_ALL);
+	ini_set('display_errors', 0);
+	ini_set('log_errors', 1);
+	
+	try {
+		$now = $_POST['now'];
+		$workspace = $_POST['workspace'] ?? 'Poznote';
+		$folder_id = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+		// If folder_id is 0, treat it as null
+		if ($folder_id === 0) {
+			$folder_id = null;
+		}
+		$folder = $_POST['folder'] ?? null;
+		$type = $_POST['type'] ?? 'note';
+		$created_date = date("Y-m-d H:i:s", (int)$now);
 
 	// Validate workspace exists
 	if (!empty($workspace)) {
@@ -25,42 +36,55 @@
 		}
 	}
 
-	// Validate folder existence for non-default folders
-	if (!isDefaultFolder($folder, $workspace)) {
+	// If no folder specified, use default
+	if ($folder_id === null && ($folder === null || $folder === '')) {
+		$folder = getDefaultFolderForNewNotes($workspace);
+	}
+
+	// If folder_id is provided, verify it exists and fetch the folder name
+	if ($folder_id !== null && $folder_id > 0) {
 		if ($workspace) {
-			$fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+			$fStmt->execute([$folder_id, $workspace, $workspace]);
+		} else {
+			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
+			$fStmt->execute([$folder_id]);
+		}
+		$folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+		if ($folderData) {
+			$folder = $folderData['name'];
+		} else {
+			// Folder ID provided but doesn't exist - reset to null to avoid FK constraint violation
+			$folder_id = null;
+			if ($folder === null || $folder === '') {
+				$folder = getDefaultFolderForNewNotes($workspace);
+			}
+		}
+	} elseif ($folder !== null && $folder !== '') {
+		// If folder name is provided, get folder_id
+		if ($workspace) {
+			$fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
 			$fStmt->execute([$folder, $workspace, $workspace]);
 		} else {
-			$fStmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
+			$fStmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
 			$fStmt->execute([$folder]);
 		}
-		$folderExists = $fStmt->fetchColumn() > 0;
-		if (!$folderExists) {
-			// check if folder exists in entries table
-			if ($workspace) {
-				$eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-				$eStmt->execute([$folder, $workspace, $workspace]);
-			} else {
-				$eStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
-				$eStmt->execute([$folder]);
-			}
-			$folderExists = $eStmt->fetchColumn() > 0;
+		$folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+		if ($folderData) {
+			$folder_id = (int)$folderData['id'];
 		}
-		if (!$folderExists) {
-			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(['status' => 0, 'error' => 'Folder not found']);
-			exit;
-		}
+		// Note: If folder not found in folders table but folder name is set, 
+		// folder_id will remain null which is acceptable for default folders
 	}
 	
 	// Generate unique title for new notes (workspace-aware)
 	$uniqueTitle = generateUniqueTitle('New note', null, $workspace);
 
-	// Insert the new note (include workspace and type)
-	$query = "INSERT INTO entries (heading, entry, folder, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?)";
+	// Insert the new note (include workspace, type, and folder_id)
+	$query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?, ?)";
 	$stmt = $con->prepare($query);
 
-	if ($stmt->execute([$uniqueTitle, $folder, $workspace, $type, $created_date, $created_date])) {
+	if ($stmt->execute([$uniqueTitle, $folder, $folder_id, $workspace, $type, $created_date, $created_date])) {
 		$id = $con->lastInsertId();
 
 		// Create the file for the note content with appropriate extension
@@ -107,6 +131,17 @@
 		echo json_encode([
 			'status' => 0,
 			'error' => 'Database error: ' . $stmt->errorInfo()[2]
+		]);
+	}
+	
+	} catch (Exception $e) {
+		header('Content-Type: application/json; charset=utf-8');
+		http_response_code(500);
+		echo json_encode([
+			'status' => 0,
+			'error' => 'Server error: ' . $e->getMessage(),
+			'file' => $e->getFile(),
+			'line' => $e->getLine()
 		]);
 	}
 ?>

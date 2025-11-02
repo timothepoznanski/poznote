@@ -65,12 +65,13 @@ function getDefaultFolderForNewNotes($workspace = null) {
 function updateDefaultFolderReferences($oldName, $newName, $workspace = null) {
     global $con;
     try {
-        // Update entries table
+        // Get the folder_id for the default folder (should be NULL for default)
+        // Update entries table - using folder_id for better performance
         if ($workspace) {
-            $stmt1 = $con->prepare("UPDATE entries SET folder = ? WHERE (folder = ? OR folder IS NULL OR folder = '') AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt1 = $con->prepare("UPDATE entries SET folder = ? WHERE (folder = ? OR folder IS NULL OR folder = '' OR folder_id IS NULL) AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
             $result1 = $stmt1->execute([$newName, $oldName, $workspace, $workspace]);
         } else {
-            $stmt1 = $con->prepare("UPDATE entries SET folder = ? WHERE folder = ? OR folder IS NULL OR folder = ''");
+            $stmt1 = $con->prepare("UPDATE entries SET folder = ? WHERE folder = ? OR folder IS NULL OR folder = '' OR folder_id IS NULL");
             $result1 = $stmt1->execute([$newName, $oldName]);
         }
         
