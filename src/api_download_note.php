@@ -126,17 +126,63 @@ if (empty($downloadFilename)) {
 $extension = getFileExtensionForType($noteType);
 $downloadFilename .= $extension;
 
+// Read the file content
+$content = file_get_contents($filePath);
+
+// If this is a tasklist type, convert JSON to HTML
+if ($noteType === 'tasklist') {
+    $decoded = json_decode($content, true);
+    if (is_array($decoded)) {
+        $tasksHtml = '<!DOCTYPE html>' . "\n";
+        $tasksHtml .= '<html>' . "\n";
+        $tasksHtml .= '<head>' . "\n";
+        $tasksHtml .= '<meta charset="utf-8">' . "\n";
+        $tasksHtml .= '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>' . "\n";
+        $tasksHtml .= '<style>' . "\n";
+        $tasksHtml .= 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }' . "\n";
+        $tasksHtml .= 'h1 { margin-bottom: 20px; }' . "\n";
+        $tasksHtml .= '.task-list-container { margin-top: 20px; }' . "\n";
+        $tasksHtml .= '.tasks-list { list-style: none; padding: 0; }' . "\n";
+        $tasksHtml .= '.task-item { padding: 8px 0; display: flex; align-items: center; }' . "\n";
+        $tasksHtml .= '.task-item input[type="checkbox"] { margin-right: 10px; cursor: default; }' . "\n";
+        $tasksHtml .= '.task-item.completed .task-text { text-decoration: line-through; color: #888; }' . "\n";
+        $tasksHtml .= '.task-text { flex: 1; }' . "\n";
+        $tasksHtml .= '</style>' . "\n";
+        $tasksHtml .= '</head>' . "\n";
+        $tasksHtml .= '<body>' . "\n";
+        $tasksHtml .= '<h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1>' . "\n";
+        $tasksHtml .= '<div class="task-list-container">' . "\n";
+        $tasksHtml .= '<div class="tasks-list">' . "\n";
+        foreach ($decoded as $task) {
+            $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
+            $completed = !empty($task['completed']) ? ' completed' : '';
+            $checked = !empty($task['completed']) ? ' checked' : '';
+            $tasksHtml .= '<div class="task-item'.$completed.'">';
+            $tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
+            $tasksHtml .= '<span class="task-text">'.$text.'</span>';
+            $tasksHtml .= '</div>' . "\n";
+        }
+        $tasksHtml .= '</div>' . "\n";
+        $tasksHtml .= '</div>' . "\n";
+        $tasksHtml .= '</body>' . "\n";
+        $tasksHtml .= '</html>';
+        $content = $tasksHtml;
+    } else {
+        // If JSON parse fails, wrap raw content in pre tag
+        $content = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' . htmlspecialchars($title, ENT_QUOTES) . '</title></head><body><h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1><pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre></body></html>';
+    }
+}
+
 // Send the file to the browser
-$fileSize = filesize($filePath);
 $contentType = ($extension === '.md') ? 'text/markdown' : 'text/html';
 
 header('Content-Type: ' . $contentType . '; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $downloadFilename . '"');
-header('Content-Length: ' . $fileSize);
+header('Content-Length: ' . strlen($content));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');
 
-// Read and output the file
-readfile($filePath);
+// Output the content
+echo $content;
 exit;
 ?>
