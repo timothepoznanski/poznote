@@ -109,6 +109,14 @@ function sortFolders($folders, $defaultFolderName, $workspace_filter) {
  * Now accepts both folder ID and name
  */
 function shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes) {
+    // Check if this folder was explicitly requested to be opened (e.g., after creating a subfolder)
+    if (isset($_GET['open_folder'])) {
+        $openFolderKey = $_GET['open_folder'];
+        if ($openFolderKey === 'folder_' . $folderId) {
+            return true;
+        }
+    }
+    
     if($total_notes <= 3) {
         // If we have very few notes (demo notes just created), open all folders
         return true;
@@ -141,11 +149,11 @@ function generateFolderActions($folderId, $folderName, $workspace_filter) {
         // No actions for Favorites folder
     } else if (isDefaultFolder($folderName, $workspace_filter)) {
         // For the default folder: allow search and empty, but do not allow renaming
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create note in folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create'></i>";
         $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$folderName\")' title='Move all files to another folder'></i>";
         $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$folderName\")' title='Move all notes to trash'></i>";
     } else {
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='event.stopPropagation(); showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create note in folder'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$folderName\")' title='Create'></i>";
         $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$folderName\")' title='Move all files to another folder'></i>";
         $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$folderName\")' title='Rename folder'></i>";
         $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$folderName\")' title='Delete folder'></i>";
@@ -180,4 +188,61 @@ function getTotalNotesCount($con, $workspace_filter) {
     }
     $total_notes_result = $con->query($total_notes_query);
     return $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
+}
+
+/**
+ * Organize folders into hierarchical structure
+ */
+function buildFolderHierarchy($folders) {
+    $folderMap = [];
+    $rootFolders = [];
+    
+    // Create a map of all folders by ID and add children array
+    foreach ($folders as $folderId => $folderData) {
+        $folderMap[$folderId] = $folderData;
+        $folderMap[$folderId]['children'] = [];
+    }
+    
+    // Build the hierarchy by linking children to parents
+    foreach ($folderMap as $folderId => $folderData) {
+        // Check if folder has parent_id in database
+        $parentId = isset($folderData['parent_id']) ? $folderData['parent_id'] : null;
+        
+        if ($parentId === null || !isset($folderMap[$parentId])) {
+            // This is a root folder
+            $rootFolders[$folderId] = &$folderMap[$folderId];
+        } else {
+            // This is a child folder
+            $folderMap[$parentId]['children'][$folderId] = &$folderMap[$folderId];
+        }
+    }
+    
+    return $rootFolders;
+}
+
+/**
+ * Get parent_id for folders from database
+ */
+function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
+    foreach ($folders as $folderId => &$folderData) {
+        $query = "SELECT parent_id FROM folders WHERE id = ?";
+        $params = [$folderId];
+        if ($workspace_filter) {
+            $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $params[] = $workspace_filter;
+            $params[] = $workspace_filter;
+        }
+        
+        $stmt = $con->prepare($query);
+        $stmt->execute($params);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result) {
+            $folderData['parent_id'] = $result['parent_id'] ? (int)$result['parent_id'] : null;
+        } else {
+            $folderData['parent_id'] = null;
+        }
+    }
+    
+    return $folders;
 }

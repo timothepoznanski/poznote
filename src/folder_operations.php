@@ -11,6 +11,50 @@ include 'db_connect.php';
 
 header('Content-Type: application/json');
 
+/**
+ * Build hierarchical folder structure from flat array
+ */
+function buildFolderHierarchy($folders) {
+    $folderMap = [];
+    $rootFolders = [];
+    
+    // Create a map of all folders by ID
+    foreach ($folders as $folder) {
+        $folder['children'] = [];
+        $folderMap[$folder['id']] = $folder;
+    }
+    
+    // Build the hierarchy
+    foreach ($folderMap as $id => $folder) {
+        if ($folder['parent_id'] === null) {
+            $rootFolders[] = &$folderMap[$id];
+        } else {
+            if (isset($folderMap[$folder['parent_id']])) {
+                $folderMap[$folder['parent_id']]['children'][] = &$folderMap[$id];
+            }
+        }
+    }
+    
+    // Sort folders at each level
+    function sortFolders(&$folders) {
+        usort($folders, function($a, $b) {
+            if ($a['is_default']) return -1;
+            if ($b['is_default']) return 1;
+            return strcasecmp($a['name'], $b['name']);
+        });
+        
+        foreach ($folders as &$folder) {
+            if (!empty($folder['children'])) {
+                sortFolders($folder['children']);
+            }
+        }
+    }
+    
+    sortFolders($rootFolders);
+    
+    return $rootFolders;
+}
+
 $action = $_POST['action'] ?? '';
 $workspace = $_POST['workspace'] ?? null;
 
@@ -24,7 +68,7 @@ switch($action) {
             exit;
         }
         
-    $defaultFolderName = getDefaultFolderName($workspace);
+        $defaultFolderName = getDefaultFolderName($workspace);
         
         if ($folderName === $defaultFolderName) {
             echo json_encode(['success' => false, 'error' => 'Cannot create folder with the same name as the default folder']);
@@ -38,25 +82,49 @@ switch($action) {
             exit;
         }
         
+        // Get parent_id from parent_folder_key if provided
+        $parentId = null;
+        $parentFolderKey = $_POST['parent_folder_key'] ?? null;
+        
+        if ($parentFolderKey && strpos($parentFolderKey, 'folder_') === 0) {
+            // Extract folder ID from folder_123 format
+            $parentId = (int)substr($parentFolderKey, 7);
+            
+            // Verify parent folder exists
+            if ($workspace !== null) {
+                $checkParent = $con->prepare("SELECT id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $checkParent->execute([$parentId, $workspace, $workspace]);
+            } else {
+                $checkParent = $con->prepare("SELECT id FROM folders WHERE id = ?");
+                $checkParent->execute([$parentId]);
+            }
+            
+            if (!$checkParent->fetch()) {
+                echo json_encode(['success' => false, 'error' => 'Parent folder not found']);
+                exit;
+            }
+        }
+        
+        // Check if folder with same name exists in same parent
         if ($workspace !== null) {
-            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $check2->execute([$folderName, $workspace, $workspace]);
+            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND parent_id IS NOT DISTINCT FROM ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $check2->execute([$folderName, $parentId, $workspace, $workspace]);
         } else {
-            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
-            $check2->execute([$folderName]);
+            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND parent_id IS NOT DISTINCT FROM ?");
+            $check2->execute([$folderName, $parentId]);
         }
         $result2 = $check2->fetch(PDO::FETCH_ASSOC);
         
         if ($result2['count'] > 0) {
-            echo json_encode(['success' => false, 'error' => 'Folder already exists']);
+            echo json_encode(['success' => false, 'error' => 'Folder already exists in this location']);
         } else {
-            // Create folder (store workspace)
-            $query = "INSERT INTO folders (name, workspace) VALUES (?, ?)";
+            // Create folder (store workspace and parent_id)
+            $query = "INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)";
             $stmt = $con->prepare($query);
             $wsValue = $workspace ?? 'Poznote';
-            if ($stmt->execute([$folderName, $wsValue])) {
+            if ($stmt->execute([$folderName, $wsValue, $parentId])) {
                 $folder_id = $con->lastInsertId();
-                echo json_encode(['success' => true, 'folder_id' => (int)$folder_id, 'folder_name' => $folderName]);
+                echo json_encode(['success' => true, 'folder_id' => (int)$folder_id, 'folder_name' => $folderName, 'parent_id' => $parentId]);
             } else {
                 echo json_encode(['success' => false, 'error' => 'Database error']);
             }
@@ -303,7 +371,9 @@ switch($action) {
     case 'list':
         require_once 'default_folder_settings.php';
         
-        $query = "SELECT id, name FROM folders";
+        $hierarchical = isset($_POST['hierarchical']) && $_POST['hierarchical'] === 'true';
+        
+        $query = "SELECT id, name, parent_id FROM folders";
         if ($workspace !== null) {
             $query .= " WHERE (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
         }
@@ -319,6 +389,7 @@ switch($action) {
             $folders[] = [
                 'id' => (int)$row['id'],
                 'name' => $row['name'],
+                'parent_id' => $row['parent_id'] ? (int)$row['parent_id'] : null,
                 'is_default' => isDefaultFolder($row['name'], $workspace)
             ];
         }
@@ -335,16 +406,22 @@ switch($action) {
             array_unshift($folders, [
                 'id' => 0,
                 'name' => $defaultFolderName,
+                'parent_id' => null,
                 'is_default' => true
             ]);
         }
         
-        // Sort folders (default folder first, then alphabetically)
-        usort($folders, function($a, $b) {
-            if ($a['is_default']) return -1;
-            if ($b['is_default']) return 1;
-            return strcasecmp($a['name'], $b['name']);
-        });
+        if ($hierarchical) {
+            // Build hierarchical structure
+            $folders = buildFolderHierarchy($folders);
+        } else {
+            // Sort folders (default folder first, then alphabetically)
+            usort($folders, function($a, $b) {
+                if ($a['is_default']) return -1;
+                if ($b['is_default']) return 1;
+                return strcasecmp($a['name'], $b['name']);
+            });
+        }
         
         echo json_encode(['success' => true, 'folders' => $folders]);
         break;
@@ -546,6 +623,147 @@ switch($action) {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
         echo json_encode(['success' => true, 'count' => (int)$result['count']]);
+        break;
+        
+    case 'get_folder_path':
+        // Get the full path of a folder (for breadcrumb)
+        $folderId = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+        $folderName = $_POST['folder_name'] ?? '';
+        
+        if ($folderId === null && empty($folderName)) {
+            echo json_encode(['success' => false, 'error' => 'Folder ID or name is required']);
+            exit;
+        }
+        
+        // Get folder by name if needed
+        if ($folderId === null && !empty($folderName)) {
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folderName, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+                $stmt->execute([$folderName]);
+            }
+            $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folderId = (int)$folderData['id'];
+            }
+        }
+        
+        if ($folderId === null) {
+            echo json_encode(['success' => false, 'error' => 'Folder not found']);
+            exit;
+        }
+        
+        // Build path by traversing up the hierarchy
+        $path = [];
+        $currentId = $folderId;
+        $depth = 0;
+        
+        while ($currentId !== null && $depth < 10) { // Limit depth to prevent infinite loops
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$currentId, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ?");
+                $stmt->execute([$currentId]);
+            }
+            
+            $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$folder) break;
+            
+            array_unshift($path, $folder['name']);
+            $currentId = $folder['parent_id'] ? (int)$folder['parent_id'] : null;
+            $depth++;
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'path' => implode('/', $path),
+            'depth' => $depth
+        ]);
+        break;
+        
+    case 'move_folder':
+        // Move a folder to a new parent
+        $folderId = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+        $folderName = $_POST['folder_name'] ?? '';
+        $newParentId = isset($_POST['new_parent_id']) ? intval($_POST['new_parent_id']) : null;
+        $newParent = $_POST['new_parent'] ?? null;
+        
+        if ($folderId === null && empty($folderName)) {
+            echo json_encode(['success' => false, 'error' => 'Folder ID or name is required']);
+            exit;
+        }
+        
+        // Get folder ID from name if needed
+        if ($folderId === null && !empty($folderName)) {
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folderName, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+                $stmt->execute([$folderName]);
+            }
+            $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folderId = (int)$folderData['id'];
+            }
+        }
+        
+        // Get new parent ID from name if provided
+        if ($newParentId === null && !empty($newParent)) {
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$newParent, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+                $stmt->execute([$newParent]);
+            }
+            $parentData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($parentData) {
+                $newParentId = (int)$parentData['id'];
+            }
+        }
+        
+        // Verify we're not creating a circular reference
+        if ($newParentId !== null) {
+            $checkId = $newParentId;
+            $depth = 0;
+            while ($checkId !== null && $depth < 10) {
+                if ($checkId === $folderId) {
+                    echo json_encode(['success' => false, 'error' => 'Cannot move folder into itself or its subfolder']);
+                    exit;
+                }
+                
+                if ($workspace !== null) {
+                    $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                    $stmt->execute([$checkId, $workspace, $workspace]);
+                } else {
+                    $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ?");
+                    $stmt->execute([$checkId]);
+                }
+                
+                $parent = $stmt->fetch(PDO::FETCH_ASSOC);
+                $checkId = $parent && $parent['parent_id'] ? (int)$parent['parent_id'] : null;
+                $depth++;
+            }
+        }
+        
+        // Update folder's parent_id
+        if ($workspace !== null) {
+            $stmt = $con->prepare("UPDATE folders SET parent_id = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $success = $stmt->execute([$newParentId, $folderId, $workspace, $workspace]);
+        } else {
+            $stmt = $con->prepare("UPDATE folders SET parent_id = ? WHERE id = ?");
+            $success = $stmt->execute([$newParentId, $folderId]);
+        }
+        
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Folder moved successfully']);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Database error']);
+        }
         break;
         
     default:

@@ -131,12 +131,25 @@ try {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         workspace TEXT DEFAULT "Poznote",
-        created DATETIME DEFAULT CURRENT_TIMESTAMP
+        parent_id INTEGER DEFAULT NULL,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
 
+    // Drop old index if it exists
+    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace');
+    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace_parent');
 
-    // Ensure unique folder names per workspace
-    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace ON folders(name, workspace)');
+    // Ensure unique folder names per workspace and parent
+    // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_parent_notnull 
+                ON folders(name, workspace, parent_id) 
+                WHERE parent_id IS NOT NULL');
+    
+    // For root folders (parent_id IS NULL): same name NOT allowed
+    $con->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_name_workspace_root 
+                ON folders(name, workspace) 
+                WHERE parent_id IS NULL');
 
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (

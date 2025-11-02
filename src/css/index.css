@@ -609,6 +609,41 @@ body {
     font-size: 0.85em !important;
 }
 
+/* Dropdown menu for create button */
+.dropdown-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 150px;
+    padding: 4px 0;
+    z-index: 10000;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+}
+
+.dropdown-item i {
+    font-size: 0.9em;
+    color: #6b7280;
+    width: 16px;
+}
+
+.dropdown-item:hover i {
+    color: #374151;
+}
 
 .resize-handle {
     width: 3px;

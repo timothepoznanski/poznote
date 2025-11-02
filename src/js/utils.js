@@ -1350,13 +1350,16 @@ function showCreateModal(folderId = null, folderName = null) {
     // Update modal title and sections visibility
     var modalTitle = document.getElementById('createModalTitle');
     var otherSection = document.getElementById('otherSection');
+    var subfolderOption = document.getElementById('subfolderOption');
     
     if (isCreatingInFolder) {
-        modalTitle.textContent = 'Create note in ' + (folderName || 'folder');
+        modalTitle.textContent = 'Create in ' + (folderName || 'folder');
         if (otherSection) otherSection.style.display = 'none';
+        if (subfolderOption) subfolderOption.style.display = 'flex';
     } else {
         modalTitle.textContent = 'Create';
         if (otherSection) otherSection.style.display = 'block';
+        if (subfolderOption) subfolderOption.style.display = 'none';
     }
     
     // Reset selection
@@ -1413,6 +1416,18 @@ function executeCreateAction() {
             break;
         case 'workspace':
             createWorkspace();
+            break;
+        case 'subfolder':
+            if (targetFolderId) {
+                var folderKey = 'folder_' + targetFolderId;
+                if (typeof createSubfolder === 'function') {
+                    createSubfolder(folderKey);
+                } else {
+                    console.error('createSubfolder function not found');
+                }
+            } else {
+                console.error('No target folder ID for subfolder creation');
+            }
             break;
         default:
             console.error('Unknown create type:', selectedCreateType);
