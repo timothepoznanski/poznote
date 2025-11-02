@@ -451,6 +451,9 @@ $body_classes = trim($extra_body_classes);
         // Add empty folders from folders table
         $folders = addEmptyFolders($con, $folders, $workspace_filter);
         
+        // Ensure Favorites folder always exists (even if empty)
+        $folders = ensureFavoritesFolder($folders);
+        
         // Sort folders
         $folders = sortFolders($folders, $defaultFolderName, $workspace_filter);
         

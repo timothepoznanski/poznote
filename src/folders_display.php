@@ -84,6 +84,32 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
 }
 
 /**
+ * Ensure Favorites folder always exists (even if empty)
+ */
+function ensureFavoritesFolder($folders) {
+    // Check if Favorites folder exists
+    $hasFavorites = false;
+    foreach ($folders as $folder) {
+        if (isset($folder['name']) && $folder['name'] === 'Favorites') {
+            $hasFavorites = true;
+            break;
+        }
+    }
+    
+    // Add empty Favorites folder if it doesn't exist
+    if (!$hasFavorites) {
+        // Use 'favorites' as special key (lowercase) to distinguish from regular folders
+        $folders['favorites'] = [
+            'id' => null,  // No real DB ID for Favorites pseudo-folder
+            'name' => 'Favorites',
+            'notes' => []
+        ];
+    }
+    
+    return $folders;
+}
+
+/**
  * Trie les dossiers (Favorites en premier, puis dossier par défaut, puis autres)
  * Now works with folder arrays containing 'id' and 'name'
  */
