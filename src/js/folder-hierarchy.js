@@ -130,11 +130,21 @@ function createSubfolder(parentFolderKey) {
                 // Reload the page
                 window.location.reload();
             } else {
-                showNotificationPopup('Error creating subfolder: ' + (data.error || 'Unknown error'), 'error');
+                // Use modal alert instead of notification popup
+                if (typeof window.showError === 'function') {
+                    window.showError(data.error || data.message || 'Unknown error', 'Error Creating Subfolder');
+                } else {
+                    showNotificationPopup('Error creating subfolder: ' + (data.error || 'Unknown error'), 'error');
+                }
             }
         })
         .catch(function(error) {
-            showNotificationPopup('Error creating subfolder: ' + error.message, 'error');
+            // Use modal alert instead of notification popup
+            if (typeof window.showError === 'function') {
+                window.showError(error.message, 'Error Creating Subfolder');
+            } else {
+                showNotificationPopup('Error creating subfolder: ' + error.message, 'error');
+            }
         });
     });
 }
