@@ -498,7 +498,7 @@ $body_classes = trim($extra_body_classes);
             type: 'tasklist'
         });
         
-        fetch("insert_new.php", {
+        fetch("api_insert_new.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
             body: params.toString()
@@ -535,7 +535,7 @@ $body_classes = trim($extra_body_classes);
             type: 'markdown'
         });
         
-        fetch("insert_new.php", {
+        fetch("api_insert_new.php", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
             body: params.toString()

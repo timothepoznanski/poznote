@@ -115,7 +115,7 @@ function createSubfolder(parentFolderKey) {
         var ws = getSelectedWorkspace();
         if (ws) formData.append('workspace', ws);
         
-        fetch('folder_operations.php', {
+        fetch('api_folders.php', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
@@ -162,7 +162,7 @@ function getFolderPath(folderId, callback) {
     var ws = getSelectedWorkspace();
     if (ws) formData.append('workspace', ws);
     
-    fetch('folder_operations.php', {
+    fetch('api_folders.php', {
         method: 'POST',
         body: formData,
         credentials: 'same-origin'

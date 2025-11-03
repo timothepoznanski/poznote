@@ -555,8 +555,22 @@ function setupNavigationDebugger() {
         return originalReplaceState.apply(history, arguments);
     };
     
-    // Monitor popstate events
+    // Monitor popstate events - reload note when using browser back/forward
     window.addEventListener('popstate', function(e) {
+        // Extract note ID from URL
+        var url = new URL(window.location.href);
+        var noteParam = url.searchParams.get('note');
+        
+        if (noteParam && typeof loadNoteFromUrl === 'function') {
+            // Use existing loadNoteFromUrl function to reload note via AJAX
+            // Pass true to indicate this is from browser history navigation
+            loadNoteFromUrl(window.location.href, true);
+        } else if (!noteParam && url.searchParams.get('workspace')) {
+            // Just workspace change, let ui.js handler manage it
+        } else {
+            // Full page reload as fallback
+            window.location.reload();
+        }
     });
     
     // Monitor all link clicks
@@ -999,7 +1013,7 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         workspace: selectedWorkspace || 'Poznote'
     });
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { 
             "Content-Type": "application/x-www-form-urlencoded", 

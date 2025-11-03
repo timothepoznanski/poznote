@@ -78,24 +78,32 @@ function updateSearchResults(count, searchTerm) {
 }
 
 function restoreNote(noteid) {
-    const wsBody = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('put_back.php', {
+    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
+    const requestBody = {
+        id: noteid
+    };
+    
+    if (workspace) {
+        requestBody.workspace = workspace;
+    }
+    
+    fetch('api_restore_note.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: 'id=' + encodeURIComponent(noteid) + wsBody
+        body: JSON.stringify(requestBody)
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
-        if (data === '1') {
+        if (data && data.success) {
             // Visually remove note from list
             const noteElement = document.getElementById('note' + noteid);
             if (noteElement) {
                 noteElement.style.display = 'none';
             }
         } else {
-            showInfoModal('Restore Error', 'Error restoring the note: ' + data);
+            showInfoModal('Restore Error', 'Error restoring the note: ' + (data.error || data.message || 'Unknown error'));
         }
     })
     .catch(error => {
@@ -106,7 +114,7 @@ function restoreNote(noteid) {
 
 function permanentlyDeleteNote(noteid) {
     const wsBodyDel = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('permanent_delete.php', {
+    fetch('api_permanent_delete.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -133,7 +141,7 @@ function permanentlyDeleteNote(noteid) {
 
 function emptyTrash() {
     const wsEmpty = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? 'workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('empty_trash.php', {
+    fetch('api_empty_trash.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

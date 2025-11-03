@@ -1,7 +1,7 @@
 // Utility and miscellaneous functions
 
 function startDownload() {
-    window.location = 'export_entries.php';
+    window.location = 'api_export_entries.php';
 }
 
 function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachmentsCount) {
@@ -145,7 +145,7 @@ function deleteFolder(folderId, folderName) {
     var ws = getSelectedWorkspace();
     if (ws) params.append('workspace', ws);
 
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
@@ -204,7 +204,7 @@ function executeDeleteFolderOperation(folderId, folderName) {
     var ws = getSelectedWorkspace();
     if (ws) deleteParams.append('workspace', ws);
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: deleteParams.toString()
@@ -434,7 +434,7 @@ function checkForUpdates() {
     // Show checking modal
     showUpdateCheckModal();
     
-    fetch('check_updates.php')
+    fetch('api_check_updates.php')
         .then(function(response) { 
             if (!response.ok) {
                 throw new Error('HTTP Error: ' + response.status);
@@ -481,7 +481,7 @@ function checkForUpdatesAutomatic() {
     localStorage.setItem('poznote_last_update_check', now.toString());
     
     // Perform silent check (no modals, only badge if update available)
-    fetch('check_updates.php')
+    fetch('api_check_updates.php')
         .then(function(response) { 
             if (!response.ok) {
                 throw new Error('HTTP Error: ' + response.status);
@@ -565,7 +565,7 @@ function showUpdateInstructions(hasUpdate = false) {
         if (availableVersionEl) availableVersionEl.textContent = 'Loading...';
         
         // Fetch update information
-        fetch('check_updates.php')
+        fetch('api_check_updates.php')
             .then(function(response) { 
                 if (!response.ok) {
                     throw new Error('HTTP Error: ' + response.status);
@@ -909,7 +909,7 @@ function saveFolderName() {
     var ws = getSelectedWorkspace();
     if (ws) params.append('workspace', ws);
 
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
@@ -1034,7 +1034,7 @@ function executeEmptyFolder(folderId, folderName) {
     var ws = getSelectedWorkspace();
     if (ws) params.append('workspace', ws);
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
@@ -1129,7 +1129,7 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
         action: 'list'
     });
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
@@ -1182,7 +1182,7 @@ function onWorkspaceChange() {
         workspace: newWorkspace
     });
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
@@ -1268,7 +1268,7 @@ function moveNoteToFolder() {
         workspace: targetWorkspace
     });
 
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
         body: params.toString()
@@ -1461,7 +1461,7 @@ function createHtmlNote() {
             createNewNote();
         } else {
             // Fallback to basic creation
-            window.open('insert_new.php?folder_id=' + encodeURIComponent(targetFolderId), '_blank');
+            window.open('api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId), '_blank');
         }
         
         // Restore original folder
@@ -1474,7 +1474,7 @@ function createHtmlNote() {
         } else if (typeof createNewNote === 'function') {
             createNewNote();
         } else {
-            window.open('insert_new.php', '_blank');
+            window.open('api_insert_new.php', '_blank');
         }
     }
 }
@@ -1495,7 +1495,7 @@ function createTaskListNoteInUtils() {
             window.createTaskListNote();
         } else {
             // Fallback
-            window.location.href = 'insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=tasklist';
+            window.location.href = 'api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=tasklist';
         }
         
         // Restore original folder
@@ -1507,7 +1507,7 @@ function createTaskListNoteInUtils() {
             window.createTaskListNote();
         } else {
             // Fallback
-            window.location.href = 'insert_new.php?type=tasklist';
+            window.location.href = 'api_insert_new.php?type=tasklist';
         }
     }
 }
@@ -1527,7 +1527,7 @@ function createMarkdownNoteInUtils() {
             window.createMarkdownNote();
         } else {
             // Fallback to basic markdown creation
-            window.open('insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=markdown', '_blank');
+            window.open('api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=markdown', '_blank');
         }
         
         // Restore original folder
@@ -1538,7 +1538,7 @@ function createMarkdownNoteInUtils() {
         if (typeof window.createMarkdownNote === 'function') {
             window.createMarkdownNote();
         } else {
-            window.open('insert_new.php?type=markdown', '_blank');
+            window.open('api_insert_new.php?type=markdown', '_blank');
         }
     }
 }

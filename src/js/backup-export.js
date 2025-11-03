@@ -8,7 +8,7 @@
  */
 function startDownload() {
     // Create a direct link to the export script
-    window.location.href = 'export_entries.php';
+    window.location.href = 'api_export_entries.php';
 }
 
 /**
@@ -16,7 +16,7 @@ function startDownload() {
  */
 function startAttachmentsDownload() {
     // Create a direct link to the attachments export script
-    window.location.href = 'export_attachments.php';
+    window.location.href = 'api_export_attachments.php';
 }
 
 // Show spinner and disable submit to avoid duplicate requests
