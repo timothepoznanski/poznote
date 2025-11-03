@@ -363,13 +363,14 @@ window.loadNoteDirectly = function(url, noteId, event) {
 /**
  * Load note via AJAX (legacy function)
  */
-function loadNoteViaAjax(url, noteId, clickedLink) {
+function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
     if (isNoteLoading) {
         return; // Prevent multiple simultaneous requests
     }
 
     isNoteLoading = true;
     currentLoadingNoteId = noteId;
+    fromHistory = fromHistory || false;
 
     // Update UI to show loading state
     showNoteLoadingState();
@@ -411,7 +412,10 @@ function loadNoteViaAjax(url, noteId, clickedLink) {
 
                             // Update URL before reinitializing so reinitializeNoteContent
                             // can detect the 'note' param and keep the right column visible
-                            updateBrowserUrl(url, noteId);
+                            // Don't push to history if we're coming from popstate event
+                            if (!fromHistory) {
+                                updateBrowserUrl(url, noteId);
+                            }
 
                             // Re-initialize any JavaScript that might be needed
                             reinitializeNoteContent();
@@ -480,7 +484,7 @@ function loadNoteViaAjax(url, noteId, clickedLink) {
 /**
  * Load note from URL (for browser navigation)
  */
-function loadNoteFromUrl(url) {
+function loadNoteFromUrl(url, fromHistory) {
     const urlParams = new URLSearchParams(new URL(url).search);
     const noteId = urlParams.get('note');
 
@@ -488,7 +492,7 @@ function loadNoteFromUrl(url) {
         // Find the corresponding note link using robust method
         const noteLink = findNoteLinkById(noteId);
         if (noteLink) {
-            loadNoteViaAjax(url, noteId, noteLink);
+            loadNoteViaAjax(url, noteId, noteLink, fromHistory);
         }
     }
 }
