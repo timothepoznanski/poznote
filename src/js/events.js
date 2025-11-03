@@ -999,7 +999,7 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         workspace: selectedWorkspace || 'Poznote'
     });
     
-    fetch("folder_operations.php", {
+    fetch("api_folders.php", {
         method: "POST",
         headers: { 
             "Content-Type": "application/x-www-form-urlencoded", 

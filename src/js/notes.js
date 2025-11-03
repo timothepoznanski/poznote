@@ -18,7 +18,7 @@ function createNewNote() {
         workspace: selectedWorkspace || 'Poznote'
     });
     
-    fetch("insert_new.php", {
+    fetch("api_insert_new.php", {
         method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
         body: params.toString()
@@ -51,7 +51,7 @@ function createTaskListNote() {
         type: 'tasklist'
     });
     
-    fetch("insert_new.php", {
+    fetch("api_insert_new.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
         body: params.toString()
@@ -84,7 +84,7 @@ function createMarkdownNote() {
         type: 'markdown'
     });
     
-    fetch("insert_new.php", {
+    fetch("api_insert_new.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
         body: params.toString()
@@ -282,35 +282,32 @@ function handleSaveResponse(data) {
 }
 
 function deleteNote(noteId) {
-    var params = new URLSearchParams({ id: noteId });
+    const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
+    const requestBody = {
+        note_id: noteId,
+        permanent: false
+    };
     
-    fetch("delete_note.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
+    if (workspace) {
+        requestBody.workspace = workspace;
+    }
+    
+    fetch("api_delete_note.php", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
     })
-    .then(function(response) { return response.text(); })
+    .then(function(response) { return response.json(); })
     .then(function(data) {
-        var trimmed = (data || '').trim();
-        
-        if (trimmed === '1') {
+        if (data && data.success) {
             redirectToWorkspace();
             return;
         }
         
-        try {
-            var jsonData = JSON.parse(trimmed);
-            if (jsonData === 1 || (jsonData && jsonData.status === 'ok')) {
-                redirectToWorkspace();
-                return;
-            }
-            if (jsonData && jsonData.status === 'error') {
-                showNotificationPopup('Deletion error: ' + (jsonData.message || 'Unknown error'), 'error');
-                return;
-            }
-            redirectToWorkspace();
-        } catch(e) {
-            showNotificationPopup('Deletion error: ' + trimmed, 'error');
+        if (data && data.message) {
+            showNotificationPopup('Deletion error: ' + data.message, 'error');
+        } else {
+            showNotificationPopup('Deletion error: Unknown error', 'error');
         }
     })
     .catch(function(error) {
