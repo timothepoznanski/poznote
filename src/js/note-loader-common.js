@@ -661,6 +661,9 @@ function handleImageClick(event) {
     const isEmbeddedExcalidraw = excalidrawContainer !== null;
     const diagramId = excalidrawContainer ? excalidrawContainer.id : null;
     
+    // Check if we're on mobile (width < 800px)
+    const isMobile = window.innerWidth < 800;
+    
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-expand"></i>
@@ -670,14 +673,17 @@ function handleImageClick(event) {
             <i class="fa-download"></i>
             Download
         </div>
+    `;
+    
+    // Add Resize option only on desktop (not on mobile)
+    if (!isMobile) {
+        menuHTML += `
         <div class="image-menu-item" data-action="resize">
             <i class="fa-maximize"></i>
             Resize
         </div>
     `;
-    
-    // Check if we're on mobile (width < 800px)
-    const isMobile = window.innerWidth < 800;
+    }
     
     // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
     if (isExcalidraw && excalidrawNoteId && !isMobile) {
