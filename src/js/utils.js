@@ -32,30 +32,32 @@ function toggleFavorite(noteId) {
 }
 
 function performFavoriteToggle(noteId) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'api_favorites.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            try {
-                var response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    var starIcon = document.querySelector('button[onclick*="toggleFavorite(\'' + noteId + '\')"] i');
-                    
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 50);
-                } else {
-                    showNotificationPopup('Error: ' + response.message);
-                }
-            } catch (e) {
-                showNotificationPopup('Error updating favorites');
-            }
+    fetch('api_favorites.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            action: 'toggle_favorite',
+            note_id: noteId,
+            workspace: selectedWorkspace || 'Poznote'
+        })
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            setTimeout(function() {
+                window.location.reload();
+            }, 50);
+        } else {
+            showNotificationPopup('Error: ' + (data.message || 'Unknown error'));
         }
-    };
-    
-    xhr.send('action=toggle_favorite&note_id=' + encodeURIComponent(noteId) + '&workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote'));
+    })
+    .catch(function(error) {
+        showNotificationPopup('Error updating favorites');
+        console.error('Favorite toggle error:', error);
+    });
 }
 
 function duplicateNote(noteId) {

@@ -248,24 +248,49 @@ function editTask(taskId, noteId) {
     const taskText = taskItem.querySelector('.task-text');
     if (!taskText) return;
 
-    const currentText = taskText.textContent;
+    // Get the original text from the data store, not from the rendered HTML
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(noteEntry.dataset.tasklistJson || '[]');
+    } catch (e) {
+        tasks = [];
+    }
+
+    const task = tasks.find(t => t.id === taskId);
+    const currentText = task ? task.text : taskText.textContent;
+
     const input = document.createElement('input');
     input.type = 'text';
     input.value = currentText;
     input.className = 'task-edit-input';
     // Allow up to 4000 characters for a task line
     input.maxLength = 4000;
+    
+    // Flag to prevent double-save (Enter + blur)
+    let isSaving = false;
 
     input.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            saveTaskEdit(taskId, noteId, input.value.trim());
+            e.preventDefault();
+            if (!isSaving) {
+                isSaving = true;
+                saveTaskEdit(taskId, noteId, input.value.trim());
+            }
         } else if (e.key === 'Escape') {
+            e.preventDefault();
+            isSaving = true; // Prevent blur from saving
             cancelTaskEdit(taskId, noteId, currentText);
         }
     });
 
     input.addEventListener('blur', function() {
-        saveTaskEdit(taskId, noteId, input.value.trim());
+        if (!isSaving) {
+            isSaving = true;
+            saveTaskEdit(taskId, noteId, input.value.trim());
+        }
     });
 
     taskText.replaceWith(input);
@@ -297,7 +322,7 @@ function saveTaskEdit(taskId, noteId, newText) {
     const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
     if (taskItem) {
         const taskText = taskItem.querySelector('.task-text') || taskItem.querySelector('.task-edit-input');
-        if (taskText) {
+        if (taskText && taskText.parentNode) {
             const newTaskText = document.createElement('span');
             newTaskText.className = 'task-text';
             newTaskText.innerHTML = linkifyHtml(newText);
@@ -305,7 +330,14 @@ function saveTaskEdit(taskId, noteId, newText) {
             // Ensure links inside don't trigger the span's onclick
             const anchors = newTaskText.querySelectorAll('a');
             anchors.forEach(a => a.addEventListener('click', e => e.stopPropagation()));
-            taskText.replaceWith(newTaskText);
+            
+            // Check if element is still in DOM before replacing
+            try {
+                taskText.replaceWith(newTaskText);
+            } catch (e) {
+                // Element already removed, ignore
+                console.debug('Task element already replaced:', e);
+            }
         }
     }
 

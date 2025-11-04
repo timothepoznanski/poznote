@@ -705,6 +705,15 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
+    // Add border toggle option
+    const hasBorder = img.classList.contains('img-with-border');
+    menuHTML += `
+        <div class="image-menu-item" data-action="toggle-border">
+            <i class="fal fa-square"></i>
+            ${hasBorder ? 'Remove' : 'Add'} Border
+        </div>
+    `;
+    
     // Add Delete option at the end
     menuHTML += `
         <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
@@ -786,6 +795,12 @@ function handleImageClick(event) {
             }
         } else if (action === 'resize') {
             enableImageResize(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'toggle-border') {
+            toggleImageBorder(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -1083,6 +1098,41 @@ function performImageDeletion(img) {
         
     } catch (error) {
         console.warn('Error deleting image:', error);
+    }
+}
+
+/**
+ * Toggle a 1px gray border around an image
+ */
+function toggleImageBorder(img) {
+    if (!img) return;
+    
+    try {
+        // Check if image currently has the border class
+        const hasBorderClass = img.classList.contains('img-with-border');
+        
+        if (hasBorderClass) {
+            // Remove border class
+            img.classList.remove('img-with-border');
+        } else {
+            // Add border class (with 8px padding, rounded corners, and #ddd border)
+            img.classList.add('img-with-border');
+        }
+        
+        // Trigger note update to save changes
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified(); // Mark note as edited
+        }
+        
+        // Trigger automatic save after a short delay
+        setTimeout(function() {
+            if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately(); // Save to server
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.warn('Error toggling image border:', error);
     }
 }
 

@@ -245,6 +245,11 @@ function handleSaveResponse(data) {
                 notesNeedingRefresh.delete(String(noteid));
             }
             
+            // Clear draft from localStorage after successful save
+            if (typeof window.clearDraft === 'function') {
+                window.clearDraft(noteid);
+            }
+            
             return;
         }
     } catch(e) {
@@ -272,6 +277,11 @@ function handleSaveResponse(data) {
         // Remove unsaved changes indicator from page title
         if (document.title.startsWith('🔴')) {
             document.title = document.title.substring(2); // Remove "🔴 " (emoji + space = 2 chars)
+        }
+        
+        // Clear draft from localStorage after successful save
+        if (typeof window.clearDraft === 'function') {
+            window.clearDraft(noteid);
         }
         
         // Mark note as saved (remove from pending refresh list)
