@@ -422,15 +422,34 @@ body {
     font-size: 1.25rem;
     font-weight: 700;
     color: #1f2937; /* dark */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.workspace-burger-icon {
+    font-size: 1.1rem;
+    color: #6c757d;
+    pointer-events: none;
+}
+.workspace-dropdown-icon {
+    margin-left: 1px;
+    font-size: 0.9rem;
+    color: #6c757d;
+    pointer-events: none;
+    transition: transform 0.2s ease;
+    position: relative;
+    top: 2px;
 }
 .workspace-title-icon {
-    margin-right: 8px;
     width: 20px;
     height: 20px;
     vertical-align: middle;
     pointer-events: none;
 }
-.workspace-title-text { vertical-align: middle; }
+.workspace-title-text { 
+    vertical-align: middle;
+    flex: 1;
+}
 .sidebar-title[role="button"] { cursor: pointer; }
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
@@ -2767,6 +2786,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 /* Font Awesome icon customizations */
+.fa-caret-down::before { content: "\f0d7"; }
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
 .fa-folder::before { content: "\f07b"; }
@@ -2845,6 +2865,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 
+.fa-caret-down,
 .fa-mobile,
 .fa-border-outer,
 .fa-paint-brush,

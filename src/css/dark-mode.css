@@ -38,6 +38,16 @@ body.dark-mode .workspace-title-text {
     color: #e0e0e0;
 }
 
+html[data-theme='dark'] .workspace-burger-icon,
+body.dark-mode .workspace-burger-icon {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] .workspace-dropdown-icon,
+body.dark-mode .workspace-dropdown-icon {
+    color: #a0a0a0;
+}
+
 /* Search bar */
 html[data-theme='dark'] .searchbar-input,
 body.dark-mode .searchbar-input {

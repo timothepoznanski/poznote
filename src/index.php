@@ -364,6 +364,7 @@ $body_classes = trim($extra_body_classes);
             <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
                 <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+                <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
                 <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
