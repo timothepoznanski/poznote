@@ -217,49 +217,6 @@
     vertical-align: middle;
 }
 
-/* Markdown Split View Styles */
-body.markdown-split-view-enabled [data-note-type="markdown"] {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    gap: 1px;
-}
-
-/* Help message for split view */
-.markdown-split-help {
-    font-size: 10px !important;
-    color: #aaa !important;
-    padding: 2px 6px;
-    margin-bottom: 6px;
-    text-align: center;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
-    cursor: default;
-    user-select: none;
-}
-
-.markdown-split-help:hover {
-    opacity: 0.9;
-    color: #888 !important;
-}
-
-.markdown-split-help i {
-    font-size: 9px;
-}
-
-/* Simple help icon */
-.markdown-split-help .help-icon {
-    font-size: 9px;
-    color: #999;
-    font-weight: bold;
-    margin-right: 2px;
-}
-
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
     border: 2px dashed #007DB8 !important;
@@ -291,22 +248,7 @@ body.markdown-split-view-enabled [data-note-type="markdown"] {
     outline: none !important;
 }
 
-body.markdown-split-view-enabled .markdown-editor {
-    display: block !important;
-    width: 50%;
-    border-right: 1px solid #e0e0e0;
-    resize: none;
-    overflow-y: auto;
-}
-
-body.markdown-split-view-enabled .markdown-preview {
-    display: block !important;
-    width: 50%;
-    overflow-y: auto;
-    padding-left: 15px;
-}
-
-/* Placeholder for empty preview in split view */
+/* Placeholder for empty preview */
 .markdown-preview-placeholder {
     color: #999;
     padding: 10px;
@@ -318,44 +260,5 @@ body.markdown-split-view-enabled .markdown-preview {
     display: flex !important;
     align-items: flex-start;
     justify-content: flex-start;
-}
-
-/* Style for split view toggle button - always blue */
-.toolbar-btn.markdown-split-view-btn i.fa-columns,
-.toolbar-btn.markdown-split-view-btn .fa-columns {
-    color: #007DB8 !important;
-}
-
-/* Hide markdown mode toggle buttons in split view (desktop only) */
-@media (min-width: 801px) {
-    body.markdown-split-view-enabled .markdown-edit-btn,
-    body.markdown-split-view-enabled .markdown-preview-btn {
-        display: none !important;
-    }
-}
-
-/* On mobile, markdown toggle buttons are always controlled by JavaScript */
-
-/* Mobile: disable split view completely */
-@media (max-width: 800px) {
-    body.markdown-split-view-enabled [data-note-type="markdown"] {
-        display: block !important;
-        flex-direction: column;
-    }
-    
-    body.markdown-split-view-enabled .markdown-editor {
-        width: 100% !important;
-        border-right: none !important;
-    }
-    
-    body.markdown-split-view-enabled .markdown-preview {
-        width: 100% !important;
-        padding-left: 10px;
-    }
-    
-    /* Hide help messages on mobile */
-    body.markdown-split-view-enabled .markdown-split-help {
-        display: none !important;
-    }
 }
 

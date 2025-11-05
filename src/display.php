@@ -123,13 +123,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
-            <div class="settings-card" id="show-split-view-btn-card">
-                <div class="settings-card-icon"><i class="fa-columns"></i></div>
-                <div class="settings-card-content">
-                    <h3>Show Markdown Split View<span id="show-split-view-btn-status" class="setting-status enabled">enabled</span></h3>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -239,27 +232,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             }).then(function(){ refreshFolderActions(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
         }); }
         refreshFolderActions();
-
-        // Show Split View Button
-        var cardSplitViewBtn = document.getElementById('show-split-view-btn-card');
-        var statusSplitViewBtn = document.getElementById('show-split-view-btn-status');
-        function refreshSplitViewBtn(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_markdown_split_view_button');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
-                if(statusSplitViewBtn){ statusSplitViewBtn.textContent = enabled ? 'enabled' : 'disabled'; statusSplitViewBtn.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-            }).catch(()=>{});
-        }
-        if(cardSplitViewBtn){ cardSplitViewBtn.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','show_markdown_split_view_button');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
-                var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','show_markdown_split_view_button'); setForm.append('value', toSet);
-                return fetch('api_settings.php',{method:'POST',body:setForm});
-            }).then(function(){ refreshSplitViewBtn(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
-        }); }
-        refreshSplitViewBtn();
     })();
     </script>
     <script>

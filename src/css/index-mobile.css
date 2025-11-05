@@ -137,11 +137,6 @@ body::-webkit-scrollbar {
     order: -1 !important; /* Put it first in the toolbar */
 }
 
-/* Hide markdown split screen icon in mobile view */
-.markdown-split-view-btn {
-    display: none !important;
-}
-
 .emoji-picker {
     width: 95vw;
     max-width: 280px;
