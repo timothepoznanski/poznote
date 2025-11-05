@@ -47,6 +47,10 @@ function performFavoriteToggle(noteId) {
     })
     .then(function(data) {
         if (data.success) {
+            // If note was added to favorites (is_favorite = 1), open the Favorites folder
+            if (data.is_favorite === 1) {
+                localStorage.setItem('folder_folder-favorites', 'open');
+            }
             setTimeout(function() {
                 window.location.reload();
             }, 50);
