@@ -1135,7 +1135,6 @@ window.initializeNoteClickHandlers = function() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteClickHandlers();
     checkAndScrollToNote();
-    initializeMarkdownSplitView();
     
     // Initialize image click handlers for images in notes
     if (typeof reinitializeImageClickHandlers === 'function') {
@@ -1153,24 +1152,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500); // Small delay to ensure content is fully loaded
     <?php endif; ?>
 });
-        if (noteId && typeof window.initializeMarkdownNote === 'function') {
-            // Clear existing markdown setup and re-initialize
-            noteEntry.querySelector('.markdown-editor')?.remove();
-            noteEntry.querySelector('.markdown-preview')?.remove();
-            
-            // Remove existing toolbar buttons
-            var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
-            if (toolbar) {
-                toolbar.querySelector('.markdown-edit-btn')?.remove();
-                toolbar.querySelector('.markdown-preview-btn')?.remove();
-            }
-            
-            window.initializeMarkdownNote(noteId);
-        }
-    });
-    
-    // No need for help messages anymore
-};
 </script>
 
 </html>
