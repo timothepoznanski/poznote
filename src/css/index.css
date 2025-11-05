@@ -1378,6 +1378,13 @@ img.img-with-border {
     box-sizing: border-box !important;
 }
 
+/* Image border style without padding */
+img.img-with-border-no-padding {
+    border: 1px solid #ddd !important;
+    /* border-radius: 4px !important; */
+    box-sizing: border-box !important;
+}
+
 /* UPDATE NOTIFICATION STYLES */
 
 .settings-menu-item {
