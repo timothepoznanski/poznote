@@ -531,11 +531,11 @@ function initializeMarkdownNote(noteId) {
             var currentMode;
             if (startInEditMode) {
                 currentMode = 'edit';
-                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
                 viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
             } else {
                 currentMode = 'preview';
-                viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
                 viewModeBtn.title = 'Preview mode (click to switch to edit mode)';
             }
             
@@ -553,12 +553,12 @@ function initializeMarkdownNote(noteId) {
             var currentMode;
             if (startInEditMode) {
                 currentMode = 'edit';
-                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
                 existingViewModeBtn.title = 'Edit mode (click to switch to preview mode)';
                 existingViewModeBtn.classList.remove('active');
             } else {
                 currentMode = 'preview';
-                existingViewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
                 existingViewModeBtn.title = 'Preview mode (click to switch to edit mode)';
                 existingViewModeBtn.classList.remove('active');
             }
@@ -838,11 +838,11 @@ function updateViewModeButton(noteId, mode) {
     viewModeBtn.setAttribute('data-current-mode', mode);
     
     if (mode === 'edit') {
-        viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+        viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
         viewModeBtn.title = 'Edit mode (click to switch to preview mode)';
         viewModeBtn.classList.remove('active');
     } else if (mode === 'preview') {
-        viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
+        viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
         viewModeBtn.title = 'Preview mode (click to switch to edit mode)';
         viewModeBtn.classList.remove('active');
     }
