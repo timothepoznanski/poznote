@@ -23,6 +23,8 @@
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+    /* Prevent parent container from scrolling when cursor moves */
+    overflow-anchor: none;
 }
 
 .markdown-editor:focus {
