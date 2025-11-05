@@ -194,9 +194,8 @@ Unfortunately, I don't have access to a Mac to test and document the installatio
 - Sharing your experience via [GitHub Issues](https://github.com/timothepoznanski/poznote/issues) or [Pull Request](https://github.com/timothepoznanski/poznote/pulls)
 
 **Expected process** (untested):
-1. Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
-2. Install Git (usually pre-installed, or via `brew install git`)
-3. Follow similar steps to Linux using Terminal
+- Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
+- Follow similar steps to Linux using Terminal
 
 Your contribution would help make Poznote accessible to the entire macOS community! 🙏
 
