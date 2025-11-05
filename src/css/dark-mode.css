@@ -1157,7 +1157,7 @@ body.dark-mode .markdown-preview h6 {
     color: #e0e0e0;
 }
 
-/* Placeholder for empty preview in split view - dark mode */
+/* Placeholder for empty preview - dark mode */
 html[data-theme='dark'] .markdown-preview-placeholder,
 body.dark-mode .markdown-preview-placeholder {
     color: #666;
@@ -1230,14 +1230,6 @@ body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
 body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
 body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
-}
-
-/* Style for split view toggle button in dark mode - always blue */
-html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn i.fa-columns,
-html[data-theme='dark'] .toolbar-btn.markdown-split-view-btn .fa-columns,
-body.dark-mode .toolbar-btn.markdown-split-view-btn i.fa-columns,
-body.dark-mode .toolbar-btn.markdown-split-view-btn .fa-columns {
-    color: #007DB8 !important;
     filter: none !important;
 }
 

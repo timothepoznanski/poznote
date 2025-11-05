@@ -705,12 +705,17 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Add border toggle option
+    // Add border toggle options
     const hasBorder = img.classList.contains('img-with-border');
+    const hasBorderNoPadding = img.classList.contains('img-with-border-no-padding');
     menuHTML += `
         <div class="image-menu-item" data-action="toggle-border">
             <i class="fal fa-square"></i>
             ${hasBorder ? 'Remove' : 'Add'} Border
+        </div>
+        <div class="image-menu-item" data-action="toggle-border-no-padding">
+            <i class="fal fa-square"></i>
+            ${hasBorderNoPadding ? 'Remove' : 'Add'} Border without padding
         </div>
     `;
     
@@ -801,6 +806,12 @@ function handleImageClick(event) {
             }
         } else if (action === 'toggle-border') {
             toggleImageBorder(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'toggle-border-no-padding') {
+            toggleImageBorderNoPadding(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -1115,7 +1126,9 @@ function toggleImageBorder(img) {
             // Remove border class
             img.classList.remove('img-with-border');
         } else {
-            // Add border class (with 8px padding, rounded corners, and #ddd border)
+            // Remove the no-padding border class if present
+            img.classList.remove('img-with-border-no-padding');
+            // Add border class (with padding, rounded corners, and #ddd border)
             img.classList.add('img-with-border');
         }
         
@@ -1133,6 +1146,43 @@ function toggleImageBorder(img) {
         
     } catch (error) {
         console.warn('Error toggling image border:', error);
+    }
+}
+
+/**
+ * Toggle a 1px gray border around an image without padding
+ */
+function toggleImageBorderNoPadding(img) {
+    if (!img) return;
+    
+    try {
+        // Check if image currently has the no-padding border class
+        const hasBorderClass = img.classList.contains('img-with-border-no-padding');
+        
+        if (hasBorderClass) {
+            // Remove border class
+            img.classList.remove('img-with-border-no-padding');
+        } else {
+            // Remove the padded border class if present
+            img.classList.remove('img-with-border');
+            // Add border class without padding
+            img.classList.add('img-with-border-no-padding');
+        }
+        
+        // Trigger note update to save changes
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified(); // Mark note as edited
+        }
+        
+        // Trigger automatic save after a short delay
+        setTimeout(function() {
+            if (typeof window.saveNoteImmediately === 'function') {
+                window.saveNoteImmediately(); // Save to server
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.warn('Error toggling image border without padding:', error);
     }
 }
 

@@ -1378,6 +1378,13 @@ img.img-with-border {
     box-sizing: border-box !important;
 }
 
+/* Image border style without padding */
+img.img-with-border-no-padding {
+    border: 1px solid #ddd !important;
+    /* border-radius: 4px !important; */
+    box-sizing: border-box !important;
+}
+
 /* UPDATE NOTIFICATION STYLES */
 
 .settings-menu-item {
@@ -2773,12 +2780,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
-/* Blue color for split view (always blue, active or not) */
-.toolbar-btn.markdown-split-view-btn i.fa-columns,
-.toolbar-btn.markdown-split-view-btn .fa-columns {
-  color: #007DB8 !important;
-}
-
 /* Blue color for markdown view mode toggle button */
 .toolbar-btn.markdown-view-mode-btn i,
 .toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
@@ -3291,11 +3292,10 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: none !important;
 }
 
-/* Exception: Remove filter for favorite/share/attachment/split-view (to show blue color) */
+/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
 .toolbar-btn.is-shared .fa-share-nodes,
-.toolbar-btn.has-attachments .fa-paperclip,
-.toolbar-btn.markdown-split-view-btn .fa-columns {
+.toolbar-btn.has-attachments .fa-paperclip {
   filter: none !important;
 }
 

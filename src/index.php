@@ -1135,7 +1135,6 @@ window.initializeNoteClickHandlers = function() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeNoteClickHandlers();
     checkAndScrollToNote();
-    initializeMarkdownSplitView();
     
     // Initialize image click handlers for images in notes
     if (typeof reinitializeImageClickHandlers === 'function') {
@@ -1153,74 +1152,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500); // Small delay to ensure content is fully loaded
     <?php endif; ?>
 });
-
-// Initialize markdown split view state from database
-function initializeMarkdownSplitView() {
-    var form = new FormData(); 
-    form.append('action','get'); 
-    form.append('key','markdown_split_view_enabled');
-    fetch('api_settings.php',{method:'POST',body:form})
-        .then(r=>r.json())
-        .then(j=>{
-            // Default to enabled if value is null/empty (first time) or explicitly '1'/'true'
-            var enabled = !j || !j.success || j.value === '' || j.value === null || j.value === '1' || j.value === 'true';
-            // Only disable if explicitly set to '0' or 'false'
-            if (j && j.success && (j.value === '0' || j.value === 'false')) {
-                enabled = false;
-            }
-            document.body.classList.toggle('markdown-split-view-enabled', enabled);
-            
-            // Re-initialize any existing markdown notes to apply split view
-            var markdownNotes = document.querySelectorAll('[data-note-type="markdown"]');
-            markdownNotes.forEach(function(noteEntry) {
-                var noteId = noteEntry.id.replace('entry', '');
-                if (noteId && typeof window.initializeMarkdownNote === 'function') {
-                    // Clear existing markdown setup and re-initialize
-                    noteEntry.querySelector('.markdown-editor')?.remove();
-                    noteEntry.querySelector('.markdown-preview')?.remove();
-                    
-                    // Remove existing toolbar buttons
-                    var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
-                    if (toolbar) {
-                        toolbar.querySelector('.markdown-edit-btn')?.remove();
-                        toolbar.querySelector('.markdown-preview-btn')?.remove();
-                    }
-                    
-                    window.initializeMarkdownNote(noteId);
-                }
-            });
-            
-            // Split view disabled on mobile, help messages removed
-        })
-        .catch(e=>console.error('Error loading markdown split view setting:', e));
-}
-
-// Function to update markdown split view from display.php
-window.updateMarkdownSplitView = function(enabled) {
-    document.body.classList.toggle('markdown-split-view-enabled', enabled);
-    
-    // Re-initialize all markdown notes
-    var markdownNotes = document.querySelectorAll('[data-note-type="markdown"]');
-    markdownNotes.forEach(function(noteEntry) {
-        var noteId = noteEntry.id.replace('entry', '');
-        if (noteId && typeof window.initializeMarkdownNote === 'function') {
-            // Clear existing markdown setup and re-initialize
-            noteEntry.querySelector('.markdown-editor')?.remove();
-            noteEntry.querySelector('.markdown-preview')?.remove();
-            
-            // Remove existing toolbar buttons
-            var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
-            if (toolbar) {
-                toolbar.querySelector('.markdown-edit-btn')?.remove();
-                toolbar.querySelector('.markdown-preview-btn')?.remove();
-            }
-            
-            window.initializeMarkdownNote(noteId);
-        }
-    });
-    
-    // No need for help messages anymore
-};
 </script>
 
 </html>
