@@ -479,11 +479,17 @@ function initializeMarkdownNote(noteId) {
         previewDiv.classList.remove('empty');
     }
     
+    // Create container for editor
+    var editorContainer = document.createElement('div');
+    editorContainer.className = 'markdown-editor-container';
+    
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
     editorDiv.setAttribute('data-ph', 'Write your markdown here...');
+    
+    editorContainer.appendChild(editorDiv);
     
     // Ensure proper line break handling in contentEditable
     editorDiv.style.whiteSpace = 'pre-wrap';
@@ -491,17 +497,17 @@ function initializeMarkdownNote(noteId) {
     // Set initial display states using setProperty to override any CSS !important rules
     if (startInEditMode) {
         // Edit mode: show editor, hide preview
-        editorDiv.style.setProperty('display', 'block', 'important');
+        editorContainer.style.setProperty('display', 'flex', 'important');
         previewDiv.style.setProperty('display', 'none', 'important');
     } else {
         // Preview mode: show preview, hide editor
-        editorDiv.style.setProperty('display', 'none', 'important');
+        editorContainer.style.setProperty('display', 'none', 'important');
         previewDiv.style.setProperty('display', 'block', 'important');
     }
     
     // Replace note content with preview and editor
     noteEntry.innerHTML = '';
-    noteEntry.appendChild(editorDiv);
+    noteEntry.appendChild(editorContainer);
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
     
@@ -574,14 +580,39 @@ function switchToEditMode(noteId) {
     
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var editorContainer = noteEntry.querySelector('.markdown-editor-container');
     var editBtn = document.querySelector('#note' + noteId + ' .markdown-edit-btn');
     var previewBtn = document.querySelector('#note' + noteId + ' .markdown-preview-btn');
     
     if (!previewDiv || !editorDiv) return;
     
+    // Save the scroll position ratio BEFORE hiding preview
+    var previewScrollTop = previewDiv.scrollTop;
+    var previewScrollHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
+    var scrollRatio = previewScrollHeight > 0 ? previewScrollTop / previewScrollHeight : 0;
+    
     // Switch to edit mode - use setProperty to override !important rules
     previewDiv.style.setProperty('display', 'none', 'important');
-    editorDiv.style.setProperty('display', 'block', 'important');
+    if (editorContainer) {
+        editorContainer.style.setProperty('display', 'block', 'important');
+    } else {
+        editorDiv.style.setProperty('display', 'block', 'important');
+    }
+    
+    // Restore scroll position in editor using proportional scroll
+    // Use multiple animation frames to ensure layout is complete
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            setTimeout(function() {
+                var editorScrollHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
+                if (editorScrollHeight > 0) {
+                    editorDiv.scrollTop = scrollRatio * editorScrollHeight;
+                } else {
+                    editorDiv.scrollTop = 0;
+                }
+            }, 50);
+        });
+    });
     
     // Show preview button, hide edit button (legacy support)
     if (editBtn) editBtn.style.display = 'none';
@@ -604,10 +635,16 @@ function switchToPreviewMode(noteId) {
     
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var editorContainer = noteEntry.querySelector('.markdown-editor-container');
     var editBtn = document.querySelector('#note' + noteId + ' .markdown-edit-btn');
     var previewBtn = document.querySelector('#note' + noteId + ' .markdown-preview-btn');
     
     if (!previewDiv || !editorDiv) return;
+    
+    // Save the scroll position ratio BEFORE switching
+    var editorScrollTop = editorDiv.scrollTop;
+    var editorScrollHeight = editorDiv.scrollHeight - editorDiv.clientHeight;
+    var scrollRatio = editorScrollHeight > 0 ? editorScrollTop / editorScrollHeight : 0;
     
     // Switch to preview mode
     // Use helper function to properly normalize content
@@ -625,8 +662,27 @@ function switchToPreviewMode(noteId) {
     noteEntry.setAttribute('data-markdown-content', markdownContent);
     
     // Use setProperty to override !important rules
-    editorDiv.style.setProperty('display', 'none', 'important');
+    if (editorContainer) {
+        editorContainer.style.setProperty('display', 'none', 'important');
+    } else {
+        editorDiv.style.setProperty('display', 'none', 'important');
+    }
     previewDiv.style.setProperty('display', 'block', 'important');
+    
+    // Restore scroll position in preview using proportional scroll
+    // Use multiple animation frames to ensure layout is complete
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            setTimeout(function() {
+                var previewScrollHeight = previewDiv.scrollHeight - previewDiv.clientHeight;
+                if (previewScrollHeight > 0) {
+                    previewDiv.scrollTop = scrollRatio * previewScrollHeight;
+                } else {
+                    previewDiv.scrollTop = 0;
+                }
+            }, 50);
+        });
+    });
     
     // Show edit button, hide preview button (legacy support)
     if (editBtn) editBtn.style.display = '';
@@ -660,10 +716,15 @@ function toggleMarkdownMode(noteId) {
     
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var editorContainer = noteEntry.querySelector('.markdown-editor-container');
     
     if (!previewDiv || !editorDiv) return;
     
-    if (editorDiv.style.display === 'none') {
+    // Check which element is visible: editor container or preview
+    var elementToCheck = editorContainer || editorDiv;
+    var isPreviewMode = window.getComputedStyle(elementToCheck).display === 'none';
+    
+    if (isPreviewMode) {
         switchToEditMode(noteId);
     } else {
         switchToPreviewMode(noteId);
@@ -699,6 +760,11 @@ function setupMarkdownEditorListeners(noteId) {
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!editorDiv) return;
     
+    // Get the scrollable parent container
+    var scrollContainer = document.getElementById('right_col');
+    var preventScroll = false;
+    var savedScrollTop = 0;
+    
     // Set noteid on focus (like normal notes)
     editorDiv.addEventListener('focus', function() {
         if (typeof noteid !== 'undefined') {
@@ -707,6 +773,29 @@ function setupMarkdownEditorListeners(noteId) {
         // Also set it globally for compatibility
         window.noteid = noteId;
     });
+    
+    // Before keydown, save scroll position
+    editorDiv.addEventListener('keydown', function(e) {
+        if (scrollContainer) {
+            savedScrollTop = scrollContainer.scrollTop;
+            preventScroll = true;
+            
+            // After a short delay, stop preventing scroll
+            setTimeout(function() {
+                preventScroll = false;
+            }, 100);
+        }
+    });
+    
+    // Prevent unwanted scroll during input
+    if (scrollContainer) {
+        scrollContainer.addEventListener('scroll', function(e) {
+            if (preventScroll) {
+                // Restore the scroll position
+                scrollContainer.scrollTop = savedScrollTop;
+            }
+        }, { passive: false });
+    }
     
     editorDiv.addEventListener('input', function() {
         // Update the data attribute with current content
@@ -740,8 +829,6 @@ function getMarkdownContent(noteId) {
     
     return noteEntry.getAttribute('data-markdown-content') || '';
 }
-
-
 
 // Helper function to update view mode button icon and title
 function updateViewModeButton(noteId, mode) {
