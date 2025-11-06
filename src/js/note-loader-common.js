@@ -675,16 +675,6 @@ function handleImageClick(event) {
         </div>
     `;
     
-    // Add Resize option only on desktop (not on mobile)
-    if (!isMobile) {
-        menuHTML += `
-        <div class="image-menu-item" data-action="resize">
-            <i class="fa-maximize"></i>
-            Resize
-        </div>
-    `;
-    }
-    
     // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
     if (isExcalidraw && excalidrawNoteId && !isMobile) {
         menuHTML = `
@@ -705,27 +695,7 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Add border toggle options
-    const hasBorder = img.classList.contains('img-with-border');
-    const hasBorderNoPadding = img.classList.contains('img-with-border-no-padding');
-    menuHTML += `
-        <div class="image-menu-item" data-action="toggle-border">
-            <i class="fal fa-square"></i>
-            ${hasBorder ? 'Remove' : 'Add'} Border
-        </div>
-        <div class="image-menu-item" data-action="toggle-border-no-padding">
-            <i class="fal fa-square"></i>
-            ${hasBorderNoPadding ? 'Remove' : 'Add'} Border without padding
-        </div>
-    `;
-    
-    // Add Delete option at the end
-    menuHTML += `
-        <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
-            <i class="fas fa-trash"></i>
-            Delete Image
-        </div>
-    `;
+    // Border toggle and delete options have been removed
     
     menu.innerHTML = menuHTML;
 
@@ -794,30 +764,6 @@ function handleImageClick(event) {
             if (diagramId && window.openExcalidrawEditor) {
                 openExcalidrawEditor(diagramId);
             }
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'resize') {
-            enableImageResize(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'toggle-border') {
-            toggleImageBorder(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'toggle-border-no-padding') {
-            toggleImageBorderNoPadding(img);
-            // Remove menu safely
-            if (document.body.contains(menu)) {
-                document.body.removeChild(menu);
-            }
-        } else if (action === 'delete-image') {
-            deleteImage(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
