@@ -3,10 +3,9 @@ require 'auth.php';
 requireApiAuth();
 
 header('Content-Type: application/json');
-require_once 'config.php';
-require_once 'functions.php';
-require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
+	require_once 'config.php';
+	include 'functions.php';
+	include 'db_connect.php';
 
 // Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -109,10 +108,8 @@ if (!empty($workspace)) {
     }
 }
 
-// If no folder specified, use default
-if ($folder_id === null && ($folder === null || $folder === '')) {
-    $folder = getDefaultFolderForNewNotes($workspace);
-}
+// If no folder specified, leave it null (notes can exist without folders)
+// Folder is only assigned when explicitly set
 
 // If folder_id is provided, verify it exists and fetch the folder name
 if ($folder_id !== null && $folder_id > 0) {
@@ -129,9 +126,7 @@ if ($folder_id !== null && $folder_id > 0) {
     } else {
         // Folder ID provided but doesn't exist - reset to null to avoid FK constraint violation
         $folder_id = null;
-        if ($folder === null || $folder === '') {
-            $folder = getDefaultFolderForNewNotes($workspace);
-        }
+        $folder = null;
     }
 } elseif ($folder !== null && $folder !== '') {
     // If folder name is provided, get folder_id
@@ -198,30 +193,30 @@ $entriesDir = dirname($filename);
 if (!is_dir($entriesDir)) {
     mkdir($entriesDir, 0755, true);
 }
-if (!empty($entry)) {
-    // For markdown notes, ensure we save clean markdown content, not HTML
-    $contentToSave = $entry;
-    if ($noteType === 'markdown') {
-        // If the entry contains HTML elements (like <div class="markdown-editor">), extract the text content
-        if (strpos($entry, '<div class="markdown-editor"') !== false) {
-            // Extract text from between the editor tags
-            if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
-                $contentToSave = strip_tags($matches[1]);
-                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            } else {
-                // Fallback: strip all HTML tags
-                $contentToSave = strip_tags($entry);
-                $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            }
+
+// For markdown notes, ensure we save clean markdown content, not HTML
+$contentToSave = $entry;
+if ($noteType === 'markdown' && !empty($entry)) {
+    // If the entry contains HTML elements (like <div class="markdown-editor">), extract the text content
+    if (strpos($entry, '<div class="markdown-editor"') !== false) {
+        // Extract text from between the editor tags
+        if (preg_match('/<div class="markdown-editor"[^>]*>(.*?)<\/div>/', $entry, $matches)) {
+            $contentToSave = strip_tags($matches[1]);
+            $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        } else {
+            // Fallback: strip all HTML tags
+            $contentToSave = strip_tags($entry);
+            $contentToSave = html_entity_decode($contentToSave, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
     }
-    
-    $write_result = file_put_contents($filename, $contentToSave);
-    if ($write_result === false) {
-        http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Failed to write file']);
-        exit;
-    }
+}
+
+// Always write the file, even if content is empty
+$write_result = file_put_contents($filename, $contentToSave);
+if ($write_result === false) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Failed to write file']);
+    exit;
 }
 
 // Prepare update query

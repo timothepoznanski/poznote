@@ -71,14 +71,6 @@ try {
         $stmt = $con->prepare("UPDATE entries SET workspace = 'Poznote' WHERE workspace = ?");
         $stmt->execute([$name]);
 
-        // Remove workspace-scoped default folder setting, if present
-        try {
-            $delSetting = $con->prepare("DELETE FROM settings WHERE key = ?");
-            $delSetting->execute(['default_folder_name::' . $name]);
-        } catch (Exception $e) {
-            // non-fatal: continue with workspace deletion
-        }
-
         $stmt = $con->prepare("DELETE FROM workspaces WHERE name = ?");
         // Audit log: record delete attempts
         try {

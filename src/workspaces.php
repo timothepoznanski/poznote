@@ -31,12 +31,6 @@ if ($_POST) {
             $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $stmt->execute([$name]);
             
-            // Create the default folder for this workspace
-            require_once 'default_folder_settings.php';
-            $defaultFolderName = getDefaultFolderForNewNotes($name);
-            $folderStmt = $con->prepare('INSERT OR IGNORE INTO folders (name, workspace) VALUES (?, ?)');
-            $folderStmt->execute([$defaultFolderName, $name]);
-            
             $message = 'Workspace created';
         } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');

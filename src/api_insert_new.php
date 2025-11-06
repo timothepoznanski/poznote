@@ -6,7 +6,6 @@
 	require_once 'config.php';
 	include 'functions.php';
 	include 'db_connect.php';
-	require_once 'default_folder_settings.php';
 	
 	// Enable error reporting for debugging
 	error_reporting(E_ALL);
@@ -36,11 +35,9 @@
 		}
 	}
 
-	// If no folder specified, use default
-	if ($folder_id === null && ($folder === null || $folder === '')) {
-		$folder = getDefaultFolderForNewNotes($workspace);
-	}
-
+	// If no folder specified, leave it null (note will appear without folder)
+	// Notes are only assigned to folders when explicitly created in a folder
+	
 	// If folder_id is provided, verify it exists and fetch the folder name
 	if ($folder_id !== null && $folder_id > 0) {
 		if ($workspace) {
@@ -56,9 +53,7 @@
 		} else {
 			// Folder ID provided but doesn't exist - reset to null to avoid FK constraint violation
 			$folder_id = null;
-			if ($folder === null || $folder === '') {
-				$folder = getDefaultFolderForNewNotes($workspace);
-			}
+			$folder = null;
 		}
 	} elseif ($folder !== null && $folder !== '') {
 		// If folder name is provided, get folder_id

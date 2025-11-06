@@ -553,4 +553,40 @@ function ensureDataPermissions() {
         }
     }
 }
+
+/**
+ * Get the complete folder path including parent folders
+ * @param int $folder_id The folder ID
+ * @param PDO $con Database connection
+ * @return string The complete folder path (e.g., "Parent/Child")
+ */
+function getFolderPath($folder_id, $con) {
+    if ($folder_id === null || $folder_id === 0) {
+        return 'Default';
+    }
+    
+    $path = [];
+    $currentId = $folder_id;
+    $maxDepth = 50; // Prevent infinite loops
+    $depth = 0;
+    
+    while ($currentId !== null && $depth < $maxDepth) {
+        $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ?");
+        $stmt->execute([$currentId]);
+        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$folder) {
+            break;
+        }
+        
+        // Add folder name to the beginning of the path
+        array_unshift($path, $folder['name']);
+        
+        // Move to parent
+        $currentId = $folder['parent_id'];
+        $depth++;
+    }
+    
+    return !empty($path) ? implode('/', $path) : 'Default';
+}
 ?>

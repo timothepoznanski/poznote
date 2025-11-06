@@ -93,7 +93,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     // Show folder header only if not filtering by folder
     if (empty($folder_filter)) {
         $folderClass = 'folder-header';
-        if (isDefaultFolder($folderName, $workspace_filter)) $folderClass .= ' default-folder';
         if ($depth > 0) $folderClass .= ' subfolder subfolder-level-' . $depth;
         $folderDomId = 'folder-' . $folderId;
         
@@ -120,7 +119,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Workspace-aware default folder handling in UI
         // Disable double-click rename for default folder and system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
-        $ondbl = (isDefaultFolder($folderName, $workspace_filter) || in_array($folderName, $systemFolders)) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
+        $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
         $noteCount = count($notes);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
@@ -181,5 +180,27 @@ $hierarchicalFolders = buildFolderHierarchy($folders);
 // Display folders and notes hierarchically
 foreach($hierarchicalFolders as $folderId => $folderData) {
     displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
+}
+
+// Display uncategorized notes (notes without folder) at the same level as folders
+if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter)) {
+    foreach ($uncategorized_notes as $row1) {
+        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected' : '';
+        
+        // Generate note link
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
+        
+        $noteClass = 'links_arbo_left note-without-folder';
+        $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+        
+        // Add onclick handler for AJAX loading
+        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
+        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
+        
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
+        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "</a>";
+        echo "<div id=pxbetweennotes></div>";
+    }
 }
 ?>

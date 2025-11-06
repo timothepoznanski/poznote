@@ -5,31 +5,42 @@
 
 /**
  * Organize notes by folder
- * Now returns array indexed by folder_id instead of folder name
+ * Now returns array with 'folders' and 'uncategorized_notes' keys
  */
-function organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_filter) {
+function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     $folders = [];
+    $uncategorized_notes = []; // Notes without folder
     $folders_with_results = [];
     
-    // Get default folder ID
-    $defaultFolderId = null;
-    $defaultFolderQuery = "SELECT id FROM folders WHERE name = ?";
-    $params = [$defaultFolderName];
-    if ($workspace_filter) {
-        $defaultFolderQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace_filter;
-        $params[] = $workspace_filter;
-    }
-    $stmt = $con->prepare($defaultFolderQuery);
-    $stmt->execute($params);
-    $defaultFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($defaultFolderData) {
-        $defaultFolderId = (int)$defaultFolderData['id'];
-    }
-    
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
-        $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : $defaultFolderId;
-        $folderName = $row1["folder"] ?: $defaultFolderName;
+        $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
+        $folderName = $row1["folder"] ?: null;
+        
+        // If no folder_id, this note has no folder - add to uncategorized list
+        if ($folderId === null) {
+            $uncategorized_notes[] = $row1;
+            continue;
+        }
+        
+        // If we already have this folder_id registered, use its name
+        if (isset($folders[$folderId])) {
+            $folderName = $folders[$folderId]['name'];
+        } else {
+            // First time seeing this folder_id - get the canonical name from folders table
+            $canonicalQuery = "SELECT name FROM folders WHERE id = ?";
+            if ($workspace_filter) {
+                $canonicalQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $canonicalStmt = $con->prepare($canonicalQuery);
+                $canonicalStmt->execute([$folderId, $workspace_filter, $workspace_filter]);
+            } else {
+                $canonicalStmt = $con->prepare($canonicalQuery);
+                $canonicalStmt->execute([$folderId]);
+            }
+            $canonicalData = $canonicalStmt->fetch(PDO::FETCH_ASSOC);
+            if ($canonicalData) {
+                $folderName = $canonicalData['name'];
+            }
+        }
         
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -42,18 +53,17 @@ function organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_
         $folders[$folderId]['notes'][] = $row1;
     }
     
-    return $folders;
+    return [
+        'folders' => $folders,
+        'uncategorized_notes' => $uncategorized_notes
+    ];
 }
 
 /**
  * Add empty folders from the folders table
  * Now uses folder_id as key
- * Note: Default folder is excluded if empty (it exists in DB but not shown)
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    require_once 'default_folder_settings.php';
-    $defaultFolderName = getDefaultFolderForNewNotes($workspace_filter);
-    
     $folders_sql = "SELECT id, name FROM folders";
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
@@ -65,13 +75,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderId = (int)$folder_row['id'];
         $folderName = $folder_row['name'];
         
-        // Skip adding empty Default folder (it exists in DB but shouldn't be displayed when empty)
         if (!isset($folders[$folderId])) {
-            if (isDefaultFolder($folderName, $workspace_filter)) {
-                // Don't add Default folder if it's empty
-                continue;
-            }
-            
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
@@ -113,8 +117,8 @@ function ensureFavoritesFolder($folders) {
  * Trie les dossiers (Favorites en premier, puis dossier par défaut, puis autres)
  * Now works with folder arrays containing 'id' and 'name'
  */
-function sortFolders($folders, $defaultFolderName, $workspace_filter) {
-    uksort($folders, function($a, $b) use ($folders, $defaultFolderName, $workspace_filter) {
+function sortFolders($folders) {
+    uksort($folders, function($a, $b) use ($folders) {
         $folderA = $folders[$a];
         $folderB = $folders[$b];
         $nameA = $folderA['name'];
@@ -122,8 +126,6 @@ function sortFolders($folders, $defaultFolderName, $workspace_filter) {
         
         if ($nameA === 'Favorites') return -1;
         if ($nameB === 'Favorites') return 1;
-        if (isDefaultFolder($nameA, $workspace_filter)) return -1;
-        if (isDefaultFolder($nameB, $workspace_filter)) return 1;
         return strcasecmp($nameA, $nameB);
     });
     
@@ -176,14 +178,6 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
-    } else if (isDefaultFolder($folderName, $workspace_filter)) {
-        // For the default folder: allow search and empty, but do not allow renaming
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
-        // Only show move/empty buttons if folder has notes
-        if ($noteCount > 0) {
-            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
-            $actions .= "<i class='fa-trash folder-empty-btn' onclick='event.stopPropagation(); emptyFolder($folderId, \"$escapedFolderName\")' title='Move all notes to trash'></i>";
-        }
     } else {
         $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
         // Only show move button if folder has notes

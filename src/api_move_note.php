@@ -5,7 +5,6 @@ requireApiAuth();
 header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
 
 // Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -35,12 +34,6 @@ if (!isset($data['note_id']) || empty(trim($data['note_id']))) {
 $folder_id = isset($data['folder_id']) ? intval($data['folder_id']) : null;
 $folder_name = isset($data['folder_name']) ? trim($data['folder_name']) : null;
 
-if ($folder_id === null && ($folder_name === null || $folder_name === '')) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'folder_id or folder_name is required']);
-    exit;
-}
-
 $note_id = trim($data['note_id']);
 $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 
@@ -60,11 +53,8 @@ if ($folder_id !== null && $folder_id > 0) {
         exit;
     }
     $folder_name = $folderData['name'];
-} elseif ($folder_id === 0 || $folder_id === null) {
-    // folder_id 0 or null means default folder
-    require_once 'default_folder_settings.php';
-    $folder_name = getDefaultFolderName($workspace);
-    // Get the folder_id for the default folder
+} elseif ($folder_name !== null && $folder_name !== '') {
+    // If folder_name is provided, get folder_id
     if ($workspace) {
         $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $stmt->execute([$folder_name, $workspace, $workspace]);
@@ -75,7 +65,15 @@ if ($folder_id !== null && $folder_id > 0) {
     $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($folderData) {
         $folder_id = (int)$folderData['id'];
+    } else {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Folder not found']);
+        exit;
     }
+} else {
+    // No folder specified - note will have no folder
+    $folder_name = null;
+    $folder_id = null;
 }
 
 try {
@@ -119,7 +117,7 @@ try {
         }
         $folder_exists = $stmt->fetchColumn() > 0;
         
-    if (!$folder_exists && !isDefaultFolder($folder_name, $workspace)) {
+        if (!$folder_exists) {
             http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'Folder not found']);
             exit;
@@ -137,12 +135,19 @@ try {
     $oldWsSegment = $note_workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($note_workspace))) : 'workspace_default';
     $newWsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
 
-    $old_file_path = __DIR__ . '/entries/' . ($note_workspace && !isDefaultFolder($current_folder, $note_workspace) ? ($oldWsSegment . '/' . $current_folder . '/' . $note_id . $fileExtension) : ($oldWsSegment . '/' . $note_id . $fileExtension));
-    if (isDefaultFolder($folder_name, $workspace)) {
-        $new_file_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $note_id . $fileExtension;
+    // Determine old file path
+    if ($current_folder && $current_folder !== '') {
+        $old_file_path = __DIR__ . '/entries/' . $oldWsSegment . '/' . $current_folder . '/' . $note_id . $fileExtension;
     } else {
+        $old_file_path = __DIR__ . '/entries/' . $oldWsSegment . '/' . $note_id . $fileExtension;
+    }
+    
+    // Determine new file path
+    if ($folder_name && $folder_name !== '') {
         $new_folder_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $folder_name;
         $new_file_path = $new_folder_path . '/' . $note_id . $fileExtension;
+    } else {
+        $new_file_path = __DIR__ . '/entries/' . $newWsSegment . '/' . $note_id . $fileExtension;
     }
     
     // Verify that note file exists
@@ -196,7 +201,7 @@ try {
     }
     
     // Create destination folder if it does not exist physically
-    if (!isDefaultFolder($folder_name, $workspace) && !file_exists($new_folder_path)) {
+    if ($folder_name && $folder_name !== '' && isset($new_folder_path) && !file_exists($new_folder_path)) {
         if (!mkdir($new_folder_path, 0755, true)) {
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Failed to create destination folder directory']);

@@ -168,24 +168,6 @@ try {
     // Insert default workspace
     $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
 
-    // Ensure every workspace has a Default folder (even if empty)
-    try {
-        require_once __DIR__ . '/default_folder_settings.php';
-        
-        // Get all workspaces
-        $workspaceStmt = $con->query("SELECT name FROM workspaces");
-        $workspaces = $workspaceStmt->fetchAll(PDO::FETCH_COLUMN);
-        
-        // For each workspace, ensure the default folder exists
-        $insertDefaultFolder = $con->prepare("INSERT OR IGNORE INTO folders (name, workspace) VALUES (?, ?)");
-        foreach ($workspaces as $ws) {
-            $defaultFolderName = getDefaultFolderForNewNotes($ws);
-            $insertDefaultFolder->execute([$defaultFolderName, $ws]);
-        }
-    } catch(PDOException $e) {
-        error_log("Error creating default folders: " . $e->getMessage());
-    }
-
     // Create settings table for configuration
     $con->exec('CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,

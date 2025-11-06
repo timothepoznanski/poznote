@@ -242,6 +242,53 @@ function updateAttachmentCountInMenu(noteId) {
                     btn.classList.remove('has-attachments');
                 }
             }
+            
+            // Update the attachments row in the notes list (left column)
+            var noteElement = document.getElementById('note' + noteId);
+            if (noteElement) {
+                var existingAttachmentsRow = noteElement.querySelector('.note-attachments-row');
+                
+                if (hasAttachments && data.attachments && data.attachments.length > 0) {
+                    // Create or update the attachments row
+                    if (!existingAttachmentsRow) {
+                        // Create new attachments row
+                        existingAttachmentsRow = document.createElement('div');
+                        existingAttachmentsRow.className = 'note-attachments-row';
+                        
+                        // Insert after tags-display div
+                        var tagsDisplay = noteElement.querySelector('.tags-display');
+                        if (tagsDisplay && tagsDisplay.nextSibling) {
+                            tagsDisplay.parentNode.insertBefore(existingAttachmentsRow, tagsDisplay.nextSibling);
+                        } else {
+                            // Fallback: insert before the title
+                            var titleElement = noteElement.querySelector('h4');
+                            if (titleElement) {
+                                titleElement.parentNode.insertBefore(existingAttachmentsRow, titleElement);
+                            }
+                        }
+                    }
+                    
+                    // Build the HTML content
+                    var attachmentsHtml = '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\'' + noteId + '\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
+                    attachmentsHtml += '<span class="note-attachments-list">';
+                    
+                    var attachmentLinks = [];
+                    for (var j = 0; j < data.attachments.length; j++) {
+                        var attachment = data.attachments[j];
+                        if (attachment.id && attachment.original_filename) {
+                            var safeFilename = attachment.original_filename.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            attachmentLinks.push('<a href="#" class="attachment-link" onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="Download ' + safeFilename + '">' + safeFilename + '</a>');
+                        }
+                    }
+                    attachmentsHtml += attachmentLinks.join(' ');
+                    attachmentsHtml += '</span>';
+                    
+                    existingAttachmentsRow.innerHTML = attachmentsHtml;
+                } else if (existingAttachmentsRow) {
+                    // Remove the attachments row if no attachments
+                    existingAttachmentsRow.parentNode.removeChild(existingAttachmentsRow);
+                }
+            }
         }
     })
     .catch(function(error) {
@@ -325,6 +372,14 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                 setTimeout(function() {
                     reinitializeImageClickHandlers();
                 }, 200); // Wait for markdown rendering
+            }
+            
+            // Rafraîchir la liste des pièces jointes et le compteur dans le menu
+            updateAttachmentCountInMenu(noteId);
+            
+            // Si le modal des pièces jointes est ouvert pour cette note, rafraîchir la liste
+            if (typeof currentNoteIdForAttachments !== 'undefined' && currentNoteIdForAttachments == noteId) {
+                loadAttachments(noteId);
             }
             
             // Trigger automatic save after a short delay

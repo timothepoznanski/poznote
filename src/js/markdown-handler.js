@@ -532,7 +532,7 @@ function initializeMarkdownNote(noteId) {
             if (startInEditMode) {
                 currentMode = 'edit';
                 viewModeBtn.innerHTML = '<i class="fa-eye"></i>';
-                viewModeBtn.title = 'Switch to preview mode)';
+                viewModeBtn.title = 'Switch to preview mode';
             } else {
                 currentMode = 'preview';
                 viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
