@@ -664,6 +664,11 @@ function handleImageClick(event) {
     // Check if we're on mobile (width < 800px)
     const isMobile = window.innerWidth < 800;
     
+    // Check if this is a markdown note (to exclude certain options for markdown)
+    const isMarkdownNote = img.closest('.markdown-preview') !== null || 
+                           img.closest('.markdown-editor') !== null ||
+                           img.closest('.note-entry[data-note-format="markdown"]') !== null;
+    
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-expand"></i>
@@ -674,6 +679,16 @@ function handleImageClick(event) {
             Download
         </div>
     `;
+    
+    // Add Resize option only on desktop (not on mobile) and NOT for markdown notes
+    if (!isMobile && !isMarkdownNote) {
+        menuHTML += `
+        <div class="image-menu-item" data-action="resize">
+            <i class="fa-maximize"></i>
+            Resize
+        </div>
+    `;
+    }
     
     // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
     if (isExcalidraw && excalidrawNoteId && !isMobile) {
@@ -695,7 +710,29 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Border toggle and delete options have been removed
+    // Add border toggle and delete options only for non-markdown notes
+    if (!isMarkdownNote) {
+        const hasBorder = img.classList.contains('img-with-border');
+        const hasBorderNoPadding = img.classList.contains('img-with-border-no-padding');
+        menuHTML += `
+            <div class="image-menu-item" data-action="toggle-border">
+                <i class="fal fa-square"></i>
+                ${hasBorder ? 'Remove' : 'Add'} Border
+            </div>
+            <div class="image-menu-item" data-action="toggle-border-no-padding">
+                <i class="fal fa-square"></i>
+                ${hasBorderNoPadding ? 'Remove' : 'Add'} Border without padding
+            </div>
+        `;
+        
+        // Add Delete option at the end
+        menuHTML += `
+            <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
+                <i class="fas fa-trash"></i>
+                Delete Image
+            </div>
+        `;
+    }
     
     menu.innerHTML = menuHTML;
 
@@ -764,6 +801,30 @@ function handleImageClick(event) {
             if (diagramId && window.openExcalidrawEditor) {
                 openExcalidrawEditor(diagramId);
             }
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'resize') {
+            enableImageResize(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'toggle-border') {
+            toggleImageBorder(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'toggle-border-no-padding') {
+            toggleImageBorderNoPadding(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'delete-image') {
+            deleteImage(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
