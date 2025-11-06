@@ -33,28 +33,10 @@ if ($target_folder_id === null) {
     exit;
 }
 
-// If target is 0 (Default folder), find the real ID or use null
-if ($target_folder_id === 0) {
-    require_once 'default_folder_settings.php';
-    $defaultFolderName = getDefaultFolderForNewNotes($workspace);
-    
-    // Try to find the default folder in the folders table
-    $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-    $stmt->execute([$defaultFolderName, $workspace, $workspace]);
-    $defaultFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($defaultFolderData) {
-        $target_folder_id = (int)$defaultFolderData['id'];
-    } else {
-        // Default folder doesn't exist in folders table, set to null
-        $target_folder_id = null;
-    }
-}
-
-// Convert 0 to null for source as well (edge case)
-if ($source_folder_id === 0) {
+// Verify both source and target exist
+if ($source_folder_id === 0 || $target_folder_id === 0) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Cannot move files from Default folder using folder actions']);
+    echo json_encode(['success' => false, 'error' => 'Invalid folder ID']);
     exit;
 }
 

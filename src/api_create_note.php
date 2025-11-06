@@ -7,7 +7,6 @@ header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
 
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,7 +20,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 $originalHeading = isset($input['heading']) ? trim($input['heading']) : '';
 $tags = isset($input['tags']) ? trim($input['tags']) : '';
-$folder = isset($input['folder_name']) ? trim($input['folder_name']) : 'Default';
+$folder = isset($input['folder_name']) ? trim($input['folder_name']) : null;
 $workspace = isset($input['workspace']) ? trim($input['workspace']) : 'Poznote';
 $entry = isset($input['entry']) ? $input['entry'] : ''; // HTML content for the file
 $entrycontent = isset($input['entrycontent']) ? $input['entrycontent'] : ''; // Text content for database

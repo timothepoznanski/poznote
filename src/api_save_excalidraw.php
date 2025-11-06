@@ -7,7 +7,6 @@ header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
 
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -62,10 +61,6 @@ if ($note_id === 0) {
     }
     $folder = isset($_POST['folder']) ? trim($_POST['folder']) : null;
     
-    if ($folder_id === null && $folder === null) {
-        $folder = getDefaultFolderForNewNotes($workspace);
-    }
-    
     // If folder_id is provided, get folder name
     if ($folder_id !== null && $folder === null) {
         $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
@@ -74,7 +69,7 @@ if ($note_id === 0) {
         if ($folderData) {
             $folder = $folderData['name'];
         } else {
-            $folder = getDefaultFolderForNewNotes($workspace);
+            $folder = null;
             $folder_id = null;
         }
     } elseif ($folder !== null && $folder_id === null) {

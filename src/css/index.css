@@ -602,6 +602,11 @@ body {
 .links_arbo_left { padding: 8px 10px; margin: 4px 0; }
 .links_arbo_left .note-title { font-weight: 500; color: #1f2937; }
 
+/* Notes without folder - indent to align with folder items */
+.links_arbo_left.note-without-folder {
+    margin-left: 6px !important;
+}
+
 /* Hover effect: blue and bold title when hovering over a note */
 .links_arbo_left:hover .note-title {
     color: #0b4da6 !important;

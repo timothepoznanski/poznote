@@ -182,7 +182,7 @@ function showIndividualNotesImportConfirmation() {
     
     // Update summary text
     const fileText = fileCount === 1 ? '1 note' : `${fileCount} notes`;
-    const summary = `This will import ${fileText} into the Default folder of the Poznote workspace.`;
+    const summary = `This will import ${fileText} into the Poznote workspace without assigning them to a folder.`;
     document.getElementById('individualNotesImportSummary').textContent = summary;
     
     document.getElementById('individualNotesImportConfirmModal').style.display = 'flex';

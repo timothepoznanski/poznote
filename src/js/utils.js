@@ -1387,13 +1387,9 @@ function showCreateModal(folderId = null, folderName = null) {
     if (isCreatingInFolder) {
         modalTitle.textContent = 'Create in ' + (folderName || 'folder');
         if (otherSection) otherSection.style.display = 'none';
-        // Hide subfolder option for Default folder
+        // Allow subfolder creation for all folders
         if (subfolderOption) {
-            if (folderName === 'Default') {
-                subfolderOption.style.display = 'none';
-            } else {
-                subfolderOption.style.display = 'flex';
-            }
+            subfolderOption.style.display = 'flex';
         }
     } else {
         modalTitle.textContent = 'Create';

@@ -4,7 +4,6 @@ requireAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
-require_once 'default_folder_settings.php';
 require_once 'functions.php';
 
 // Get note ID from URL parameter
@@ -58,7 +57,7 @@ function formatDateString($dateStr) {
 
 $createdText = formatDateString($note['created']);
 $updatedText = formatDateString($note['updated']);
-$folderText = $note['folder'] ?: getDefaultFolderForNewNotes($workspace);
+$folderText = $note['folder'] ?: 'No folder';
 $isFavorite = (int)$note['favorite'] === 1;
 
 // Build full path of the note with appropriate extension

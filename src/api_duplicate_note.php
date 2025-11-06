@@ -7,7 +7,6 @@ header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
 
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

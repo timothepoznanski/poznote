@@ -29,9 +29,6 @@ function initializeWorkspaces() {
         wsSelector.value = selectedWorkspace;
         wsSelector.addEventListener('change', onWorkspaceChange);
     }
-
-    // Load default folder settings
-    loadDefaultFolderSettings();
 }
 
 function onWorkspaceChange() {
@@ -78,23 +75,6 @@ function onWorkspaceChange() {
     
     url.searchParams.set('workspace', val);
     window.location.href = url.toString();
-}
-
-function loadDefaultFolderSettings() {
-    fetch("api_default_folder_settings.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=get_default_folder_name&workspace=" + encodeURIComponent(selectedWorkspace || 'Poznote')
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data.success) {
-            updateDefaultFolderName(data.default_folder_name);
-        }
-    })
-    .catch(function(error) {
-        console.log('Error loading folder settings:', error);
-    });
 }
 
 function toggleWorkspaceMenu(event) {

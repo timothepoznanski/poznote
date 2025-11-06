@@ -112,7 +112,7 @@
         <h3>Change folder</h3>
         <p>Move "<span id="moveNoteTitle"></span>" to:</p>
         <select id="moveNoteFolder">
-            <option value="<?php echo htmlspecialchars($defaultFolderName, ENT_QUOTES); ?>"><?php echo htmlspecialchars($defaultFolderName, ENT_QUOTES); ?></option>
+            <option value="">No folder</option>
         </select>
         <div class="modal-buttons">
             <button onclick="moveNoteToFolder()">Move</button>

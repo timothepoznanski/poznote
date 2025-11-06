@@ -3,10 +3,9 @@ require 'auth.php';
 requireApiAuth();
 
 header('Content-Type: application/json');
-require_once 'config.php';
-require_once 'functions.php';
-require_once 'db_connect.php';
-require_once 'default_folder_settings.php';
+	require_once 'config.php';
+	include 'functions.php';
+	include 'db_connect.php';
 
 // Only accept POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -109,10 +108,8 @@ if (!empty($workspace)) {
     }
 }
 
-// If no folder specified, use default
-if ($folder_id === null && ($folder === null || $folder === '')) {
-    $folder = getDefaultFolderForNewNotes($workspace);
-}
+// If no folder specified, leave it null (notes can exist without folders)
+// Folder is only assigned when explicitly set
 
 // If folder_id is provided, verify it exists and fetch the folder name
 if ($folder_id !== null && $folder_id > 0) {
@@ -129,9 +126,7 @@ if ($folder_id !== null && $folder_id > 0) {
     } else {
         // Folder ID provided but doesn't exist - reset to null to avoid FK constraint violation
         $folder_id = null;
-        if ($folder === null || $folder === '') {
-            $folder = getDefaultFolderForNewNotes($workspace);
-        }
+        $folder = null;
     }
 } elseif ($folder !== null && $folder !== '') {
     // If folder name is provided, get folder_id

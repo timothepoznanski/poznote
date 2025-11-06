@@ -10,7 +10,6 @@ requireAuth();
 
 ob_start();
 require_once 'config.php';
-require_once 'default_folder_settings.php';
 include 'functions.php';
 
 include 'db_connect.php';
@@ -21,28 +20,6 @@ require_once 'search_handler.php';
 require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
-
-// Create welcome note if this is a fresh installation (no notes exist)
-try {
-    $stmt = $con->query("SELECT COUNT(*) FROM entries");
-    $noteCount = $stmt->fetchColumn();
-    
-    if ($noteCount == 0) {
-        $welcomeContent = '<p>🎉 <strong>Welcome to Poznote!</strong></p>
-<p>Your personal note-taking application is ready to use. Enjoy!</p>
-<p><em>This welcome note can be deleted at any time.</em></p>
-<hr>
-<p><small>Version installed on ' . date('m/d/Y \a\t H:i') . '</small></p>';
-
-        // Use the standard note creation function
-        $result = createNote($con, 'Welcome to Poznote', $welcomeContent, 'Default', 'Poznote', 1);
-        if (!$result['success']) {
-            error_log("Failed to create welcome note: " . $result['error']);
-        }
-    }
-} catch (Exception $e) {
-    error_log("Error checking for welcome note: " . $e->getMessage());
-}
 
 // Check if we need to redirect to include workspace from localStorage or default_workspace setting
 // Only redirect if no workspace parameter is present in GET
@@ -112,12 +89,9 @@ if ($workspace_filter === '__last_opened__') {
     $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 }
 
-// Get the custom default folder name
-$defaultFolderName = getDefaultFolderName($workspace_filter);
-
 // Load note-related data (res_right, default/current note folders)
 // Ensure these variables exist for included templates
-$note_load_result = loadNoteData($con, $note, $workspace_filter, $defaultFolderName);
+$note_load_result = loadNoteData($con, $note, $workspace_filter);
 $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
@@ -405,7 +379,7 @@ $body_classes = trim($extra_body_classes);
     window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
     window.currentNoteFolder = <?php 
         if ($note != '' && empty($search) && empty($tags_search)) {
-            $folder_value = $current_note_folder ?? $defaultFolderName ?? 'Default';
+            $folder_value = $current_note_folder ?? '';
             echo json_encode($folder_value);
         } else if (isset($default_note_folder) && $default_note_folder && empty($search) && empty($tags_search)) {
             echo json_encode($default_note_folder);
@@ -433,7 +407,9 @@ $body_classes = trim($extra_body_classes);
         // Sinon, garder $res_right tel qu'il a été défini par loadNoteData
         
         // Group notes by folder for hierarchical display (now uses folder_id)
-        $folders = organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_filter);
+        $organized = organizeNotesByFolder($stmt_left, $con, $workspace_filter);
+        $folders = $organized['folders'];
+        $uncategorized_notes = $organized['uncategorized_notes'];
         
         // Handle favorites
         $folders = handleFavorites($folders);
@@ -456,7 +432,7 @@ $body_classes = trim($extra_body_classes);
         $folders = ensureFavoritesFolder($folders);
         
         // Sort folders
-        $folders = sortFolders($folders, $defaultFolderName, $workspace_filter);
+        $folders = sortFolders($folders);
         
         // Get total notes count for folder opening logic
         $total_notes = getTotalNotesCount($con, $workspace_filter);
@@ -724,8 +700,7 @@ $body_classes = trim($extra_body_classes);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? $defaultFolderName;
-                    if (isDefaultFolder($folder_name, $workspace_filter)) $folder_name = 'Non classé';
+                    $folder_name = $row['folder'] ?? 'Uncategorized';
                     $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
@@ -736,7 +711,7 @@ $body_classes = trim($extra_body_classes);
                     $attachments_count_json = json_encode($attachments_count, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
                     
                     // Safety checks
-                    if ($folder_json === false) $folder_json = '"' . $defaultFolderName . '"';
+                    if ($folder_json === false) $folder_json = 'null';
                     if ($favorite_json === false) $favorite_json = '0';
                     if ($tags_json === false) $tags_json = '""';
                     if ($attachments_count_json === false) $attachments_count_json = '0';
@@ -791,7 +766,7 @@ $body_classes = trim($extra_body_classes);
                     }
                     
                     // Hidden folder value for the note
-                    echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: $defaultFolderName, ENT_QUOTES).'"/>';
+                    echo '<input type="hidden" id="folder'.$row['id'].'" value="'.htmlspecialchars($row['folder'] ?: '', ENT_QUOTES).'"/>';
                     echo '<input type="hidden" id="folderId'.$row['id'].'" value="'.htmlspecialchars($row['folder_id'] ?: '', ENT_QUOTES).'"/>';
                     
                     // Title - disable for protected note

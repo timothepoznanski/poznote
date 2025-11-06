@@ -78,18 +78,6 @@ try {
             ];
         }
         
-        // Add default folder if not present (ID 0 for default/uncategorized)
-        $hasDefault = false;
-        foreach ($folders as $f) {
-            if ($f['name'] === 'Default' || $f['name'] === 'Uncategorized') {
-                $hasDefault = true;
-                break;
-            }
-        }
-        if (!$hasDefault) {
-            $folders[0] = ['id' => 0, 'name' => 'Default'];
-        }
-        
         echo json_encode(['success' => true, 'folders' => $folders], JSON_FORCE_OBJECT);
         exit;
     }

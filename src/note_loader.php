@@ -6,7 +6,7 @@
 /**
  * Determine the note to display and prepare queries
  */
-function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
+function loadNoteData($con, &$note, $workspace_filter) {
     $default_note_folder = null;
     $res_right = null;
     $current_note_folder = null;
@@ -19,7 +19,7 @@ function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
         $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($note_data) {
-            $current_note_folder = $note_data["folder"] ?: $defaultFolderName;
+            $current_note_folder = $note_data["folder"] ?: null;
             // Prepare result for right column (ensure it's in the workspace)
             $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
             $stmt_right->execute([$note_id, $workspace_filter, $workspace_filter]);
@@ -27,13 +27,13 @@ function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
         } else {
             // If the requested note doesn't exist, display the last updated note
             $note = ''; // Reset note to trigger showing latest note
-            $latest_note_data = getLatestNote($con, $workspace_filter, $defaultFolderName);
+            $latest_note_data = getLatestNote($con, $workspace_filter);
             $res_right = $latest_note_data['res_right'];
             $default_note_folder = $latest_note_data['default_note_folder'];
         }
     } else {
         // No specific note requested, check if we have notes to show the latest one
-        $latest_note_data = getLatestNote($con, $workspace_filter, $defaultFolderName);
+        $latest_note_data = getLatestNote($con, $workspace_filter);
         $res_right = $latest_note_data['res_right'];
         $default_note_folder = $latest_note_data['default_note_folder'];
     }
@@ -48,7 +48,7 @@ function loadNoteData($con, &$note, $workspace_filter, $defaultFolderName) {
 /**
  * Récupère la dernière note mise à jour
  */
-function getLatestNote($con, $workspace_filter, $defaultFolderName) {
+function getLatestNote($con, $workspace_filter) {
     $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
     $check_stmt->execute([$workspace_filter, $workspace_filter]);
     $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
@@ -63,7 +63,7 @@ function getLatestNote($con, $workspace_filter, $defaultFolderName) {
         $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
         
         if($latest_note) {
-            $default_note_folder = $latest_note["folder"] ?: $defaultFolderName;
+            $default_note_folder = $latest_note["folder"] ?: null;
             // Reset statement to be used in display loop (workspace filtered)
             $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
             $stmt_right->execute([$workspace_filter, $workspace_filter]);

@@ -851,7 +851,7 @@ function setupDragDropEvents() {
 
 function setupNoteDragDropEvents() {
     // Remove existing event listeners to avoid duplicates
-    document.querySelectorAll('.links_arbo_left.note-in-folder').forEach(function(link) {
+    document.querySelectorAll('.links_arbo_left').forEach(function(link) {
         link.removeEventListener('dragstart', handleNoteDragStart);
         link.removeEventListener('dragend', handleNoteDragEnd);
     });
@@ -862,8 +862,8 @@ function setupNoteDragDropEvents() {
         header.removeEventListener('dragleave', handleFolderDragLeave);
     });
     
-    // Add drag events to note links
-    var noteLinks = document.querySelectorAll('.links_arbo_left.note-in-folder');
+    // Add drag events to all note links (both in folders and without folder)
+    var noteLinks = document.querySelectorAll('.links_arbo_left');
     noteLinks.forEach(function(link) {
         link.draggable = true;
         link.addEventListener('dragstart', handleNoteDragStart);
@@ -880,7 +880,7 @@ function setupNoteDragDropEvents() {
 }
 
 function handleNoteDragStart(e) {
-    var noteLink = e.target.closest('.links_arbo_left.note-in-folder');
+    var noteLink = e.target.closest('.links_arbo_left');
     if (!noteLink) return;
     
     var noteId = noteLink.getAttribute('data-note-db-id');
@@ -890,8 +890,8 @@ function handleNoteDragStart(e) {
     if (noteId) {
         e.dataTransfer.setData('text/plain', JSON.stringify({
             noteId: noteId,
-            currentFolder: currentFolder,
-            currentFolderId: currentFolderId
+            currentFolder: currentFolder || null,
+            currentFolderId: currentFolderId || null
         }));
         e.dataTransfer.effectAllowed = 'move';
         
@@ -902,7 +902,7 @@ function handleNoteDragStart(e) {
 
 function handleNoteDragEnd(e) {
     // Remove dragging class
-    var noteLink = e.target.closest('.links_arbo_left.note-in-folder');
+    var noteLink = e.target.closest('.links_arbo_left');
     if (noteLink) {
         noteLink.classList.remove('dragging');
     }
@@ -1630,7 +1630,7 @@ function emergencySave(noteId) {
     var headi = titleInput.value || '';
     var ent = entryElem.innerHTML.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     var tags = tagsElem ? tagsElem.value : '';
-    var folder = folderElem ? folderElem.value : (window.getDefaultFolderName ? window.getDefaultFolderName() : 'General');
+    var folder = folderElem ? folderElem.value : null; // No folder selected
     
     // Get folder_id from hidden input field
     var folderIdElem = document.getElementById("folderId" + noteId);
