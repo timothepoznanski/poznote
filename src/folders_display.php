@@ -28,8 +28,31 @@ function organizeNotesByFolder($stmt_left, $defaultFolderName, $con, $workspace_
     }
     
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
-        $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : $defaultFolderId;
+        $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
         $folderName = $row1["folder"] ?: $defaultFolderName;
+        
+        // If folder_id is null, try to get it from the folders table based on folder name
+        if ($folderId === null && !empty($folderName)) {
+            $folderQuery = "SELECT id FROM folders WHERE name = ?";
+            $folderParams = [$folderName];
+            if ($workspace_filter) {
+                $folderQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $folderParams[] = $workspace_filter;
+                $folderParams[] = $workspace_filter;
+            }
+            $folderStmt = $con->prepare($folderQuery);
+            $folderStmt->execute($folderParams);
+            $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folderId = (int)$folderData['id'];
+            } else {
+                // Folder doesn't exist in folders table - use default folder
+                $folderId = $defaultFolderId;
+            }
+        } else if ($folderId === null) {
+            // No folder_id and no folder name - use default
+            $folderId = $defaultFolderId;
+        }
         
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [

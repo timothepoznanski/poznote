@@ -171,7 +171,12 @@
 <div id="deleteFolderModal" class="modal">
     <div class="modal-content">
         <h3>Delete Folder</h3>
-        <p id="deleteFolderMessage"></p>
+        <div id="deleteFolderMessage" style="margin: 15px 0;">
+            <p id="deleteFolderMainMessage" style="margin-bottom: 10px;"></p>
+            <ul id="deleteFolderDetails" style="list-style: none; padding: 0; margin: 10px 0;">
+            </ul>
+            <p id="deleteFolderNote" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+        </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeModal('deleteFolderModal')">Cancel</button>
             <button type="button" class="btn-danger" onclick="executeDeleteFolder()">Delete Folder</button>

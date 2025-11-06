@@ -229,40 +229,84 @@ switch($action) {
                 exit;
             }
             $folderName = $folderData['name'];
+        } elseif (!empty($folderName)) {
+            // If folder_name is provided instead, verify it exists and get its ID
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folderName, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+                $stmt->execute([$folderName]);
+            }
+            $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folderId = (int)$folderData['id'];
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Folder not found']);
+                exit;
+            }
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Folder ID or name is required']);
+            exit;
         }
         
-        if (empty($folderName) || isDefaultFolder($folderName, $workspace)) {
+        if (isDefaultFolder($folderName, $workspace)) {
             echo json_encode(['success' => false, 'error' => 'Cannot delete the default folder']);
             exit;
         }
         
-        $defaultFolderName = getDefaultFolderForNewNotes($workspace);
-        
-        // Get default folder ID
-        if ($workspace !== null) {
-            $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt->execute([$defaultFolderName, $workspace, $workspace]);
-        } else {
-            $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
-            $stmt->execute([$defaultFolderName]);
+        // Function to get all folder IDs recursively (including the folder itself and all subfolders)
+        function getAllFolderIds($con, $folderId, $workspace) {
+            $folderIds = [$folderId];
+            
+            // Get all subfolders
+            if ($workspace !== null) {
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $stmt = $con->prepare($query);
+                $stmt->execute([$folderId, $workspace, $workspace]);
+            } else {
+                $query = "SELECT id FROM folders WHERE parent_id = ?";
+                $stmt = $con->prepare($query);
+                $stmt->execute([$folderId]);
+            }
+            
+            // Recursively get subfolder IDs
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folderIds = array_merge($folderIds, getAllFolderIds($con, (int)$row['id'], $workspace));
+            }
+            
+            return $folderIds;
         }
-        $defaultFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
-        $defaultFolderId = $defaultFolderData ? (int)$defaultFolderData['id'] : null;
         
-        // Move all notes from this folder to default folder (using folder_id)
+        // Get all folder IDs that will be deleted (folder + all subfolders)
+        $allFolderIds = getAllFolderIds($con, $folderId, $workspace);
+        
+        // Move all notes from this folder AND all subfolders to trash
+        if (!empty($allFolderIds)) {
+            $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
+            
+            if ($workspace !== null) {
+                $query1 = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders) AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $stmt1 = $con->prepare($query1);
+                $params = array_merge($allFolderIds, [$workspace, $workspace]);
+                $exec1 = $stmt1->execute($params);
+            } else {
+                $query1 = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders)";
+                $stmt1 = $con->prepare($query1);
+                $exec1 = $stmt1->execute($allFolderIds);
+            }
+        } else {
+            $exec1 = true; // No notes to move
+        }
+        
+        // Delete the folder (CASCADE will automatically delete all subfolders)
         if ($workspace !== null) {
-            $query1 = "UPDATE entries SET folder = ?, folder_id = ? WHERE folder_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $stmt1 = $con->prepare($query1);
-            $exec1 = $stmt1->execute([$defaultFolderName, $defaultFolderId, $folderId, $workspace, $workspace]);
             $query2 = "DELETE FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
             $stmt2 = $con->prepare($query2);
             $exec2 = $stmt2->execute([$folderId, $workspace, $workspace]);
         } else {
-            $query1 = "UPDATE entries SET folder = ?, folder_id = ? WHERE folder_id = ?";
             $query2 = "DELETE FROM folders WHERE id = ?";
-            $stmt1 = $con->prepare($query1);
             $stmt2 = $con->prepare($query2);
-            $exec1 = $stmt1->execute([$defaultFolderName, $defaultFolderId, $folderId]);
             $exec2 = $stmt2->execute([$folderId]);
         }
         
@@ -599,7 +643,26 @@ switch($action) {
             exit;
         }
         
-        if ($folderId !== null && $folderId > 0) {
+        // Get folder ID from name if needed
+        if ($folderId === null && !empty($folderName)) {
+            if ($workspace !== null) {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folderName, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
+                $stmt->execute([$folderName]);
+            }
+            $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $folderId = (int)$folderData['id'];
+            }
+        }
+        
+        // Function to recursively count notes in folder and all subfolders
+        function countNotesRecursive($con, $folderId, $workspace) {
+            $count = 0;
+            
+            // Count notes directly in this folder
             if ($workspace !== null) {
                 $query = "SELECT COUNT(*) as count FROM entries WHERE folder_id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
                 $stmt = $con->prepare($query);
@@ -609,20 +672,62 @@ switch($action) {
                 $stmt = $con->prepare($query);
                 $stmt->execute([$folderId]);
             }
-        } else {
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $count += (int)$result['count'];
+            
+            // Get all subfolders
             if ($workspace !== null) {
-                $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderName, $workspace, $workspace]);
+                $stmt->execute([$folderId, $workspace, $workspace]);
             } else {
-                $query = "SELECT COUNT(*) as count FROM entries WHERE folder = ? AND trash = 0";
+                $query = "SELECT id FROM folders WHERE parent_id = ?";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderName]);
+                $stmt->execute([$folderId]);
             }
+            
+            // Recursively count notes in each subfolder
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $count += countNotesRecursive($con, (int)$row['id'], $workspace);
+            }
+            
+            return $count;
         }
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        echo json_encode(['success' => true, 'count' => (int)$result['count']]);
+        // Function to count subfolders recursively
+        function countSubfoldersRecursive($con, $folderId, $workspace) {
+            $count = 0;
+            
+            // Get all direct subfolders
+            if ($workspace !== null) {
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $stmt = $con->prepare($query);
+                $stmt->execute([$folderId, $workspace, $workspace]);
+            } else {
+                $query = "SELECT id FROM folders WHERE parent_id = ?";
+                $stmt = $con->prepare($query);
+                $stmt->execute([$folderId]);
+            }
+            
+            $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $count += count($subfolders);
+            
+            // Recursively count subfolders of each subfolder
+            foreach ($subfolders as $row) {
+                $count += countSubfoldersRecursive($con, (int)$row['id'], $workspace);
+            }
+            
+            return $count;
+        }
+        
+        $totalCount = countNotesRecursive($con, $folderId, $workspace);
+        $subfolderCount = countSubfoldersRecursive($con, $folderId, $workspace);
+        
+        echo json_encode([
+            'success' => true, 
+            'count' => $totalCount,
+            'subfolder_count' => $subfolderCount
+        ]);
         break;
         
     case 'get_folder_path':

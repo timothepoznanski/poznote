@@ -160,17 +160,46 @@ function deleteFolder(folderId, folderName) {
     .then(function(data) {
         if (data.success) {
             var noteCount = data.count || 0;
+            var subfolderCount = data.subfolder_count || 0;
             
-            // If the folder is empty, delete without confirmation
-            if (noteCount === 0) {
+            // If the folder is empty and has no subfolders, delete without confirmation
+            if (noteCount === 0 && subfolderCount === 0) {
                 executeDeleteFolderOperation(folderId, folderName);
                 return;
             }
             
-            // For folders with notes, show a confirmation
-            var confirmMessage = 'Are you sure you want to delete the folder "' + folderName + '"?\n' + noteCount + ' note' + (noteCount > 1 ? 's' : '') + ' will be moved to "' + getDefaultFolderName() + '".\n\nIf you want to delete all notes in this folder, you can move them to "' + getDefaultFolderName() + '" then empty this folder.';
+            // Update modal content
+            var mainMessage = document.getElementById('deleteFolderMainMessage');
+            var detailsList = document.getElementById('deleteFolderDetails');
+            var noteElement = document.getElementById('deleteFolderNote');
             
-            showDeleteFolderModal(folderId, folderName, confirmMessage);
+            if (mainMessage) {
+                mainMessage.textContent = 'Are you sure you want to delete the folder "' + folderName + '"?';
+            }
+            
+            if (detailsList) {
+                detailsList.innerHTML = '';
+                
+                if (subfolderCount > 0) {
+                    var subfolderLi = document.createElement('li');
+                    subfolderLi.style.marginBottom = '5px';
+                    subfolderLi.innerHTML = '<strong>• ' + subfolderCount + '</strong> subfolder' + (subfolderCount > 1 ? 's' : '') + ' will also be deleted';
+                    detailsList.appendChild(subfolderLi);
+                }
+                
+                if (noteCount > 0) {
+                    var noteLi = document.createElement('li');
+                    noteLi.style.marginBottom = '5px';
+                    noteLi.innerHTML = '<strong>• ' + noteCount + '</strong> note' + (noteCount > 1 ? 's' : '') + ' will be moved to trash';
+                    detailsList.appendChild(noteLi);
+                }
+            }
+            
+            if (noteElement) {
+                noteElement.textContent = '';
+            }
+            
+            showDeleteFolderModal(folderId, folderName, null);
         } else {
             showNotificationPopup('Error checking folder content: ' + data.error, 'error');
         }
@@ -182,12 +211,8 @@ function deleteFolder(folderId, folderName) {
 
 function showDeleteFolderModal(folderId, folderName, message) {
     currentFolderToDelete = {id: folderId, name: folderName};
-    var messageElement = document.getElementById('deleteFolderMessage');
     var modal = document.getElementById('deleteFolderModal');
     
-    if (messageElement) {
-        messageElement.textContent = message;
-    }
     if (modal) {
         modal.style.display = 'flex';
     }
