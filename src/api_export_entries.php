@@ -47,7 +47,12 @@ if ($res_right && $res_right) {
     $indexContent .= '<ul>';
     while($row = $res_right->fetch(PDO::FETCH_ASSOC)) {
         $title = htmlspecialchars($row["heading"] ?: 'New note', ENT_QUOTES, 'UTF-8');
-        $folder = htmlspecialchars($row["folder"] ?: 'Default', ENT_QUOTES, 'UTF-8');
+        
+        // Get the complete folder path including parents
+        $folder_id = $row["folder_id"] ?? null;
+        $folderPath = getFolderPath($folder_id, $con);
+        $folder = htmlspecialchars($folderPath, ENT_QUOTES, 'UTF-8');
+        
         $tags = $row["tags"] ? ' - ' . htmlspecialchars($row["tags"], ENT_QUOTES, 'UTF-8') : '';
         
         // Determine the correct file extension based on note type
