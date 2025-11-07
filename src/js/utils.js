@@ -777,7 +777,7 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
-    select.innerHTML = '<option value="">Select target folder...</option>';
+    select.innerHTML = '<option value="">No folder</option>';
     
     // Get all folders
     fetch('api_list_notes.php', {
@@ -803,18 +803,7 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                     select.appendChild(option);
                 }
             }
-            // After populating options, if there is at least one real option, select the first one
-            try {
-                var firstRealIndex = null;
-                for (var oi = 0; oi < select.options.length; oi++) {
-                    if (select.options[oi].value && select.options[oi].value !== '') { firstRealIndex = oi; break; }
-                }
-                if (firstRealIndex !== null) {
-                    select.selectedIndex = firstRealIndex;
-                    // Trigger change so any handlers (e.g., enabling Move button) run
-                    select.dispatchEvent(new Event('change'));
-                }
-            } catch (e) {}
+            // Don't auto-select any folder - leave "No folder" selected by default
         }
     })
     .catch(function(error) {
@@ -824,12 +813,13 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     // If this dropdown is used for the 'move note' modal, wire change handler to enable the Move button
     try {
         select.addEventListener('change', function() {
-            // When a selection exists, treat as exact match and enable Move
-            updateMoveButton(this.value || '', !!this.value);
+            // Always treat selection as exact match (including "No folder" with empty value)
+            // The user explicitly selected an option, so enable Move button
+            updateMoveButton(this.value || 'no-folder', true);
         });
 
-        // Initialize button state based on any pre-selected value (most likely none)
-        updateMoveButton(select.value || '', !!select.value);
+        // Initialize button state - "No folder" is pre-selected
+        updateMoveButton(select.value || 'no-folder', true);
     } catch (e) {
         // ignore if updateMoveButton is not available in this context
     }
@@ -1227,7 +1217,7 @@ function onWorkspaceChange() {
             // Update the target folder dropdown with folders from the new workspace
             var select = document.getElementById('moveNoteTargetSelect');
             if (select) {
-                select.innerHTML = '<option value="">Select target folder...</option>';
+                select.innerHTML = '<option value="">No folder</option>';
                 
                 // Populate with folders from the new workspace
                 if (Array.isArray(allFolders)) {
@@ -1242,13 +1232,9 @@ function onWorkspaceChange() {
                     });
                 }
                 
-                // Select the first real option if available
-                try {
-                    if (select.options.length > 1) {
-                        select.selectedIndex = 1;
-                        select.dispatchEvent(new Event('change'));
-                    }
-                } catch (e) {}
+                // Leave "No folder" selected by default (index 0)
+                // Update button state to enable Move button with "No folder" selected
+                updateMoveButton('no-folder', true);
             }
         }
     })
@@ -1280,10 +1266,11 @@ function moveNoteToFolder() {
     // Prefer explicit select dropdown if present (from move files modal). Fallback to old input if still present.
     var select = document.getElementById('moveNoteTargetSelect');
     var targetFolderId = '';
-    if (select && select.value) {
+    if (select) {
+        // Accept empty value (for "No folder" option)
         targetFolderId = select.value;
     } else {
-        // No select available or no value selected — require explicit selection
+        // No select available — require explicit selection
         showMoveFolderError('Please select a target folder');
         return;
     }

@@ -6,13 +6,23 @@
 /**
  * Traite les favoris et les ajoute au tableau des dossiers
  * Now works with folder arrays containing 'id', 'name', and 'notes'
+ * Also checks uncategorized notes (notes without folder)
  */
-function handleFavorites($folders) {
+function handleFavorites($folders, $uncategorized_notes = []) {
     $favorites = [];
     
     // Parcourir tous les dossiers pour extraire les favoris
     foreach ($folders as $folderId => $folderData) {
         foreach ($folderData['notes'] as $note) {
+            if ($note["favorite"]) {
+                $favorites[] = $note;
+            }
+        }
+    }
+    
+    // Also check uncategorized notes for favorites
+    if (!empty($uncategorized_notes)) {
+        foreach ($uncategorized_notes as $note) {
             if ($note["favorite"]) {
                 $favorites[] = $note;
             }
