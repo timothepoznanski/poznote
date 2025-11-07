@@ -84,9 +84,8 @@ if ($folderData) {
 }
 // Note: If folder not found in folders table, folder_id remains null which is acceptable
 
-// WORKAROUND: Server clock is 1 hour behind (shows local time as UTC)
-// Subtract 1 hour to get real UTC
-$now = time() - 3600; // Subtract 1 hour (3600 seconds)
+// Get current UTC timestamp
+$now = time();
 $now_utc = gmdate('Y-m-d H:i:s', $now);
 
 $stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
