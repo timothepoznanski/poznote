@@ -177,17 +177,19 @@ try {
 
 // Load note list sort preference to affect server-side note listing
 $note_list_order_by = 'folder, updated DESC';
+$note_list_sort_type = 'updated_desc'; // default
 try {
     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
     $stmt->execute(['note_list_sort']);
     $pref = $stmt->fetchColumn();
     $allowed_sorts = [
-        'updated_desc' => 'folder, updated DESC',
-        'created_desc' => 'folder, created DESC',
+        'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, updated DESC',
+        'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, created DESC',
         'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
     ];
     if ($pref && isset($allowed_sorts[$pref])) {
         $note_list_order_by = $allowed_sorts[$pref];
+        $note_list_sort_type = $pref;
     }
 } catch (Exception $e) {
     // ignore and keep default

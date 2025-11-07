@@ -102,9 +102,10 @@ try {
     $order_by = "folder, updated DESC"; // default
     if ($sort) {
         // whitelist allowed values
+        // For updated_desc and created_desc, notes without folder should appear first (by sorting folder_id DESC NULLS FIRST, then by date)
         $allowed = [
-            'updated_desc' => 'folder, updated DESC',
-            'created_desc' => 'folder, created DESC',
+            'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, updated DESC',
+            'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, created DESC',
             'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
         ];
         if (isset($allowed[$sort])) {

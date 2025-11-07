@@ -177,15 +177,72 @@ $folders = enrichFoldersWithParentId($folders, $con, $workspace_filter);
 // Build hierarchical structure
 $hierarchicalFolders = buildFolderHierarchy($folders);
 
-// Display folders and notes hierarchically
+// Determine if we should display uncategorized notes first (after Favorites, before other folders)
+// This happens when sort order is by date (updated_desc or created_desc)
+$displayUncategorizedFirst = isset($note_list_sort_type) && 
+    ($note_list_sort_type === 'updated_desc' || $note_list_sort_type === 'created_desc');
+
+// Separate Favorites folder from other folders
+$favoritesFolder = null;
+$regularFolders = [];
 foreach($hierarchicalFolders as $folderId => $folderData) {
+    if ($folderData['name'] === 'Favorites') {
+        $favoritesFolder = [$folderId => $folderData];
+    } else {
+        $regularFolders[$folderId] = $folderData;
+    }
+}
+
+// Display Favorites folder first
+if ($favoritesFolder) {
+    foreach($favoritesFolder as $folderId => $folderData) {
+        displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
+    }
+}
+
+// Display uncategorized notes (notes without folder) AFTER Favorites if sorting by date
+if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter) && $displayUncategorizedFirst) {
+    // Sort uncategorized notes by date (updated or created depending on sort type)
+    $sortedUncategorized = $uncategorized_notes;
+    if ($note_list_sort_type === 'updated_desc') {
+        usort($sortedUncategorized, function($a, $b) {
+            return strcmp($b['updated'] ?? '', $a['updated'] ?? '');
+        });
+    } elseif ($note_list_sort_type === 'created_desc') {
+        usort($sortedUncategorized, function($a, $b) {
+            return strcmp($b['created'] ?? '', $a['created'] ?? '');
+        });
+    }
+    
+    foreach ($sortedUncategorized as $row1) {
+        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
+        
+        // Generate note link
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
+        
+        $noteClass = 'links_arbo_left note-without-folder';
+        $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+        
+        // Add onclick handler for AJAX loading
+        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
+        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
+        
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
+        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "</a>";
+        echo "<div id=pxbetweennotes></div>";
+    }
+}
+
+// Display regular folders and notes hierarchically
+foreach($regularFolders as $folderId => $folderData) {
     displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
 }
 
-// Display uncategorized notes (notes without folder) at the same level as folders
-if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter)) {
+// Display uncategorized notes (notes without folder) at the END if NOT sorting by date (i.e., alphabetical sort)
+if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder_filter) && !$displayUncategorizedFirst) {
     foreach ($uncategorized_notes as $row1) {
-        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected' : '';
+        $isSelected = (isset($note) && $row1["id"] == $note) ? 'selected-note' : '';
         
         // Generate note link
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"]);
