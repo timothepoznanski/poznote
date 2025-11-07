@@ -413,8 +413,8 @@ $body_classes = trim($extra_body_classes);
         $folders = $organized['folders'];
         $uncategorized_notes = $organized['uncategorized_notes'];
         
-        // Handle favorites
-        $folders = handleFavorites($folders);
+        // Handle favorites (including uncategorized notes)
+        $folders = handleFavorites($folders, $uncategorized_notes);
         
         // Track folders with search results for favorites
         $folders_with_results = [];
