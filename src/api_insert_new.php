@@ -23,11 +23,9 @@
 		$folder = $_POST['folder'] ?? null;
 		$type = $_POST['type'] ?? 'note';
 		
-		// WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
-		$adjusted_now = (int)$now - 3600;
-		$created_date = gmdate("Y-m-d H:i:s", $adjusted_now);
-
-	// Validate workspace exists
+// Get current timestamp in UTC
+$now = time();
+$created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 	if (!empty($workspace)) {
 		$wsStmt = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
 		$wsStmt->execute([$workspace]);

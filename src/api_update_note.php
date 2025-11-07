@@ -51,8 +51,8 @@ if ($action === 'beacon_save') {
         exit;
     }
     
-    // WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
-    $now = time() - 3600;
+    // Get current UTC timestamp
+    $now = time();
     $now_utc = gmdate('Y-m-d H:i:s', $now);
     
     $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = ? WHERE id = ?");
@@ -222,8 +222,8 @@ if ($write_result === false) {
     exit;
 }
 
-// WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
-$now = time() - 3600;
+// Get current UTC timestamp
+$now = time();
 $now_utc = gmdate('Y-m-d H:i:s', $now);
 
 if ($workspace !== null) {
