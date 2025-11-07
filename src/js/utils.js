@@ -1217,7 +1217,7 @@ function onWorkspaceChange() {
             // Update the target folder dropdown with folders from the new workspace
             var select = document.getElementById('moveNoteTargetSelect');
             if (select) {
-                select.innerHTML = '<option value="">Select target folder...</option>';
+                select.innerHTML = '<option value="">No folder</option>';
                 
                 // Populate with folders from the new workspace
                 if (Array.isArray(allFolders)) {
@@ -1232,13 +1232,9 @@ function onWorkspaceChange() {
                     });
                 }
                 
-                // Select the first real option if available
-                try {
-                    if (select.options.length > 1) {
-                        select.selectedIndex = 1;
-                        select.dispatchEvent(new Event('change'));
-                    }
-                } catch (e) {}
+                // Leave "No folder" selected by default (index 0)
+                // Update button state to enable Move button with "No folder" selected
+                updateMoveButton('no-folder', true);
             }
         }
     })
