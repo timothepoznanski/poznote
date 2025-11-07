@@ -285,7 +285,7 @@ switch($action) {
     case 'move_to':
         try {
             $noteId = $_POST['note_id'] ?? '';
-            $targetFolderId = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
+            $targetFolderId = isset($_POST['folder_id']) ? ($_POST['folder_id'] === '' ? null : intval($_POST['folder_id'])) : null;
             $targetFolder = $_POST['folder'] ?? $_POST['target_folder'] ?? null;
             
             if (empty($noteId)) {
@@ -293,8 +293,13 @@ switch($action) {
                 exit;
             }
             
-            // If folder_id is provided, fetch the folder name
-            if ($targetFolderId !== null && $targetFolderId > 0) {
+            // If folder_id is empty string or 0, treat as "no folder"
+            if ($targetFolderId === null || $targetFolderId === 0) {
+                $targetFolder = null;
+                $targetFolderId = null;
+            }
+            // If folder_id is provided and > 0, fetch the folder name
+            elseif ($targetFolderId > 0) {
                 if ($workspace) {
                     $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
                     $stmt->execute([$targetFolderId, $workspace, $workspace]);
