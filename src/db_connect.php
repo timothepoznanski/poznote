@@ -219,4 +219,26 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
+// Do NOT set timezone here - keep PHP in UTC so datetime('now') stores UTC timestamps
+// Timezone conversion should only happen when displaying dates to the user
+// The user's timezone preference is loaded from settings table when needed for display
+/*
+// Set timezone from database settings or use default
+try {
+    $timezone = DEFAULT_TIMEZONE;
+    if (isset($con)) {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['timezone']);
+        $saved_timezone = $stmt->fetchColumn();
+        if ($saved_timezone && $saved_timezone !== '') {
+            $timezone = $saved_timezone;
+        }
+    }
+    date_default_timezone_set($timezone);
+} catch (Exception $e) {
+    // Ignore errors, use default timezone
+    date_default_timezone_set(DEFAULT_TIMEZONE);
+}
+*/
+
 ?>

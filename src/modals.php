@@ -335,3 +335,87 @@
     </div>
 </div>
 
+<!-- Timezone modal -->
+<div id="timezoneModal" class="modal">
+    <div class="modal-content">
+        <h3>Timezone</h3>
+        <div class="modal-body">
+            <p>Select your timezone:</p>
+            <select id="timezoneSelect" style="width:100%; padding:8px; margin-top:10px; border:1px solid #ddd; border-radius:4px; font-size:14px;">
+                <optgroup label="Europe">
+                    <option value="Europe/Paris">Europe/Paris (France, CET/CEST)</option>
+                    <option value="Europe/London">Europe/London (UK, GMT/BST)</option>
+                    <option value="Europe/Brussels">Europe/Brussels (Belgium, CET/CEST)</option>
+                    <option value="Europe/Amsterdam">Europe/Amsterdam (Netherlands, CET/CEST)</option>
+                    <option value="Europe/Berlin">Europe/Berlin (Germany, CET/CEST)</option>
+                    <option value="Europe/Madrid">Europe/Madrid (Spain, CET/CEST)</option>
+                    <option value="Europe/Rome">Europe/Rome (Italy, CET/CEST)</option>
+                    <option value="Europe/Zurich">Europe/Zurich (Switzerland, CET/CEST)</option>
+                    <option value="Europe/Vienna">Europe/Vienna (Austria, CET/CEST)</option>
+                    <option value="Europe/Warsaw">Europe/Warsaw (Poland, CET/CEST)</option>
+                    <option value="Europe/Stockholm">Europe/Stockholm (Sweden, CET/CEST)</option>
+                    <option value="Europe/Copenhagen">Europe/Copenhagen (Denmark, CET/CEST)</option>
+                    <option value="Europe/Oslo">Europe/Oslo (Norway, CET/CEST)</option>
+                    <option value="Europe/Helsinki">Europe/Helsinki (Finland, EET/EEST)</option>
+                    <option value="Europe/Athens">Europe/Athens (Greece, EET/EEST)</option>
+                    <option value="Europe/Moscow">Europe/Moscow (Russia, MSK)</option>
+                    <option value="Europe/Lisbon">Europe/Lisbon (Portugal, WET/WEST)</option>
+                    <option value="Europe/Dublin">Europe/Dublin (Ireland, GMT/IST)</option>
+                </optgroup>
+                <optgroup label="America">
+                    <option value="America/New_York">America/New_York (US Eastern)</option>
+                    <option value="America/Chicago">America/Chicago (US Central)</option>
+                    <option value="America/Denver">America/Denver (US Mountain)</option>
+                    <option value="America/Los_Angeles">America/Los_Angeles (US Pacific)</option>
+                    <option value="America/Anchorage">America/Anchorage (US Alaska)</option>
+                    <option value="America/Honolulu">America/Honolulu (US Hawaii)</option>
+                    <option value="America/Toronto">America/Toronto (Canada Eastern)</option>
+                    <option value="America/Vancouver">America/Vancouver (Canada Pacific)</option>
+                    <option value="America/Mexico_City">America/Mexico_City (Mexico)</option>
+                    <option value="America/Sao_Paulo">America/Sao_Paulo (Brazil)</option>
+                    <option value="America/Buenos_Aires">America/Buenos_Aires (Argentina)</option>
+                    <option value="America/Santiago">America/Santiago (Chile)</option>
+                    <option value="America/Bogota">America/Bogota (Colombia)</option>
+                    <option value="America/Lima">America/Lima (Peru)</option>
+                </optgroup>
+                <optgroup label="Asia">
+                    <option value="Asia/Dubai">Asia/Dubai (UAE)</option>
+                    <option value="Asia/Kolkata">Asia/Kolkata (India)</option>
+                    <option value="Asia/Bangkok">Asia/Bangkok (Thailand)</option>
+                    <option value="Asia/Singapore">Asia/Singapore</option>
+                    <option value="Asia/Hong_Kong">Asia/Hong_Kong</option>
+                    <option value="Asia/Shanghai">Asia/Shanghai (China)</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo (Japan)</option>
+                    <option value="Asia/Seoul">Asia/Seoul (South Korea)</option>
+                    <option value="Asia/Jakarta">Asia/Jakarta (Indonesia)</option>
+                    <option value="Asia/Manila">Asia/Manila (Philippines)</option>
+                    <option value="Asia/Taipei">Asia/Taipei (Taiwan)</option>
+                    <option value="Asia/Karachi">Asia/Karachi (Pakistan)</option>
+                    <option value="Asia/Tehran">Asia/Tehran (Iran)</option>
+                    <option value="Asia/Jerusalem">Asia/Jerusalem (Israel)</option>
+                    <option value="Asia/Riyadh">Asia/Riyadh (Saudi Arabia)</option>
+                </optgroup>
+                <optgroup label="Pacific">
+                    <option value="Pacific/Auckland">Pacific/Auckland (New Zealand)</option>
+                    <option value="Australia/Sydney">Australia/Sydney</option>
+                    <option value="Australia/Melbourne">Australia/Melbourne</option>
+                    <option value="Australia/Brisbane">Australia/Brisbane</option>
+                    <option value="Australia/Perth">Australia/Perth</option>
+                    <option value="Pacific/Fiji">Pacific/Fiji</option>
+                </optgroup>
+                <optgroup label="Africa">
+                    <option value="Africa/Cairo">Africa/Cairo (Egypt)</option>
+                    <option value="Africa/Johannesburg">Africa/Johannesburg (South Africa)</option>
+                    <option value="Africa/Lagos">Africa/Lagos (Nigeria)</option>
+                    <option value="Africa/Nairobi">Africa/Nairobi (Kenya)</option>
+                    <option value="Africa/Casablanca">Africa/Casablanca (Morocco)</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('timezoneModal')">Cancel</button>
+            <button type="button" class="btn-primary" id="saveTimezoneModalBtn">Save</button>
+        </div>
+    </div>
+</div>
+

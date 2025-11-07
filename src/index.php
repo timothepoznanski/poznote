@@ -176,15 +176,15 @@ try {
 }
 
 // Load note list sort preference to affect server-side note listing
-$note_list_order_by = 'folder, updated DESC';
+$note_list_order_by = 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, updated DESC';
 $note_list_sort_type = 'updated_desc'; // default
 try {
     $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
     $stmt->execute(['note_list_sort']);
     $pref = $stmt->fetchColumn();
     $allowed_sorts = [
-        'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, updated DESC',
-        'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, created DESC',
+        'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, updated DESC',
+        'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, created DESC',
         'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
     ];
     if ($pref && isset($allowed_sorts[$pref])) {
@@ -329,7 +329,7 @@ $body_classes = trim($extra_body_classes);
     $search_params = $search_conditions['search_params'];
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, location, subheading, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, location, subheading, type FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -682,12 +682,13 @@ $body_classes = trim($extra_body_classes);
                     $created_clean = trim($created_raw);
                     $updated_clean = trim($updated_raw);
                     
-                    // Use timestamp validation and formatting for safety
-                    $created_timestamp = strtotime($created_clean);
-                    $updated_timestamp = strtotime($updated_clean);
+                    // Convert UTC timestamps to user's timezone
+                    $final_created = convertUtcToUserTimezone($created_clean);
+                    $final_updated = convertUtcToUserTimezone($updated_clean);
                     
-                    $final_created = $created_timestamp ? date('Y-m-d H:i:s', $created_timestamp) : date('Y-m-d H:i:s');
-                    $final_updated = $updated_timestamp ? date('Y-m-d H:i:s', $updated_timestamp) : date('Y-m-d H:i:s');
+                    // Fallback to current time if conversion failed
+                    if (empty($final_created)) $final_created = convertUtcToUserTimezone(gmdate('Y-m-d H:i:s'));
+                    if (empty($final_updated)) $final_updated = convertUtcToUserTimezone(gmdate('Y-m-d H:i:s'));
                     
                     // Encode with ALL safety flags to handle emojis and special characters
                     $created_json = json_encode($final_created, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP);
@@ -775,9 +776,10 @@ $body_classes = trim($extra_body_classes);
                     echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'New note'), ENT_QUOTES, 'UTF-8').'"/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
-                    if (!empty($row['created'])) {
+                    if (!empty($final_created)) {
                         try {
-                            $dt = new DateTime($row['created']);
+                            // Use the already-converted timezone date from above
+                            $dt = new DateTime($final_created);
                             $created_display = $dt->format('d/m/Y H:i');
                         } catch (Exception $e) {
                             $created_display = '';

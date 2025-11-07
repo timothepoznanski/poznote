@@ -51,9 +51,12 @@ if ($action === 'beacon_save') {
         exit;
     }
     
-    // Update database
-    $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
-    if ($stmt->execute([$content, $id])) {
+    // WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
+    $now = time() - 3600;
+    $now_utc = gmdate('Y-m-d H:i:s', $now);
+    
+    $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = ? WHERE id = ?");
+    if ($stmt->execute([$content, $now_utc, $id])) {
         echo json_encode(['success' => true, 'id' => $id]);
     } else {
         http_response_code(500);
@@ -219,13 +222,16 @@ if ($write_result === false) {
     exit;
 }
 
-// Prepare update query
+// WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
+$now = time() - 3600;
+$now_utc = gmdate('Y-m-d H:i:s', $now);
+
 if ($workspace !== null) {
-    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, workspace = ?, updated = datetime('now') WHERE id = ?");
-    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $workspace, $id];
+    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, workspace = ?, updated = ? WHERE id = ?");
+    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $workspace, $now_utc, $id];
 } else {
-    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, updated = datetime('now') WHERE id = ?");
-    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $id];
+    $stmt = $con->prepare("UPDATE entries SET heading = ?, entry = ?, tags = ?, folder = ?, folder_id = ?, updated = ? WHERE id = ?");
+    $executeParams = [$originalHeading, $entrycontent, $tags, $folder, $folder_id, $now_utc, $id];
 }
 
 try {

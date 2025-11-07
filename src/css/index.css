@@ -2823,6 +2823,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-cog::before { content: "\f013"; }
 .fa-eye::before { content: "\f06e"; }
+.fa-clock::before { content: "\f017"; }
 .fa-columns::before { content: "\f0db"; }
 .fa-lightbulb::before { content: "\f0eb"; }
 .fa-video::before { content: "\f03d"; }
@@ -2879,6 +2880,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 
+.fa-clock,
 .fa-caret-down,
 .fa-mobile,
 .fa-border-outer,

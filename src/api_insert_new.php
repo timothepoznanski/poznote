@@ -22,7 +22,10 @@
 		}
 		$folder = $_POST['folder'] ?? null;
 		$type = $_POST['type'] ?? 'note';
-		$created_date = date("Y-m-d H:i:s", (int)$now);
+		
+		// WORKAROUND: Server clock is 1 hour behind - subtract 1 hour to get real UTC
+		$adjusted_now = (int)$now - 3600;
+		$created_date = gmdate("Y-m-d H:i:s", $adjusted_now);
 
 	// Validate workspace exists
 	if (!empty($workspace)) {
