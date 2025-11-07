@@ -88,6 +88,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <div class="settings-card" onclick="showTimezonePrompt();">
+                <div class="settings-card-icon"><i class="fal fa-clock"></i></div>
+                <div class="settings-card-content">
+                    <h3>Timezone <span id="timezone-badge" class="setting-status">loading...</span></h3>
+                </div>
+            </div>
+
             <div class="settings-card" id="emoji-icons-card">
                 <div class="settings-card-icon"><i class="fa-grin"></i></div>
                 <div class="settings-card-content">
@@ -379,16 +386,98 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             });
         }
 
+        // Load Timezone
+        function refreshTimezoneBadge() {
+            getSetting('timezone', function(value) {
+                var badge = document.getElementById('timezone-badge');
+                if (badge) {
+                    if (value && value.trim()) {
+                        badge.textContent = value.trim();
+                        badge.className = 'setting-status enabled';
+                    } else {
+                        badge.textContent = 'Europe/Paris';
+                        badge.className = 'setting-status disabled';
+                    }
+                }
+            });
+        }
+
         // Load all badges on page load
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshTimezoneBadge();
         
         // Make refresh functions available globally
         window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
         window.refreshFontSizeBadge = refreshFontSizeBadge;
         window.refreshNoteSortBadge = refreshNoteSortBadge;
+        window.refreshTimezoneBadge = refreshTimezoneBadge;
     })();
+    </script>
+    <script>
+    // Timezone setting modal
+    function showTimezonePrompt() {
+        var modal = document.getElementById('timezoneModal');
+        if (!modal) return;
+        
+        // Load current timezone preference
+        var form = new FormData();
+        form.append('action', 'get');
+        form.append('key', 'timezone');
+        
+        fetch('api_settings.php', {method: 'POST', body: form})
+            .then(r => r.json())
+            .then(j => {
+                var currentValue = (j && j.success && j.value) ? j.value : 'Europe/Paris';
+                var select = document.getElementById('timezoneSelect');
+                if (select) {
+                    select.value = currentValue;
+                }
+                modal.style.display = 'flex';
+            })
+            .catch(function() {
+                modal.style.display = 'flex';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+        var saveBtn = document.getElementById('saveTimezoneModalBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function(){
+                var select = document.getElementById('timezoneSelect');
+                var selectedTimezone = select ? select.value : 'Europe/Paris';
+                
+                var setForm = new FormData();
+                setForm.append('action', 'set');
+                setForm.append('key', 'timezone');
+                setForm.append('value', selectedTimezone);
+                
+                fetch('api_settings.php', {method: 'POST', body: setForm})
+                    .then(r => r.json())
+                    .then(function(result) {
+                        if (result && result.success) {
+                            try { closeModal('timezoneModal'); } catch(e) {}
+                            if (typeof window.refreshTimezoneBadge === 'function') {
+                                window.refreshTimezoneBadge();
+                            }
+                            // Reload main window if open
+                            try {
+                                if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
+                                    window.opener.location.reload();
+                                }
+                            } catch(e) {}
+                            alert('Timezone updated successfully. Changes will take effect immediately.');
+                        } else {
+                            alert('Error updating timezone');
+                        }
+                    })
+                    .catch(function() {
+                        alert('Error updating timezone');
+                    });
+            });
+        }
+    });
     </script>
 </body>
 </html>

@@ -48,7 +48,11 @@ $title = $note['heading'] ?: 'New note';
 function formatDateString($dateStr) {
     if (empty($dateStr)) return 'Not available';
     try {
-        $date = new DateTime($dateStr);
+        // Dates are stored in UTC in the database
+        // Convert to the user's configured timezone for display
+        $timezone = getUserTimezone();
+        $date = new DateTime($dateStr, new DateTimeZone('UTC'));
+        $date->setTimezone(new DateTimeZone($timezone));
         return $date->format('d/m/Y H:i');
     } catch (Exception $e) {
         return 'Not available';

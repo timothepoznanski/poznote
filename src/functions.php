@@ -1,6 +1,46 @@
 <?php
 date_default_timezone_set('UTC');
 
+/**
+ * Get the user's configured timezone from the database
+ * Returns 'UTC' if no timezone is configured
+ * @return string The timezone identifier (e.g., 'Europe/Paris')
+ */
+function getUserTimezone() {
+    global $con;
+    try {
+        if (isset($con)) {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['timezone']);
+            $timezone = $stmt->fetchColumn();
+            if ($timezone && $timezone !== '') {
+                return $timezone;
+            }
+        }
+    } catch (Exception $e) {
+        // Ignore errors
+    }
+    return defined('DEFAULT_TIMEZONE') ? DEFAULT_TIMEZONE : 'UTC';
+}
+
+/**
+ * Convert a UTC datetime string to the user's configured timezone
+ * @param string $utcDatetime The UTC datetime string (e.g., '2025-11-07 10:52:00')
+ * @param string $format The output format (default: 'Y-m-d H:i:s')
+ * @return string The datetime in the user's timezone
+ */
+function convertUtcToUserTimezone($utcDatetime, $format = 'Y-m-d H:i:s') {
+    if (empty($utcDatetime)) return '';
+    try {
+        $userTz = getUserTimezone();
+        $date = new DateTime($utcDatetime, new DateTimeZone('UTC'));
+        $date->setTimezone(new DateTimeZone($userTz));
+        return $date->format($format);
+    } catch (Exception $e) {
+        return $utcDatetime; // Return original on error
+    }
+}
+
 function formatDate($t) {
 	return date('j M Y',$t);
 }

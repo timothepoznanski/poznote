@@ -84,9 +84,14 @@ if ($folderData) {
 }
 // Note: If folder not found in folders table, folder_id remains null which is acceptable
 
-$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
+// WORKAROUND: Server clock is 1 hour behind (shows local time as UTC)
+// Subtract 1 hour to get real UTC
+$now = time() - 3600; // Subtract 1 hour (3600 seconds)
+$now_utc = gmdate('Y-m-d H:i:s', $now);
 
-if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type])) {
+$stmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $now_utc, $now_utc])) {
     $id = $con->lastInsertId();
     
     // Create the file for the note content with appropriate extension

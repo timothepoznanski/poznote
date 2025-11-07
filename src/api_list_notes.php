@@ -83,7 +83,7 @@ try {
     }
 
     // Get notes
-    $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated FROM entries WHERE trash = 0";
+    $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created FROM entries WHERE trash = 0";
     $params = [];
     
     if ($workspace) {
@@ -99,21 +99,22 @@ try {
     
     // Sorting: accept explicit 'sort' parameter (GET or POST) but map to safe clauses
     $sort = $_GET['sort'] ?? $_POST['sort'] ?? null;
-    $order_by = "folder, updated DESC"; // default
-    if ($sort) {
-        // whitelist allowed values
-        $allowed = [
-            'updated_desc' => 'folder, updated DESC',
-            'created_desc' => 'folder, created DESC',
-            'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
-        ];
-        if (isset($allowed[$sort])) {
-            $order_by = $allowed[$sort];
-        }
-    }
+    
+    // Whitelist allowed values
+    // For updated_desc and created_desc, notes without folder should appear first, then grouped by folder, then sorted by date
+    $allowed = [
+        'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, updated DESC',
+        'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, created DESC',
+        'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
+    ];
+    
+    // Default order (use updated_desc logic as default)
+    $order_by = $allowed['updated_desc'];
 
-    // If no explicit sort provided, try loading saved preference from settings table
-    if (!$sort) {
+    if ($sort && isset($allowed[$sort])) {
+        $order_by = $allowed[$sort];
+    } else if (!$sort) {
+        // If no explicit sort provided, try loading saved preference from settings table
         try {
             $stmtPref = $con->prepare('SELECT value FROM settings WHERE key = ?');
             $stmtPref->execute(['note_list_sort']);
