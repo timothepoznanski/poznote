@@ -121,6 +121,15 @@
     color: #666;
 }
 
+.task-item.completed .task-text a {
+    color: #666;
+}
+
+.task-item.completed .task-text a:hover {
+    color: #444;
+    text-decoration: underline;
+}
+
 .task-checkbox {
     width: 16px;
     height: 16px;
@@ -143,8 +152,13 @@
 
 .task-text a {
     color: #007DB8;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.task-text a:hover {
+    color: #005a8a;
     text-decoration: underline;
-    word-break: break-word;
 }
 
 .task-edit-input {
@@ -214,6 +228,16 @@
 .task-item.important .task-text {
     color: #c62828; /* red text for important tasks */
     font-weight: 600;
+}
+
+.task-item.important .task-text a {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.task-item.important .task-text a:hover {
+    color: #8b0000;
+    text-decoration: underline;
 }
 
 .task-important-btn {

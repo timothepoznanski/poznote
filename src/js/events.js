@@ -1094,6 +1094,15 @@ function setupLinkEvents() {
     // Image and text paste management
     document.body.addEventListener('paste', function(e) {
         try {
+            // Skip paste handling for task input fields
+            if (e.target && (
+                e.target.classList.contains('task-input') || 
+                e.target.classList.contains('task-edit-input') ||
+                e.target.tagName === 'INPUT'
+            )) {
+                return; // Let the default paste behavior handle it
+            }
+            
             var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
             if (!note) return;
             

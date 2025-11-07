@@ -97,6 +97,19 @@ function renderTaskList(noteId, tasks) {
                 addTask(noteId);
             }
         });
+        
+        // Ensure pasted content is plain text only
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            // Insert plain text at cursor position
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            const currentValue = this.value;
+            this.value = currentValue.substring(0, start) + text + currentValue.substring(end);
+            // Move cursor to end of pasted text
+            this.selectionStart = this.selectionEnd = start + text.length;
+        });
     }
 
     // Store tasks data
@@ -293,6 +306,19 @@ function editTask(taskId, noteId) {
         }
     });
 
+    // Ensure pasted content is plain text only
+    input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        // Insert plain text at cursor position
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const currentValue = this.value;
+        this.value = currentValue.substring(0, start) + text + currentValue.substring(end);
+        // Move cursor to end of pasted text
+        this.selectionStart = this.selectionEnd = start + text.length;
+    });
+
     taskText.replaceWith(input);
     input.focus();
     input.select();
@@ -478,8 +504,17 @@ function linkifyHtml(text) {
     const replaced = escaped.replace(urlRegex, function(m) {
         let href = m;
         if (!/^https?:\/\//i.test(href)) href = 'http://' + href;
+        
+        // Truncate display text if URL is too long (keep full URL in href and title)
+        let displayText = m;
+        const maxLength = 50;
+        if (m.length > maxLength) {
+            displayText = m.substring(0, maxLength - 3) + '...';
+        }
+        
         // Use double quotes around attributes and stop propagation on click to avoid editing
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
+        // Add title attribute to show full URL on hover
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" title="${m}" onclick="event.stopPropagation();">${displayText}</a>`;
     });
 
     return replaced;
