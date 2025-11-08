@@ -5,6 +5,7 @@
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![GitHub stars](https://img.shields.io/github/stars/timothepoznanski/poznote?style=social)](https://github.com/timothepoznanski/poznote/stargazers)
 
 ## Table of Contents
 
