@@ -264,7 +264,7 @@
                     <div class="create-note-option" data-type="html" onclick="selectCreateType('html')">
                         <i class="fa fa-file-alt"></i>
                         <div>
-                            <span>HTML Note</span>
+                            <span>Note</span>
                             <p>Rich text with formatting, images, links, and Excalidraw diagrams</p>
                         </div>
                     </div>
