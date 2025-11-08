@@ -132,14 +132,38 @@ if ($note_id > 0) {
     
     // Check if file exists to preserve existing content
     $existing_content = '';
+    $existing_img_classes = '';
+    $existing_img_style = '';
     if (file_exists($filename)) {
         $existing_content = file_get_contents($filename);
+        
+        // Extract existing image classes and style to preserve border settings
+        if (preg_match('/<img[^>]+class="([^"]*)"[^>]*\/?>/', $existing_content, $class_matches)) {
+            $existing_img_classes = $class_matches[1];
+        }
+        if (preg_match('/<img[^>]+style="([^"]*)"[^>]*\/?>/', $existing_content, $style_matches)) {
+            $existing_img_style = $style_matches[1];
+        }
     }
     
     // Generate new Excalidraw HTML content
     if (!empty($base64_image)) {
+        // Build class attribute preserving border classes
+        $img_classes = 'excalidraw-image';
+        if (!empty($existing_img_classes)) {
+            // Preserve img-with-border and img-with-border-no-padding classes
+            if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
+                $img_classes .= ' img-with-border-no-padding';
+            } elseif (strpos($existing_img_classes, 'img-with-border') !== false) {
+                $img_classes .= ' img-with-border';
+            }
+        }
+        
+        // Build style attribute
+        $img_style = !empty($existing_img_style) ? ' style="' . htmlspecialchars($existing_img_style) . '"' : '';
+        
         $new_excalidraw_html = '<div class="excalidraw-container" contenteditable="false">';
-        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="excalidraw-image" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '" />';
+        $new_excalidraw_html .= '<img src="data:' . $mime_type . ';base64,' . $base64_image . '" alt="Excalidraw diagram" class="' . $img_classes . '" data-is-excalidraw="true" data-excalidraw-note-id="' . $note_id . '"' . $img_style . ' />';
         $new_excalidraw_html .= '<div class="excalidraw-data" style="display: none;">' . htmlspecialchars($diagram_data, ENT_QUOTES) . '</div>';
         $new_excalidraw_html .= '</div>';
     } else {
@@ -236,6 +260,50 @@ function saveEmbeddedDiagram() {
             $image_data = substr($preview_image_base64, strlen('data:image/png;base64,'));
         }
         
+        // Extract existing image classes and style to preserve border settings
+        $existing_img_classes = '';
+        $existing_img_style = '';
+        $pattern_for_extraction = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)"[^>]*style="([^"]*)".*?<\/div>/s';
+        if (preg_match($pattern_for_extraction, $html_content, $extraction_matches)) {
+            if (isset($extraction_matches[1])) {
+                $existing_img_classes = $extraction_matches[1];
+            }
+            if (isset($extraction_matches[2])) {
+                $existing_img_style = $extraction_matches[2];
+            }
+        } else {
+            // Try extracting just class or just style separately
+            $class_pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+class="([^"]*)".*?<\/div>/s';
+            $style_pattern = '/<div class="excalidraw-container" id="' . preg_quote($diagram_id, '/') . '"[^>]*>.*?<img[^>]+style="([^"]*)".*?<\/div>/s';
+            
+            if (preg_match($class_pattern, $html_content, $class_matches)) {
+                $existing_img_classes = $class_matches[1];
+            }
+            if (preg_match($style_pattern, $html_content, $style_matches)) {
+                $existing_img_style = $style_matches[1];
+            }
+        }
+        
+        // Build class attribute preserving border classes
+        $img_classes = 'excalidraw-image';
+        if (!empty($existing_img_classes)) {
+            // Preserve img-with-border and img-with-border-no-padding classes
+            if (strpos($existing_img_classes, 'img-with-border-no-padding') !== false) {
+                $img_classes .= ' img-with-border-no-padding';
+            } elseif (strpos($existing_img_classes, 'img-with-border') !== false) {
+                $img_classes .= ' img-with-border';
+            }
+        }
+        
+        // Build style attribute
+        $base_style = 'max-width: 100%; height: auto;';
+        if (!empty($existing_img_style)) {
+            // Merge existing style with base style
+            $img_style_attr = ' style="' . htmlspecialchars($base_style . ' ' . $existing_img_style) . '"';
+        } else {
+            $img_style_attr = ' style="' . $base_style . '"';
+        }
+        
         // Create the updated diagram HTML with embedded data and preview
         $diagram_html = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" 
                               style="padding: 10px; margin: 10px 0; cursor: pointer; text-align: center;" 
@@ -243,7 +311,7 @@ function saveEmbeddedDiagram() {
                               data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if (!empty($image_data)) {
-            $diagram_html .= '<img src="data:image/png;base64,' . $image_data . '" class="excalidraw-image" data-is-excalidraw="true" style="max-width: 100%; height: auto;" alt="Excalidraw diagram" />';
+            $diagram_html .= '<img src="data:image/png;base64,' . $image_data . '" class="' . $img_classes . '" data-is-excalidraw="true"' . $img_style_attr . ' alt="Excalidraw diagram" />';
         } else {
             $diagram_html .= '<i class="fa fa-draw-polygon" style="font-size: 48px; color: #666; margin-bottom: 10px;"></i>
                               <p style="color: #666; font-size: 16px; margin: 0;">Excalidraw diagram</p>';
