@@ -334,10 +334,8 @@ You can run multiple isolated Poznote instances on the same server. Each instanc
 ### Why Multiple Instances?
 
 Perfect for:
-- Different family members with separate accounts
-- Separating personal and work notes
-- Testing new features without affecting production
-- Hosting for multiple users on the same server
+- Hosting for different users on the same server, each with their own separate instance and account
+- Testing new features without affecting your production instance
 
 ### Example: Tom and Alice instances on the same server
 
