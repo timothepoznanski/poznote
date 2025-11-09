@@ -239,9 +239,9 @@ try {
 </ul>
 
 <h3>💡 Learn More</h3>
-<p>For pro tips, click the <strong>Display menu</strong> (eye icon in the top bar) and select <strong>"Tips and Tricks"</strong>.</p>
+<p>For pro tips, visit <strong>Settings</strong> and check the <strong>"Tips & Tricks"</strong> section.</p>
 
-<p><em>You can delete this welcome note once you're comfortable with Poznote. Happy note-taking! ✨</em></p>
+<p><em>You can delete this welcome note whenever you want. Happy note-taking! ✨</em></p>
 HTML;
 
             // Insert the welcome note
