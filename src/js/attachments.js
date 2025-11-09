@@ -447,10 +447,19 @@ function insertMarkdownAtCursor(text, dropTarget) {
             }
         }
         
-        // Fallback : ajouter à la fin
-        var currentContent = editor.textContent || '';
-        editor.textContent = currentContent + '\n' + text;
+        // Fallback : ajouter à la fin sans écraser les sauts de ligne
+        // Créer un node de texte pour le retour à la ligne et le nouveau texte
+        var newLineNode = document.createTextNode('\n' + text);
+        editor.appendChild(newLineNode);
         editor.focus();
+        
+        // Placer le curseur à la fin
+        var range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
 }
 
