@@ -191,6 +191,8 @@ try {
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
     // Renamed setting: show_note_subheading (was show_note_location)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_subheading', '1')");
+    // Folder counts hidden by default
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
 
     // Ensure required data directories exist
     // $dbDir points to data/database, so we need to go up one level to get data/
