@@ -457,8 +457,29 @@ function insertMarkdownAtCursor(text, dropTarget) {
 function replaceLoadingText(oldText, newText, dropTarget) {
     var editor = dropTarget.querySelector('.markdown-editor');
     if (editor) {
-        var content = editor.textContent || '';
-        editor.textContent = content.replace(oldText, newText);
+        // Parcourir les nodes de texte pour remplacer oldText sans perdre les sauts de ligne
+        var walker = document.createTreeWalker(
+            editor,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        var textNodes = [];
+        var node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+        
+        // Chercher et remplacer dans les nodes de texte
+        for (var i = 0; i < textNodes.length; i++) {
+            var textNode = textNodes[i];
+            var text = textNode.textContent;
+            if (text.indexOf(oldText) !== -1) {
+                textNode.textContent = text.replace(oldText, newText);
+                break; // On remplace seulement la première occurrence
+            }
+        }
         
         // Déclencher l'événement input pour que les listeners de markdown soient informés
         var event = new Event('input', { bubbles: true });
