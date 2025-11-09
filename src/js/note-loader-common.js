@@ -1206,16 +1206,16 @@ function enableImageResize(img) {
     // Create resize handle
     const resizeHandle = document.createElement('div');
     resizeHandle.className = 'image-resize-handle';
-    resizeHandle.innerHTML = '<i class="fas fa-grip-lines-vertical"></i>';
+    resizeHandle.innerHTML = '⤡';
     
     // Position the image as relative so the handle can be positioned absolutely
     const originalPosition = img.style.position;
     img.style.position = 'relative';
     img.style.display = 'inline-block';
     
-    // Create a wrapper if the image doesn't have one
+    // Create a wrapper if the image doesn't have one OR if parent doesn't have the resize wrapper class
     let wrapper = img.parentElement;
-    if (!wrapper || wrapper.tagName === 'DIV' && !wrapper.classList.contains('image-resize-wrapper')) {
+    if (!wrapper || !wrapper.classList.contains('image-resize-wrapper')) {
         wrapper = document.createElement('div');
         wrapper.className = 'image-resize-wrapper';
         wrapper.style.position = 'relative';
@@ -1223,6 +1223,10 @@ function enableImageResize(img) {
         wrapper.style.maxWidth = '100%';
         img.parentNode.insertBefore(wrapper, img);
         wrapper.appendChild(img);
+    } else {
+        // Ensure wrapper has proper positioning even if it already exists
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
     }
     
     // Add the handle to the wrapper

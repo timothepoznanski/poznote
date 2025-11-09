@@ -1259,8 +1259,8 @@ img {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
     background: #007DB8;
     border: 2px solid white;
     border-radius: 4px 0 4px 0;
@@ -1271,12 +1271,16 @@ img {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     z-index: 100;
     transition: all 0.2s ease;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .image-resize-handle:hover {
     background: #005a8a;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
 }
 
 .image-resize-handle i {
@@ -2879,6 +2883,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-copy::before { content: "\f0c5"; }
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
+.fa-grip-lines-vertical::before { content: "\f7a5"; }
 
 .fa-eye,
 .fa-clock,
@@ -2944,6 +2949,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-copy,
 .fa-trash-restore-alt,
 .fa-grip-vertical,
+.fa-grip-lines-vertical,
 .fa-video,
 .fa-plus,
 .fa-list-check,
