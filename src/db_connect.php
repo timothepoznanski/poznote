@@ -185,12 +185,14 @@ try {
     )');
 
     // Set default settings
-    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '16')");
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
     // Controls to show/hide metadata under note title in notes list (enabled by default)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
     // Renamed setting: show_note_subheading (was show_note_location)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_subheading', '1')");
+    // Folder counts hidden by default
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
 
     // Ensure required data directories exist
     // $dbDir points to data/database, so we need to go up one level to get data/
@@ -237,9 +239,9 @@ try {
 </ul>
 
 <h3>💡 Learn More</h3>
-<p>For pro tips, click the <strong>Display menu</strong> (eye icon in the top bar) and select <strong>"Tips and Tricks"</strong>.</p>
+<p>For pro tips, visit <strong>Settings</strong> and check the <strong>"Tips & Tricks"</strong> section.</p>
 
-<p><em>You can delete this welcome note once you're comfortable with Poznote. Happy note-taking! ✨</em></p>
+<p><em>You can delete this welcome note whenever you want. Happy note-taking! ✨</em></p>
 HTML;
 
             // Insert the welcome note
