@@ -2880,6 +2880,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 
+.fa-eye,
 .fa-clock,
 .fa-caret-down,
 .fa-mobile,

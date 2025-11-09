@@ -227,55 +227,25 @@ try {
             
             // Create welcome note content
             $welcomeContent = <<<'HTML'
-<h2>Getting Started</h2>
+<p>Poznote is your personal note-taking workspace designed for simplicity and efficiency.</p>
 
-<p>Poznote is your personal note-taking workspace. Here's how to get started:</p>
-
-<h3>📝 Creating Notes</h3>
+<h3>🚀 Quick Start</h3>
 <ul>
-<li><strong>New Note Button</strong>: Click the "+ New" button in the top navigation to create a note</li>
-<li><strong>Within Folders</strong>: Click the "+" icon next to any folder name to create a note directly in that folder</li>
-<li><strong>Note Types</strong>: Choose between HTML notes, Markdown notes, or Task Lists</li>
+<li><strong>Create Notes</strong>: Click the "+ New" button to create HTML notes, Markdown notes, or Task Lists</li>
+<li><strong>Organize</strong>: Use folders and workspaces to keep your notes organized</li>
+<li><strong>Search</strong>: Find anything instantly with tags and full-text search</li>
 </ul>
 
-<h3>📁 Organizing with Folders</h3>
-<ul>
-<li><strong>Create Folders</strong>: Click "New Folder" to organize your notes by topic or project</li>
-<li><strong>Move Notes</strong>: Drag and drop notes between folders, or use the "Move to Folder" option in the note menu</li>
-<li><strong>Workspaces</strong>: Create separate workspaces for different areas of your life (Work, Personal, Projects, etc.)</li>
-</ul>
+<h3>💡 Learn More</h3>
+<p>For pro tips, click the <strong>Display menu</strong> (eye icon in the top bar) and select <strong>"Tips and Tricks"</strong>.</p>
 
-<h3>✨ Key Features</h3>
-<ul>
-<li><strong>Rich Text Editing</strong>: Format your notes with headings, lists, bold, italic, and more</li>
-<li><strong>Attachments</strong>: Add images and files to your notes</li>
-<li><strong>Tags</strong>: Tag your notes for easy searching and organization</li>
-<li><strong>Favorites</strong>: Star important notes to access them quickly</li>
-<li><strong>Search</strong>: Quickly find notes by searching their content or searching by tags</li>
-<li><strong>Excalidraw</strong>: Create diagrams and drawings right in your notes</li>
-</ul>
-
-<h3>💡 Pro Tips</h3>
-<ul>
-<li>All notes are automatically saved as you type</li>
-<li>Use the display menu to customize your experience</li>
-<li>Backup your data regularly from the settings menu</li>
-</ul>
-
-<h3>🚀 Next Steps</h3>
-<ol>
-<li>Create your first folder to organize your notes</li>
-<li>Start writing! Try creating a note to see how it works</li>
-<li>Explore the settings to customize Poznote to your liking</li>
-</ol>
-
-<p><em>You can delete this welcome note once you're comfortable with Poznote. Happy note-taking!</em></p>
+<p><em>You can delete this welcome note once you're comfortable with Poznote. Happy note-taking! ✨</em></p>
 HTML;
 
             // Insert the welcome note
             $now_utc = gmdate('Y-m-d H:i:s', time());
             $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
+            $stmt->execute(['👋 Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
             
             $welcomeNoteId = $con->lastInsertId();
             
