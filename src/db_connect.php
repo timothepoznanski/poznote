@@ -213,9 +213,10 @@ try {
 
     // Create welcome note and Getting Started folder if no notes exist (first installation)
     try {
-        $noteCount = $con->query("SELECT COUNT(*) FROM entries WHERE trash = 0")->fetchColumn();
+        // Check if ANY notes exist (including in trash) - only create welcome note on true first installation
+        $totalNoteCount = $con->query("SELECT COUNT(*) FROM entries")->fetchColumn();
         
-        if ($noteCount == 0) {
+        if ($totalNoteCount == 0) {
             // Create "Getting Started" folder first
             $con->exec("INSERT OR IGNORE INTO folders (name, workspace, created) VALUES ('Getting Started', 'Poznote', datetime('now'))");
             
