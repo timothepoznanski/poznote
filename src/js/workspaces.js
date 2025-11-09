@@ -3,11 +3,17 @@
 function initializeWorkspaces() {
     var wsSelector = document.getElementById('workspaceSelector');
     
-    // Load workspace from localStorage
-    try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) selectedWorkspace = stored;
-    } catch(e) {}
+    // First priority: use window.selectedWorkspace (set by PHP from URL or default_workspace setting)
+    // This ensures the workspace selector matches the actual page workspace
+    if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) {
+        selectedWorkspace = window.selectedWorkspace;
+    } else {
+        // Second priority: load workspace from localStorage
+        try {
+            var stored = localStorage.getItem('poznote_selected_workspace');
+            if (stored) selectedWorkspace = stored;
+        } catch(e) {}
+    }
 
     // Validate that workspace exists in selector
     if (wsSelector) {
@@ -126,7 +132,8 @@ function loadAndShowWorkspaceMenu(menu) {
 }
 
 function displayWorkspaceMenu(menu, workspaces) {
-    var currentWorkspace = selectedWorkspace || 'Poznote';
+    // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
+    var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || 'Poznote');
     var menuHtml = '';
     
     // Add default workspace if it's not in the list

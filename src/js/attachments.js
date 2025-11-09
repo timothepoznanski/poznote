@@ -447,18 +447,48 @@ function insertMarkdownAtCursor(text, dropTarget) {
             }
         }
         
-        // Fallback : ajouter à la fin
-        var currentContent = editor.textContent || '';
-        editor.textContent = currentContent + '\n' + text;
+        // Fallback : ajouter à la fin sans écraser les sauts de ligne
+        // Créer un node de texte pour le retour à la ligne et le nouveau texte
+        var newLineNode = document.createTextNode('\n' + text);
+        editor.appendChild(newLineNode);
         editor.focus();
+        
+        // Placer le curseur à la fin
+        var range = document.createRange();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
 }
 
 function replaceLoadingText(oldText, newText, dropTarget) {
     var editor = dropTarget.querySelector('.markdown-editor');
     if (editor) {
-        var content = editor.textContent || '';
-        editor.textContent = content.replace(oldText, newText);
+        // Parcourir les nodes de texte pour remplacer oldText sans perdre les sauts de ligne
+        var walker = document.createTreeWalker(
+            editor,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        var textNodes = [];
+        var node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+        
+        // Chercher et remplacer dans les nodes de texte
+        for (var i = 0; i < textNodes.length; i++) {
+            var textNode = textNodes[i];
+            var text = textNode.textContent;
+            if (text.indexOf(oldText) !== -1) {
+                textNode.textContent = text.replace(oldText, newText);
+                break; // On remplace seulement la première occurrence
+            }
+        }
         
         // Déclencher l'événement input pour que les listeners de markdown soient informés
         var event = new Event('input', { bubbles: true });

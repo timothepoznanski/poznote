@@ -36,8 +36,7 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 		}
 	}
 
-	// If no folder specified, leave it null (note will appear without folder)
-	// Notes are only assigned to folders when explicitly created in a folder
+	// Legacy behavior: folder_id and folder both remain null if not specified
 	
 	// If folder_id is provided, verify it exists and fetch the folder name
 	if ($folder_id !== null && $folder_id > 0) {

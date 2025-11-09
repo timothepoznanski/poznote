@@ -96,31 +96,34 @@ try {
     $current_folder = $note['folder'];
     
     // Verify that destination folder exists (in folders table or as a folder used in entries)
-    // Check folders table respecting workspace
-    if ($workspace) {
-        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_name, $workspace, $workspace]);
-    } else {
-        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
-        $stmt->execute([$folder_name]);
-    }
-    $folder_exists = $stmt->fetchColumn() > 0;
-    
-    if (!$folder_exists) {
-        // Check if folder already exists in entries
+    // Only check if a folder is specified (allow moving to workspace root with null folder)
+    if ($folder_name !== null && $folder_name !== '') {
+        // Check folders table respecting workspace
         if ($workspace) {
-            $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
             $stmt->execute([$folder_name, $workspace, $workspace]);
         } else {
-            $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
+            $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
             $stmt->execute([$folder_name]);
         }
         $folder_exists = $stmt->fetchColumn() > 0;
         
         if (!$folder_exists) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Folder not found']);
-            exit;
+            // Check if folder already exists in entries
+            if ($workspace) {
+                $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+                $stmt->execute([$folder_name, $workspace, $workspace]);
+            } else {
+                $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
+                $stmt->execute([$folder_name]);
+            }
+            $folder_exists = $stmt->fetchColumn() > 0;
+            
+            if (!$folder_exists) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Folder not found']);
+                exit;
+            }
         }
     }
     

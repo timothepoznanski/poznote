@@ -211,9 +211,65 @@ try {
         }
     }
 
-    // Create welcome note if no notes exist (first installation)
-    // This will be handled by a deferred function call to avoid circular dependencies during DB initialization
-    // The welcome note creation is registered to be executed after all includes are loaded
+    // Create welcome note and Getting Started folder if no notes exist (first installation)
+    try {
+        // Check if ANY notes exist (including in trash) - only create welcome note on true first installation
+        $totalNoteCount = $con->query("SELECT COUNT(*) FROM entries")->fetchColumn();
+        
+        if ($totalNoteCount == 0) {
+            // Create "Getting Started" folder first
+            $con->exec("INSERT OR IGNORE INTO folders (name, workspace, created) VALUES ('Getting Started', 'Poznote', datetime('now'))");
+            
+            // Get the folder ID
+            $folderStmt = $con->query("SELECT id FROM folders WHERE name = 'Getting Started' AND workspace = 'Poznote'");
+            $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+            $folderId = $folderData ? (int)$folderData['id'] : null;
+            
+            // Create welcome note content
+            $welcomeContent = <<<'HTML'
+<p>Poznote is your personal note-taking workspace designed for simplicity and efficiency.</p>
+
+<h3>🚀 Quick Start</h3>
+<ul>
+<li><strong>Create Notes</strong>: Click the "+ New" button to create HTML notes, Markdown notes, or Task Lists</li>
+<li><strong>Organize</strong>: Use folders and workspaces to keep your notes organized</li>
+<li><strong>Search</strong>: Find anything instantly with tags and full-text search</li>
+</ul>
+
+<h3>💡 Learn More</h3>
+<p>For pro tips, click the <strong>Display menu</strong> (eye icon in the top bar) and select <strong>"Tips and Tricks"</strong>.</p>
+
+<p><em>You can delete this welcome note once you're comfortable with Poznote. Happy note-taking! ✨</em></p>
+HTML;
+
+            // Insert the welcome note
+            $now_utc = gmdate('Y-m-d H:i:s', time());
+            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute(['👋 Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
+            
+            $welcomeNoteId = $con->lastInsertId();
+            
+            // Create the HTML file for the welcome note
+            $dataDir = dirname($dbDir);
+            $entriesDir = $dataDir . '/entries';
+            if (!is_dir($entriesDir)) {
+                mkdir($entriesDir, 0755, true);
+            }
+            
+            $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
+            file_put_contents($welcomeFile, $welcomeContent);
+            chmod($welcomeFile, 0644);
+            
+            // Set proper ownership if running as root
+            if (function_exists('posix_getuid') && posix_getuid() === 0) {
+                chown($welcomeFile, 'www-data');
+                chgrp($welcomeFile, 'www-data');
+            }
+        }
+    } catch(Exception $e) {
+        // Log error but don't fail database connection
+        error_log("Failed to create welcome note: " . $e->getMessage());
+    }
 
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
