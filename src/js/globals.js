@@ -2,7 +2,8 @@
 var noteid = -1;
 var selectedFolderId = null; // ID du dossier sélectionné
 var selectedFolder = null; // Nom du dossier (pour affichage uniquement)
-var selectedWorkspace = 'Poznote';
+// Initialize from window.selectedWorkspace if available (set by PHP), otherwise default to Poznote
+var selectedWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : 'Poznote';
 var currentNoteFolder = null;
 var currentNoteFolderId = null; // ID du dossier de la note actuelle
 var currentNoteIdForAttachments = null;
