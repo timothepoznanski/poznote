@@ -51,8 +51,18 @@ function parseMarkdown($text) {
     
     // Helper function to apply inline styles (bold, italic, code, etc.)
     $applyInlineStyles = function($text) use (&$protectedElements) {
-        // Inline code (must be first to protect code content from other replacements)
-        $text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
+        // First, protect inline code content from other replacements
+        $protectedCode = [];
+        $codeIndex = 0;
+        $text = preg_replace_callback('/`([^`]+)`/', function($matches) use (&$protectedCode, &$codeIndex) {
+            $placeholder = "\x00CODE" . $codeIndex . "\x00";
+            $protectedCode[$codeIndex] = '<code>' . $matches[1] . '</code>';
+            $codeIndex++;
+            return $placeholder;
+        }, $text);
+        
+        // Handle angle bracket URLs <https://example.com>
+        $text = preg_replace('/&lt;(https?:\/\/[^\s&gt;]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
         
         // Bold and italic
         $text = preg_replace('/\*\*\*([^\*]+)\*\*\*/', '<strong><em>$1</em></strong>', $text);
@@ -64,6 +74,12 @@ function parseMarkdown($text) {
         
         // Strikethrough
         $text = preg_replace('/~~([^~]+)~~/', '<del>$1</del>', $text);
+        
+        // Restore protected code elements
+        $text = preg_replace_callback('/\x00CODE(\d+)\x00/', function($matches) use ($protectedCode) {
+            $index = (int)$matches[1];
+            return isset($protectedCode[$index]) ? $protectedCode[$index] : $matches[0];
+        }, $text);
         
         // Restore protected elements (images and links)
         $text = preg_replace_callback('/\x00P(IMG|LNK)(\d+)\x00/', function($matches) use ($protectedElements) {
@@ -163,55 +179,108 @@ function parseMarkdown($text) {
             continue;
         }
         
-        // Task lists (checkboxes) - must be checked before unordered lists
-        if (preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $line, $matches)) {
-            $flushParagraph();
-            $checked = strtolower($matches[1]) === 'x';
-            $content = $applyInlineStyles($matches[2]);
-            $checkbox = '<input type="checkbox" ' . ($checked ? 'checked ' : '') . 'disabled>';
-            $listItems = ['<li class="task-list-item">' . $checkbox . ' ' . $content . '</li>'];
+        // Helper function to parse nested lists
+        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList) {
+            $listItems = [];
+            $currentIndex = $startIndex;
+            $baseIndent = null;
             
-            // Check if next lines are also task list items
-            while ($i + 1 < count($lines) && preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $lines[$i + 1], $nextMatches)) {
-                $i++;
-                $nextChecked = strtolower($nextMatches[1]) === 'x';
-                $nextContent = $applyInlineStyles($nextMatches[2]);
-                $nextCheckbox = '<input type="checkbox" ' . ($nextChecked ? 'checked ' : '') . 'disabled>';
-                $listItems[] = '<li class="task-list-item">' . $nextCheckbox . ' ' . $nextContent . '</li>';
+            while ($currentIndex < count($lines)) {
+                $currentLine = $lines[$currentIndex];
+                
+                // Check if this is a list item
+                if ($isTaskList) {
+                    $listMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $currentLine, $matches);
+                } else {
+                    $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $currentLine, $matches);
+                }
+                
+                if (!$listMatch) {
+                    break; // Not a list item, end of list
+                }
+                
+                $indent = strlen($matches[1]);
+                $content = $isTaskList ? $matches[3] : $matches[3];
+                
+                // If this is the first item, set the base indentation
+                if ($baseIndent === null) {
+                    $baseIndent = $indent;
+                }
+                
+                if ($indent === $baseIndent) {
+                    // Same level item
+                    if ($isTaskList) {
+                        $isChecked = strtolower($matches[2]) === 'x';
+                        $checkbox = '<input type="checkbox" ' . ($isChecked ? 'checked ' : '') . 'disabled>';
+                        $itemHtml = '<li class="task-list-item">' . $checkbox . ' ' . $applyInlineStyles($content);
+                    } else {
+                        $itemHtml = '<li>' . $applyInlineStyles($content);
+                    }
+                    
+                    // Check if next items are more indented (nested)
+                    $nextIndex = $currentIndex + 1;
+                    if ($nextIndex < count($lines)) {
+                        $nextLine = $lines[$nextIndex];
+                        if ($isTaskList) {
+                            $nextMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $nextLine, $nextMatches);
+                        } else {
+                            $nextMatch = preg_match('/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/', $nextLine, $nextMatches);
+                        }
+                        
+                        if ($nextMatch && strlen($nextMatches[1]) > $indent) {
+                            // Parse nested list recursively
+                            $nestedResult = $parseNestedList($nextIndex, $isTaskList);
+                            $isOrderedNested = !$isTaskList && preg_match('/\d+\./', $nextMatches[2]);
+                            $listTag = $isOrderedNested ? 'ol' : 'ul';
+                            $listClass = $isTaskList ? ' class="task-list"' : '';
+                            $itemHtml .= '<' . $listTag . $listClass . '>' . implode('', $nestedResult['items']) . '</' . $listTag . '>';
+                            $currentIndex = $nestedResult['endIndex'];
+                        }
+                    }
+                    
+                    $itemHtml .= '</li>';
+                    $listItems[] = $itemHtml;
+                } else if ($indent < $baseIndent) {
+                    // Less indented, end of current list
+                    break;
+                } else {
+                    // This shouldn't happen if we're parsing correctly
+                    break;
+                }
+                
+                $currentIndex++;
             }
-            $result[] = '<ul class="task-list">' . implode('', $listItems) . '</ul>';
+            
+            return [
+                'items' => $listItems,
+                'endIndex' => $currentIndex - 1
+            ];
+        };
+        
+        // Task lists (checkboxes) - must be checked before unordered lists
+        if (preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $line)) {
+            $flushParagraph();
+            $listResult = $parseNestedList($i, true);
+            $result[] = '<ul class="task-list">' . implode('', $listResult['items']) . '</ul>';
+            $i = $listResult['endIndex'];
             continue;
         }
         
         // Unordered lists
-        if (preg_match('/^\s*[\*\-\+]\s+(.+)$/', $line, $matches)) {
+        if (preg_match('/^\s*[\*\-\+]\s+(.+)$/', $line)) {
             $flushParagraph();
-            $content = $applyInlineStyles($matches[1]);
-            $listItems = ['<li>' . $content . '</li>'];
-            
-            // Check if next lines are also list items
-            while ($i + 1 < count($lines) && preg_match('/^\s*[\*\-\+]\s+(.+)$/', $lines[$i + 1], $nextMatches)) {
-                $i++;
-                $nextContent = $applyInlineStyles($nextMatches[1]);
-                $listItems[] = '<li>' . $nextContent . '</li>';
-            }
-            $result[] = '<ul>' . implode('', $listItems) . '</ul>';
+            $listResult = $parseNestedList($i, false);
+            $result[] = '<ul>' . implode('', $listResult['items']) . '</ul>';
+            $i = $listResult['endIndex'];
             continue;
         }
         
         // Ordered lists
-        if (preg_match('/^\s*\d+\.\s+(.+)$/', $line, $matches)) {
+        if (preg_match('/^\s*\d+\.\s+(.+)$/', $line)) {
             $flushParagraph();
-            $content = $applyInlineStyles($matches[1]);
-            $listItems = ['<li>' . $content . '</li>'];
-            
-            // Check if next lines are also list items
-            while ($i + 1 < count($lines) && preg_match('/^\s*\d+\.\s+(.+)$/', $lines[$i + 1], $nextMatches)) {
-                $i++;
-                $nextContent = $applyInlineStyles($nextMatches[1]);
-                $listItems[] = '<li>' . $nextContent . '</li>';
-            }
-            $result[] = '<ol>' . implode('', $listItems) . '</ol>';
+            $listResult = $parseNestedList($i, false);
+            $result[] = '<ol>' . implode('', $listResult['items']) . '</ol>';
+            $i = $listResult['endIndex'];
             continue;
         }
         
