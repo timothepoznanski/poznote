@@ -95,8 +95,18 @@ function parseMarkdown(text) {
     
     // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
-        // Inline code (must be first to protect code content from other replacements)
-        text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // First, protect inline code content from other replacements
+        let protectedCode = [];
+        let codeIndex = 0;
+        text = text.replace(/`([^`]+)`/g, function(match, code) {
+            let placeholder = '\x00CODE' + codeIndex + '\x00';
+            protectedCode[codeIndex] = '<code>' + code + '</code>';
+            codeIndex++;
+            return placeholder;
+        });
+        
+        // Handle angle bracket URLs <https://example.com>
+        text = text.replace(/&lt;(https?:\/\/[^\s&gt;]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
         
         // Bold and italic
         text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
@@ -108,6 +118,11 @@ function parseMarkdown(text) {
         
         // Strikethrough
         text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+        
+        // Restore protected code elements
+        text = text.replace(/\x00CODE(\d+)\x00/g, function(match, index) {
+            return protectedCode[parseInt(index)] || match;
+        });
         
         // Restore protected elements (images and links)
         text = text.replace(/\x00P(IMG|LNK)(\d+)\x00/g, function(match, type, index) {
@@ -244,58 +259,110 @@ function parseMarkdown(text) {
             continue;
         }
         
+        // Helper function to parse nested lists
+        function parseNestedList(startIndex, isTaskList = false) {
+            let listItems = [];
+            let currentIndex = startIndex;
+            
+            while (currentIndex < lines.length) {
+                let currentLine = lines[currentIndex];
+                
+                // Check if this is a list item
+                let listMatch;
+                if (isTaskList) {
+                    listMatch = currentLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                } else {
+                    listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                }
+                
+                if (!listMatch) {
+                    break; // Not a list item, end of list
+                }
+                
+                let indent = listMatch[1].length;
+                let content = isTaskList ? listMatch[3] : listMatch[3];
+                
+                // If this is the first item, set the base indentation
+                if (listItems.length === 0) {
+                    var baseIndent = indent;
+                }
+                
+                if (indent === baseIndent) {
+                    // Same level item
+                    let itemHtml;
+                    if (isTaskList) {
+                        let isChecked = listMatch[2].toLowerCase() === 'x';
+                        let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
+                        itemHtml = '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content);
+                    } else {
+                        itemHtml = '<li>' + applyInlineStyles(content);
+                    }
+                    
+                    // Check if next items are more indented (nested)
+                    let nextIndex = currentIndex + 1;
+                    if (nextIndex < lines.length) {
+                        let nextLine = lines[nextIndex];
+                        let nextMatch;
+                        if (isTaskList) {
+                            nextMatch = nextLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                        } else {
+                            nextMatch = nextLine.match(/^(\s*)([\*\-\+]|\d+\.)\s+(.+)$/);
+                        }
+                        
+                        if (nextMatch && nextMatch[1].length > indent) {
+                            // Parse nested list
+                            let nestedResult = parseNestedList(nextIndex, isTaskList);
+                            let isOrderedNested = !isTaskList && nextMatch[2].match(/\d+\./);
+                            let listTag = isOrderedNested ? 'ol' : 'ul';
+                            let listClass = isTaskList ? ' class="task-list"' : '';
+                            itemHtml += '<' + listTag + listClass + '>' + nestedResult.items.join('') + '</' + listTag + '>';
+                            currentIndex = nestedResult.endIndex;
+                        }
+                    }
+                    
+                    itemHtml += '</li>';
+                    listItems.push(itemHtml);
+                } else if (indent < baseIndent) {
+                    // Less indented, end of current list
+                    break;
+                } else {
+                    // This shouldn't happen if we're parsing correctly
+                    break;
+                }
+                
+                currentIndex++;
+            }
+            
+            return {
+                items: listItems,
+                endIndex: currentIndex - 1
+            };
+        }
+        
         // Task lists (checkboxes) - must be checked before unordered lists
         if (line.match(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/)) {
             flushParagraph();
-            // Check if next lines are also task list items to group them
-            let listItems = [line.replace(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/, function(match, checked, content) {
-                let isChecked = checked.toLowerCase() === 'x';
-                let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
-                return '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content) + '</li>';
-            })];
-            while (i + 1 < lines.length && lines[i + 1].match(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/)) {
-                i++;
-                listItems.push(lines[i].replace(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/, function(match, checked, content) {
-                    let isChecked = checked.toLowerCase() === 'x';
-                    let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
-                    return '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content) + '</li>';
-                }));
-            }
-            result.push('<ul class="task-list">' + listItems.join('') + '</ul>');
+            let listResult = parseNestedList(i, true);
+            result.push('<ul class="task-list">' + listResult.items.join('') + '</ul>');
+            i = listResult.endIndex;
             continue;
         }
         
         // Unordered lists
         if (line.match(/^\s*[\*\-\+]\s+(.+)$/)) {
             flushParagraph();
-            // Check if next lines are also list items to group them
-            let listItems = [line.replace(/^\s*[\*\-\+]\s+(.+)$/, function(match, content) {
-                return '<li>' + applyInlineStyles(content) + '</li>';
-            })];
-            while (i + 1 < lines.length && lines[i + 1].match(/^\s*[\*\-\+]\s+(.+)$/)) {
-                i++;
-                listItems.push(lines[i].replace(/^\s*[\*\-\+]\s+(.+)$/, function(match, content) {
-                    return '<li>' + applyInlineStyles(content) + '</li>';
-                }));
-            }
-            result.push('<ul>' + listItems.join('') + '</ul>');
+            let listResult = parseNestedList(i, false);
+            result.push('<ul>' + listResult.items.join('') + '</ul>');
+            i = listResult.endIndex;
             continue;
         }
         
         // Ordered lists
         if (line.match(/^\s*\d+\.\s+(.+)$/)) {
             flushParagraph();
-            // Check if next lines are also list items to group them
-            let listItems = [line.replace(/^\s*\d+\.\s+(.+)$/, function(match, content) {
-                return '<li>' + applyInlineStyles(content) + '</li>';
-            })];
-            while (i + 1 < lines.length && lines[i + 1].match(/^\s*\d+\.\s+(.+)$/)) {
-                i++;
-                listItems.push(lines[i].replace(/^\s*\d+\.\s+(.+)$/, function(match, content) {
-                    return '<li>' + applyInlineStyles(content) + '</li>';
-                }));
-            }
-            result.push('<ol>' + listItems.join('') + '</ol>');
+            let listResult = parseNestedList(i, false);
+            result.push('<ol>' + listResult.items.join('') + '</ol>');
+            i = listResult.endIndex;
             continue;
         }
         
