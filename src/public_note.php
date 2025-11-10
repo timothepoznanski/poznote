@@ -50,10 +50,10 @@ function parseMarkdown($text) {
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     
     // Helper function to apply inline styles (bold, italic, code, etc.)
-    $protectedCode = [];
-    $codeIndex = 0;
-    $applyInlineStyles = function($text) use (&$protectedElements, &$protectedCode, &$codeIndex) {
+    $applyInlineStyles = function($text) use (&$protectedElements) {
         // First, protect inline code content from other replacements
+        $protectedCode = [];
+        $codeIndex = 0;
         $text = preg_replace_callback('/`([^`]+)`/', function($matches) use (&$protectedCode, &$codeIndex) {
             $placeholder = "\x00CODE" . $codeIndex . "\x00";
             $protectedCode[$codeIndex] = '<code>' . $matches[1] . '</code>';
@@ -180,7 +180,7 @@ function parseMarkdown($text) {
         }
         
         // Helper function to parse nested lists
-        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles) {
+        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList) {
             $listItems = [];
             $currentIndex = $startIndex;
             $baseIndent = null;
@@ -229,7 +229,7 @@ function parseMarkdown($text) {
                         
                         if ($nextMatch && strlen($nextMatches[1]) > $indent) {
                             // Parse nested list recursively
-                            $nestedResult = call_user_func($parseNestedList, $nextIndex, $isTaskList);
+                            $nestedResult = $parseNestedList($nextIndex, $isTaskList);
                             $isOrderedNested = !$isTaskList && preg_match('/\d+\./', $nextMatches[2]);
                             $listTag = $isOrderedNested ? 'ol' : 'ul';
                             $listClass = $isTaskList ? ' class="task-list"' : '';
