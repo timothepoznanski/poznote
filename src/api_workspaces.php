@@ -67,9 +67,30 @@ try {
             echo json_encode(['success' => false, 'message' => 'Workspace not found']);
             exit;
         }
+        
+        // Check if this workspace is set as the default workspace
+        $currentDefaultWorkspace = null;
+        try {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['default_workspace']);
+            $currentDefaultWorkspace = $stmt->fetchColumn();
+        } catch (Exception $e) {
+            // Settings table may not exist - ignore
+        }
+        
         // Move notes from this workspace to default before deleting
         $stmt = $con->prepare("UPDATE entries SET workspace = 'Poznote' WHERE workspace = ?");
         $stmt->execute([$name]);
+
+        // If the deleted workspace was the default workspace, reset to "last opened"
+        if ($currentDefaultWorkspace === $name) {
+            try {
+                $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                $resetStmt->execute(['default_workspace', '__last_opened__']);
+            } catch (Exception $e) {
+                // If settings update fails, continue - it's not critical for workspace deletion
+            }
+        }
 
         $stmt = $con->prepare("DELETE FROM workspaces WHERE name = ?");
         // Audit log: record delete attempts

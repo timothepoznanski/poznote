@@ -44,6 +44,16 @@ if ($_POST) {
                 throw new Exception('Workspace not found');
             }
 
+                // Check if this workspace is set as the default workspace
+                $currentDefaultWorkspace = null;
+                try {
+                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                    $stmt->execute(['default_workspace']);
+                    $currentDefaultWorkspace = $stmt->fetchColumn();
+                } catch (Exception $e) {
+                    // Settings table may not exist - ignore
+                }
+
                 // Delete all entries for this workspace (including trashed notes)
                 $selectEntries = $con->prepare('SELECT id, attachments, type FROM entries WHERE workspace = ?');
                 $selectEntries->execute([$name]);
@@ -143,6 +153,16 @@ if ($_POST) {
                     $delSettings->execute(['%::' . $name]);
                 } catch (Exception $e) {
                     // non-fatal
+                }
+
+                // If the deleted workspace was the default workspace, reset to "last opened"
+                if ($currentDefaultWorkspace === $name) {
+                    try {
+                        $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                        $resetStmt->execute(['default_workspace', '__last_opened__']);
+                    } catch (Exception $e) {
+                        // If settings update fails, continue - it's not critical for workspace deletion
+                    }
                 }
 
                 // Finally remove workspace record
@@ -676,7 +696,7 @@ try {
 
         // Default Workspace Management
         (function(){
-            function loadDefaultWorkspaceSetting() {
+            window.loadDefaultWorkspaceSetting = function loadDefaultWorkspaceSetting() {
                 var select = document.getElementById('defaultWorkspaceSelect');
                 if (!select) return;
                 

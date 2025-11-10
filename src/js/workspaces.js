@@ -546,6 +546,14 @@ function handleDeleteButtonClick(e) {
                         }
 
                     } catch(e) {}
+                    // Update the default workspace dropdown if needed
+                    try {
+                        // If there's a loadDefaultWorkspaceSetting function available, call it to refresh the dropdown
+                        if (typeof window.loadDefaultWorkspaceSetting === 'function') {
+                            window.loadDefaultWorkspaceSetting();
+                        }
+                    } catch (e) {}
+                    
                     // Reload page to show updated workspace list
                     setTimeout(function() {
                         window.location.reload();
