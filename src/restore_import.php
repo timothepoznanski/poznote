@@ -534,6 +534,56 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </a>
 
         <br><br>
+        
+        <!-- Global Messages Section - Always visible at the top -->
+        <?php if ($restore_message): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($restore_message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($restore_error): ?>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($restore_error); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_notes_message): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($import_notes_message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_notes_error): ?>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($import_notes_error); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_attachments_message): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($import_attachments_message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_attachments_error): ?>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($import_attachments_error); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_individual_notes_message): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($import_individual_notes_message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($import_individual_notes_error): ?>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($import_individual_notes_error); ?>
+            </div>
+        <?php endif; ?>
+        
         <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
         
@@ -553,18 +603,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </h3>
             <div id="standardRestore" class="accordion-content" style="display: none;">
             <p>Upload a complete backup ZIP file. This method is fast and simple.</p>
-            
-            <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
-                <div class="alert alert-success">
-                    <?php echo htmlspecialchars($restore_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($restore_error && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
-                <div class="alert alert-danger">
-                    <?php echo htmlspecialchars($restore_error); ?>
-                </div>
-            <?php endif; ?>
 
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="complete_restore">
@@ -687,18 +725,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </h3>
             <div id="individualNotes" class="accordion-content" style="display: none;">
             <p>Notes will be imported into the <b>Default</b> folder of the <b>Poznote</b> workspace.<br><br>The title will be automatically created from the file name (without the extension).</p>
-            
-            <?php if ($import_individual_notes_message): ?>
-                <div class="alert alert-success">
-                    <?php echo htmlspecialchars($import_individual_notes_message); ?>
-                </div>
-            <?php endif; ?>
-            
-            <?php if ($import_individual_notes_error): ?>
-                <div class="alert alert-danger">
-                    <?php echo htmlspecialchars($import_individual_notes_error); ?>
-                </div>
-            <?php endif; ?>
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
