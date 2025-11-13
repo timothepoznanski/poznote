@@ -168,6 +168,11 @@ window.loadNoteDirectly = function(url, noteId, event) {
             event.stopPropagation();
         }
         
+        // Set flag for mobile scroll behavior
+        if (typeof sessionStorage !== 'undefined' && isMobileDevice()) {
+            sessionStorage.setItem('shouldScrollToNote', 'true');
+        }
+        
         // Cancel any pending auto-save operations for the previous note
         if (typeof saveTimeout !== 'undefined') {
             clearTimeout(saveTimeout);
@@ -941,6 +946,11 @@ function reinitializeNoteContent() {
 
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
+    
+    // Re-initialize note drag and drop events
+    if (typeof setupNoteDragDropEvents === 'function') {
+        setupNoteDragDropEvents();
+    }
 
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)

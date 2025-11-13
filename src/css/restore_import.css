@@ -33,17 +33,57 @@ body {
 
 /* Sections de sauvegarde */
 .backup-section {
-    margin-bottom: 30px;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #ffffff;
     border-radius: 6px;
 }
 
 .backup-section h3 {
     margin-top: 0;
     color: #333;
-    border-bottom: 2px solid #007cba;
+    border-bottom: none;
     padding-bottom: 10px;
+}
+
+.backup-section.child-section h3 {
+    font-weight: 400;
+}
+
+/* Accordion styles */
+.accordion-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.accordion-header:hover {
+    color: #007cba;
+}
+
+.accordion-icon {
+    display: inline-block;
+    width: 20px;
+    margin-right: 10px;
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+.accordion-content {
+    /* padding-top: 15px; */
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Boîte d'information */

@@ -427,8 +427,8 @@ function toggleCodeBlock() {
   
   // Otherwise, create a code block with the selected text
   if (sel.isCollapsed) {
-    // No selection: insert empty block
-    document.execCommand('insertHTML', false, '<pre class="code-block"><br></pre>');
+    // No selection: insert empty block with blank lines before and after
+    document.execCommand('insertHTML', false, '<br><pre class="code-block"><br></pre><br>');
     return;
   }
   
@@ -442,7 +442,7 @@ function toggleCodeBlock() {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
   
-  const codeHTML = `<pre class="code-block">${escapedText}</pre>`;
+  const codeHTML = `<br><pre class="code-block">${escapedText}</pre><br>`;
   document.execCommand('insertHTML', false, codeHTML);
 }
 

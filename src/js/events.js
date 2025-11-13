@@ -172,6 +172,56 @@ function setupNoteEditingEvents() {
     document.body.addEventListener('blur', function(e) {
         handleTitleBlur(e);
     }, true); // Use capture phase to ensure we catch the event
+    
+    // Monitor code blocks and remove them if they become empty
+    document.body.addEventListener('input', function(e) {
+        var target = e.target;
+        
+        // Check if we're editing a noteentry (HTML notes)
+        if (target.classList && target.classList.contains('noteentry')) {
+            // Use requestAnimationFrame to check after the input is processed
+            requestAnimationFrame(function() {
+                if (target && target.parentNode) {
+                    // Find all code blocks in this note
+                    var codeBlocks = target.querySelectorAll('pre, .code-block');
+                    
+                    for (var i = 0; i < codeBlocks.length; i++) {
+                        var codeBlock = codeBlocks[i];
+                        var content = codeBlock.textContent || '';
+                        
+                        // If the code block is now empty, remove it
+                        if (content.trim() === '') {
+                            // Save the selection before modifying DOM
+                            var sel = window.getSelection();
+                            var wasInCodeBlock = codeBlock.contains(sel.anchorNode);
+                            
+                            // Create a paragraph to replace the empty code block
+                            var paragraph = document.createElement('p');
+                            paragraph.innerHTML = '<br>';
+                            
+                            // Insert the paragraph before removing the code block
+                            codeBlock.parentNode.insertBefore(paragraph, codeBlock);
+                            codeBlock.remove();
+                            
+                            // Place cursor in the new paragraph if it was in the code block
+                            if (wasInCodeBlock) {
+                                var range = document.createRange();
+                                range.setStart(paragraph, 0);
+                                range.collapse(true);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                            
+                            // Mark note as modified
+                            if (typeof window.markNoteAsModified === 'function') {
+                                window.markNoteAsModified();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }, true); // Use capture phase to catch events from contenteditable children
 }
 
 function handleChecklistKeydown(e) {
@@ -864,10 +914,50 @@ function setupNoteDragDropEvents() {
     
     // Add drag events to all note links (both in folders and without folder)
     var noteLinks = document.querySelectorAll('.links_arbo_left');
-    noteLinks.forEach(function(link) {
+    
+    noteLinks.forEach(function(link, index) {
+        // Force draggable attribute both ways
+        link.setAttribute('draggable', 'true');
         link.draggable = true;
-        link.addEventListener('dragstart', handleNoteDragStart);
-        link.addEventListener('dragend', handleNoteDragEnd);
+        
+        // Remove existing event listeners if any
+        link.removeEventListener('dragstart', handleNoteDragStart);
+        link.removeEventListener('dragend', handleNoteDragEnd);
+        
+        // Add fresh event listeners
+        link.addEventListener('dragstart', handleNoteDragStart, false);
+        link.addEventListener('dragend', handleNoteDragEnd, false);
+        
+        // Handle click events separately
+        var dataOnclick = link.getAttribute('data-onclick') || link.getAttribute('onclick');
+        if (dataOnclick) {
+            link.removeAttribute('onclick'); // Remove to avoid conflicts
+            
+            link.addEventListener('click', function(e) {
+                // On mobile, execute immediately without delay for better responsiveness
+                var isMobile = window.innerWidth <= 800;
+                
+                if (isMobile) {
+                    // Execute immediately on mobile
+                    try {
+                        var func = new Function('event', dataOnclick);
+                        return func.call(link, e);
+                    } catch (err) {
+                        console.error('Error executing click handler:', err);
+                    }
+                } else {
+                    // Small delay on desktop to distinguish from drag
+                    setTimeout(function() {
+                        try {
+                            var func = new Function('event', dataOnclick);
+                            return func.call(link, e);
+                        } catch (err) {
+                            console.error('Error executing click handler:', err);
+                        }
+                    }, 50);
+                }
+            }, false);
+        }
     });
     
     // Add drop events to folder headers
@@ -877,40 +967,261 @@ function setupNoteDragDropEvents() {
         header.addEventListener('drop', handleFolderDrop);
         header.addEventListener('dragleave', handleFolderDragLeave);
     });
+    
+    // Add global drop handler for dropping outside folders (move to no folder)
+    var notesListContainer = document.querySelector('.notes_list, #notes-list, body');
+    if (notesListContainer) {
+        notesListContainer.addEventListener('dragover', function(e) {
+            // Check if we're not over a folder header
+            var isOverFolder = e.target.closest('.folder-header');
+            if (!isOverFolder && window.currentDragData && window.currentDragData.currentFolderId) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+        });
+        
+        notesListContainer.addEventListener('drop', function(e) {
+            // Check if we're not over a folder header
+            var isOverFolder = e.target.closest('.folder-header');
+            if (!isOverFolder && window.currentDragData && window.currentDragData.currentFolderId) {
+                e.preventDefault();
+                moveNoteToRoot(window.currentDragData.noteId);
+            }
+        });
+    }
+    
+    // Add drop events to root drop zone
+    var rootDropZone = document.getElementById('root-drop-zone');
+    
+    if (rootDropZone) {
+        // Remove existing listeners first
+        rootDropZone.removeEventListener('dragover', handleRootDragOver);
+        rootDropZone.removeEventListener('drop', handleRootDrop);
+        rootDropZone.removeEventListener('dragleave', handleRootDragLeave);
+        
+        // Add new listeners
+        rootDropZone.addEventListener('dragover', handleRootDragOver);
+        rootDropZone.addEventListener('drop', handleRootDrop);
+        rootDropZone.addEventListener('dragleave', handleRootDragLeave);
+    }
 }
 
 function handleNoteDragStart(e) {
     var noteLink = e.target.closest('.links_arbo_left');
-    if (!noteLink) return;
+    if (!noteLink) {
+        return;
+    }
     
     var noteId = noteLink.getAttribute('data-note-db-id');
     var currentFolder = noteLink.getAttribute('data-folder');
     var currentFolderId = noteLink.getAttribute('data-folder-id');
     
     if (noteId) {
-        e.dataTransfer.setData('text/plain', JSON.stringify({
+        var dragData = {
             noteId: noteId,
             currentFolder: currentFolder || null,
             currentFolderId: currentFolderId || null
-        }));
+        };
+        
+        e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
         e.dataTransfer.effectAllowed = 'move';
+        
+        // Store drag data globally for mouseup fallback
+        window.currentDragData = dragData;
+        
+        // Create a custom drag image with styles already applied
+        var dragImage = noteLink.cloneNode(true);
+        dragImage.style.position = 'absolute';
+        dragImage.style.top = '-1000px';
+        dragImage.style.opacity = '0.85';
+        dragImage.style.backgroundColor = 'rgba(0, 123, 255, 0.08)';
+        dragImage.style.border = '1px solid rgba(0, 123, 255, 0.3)';
+        dragImage.style.transform = 'scale(1.02)';
+        dragImage.style.padding = '10px';
+        dragImage.style.borderRadius = '4px';
+        dragImage.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.15)';
+        dragImage.style.width = noteLink.offsetWidth + 'px';
+        dragImage.style.height = noteLink.offsetHeight + 'px';
+        document.body.appendChild(dragImage);
+        
+        // Set the custom drag image
+        try {
+            e.dataTransfer.setDragImage(dragImage, 50, 20);
+        } catch (err) {
+            // Silently fail if browser doesn't support custom drag images
+        }
+        
+        // Remove the drag image after a short delay
+        setTimeout(function() {
+            if (dragImage && dragImage.parentNode) {
+                dragImage.parentNode.removeChild(dragImage);
+            }
+        }, 0);
         
         // Add visual feedback
         noteLink.classList.add('dragging');
+        noteLink.setAttribute('data-dragging', 'true');
+        noteLink.style.setProperty('opacity', '0.6', 'important');
+        noteLink.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
+        noteLink.style.setProperty('border-left', '3px solid rgba(0, 123, 255, 0.4)', 'important');
+        noteLink.style.setProperty('transform', 'scale(0.98)', 'important');
+        
+        // Show root drop zone only if note is in a folder
+        var rootDropZone = document.getElementById('root-drop-zone');
+        
+        if (false && rootDropZone && currentFolderId) {
+            // DISABLED: Zone de drop désactivée
+            // Remove the display:none style completely and force new styles
+            rootDropZone.removeAttribute('style');
+            rootDropZone.className = 'root-drop-zone active-drop-zone';
+            
+            // Apply styles via direct assignment
+            rootDropZone.style.cssText = `
+                display: block !important;
+                position: relative !important;
+                z-index: 9999 !important;
+                background-color: #e3f2fd !important;
+                border: 3px dashed #007bff !important;
+                padding: 20px !important;
+                margin: 10px !important;
+                text-align: center !important;
+                font-weight: bold !important;
+                color: #007bff !important;
+                min-height: 60px !important;
+                width: auto !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            `;
+            
+            // Force reflow
+            rootDropZone.offsetHeight;
+            
+            // IMPORTANT: Re-apply dragging styles to the note after showing drop zone
+            setTimeout(function() {
+                if (noteLink) {
+                    noteLink.style.setProperty('opacity', '0.6', 'important');
+                    noteLink.style.setProperty('background-color', 'rgba(0, 123, 255, 0.08)', 'important');
+                    noteLink.style.setProperty('border-left', '3px solid rgba(0, 123, 255, 0.4)', 'important');
+                    noteLink.style.setProperty('transform', 'scale(0.98)', 'important');
+                }
+            }, 0);
+            
+            // Re-attach event listeners specifically for this drag session
+            rootDropZone.removeEventListener('dragover', handleRootDragOver);
+            rootDropZone.removeEventListener('drop', handleRootDrop);
+            rootDropZone.removeEventListener('dragleave', handleRootDragLeave);
+            
+            rootDropZone.addEventListener('dragover', handleRootDragOver);
+            rootDropZone.addEventListener('drop', handleRootDrop);
+            rootDropZone.addEventListener('dragleave', handleRootDragLeave);
+            
+            // Alternative: use mouse events during drag as backup
+            rootDropZone.addEventListener('mouseenter', function(e) {
+                // Check if we're currently dragging
+                if (document.querySelector('.links_arbo_left.dragging')) {
+                    rootDropZone.classList.add('drag-over');
+                    rootDropZone.style.backgroundColor = '#e3f2fd';
+                    rootDropZone.style.borderColor = '#007bff';
+                    rootDropZone.style.transform = 'scale(1.02)';
+                }
+            });
+            
+            rootDropZone.addEventListener('mouseleave', function(e) {
+                if (document.querySelector('.links_arbo_left.dragging')) {
+                    rootDropZone.classList.remove('drag-over');
+                    rootDropZone.style.transform = 'scale(1)';
+                }
+            });
+            
+            // Alternative drop detection via click during or after drag
+            rootDropZone.addEventListener('click', function(e) {
+                // Check if we have drag data stored globally
+                if (window.currentDragData) {
+                    if (window.currentDragData.noteId && window.currentDragData.currentFolderId) {
+                        // Hide the drop zone immediately after successful drop
+                        rootDropZone.classList.remove('drag-over');
+                        rootDropZone.className = 'root-drop-zone';
+                        rootDropZone.style.cssText = 'display: none;';
+                        
+                        // Move the note
+                        moveNoteToRoot(window.currentDragData.noteId);
+                    }
+                    // Clear the drag data
+                    window.currentDragData = null;
+                }
+            });
+            
+            // Keep the mouseup handler as backup
+            rootDropZone.addEventListener('mouseup', function(e) {
+                // Check if we have drag data stored globally
+                if (window.currentDragData) {
+                    if (window.currentDragData.noteId && window.currentDragData.currentFolderId) {
+                        // Hide the drop zone immediately after successful drop
+                        rootDropZone.classList.remove('drag-over');
+                        rootDropZone.className = 'root-drop-zone';
+                        rootDropZone.style.cssText = 'display: none;';
+                        
+                        // Move the note
+                        moveNoteToRoot(window.currentDragData.noteId);
+                    }
+                    // Clear the drag data
+                    window.currentDragData = null;
+                }
+            });
+            
+            // Scroll into view
+            rootDropZone.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 }
 
 function handleNoteDragEnd(e) {
-    // Remove dragging class
+    // DON'T clean up the drop zone immediately - let mouseup events fire first
+    // Only clean up the dragged note styles
     var noteLink = e.target.closest('.links_arbo_left');
     if (noteLink) {
         noteLink.classList.remove('dragging');
+        // Remove inline styles
+        noteLink.style.opacity = '';
+        noteLink.style.transform = '';
+        noteLink.style.backgroundColor = '';
+        noteLink.style.border = '';
+        noteLink.style.zIndex = '';
+        noteLink.style.position = '';
     }
+    
+    // Also clean up any other notes that might have been prepared for drag
+    document.querySelectorAll('.links_arbo_left.dragging').forEach(function(link) {
+        if (link !== noteLink) {
+            link.classList.remove('dragging');
+            link.style.opacity = '';
+            link.style.transform = '';
+            link.style.backgroundColor = '';
+            link.style.border = '';
+            link.style.zIndex = '';
+            link.style.position = '';
+        }
+    });
     
     // Remove drag-over class from all folders
     document.querySelectorAll('.folder-header.drag-over').forEach(function(header) {
         header.classList.remove('drag-over');
     });
+    
+    // Clean up global drag data and hide drop zone after a longer delay
+    setTimeout(function() {
+        if (window.currentDragData) {
+            window.currentDragData = null;
+        }
+        
+        // Hide root drop zone
+        var rootDropZone = document.getElementById('root-drop-zone');
+        if (rootDropZone && getComputedStyle(rootDropZone).display !== 'none') {
+            rootDropZone.classList.remove('drag-over');
+            rootDropZone.className = 'root-drop-zone'; // Reset to original class
+            rootDropZone.style.cssText = 'display: none;'; // Reset styles
+        }
+    }, 2000); // Much longer delay to allow for click interaction
 }
 
 function handleFolderDragOver(e) {
@@ -1037,6 +1348,91 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
     })
     .catch(function(error) {
         showNotificationPopup('Error moving note: ' + error.message, 'error');
+    });
+}
+
+// Root drop zone handlers
+function handleRootDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    var rootDropZone = document.getElementById('root-drop-zone');
+    if (rootDropZone) {
+        rootDropZone.classList.add('drag-over');
+        rootDropZone.style.display = 'block';
+    }
+}
+
+function handleRootDragLeave(e) {
+    var rootDropZone = document.getElementById('root-drop-zone');
+    if (rootDropZone) {
+        rootDropZone.classList.remove('drag-over');
+    }
+}
+
+function handleRootDrop(e) {
+    e.preventDefault();
+    
+    var rootDropZone = document.getElementById('root-drop-zone');
+    if (rootDropZone) {
+        rootDropZone.classList.remove('drag-over');
+        rootDropZone.className = 'root-drop-zone';
+        rootDropZone.style.cssText = 'display: none;';
+    }
+    
+    // Remove dragging class from all notes
+    document.querySelectorAll('.links_arbo_left.dragging').forEach(function(link) {
+        link.classList.remove('dragging');
+        link.style.opacity = '';
+        link.style.transform = '';
+        link.style.backgroundColor = '';
+        link.style.border = '';
+        link.style.zIndex = '';
+        link.style.position = '';
+    });
+    
+    try {
+        var data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        
+        // Only proceed if note is currently in a folder (not already in root)
+        if (data.noteId && data.currentFolderId) {
+            moveNoteToRoot(data.noteId);
+        }
+    } catch (err) {
+        console.error('Error handling root drop:', err);
+    }
+}
+
+function moveNoteToRoot(noteId) {
+    var params = new URLSearchParams({
+        action: 'remove_from_folder',
+        note_id: noteId,
+        workspace: selectedWorkspace || 'Poznote'
+    });
+    
+    fetch("api_folders.php", {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/x-www-form-urlencoded", 
+            'X-Requested-With': 'XMLHttpRequest', 
+            'Accept': 'application/json' 
+        },
+        body: params.toString()
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data && data.success) {
+            // Note moved to root successfully
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        } else {
+            var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+            showNotificationPopup('Error removing note from folder: ' + err, 'error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup('Error removing note from folder: ' + error.message, 'error');
     });
 }
 

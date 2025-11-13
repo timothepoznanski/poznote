@@ -146,9 +146,9 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Add onclick handler for AJAX loading
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
+        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' draggable='true'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
@@ -198,6 +198,16 @@ if ($favoritesFolder) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
     }
+}
+
+// Add drop zone for moving notes to root (no folder)
+if (empty($folder_filter)) {
+    echo '<div id="root-drop-zone" class="root-drop-zone" style="display: none;">';
+    echo '<div class="drop-zone-content">';
+    echo '<i class="fa-home drop-zone-icon"></i>';
+    echo '<span class="drop-zone-text">Drop here to remove from folder</span>';
+    echo '</div>';
+    echo '</div>';
 }
 
 // Display uncategorized notes (notes without folder) AFTER Favorites if sorting by date

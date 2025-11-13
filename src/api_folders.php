@@ -788,6 +788,34 @@ switch($action) {
             echo json_encode(['success' => false, 'error' => 'Database error']);
         }
         break;
+    
+    case 'remove_from_folder':
+        try {
+            $noteId = $_POST['note_id'] ?? '';
+            
+            if (empty($noteId)) {
+                echo json_encode(['success' => false, 'error' => 'Note ID is required']);
+                exit;
+            }
+            
+            // Move note to root (no folder) by setting folder and folder_id to null
+            $query = "UPDATE entries SET folder = NULL, folder_id = NULL, updated = datetime('now') WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $success = $stmt->execute([$noteId]);
+            
+            if ($success) {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Note removed from folder successfully'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Database error']);
+            }
+        } catch (Exception $e) {
+            error_log("Remove from folder error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Internal server error: ' . $e->getMessage()]);
+        }
+        break;
         
     default:
         echo json_encode(['success' => false, 'error' => 'Invalid action']);

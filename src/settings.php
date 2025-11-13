@@ -118,7 +118,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-code-branch"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>GitHub Repository</h3>
+                    <h3>Documentation</h3>
                 </div>
             </div>
 

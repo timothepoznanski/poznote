@@ -380,7 +380,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     global $con;
     
     // Check file count limit
-    $maxFiles = 20;
+    $maxFiles = 50;
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
@@ -438,34 +438,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         
         // Extract title from filename (without extension)
         $title = pathinfo($fileName, PATHINFO_FILENAME);
-        
-        // For markdown files, try to extract title from first line if it's a heading
-        if ($noteType === 'markdown') {
-            $lines = explode("\n", $content);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (preg_match('/^#\s+(.+)$/', $line, $matches)) {
-                    $title = trim($matches[1]);
-                    break;
-                } elseif (!empty($line) && $line[0] !== '#') {
-                    // Stop at first non-heading, non-empty line
-                    break;
-                }
-            }
-        } else {
-            // For HTML files, try to extract title from <title> or <h1> tags
-            if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $content, $matches)) {
-                $extractedTitle = trim(strip_tags($matches[1]));
-                if (!empty($extractedTitle)) {
-                    $title = $extractedTitle;
-                }
-            } elseif (preg_match('/<h1[^>]*>(.*?)<\/h1>/is', $content, $matches)) {
-                $extractedTitle = trim(strip_tags($matches[1]));
-                if (!empty($extractedTitle)) {
-                    $title = $extractedTitle;
-                }
-            }
-        }
         
         // Sanitize title
         $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
@@ -562,11 +534,24 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         </a>
 
         <br><br>
-        <div> If you want to know more about why we have several retore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
+        
+        <!-- Parent Restore Section -->
+        <div class="backup-section parent-section">
+            <h3 class="accordion-header" onclick="toggleAccordion('restoreBackup')">
+                <span class="accordion-icon" id="restoreBackupIcon">▶</span>
+                Want to restore a backup file?
+            </h3>
+            <div id="restoreBackup" class="accordion-content" style="display: none;">
+            
         <!-- Standard Complete Restore Section -->
-        <div class="backup-section">
-            <h3>Backup file sizes less than 500MB - Standard Complete Restore</h3>
+        <div class="backup-section child-section">
+            <h3 class="accordion-header" onclick="toggleAccordion('standardRestore')">
+                <span class="accordion-icon" id="standardRestoreIcon">▶</span>
+                Is your backup file less than 500MB? 
+            </h3>
+            <div id="standardRestore" class="accordion-content" style="display: none;">
             <p>Upload a complete backup ZIP file. This method is fast and simple.</p>
             
             <?php if ($restore_message && isset($_POST['action']) && $_POST['action'] === 'complete_restore'): ?>
@@ -589,7 +574,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 </div>
                 
                 <button type="button" id="completeRestoreBtn" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
-                    <span> Start Complete Restore (Standard)
+                    <span> Start Restore
                 </button>
                 <!-- Spinner shown while processing restore -->
                 <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
@@ -598,11 +583,16 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
                 </div>
             </form>
+            </div>
         </div>
 
         <!-- Chunked Complete Restore Section -->
-        <div class="backup-section">
-            <h3>Backup file sizes between 500MB and 800MB - Chunked Complete Restore</h3>
+        <div class="backup-section child-section">
+            <h3 class="accordion-header" onclick="toggleAccordion('chunkedRestore')">
+                <span class="accordion-icon" id="chunkedRestoreIcon">▶</span>
+                Is your backup file between 500MB and 800MB?
+            </h3>
+            <div id="chunkedRestore" class="accordion-content" style="display: none;">
             <p>Upload a complete backup ZIP file. Use this method to avoid HTTP timeouts and memory issues.</p>            <div id="chunkedUploadStatus" style="display: none;">
                 <div class="progress-bar">
                     <div id="chunkedProgress" class="progress-fill" style="width: 0%;">0%</div>
@@ -617,20 +607,25 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 </div>
                 
                 <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" onclick="startChunkedRestore()" disabled>
-                    Start Complete Restore (Chunked)
+                    Start Restore
                 </button>
+            </div>
             </div>
         </div>
 
         <!-- Direct Copy Restore Section -->
-        <div class="backup-section">
-            <h3>Backup file sizes over 800MB - Direct File Copy Restore</h3>
+        <div class="backup-section child-section">
+            <h3 class="accordion-header" onclick="toggleAccordion('directCopyRestore')">
+                <span class="accordion-icon" id="directCopyRestoreIcon">▶</span>
+                Is your backup file over 800MB?
+            </h3>
+            <div id="directCopyRestore" class="accordion-content" style="display: none;">
             <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
                 <button type="button" class="btn btn-primary" onclick="showDirectCopyRestoreConfirmation()">
-                    Start Complete Restore (Direct copy)
+                    Start Restore
                 </button>
             </form>
 
@@ -678,12 +673,20 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 }
                 ?>
             <?php endif; ?>
+            </div>
+        </div>
+        
+            </div>
         </div>
         
         <!-- Individual Notes Import Section -->
         <div class="backup-section">
-            <h3>Import Individual Notes</h3>
-            <p>Import one or more HTML or Markdown notes. <br><br>Notes will be imported into the <b>Default</b> folder of the <b>Poznote</b> workspace.</p>
+            <h3 class="accordion-header" onclick="toggleAccordion('individualNotes')">
+                <span class="accordion-icon" id="individualNotesIcon">▶</span>
+                Want to import HTML or Markdown files?
+            </h3>
+            <div id="individualNotes" class="accordion-content" style="display: none;">
+            <p>Notes will be imported into the <b>Default</b> folder of the <b>Poznote</b> workspace.<br><br>The title will be automatically created from the file name (without the extension).</p>
             
             <?php if ($import_individual_notes_message): ?>
                 <div class="alert alert-success">
@@ -704,7 +707,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 
                 <div class="form-group">
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
-                    <small class="form-text text-muted">You can select multiple files at once (maximum 20 files). Supported formats: .html, .md, .markdown</small>
+                    <small class="form-text text-muted">You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown</small>
                 </div>
                 <br>
                 
@@ -712,6 +715,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     Start Import Individual Notes
                 </button>
             </form>
+            </div>
         </div>
         
         <!-- Bottom padding for better spacing -->
@@ -849,6 +853,20 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <script src="js/restore-import.js"></script>
     <script src="js/chunked-uploader.js"></script>
     <script>
+        // Accordion functionality
+        function toggleAccordion(sectionId) {
+            const content = document.getElementById(sectionId);
+            const icon = document.getElementById(sectionId + 'Icon');
+            
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
         // Standard upload file size check
         document.getElementById('complete_backup_file').addEventListener('change', function(e) {
             const file = e.target.files[0];
