@@ -380,7 +380,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     global $con;
     
     // Check file count limit
-    $maxFiles = 20;
+    $maxFiles = 50;
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
@@ -704,7 +704,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 
                 <div class="form-group">
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
-                    <small class="form-text text-muted">You can select multiple files at once (maximum 20 files). Supported formats: .html, .md, .markdown</small>
+                    <small class="form-text text-muted">You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown</small>
                 </div>
                 <br>
                 
