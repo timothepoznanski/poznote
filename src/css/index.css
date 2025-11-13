@@ -2061,7 +2061,7 @@ pre.code-block,
 
 /* Ensure code blocks have the correct margins even without a wrapper */
 .code-block, pre.code-block, .noteentry pre {
-    margin: 0 !important;
+    margin: 1em 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
     background: #F8FAFC !important;
