@@ -884,15 +884,28 @@ function setupNoteDragDropEvents() {
             link.removeAttribute('onclick'); // Remove to avoid conflicts
             
             link.addEventListener('click', function(e) {
-                // Small delay to see if this was a drag attempt
-                setTimeout(function() {
+                // On mobile, execute immediately without delay for better responsiveness
+                var isMobile = window.innerWidth <= 800;
+                
+                if (isMobile) {
+                    // Execute immediately on mobile
                     try {
                         var func = new Function('event', dataOnclick);
                         return func.call(link, e);
                     } catch (err) {
                         console.error('Error executing click handler:', err);
                     }
-                }, 50);
+                } else {
+                    // Small delay on desktop to distinguish from drag
+                    setTimeout(function() {
+                        try {
+                            var func = new Function('event', dataOnclick);
+                            return func.call(link, e);
+                        } catch (err) {
+                            console.error('Error executing click handler:', err);
+                        }
+                    }, 50);
+                }
             }, false);
         }
     });

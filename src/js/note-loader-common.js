@@ -168,6 +168,11 @@ window.loadNoteDirectly = function(url, noteId, event) {
             event.stopPropagation();
         }
         
+        // Set flag for mobile scroll behavior
+        if (typeof sessionStorage !== 'undefined' && isMobileDevice()) {
+            sessionStorage.setItem('shouldScrollToNote', 'true');
+        }
+        
         // Cancel any pending auto-save operations for the previous note
         if (typeof saveTimeout !== 'undefined') {
             clearTimeout(saveTimeout);
