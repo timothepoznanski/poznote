@@ -243,19 +243,18 @@ function parseMarkdown(text) {
             continue;
         }
         
-        // Horizontal rules
-        if (line.match(/^(\*\*\*+|---+|___+)$/)) {
+        // Horizontal rules - allow spaces and require at least 3 characters
+        if (line.trim().match(/^(\*{3,}|-{3,}|_{3,})$/)) {
             flushParagraph();
             result.push('<hr>');
             continue;
         }
         
-        // Blockquotes
-        if (line.match(/^&gt;\s+(.+)$/)) {
+        // Blockquotes - handle both escaped and unescaped
+        if (line.match(/^(&gt;|>)\s*(.*)$/)) {
             flushParagraph();
-            result.push(line.replace(/^&gt;\s+(.+)$/, function(match, content) {
-                return '<blockquote>' + applyInlineStyles(content) + '</blockquote>';
-            }));
+            let quoteContent = line.replace(/^(&gt;|>)\s*(.*)$/, '$2');
+            result.push('<blockquote>' + applyInlineStyles(quoteContent) + '</blockquote>');
             continue;
         }
         
@@ -618,6 +617,25 @@ function initializeMarkdownNote(noteId) {
             };
             
             toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
+            
+            // Create markdown help button
+            var helpBtn = document.createElement('button');
+            helpBtn.type = 'button';
+            helpBtn.className = 'toolbar-btn markdown-help-btn note-action-btn';
+            helpBtn.innerHTML = '<i class="fa-question-circle"></i>';
+            helpBtn.title = 'Markdown Guide';
+            helpBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open('markdown_guide.php', '_blank');
+            };
+            
+            // Insert help button right after the view mode button
+            if (viewModeBtn.nextSibling) {
+                toolbar.insertBefore(helpBtn, viewModeBtn.nextSibling);
+            } else {
+                toolbar.appendChild(helpBtn);
+            }
         } else {
             // Update existing button based on current state
             var currentMode;
