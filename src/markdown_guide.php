@@ -108,58 +108,70 @@ $v = '20251020.6'; // Cache version
     <h1>Markdown Guide</h1>
     
     <h2>Headers</h2>
-    <ul>
-        <li><code># Heading 1</code></li>
-        <li><code>## Heading 2</code></li>
-        <li><code>### Heading 3</code></li>
-    </ul>
+    <p>
+        <code># Heading 1</code><br>
+        <code>## Heading 2</code><br>
+        <code>### Heading 3</code>
+    </p>
     
     <h2>Text Formatting</h2>
-    <ul>
-        <li><code>**bold text**</code> → <strong>bold text</strong></li>
-        <li><code>*italic text*</code> → <em>italic text</em></li>
-        <li><code>~~strikethrough~~</code> → <del>strikethrough</del></li>
-        <li><code>`inline code`</code> → <code>inline code</code></li>
-    </ul>
+    <p>
+        <code>**bold text**</code> → <strong>bold text</strong><br>
+        <code>*italic text*</code> → <em>italic text</em><br>
+        <code>~~strikethrough~~</code> → <del>strikethrough</del><br>
+        <code>`inline code`</code> → <code>inline code</code>
+    </p>
     
-    <h2>Lists</h2>
-    <ul>
-        <li><strong>Unordered list:</strong> Use <code>-</code>, <code>*</code>, or <code>+</code></li>
-        <li><strong>Ordered list:</strong> Use <code>1.</code>, <code>2.</code>, etc.</li>
-    </ul>
+    <h2>Unordered Lists</h2>
+    <p>
+        Use <code>-</code>, <code>*</code>, or <code>+</code>
+    </p>
     
-    <h2>Links and Images</h2>
-    <ul>
-        <li><code>[Link text](https://example.com)</code></li>
-        <li><code>![Alt text](image-url.jpg)</code></li>
-    </ul>
+    <h2>Ordered Lists</h2>
+    <p>
+        Use <code>1.</code>, <code>2.</code>, etc.
+    </p>
+    
+    <h2>Checkboxes</h2>
+    <p>
+        <code>- [ ] Unchecked item</code><br>
+        <code>- [x] Checked item</code>
+    </p>
+    
+    <h2>Images</h2>
+    <p>
+        <code>![Alt text](image-url.jpg)</code>
+    </p>
+    
+    <h2>URLs</h2>
+    <p>
+        <code>&lt;https://example.com&gt;</code>
+    </p>
     
     <h2>Code Blocks</h2>
-    <ul>
-        <li>Use three backticks <code>```</code> before and after the code</li>
-    </ul>
+    <p>
+        Use three backticks <code>```</code> before and after the code
+    </p>
     
     <h2>Quotes</h2>
-    <ul>
-        <li><code>&gt; This is a quote</code></li>
-    </ul>
+    <p>
+        <code>&gt; This is a quote</code>
+    </p>
     
     <h2>Line Breaks</h2>
-    <ul>
-        <li>A single line break in edit mode creates a line break in the preview</li>
-        <li>Leave a blank line between paragraphs to create separate paragraphs</li>
-    </ul>
+    <p>
+        A single line break in edit mode creates a line break in the preview
+    </p>
     
     <h2>Horizontal Rule</h2>
-    <ul>
-        <li><code>---</code> or <code>***</code></li>
-    </ul>
+    <p>
+        <code>---</code> or <code>***</code>
+    </p>
     
     <h2>Tables</h2>
-    <ul>
-        <li>Use pipes <code>|</code> to separate columns</li>
-        <li>Use dashes <code>---</code> to separate headers from content</li>
-    </ul>
+    <p>
+        Use pipes <code>|</code> to separate columns and dashes <code>---</code> to separate headers from content
+    </p>
     
 </body>
 </html>
