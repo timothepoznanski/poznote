@@ -527,11 +527,14 @@ function initializeMarkdownNote(noteId) {
     var isEmpty = markdownContent.trim() === '';
     var startInEditMode;
     
-    if (savedMode && (savedMode === 'edit' || savedMode === 'preview')) {
+    // Always start in edit mode for empty notes (new notes)
+    if (isEmpty) {
+        startInEditMode = true;
+    } else if (savedMode && (savedMode === 'edit' || savedMode === 'preview')) {
         startInEditMode = (savedMode === 'edit');
     } else {
-        // Default: edit mode if empty, preview mode if content exists
-        startInEditMode = isEmpty;
+        // Default: preview mode if content exists
+        startInEditMode = false;
     }
     
     // Create preview and editor containers
