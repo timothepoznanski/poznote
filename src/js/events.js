@@ -172,6 +172,56 @@ function setupNoteEditingEvents() {
     document.body.addEventListener('blur', function(e) {
         handleTitleBlur(e);
     }, true); // Use capture phase to ensure we catch the event
+    
+    // Monitor code blocks and remove them if they become empty
+    document.body.addEventListener('input', function(e) {
+        var target = e.target;
+        
+        // Check if we're editing a noteentry (HTML notes)
+        if (target.classList && target.classList.contains('noteentry')) {
+            // Use requestAnimationFrame to check after the input is processed
+            requestAnimationFrame(function() {
+                if (target && target.parentNode) {
+                    // Find all code blocks in this note
+                    var codeBlocks = target.querySelectorAll('pre, .code-block');
+                    
+                    for (var i = 0; i < codeBlocks.length; i++) {
+                        var codeBlock = codeBlocks[i];
+                        var content = codeBlock.textContent || '';
+                        
+                        // If the code block is now empty, remove it
+                        if (content.trim() === '') {
+                            // Save the selection before modifying DOM
+                            var sel = window.getSelection();
+                            var wasInCodeBlock = codeBlock.contains(sel.anchorNode);
+                            
+                            // Create a paragraph to replace the empty code block
+                            var paragraph = document.createElement('p');
+                            paragraph.innerHTML = '<br>';
+                            
+                            // Insert the paragraph before removing the code block
+                            codeBlock.parentNode.insertBefore(paragraph, codeBlock);
+                            codeBlock.remove();
+                            
+                            // Place cursor in the new paragraph if it was in the code block
+                            if (wasInCodeBlock) {
+                                var range = document.createRange();
+                                range.setStart(paragraph, 0);
+                                range.collapse(true);
+                                sel.removeAllRanges();
+                                sel.addRange(range);
+                            }
+                            
+                            // Mark note as modified
+                            if (typeof window.markNoteAsModified === 'function') {
+                                window.markNoteAsModified();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }, true); // Use capture phase to catch events from contenteditable children
 }
 
 function handleChecklistKeydown(e) {
