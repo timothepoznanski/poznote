@@ -941,6 +941,11 @@ function reinitializeNoteContent() {
 
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
+    
+    // Re-initialize note drag and drop events
+    if (typeof setupNoteDragDropEvents === 'function') {
+        setupNoteDragDropEvents();
+    }
 
     // Re-initialize any other components that might be needed
     // (emoji picker, toolbar handlers, etc.)
