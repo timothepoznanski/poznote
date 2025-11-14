@@ -324,6 +324,7 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+<a id="automated-backups-with-bash-script"></a>
 **🤖 Automated Backups with Bash Script**
 
 For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
