@@ -323,6 +323,36 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+### Automated Backups with Bash Script
+
+For automated scheduled backups, you can use the included `backups-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention (keeps only the most recent backups).
+
+**Script location:** `backups-poznote.sh` (in the Poznote installation directory)
+
+**Usage:**
+```bash
+bash backups-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
+```
+
+**Example with crontab:**
+
+To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
+
+```bash
+0 0,12 * * * bash /root/backups-poznote.sh 'https://poznote.timpoz.com' 'admin' 'xxxxx' '/root/poznote' '30'
+```
+
+This configuration will:
+- Run backups at 00:00 and 12:00 every day
+- Connect to your Poznote instance at `https://poznote.timpoz.com`
+- Keep the 30 most recent backups (older ones are automatically deleted)
+- Store backups in `/root/poznote/data/backups/`
+
+To edit your crontab, run:
+```bash
+crontab -e
+```
+
 ## Offline View
 
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser.
