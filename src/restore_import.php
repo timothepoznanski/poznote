@@ -586,7 +586,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <div class="backup-section parent-section">
             <h3 class="accordion-header" onclick="toggleAccordion('restoreBackup')">
                 <span class="accordion-icon" id="restoreBackupIcon">▶</span>
-                Want to restore a backup file?
+                Want to restore from a backup file?
             </h3>
             <div id="restoreBackup" class="accordion-content" style="display: none;">
             
