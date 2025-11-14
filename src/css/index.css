@@ -2715,29 +2715,27 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
 }
 
-/* Note Loading State Styles */
+/* Note Loading State Styles - Smooth fade effect */
 .note-loading-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 300px;
-    flex-direction: column;
+    opacity: 0;
+    animation: gentleFadeIn 0.15s ease-in-out forwards;
 }
 
-.loading-spinner {
-    text-align: center;
-    color: #666;
+@keyframes gentleFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.loading-spinner i {
-    font-size: 2em;
-    margin-bottom: 15px;
-    color: #007bff;
-}
-
-.loading-spinner p {
-    margin: 0;
-    font-size: 1.1em;
+/* Smooth fade out for outgoing content */
+.note-fade-out {
+    opacity: 0;
+    transition: opacity 0.1s ease-out;
 }
 
 @keyframes spin {

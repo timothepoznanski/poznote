@@ -235,7 +235,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         
         // Add onclick handler for AJAX loading
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
+        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
@@ -262,7 +262,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         
         // Add onclick handler for AJAX loading
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
+        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
         echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";

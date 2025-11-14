@@ -281,10 +281,12 @@ window.loadNoteDirectly = function(url, noteId, event) {
                                         try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                                     }
 
-                                    hideNoteLoadingState();
-
-                                    // Apply selection after content is loaded and initialized
-                                    updateSelectedNote(clickedLink);
+                                    // Add a small delay to ensure the loading animation is visible
+                                    setTimeout(() => {
+                                        hideNoteLoadingState();
+                                        // Apply selection after content is loaded and initialized
+                                        updateSelectedNote(clickedLink);
+                                    }, 80);
                                     
                                     // Reinitialize note click handlers for mobile navigation after loading individual note
                                     if (typeof window.initializeNoteClickHandlers === 'function') {
@@ -430,8 +432,11 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
                                 try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                             }
 
-                            // Hide loading state
-                            hideNoteLoadingState();
+                            // Add a small delay to ensure the loading animation is visible
+                            setTimeout(() => {
+                                // Hide loading state
+                                hideNoteLoadingState();
+                            }, 80);
                         }
                     } else {
                         throw new Error('Could not find note content in response');
@@ -503,28 +508,30 @@ function loadNoteFromUrl(url, fromHistory) {
 }
 
 /**
- * Show loading state in the right column
+ * Show loading state with smooth fade effect
  */
 function showNoteLoadingState() {
     const rightColumn = document.getElementById('right_col');
     if (rightColumn) {
-        const loadingHtml = `
-            <div class="note-loading-state">
-                <div class="loading-spinner">
-                    <i class="fa-spinner fa-spin"></i>
-                    <p>Loading note...</p>
-                </div>
-            </div>
-        `;
-        rightColumn.innerHTML = loadingHtml;
+        // Add fade-out class to current content
+        rightColumn.classList.add('note-fade-out');
     }
 }
 
 /**
- * Hide loading state
+ * Hide loading state and show content with fade-in
  */
 function hideNoteLoadingState() {
-    // Loading state is automatically hidden when new content is loaded
+    const rightColumn = document.getElementById('right_col');
+    if (rightColumn) {
+        rightColumn.classList.remove('note-fade-out');
+        rightColumn.classList.add('note-loading-state');
+        
+        // Remove fade-in class after animation completes
+        setTimeout(() => {
+            rightColumn.classList.remove('note-loading-state');
+        }, 150);
+    }
 }
 
 /**
