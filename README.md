@@ -351,19 +351,10 @@ To schedule automatic backups twice daily (at midnight and noon), add this line 
 
 **How the backup process works:**
 
-1. The script calls the Poznote API to create a backup
+1. The script calls the Poznote API to create a backup at 00:00 (midnight) and 12:00 (noon) every day
 2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
-3. The script downloads this backup to: `/root/poznote/backups-poznote/`
-4. Old backups are automatically deleted from both locations to keep only the most recent ones (based on retention count)
-
-This configuration will:
-- Run backups at 00:00 (midnight) and 12:00 (noon) every day
-- Connect to your Poznote instance using the provided credentials
-- Create timestamped backup ZIP files via the API
-- Store backups locally in `/root/poznote/backups-poznote/`
-- Keep only the 30 most recent backups in both locations (automatically deletes older ones)
-
-
+3. The script downloads this backup locally to: `/root/poznote/backups-poznote/`
+4. Old backups are automatically deleted from both locations to keep only the most recent ones based on retention count
 
 ## Offline View
 
