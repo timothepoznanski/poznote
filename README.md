@@ -325,13 +325,13 @@ Upload the complete backup ZIP to restore everything:
 
 **🤖 Automated Backups with Bash Script**
 
-For automated scheduled backups, you can use the included `backups-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention (keeps only the most recent backups).
+For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention..
 
-**Script location:** `backups-poznote.sh` (in the Poznote installation directory)
+**Script location:** `backup-poznote.sh` (in the Poznote installation directory)
 
 **Usage:**
 ```bash
-bash backups-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
+bash backup-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_directory>' '<retention_count>'
 ```
 
 **Example with crontab:**
@@ -339,12 +339,12 @@ bash backups-poznote.sh '<poznote_url>' '<username>' '<password>' '<backup_direc
 To schedule automatic backups twice daily (at midnight and noon), add this line to your crontab:
 
 ```bash
-0 0,12 * * * bash /root/backups-poznote.sh 'https://poznote.timpoz.com' 'admin' 'xxxxx' '/root/poznote' '30'
+0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
 ```
 
 This configuration will:
 - Run backups at 00:00 and 12:00 every day
-- Connect to your Poznote instance at `https://poznote.timpoz.com`
+- Connect to your Poznote instance at `https://poznote.xxxx.com`
 - Keep the 30 most recent backups (older ones are automatically deleted)
 - Store backups in `/root/poznote/data/backups/`
 
