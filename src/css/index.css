@@ -370,7 +370,7 @@ body {
     flex-direction: row;
     height: 100vh;
     margin: 0;
-    overflow-x: hidden !important;
+    overflow: hidden !important; /* Prevent double scrollbars */
     min-width: 0;
     min-height: 0;
 }
@@ -830,8 +830,8 @@ body {
     min-width: 400px;
     height: 100vh;
     background-color: #FFFFFF;
-    overflow-y: scroll; /* Always show scrollbar */
-    overflow-x: hidden; /* Disable horizontal scrolling */
+    overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
 }
 
