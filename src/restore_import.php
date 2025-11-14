@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'import_individual_notes':
             if (isset($_FILES['individual_notes_files']) && !empty($_FILES['individual_notes_files']['name'][0])) {
                 $workspace = $_POST['target_workspace'] ?? 'Poznote';
-                $folder = $_POST['target_folder'] ?? 'Default';
+                $folder = $_POST['target_folder'] ?? null;
                 $result = importIndividualNotes($_FILES['individual_notes_files'], $workspace, $folder);
                 if ($result['success']) {
                     $import_individual_notes_message = "Notes imported successfully! " . $result['message'];
@@ -279,14 +279,9 @@ function importNotesZip($uploadedFile) {
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
-                // Get folder_id for 'Default' folder in 'Poznote' workspace
-                $folderIdStmt = $con->prepare("SELECT id FROM folders WHERE name = 'Default' AND (workspace = 'Poznote' OR (workspace IS NULL AND 'Poznote' = 'Poznote'))");
-                $folderIdStmt->execute();
-                $folderData = $folderIdStmt->fetch(PDO::FETCH_ASSOC);
-                $folderId = $folderData ? (int)$folderData['id'] : null;
-                
-                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, 'Default', ?, 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $content, $folderId, $noteType]);
+                // No folder (uncategorized)
+                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, NULL, NULL, 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
+                $insertStmt->execute([$noteId, $title, $content, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
@@ -376,7 +371,7 @@ function importAttachmentsZip($uploadedFile) {
     return ['success' => true, 'message' => "Imported {$importedCount} attachment files."];
 }
 
-function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = 'Default') {
+function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = null) {
     global $con;
     
     // Check file count limit
@@ -446,9 +441,9 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         }
         
         try {
-            // Get folder_id if folder is not default
+            // Get folder_id if folder is provided
             $folder_id = null;
-            if ($folder !== 'Default' && $folder !== 'Uncategorized') {
+            if ($folder !== null && $folder !== '') {
                 $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
                 $fStmt->execute([$folder, $workspace, $workspace]);
                 $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
@@ -724,12 +719,11 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 Want to import HTML or Markdown files?
             </h3>
             <div id="individualNotes" class="accordion-content" style="display: none;">
-            <p>Notes will be imported into the <b>Default</b> folder of the <b>Poznote</b> workspace.<br><br>The title will be automatically created from the file name (without the extension).</p>
+            <p>Notes will be imported into the <b>Poznote</b> workspace without being assigned to a folder (uncategorized).<br><br>The title will be automatically created from the file name (without the extension).</p>
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
                 <input type="hidden" name="target_workspace" value="Poznote">
-                <input type="hidden" name="target_folder" value="Default">
                 
                 <div class="form-group">
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
@@ -854,7 +848,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
             <h3>Import Individual Notes?</h3>
-            <p id="individualNotesImportSummary">This will import notes into the Default folder of the Poznote workspace.</p>
+            <p id="individualNotesImportSummary">This will import notes into the Poznote workspace.</p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">

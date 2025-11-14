@@ -71,12 +71,7 @@ if ($folder_id !== null) {
     }
 }
 
-// Verify that folder is not protected
-if ($folder_name === 'Uncategorized' || $folder_name === 'Default') {
-    http_response_code(400);
-    echo json_encode(['error' => 'Cannot delete the default folder']);
-    exit;
-}
+// No protected folders anymore - all folders can be deleted
 
 try {
     // Check if folder exists (workspace-scoped)
@@ -122,10 +117,10 @@ try {
     $con->beginTransaction();
     
     try {
-    // Move all notes from this folder to the default folder
+        // Move all notes from this folder to no folder (uncategorized)
         if ($total_notes > 0) {
-            // Move notes to default folder (using folder_id = NULL or default folder ID)
-            $stmt = $con->prepare("UPDATE entries SET folder = 'Default', folder_id = NULL, updated = datetime('now') WHERE folder_id = ?");
+            // Move notes to no folder (folder_id = NULL)
+            $stmt = $con->prepare("UPDATE entries SET folder = NULL, folder_id = NULL, updated = datetime('now') WHERE folder_id = ?");
             $stmt->execute([$folder_id]);
         }
         

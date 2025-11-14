@@ -89,8 +89,12 @@ try {
         $noteType = $note['type'] ?? 'note';
         $fileExtension = ($noteType === 'markdown') ? '.md' : '.html';
         
-        $note_file_path = __DIR__ . '/entries/';
-        if ($note['folder'] && $note['folder'] !== 'Uncategorized' && $note['folder'] !== 'Default') {
+        // Build file path with workspace support
+        $wsSegment = $workspace ? ('workspace_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($workspace))) : 'workspace_default';
+        $note_file_path = __DIR__ . '/entries/' . $wsSegment . '/';
+        
+        // If note has a folder, include it in the path
+        if (!empty($note['folder'])) {
             $note_file_path .= $note['folder'] . '/';
         }
         $note_file_path .= $note_id . $fileExtension;
