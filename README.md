@@ -342,16 +342,28 @@ To schedule automatic backups twice daily (at midnight and noon), add this line 
 0 0,12 * * * bash /root/backup-poznote.sh 'https://poznote.xxxxx.com' 'admin' 'xxxxx' '/root/poznote' '30'
 ```
 
-This configuration will:
-- Run backups at 00:00 and 12:00 every day
-- Connect to your Poznote instance at `https://poznote.xxxx.com`
-- Keep the 30 most recent backups (older ones are automatically deleted)
-- Store backups in `/root/poznote/data/backups/`
+**Parameters explained:**
+- `'https://poznote.xxxxx.com'` - Your Poznote instance URL
+- `'admin'` - Your Poznote username
+- `'xxxxx'` - Your Poznote password
+- `'/root/poznote'` - Parent directory where backups will be stored (the script creates a `backups-poznote` folder inside this path)
+- `'30'` - Number of backups to keep (older ones are automatically deleted)
 
-To edit your crontab, run:
-```bash
-crontab -e
-```
+**How the backup process works:**
+
+1. The script calls the Poznote API to create a backup
+2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
+3. The script downloads this backup to: `/root/poznote/backups-poznote/`
+4. Old backups are automatically deleted from both locations to keep only the most recent ones (based on retention count)
+
+This configuration will:
+- Run backups at 00:00 (midnight) and 12:00 (noon) every day
+- Connect to your Poznote instance using the provided credentials
+- Create timestamped backup ZIP files via the API
+- Store backups locally in `/root/poznote/backups-poznote/`
+- Keep only the 30 most recent backups in both locations (automatically deletes older ones)
+
+
 
 ## Offline View
 
