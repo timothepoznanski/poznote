@@ -116,8 +116,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             echo "<i class='$chevron_icon folder-icon'></i>";
         }
         
-        // Workspace-aware default folder handling in UI
-        // Disable double-click rename for default folder and system folders
+        // Workspace-aware folder handling in UI
+        // Disable double-click rename for system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
         $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";

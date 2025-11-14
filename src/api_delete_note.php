@@ -128,7 +128,7 @@ try {
                 'note' => [
                     'id' => $note_id,
                     'title' => $note['heading'],
-                    'html_file_deleted' => $html_deleted,
+                    'file_deleted' => $file_deleted,
                     'png_file_deleted' => $png_deleted,
                     'attachments_deleted' => $deleted_attachments
                 ]

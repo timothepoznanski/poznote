@@ -145,7 +145,7 @@ if ($folder_id !== null && $folder_id > 0) {
         $folder_id = (int)$folderData['id'];
     }
     // Note: If folder not found in folders table but folder name is set,
-    // folder_id will remain null which is acceptable for default folders
+    // folder_id will remain null (note without folder)
 }
 
 // Validate tags format

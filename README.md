@@ -555,7 +555,7 @@ curl -X POST -u 'username:password' \
 
 **Delete Folder**
 
-Delete a folder and move its contents to Default folder:
+Delete a folder and move its contents to no folder (uncategorized):
 ```bash
 curl -X DELETE -u 'username:password' \
   -H "Content-Type: application/json" \
