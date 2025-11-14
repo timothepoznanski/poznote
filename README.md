@@ -311,7 +311,7 @@ Import one or more HTML or Markdown notes directly:
 
   - Upload `.html`, `.md`, or `.markdown` files
   - Multiple files can be selected at once
-  - Notes are imported into the Default folder of the Poznote workspace
+  - Notes are imported into the Poznote workspace
   - Titles are automatically extracted from file content or filename
   - Supports both full HTML documents and simple fragments
 
@@ -555,7 +555,7 @@ curl -X POST -u 'username:password' \
 
 **Delete Folder**
 
-Delete a folder and move its contents to Default folder:
+Delete a folder and move its contents to no folder (uncategorized):
 ```bash
 curl -X DELETE -u 'username:password' \
   -H "Content-Type: application/json" \

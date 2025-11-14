@@ -67,12 +67,10 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 		$folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
 		if ($folderData) {
 			$folder_id = (int)$folderData['id'];
-		}
-		// Note: If folder not found in folders table but folder name is set, 
-		// folder_id will remain null which is acceptable for default folders
-	}
-	
-	// Generate unique title for new notes (workspace-aware)
+    }
+    // Note: If folder not found in folders table but folder name is set, 
+    // folder_id will remain null (note without folder)
+  }	// Generate unique title for new notes (workspace-aware)
 	$uniqueTitle = generateUniqueTitle('New note', null, $workspace);
 
 	// Insert the new note (include workspace, type, and folder_id)

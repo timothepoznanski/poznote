@@ -128,7 +128,7 @@ try {
     }
     
     // Determine file paths
-    // Decide default folder logic using workspace if available
+    // Handle workspace-specific file paths
     $note_workspace = $note['workspace'] ?? null;
     // Determine file extension based on note type
     $noteType = $note['type'] ?? 'note';

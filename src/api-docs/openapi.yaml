@@ -666,7 +666,7 @@ paths:
       tags:
         - Folders Management
       summary: Delete folder
-      description: Delete a folder and move all its contents to the Default folder
+      description: Delete a folder and move all its contents to no folder (uncategorized)
       requestBody:
         required: true
         content:
@@ -692,7 +692,7 @@ paths:
         '200':
           description: Folder deleted successfully
         '400':
-          description: Cannot delete default folder or invalid request
+          description: Invalid request
         '404':
           description: Folder not found
 

@@ -2467,7 +2467,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     background-color: rgba(0, 125, 184, 0.2);
 } */
 
-/* Hide edit button for default folder to prevent renaming */
+/* Hide edit button for system folders to prevent renaming */
 .default-folder .folder-edit-btn { display: none !important; }
 
 /* Change button background color */

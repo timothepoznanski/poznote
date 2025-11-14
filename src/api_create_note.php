@@ -69,7 +69,7 @@ if ($originalHeading === '') {
 
 // Get folder_id if needed
 $folder_id = null;
-// Always try to get folder_id from folders table, even for default folders
+// Try to get folder_id from folders table if folder is specified
 if ($workspace) {
     $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
     $fStmt->execute([$folder, $workspace, $workspace]);
