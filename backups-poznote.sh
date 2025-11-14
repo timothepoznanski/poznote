@@ -10,7 +10,7 @@
 #
 # Examples:
 #   ./backup-poznote.sh 'http://localhost:8080' 'admin' 'mypassword' '/var/backups'
-#   ./backup-poznote.sh 'https://poznote.example.com' 'user' 'my secure pass' '/home/user' 30
+#   ./backup-poznote.sh 'https://poznote.example.com' 'myuser' 'mypassword' '/home/user' '30'
 #
 # Note: The script will create a 'backups-poznote' folder inside the specified path
 #       Default MAX_BACKUPS is 20 if not specified
@@ -32,7 +32,7 @@ if [ $# -lt 4 ] || [ $# -gt 5 ]; then
     echo ""
     echo "Examples:"
     echo "  $0 'http://localhost:8080' 'admin' 'mypassword' '/var/backups'"
-    echo "  $0 'https://poznote.example.com' 'myuser' 'mypassword' '/home/myuser' 30"
+    echo "  $0 'https://poznote.example.com' 'myuser' 'mypassword' '/home/myuser' '30'"
     echo ""
     echo "Note: The script will create a 'backups-poznote' folder inside the specified path"
     echo ""
