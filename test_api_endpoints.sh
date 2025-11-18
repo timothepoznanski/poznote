@@ -4,10 +4,16 @@
 # Tests all API endpoints documented in README.md
 
 # Configuration
-BASE_URL="http://localhost:8040"
+BASE_URL="http://timpoz.com:8041"
 USERNAME="admin"
-PASSWORD="XXXXXXXXXXXX"
+PASSWORD="Ijnbhuygv123456!"
 AUTH="$USERNAME:$PASSWORD"
+
+# Test resources
+TEST_WORKSPACE="TestWorkspace"
+RENAMED_WORKSPACE="TestWorkspaceRenamed"
+TEST_FOLDER="TestFolder"
+TEST_ATTACHMENT_PATH="/tmp/poznote_api_test_attachment.txt"
 
 # Colors for output
 RED='\033[0;31m'
@@ -56,9 +62,9 @@ test_version() {
 }
 
 test_list_notes() {
-    print_test "2. api_list_notes.php - List all notes"
+    print_test "2. api_list_notes.php - List all notes in test workspace"
     
-    RESPONSE=$(curl -s -u "$AUTH" "$BASE_URL/api_list_notes.php")
+    RESPONSE=$(curl -s -u "$AUTH" "$BASE_URL/api_list_notes.php?workspace=$TEST_WORKSPACE")
     
     if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
         NOTE_COUNT=$(echo "$RESPONSE" | jq '.notes | length')
@@ -69,6 +75,10 @@ test_list_notes() {
         FIRST_NOTE_ID=$(echo "$RESPONSE" | jq -r '.notes[0].id // empty')
         if [ -n "$FIRST_NOTE_ID" ]; then
             print_info "Using note ID $FIRST_NOTE_ID for subsequent tests"
+            if [ -z "$TEST_NOTE_ID" ]; then
+                TEST_NOTE_ID="$FIRST_NOTE_ID"
+                print_info "TEST_NOTE_ID set to $TEST_NOTE_ID from FIRST_NOTE_ID"
+            fi
         fi
     else
         print_error "List notes failed"
@@ -88,7 +98,7 @@ test_create_note() {
             "entrycontent": "This is a test note created by the API test script.",
             "tags": "test,api,automated",
             "folder": "Default",
-            "workspace": "Poznote"
+            "workspace": "'$TEST_WORKSPACE'"
         }' \
         "$BASE_URL/api_create_note.php")
     
@@ -101,6 +111,8 @@ test_create_note() {
         print_error "Create note failed"
     fi
 }
+
+## Removed session login: use HTTP Basic auth for all calls
 
 test_workspaces_list() {
     print_test "4. api_workspaces.php - List workspaces (GET)"
@@ -123,7 +135,7 @@ test_workspaces_create() {
         -X POST \
         -d '{
             "action": "create",
-            "name": "TestWorkspace"
+            "name": "'$TEST_WORKSPACE'"
         }' \
         "$BASE_URL/api_workspaces.php")
     
@@ -159,6 +171,17 @@ test_apply_tags() {
         }" \
         "$BASE_URL/api_apply_tags.php")
     
+    # Optional: apply tags while scoping to workspace
+    RESPONSE_WS=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"note_id\": $TEST_NOTE_ID,
+            \"tags\": \"updated,strict,validation\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_apply_tags.php")
+    
     echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
     
     if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
@@ -178,10 +201,265 @@ test_apply_tags() {
         }" \
         "$BASE_URL/api_apply_tags.php")
     
+    # Also test old 'id' parameter with workspace field (should still reject id param)
+    HTTP_CODE_WS=$(curl -s -o /dev/null -w "%{http_code}" -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"id\": $TEST_NOTE_ID,
+            \"tags\": \"test\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_apply_tags.php")
+    
     if [ "$HTTP_CODE" = "400" ]; then
         print_success "Correctly rejects old 'id' parameter (HTTP 400)"
     else
         print_error "Should reject 'id' parameter but got HTTP $HTTP_CODE"
+    fi
+}
+
+test_update_note() {
+    print_test "X. api_update_note.php - Update existing note content"
+
+    if [ -z "$TEST_NOTE_ID" ]; then
+        print_info "Skipping: No test note created"
+        return
+    fi
+
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"id\": $TEST_NOTE_ID,
+            \"heading\": \"API Test Note Updated\",
+            \"entrycontent\": \"This is an updated note content from the API test script.\",
+            \"tags\": \"updated,api-test\"
+            ,\"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_update_note.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Update note worked"
+    else
+        print_error "Update note failed"
+    fi
+}
+
+test_create_folder() {
+    print_test "Y. api_create_folder.php - Create folder"
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"folder_name\": \"$TEST_FOLDER\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_create_folder.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        FOLDER_ID=$(echo "$RESPONSE" | jq -r '.folder.id // empty')
+        print_success "Create folder worked (ID: $FOLDER_ID)"
+    else
+        # If folder already exists, note it and continue
+        if echo "$RESPONSE" | jq -e '.error' >/dev/null 2>&1; then
+            ERR_MSG=$(echo "$RESPONSE" | jq -r '.error')
+            if echo "$ERR_MSG" | grep -q "already exists"; then
+                print_info "Folder already exists (expected): $TEST_FOLDER"
+                ((TESTS_PASSED++))
+            else
+                print_error "Create folder failed: $ERR_MSG"
+            fi
+        else
+            print_error "Create folder failed"
+        fi
+    fi
+}
+
+test_move_note_to_folder() {
+    print_test "Z. api_update_note.php - Assign folder to note (logical move)"
+
+    if [ -z "$TEST_NOTE_ID" ]; then
+        print_info "Skipping: No test note created"
+        return
+    fi
+
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"id\": $TEST_NOTE_ID,
+            \"heading\": "API Test Note Updated",
+            \"entrycontent\": "This is an updated note content from the API test script.",
+            \"tags\": "updated,api-test",
+            \"folder\": \"$TEST_FOLDER\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_update_note.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Assign folder to note (logical move) worked (folder: $TEST_FOLDER in $TEST_WORKSPACE)"
+    else
+        print_error "Assign folder to note failed"
+    fi
+}
+
+test_list_tags() {
+    print_test "api_list_tags.php - List tags"
+
+    RESPONSE=$(curl -s -u "$AUTH" "$BASE_URL/api_list_tags.php?workspace=$TEST_WORKSPACE")
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        TAG_COUNT=$(echo "$RESPONSE" | jq '.tags | length')
+        print_success "List tags works ($TAG_COUNT tags)"
+    else
+        print_error "List tags failed"
+    fi
+}
+
+test_update_tag_on_note() {
+    print_test "api_apply_tags.php - Update tags for test note (replace tags)"
+
+    if [ -z "$TEST_NOTE_ID" ]; then
+        print_info "Skipping: No test note created"
+        return
+    fi
+
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"note_id\": $TEST_NOTE_ID,
+            \"tags\": \"api-tag-updated,tested\"
+        }" \
+        "$BASE_URL/api_apply_tags.php")
+    
+    # Update tags with workspace parameter
+    RESPONSE_WS=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"note_id\": $TEST_NOTE_ID,
+            \"tags\": \"api-tag-updated,tested\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_apply_tags.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Tags updated on note"
+    else
+        print_error "Updating tags on note failed"
+    fi
+}
+
+test_upload_attachment() {
+    print_test "api_attachments.php - Upload attachment (multipart/form-data)"
+
+    if [ -z "$TEST_NOTE_ID" ]; then
+        print_info "Skipping attachment upload: No test note created"
+        return
+    fi
+
+    # Create a small temporary file to upload
+    echo "Poznote API Test Attachment" > "$TEST_ATTACHMENT_PATH"
+
+    RESPONSE=$(curl -s -u "$AUTH" -F "action=upload" -F "note_id=$TEST_NOTE_ID" -F "workspace=$TEST_WORKSPACE" -F "file=@$TEST_ATTACHMENT_PATH" "$BASE_URL/api_attachments.php")
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        ATTACHMENT_ID=$(echo "$RESPONSE" | jq -r '.attachment_id // empty')
+        print_success "Attachment uploaded (id: $ATTACHMENT_ID)"
+    else
+        print_error "Attachment upload failed"
+    fi
+
+    # Cleanup temp file
+    rm -f "$TEST_ATTACHMENT_PATH"
+}
+
+test_restore_note() {
+    print_test "api_restore_note.php - Restore note from trash"
+
+    if [ -z "$TEST_NOTE_ID" ]; then
+        print_info "Skipping: No test note created"
+        return
+    fi
+
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"id\": $TEST_NOTE_ID
+        }" \
+        "$BASE_URL/api_restore_note.php")
+    
+    # Restore with workspace parameter
+    RESPONSE_WS=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d "{
+            \"id\": $TEST_NOTE_ID,
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_restore_note.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Restore note works"
+    else
+        print_error "Restore note failed"
+    fi
+}
+
+test_delete_folder() {
+    print_test "api_delete_folder.php - Delete folder we created"
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X DELETE \
+        -d "{
+            \"folder_name\": \"$TEST_FOLDER\",
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_delete_folder.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Delete folder works"
+    else
+        print_error "Delete folder failed"
+    fi
+}
+
+test_rename_workspace() {
+    print_test "api_workspaces.php - Rename workspace (POST JSON)"
+
+    RESPONSE=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X POST \
+        -d '{
+            "action": "rename",
+            "old_name": "'$TEST_WORKSPACE'",
+            "new_name": "'$RENAMED_WORKSPACE'"
+        }' \
+        "$BASE_URL/api_workspaces.php")
+
+    echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
+
+    if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
+        print_success "Rename workspace works ("$TEST_WORKSPACE" -> "$RENAMED_WORKSPACE")"
+    else
+        print_error "Rename workspace failed"
     fi
 }
 
@@ -199,7 +477,7 @@ test_favorites() {
         -d "{
             \"action\": \"toggle_favorite\",
             \"note_id\": $TEST_NOTE_ID,
-            \"workspace\": \"Poznote\"
+            \"workspace\": \"$TEST_WORKSPACE\"
         }" \
         "$BASE_URL/api_favorites.php")
     
@@ -227,6 +505,7 @@ test_share_note() {
         -X POST \
         -d "{
             \"note_id\": $TEST_NOTE_ID,
+            \"workspace\": \"$TEST_WORKSPACE\",
             \"action\": \"create\"
         }" \
         "$BASE_URL/api_share_note.php")
@@ -247,6 +526,7 @@ test_share_note() {
         -X POST \
         -d "{
             \"note_id\": $TEST_NOTE_ID,
+            \"workspace\": \"$TEST_WORKSPACE\",
             \"action\": \"get\"
         }" \
         "$BASE_URL/api_share_note.php")
@@ -267,7 +547,7 @@ test_attachments_list() {
     fi
     
     RESPONSE=$(curl -s -u "$AUTH" \
-        "$BASE_URL/api_attachments.php?action=list&note_id=$TEST_NOTE_ID")
+        "$BASE_URL/api_attachments.php?action=list&note_id=$TEST_NOTE_ID&workspace=$TEST_WORKSPACE")
     
     echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
     
@@ -295,6 +575,16 @@ test_delete_note() {
         }" \
         "$BASE_URL/api_delete_note.php")
     
+    # Also test delete with workspace param (DELETE method with JSON body containing workspace)
+    RESPONSE_WS=$(curl -s -u "$AUTH" \
+        -H "Content-Type: application/json" \
+        -X DELETE \
+        -d "{
+            \"note_id\": $TEST_NOTE_ID,
+            \"workspace\": \"$TEST_WORKSPACE\"
+        }" \
+        "$BASE_URL/api_delete_note.php")
+    
     echo "$RESPONSE" | jq . 2>/dev/null || echo "$RESPONSE"
     
     if echo "$RESPONSE" | jq -e '.success == true' >/dev/null 2>&1; then
@@ -312,7 +602,7 @@ test_workspaces_delete() {
         -X POST \
         -d '{
             "action": "delete",
-            "name": "TestWorkspace"
+            "name": "'$RENAMED_WORKSPACE'"
         }' \
         "$BASE_URL/api_workspaces.php")
     
@@ -339,15 +629,24 @@ main() {
     
     # Run all tests in sequence
     test_version
-    test_list_notes
-    test_create_note
     test_workspaces_list
     test_workspaces_create
+    test_create_note
+    test_list_notes
+    test_update_note
     test_apply_tags
     test_favorites
     test_share_note
+    test_create_folder
+    test_move_note_to_folder
+    test_list_tags
+    test_update_tag_on_note
+    test_upload_attachment
     test_attachments_list
     test_delete_note
+    test_restore_note
+    test_delete_folder
+    test_rename_workspace
     test_workspaces_delete
     
     # Summary

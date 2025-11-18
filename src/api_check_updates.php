@@ -1,11 +1,6 @@
 <?php
 require_once 'auth.php';
-
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
-}
+requireApiAuth();
 
 header('Content-Type: application/json');
 
