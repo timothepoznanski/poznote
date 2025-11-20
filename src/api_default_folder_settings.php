@@ -1,6 +1,6 @@
 <?php
 require 'auth.php';
-requireAuth();
+requireApiAuth();
 
 header('Content-Type: application/json');
 

@@ -24,3 +24,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Scripts with sensitive credentials
+clear_all_except_poznote.sh
