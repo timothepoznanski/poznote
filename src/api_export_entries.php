@@ -1,6 +1,6 @@
 <?php
 require 'auth.php';
-requireAuth();
+requireApiAuth();
 
 include 'functions.php';
 require_once 'config.php';

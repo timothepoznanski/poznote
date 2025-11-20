@@ -1,13 +1,7 @@
 <?php
 require 'auth.php';
+requireApiAuth();
 require 'db_connect.php';
-
-// Verify authentication
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
-    exit;
-}
 
 // Verify HTTP method
 if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
