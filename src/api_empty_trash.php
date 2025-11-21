@@ -1,6 +1,6 @@
 <?php
 	require 'auth.php';
-	requireAuth();
+	requireApiAuth();
 	
 	date_default_timezone_set('UTC');
 	include 'functions.php';
@@ -42,9 +42,16 @@
     if ($workspace) {
         $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
         $ok = $del_stmt->execute([$workspace, $workspace]);
-        echo $ok ? 1 : $del_stmt->errorInfo()[2];
     } else {
         $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1");
-        echo $del_stmt->execute() ? 1 : $del_stmt->errorInfo()[2];
+        $ok = $del_stmt->execute();
+    }
+    
+    header('Content-Type: application/json');
+    if ($ok) {
+        echo json_encode(['success' => true, 'message' => 'Trash emptied successfully']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => $del_stmt->errorInfo()[2]]);
     }
 ?>
