@@ -149,13 +149,13 @@ function emptyTrash() {
         ,
         body: wsEmpty
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
-        if (data === '1') {
+        if (data.success === true) {
             // Success - redirect to trash.php to refresh page
             window.location.href = 'trash.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
         } else {
-            showInfoModal('Empty Trash Error', 'Error emptying trash: ' + data);
+            showInfoModal('Empty Trash Error', 'Error emptying trash: ' + (data.error || 'Unknown error'));
         }
     })
     .catch(error => {
