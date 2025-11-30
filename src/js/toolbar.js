@@ -954,6 +954,67 @@ function toggleTablePicker() {
   label.textContent = '1 × 1';
   picker.appendChild(label);
   
+  // Create direct input section
+  const inputSection = document.createElement('div');
+  inputSection.className = 'table-picker-input-section';
+  
+  const inputLabel = document.createElement('div');
+  inputLabel.className = 'table-picker-input-label';
+  inputLabel.textContent = 'Or enter dimensions:';
+  inputSection.appendChild(inputLabel);
+  
+  const inputContainer = document.createElement('div');
+  inputContainer.className = 'table-picker-input-container';
+  
+  // Rows input
+  const rowsWrapper = document.createElement('div');
+  rowsWrapper.className = 'table-picker-input-wrapper';
+  
+  const rowsLabel = document.createElement('label');
+  rowsLabel.textContent = 'Rows:';
+  rowsLabel.className = 'table-picker-input-field-label';
+  rowsWrapper.appendChild(rowsLabel);
+  
+  const rowsInput = document.createElement('input');
+  rowsInput.type = 'number';
+  rowsInput.className = 'table-picker-input-field';
+  rowsInput.min = '1';
+  rowsInput.max = '20';
+  rowsInput.value = '3';
+  rowsInput.placeholder = 'Rows';
+  rowsWrapper.appendChild(rowsInput);
+  
+  inputContainer.appendChild(rowsWrapper);
+  
+  // Columns input
+  const colsWrapper = document.createElement('div');
+  colsWrapper.className = 'table-picker-input-wrapper';
+  
+  const colsLabel = document.createElement('label');
+  colsLabel.textContent = 'Cols:';
+  colsLabel.className = 'table-picker-input-field-label';
+  colsWrapper.appendChild(colsLabel);
+  
+  const colsInput = document.createElement('input');
+  colsInput.type = 'number';
+  colsInput.className = 'table-picker-input-field';
+  colsInput.min = '1';
+  colsInput.max = '20';
+  colsInput.value = '3';
+  colsInput.placeholder = 'Cols';
+  colsWrapper.appendChild(colsInput);
+  
+  inputContainer.appendChild(colsWrapper);
+  
+  // Insert button
+  const insertBtn = document.createElement('button');
+  insertBtn.className = 'table-picker-insert-btn';
+  insertBtn.textContent = 'Insert';
+  inputContainer.appendChild(insertBtn);
+  
+  inputSection.appendChild(inputContainer);
+  picker.appendChild(inputSection);
+  
   // Append to body
   document.body.appendChild(picker);
   
@@ -1051,6 +1112,38 @@ function toggleTablePicker() {
       }, 200);
     }
   });
+  
+  // Handle insert button click
+  insertBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    let rows = parseInt(rowsInput.value);
+    let cols = parseInt(colsInput.value);
+    
+    // Validate inputs
+    if (isNaN(rows) || rows < 1) rows = 1;
+    if (isNaN(cols) || cols < 1) cols = 1;
+    if (rows > 20) rows = 20;
+    if (cols > 20) cols = 20;
+    
+    insertTable(rows, cols);
+    picker.classList.remove('show');
+    setTimeout(() => {
+      picker.remove();
+    }, 200);
+  });
+  
+  // Handle Enter key in input fields
+  const handleInputEnter = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      insertBtn.click();
+    }
+  };
+  
+  rowsInput.addEventListener('keydown', handleInputEnter);
+  colsInput.addEventListener('keydown', handleInputEnter);
   
   // Close picker when clicking outside
   setTimeout(() => {
