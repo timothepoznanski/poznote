@@ -1063,6 +1063,50 @@ body.dark-mode .table-picker-label {
     color: #b0b0b0;
 }
 
+/* Direct input section for dark mode */
+html[data-theme='dark'] .table-picker-input-section,
+body.dark-mode .table-picker-input-section {
+    border-top-color: #404040;
+}
+
+html[data-theme='dark'] .table-picker-input-label,
+body.dark-mode .table-picker-input-label {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .table-picker-input-field-label,
+body.dark-mode .table-picker-input-field-label {
+    color: #c0c0c0;
+}
+
+html[data-theme='dark'] .table-picker-input-field,
+body.dark-mode .table-picker-input-field {
+    background-color: #1a1a1a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .table-picker-input-field:focus,
+body.dark-mode .table-picker-input-field:focus {
+    border-color: #64B5F6;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.15);
+}
+
+html[data-theme='dark'] .table-picker-input-field:hover,
+body.dark-mode .table-picker-input-field:hover {
+    border-color: #555;
+}
+
+html[data-theme='dark'] .table-picker-insert-btn,
+body.dark-mode .table-picker-insert-btn {
+    background: #1976D2;
+}
+
+html[data-theme='dark'] .table-picker-insert-btn:hover,
+body.dark-mode .table-picker-insert-btn:hover {
+    background: #1565C0;
+}
+
 /* Inserted table styles for dark mode */
 html[data-theme='dark'] .noteentry table.inserted-table td,
 html[data-theme='dark'] .noteentry table.inserted-table th,
@@ -1076,9 +1120,22 @@ body.dark-mode .noteentry table.inserted-table th {
     background-color: #2a2a2a;
 }
 
-html[data-theme='dark'] .noteentry table.inserted-table tr:hover,
-body.dark-mode .noteentry table.inserted-table tr:hover {
-    background-color: #2a2a2a;
+/* Table Context Menu - Dark Mode */
+html[data-theme='dark'] .table-context-menu,
+body.dark-mode .table-context-menu {
+    background: #2d2d2d !important;
+    border-color: #444 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+html[data-theme='dark'] .table-context-menu-item,
+body.dark-mode .table-context-menu-item {
+    color: #e5e5e5 !important;
+}
+
+html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"],
+body.dark-mode .table-context-menu-item[style*="color: #dc2626"] {
+    color: #f87171 !important;
 }
 
 /* Color palette popup */

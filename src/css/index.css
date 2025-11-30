@@ -3164,6 +3164,82 @@ input[type="search"]::-webkit-search-results-decoration {
     font-weight: 500;
 }
 
+/* Direct input section */
+.table-picker-input-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.table-picker-input-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.table-picker-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.table-picker-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-picker-input-field-label {
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+}
+
+.table-picker-input-field {
+    width: 50px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s ease;
+}
+
+.table-picker-input-field:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+}
+
+.table-picker-input-field:hover {
+    border-color: #bbb;
+}
+
+.table-picker-insert-btn {
+    padding: 6px 14px;
+    background: #007DB8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.table-picker-insert-btn:hover {
+    background: #006399;
+}
+
+.table-picker-insert-btn:active {
+    transform: scale(0.98);
+}
+
 /* Inserted table styles */
 .noteentry table.inserted-table {
     border-collapse: collapse;
@@ -3181,10 +3257,6 @@ input[type="search"]::-webkit-search-results-decoration {
 .noteentry table.inserted-table th {
     background-color: #f5f5f5;
     font-weight: 600;
-}
-
-.noteentry table.inserted-table tr:hover {
-    background-color: #f9f9f9;
 }
 
 .folder-option:last-child {
