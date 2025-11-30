@@ -136,3 +136,13 @@ if [ -f "$DB_PATH" ]; then
 fi
 
 echo "Starting Poznote services..."
+echo ""
+echo "======================================"
+echo "  Poznote is ready!"
+echo "======================================"
+echo ""
+echo "  Access your instance at:"
+echo "  → http://localhost:${HTTP_WEB_PORT}"
+echo ""
+echo "======================================"
+echo ""
