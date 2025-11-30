@@ -3259,10 +3259,6 @@ input[type="search"]::-webkit-search-results-decoration {
     font-weight: 600;
 }
 
-.noteentry table.inserted-table tr:hover {
-    background-color: #f9f9f9;
-}
-
 .folder-option:last-child {
     border-bottom: none;
 }

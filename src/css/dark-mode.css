@@ -1120,11 +1120,6 @@ body.dark-mode .noteentry table.inserted-table th {
     background-color: #2a2a2a;
 }
 
-html[data-theme='dark'] .noteentry table.inserted-table tr:hover,
-body.dark-mode .noteentry table.inserted-table tr:hover {
-    background-color: #2a2a2a;
-}
-
 /* Table Context Menu - Dark Mode */
 html[data-theme='dark'] .table-context-menu,
 body.dark-mode .table-context-menu {
