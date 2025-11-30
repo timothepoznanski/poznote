@@ -1081,6 +1081,24 @@ body.dark-mode .noteentry table.inserted-table tr:hover {
     background-color: #2a2a2a;
 }
 
+/* Table Context Menu - Dark Mode */
+html[data-theme='dark'] .table-context-menu,
+body.dark-mode .table-context-menu {
+    background: #2d2d2d !important;
+    border-color: #444 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+html[data-theme='dark'] .table-context-menu-item,
+body.dark-mode .table-context-menu-item {
+    color: #e5e5e5 !important;
+}
+
+html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"],
+body.dark-mode .table-context-menu-item[style*="color: #dc2626"] {
+    color: #f87171 !important;
+}
+
 /* Color palette popup */
 html[data-theme='dark'] .color-palette-popup,
 body.dark-mode .color-palette-popup {
