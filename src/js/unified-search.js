@@ -712,11 +712,36 @@ class SearchManager {
 
             // Update URL
             try {
-                const newUrl = window.location.pathname + '?' + formParams;
+                // Extract the note ID from the displayed note in right column
+                let displayedNoteId = null;
+                try {
+                    const rightCol = document.getElementById('right_col');
+                    if (rightCol) {
+                        const noteCard = rightCol.querySelector('.notecard[id^="note"]');
+                        if (noteCard && noteCard.id) {
+                            // Extract ID from "note123" format
+                            const match = noteCard.id.match(/^note(\d+)$/);
+                            if (match && match[1]) {
+                                displayedNoteId = match[1];
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
+                // Add the displayed note ID to the URL params
+                const urlParams = new URLSearchParams(formParams);
+                if (displayedNoteId) {
+                    urlParams.set('note', displayedNoteId);
+                }
+
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
                 history.pushState({}, '', newUrl);
+                
                 // Update global search mode flag so reinitialized code knows we're in search
                 try {
-                    const newParams = new URLSearchParams(formParams);
+                    const newParams = new URLSearchParams(urlParams.toString());
                     const unified = newParams.get('unified_search');
                     const search = newParams.get('search');
                     const tagsSearch = newParams.get('tags_search');
@@ -992,6 +1017,12 @@ class SearchManager {
         const currentFolder = urlParams.get('folder');
         if (currentFolder) {
             newParams.set('folder', currentFolder);
+        }
+
+        // Preserve the currently selected note
+        const currentNote = urlParams.get('note');
+        if (currentNote) {
+            newParams.set('note', currentNote);
         }
 
         // Preserve the currently active search type
