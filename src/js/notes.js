@@ -198,10 +198,17 @@ function saveNoteToServer() {
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
         } else {
             console.error('[Poznote Auto-Save] Save error:', data.message || 'Unknown error');
+            // Show user-visible error notification
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(data.message || 'Error saving note', 'error');
+            }
         }
     })
     .catch(function(error) {
         console.error('[Poznote Auto-Save] Network error:', error.message);
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup('Network error: ' + error.message, 'error');
+        }
     });
 }
 

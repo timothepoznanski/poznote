@@ -171,9 +171,18 @@ if ($noteType === false) {
     exit;
 }
 
-// Enforce uniqueness of heading within workspace (exclude current id)
+// Enforce uniqueness of heading within the same folder and workspace (exclude current id)
 $checkQuery = "SELECT id FROM entries WHERE heading = ? AND trash = 0";
 $params = [$originalHeading];
+
+// Check uniqueness within the same folder (folder_id)
+if ($folder_id !== null) {
+    $checkQuery .= " AND folder_id = ?";
+    $params[] = $folder_id;
+} else {
+    $checkQuery .= " AND folder_id IS NULL";
+}
+
 if ($workspace !== null) {
     $checkQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
     $params[] = $workspace;
@@ -186,7 +195,7 @@ $checkStmt->execute($params);
 $conflictId = $checkStmt->fetchColumn();
 if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     http_response_code(409);
-    echo json_encode(['success' => false, 'message' => 'Another note with the same title exists in this workspace']);
+    echo json_encode(['success' => false, 'message' => 'Another note with the same title exists in this folder']);
     exit;
 }
 

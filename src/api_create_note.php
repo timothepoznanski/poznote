@@ -51,22 +51,6 @@ if (!empty($tags)) {
     $tags = implode(',', $validTags);
 }
 
-// If heading is empty, default to "New note". Otherwise trim input.
-$originalHeading = trim($originalHeading);
-if ($originalHeading === '') {
-    $heading = generateUniqueTitle('New note', null, $workspace);
-} else {
-    // If the provided heading already exists, auto-rename using generateUniqueTitle
-    $check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-    $check->execute([$originalHeading, $workspace, $workspace]);
-    if ($check->fetchColumn() > 0) {
-        // Generate a unique variant based on the requested heading
-        $heading = generateUniqueTitle($originalHeading, null, $workspace);
-    } else {
-        $heading = $originalHeading;
-    }
-}
-
 // Get folder_id if needed
 $folder_id = null;
 // Try to get folder_id from folders table if folder is specified
@@ -83,6 +67,29 @@ if ($folderData) {
     $folder_id = (int)$folderData['id'];
 }
 // Note: If folder not found in folders table, folder_id remains null which is acceptable
+
+// If heading is empty, default to "New note". Otherwise trim input.
+$originalHeading = trim($originalHeading);
+if ($originalHeading === '') {
+    $heading = generateUniqueTitle('New note', null, $workspace, $folder_id);
+} else {
+    // If the provided heading already exists in the same folder, auto-rename using generateUniqueTitle
+    // Check uniqueness within the same folder (folder_id) and workspace
+    if ($folder_id !== null) {
+        $check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $check->execute([$originalHeading, $folder_id, $workspace, $workspace]);
+    } else {
+        // For notes without folder, check among other notes without folder in the same workspace
+        $check = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+        $check->execute([$originalHeading, $workspace, $workspace]);
+    }
+    if ($check->fetchColumn() > 0) {
+        // Generate a unique variant based on the requested heading
+        $heading = generateUniqueTitle($originalHeading, null, $workspace, $folder_id);
+    } else {
+        $heading = $originalHeading;
+    }
+}
 
 // Get current UTC timestamp
 $now = time();

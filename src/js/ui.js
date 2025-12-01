@@ -3,11 +3,33 @@
 function showNotificationPopup(message, type) {
     type = type || 'success';
     
+    // Use the modal alert system for better styling
+    if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+        // Map type to modal alert type
+        var alertType = 'info';
+        var title = 'Notification';
+        
+        if (type === 'error') {
+            alertType = 'error';
+            title = 'Error';
+        } else if (type === 'warning') {
+            alertType = 'warning';
+            title = 'Warning';
+        } else if (type === 'success') {
+            alertType = 'success';
+            title = 'Success';
+        }
+        
+        window.modalAlert.alert(message, alertType, title);
+        return;
+    }
+    
+    // Fallback to old notification system if modalAlert is not available
     var popup = document.getElementById('notificationPopup');
     var overlay = document.getElementById('notificationOverlay');
     
     if (!popup || !overlay) {
-        // Fallback if elements don't exist
+        // Final fallback
         alert(message);
         return;
     }

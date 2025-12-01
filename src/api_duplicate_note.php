@@ -37,9 +37,9 @@ if (!$originalNote) {
     exit;
 }
 
-// Generate a unique heading for the duplicate
+// Generate a unique heading for the duplicate (within the same folder)
 $originalHeading = $originalNote['heading'];
-$newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace']);
+$newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace'], $originalNote['folder_id']);
 
 // Insert the duplicate note
 $insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))");
