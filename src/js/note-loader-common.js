@@ -580,9 +580,9 @@ function updateSelectedNote(clickedLink) {
  */
 function updateBrowserUrl(url, noteId) {
     try {
-        // Merge existing search params (search, tags_search, workspace) into the target URL
+        // Merge existing search params (search, tags_search, workspace, preserve_notes, preserve_tags) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
-    const preserveKeys = ['search', 'tags_search', 'workspace'];
+        const preserveKeys = ['search', 'tags_search', 'workspace', 'preserve_notes', 'preserve_tags'];
 
         const target = new URL(url, window.location.origin);
         const targetParams = new URLSearchParams(target.search || '');
