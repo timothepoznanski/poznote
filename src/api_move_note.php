@@ -160,47 +160,44 @@ try {
         exit;
     }
 
-    // If moving between workspaces (source workspace differs from destination),
-    // check for a title conflict in the destination workspace and rename the
-    // source note by appending " (1)", " (2)", ... until unique.
+    // Check for a title conflict in the destination folder
+    // Uniqueness is scoped to folder + workspace
     $original_heading = $note['heading'] ?? '';
     $renamed_heading = null;
-    // Only consider workspace-aware rename when $workspace (destination) is provided
-    // and it's different from the note's current workspace
-    if ($workspace && ($note['workspace'] ?? null) !== $workspace) {
-        $checkStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $checkStmt->execute([$original_heading, $workspace, $workspace]);
-        if ($checkStmt->fetchColumn() > 0) {
-            // Find a unique heading by appending (1), (2), ...
-            $base = $original_heading;
-            $i = 1;
-            do {
-                $candidate = $base . ' (' . $i . ')';
-                $checkStmt->execute([$candidate, $workspace, $workspace]);
-                $exists = $checkStmt->fetchColumn() > 0;
-                $i++;
-            } while ($exists);
-
-            $renamed_heading = $candidate;
-
-            // Update the DB heading for this note (respecting the note's current workspace)
-            if ($note['workspace']) {
-                $upd = $con->prepare("UPDATE entries SET heading = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $updSuccess = $upd->execute([$renamed_heading, $note_id, $note['workspace'], $note['workspace']]);
-            } else {
-                $upd = $con->prepare("UPDATE entries SET heading = ? WHERE id = ?");
-                $updSuccess = $upd->execute([$renamed_heading, $note_id]);
-            }
-
-            if (!$updSuccess) {
-                http_response_code(500);
-                echo json_encode(['success' => false, 'message' => 'Failed to update note heading for rename']);
-                exit;
-            }
-
-            // Reflect the change locally for the response
-            $note['heading'] = $renamed_heading;
-        }
+    
+    // Determine target workspace (use provided workspace or keep current)
+    $target_workspace = $workspace ?? ($note['workspace'] ?? null);
+    
+    // Check if a note with the same heading already exists in the destination folder
+    $checkQuery = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ?";
+    $checkParams = [$original_heading, $note_id];
+    
+    // Add folder constraint
+    if ($folder_id !== null) {
+        $checkQuery .= " AND folder_id = ?";
+        $checkParams[] = $folder_id;
+    } else {
+        $checkQuery .= " AND folder_id IS NULL";
+    }
+    
+    // Add workspace constraint
+    if ($target_workspace !== null) {
+        $checkQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $checkParams[] = $target_workspace;
+        $checkParams[] = $target_workspace;
+    }
+    
+    $checkStmt = $con->prepare($checkQuery);
+    $checkStmt->execute($checkParams);
+    
+    if ($checkStmt->fetchColumn() > 0) {
+        // Conflict detected - reject the move operation
+        http_response_code(409);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'A note with the same title already exists in the destination folder.'
+        ]);
+        exit;
     }
     
     // Create destination folder if it does not exist physically

@@ -334,12 +334,43 @@ switch($action) {
             }
             
             // Get current note info to know what we're moving
-            $checkStmt = $con->prepare("SELECT id, folder, folder_id, workspace FROM entries WHERE id = ?");
+            $checkStmt = $con->prepare("SELECT id, heading, folder, folder_id, workspace FROM entries WHERE id = ?");
             $checkStmt->execute([$noteId]);
             $currentNote = $checkStmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$currentNote) {
                 echo json_encode(['success' => false, 'error' => 'Note not found']);
+                exit;
+            }
+            
+            // Check for duplicate heading in target folder (scoped uniqueness)
+            $targetWorkspace = $workspace ?? $currentNote['workspace'];
+            $duplicateCheckQuery = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ?";
+            $duplicateCheckParams = [$currentNote['heading'], $noteId];
+            
+            // Add folder constraint
+            if ($targetFolderId !== null) {
+                $duplicateCheckQuery .= " AND folder_id = ?";
+                $duplicateCheckParams[] = $targetFolderId;
+            } else {
+                $duplicateCheckQuery .= " AND folder_id IS NULL";
+            }
+            
+            // Add workspace constraint
+            if ($targetWorkspace !== null) {
+                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $duplicateCheckParams[] = $targetWorkspace;
+                $duplicateCheckParams[] = $targetWorkspace;
+            }
+            
+            $duplicateCheckStmt = $con->prepare($duplicateCheckQuery);
+            $duplicateCheckStmt->execute($duplicateCheckParams);
+            
+            if ($duplicateCheckStmt->fetchColumn() > 0) {
+                echo json_encode([
+                    'success' => false, 
+                    'error' => 'A note with the same title already exists in the destination folder.'
+                ]);
                 exit;
             }
             
@@ -795,6 +826,42 @@ switch($action) {
             
             if (empty($noteId)) {
                 echo json_encode(['success' => false, 'error' => 'Note ID is required']);
+                exit;
+            }
+            
+            // Get current note info
+            $checkStmt = $con->prepare("SELECT heading, workspace FROM entries WHERE id = ?");
+            $checkStmt->execute([$noteId]);
+            $currentNote = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$currentNote) {
+                echo json_encode(['success' => false, 'error' => 'Note not found']);
+                exit;
+            }
+            
+            // Check for duplicate heading at root (folder_id IS NULL)
+            $duplicateCheckQuery = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ? AND folder_id IS NULL";
+            $duplicateCheckParams = [$currentNote['heading'], $noteId];
+            
+            // Add workspace constraint
+            if ($workspace !== null) {
+                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $duplicateCheckParams[] = $workspace;
+                $duplicateCheckParams[] = $workspace;
+            } elseif ($currentNote['workspace'] !== null) {
+                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $duplicateCheckParams[] = $currentNote['workspace'];
+                $duplicateCheckParams[] = $currentNote['workspace'];
+            }
+            
+            $duplicateCheckStmt = $con->prepare($duplicateCheckQuery);
+            $duplicateCheckStmt->execute($duplicateCheckParams);
+            
+            if ($duplicateCheckStmt->fetchColumn() > 0) {
+                echo json_encode([
+                    'success' => false, 
+                    'error' => 'A note with the same title already exists at the root level.'
+                ]);
                 exit;
             }
             

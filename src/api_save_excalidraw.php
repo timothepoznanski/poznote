@@ -93,8 +93,8 @@ if ($note_id === 0) {
         }
     }
     
-    // Generate unique title
-    $uniqueTitle = generateUniqueTitle($heading, null, $workspace);
+    // Generate unique title (folder-aware)
+    $uniqueTitle = generateUniqueTitle($heading, null, $workspace, $folder_id);
     
     // Create new note - store diagram data in entry column for backward compatibility
     $created_date = date("Y-m-d H:i:s");

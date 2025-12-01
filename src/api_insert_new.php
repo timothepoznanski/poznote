@@ -70,8 +70,8 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
     }
     // Note: If folder not found in folders table but folder name is set, 
     // folder_id will remain null (note without folder)
-  }	// Generate unique title for new notes (workspace-aware)
-	$uniqueTitle = generateUniqueTitle('New note', null, $workspace);
+  }	// Generate unique title for new notes (folder-aware and workspace-aware)
+	$uniqueTitle = generateUniqueTitle('New note', null, $workspace, $folder_id);
 
 	// Insert the new note (include workspace, type, and folder_id)
 	$query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?, ?)";

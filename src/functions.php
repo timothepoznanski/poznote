@@ -128,7 +128,7 @@ function getWorkspaceFilter() {
  * Default to "New note" when empty.
  * If a title already exists, add a numeric suffix like " (1)", " (2)", ...
  */
-function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = null) {
+function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = null, $folder_id = null) {
     global $con;
     
     // Clean the original title
@@ -138,8 +138,17 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
     }
     
     // Check if title already exists (excluding the current note if updating)
+    // Uniqueness is scoped to folder + workspace
     $query = "SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0";
     $params = [$title];
+
+    // Check uniqueness within the same folder
+    if ($folder_id !== null) {
+        $query .= " AND folder_id = ?";
+        $params[] = $folder_id;
+    } else {
+        $query .= " AND folder_id IS NULL";
+    }
 
     // If workspace specified, restrict uniqueness to that workspace
     if ($workspace !== null) {
