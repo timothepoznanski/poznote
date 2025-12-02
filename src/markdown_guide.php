@@ -145,7 +145,7 @@ $v = '20251020.6'; // Cache version
     
     <h2>URLs</h2>
     <p>
-        <code>&lt;https://example.com&gt;</code>
+        <code>[Link text](https://example.com)</code>
     </p>
     
     <h2>Code Blocks</h2>
