@@ -654,7 +654,8 @@ function toggleEmojiPicker() {
   const emojis = ['😀', '😃', '😄', '😊', '😍', '😘', '😎', '🤔', '😅', '😂', '😢', '😭', '😡', '👍', '👎', '👉', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '❤️', '➜', '🚧', '✅', '🟩', '🟪', '☑️', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '⚠️', '🚩', '🟢', '🔴', '🔵', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];  
   
   // Create picker content
-  let content = '<div class="emoji-category">';
+  let content = '<div class="emoji-hint">💡 On Windows, press <kbd>Win</kbd> + <kbd>;</kbd> to open native emoji picker</div>';
+  content += '<div class="emoji-category">';
   content += '<div class="emoji-grid">';
   
   emojis.forEach(emoji => {
@@ -678,7 +679,7 @@ function toggleEmojiPicker() {
     
     // Picker dimensions according to screen
     const pickerWidth = isMobile ? Math.min(300, windowWidth - 40) : 360;
-    const pickerHeight = isMobile ? 350 : 400;
+    const pickerHeight = isMobile ? 450 : 550;
     
     picker.style.position = 'fixed';
     picker.style.width = pickerWidth + 'px';

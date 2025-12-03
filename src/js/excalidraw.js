@@ -49,6 +49,7 @@ function isCursorInEditableNote() {
     return (editableElement && noteEntry) || markdownEditor || (editableElement && editableElement.classList.contains('noteentry'));
 }
 
+
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
     // Disable Excalidraw insertion on mobile devices (< 800px)
@@ -63,7 +64,11 @@ function insertExcalidrawDiagram() {
     
     // Check if cursor is in editable note first
     if (!isCursorInEditableNote()) {
-        showCursorWarning();
+        if (typeof window.showCursorWarning === 'function') {
+            window.showCursorWarning();
+        } else {
+            window.showError('Please position your cursor in the note content area before inserting a diagram.', 'Cursor Position');
+        }
         return;
     }
     
@@ -81,42 +86,135 @@ function insertExcalidrawDiagram() {
         return;
     }
     
+    // Show loading spinner
+    const spinner = window.showLoadingSpinner('Saving note...', 'Saving');
+    
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
     
-    // Check if we're on mobile to adapt the button behavior
-    const isMobile = window.innerWidth < 800;
-    
-    // Create simple button for the Excalidraw diagram
-    let diagramHTML;
-    if (isMobile) {
-        // On mobile, create a disabled button with a different onclick that shows an alert
-        diagramHTML = `<button class="excalidraw-btn excalidraw-btn-mobile" id="${diagramId}" onclick="showMobileExcalidrawAlert()" style="cursor: not-allowed; background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px; opacity: 0.7;" title="Excalidraw editing disabled on mobile">Excalidraw (Mobile editing disabled)</button><br><br>`;
-    } else {
-        // On desktop, normal behavior
-        diagramHTML = `<button class="excalidraw-btn" id="${diagramId}" onclick="openExcalidrawEditor('${diagramId}')" style="cursor: pointer; background: #007DB8; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 14px; margin: 4px;" title="Open Excalidraw diagram editor">Click here to create your Excalidraw image here</button><br><br>`;
-    }
-    
-    // Insert at cursor position
-    insertHtmlAtCursor(diagramHTML);
-    
-    // Trigger automatic save to ensure placeholder is saved before opening editor
-    if (typeof window.markNoteAsModified === 'function') {
-        window.markNoteAsModified(); // Mark note as edited and start debounce timer (2 seconds)
-    }
-    
-    // Wait for the debounced save to complete before opening editor
-    // The auto-save system has a 2-second debounce, so we wait slightly longer to be safe
-    if (!isMobile) {
-        // Show loading spinner
-        const spinner = window.showLoadingSpinner('Saving diagram placeholder...', 'Loading');
+    // Save the note and wait for completion
+    saveNoteAndWaitForCompletion()
+        .then(function(success) {
+            if (success) {
+                // Note saved successfully
+                // Wait a bit more to ensure all handlers complete
+                setTimeout(function() {
+                    openExcalidrawEditor(diagramId);
+                    // Note: spinner will be closed when page navigates to editor
+                }, 300);
+            } else {
+                // Save failed, close spinner and show error
+                if (spinner && spinner.close) {
+                    spinner.close();
+                }
+                if (typeof window.showError === 'function') {
+                    window.showError('Failed to save note. Please try again.', 'Save Error');
+                }
+            }
+        })
+        .catch(function(error) {
+            // Error occurred, close spinner
+            if (spinner && spinner.close) {
+                spinner.close();
+            }
+            console.error('Error saving note:', error);
+            if (typeof window.showError === 'function') {
+                window.showError('Error saving note: ' + (error.message || 'Unknown error'), 'Save Error');
+            }
+        });
+}
+
+// Helper function to save note and wait for completion
+function saveNoteAndWaitForCompletion() {
+    return new Promise(function(resolve, reject) {
+        // Check that noteid is valid
+        if (typeof noteid === 'undefined' || noteid == -1 || noteid == '' || noteid === null || noteid === undefined) {
+            reject(new Error('Invalid note ID'));
+            return;
+        }
         
-        // Wait 2.5 seconds (accounting for 2-second debounce + small buffer)
-        setTimeout(function() {
-            openExcalidrawEditor(diagramId);
-            // Note: spinner will be closed when page navigates to editor
-        }, 2500); // Wait for debounced save to complete
-    }
+        // Check if saveNoteToServer function exists
+        if (typeof saveNoteToServer !== 'function') {
+            reject(new Error('saveNoteToServer function not available'));
+            return;
+        }
+        
+        // Clear any pending save timeout to avoid conflicts
+        if (typeof saveTimeout !== 'undefined' && saveTimeout !== null) {
+            clearTimeout(saveTimeout);
+            saveTimeout = null;
+        }
+        
+        // Call the existing save function
+        try {
+            saveNoteToServer();
+            
+            // Wait a bit for the save to complete
+            // The save is asynchronous but we can check for indicators
+            var checkCount = 0;
+            var maxChecks = 20; // 2 seconds max (20 x 100ms)
+            
+            var checkInterval = setInterval(function() {
+                checkCount++;
+                
+                // Check if save completed by looking at indicators
+                var saveCompleted = true;
+                
+                // Check if there's still a pending save timeout
+                if (typeof saveTimeout !== 'undefined' && saveTimeout !== null) {
+                    saveCompleted = false;
+                }
+                
+                // Check if note still needs refresh
+                if (typeof notesNeedingRefresh !== 'undefined' && 
+                    notesNeedingRefresh.has && 
+                    notesNeedingRefresh.has(String(noteid))) {
+                    saveCompleted = false;
+                }
+                
+                // Check if page title still has unsaved indicator
+                if (document.title.startsWith('🔴')) {
+                    saveCompleted = false;
+                }
+                
+                if (saveCompleted || checkCount >= maxChecks) {
+                    clearInterval(checkInterval);
+                    
+                    // Clean up indicators to be sure
+                    if (typeof saveTimeout !== 'undefined') {
+                        clearTimeout(saveTimeout);
+                        saveTimeout = null;
+                    }
+                    
+                    if (typeof notesNeedingRefresh !== 'undefined' && notesNeedingRefresh.delete) {
+                        notesNeedingRefresh.delete(String(noteid));
+                    }
+                    
+                    if (document.title.startsWith('🔴')) {
+                        document.title = document.title.substring(2);
+                    }
+                    
+                    // Clear draft from localStorage
+                    try {
+                        localStorage.removeItem('poznote_draft_' + noteid);
+                        localStorage.removeItem('poznote_title_' + noteid);
+                        localStorage.removeItem('poznote_tags_' + noteid);
+                    } catch (err) {
+                        // Ignore errors
+                    }
+                    
+                    if (checkCount >= maxChecks) {
+                        console.warn('Save timeout reached, proceeding anyway');
+                    }
+                    
+                    resolve(true);
+                }
+            }, 100); // Check every 100ms
+            
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
 // Open Excalidraw editor for a specific diagram
@@ -138,11 +236,28 @@ function openExcalidrawEditor(diagramId) {
         return;
     }
     
+    // Get the note entry element to extract cursor position
+    const noteEntry = document.getElementById('entry' + currentNoteId);
+    let cursorPosition = null;
+    
+    if (noteEntry) {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            // Calculate the offset from the beginning of the note content
+            const preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(noteEntry);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            cursorPosition = preCaretRange.toString().length;
+        }
+    }
+    
     // Store diagram context in sessionStorage
     sessionStorage.setItem('excalidraw_context', JSON.stringify({
         noteId: currentNoteId,
         diagramId: diagramId,
-        returnUrl: window.location.href
+        returnUrl: window.location.href,
+        cursorPosition: cursorPosition
     }));
     
     // Redirect to Excalidraw editor with diagram context

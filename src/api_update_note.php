@@ -195,7 +195,7 @@ $checkStmt->execute($params);
 $conflictId = $checkStmt->fetchColumn();
 if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     http_response_code(409);
-    echo json_encode(['success' => false, 'message' => 'Another note with the same title exists in this folder']);
+    echo json_encode(['success' => false, 'message' => 'Another note with the same title exists in this folder.']);
     exit;
 }
 

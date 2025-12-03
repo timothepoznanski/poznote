@@ -703,7 +703,10 @@ $body_classes = trim($extra_body_classes);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? 'Uncategorized';
+                    $folder_name = $row['folder'] ?? 'No folder';
+                    // Get the complete folder path including parents
+                    $folder_id = $row['folder_id'] ?? null;
+                    $folder_path = $folder_id ? getFolderPath($folder_id, $con) : $folder_name;
                     $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
@@ -738,9 +741,13 @@ $body_classes = trim($extra_body_classes);
                     echo '</div>';
                     echo '</div>';
                 
-                    // Tags container: keep a hidden input for JS but remove the visible icon/input.
+                    // Tags container with folder: keep a hidden input for JS but remove the visible icon/input.
                     // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                     echo '<div class="note-tags-row">';
+                    echo '<div class="folder-wrapper">';
+                    echo '<span class="fa-folder icon_folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="Change folder"></span>';
+                    echo '<span class="folder_name" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="Change folder">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    echo '</div>';
                     echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
                     echo '<span class="name_tags">'
                         .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'

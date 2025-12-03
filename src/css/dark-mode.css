@@ -286,6 +286,20 @@ body.dark-mode .tag-input::placeholder {
     color: #808080;
 }
 
+/* Folder name badge */
+html[data-theme='dark'] .folder_name,
+body.dark-mode .folder_name {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder_name:hover,
+body.dark-mode .folder_name:hover {
+    background: #333;
+    border-color: #4a4a4a;
+}
+
 /* Modals */
 html[data-theme='dark'] .modal,
 body.dark-mode .modal {
@@ -1022,6 +1036,20 @@ html[data-theme='dark'] .emoji-picker-popup,
 body.dark-mode .emoji-picker-popup {
     /* background-color: #242424; */
     border-color: #404040;
+}
+
+html[data-theme='dark'] .emoji-hint,
+body.dark-mode .emoji-hint {
+    background: #2a2a2a;
+    border-left-color: #4a90e2;
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .emoji-hint kbd,
+body.dark-mode .emoji-hint kbd {
+    background: #1a1a1a;
+    border-color: #404040;
+    color: #e0e0e0;
 }
 
 html[data-theme='dark'] .emoji-picker-popup .emoji-item:hover,

@@ -1467,13 +1467,77 @@ img.img-with-border-no-padding {
     margin-top: 5px;
 }
 
+.fa-folder.icon_folder {
+    font-size: 14px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+    color: #6c757d;
+}
+
+.fa-folder.icon_folder::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    content: "\f07b";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 1em;
+    vertical-align: middle;
+}
+
+.folder_name {
+    font-size: 13px;
+    color: #37352F;
+    flex-shrink: 0;
+    margin-right: 20px;
+    background: #f0f4f8;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+}
+
+.folder_name:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.folder-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+@media (max-width: 800px) {
+    .note-tags-row {
+        flex-wrap: wrap;
+    }
+    
+    .folder-wrapper {
+        flex-basis: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .folder_name {
+        margin-right: 0;
+    }
+}
+
 .fa-tag.icon_tag {
     font-size: 14px;
-    margin-right: 14px;
+    margin-right: 4px;
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
     cursor: pointer;
+    color: #6c757d;
 }
 
 .fa-tag.icon_tag:hover {
@@ -3034,11 +3098,32 @@ input[type="search"]::-webkit-search-results-decoration {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     width: 360px;
-    max-height: 500px;
+    max-height: 550px;
     overflow-y: auto;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
     padding: 10px;
+}
+
+.emoji-hint {
+    padding: 10px 15px;
+    margin: 5px 10px 10px 10px;
+    background: #f8f9fa;
+    border-left: 3px solid #0066cc;
+    font-size: 12px;
+    color: #555;
+    border-radius: 4px;
+}
+
+.emoji-hint kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .emoji-category {

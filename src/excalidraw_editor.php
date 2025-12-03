@@ -143,6 +143,17 @@ if ($note_id > 0) {
     #saveAndExitBtn:hover {
         background: #1d4ed8 !important;
     }
+    .excalidraw-toolbar-btn:disabled,
+    .excalidraw-save-btn:disabled {
+        background: #9ca3af !important;
+        border-color: #9ca3af !important;
+        cursor: not-allowed !important;
+        opacity: 0.6;
+    }
+    .excalidraw-toolbar-btn:disabled:hover,
+    .excalidraw-save-btn:disabled:hover {
+        background: #9ca3af !important;
+    }
     </style>
     
     <!-- Modal alerts system -->
@@ -155,14 +166,14 @@ if ($note_id > 0) {
         <!-- Clean toolbar -->
         <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 5000;">
             <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
                     Save
                 </button>
-                <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
                     Save and exit
                 </button>
                 <button id="cancelBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #dc2626; border: 1px solid #dc2626; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
-                    Exit
+                    Exit without saving
                 </button>
             </div>
             <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
@@ -182,6 +193,17 @@ if ($note_id > 0) {
     const workspace = <?php echo json_encode($workspace); ?>;
     const diagramId = <?php echo json_encode($diagram_id); ?>;
     const isEmbeddedDiagram = <?php echo $is_embedded_diagram ? 'true' : 'false'; ?>;
+    
+    // Get cursor position from sessionStorage if available
+    let cursorPosition = null;
+    try {
+        const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
+        if (context.cursorPosition !== undefined && context.cursorPosition !== null) {
+            cursorPosition = context.cursorPosition;
+        }
+    } catch (e) {
+        console.error('Failed to parse excalidraw context:', e);
+    }
     
     // Safer data handling
     let existingData = null;
@@ -242,6 +264,50 @@ if ($note_id > 0) {
     }
     
     let excalidrawAPI = null;
+    let hasChanges = false;
+    let initialElements = null;
+
+    // Function to enable/disable save buttons based on changes
+    function updateSaveButtonsState() {
+        const saveBtn = document.getElementById('saveBtn');
+        const saveAndExitBtn = document.getElementById('saveAndExitBtn');
+        
+        if (hasChanges) {
+            saveBtn.disabled = false;
+            saveAndExitBtn.disabled = false;
+        } else {
+            saveBtn.disabled = true;
+            saveAndExitBtn.disabled = true;
+        }
+    }
+
+    // Function to check if there are changes
+    function checkForChanges() {
+        if (!excalidrawAPI || !initialElements) {
+            return;
+        }
+        
+        const currentElements = excalidrawAPI.getSceneElements();
+        
+        // Check if elements count changed
+        if (currentElements.length !== initialElements.length) {
+            hasChanges = true;
+            updateSaveButtonsState();
+            return;
+        }
+        
+        // Check if any element has changed
+        const currentJSON = JSON.stringify(currentElements);
+        const initialJSON = JSON.stringify(initialElements);
+        
+        if (currentJSON !== initialJSON) {
+            hasChanges = true;
+        } else {
+            hasChanges = false;
+        }
+        
+        updateSaveButtonsState();
+    }
 
     window.addEventListener('DOMContentLoaded', function() {
         // Mobile optimizations
@@ -290,6 +356,16 @@ if ($note_id > 0) {
                     initialData: safeInitialData,
                     theme: getTheme()
                 });
+                
+                // Store initial elements for change detection
+                setTimeout(function() {
+                    if (excalidrawAPI) {
+                        initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
+                        
+                        // Set up change detection interval
+                        setInterval(checkForChanges, 500);
+                    }
+                }, 500);
                 
                 // Hide loading message
                 const loading = document.getElementById('loading');
@@ -355,6 +431,11 @@ if ($note_id > 0) {
                 localStorage.removeItem('poznote_tags_' + noteId);
             } catch (err) {
             }
+            
+            // Reset change tracking after save
+            initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
+            hasChanges = false;
+            updateSaveButtonsState();
             
             this.textContent = 'Saved!';
             setTimeout(() => { this.textContent = 'Save'; }, 2000);
@@ -450,6 +531,11 @@ if ($note_id > 0) {
         formData.append('workspace', workspace);
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_image_base64', base64Image);
+        
+        // Send cursor position if available
+        if (cursorPosition !== null) {
+            formData.append('cursor_position', cursorPosition);
+        }
         
         const response = await fetch('api_save_excalidraw.php', {
             method: 'POST',

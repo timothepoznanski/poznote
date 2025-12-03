@@ -215,6 +215,7 @@ function saveEmbeddedDiagram() {
     $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
+    $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
     
     if ($note_id <= 0 || empty($diagram_id)) {
         http_response_code(400);
@@ -330,13 +331,35 @@ function saveEmbeddedDiagram() {
             // Replace existing button placeholder
             $html_content = preg_replace($button_pattern, $diagram_html, $html_content);
         } else {
-            // Neither container nor button exists, add it to the end of the note
-            if (empty($html_content)) {
+            // Neither container nor button exists, insert at cursor position if available
+            if ($cursor_position !== null && !empty($html_content)) {
+                // Strip HTML tags to get plain text position
+                $plain_text = strip_tags($html_content);
+                
+                // If cursor position is valid
+                if ($cursor_position >= 0 && $cursor_position <= mb_strlen($plain_text)) {
+                    // Find the HTML position that corresponds to the plain text position
+                    $html_position = findHtmlPositionFromTextOffset($html_content, $cursor_position);
+                    
+                    if ($html_position !== false) {
+                        // Insert the diagram at the calculated position
+                        $html_content = mb_substr($html_content, 0, $html_position) . 
+                                       $diagram_html . 
+                                       mb_substr($html_content, $html_position);
+                    } else {
+                        // Fallback: add at the end if position calculation fails
+                        $html_content .= $diagram_html;
+                    }
+                } else {
+                    // Invalid cursor position, add at the end
+                    $html_content .= $diagram_html;
+                }
+            } else if (empty($html_content)) {
                 // If note is completely empty, just add the diagram
                 $html_content = $diagram_html;
             } else {
-                // Add diagram at the end of existing content
-                $html_content .= "\n" . $diagram_html;
+                // No cursor position provided, add diagram at the end of existing content
+                $html_content .= $diagram_html;
             }
         }
         
@@ -361,4 +384,60 @@ function saveEmbeddedDiagram() {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
     }
+}
+
+/**
+ * Find the HTML position corresponding to a plain text offset
+ * This helps insert content at the cursor position in HTML content
+ */
+function findHtmlPositionFromTextOffset($html_content, $text_offset) {
+    // Decode HTML entities first to get accurate text position
+    $decoded_html = html_entity_decode($html_content, ENT_QUOTES | ENT_HTML5);
+    
+    $html_length = mb_strlen($decoded_html);
+    $text_position = 0;
+    $html_position = 0;
+    $in_tag = false;
+    
+    while ($html_position < $html_length && $text_position < $text_offset) {
+        $char = mb_substr($decoded_html, $html_position, 1);
+        
+        if ($char === '<') {
+            $in_tag = true;
+        } else if ($char === '>') {
+            $in_tag = false;
+        } else if (!$in_tag) {
+            // Count non-tag characters as text
+            $text_position++;
+        }
+        
+        $html_position++;
+    }
+    
+    // Return position in original HTML (with entities)
+    // We need to find the corresponding position in the original string
+    $original_position = 0;
+    $decoded_position = 0;
+    
+    while ($decoded_position < $html_position && $original_position < mb_strlen($html_content)) {
+        // Check if we're at an HTML entity in the original content
+        if (mb_substr($html_content, $original_position, 1) === '&') {
+            // Find the end of the entity
+            $entity_end = mb_strpos($html_content, ';', $original_position);
+            if ($entity_end !== false) {
+                $entity = mb_substr($html_content, $original_position, $entity_end - $original_position + 1);
+                $decoded_entity = html_entity_decode($entity, ENT_QUOTES | ENT_HTML5);
+                
+                // Skip the entire entity in original, but only count decoded length in decoded
+                $original_position = $entity_end + 1;
+                $decoded_position += mb_strlen($decoded_entity);
+                continue;
+            }
+        }
+        
+        $original_position++;
+        $decoded_position++;
+    }
+    
+    return $original_position;
 }
