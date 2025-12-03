@@ -286,6 +286,20 @@ body.dark-mode .tag-input::placeholder {
     color: #808080;
 }
 
+/* Folder name badge */
+html[data-theme='dark'] .folder_name,
+body.dark-mode .folder_name {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder_name:hover,
+body.dark-mode .folder_name:hover {
+    background: #333;
+    border-color: #4a4a4a;
+}
+
 /* Modals */
 html[data-theme='dark'] .modal,
 body.dark-mode .modal {
