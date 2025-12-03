@@ -703,7 +703,7 @@ $body_classes = trim($extra_body_classes);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? 'Uncategorized';
+                    $folder_name = $row['folder'] ?? 'No folder';
                     // Get the complete folder path including parents
                     $folder_id = $row['folder_id'] ?? null;
                     $folder_path = $folder_id ? getFolderPath($folder_id, $con) : $folder_name;

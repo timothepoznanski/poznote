@@ -1493,9 +1493,21 @@ img.img-with-border-no-padding {
 
 .folder_name {
     font-size: 13px;
-    color: #6c757d;
+    color: #37352F;
     flex-shrink: 0;
     margin-right: 20px;
+    background: #f0f4f8;
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: inline-block;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+}
+
+.folder_name:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
 }
 
 .fa-tag.icon_tag {
