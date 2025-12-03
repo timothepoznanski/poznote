@@ -1467,9 +1467,40 @@ img.img-with-border-no-padding {
     margin-top: 5px;
 }
 
+.fa-folder.icon_folder {
+    font-size: 14px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 1;
+    color: #6c757d;
+}
+
+.fa-folder.icon_folder::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    content: "\f07b";
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-size: 1em;
+    vertical-align: middle;
+}
+
+.folder_name {
+    font-size: 13px;
+    color: #6c757d;
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
 .fa-tag.icon_tag {
     font-size: 14px;
-    margin-right: 14px;
+    margin-right: 4px;
     flex-shrink: 0;
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
