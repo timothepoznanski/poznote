@@ -1510,6 +1510,26 @@ img.img-with-border-no-padding {
     border-color: #cbd5e1;
 }
 
+.folder-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+@media (max-width: 800px) {
+    .note-tags-row {
+        flex-wrap: wrap;
+    }
+    
+    .folder-wrapper {
+        flex-basis: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .folder_name {
+        margin-right: 0;
+    }
+}
+
 .fa-tag.icon_tag {
     font-size: 14px;
     margin-right: 4px;
@@ -1517,6 +1537,7 @@ img.img-with-border-no-padding {
     align-self: center;
     line-height: 1; /* avoid extra vertical spacing */
     cursor: pointer;
+    color: #6c757d;
 }
 
 .fa-tag.icon_tag:hover {
