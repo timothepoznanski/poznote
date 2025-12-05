@@ -65,20 +65,7 @@ After installation, access Poznote at: **[http://localhost:8040](http://localhos
 
 ## 📚 Documentation
 
-### Getting Started
-- **[Installation Guide](../../wiki/Installation-Guide)** - Detailed setup for all platforms
-- **[Configuration](../../wiki/Configuration)** - Settings, credentials, and customization
-- **[Update Guide](../../wiki/Update-Guide)** - Keep your instance up to date
-
-### Advanced Usage
-- **[Backup and Restore](../../wiki/Backup-and-Restore)** - Protect your data with backups
-- **[Multiple Instances](../../wiki/Multiple-Instances-Setup)** - Run multiple isolated instances
-- **[API Documentation](../../wiki/API-Documentation)** - Complete REST API reference
-
-### Technical Details
-- **[Tech Stack](../../wiki/Tech-Stack)** - Under the hood of Poznote
-
-**[📖 View Full Wiki →](../../wiki)**
+**[View Full Wiki →](../../wiki)**
 
 
 ## 🛠️ Quick Commands
