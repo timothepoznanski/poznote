@@ -20,7 +20,7 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 <p align="center">
   <br>Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note.
   <img width="1893" height="899" alt="image" src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" />
-  <br>Create special notes for your to-do lists or any other lists.
+  <br><br>Create special notes for your to-do lists or any other lists.
   <img width="1906" height="895" alt="image" src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" />
   <br>Insert diagrams directly into your notes using an Excalidraw editor.
   <img width="1902" height="893" alt="image" src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" />
