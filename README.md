@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="poznote.svg" alt="Poznote Logo" width="120">
+  <img src="poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
 <h1 align="center">Poznote - Lightweight Note-Taking Platform</h1>
