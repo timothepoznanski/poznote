@@ -63,10 +63,6 @@ After installation, access Poznote at: **[http://localhost:8040](http://localhos
 - Username: `admin`
 - Password: `admin123!`
 
-⚠️ **Change these credentials immediately after first login!** See [Configuration Guide](../../wiki/Configuration).
-
-
-
 ## 📚 Documentation
 
 ### Getting Started
