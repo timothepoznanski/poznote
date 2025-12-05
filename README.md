@@ -9,16 +9,21 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 </p>
 
 <p align="center">
+Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note.
   <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Supported-blue?logo=docker" alt="Docker"></a>
+Create special notes for your to-do lists or any other lists.
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Open%20Source-green" alt="License"></a>
+Insert diagrams directly into your notes using an Excalidraw editor.
   <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.x-purple?logo=php" alt="PHP"></a>
+Insert code blocks where you can highlight or color the parts that matter to you.
   <a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite" alt="SQLite"></a>
+And for the fans, create notes in Markdown.
   <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript" alt="JavaScript"></a>
   <a href="https://github.com/timothepoznanski/poznote/stargazers"><img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=social" alt="GitHub stars"></a>
 </p>
 
 <p align="center">
-  Example HTML Note
+  
   <img width="1893" height="899" alt="image" src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" />
   <img width="1906" height="895" alt="image" src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" />
   <img width="1902" height="893" alt="image" src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" />
