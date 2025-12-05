@@ -135,6 +135,11 @@ function saveNoteToServer() {
     // Prepare data
     var headi = titleInput.value || '';
     
+    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
+    if (headi === '' && titleInput.placeholder && /^New note( \(\d+\))?$/.test(titleInput.placeholder)) {
+        headi = titleInput.placeholder;
+    }
+    
     // Serialize checklist data before saving
     serializeChecklists(entryElem);
     
@@ -388,7 +393,13 @@ function updateNoteTitleInLeftColumn() {
     if (!elements.title) return;
     
     var newTitle = elements.title.value.trim();
-    if (newTitle === '') newTitle = 'Note sans titre';
+    
+    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
+    if (newTitle === '' && elements.title.placeholder && /^New note( \(\d+\))?$/.test(elements.title.placeholder)) {
+        newTitle = elements.title.placeholder;
+    } else if (newTitle === '') {
+        newTitle = 'Note sans titre';
+    }
     
     // Search elements to update
     var elementsToUpdate = [];

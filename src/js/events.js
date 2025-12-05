@@ -2040,6 +2040,12 @@ function emergencySave(noteId) {
     serializeChecklists(entryElem);
     
     var headi = titleInput.value || '';
+    
+    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
+    if (headi === '' && titleInput.placeholder && /^New note( \(\d+\))?$/.test(titleInput.placeholder)) {
+        headi = titleInput.placeholder;
+    }
+    
     var ent = entryElem.innerHTML.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
     var tags = tagsElem ? tagsElem.value : '';
     var folder = folderElem ? folderElem.value : null; // No folder selected
