@@ -61,11 +61,6 @@ services:
 "@ | Out-File -FilePath docker-compose.yml -Encoding UTF8
 ```
 
-Download the latest Poznote Docker image:
-```powershell
-docker compose pull
-```
-
 Start Poznote container in detached mode (runs in background):
 ```powershell
 docker compose up -d
@@ -125,11 +120,6 @@ services:
     volumes:
       - "./data:/var/www/html/data"
 EOF
-```
-
-Download the latest Poznote Docker image:
-```bash
-docker compose pull
 ```
 
 Start Poznote container in detached mode (runs in background):
