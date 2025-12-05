@@ -12,11 +12,25 @@
 Poznote is a lightweight yet powerful web app for taking notes.  
 Capture, organize, and access your notes while keeping full ownership of your data.
 
-[**View all features on poznote.com**](https://poznote.com/index.html#features)
+## 🌟 Key Features
+
+✅ **Self-Hosted** - Full control over your data  
+✅ **Lightweight** - Fast and efficient  
+✅ **Easy Installation** - One-command Docker deployment  
+✅ **Offline Capable** - Export notes for offline browsing  
+✅ **Multiple Workspaces** - Organize notes by context  
+✅ **Rich Editor** - Markdown and HTML support  
+✅ **Attachments** - Upload files to your notes  
+✅ **Tags & Folders** - Flexible organization  
+✅ **Full-Text Search** - Find notes instantly  
+✅ **REST API** - Programmatic access  
+✅ **Backup/Restore** - Built-in data protection  
+✅ **Dark Mode** - Easy on the eyes  
+✅ **Excalidraw Integration** - Create diagrams  
+
 
 ![poznote](poznote.png)
 
----
 
 ## 🎮 Try the Demo
 
@@ -25,7 +39,6 @@ A Poznote demo is available at [**poznote-demo.up.railway.app**](https://poznote
 - **Username:** `poznote`
 - **Password:** `poznote`
 
----
 
 ## 🚀 Quick Start
 
@@ -47,7 +60,7 @@ After installation, access Poznote at: **[http://localhost:8040](http://localhos
 
 ⚠️ **Change these credentials immediately after first login!** See [Configuration Guide](../../wiki/Configuration).
 
----
+
 
 ## 📚 Documentation
 
@@ -66,25 +79,6 @@ After installation, access Poznote at: **[http://localhost:8040](http://localhos
 
 **[📖 View Full Wiki →](../../wiki)**
 
----
-
-## 🌟 Key Features
-
-✅ **Self-Hosted** - Full control over your data  
-✅ **Lightweight** - Fast and efficient  
-✅ **Easy Installation** - One-command Docker deployment  
-✅ **Offline Capable** - Export notes for offline browsing  
-✅ **Multiple Workspaces** - Organize notes by context  
-✅ **Rich Editor** - Markdown and HTML support  
-✅ **Attachments** - Upload files to your notes  
-✅ **Tags & Folders** - Flexible organization  
-✅ **Full-Text Search** - Find notes instantly  
-✅ **REST API** - Programmatic access  
-✅ **Backup/Restore** - Built-in data protection  
-✅ **Dark Mode** - Easy on the eyes  
-✅ **Excalidraw Integration** - Create diagrams  
-
----
 
 ## 🛠️ Quick Commands
 
@@ -119,7 +113,7 @@ docker compose up -d
 
 [**Full configuration guide →**](../../wiki/Configuration)
 
----
+
 
 ## 💻 Tech Stack
 
@@ -131,7 +125,7 @@ docker compose up -d
 
 [**Learn more about the tech stack →**](../../wiki/Tech-Stack)
 
----
+
 
 ## 🔌 API
 
@@ -154,7 +148,6 @@ curl -u 'admin:admin123!' \
 
 [**Full API reference →**](../../wiki/API-Documentation)
 
----
 
 ## 🤝 Contributing
 
@@ -167,13 +160,13 @@ Contributions are welcome! Whether it's:
 
 **[Open an issue](https://github.com/timothepoznanski/poznote/issues)** or **[submit a pull request](https://github.com/timothepoznanski/poznote/pulls)**!
 
----
+
 
 ## 📄 License
 
 Poznote is open source software. See [LICENSE](LICENSE) for details.
 
----
+
 
 ## 🌐 Links
 
@@ -183,7 +176,7 @@ Poznote is open source software. See [LICENSE](LICENSE) for details.
 - **Issues:** [GitHub Issues](https://github.com/timothepoznanski/poznote/issues)
 - **Releases:** [GitHub Releases](https://github.com/timothepoznanski/poznote/releases)
 
----
+
 
 ## ⭐ Support
 
@@ -194,6 +187,6 @@ If you find Poznote useful, please consider:
 - 🐛 **Reporting bugs** or suggesting features
 - 💬 **Contributing** to the project
 
----
+
 
 <p align="center">Made with ❤️ for note-takers who value simplicity and ownership</p>
