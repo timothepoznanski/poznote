@@ -18,6 +18,7 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 </p>
 
 <p align="center">
+  Example HTML Note
   <img width="1893" height="899" alt="image" src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" />
   <img width="1906" height="895" alt="image" src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" />
   <img width="1902" height="893" alt="image" src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" />
@@ -38,6 +39,8 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 • **Full-Text Search** - Find notes instantly  
 • **REST API** - Programmatic access  
 • **Backup/Restore** - Built-in data protection  
+• **Public Sharing** - Share notes with public links  
+• **Responsive Design** - Works on desktop, tablet, and mobile  
 • **Dark Mode** - Easy on the eyes  
 • **Excalidraw Integration** - Create diagrams  
 
