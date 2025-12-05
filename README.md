@@ -12,6 +12,10 @@
 Poznote is a lightweight yet powerful web app for taking notes.  
 Capture, organize, and access your notes while keeping full ownership of your data.
 
+
+
+![poznote](poznote.png)
+
 • **Self-Hosted** - Full control over your data  
 • **Lightweight** - Fast and efficient  
 • **Easy Installation** - One-command Docker deployment  
@@ -25,10 +29,6 @@ Capture, organize, and access your notes while keeping full ownership of your da
 • **Backup/Restore** - Built-in data protection  
 • **Dark Mode** - Easy on the eyes  
 • **Excalidraw Integration** - Create diagrams  
-
-
-![poznote](poznote.png)
-
 
 ## 🎮 Try the Demo
 
