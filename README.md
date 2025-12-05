@@ -1,5 +1,9 @@
 # Poznote
 
+<p align="center">
+  <img src="poznote.png" alt="Poznote" width="800">
+</p>
+
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
@@ -12,9 +16,7 @@
 Poznote is a lightweight yet powerful web app for taking notes.  
 Capture, organize, and access your notes while keeping full ownership of your data.
 
-
-
-![poznote](poznote.png)
+## 🌟 Key Features
 
 • **Self-Hosted** - Full control over your data  
 • **Lightweight** - Fast and efficient  
