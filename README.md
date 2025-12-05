@@ -1,20 +1,25 @@
-# Poznote
+<p align="center">
+  <img src="poznote.svg" alt="Poznote Logo" width="120">
+</p>
+
+<h1 align="center">Poznote - Lightweight Note-Taking Platform</h1>
+
+<p align="center">
+Poznote is a powerful, open-source note-taking platform. Run it as a personal desktop app, in the browser, or deploy it on your own servers with a private API. Capture, organize, and access your notes while keeping full ownership of your data.
+</p>
+
+<p align="center">
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Supported-blue?logo=docker" alt="Docker"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Open%20Source-green" alt="License"></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.x-purple?logo=php" alt="PHP"></a>
+  <a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite" alt="SQLite"></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript" alt="JavaScript"></a>
+  <a href="https://github.com/timothepoznanski/poznote/stargazers"><img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=social" alt="GitHub stars"></a>
+</p>
 
 <p align="center">
   <img src="poznote.png" alt="Poznote" width="800">
 </p>
-
-[![Docker](https://img.shields.io/badge/Docker-Supported-blue?logo=docker)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-Open%20Source-green)](LICENSE)
-[![PHP](https://img.shields.io/badge/PHP-8.x-purple?logo=php)](https://www.php.net/)
-[![SQLite](https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite)](https://www.sqlite.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![GitHub stars](https://img.shields.io/github/stars/timothepoznanski/poznote?style=social)](https://github.com/timothepoznanski/poznote/stargazers)
-
-## 📖 Introduction
-
-Poznote is a lightweight yet powerful web app for taking notes.  
-Capture, organize, and access your notes while keeping full ownership of your data.
 
 ## 🌟 Key Features
 
