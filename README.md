@@ -2,7 +2,7 @@
   <img src="poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
-<h1 align="center">Poznote - Lightweight Note-Taking Platform</h1>
+<h1 align="center">Poznote - Lightweight Note-Taking Web App</h1>
 
 <p align="center">
 Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
@@ -49,11 +49,28 @@ A Poznote demo is available at [**poznote-demo.up.railway.app**](https://poznote
 
 ### Installation
 
-Choose your platform and follow the guide:
-
-- **[Windows Installation →](../../wiki/Installation-Guide#windows)**
-- **[Linux Installation →](../../wiki/Installation-Guide#linux)**
-- **[macOS Installation →](../../wiki/Installation-Guide#macos)**
+<table>
+<tr>
+<td align="center" width="33%">
+<a href="../../wiki/Installation-Guide#windows">
+<img src="https://img.icons8.com/color/96/000000/windows-10.png" alt="Windows" width="64"><br>
+<b>Windows</b>
+</a>
+</td>
+<td align="center" width="33%">
+<a href="../../wiki/Installation-Guide#linux">
+<img src="https://img.icons8.com/color/96/000000/linux.png" alt="Linux" width="64"><br>
+<b>Linux</b>
+</a>
+</td>
+<td align="center" width="33%">
+<a href="../../wiki/Installation-Guide#macos">
+<img src="https://img.icons8.com/ios-filled/100/000000/mac-os.png" alt="macOS" width="64"><br>
+<b>macOS</b>
+</a>
+</td>
+</tr>
+</table>
 
 ### Access Your Instance
 
