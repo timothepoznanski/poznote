@@ -18,15 +18,15 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 </p>
 
 <p align="center">
-  Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note.
+  <br>Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note.
   <img width="1893" height="899" alt="image" src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" />
-  Create special notes for your to-do lists or any other lists.
+  <br>Create special notes for your to-do lists or any other lists.
   <img width="1906" height="895" alt="image" src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" />
-  Insert diagrams directly into your notes using an Excalidraw editor.
+  <br>Insert diagrams directly into your notes using an Excalidraw editor.
   <img width="1902" height="893" alt="image" src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" />
-  Insert code blocks where you can highlight or color the parts that matter to you.
+  <br>Insert code blocks where you can highlight or color the parts that matter to you.
   <img width="1894" height="895" alt="image" src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" />
-  And for the fans, create notes in Markdown.
+  <br>And for the fans, create notes in Markdown.
   <img width="1873" height="891" alt="image" src="https://github.com/user-attachments/assets/31450a06-cfb6-4d79-a66d-d60fd7a2fd17" />
 </p>
 
