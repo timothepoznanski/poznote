@@ -134,7 +134,7 @@ $v = '20251020.6'; // Cache version
     
     <h2>Checkboxes</h2>
     <p>
-        <code>- [ ] Unchecked item</code><br>
+        <code>- [] Unchecked item</code><br>
         <code>- [x] Checked item</code>
     </p>
     
