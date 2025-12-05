@@ -30,7 +30,7 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 
 • **Self-Hosted** - Full control over your data  
 • **Lightweight** - Fast and efficient  
-• **Easy Installation** - One-command Docker deployment  
+• **Easy Installation** - Docker deployment  
 • **Offline Capable** - Export notes for offline browsing  
 • **Multiple Workspaces** - Organize notes by context  
 • **Rich Editor** - Markdown and HTML support  
