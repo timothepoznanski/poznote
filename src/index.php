@@ -780,7 +780,12 @@ $body_classes = trim($extra_body_classes);
                     echo '<input type="hidden" id="folderId'.$row['id'].'" value="'.htmlspecialchars($row['folder_id'] ?: '', ENT_QUOTES).'"/>';
                     
                     // Title - disable for protected note
-                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="Title ?" value="'.htmlspecialchars(htmlspecialchars_decode($row['heading'] ?: 'New note'), ENT_QUOTES, 'UTF-8').'"/></h4>';
+                    // If the heading is "New note" or "New note (x)", treat it as a placeholder
+                    $heading = htmlspecialchars_decode($row['heading'] ?: 'New note');
+                    $isDefaultTitle = preg_match('/^New note( \(\d+\))?$/', $heading);
+                    $titleValue = $isDefaultTitle ? '' : htmlspecialchars($heading, ENT_QUOTES, 'UTF-8');
+                    $titlePlaceholder = $isDefaultTitle ? htmlspecialchars($heading, ENT_QUOTES, 'UTF-8') : 'Title ?';
+                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
                     if (!empty($final_created)) {
