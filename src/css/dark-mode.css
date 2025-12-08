@@ -1180,10 +1180,23 @@ body.dark-mode .task-item {
     border-color: #404040;
 }
 
+html[data-theme='dark'] .task-text,
+body.dark-mode .task-text {
+    color: #e0e0e0;
+}
+
 html[data-theme='dark'] .task-input,
 body.dark-mode .task-input {
     background-color: #242424;
     border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .task-edit-input,
+body.dark-mode .task-edit-input {
+    background-color: #242424;
+    border-color: #007DB8;
+    color: #e0e0e0;
 }
 
 html[data-theme='dark'] .task-item:hover,
