@@ -33,10 +33,10 @@ if ($target_folder_id === null) {
     exit;
 }
 
-// Verify both source and target exist
-if ($source_folder_id === 0 || $target_folder_id === 0) {
+// Verify source exists (target_folder_id = 0 means "No folder")
+if ($source_folder_id === 0) {
     ob_clean();
-    echo json_encode(['success' => false, 'error' => 'Invalid folder ID']);
+    echo json_encode(['success' => false, 'error' => 'Invalid source folder ID']);
     exit;
 }
 
@@ -62,29 +62,35 @@ try {
     }
     $source_folder_name = $sourceFolderData['name'];
     
-    // Verify target folder exists AND belongs to the correct workspace
-    $folderStmt = $con->prepare("SELECT name, workspace FROM folders WHERE id = ?");
-    $folderStmt->execute([$target_folder_id]);
-    $targetFolderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
-    if (!$targetFolderData) {
-        $con->rollBack();
-        ob_clean();
-        error_log("Target folder ID $target_folder_id not found in folders table");
-        echo json_encode(['success' => false, 'error' => 'Target folder not found (ID: ' . $target_folder_id . ')']);
-        exit;
+    // Handle "No folder" case (target_folder_id = 0)
+    if ($target_folder_id === 0) {
+        $target_folder_name = null;
+        $targetWorkspace = $workspace; // No folder belongs to current workspace
+    } else {
+        // Verify target folder exists AND belongs to the correct workspace
+        $folderStmt = $con->prepare("SELECT name, workspace FROM folders WHERE id = ?");
+        $folderStmt->execute([$target_folder_id]);
+        $targetFolderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$targetFolderData) {
+            $con->rollBack();
+            ob_clean();
+            error_log("Target folder ID $target_folder_id not found in folders table");
+            echo json_encode(['success' => false, 'error' => 'Target folder not found (ID: ' . $target_folder_id . ')']);
+            exit;
+        }
+        
+        // Verify workspace match
+        $targetWorkspace = $targetFolderData['workspace'] ?: 'Poznote';
+        if ($targetWorkspace !== $workspace && !($targetWorkspace === null && $workspace === 'Poznote')) {
+            $con->rollBack();
+            ob_clean();
+            error_log("Target folder ID $target_folder_id belongs to workspace '$targetWorkspace', not '$workspace'");
+            echo json_encode(['success' => false, 'error' => 'Target folder belongs to a different workspace']);
+            exit;
+        }
+        
+        $target_folder_name = $targetFolderData['name'];
     }
-    
-    // Verify workspace match
-    $targetWorkspace = $targetFolderData['workspace'] ?: 'Poznote';
-    if ($targetWorkspace !== $workspace && !($targetWorkspace === null && $workspace === 'Poznote')) {
-        $con->rollBack();
-        ob_clean();
-        error_log("Target folder ID $target_folder_id belongs to workspace '$targetWorkspace', not '$workspace'");
-        echo json_encode(['success' => false, 'error' => 'Target folder belongs to a different workspace']);
-        exit;
-    }
-    
-    $target_folder_name = $targetFolderData['name'];
     
     // Get all notes in source folder (excluding trash)
     $sql = "SELECT id, heading, folder FROM entries WHERE trash = 0 AND folder_id = ?";
@@ -109,13 +115,26 @@ try {
     }
     
     // Update all notes to move them to target folder (update both folder_id and folder name)
-    $update_sql = "UPDATE entries SET folder_id = ?, folder = ?, updated = CURRENT_TIMESTAMP WHERE id = ?";
-    $update_stmt = $con->prepare($update_sql);
-    
-    $moved_count = 0;
-    foreach ($notes as $note) {
-        if ($update_stmt->execute([$target_folder_id, $target_folder_name, $note['id']])) {
-            $moved_count++;
+    // If target is "No folder" (id=0), set both folder_id and folder to NULL
+    if ($target_folder_id === 0) {
+        $update_sql = "UPDATE entries SET folder_id = NULL, folder = NULL, updated = CURRENT_TIMESTAMP WHERE id = ?";
+        $update_stmt = $con->prepare($update_sql);
+        
+        $moved_count = 0;
+        foreach ($notes as $note) {
+            if ($update_stmt->execute([$note['id']])) {
+                $moved_count++;
+            }
+        }
+    } else {
+        $update_sql = "UPDATE entries SET folder_id = ?, folder = ?, updated = CURRENT_TIMESTAMP WHERE id = ?";
+        $update_stmt = $con->prepare($update_sql);
+        
+        $moved_count = 0;
+        foreach ($notes as $note) {
+            if ($update_stmt->execute([$target_folder_id, $target_folder_name, $note['id']])) {
+                $moved_count++;
+            }
         }
     }
     
@@ -124,10 +143,11 @@ try {
     
     // Clean output buffer and send JSON response
     ob_clean();
+    $target_display_name = $target_folder_name ?: 'No folder';
     echo json_encode([
         'success' => true, 
         'moved_count' => $moved_count,
-        'message' => "Successfully moved {$moved_count} files from '{$source_folder_name}' to '{$target_folder_name}'"
+        'message' => "Successfully moved {$moved_count} files from '{$source_folder_name}' to '{$target_display_name}'"
     ]);
 
 } catch (Exception $e) {
