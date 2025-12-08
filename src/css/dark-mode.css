@@ -1180,10 +1180,23 @@ body.dark-mode .task-item {
     border-color: #404040;
 }
 
+html[data-theme='dark'] .task-text,
+body.dark-mode .task-text {
+    color: #e0e0e0;
+}
+
 html[data-theme='dark'] .task-input,
 body.dark-mode .task-input {
     background-color: #242424;
     border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .task-edit-input,
+body.dark-mode .task-edit-input {
+    background-color: #242424;
+    border-color: #007DB8;
+    color: #e0e0e0;
 }
 
 html[data-theme='dark'] .task-item:hover,
@@ -1220,6 +1233,30 @@ body.dark-mode .task-important-btn.is-favorite i {
     color: #ff6b6b !important;
 }
 
+/* Tag suggestions dropdown */
+html[data-theme='dark'] .tag-suggestions,
+body.dark-mode .tag-suggestions {
+    background-color: #242424 !important;
+    border-color: #404040 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+html[data-theme='dark'] .tag-suggestion-item,
+body.dark-mode .tag-suggestion-item {
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] .tag-suggestion-item:hover,
+body.dark-mode .tag-suggestion-item:hover {
+    background-color: #2a2a2a !important;
+}
+
+html[data-theme='dark'] .tag-suggestion-item.highlighted,
+body.dark-mode .tag-suggestion-item.highlighted {
+    background-color: #007DB8 !important;
+    color: #ffffff !important;
+}
+
 /* Markdown preview */
 html[data-theme='dark'] .markdown-preview,
 body.dark-mode .markdown-preview {
@@ -1240,6 +1277,74 @@ body.dark-mode .markdown-preview h4,
 body.dark-mode .markdown-preview h5,
 body.dark-mode .markdown-preview h6 {
     color: #e0e0e0;
+}
+
+html[data-theme='dark'] .markdown-preview h1,
+html[data-theme='dark'] .markdown-preview h2,
+body.dark-mode .markdown-preview h1,
+body.dark-mode .markdown-preview h2 {
+    border-bottom-color: #404040;
+}
+
+/* Markdown code blocks */
+html[data-theme='dark'] .markdown-preview code,
+body.dark-mode .markdown-preview code {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .markdown-preview pre,
+body.dark-mode .markdown-preview pre {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .markdown-preview blockquote,
+body.dark-mode .markdown-preview blockquote {
+    border-left-color: #404040;
+    color: #b0b0b0;
+}
+
+/* Markdown tables */
+html[data-theme='dark'] .markdown-preview table,
+body.dark-mode .markdown-preview table {
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .markdown-preview table th,
+html[data-theme='dark'] .markdown-preview table td,
+body.dark-mode .markdown-preview table th,
+body.dark-mode .markdown-preview table td {
+    border-color: #404040;
+    color: #e0e0e0;
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .markdown-preview table th,
+body.dark-mode .markdown-preview table th {
+    background-color: #333333;
+    font-weight: bold;
+}
+
+html[data-theme='dark'] .markdown-preview table tr:nth-child(even),
+html[data-theme='dark'] .markdown-preview table tr:nth-child(even) td,
+body.dark-mode .markdown-preview table tr:nth-child(even),
+body.dark-mode .markdown-preview table tr:nth-child(even) td {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .markdown-preview a,
+body.dark-mode .markdown-preview a {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .markdown-preview hr,
+body.dark-mode .markdown-preview hr {
+    border-top-color: #404040;
+}
+
+html[data-theme='dark'] .markdown-preview del,
+body.dark-mode .markdown-preview del {
+    color: #808080;
 }
 
 /* Placeholder for empty preview - dark mode */

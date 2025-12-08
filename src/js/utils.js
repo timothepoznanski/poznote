@@ -743,7 +743,7 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'folder_id=' + encodeURIComponent(sourceFolderId) + '&workspace=' + encodeURIComponent(selectedWorkspace)
+        body: 'folder=' + encodeURIComponent(sourceFolderName) + '&workspace=' + encodeURIComponent(selectedWorkspace)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -830,12 +830,9 @@ function executeMoveAllFiles() {
     var sourceFolderId = sourceFolderElement.dataset.folderId;
     var targetFolderId = document.getElementById('moveFolderFilesTargetSelect').value;
     
-    if (!targetFolderId) {
-        showNotificationPopup('Please select a target folder', 'error');
-        return;
-    }
-    
-    if (sourceFolderId == targetFolderId) {
+    // Allow empty value for "No folder" (value will be "" or "0")
+    // Only check if source and target are the same
+    if (sourceFolderId == targetFolderId && targetFolderId !== '' && targetFolderId !== '0') {
         showNotificationPopup('Source and target folders cannot be the same', 'error');
         return;
     }
@@ -847,13 +844,16 @@ function executeMoveAllFiles() {
     moveButton.textContent = 'Moving...';
     
     // Move all files
+    // Use "0" for "No folder" if targetFolderId is empty
+    var targetId = targetFolderId === '' ? '0' : targetFolderId;
+    
     fetch('api_move_folder_files.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: 'source_folder_id=' + encodeURIComponent(sourceFolderId) + 
-              '&target_folder_id=' + encodeURIComponent(targetFolderId) + 
+              '&target_folder_id=' + encodeURIComponent(targetId) + 
               '&workspace=' + encodeURIComponent(selectedWorkspace)
     })
     .then(function(response) {
