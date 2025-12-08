@@ -1316,16 +1316,20 @@ body.dark-mode .markdown-preview table th,
 body.dark-mode .markdown-preview table td {
     border-color: #404040;
     color: #e0e0e0;
+    background-color: #2a2a2a;
 }
 
 html[data-theme='dark'] .markdown-preview table th,
 body.dark-mode .markdown-preview table th {
-    background-color: #2a2a2a;
+    background-color: #333333;
+    font-weight: bold;
 }
 
 html[data-theme='dark'] .markdown-preview table tr:nth-child(even),
-body.dark-mode .markdown-preview table tr:nth-child(even) {
-    background-color: #242424;
+html[data-theme='dark'] .markdown-preview table tr:nth-child(even) td,
+body.dark-mode .markdown-preview table tr:nth-child(even),
+body.dark-mode .markdown-preview table tr:nth-child(even) td {
+    background-color: #2a2a2a;
 }
 
 html[data-theme='dark'] .markdown-preview a,
