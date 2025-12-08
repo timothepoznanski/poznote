@@ -81,7 +81,7 @@ A Poznote demo is available at [**poznote-demo.up.railway.app**](https://poznote
 </a>
 </td>
 <td align="center" width="25%">
-<a href="CLOUD.md">
+<a href="../../wiki/Cloud-Deployment">
 <img src="https://img.icons8.com/color/96/000000/cloud.png" alt="Cloud" width="64"><br>
 <b>Cloud</b>
 </a>

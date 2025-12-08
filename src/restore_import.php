@@ -579,7 +579,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </div>
         <?php endif; ?>
         
-        <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/wiki/Backup-and-Restore#complete-restore" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
         
         <!-- Parent Restore Section -->
@@ -653,7 +653,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 Is your backup file over 800MB?
             </h3>
             <div id="directCopyRestore" class="accordion-content" style="display: none;">
-            <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
+            <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/wiki/Backup-and-Restore#method-3-direct-file-copy--800mb" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
