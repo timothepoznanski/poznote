@@ -71,7 +71,11 @@ Download the environment file with default credentials and port configuration:
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs.
+Edit the `.env` file so that it fits your needs:
+
+```powershell
+notepad .env
+```
 
 Download the Docker Compose configuration file for Poznote service:
 
@@ -119,7 +123,10 @@ Download the environment file with default credentials and port configuration:
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs.
+Edit the `.env` file so that it fits your needs:
+```bash
+vim .env
+```
 
 Download the Docker Compose configuration file for Poznote service:
 ```bash
