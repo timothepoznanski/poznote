@@ -30,9 +30,13 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
   <img width="1873" height="891" alt="image" src="https://github.com/user-attachments/assets/31450a06-cfb6-4d79-a66d-d60fd7a2fd17" />
 </p>
 
-## Play with Poznote demo
+## Features
 
-A Poznote demo is available on [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
+Discover all Poznote features at [poznote.com/index.html#features](https://poznote.com/index.html#features)
+
+## Try the Poznote demo
+
+A live Poznote demo is available at [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 Username: `poznote`
 <br>
@@ -193,10 +197,6 @@ After installation, access Poznote in your web browser:
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
-  - [Complete Backup](#complete-backup)
-  - [Import Individual Notes](#import-individual-notes)
-  - [Complete Restore](#complete-restore)
-  - [Automated Backups with Bash Script](#automated-backups-with-bash-script)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
 - [Tech Stack](#tech-stack)
