@@ -580,7 +580,6 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <?php endif; ?>
         
         <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
-        <br><br>" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
         <br><br>
         
         <!-- Parent Restore Section -->
