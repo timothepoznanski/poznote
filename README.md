@@ -777,8 +777,6 @@ If you:
 
 **👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
 
----
-
 ## Star History
 
 <p align="center">
