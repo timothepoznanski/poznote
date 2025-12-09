@@ -776,3 +776,11 @@ If you:
 - Are okay with approximately $5/month (Cloud provider fees)
 
 **👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
+
+## Star History
+
+<p align="center">
+  <a href="https://star-history.com/#timothepoznanski/poznote&Date">
+    <img src="https://api.star-history.com/svg?repos=timothepoznanski/poznote&type=Date" alt="Star History Chart">
+  </a>
+</p>
