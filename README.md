@@ -18,6 +18,12 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 </p>
 
 <p align="center">
+  <a href="https://star-history.com/#timothepoznanski/poznote&Date">
+    <img src="https://api.star-history.com/svg?repos=timothepoznanski/poznote&type=Date" alt="Star History Chart">
+  </a>
+</p>
+
+<p align="center">
   <br>Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note.<br><br>
   <img width="1893" height="899" alt="image" src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" />
   <br><br>Create special notes for your to-do lists or any other lists.<br><br>
