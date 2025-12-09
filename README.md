@@ -412,10 +412,6 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
 
-### Missing an API Endpoint?
-
-If you need additional REST API functionality that isn't currently available, feel free to [open an issue on GitHub](https://github.com/timothepoznanski/poznote/issues) describing your use case. We're always looking to improve the API based on community feedback!
-
 ### Interactive Documentation (Swagger)
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
