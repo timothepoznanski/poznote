@@ -21,9 +21,30 @@ window.PoznoteExcalidraw = {
     let lastAppState = {};
     let lastFiles = {};
 
+    // Load global library from localStorage
+    let initialLibraryItems = options.initialData.libraryItems || [];
+    try {
+        const globalLibrary = localStorage.getItem('poznote-library');
+        if (globalLibrary) {
+            const parsed = JSON.parse(globalLibrary);
+            if (Array.isArray(parsed)) {
+                // Merge global library with diagram library, removing duplicates by ID
+                initialLibraryItems = _.uniqBy([...parsed, ...initialLibraryItems], 'id');
+            }
+        }
+    } catch (e) {
+        console.error('Error loading global library', e);
+    }
+    
+    // Update initialData with merged library
+    const initialData = {
+        ...options.initialData,
+        libraryItems: initialLibraryItems
+    };
+
     const ExcalidrawWrapper = () => (
       <Excalidraw 
-        initialData={options.initialData || { elements: [], appState: {} }}
+        initialData={initialData || { elements: [], appState: {} }}
         theme='light'
         ref={(api) => {
           excalidrawAPI = api;
@@ -33,6 +54,14 @@ window.PoznoteExcalidraw = {
           lastElements = elements;
           lastAppState = appState;
           lastFiles = files;
+        }}
+        onLibraryChange={(items) => {
+            // Save to global storage
+            try {
+                localStorage.setItem('poznote-library', JSON.stringify(items));
+            } catch (e) {
+                console.error('Error saving global library', e);
+            }
         }}
         onInitLibrary={(err) => {
           if (err) {
@@ -63,6 +92,15 @@ window.PoznoteExcalidraw = {
           return excalidrawAPI.getFiles();
         }
         return lastFiles;
+      },
+      getLibraryItems: () => {
+        if (excalidrawAPI) {
+            // Check if getLibraryItems exists (it should in recent versions)
+            if (typeof excalidrawAPI.getLibraryItems === 'function') {
+                return excalidrawAPI.getLibraryItems();
+            }
+        }
+        return [];
       },
       exportToCanvas: async (exportOptions) => {
         return await exportToCanvas(exportOptions);

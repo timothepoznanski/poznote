@@ -239,6 +239,9 @@ if ($note_id > 0) {
             if (!existingData.files) {
                 existingData.files = {};
             }
+            if (!existingData.libraryItems) {
+                existingData.libraryItems = [];
+            }
             
             // Ensure elements is an array
             if (!Array.isArray(existingData.elements)) {
@@ -254,7 +257,8 @@ if ($note_id > 0) {
                     scrollX: existingData.appState.scrollX || 0,
                     scrollY: existingData.appState.scrollY || 0
                 },
-                files: existingData.files || {}
+                files: existingData.files || {},
+                libraryItems: existingData.libraryItems || []
             };
         }
         
@@ -399,6 +403,7 @@ if ($note_id > 0) {
             const elements = excalidrawAPI.getSceneElements();
             const appState = excalidrawAPI.getAppState();
             const files = excalidrawAPI.getFiles();
+            const libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
             
             // Convert files to serializable format with minimal required properties
             const serializableFiles = {};
@@ -414,7 +419,7 @@ if ($note_id > 0) {
             }
             
             // Include files in the data object
-            const data = { elements, appState, files: serializableFiles };
+            const data = { elements, appState, files: serializableFiles, libraryItems };
             
             if (isEmbeddedDiagram) {
                 // Embedded diagram mode: save to existing note HTML
@@ -460,6 +465,7 @@ if ($note_id > 0) {
             const elements = excalidrawAPI.getSceneElements();
             const appState = excalidrawAPI.getAppState();
             const files = excalidrawAPI.getFiles();
+            const libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
             
             // Convert files to serializable format with minimal required properties
             const serializableFiles = {};
@@ -475,7 +481,7 @@ if ($note_id > 0) {
             }
             
             // Include files in the data object
-            const data = { elements, appState, files: serializableFiles };
+            const data = { elements, appState, files: serializableFiles, libraryItems };
             
             if (isEmbeddedDiagram) {
                 // Embedded diagram mode: save to existing note HTML

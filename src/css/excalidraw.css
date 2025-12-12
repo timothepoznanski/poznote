@@ -308,26 +308,6 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 /* ------------------------------------------------------------------
-   Masquer le bouton "Library" de l'éditeur Excalidraw
-   
-   Cible spécifiquement la zone top-right où se trouve le bouton Library
-   ------------------------------------------------------------------ */
-.layer-ui__wrapper__top-right.zen-mode-transition {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-/* Sélecteurs alternatifs au cas où les classes varient */
-.layer-ui__wrapper__top-right,
-div[class*="layer-ui__wrapper__top-right"],
-div[class*="zen-mode-transition"] {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-/* ------------------------------------------------------------------
    Improvements for Excalidraw responsiveness
    ------------------------------------------------------------------ */
 
@@ -474,4 +454,40 @@ html[data-theme='dark'] .excalidraw-editor *,
 html[data-theme='dark'] .excalidraw-container *,
 html[data-theme='dark'] #app * {
     color-scheme: light !important;
+}
+
+/* ------------------------------------------------------------------
+   Masquer le bouton "Browse libraries" dans le menu Library
+   ------------------------------------------------------------------ */
+.excalidraw .library-menu-browse-button {
+    display: none !important;
+}
+
+/* Style pour le nouveau bouton Load */
+.excalidraw .library-menu-load-button {
+    flex: 1;
+    height: var(--lg-button-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    border-radius: var(--border-radius-lg);
+    background-color: var(--color-primary);
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: .75rem;
+    border: none;
+    cursor: pointer;
+}
+
+.excalidraw .library-menu-load-button:hover {
+    background-color: var(--color-brand-hover);
+}
+
+.excalidraw .library-menu-load-button:active {
+    background-color: var(--color-brand-active);
 }
