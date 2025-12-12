@@ -198,7 +198,7 @@ After installation, access Poznote in your web browser:
 - Password: `admin123!`
 - Port: `8040`
 
-# Other informations
+# Other information
 
 - [Change Settings](#change-settings)
 - [Password Recovery](#password-recovery)
@@ -209,6 +209,7 @@ After installation, access Poznote in your web browser:
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
+- [Star History](#star-history)
 
 ## Change Settings
 
