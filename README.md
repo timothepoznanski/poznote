@@ -4,10 +4,10 @@
   <img src="poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
-<h1 align="center">Poznote - Note-Taking and documentation</h1>
+<h1 align="center">Poznote</h1>
 
 <p align="center">
-Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
+Poznote is a powerful, open-source note-taking and documentation platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
 </p>
 
 <p align="center">
