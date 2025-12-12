@@ -1,4 +1,13 @@
 <p align="center">
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Supported-blue?logo=docker" alt="Docker"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Open%20Source-green" alt="License"></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.x-purple?logo=php" alt="PHP"></a>
+  <a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite" alt="SQLite"></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript" alt="JavaScript"></a>
+  <a href="https://github.com/timothepoznanski/poznote/stargazers"><img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=social" alt="GitHub stars"></a>
+</p>
+
+<p align="center">
   <img src="poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
@@ -8,25 +17,16 @@
 Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
 </p>
 
-<p align="center">
-  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Supported-blue?logo=docker" alt="Docker"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Open%20Source-green" alt="License"></a>
-  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.x-purple?logo=php" alt="PHP"></a>
-  <a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite" alt="SQLite"></a>
-  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript" alt="JavaScript"></a>
-  <a href="https://github.com/timothepoznanski/poznote/stargazers"><img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=social" alt="GitHub stars"></a>
-</p>
+
 
 ## Features
 
 Discover all Poznote features at [poznote.com/index.html#features](https://poznote.com/index.html#features)
 
-<p align="center">
-  Create HTML notes where you can directly paste images or screenshots, insert tables, checkboxes, format your text quickly and easily, add emojis, attach files, share publicly, and more. Paste the content of web pages directly into a note. Create special notes for your to-do lists or any other lists. Insert diagrams directly into your notes using an Excalidraw editor. Insert code blocks where you can highlight or color the parts that matter to you. And for the fans, create notes in Markdown.
-</p>
+Poznote offers a versatile note-taking experience tailored to your needs. Effortlessly create rich HTML notes with support for direct image pasting, tables, checkboxes, and file attachments. Format your text with ease, add emojis, and even paste web content directly. Stay organized with dedicated to-do lists, visualize ideas using the integrated Excalidraw editor, and manage code snippets with syntax highlighting. For those who prefer a lightweight approach, full Markdown support is also included.
 
 <p align="center">
-  <table>
+  <table cellspacing="10" cellpadding="10">
     <tr>
       <td><img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="100%"></td>
       <td><img src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" alt="Todo Lists" width="100%"></td>
