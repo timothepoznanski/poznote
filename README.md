@@ -1,11 +1,4 @@
-<p align="center">
-  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Supported-blue?logo=docker" alt="Docker"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Open%20Source-green" alt="License"></a>
-  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.x-purple?logo=php" alt="PHP"></a>
-  <a href="https://www.sqlite.org/"><img src="https://img.shields.io/badge/SQLite-3.x-blue?logo=sqlite" alt="SQLite"></a>
-  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-Vanilla-yellow?logo=javascript" alt="JavaScript"></a>
-  <a href="https://github.com/timothepoznanski/poznote/stargazers"><img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=social" alt="GitHub stars"></a>
-</p>
+
 
 <p align="center">
   <img src="poznote.svg" alt="Poznote Logo" width="80">
