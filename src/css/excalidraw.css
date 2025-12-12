@@ -475,5 +475,12 @@ html[data-theme='dark'] #app * {
     z-index: 100 !important;
 }
 
+/* ------------------------------------------------------------------
+   Hide Library Trigger when Sidebar is Open
+   ------------------------------------------------------------------ */
+.excalidraw:has(.layer-ui__library) .default-sidebar-trigger {
+    display: none !important;
+}
+
 
 
