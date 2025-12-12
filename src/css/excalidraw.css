@@ -459,9 +459,9 @@ html[data-theme='dark'] #app * {
 /* ------------------------------------------------------------------
    Masquer le bouton "Browse libraries" dans le menu Library
    ------------------------------------------------------------------ */
-.excalidraw .library-menu-browse-button {
+/* .excalidraw .library-menu-browse-button {
     display: none !important;
-}
+} */
 
 /* ------------------------------------------------------------------
    Fix Library Menu Positioning (Bottom)
