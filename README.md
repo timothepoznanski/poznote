@@ -4,17 +4,11 @@
   <img src="poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
-<h1 align="center">Poznote - Lightweight Note-Taking Web App</h1>
+<h1 align="center">Poznote - Note-Taking and documentation</h1>
 
 <p align="center">
 Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
 </p>
-
-
-<p align="center">
-  Discover all Poznote [here](https://poznote.com/index.html#features)
-</p>
-
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="45%">
@@ -28,7 +22,38 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
   <img src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" alt="Code Blocks" width="45%">
 </p>
 
+## Features
 
+<table align="center">
+  <tr>
+    <td align="center" width="160">📝<br>Rich Text Editor</td>
+    <td align="center" width="160">🔍<br>Powerful Search</td>
+    <td align="center" width="160">🏷️<br>Tag System</td>
+    <td align="center" width="160">📎<br>File Attachments</td>
+    <td align="center" width="160">📱<br>Responsive Design</td>
+  </tr>
+  <tr>
+    <td align="center">🔒<br>Self-Hosted</td>
+    <td align="center">🖥️<br>Multi-instance</td>
+    <td align="center">📂<br>Workspaces</td>
+    <td align="center">📥<br>Built-in Backup</td>
+    <td align="center">🗑️<br>Trash System</td>
+  </tr>
+  <tr>
+    <td align="center">🔌<br>REST API</td>
+    <td align="center">🔗<br>Public Sharing</td>
+    <td align="center">☑️<br>Tasklist</td>
+    <td align="center">M↓<br>Markdown Notes</td>
+    <td align="center">🌙<br>Dark Mode</td>
+  </tr>
+  <tr>
+    <td align="center">🎨<br>Excalidraw Integration</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Try the Poznote demo
 
