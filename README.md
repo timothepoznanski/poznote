@@ -24,36 +24,22 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 
 ## Features
 
-<table align="center" border="0">
-  <tr>
-    <td align="center" width="160">📝<br>Rich Text Editor</td>
-    <td align="center" width="160">🔍<br>Powerful Search</td>
-    <td align="center" width="160">🏷️<br>Tag System</td>
-    <td align="center" width="160">📎<br>File Attachments</td>
-    <td align="center" width="160">📱<br>Responsive Design</td>
-  </tr>
-  <tr>
-    <td align="center">🔒<br>Self-Hosted</td>
-    <td align="center">🖥️<br>Multi-instance</td>
-    <td align="center">📂<br>Workspaces</td>
-    <td align="center">📥<br>Built-in Backup</td>
-    <td align="center">🗑️<br>Trash System</td>
-  </tr>
-  <tr>
-    <td align="center">🔌<br>REST API</td>
-    <td align="center">🔗<br>Public Sharing</td>
-    <td align="center">☑️<br>Tasklist</td>
-    <td align="center">M↓<br>Markdown Notes</td>
-    <td align="center">🌙<br>Dark Mode</td>
-  </tr>
-  <tr>
-    <td align="center">🎨<br>Excalidraw Integration</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
+- Rich Text Editor
+- Powerful Search
+- Tag System
+- File Attachments
+- Responsive Design
+- Self-Hosted
+- Multi-instance
+- Workspaces
+- Built-in Backup
+- Trash System
+- REST API
+- Public Sharing
+- Tasklist
+- Markdown Notes
+- Dark Mode
+- Excalidraw Integration
 
 ## Try the Poznote demo
 
