@@ -14,7 +14,9 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 
 ## Features
 
-Discover all Poznote [features here](https://poznote.com/index.html#features)
+<p align="center">
+  Discover all Poznote <a href="https://poznote.com/index.html#features" style="text-decoration:none">features here</a>
+</p>
 
 
 <p align="center">
