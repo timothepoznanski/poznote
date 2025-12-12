@@ -23,20 +23,20 @@ Poznote is a powerful, open-source note-taking platform.<br>Capture, organize, a
 
 Discover all Poznote features at [poznote.com/index.html#features](https://poznote.com/index.html#features)
 
-Poznote offers a versatile note-taking experience tailored to your needs. Effortlessly create rich HTML notes with support for direct image pasting, tables, checkboxes, and file attachments. Format your text with ease, add emojis, and even paste web content directly. Stay organized with dedicated to-do lists, visualize ideas using the integrated Excalidraw editor, and manage code snippets with syntax highlighting. For those who prefer a lightweight approach, full Markdown support is also included.
 
 <p align="center">
-  <table cellspacing="10" cellpadding="10">
-    <tr>
-      <td><img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" alt="Todo Lists" width="100%"></td>
-    </tr>
-    <tr>
-      <td><img src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" alt="Excalidraw" width="100%"></td>
-      <td><img src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" alt="Code Blocks" width="100%"></td>
-    </tr>
-  </table>
-  <br>
+  <img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="45%">
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" alt="Todo Lists" width="45%">
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" alt="Excalidraw" width="45%">
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" alt="Code Blocks" width="45%">
+</p>
+
+<p align="center">
   <img width="1873" height="891" alt="image" src="https://github.com/user-attachments/assets/31450a06-cfb6-4d79-a66d-d60fd7a2fd17" />
 </p>
 
