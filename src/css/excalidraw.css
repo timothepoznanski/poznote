@@ -463,31 +463,4 @@ html[data-theme='dark'] #app * {
     display: none !important;
 }
 
-/* Style pour le nouveau bouton Load */
-.excalidraw .library-menu-load-button {
-    flex: 1;
-    height: var(--lg-button-size);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    border-radius: var(--border-radius-lg);
-    background-color: var(--color-primary);
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    text-decoration: none !important;
-    font-weight: 600;
-    font-size: .75rem;
-    border: none;
-    cursor: pointer;
-}
 
-.excalidraw .library-menu-load-button:hover {
-    background-color: var(--color-brand-hover);
-}
-
-.excalidraw .library-menu-load-button:active {
-    background-color: var(--color-brand-active);
-}
