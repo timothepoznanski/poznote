@@ -19,13 +19,13 @@ Discover all Poznote features at [poznote.com/index.html#features](https://pozno
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="45%">
-  &nbsp; &nbsp; &nbsp; &nbsp;
+  &nbsp; &nbsp;
   <img src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" alt="Todo Lists" width="45%">
 </p>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" alt="Excalidraw" width="45%">
-  &nbsp; &nbsp; &nbsp; &nbsp;
+  &nbsp; &nbsp;
   <img src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" alt="Code Blocks" width="45%">
 </p>
 
