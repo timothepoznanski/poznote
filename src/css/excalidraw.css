@@ -463,4 +463,17 @@ html[data-theme='dark'] #app * {
     display: none !important;
 }
 
+/* ------------------------------------------------------------------
+   Fix Library Menu Positioning (Bottom)
+   ------------------------------------------------------------------ */
+.excalidraw .layer-ui__library .library-menu-dropdown-container:not(.library-menu-dropdown-container--in-heading) .dropdown-menu {
+    right: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 100% !important;
+    margin-bottom: 10px !important;
+    z-index: 100 !important;
+}
+
+
 
