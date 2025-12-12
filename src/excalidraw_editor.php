@@ -610,5 +610,53 @@ if ($note_id > 0) {
         }
     }
     </script>
+    <!-- Library Warning Modal -->
+    <div id="libraryWarningModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #d97706; font-size: 18px; font-weight: 600;">Warning</h3>
+            <p style="font-size: 14px; color: #374151; line-height: 1.5;">The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.</p>
+            <p style="font-size: 14px; color: #374151; line-height: 1.5;">You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.</p>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button id="libraryWarningCancel" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;">Cancel</button>
+                <button id="libraryWarningOk" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Library Warning Modal Logic
+    window.showLibraryWarning = function(url) {
+        const modal = document.getElementById('libraryWarningModal');
+        const cancelBtn = document.getElementById('libraryWarningCancel');
+        const okBtn = document.getElementById('libraryWarningOk');
+        
+        if (!modal) return;
+        
+        modal.style.display = 'block';
+        
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+        
+        // Remove old event listeners to prevent duplicates if called multiple times
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        newCancelBtn.onclick = closeModal;
+        
+        const newOkBtn = okBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        newOkBtn.onclick = () => {
+            closeModal();
+            window.open(url, '_blank');
+        };
+        
+        // Close on click outside
+        modal.onclick = (event) => {
+            if (event.target == modal) {
+                closeModal();
+            }
+        };
+    };
+    </script>
 </body>
 </html>
