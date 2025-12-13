@@ -201,6 +201,7 @@ After installation, access Poznote in your web browser:
 # Other information
 
 - [Change Settings](#change-settings)
+- [Using a Hashed Password](#using-a-hashed-password)
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
@@ -233,6 +234,24 @@ POZNOTE_PASSWORD=your_new_password
 HTTP_WEB_PORT=8040
 ```
 
+## Using a Hashed Password
+
+For enhanced security, you can use a bcrypt-hashed password instead of plain text:
+
+1. Generate a hash for your password:
+```bash
+docker run --rm ghcr.io/timothepoznanski/poznote:latest php -r "echo password_hash('your_password', PASSWORD_DEFAULT);"
+```
+
+2. Copy the generated hash (starts with `$2y$10$`)
+
+3. Edit your `.env` file and use **single quotes** around the hash:
+```
+POZNOTE_USERNAME=admin
+POZNOTE_PASSWORD='$2y$10$eMG4MxzVUlpwT8Ro5BWQAeOB2/QAmPRw4guUW9UW1Pl1rUmkol05S'
+HTTP_WEB_PORT=8040
+```
+
 Restart Poznote with new configuration:
 ```bash
 docker compose up -d
@@ -242,11 +261,29 @@ docker compose up -d
 
 Your credentials are stored in the `.env` file in your Poznote directory.
 
-To retrieve your password:
+### If you used a plain text password:
 
 1. Navigate to your Poznote directory
 2. Open the `.env` file
-3. Look for the `POZNOTE_PASSWORD` value
+3. Look for the `POZNOTE_PASSWORD` value - you'll see your password in plain text
+
+### If you used a hashed password:
+
+**Important:** Hashed passwords cannot be recovered. You'll need to reset your password:
+
+1. Navigate to your Poznote directory
+2. Generate a new hash for your new password:
+```bash
+docker run --rm ghcr.io/timothepoznanski/poznote:latest php -r "echo password_hash('your_new_password', PASSWORD_DEFAULT);"
+```
+3. Edit your `.env` file and replace the old hash with the new one (use single quotes):
+```
+POZNOTE_PASSWORD='$2y$10$NewHashHere...'
+```
+4. Restart Poznote:
+```bash
+docker compose up -d
+```
 
 ## Update to the latest version
 

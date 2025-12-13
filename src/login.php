@@ -45,28 +45,38 @@ if (isAuthenticated()) {
 
 // Login form processing
 if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
-    
-    if (authenticate($username, $password, $rememberMe)) {
-        // Redirect to index with JavaScript to include localStorage workspace
-        // Include minimal HTML to ensure proper execution
-        echo '<!DOCTYPE html><html><head>';
-        echo '<script>
-            var workspace = localStorage.getItem("poznote_selected_workspace");
-            if (workspace) {
-                window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
-            } else {
-                window.location.href = "index.php";
-            }
-        </script>';
-        echo '</head><body>Redirecting...</body></html>';
-        exit;
+    // Validate CSRF token
+    $csrf_token = $_POST['csrf_token'] ?? '';
+    if (!validateCSRFToken($csrf_token)) {
+        $error = 'Invalid security token. Please refresh the page and try again.';
     } else {
-        $error = 'Incorrect username or password.';
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';
+        
+        $result = authenticate($username, $password, $rememberMe);
+        if ($result['success']) {
+            // Redirect to index with JavaScript to include localStorage workspace
+            // Include minimal HTML to ensure proper execution
+            echo '<!DOCTYPE html><html><head>';
+            echo '<script>
+                var workspace = localStorage.getItem("poznote_selected_workspace");
+                if (workspace) {
+                    window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
+                } else {
+                    window.location.href = "index.php";
+                }
+            </script>';
+            echo '</head><body>Redirecting...</body></html>';
+            exit;
+        } else {
+            $error = $result['error'];
+        }
     }
 }
+
+// Generate CSRF token for the form
+$csrf_token = generateCSRFToken();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -93,6 +103,7 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         </div>
         
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
             <div class="form-group">
                 <input type="text" id="username" name="username" placeholder="Username" required autofocus autocomplete="username">
             </div>
