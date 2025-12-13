@@ -128,16 +128,22 @@ function parseMarkdown($text) {
         $line = $lines[$i];
         
         // Handle code blocks
-        if (preg_match('/^```/', $line)) {
+        if (preg_match('/^\s*```/', $line)) {
             $flushParagraph();
             if (!$inCodeBlock) {
                 $inCodeBlock = true;
-                $codeBlockLang = trim(preg_replace('/^```/', '', $line));
+                $codeBlockLang = trim(preg_replace('/^\s*```/', '', $line));
                 $codeBlockContent = [];
             } else {
                 $inCodeBlock = false;
                 $codeContent = implode("\n", $codeBlockContent);
-                $result[] = '<pre><code class="language-' . ($codeBlockLang ?: 'text') . '">' . $codeContent . '</code></pre>';
+                if (strtolower($codeBlockLang) === 'mermaid') {
+                    // Unescape HTML for mermaid
+                    $unescapedContent = htmlspecialchars_decode($codeContent, ENT_QUOTES);
+                    $result[] = '<div class="mermaid">' . $unescapedContent . '</div>';
+                } else {
+                    $result[] = '<pre><code class="language-' . ($codeBlockLang ?: 'text') . '">' . $codeContent . '</code></pre>';
+                }
                 $codeBlockContent = [];
                 $codeBlockLang = '';
             }
@@ -463,6 +469,7 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/tasks.css">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
+    <script src="js/mermaid/mermaid.min.js?v=<?php echo filemtime(__DIR__ . '/js/mermaid/mermaid.min.js'); ?>"></script>
 </head>
 <body>
     <div class="public-note">
@@ -471,4 +478,117 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
     </div>
 </body>
 <script src="js/copy-code-on-focus.js"></script>
+<script>
+    if (typeof mermaid !== 'undefined') {
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderMermaidError(node, err, source) {
+            var msg = 'Mermaid: syntax error.';
+            try {
+                if (err) {
+                    if (typeof err === 'string') msg = err;
+                    else if (err.str) msg = err.str;
+                    else if (err.message) msg = err.message;
+                }
+            } catch (e) {}
+
+            node.classList.remove('mermaid');
+            node.innerHTML =
+                '<pre><code class="language-text">' +
+                escapeHtml(msg) +
+                (source ? ('\n\n' + escapeHtml(source)) : '') +
+                '</code></pre>';
+        }
+
+        var theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default';
+        try {
+            // Support Mermaid blocks that ended up rendered as regular code blocks
+            // e.g. <pre><code class="language-mermaid">...</code></pre>
+            (function() {
+                var codeNodes = document.querySelectorAll('pre > code, code');
+                for (var i = 0; i < codeNodes.length; i++) {
+                    var codeNode = codeNodes[i];
+                    if (!codeNode || !codeNode.classList) continue;
+                    var isMermaidCode = codeNode.classList.contains('language-mermaid') ||
+                        codeNode.classList.contains('lang-mermaid') ||
+                        codeNode.classList.contains('mermaid');
+                    if (!isMermaidCode) continue;
+                    if (codeNode.closest && codeNode.closest('.mermaid')) continue;
+
+                    var pre = codeNode.parentElement && codeNode.parentElement.tagName === 'PRE'
+                        ? codeNode.parentElement
+                        : (codeNode.closest ? codeNode.closest('pre') : null);
+
+                    var diagramText = codeNode.textContent || '';
+                    if (!diagramText.trim()) continue;
+
+                    var mermaidDiv = document.createElement('div');
+                    mermaidDiv.className = 'mermaid';
+                    mermaidDiv.textContent = diagramText;
+
+                    if (pre && pre.parentNode) {
+                        pre.parentNode.replaceChild(mermaidDiv, pre);
+                    } else if (codeNode.parentNode) {
+                        codeNode.parentNode.replaceChild(mermaidDiv, codeNode);
+                    }
+                }
+            })();
+
+            mermaid.initialize({ startOnLoad: false, theme: theme });
+
+            var mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+            for (var j = 0; j < mermaidNodes.length; j++) {
+                var n = mermaidNodes[j];
+                if (!n.getAttribute('data-mermaid-source')) {
+                    n.setAttribute('data-mermaid-source', (n.textContent || '').trim());
+                }
+            }
+
+            if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
+                var validNodes = [];
+                var checks = mermaidNodes.map(function(node) {
+                    var src = node.getAttribute('data-mermaid-source') || '';
+                    if (!src.trim()) return Promise.resolve();
+                    return Promise.resolve(mermaid.parse(src))
+                        .then(function() {
+                            node.textContent = src;
+                            validNodes.push(node);
+                        })
+                        .catch(function(err) {
+                            renderMermaidError(node, err, src);
+                        });
+                });
+
+                Promise.all(checks).then(function() {
+                    if (!validNodes.length) return;
+                    return mermaid.run({
+                        nodes: validNodes,
+                        suppressErrors: true
+                    });
+                }).catch(function(e1) {
+                    console.error('Mermaid rendering failed', e1);
+                });
+            } else {
+                mermaid.run({
+                    nodes: document.querySelectorAll('.mermaid'),
+                    suppressErrors: true
+                });
+            }
+        } catch (e) {
+            try {
+                mermaid.initialize({ startOnLoad: false, theme: theme });
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            } catch (e2) {
+                console.error('Mermaid initialization failed', e2);
+            }
+        }
+    }
+</script>
 </html>

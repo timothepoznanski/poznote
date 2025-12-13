@@ -40,6 +40,7 @@ Poznote is a powerful, open-source note-taking and documentation platform.<br>Ca
 - Markdown Notes
 - Dark Mode
 - Excalidraw Integration
+- Mermaid Diagrams
 
 ## Try the Poznote demo
 

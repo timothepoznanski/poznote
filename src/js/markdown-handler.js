@@ -51,6 +51,135 @@ function normalizeContentEditableText(element) {
     return content;
 }
 
+function initMermaid() {
+    if (typeof mermaid !== 'undefined') {
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderMermaidError(node, err, source) {
+            var msg = 'Mermaid: syntax error.';
+            try {
+                if (err) {
+                    if (typeof err === 'string') msg = err;
+                    else if (err.str) msg = err.str;
+                    else if (err.message) msg = err.message;
+                }
+            } catch (e) {}
+
+            // Replace with readable error output using existing code block styling
+            node.classList.remove('mermaid');
+            node.innerHTML =
+                '<pre><code class="language-text">' +
+                escapeHtml(msg) +
+                (source ? ('\n\n' + escapeHtml(source)) : '') +
+                '</code></pre>';
+        }
+
+        // Also support Mermaid blocks rendered as regular code blocks
+        // e.g. <pre><code class="language-mermaid">...</code></pre>
+        try {
+            var codeNodes = document.querySelectorAll('pre > code, code');
+            for (var i = 0; i < codeNodes.length; i++) {
+                var codeNode = codeNodes[i];
+                if (!codeNode || !codeNode.classList) continue;
+
+                var isMermaidCode = codeNode.classList.contains('language-mermaid') ||
+                    codeNode.classList.contains('lang-mermaid') ||
+                    codeNode.classList.contains('mermaid');
+
+                if (!isMermaidCode) continue;
+
+                // If it's already inside a .mermaid container, leave it alone
+                if (codeNode.closest && codeNode.closest('.mermaid')) continue;
+
+                var pre = codeNode.parentElement && codeNode.parentElement.tagName === 'PRE'
+                    ? codeNode.parentElement
+                    : (codeNode.closest ? codeNode.closest('pre') : null);
+
+                var diagramText = codeNode.textContent || '';
+                if (!diagramText.trim()) continue;
+
+                var mermaidDiv = document.createElement('div');
+                mermaidDiv.className = 'mermaid';
+                mermaidDiv.textContent = diagramText;
+
+                if (pre && pre.parentNode) {
+                    pre.parentNode.replaceChild(mermaidDiv, pre);
+                } else if (codeNode.parentNode) {
+                    codeNode.parentNode.replaceChild(mermaidDiv, codeNode);
+                }
+            }
+        } catch (e0) {
+            // Non-fatal: continue with normal Mermaid initialization
+        }
+
+        var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
+
+        // Validate diagrams first (gives a clearer error than Mermaid's default icon)
+        var mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+        if (mermaidNodes.length === 0) return;
+
+        // Store original text (so we can show it on error)
+        for (var j = 0; j < mermaidNodes.length; j++) {
+            var n = mermaidNodes[j];
+            if (!n.getAttribute('data-mermaid-source')) {
+                n.setAttribute('data-mermaid-source', (n.textContent || '').trim());
+            }
+        }
+
+        try {
+            mermaid.initialize({ startOnLoad: false, theme: theme });
+
+            // If mermaid.parse is available, validate each diagram and render only valid ones
+            if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
+                var validNodes = [];
+                var checks = mermaidNodes.map(function(node) {
+                    var src = node.getAttribute('data-mermaid-source') || '';
+                    if (!src.trim()) return Promise.resolve();
+                    return Promise.resolve(mermaid.parse(src))
+                        .then(function() {
+                            // Restore source in case it was altered
+                            node.textContent = src;
+                            validNodes.push(node);
+                        })
+                        .catch(function(err) {
+                            renderMermaidError(node, err, src);
+                        });
+                });
+
+                Promise.all(checks).then(function() {
+                    if (!validNodes.length) return;
+                    return mermaid.run({
+                        nodes: validNodes,
+                        suppressErrors: true
+                    });
+                }).catch(function(e1) {
+                    console.error('Mermaid rendering failed', e1);
+                });
+            } else {
+                mermaid.run({
+                    nodes: document.querySelectorAll('.mermaid'),
+                    suppressErrors: true
+                });
+            }
+        } catch (e) {
+            // Fallback for older versions
+            try {
+                mermaid.initialize({ startOnLoad: false, theme: theme });
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            } catch (e2) {
+                console.error('Mermaid initialization failed', e2);
+            }
+        }
+    }
+}
+
 function parseMarkdown(text) {
     if (!text) return '';
     
@@ -172,16 +301,28 @@ function parseMarkdown(text) {
         let line = lines[i];
         
         // Handle code blocks
-        if (line.match(/^```/)) {
+        if (line.match(/^\s*```/)) {
             flushParagraph();
             if (!inCodeBlock) {
                 inCodeBlock = true;
-                codeBlockLang = line.replace(/^```/, '').trim();
+                codeBlockLang = line.replace(/^\s*```/, '').trim();
                 codeBlockContent = [];
             } else {
                 inCodeBlock = false;
                 let codeContent = codeBlockContent.join('\n');
-                result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
+                // Check for mermaid, handling potential whitespace or case issues
+                if (codeBlockLang && codeBlockLang.trim().toLowerCase() === 'mermaid') {
+                    // Unescape HTML for mermaid to ensure arrows and other symbols work
+                    let unescapedContent = codeContent
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&amp;/g, '&')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#039;/g, "'");
+                    result.push('<div class="mermaid">' + unescapedContent + '</div>');
+                } else {
+                    result.push('<pre><code class="language-' + (codeBlockLang || 'text') + '">' + codeContent + '</code></pre>');
+                }
                 codeBlockContent = [];
                 codeBlockLang = '';
             }
@@ -580,6 +721,11 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
     
+    // Initialize Mermaid diagrams if in preview mode
+    if (!startInEditMode && !isEmpty) {
+        setTimeout(initMermaid, 100);
+    }
+    
     var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
     if (toolbar) {
         // Hide separator button for markdown notes
@@ -745,6 +891,7 @@ function switchToPreviewMode(noteId) {
     } else {
         previewDiv.innerHTML = parseMarkdown(markdownContent);
         previewDiv.classList.remove('empty');
+        setTimeout(initMermaid, 100);
     }
     
     noteEntry.setAttribute('data-markdown-content', markdownContent);

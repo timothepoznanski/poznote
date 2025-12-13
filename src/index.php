@@ -147,6 +147,7 @@ $using_unified_search = handleUnifiedSearch();
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
+    <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
