@@ -264,3 +264,18 @@
     justify-content: flex-start;
 }
 
+
+/* Mermaid diagrams */
+.mermaid {
+    margin: 1em 0;
+    text-align: center;
+    background-color: white; /* Ensure visibility in dark mode if mermaid doesn't handle it */
+    padding: 10px;
+    border-radius: 4px;
+}
+
+/* Dark mode adjustment for mermaid container */
+[data-theme='dark'] .mermaid {
+    background-color: #2d2d2d;
+}
+
