@@ -295,7 +295,11 @@
      */
     window.navigateToNote = function(noteId) {
         const workspace = localStorage.getItem('poznote_selected_workspace') || 'Poznote';
-        window.location.href = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}`;
+        const isMobile = window.innerWidth <= 800;
+        
+        // Add scroll parameter for mobile to trigger auto-scroll to note content
+        const scrollParam = isMobile ? '&scroll=1' : '';
+        window.location.href = `index.php?note=${noteId}&workspace=${encodeURIComponent(workspace)}${scrollParam}`;
     };
 
     /**
