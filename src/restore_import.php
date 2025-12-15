@@ -719,7 +719,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 Want to import HTML or Markdown files?
             </h3>
             <div id="individualNotes" class="accordion-content" style="display: none;">
-            <p>Notes will be imported into the <b>Poznote</b> workspace without being assigned to a folder (uncategorized).<br><br>The title will be automatically created from the file name (without the extension).</p>
+            <p>Notes will be imported into the <b>Poznote</b> workspace without being assigned to a folder.<br><br>The title will be automatically created from the file name (without the extension).</p>
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">

@@ -328,7 +328,7 @@ function createBackup() {
             <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
             <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
                 <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li><br>
-                <li><strong>Offline Reading:</strong> Open the included <code>index.html</code> to browse your notes without Poznote</li><br>
+                <li><strong>Offline Reading:</strong> Open the included <b>index.html</b> to browse your notes without Poznote</li><br>
             </ul>
             
             <form id="completeBackupForm" method="post">
