@@ -419,3 +419,19 @@
     </div>
 </div>
 
+<!-- Note Reference Modal -->
+<div id="noteReferenceModal" class="modal">
+    <div class="modal-content note-reference-modal-content">
+        <h3><i class="fa-link"></i> Insert Note Reference</h3>
+        <div class="note-reference-search">
+            <input type="text" id="noteReferenceSearch" placeholder="Search for a note..." autocomplete="off">
+        </div>
+        <div class="note-reference-recent-label">Recent notes</div>
+        <div id="noteReferenceList" class="note-reference-list">
+            <!-- Notes will be populated here -->
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeNoteReferenceModal()">Cancel</button>
+        </div>
+    </div>
+</div>

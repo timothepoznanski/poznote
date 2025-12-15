@@ -141,11 +141,13 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
+    <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
 
@@ -653,6 +655,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="Insert checklist" onclick="insertChecklist()"><i class="fa-list-check"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="Insert note reference" onclick="openNoteReferenceModal()"><i class="fa-at"></i></button>';
+
                 
                     // Favorite / Share / Attachment buttons
                     $attachments_count = 0;
@@ -883,7 +887,7 @@ $body_classes = trim($extra_body_classes);
                     $editable = 'true';
                     $excalidraw_attr = '';
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
@@ -934,6 +938,30 @@ $body_classes = trim($extra_body_classes);
     });
     </script>
     <?php endif; ?>
+    
+    <!-- Track opened note and process note references -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Track the currently opened note for recent notes list
+        var noteEntry = document.querySelector('.noteentry[data-note-id]');
+        if (noteEntry && typeof window.trackNoteOpened === 'function') {
+            var noteId = noteEntry.getAttribute('data-note-id');
+            var heading = noteEntry.getAttribute('data-note-heading');
+            if (noteId && heading) {
+                window.trackNoteOpened(noteId, heading);
+            }
+        }
+        
+        // Process note references [[Note Title]] in rendered content
+        if (typeof window.processNoteReferences === 'function') {
+            var noteEntries = document.querySelectorAll('.noteentry');
+            noteEntries.forEach(function(entry) {
+                // Only process for view mode or after markdown rendering
+                window.processNoteReferences(entry);
+            });
+        }
+    });
+    </script>
         
     </div>  <!-- Close main-container -->
     <script>

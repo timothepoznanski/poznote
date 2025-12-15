@@ -2114,7 +2114,7 @@ pre.code-block,
     /* border: 1px solid #e1e1e1; */
     border-radius: 4px;
     padding: 20px 20px;
-    margin: 8px 0;
+    margin: 0;
     color: #333;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -2125,7 +2125,7 @@ pre.code-block,
 
 /* Ensure code blocks have the correct margins even without a wrapper */
 .code-block, pre.code-block, .noteentry pre {
-    margin: 1em 0 !important;
+    margin: 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
     background: #F8FAFC !important;
@@ -2933,6 +2933,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-text-height::before { content: "\f034"; }
 .fa-code::before { content: "\f121"; }
 .fa-terminal::before { content: "\f120"; }
+.fa-at::before { content: "\f1fa"; }
 .fa-tag::before { content: "\f02b"; }
 .fa-tags::before { content: "\f02c"; }
 .fa-sign-out-alt::before { content: "\f2f5"; }
@@ -3001,6 +3002,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-text-height,
 .fa-code,
 .fa-terminal,
+.fa-at,
 .fa-tag,
 .fa-tags,
 .fa-sign-out-alt,

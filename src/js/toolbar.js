@@ -425,10 +425,50 @@ function toggleCodeBlock() {
     return;
   }
   
+  // Find the note entry container
+  const noteEntry = container.closest ? container.closest('.noteentry') : null;
+  
+  // Helper function to check if we're at the first line of the note
+  function isAtFirstLine() {
+    if (!noteEntry) return false;
+    try {
+      const rangeToStart = document.createRange();
+      rangeToStart.setStart(noteEntry, 0);
+      rangeToStart.setEnd(range.startContainer, range.startOffset);
+      const textBefore = rangeToStart.toString();
+      // Check if there's no text or only whitespace before the selection
+      return !textBefore.trim();
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  // Helper function to check if we're at the last line of the note
+  function isAtLastLine() {
+    if (!noteEntry) return false;
+    try {
+      const rangeToEnd = document.createRange();
+      rangeToEnd.setStart(range.endContainer, range.endOffset);
+      rangeToEnd.selectNodeContents(noteEntry);
+      rangeToEnd.setStart(range.endContainer, range.endOffset);
+      const textAfter = rangeToEnd.toString();
+      // Check if there's no text or only whitespace after the selection
+      return !textAfter.trim();
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  const atFirstLine = isAtFirstLine();
+  const atLastLine = isAtLastLine();
+  
   // Otherwise, create a code block with the selected text
   if (sel.isCollapsed) {
-    // No selection: insert empty block with blank lines before and after
-    document.execCommand('insertHTML', false, '<br><pre class="code-block"><br></pre><br>');
+    // No selection: insert empty block
+    // Add blank line before only if at first line, after only if at last line
+    const brBefore = atFirstLine ? '<br>' : '';
+    const brAfter = atLastLine ? '<br>' : '';
+    document.execCommand('insertHTML', false, `${brBefore}<pre class="code-block"><br></pre>${brAfter}`);
     return;
   }
   
@@ -442,7 +482,10 @@ function toggleCodeBlock() {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
   
-  const codeHTML = `<br><pre class="code-block">${escapedText}</pre><br>`;
+  // Add blank line before only if at first line, after only if at last line
+  const brBefore = atFirstLine ? '<br>' : '';
+  const brAfter = atLastLine ? '<br>' : '';
+  const codeHTML = `${brBefore}<pre class="code-block">${escapedText}</pre>${brAfter}`;
   document.execCommand('insertHTML', false, codeHTML);
 }
 
