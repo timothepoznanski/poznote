@@ -2114,7 +2114,7 @@ pre.code-block,
     /* border: 1px solid #e1e1e1; */
     border-radius: 4px;
     padding: 20px 20px;
-    margin: 8px 0;
+    margin: 0;
     color: #333;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -2125,7 +2125,7 @@ pre.code-block,
 
 /* Ensure code blocks have the correct margins even without a wrapper */
 .code-block, pre.code-block, .noteentry pre {
-    margin: 1em 0 !important;
+    margin: 0 !important;
     padding: 30px 30px !important;
     /* border-radius: 6px; */
     background: #F8FAFC !important;
