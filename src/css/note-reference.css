@@ -138,18 +138,7 @@
     font-size: 10px;
 }
 
-.note-reference-item-arrow {
-    color: var(--text-muted, #999);
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.15s, transform 0.15s;
-    margin-left: 8px;
-}
 
-.note-reference-item:hover .note-reference-item-arrow {
-    opacity: 1;
-    transform: translateX(2px);
-}
 
 /* Internal note links in content */
 a.note-internal-link,

@@ -208,7 +208,6 @@
                         <span class="note-reference-item-title">${escapeHtml(heading)}</span>
                         ${folder ? `<span class="note-reference-item-folder"><i class="fa-folder"></i> ${escapeHtml(folder)}</span>` : ''}
                     </div>
-                    <i class="fa-arrow-right note-reference-item-arrow"></i>
                 `;
                 
                 item.addEventListener('click', () => {
