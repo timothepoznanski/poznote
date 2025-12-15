@@ -1,0 +1,243 @@
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeNoteReferenceModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+/* Note Reference Modal & Links Styles */
+
+/* Modal specific styles */
+.note-reference-modal-content {
+    max-width: 480px;
+    width: 90%;
+}
+
+.note-reference-modal-content .modal-buttons .btn-cancel {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.note-reference-modal-content .modal-buttons .btn-cancel:hover {
+    background-color: #c82333;
+}
+
+.note-reference-modal-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.note-reference-modal-content h3 i {
+    color: var(--primary-color, #2196F3);
+}
+
+/* Search input */
+.note-reference-search {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.note-reference-search input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--input-bg, #fff);
+    color: var(--text-color, #333);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.note-reference-search input:focus {
+    outline: none;
+    border-color: var(--primary-color, #2196F3);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* Recent label */
+.note-reference-recent-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+}
+
+/* Notes list */
+.note-reference-list {
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #eee);
+}
+
+.note-reference-loading,
+.note-reference-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted, #999);
+    font-size: 14px;
+}
+
+.note-reference-loading i {
+    margin-right: 8px;
+}
+
+/* Note item */
+.note-reference-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.note-reference-item:last-child {
+    border-bottom: none;
+}
+
+.note-reference-item:hover {
+    background-color: var(--hover-bg, rgba(33, 150, 243, 0.08));
+}
+
+.note-reference-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.note-reference-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color, #333);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.note-reference-item-folder {
+    font-size: 12px;
+    color: var(--text-muted, #888);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.note-reference-item-folder i {
+    font-size: 10px;
+}
+
+.note-reference-item-arrow {
+    color: var(--text-muted, #999);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    margin-left: 8px;
+}
+
+.note-reference-item:hover .note-reference-item-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+/* Internal note links in content */
+a.note-internal-link,
+span.note-internal-link {
+    color: var(--primary-color, #2196F3);
+    text-decoration: none;
+    padding: 0 2px;
+    border-radius: 2px;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+a.note-internal-link:hover {
+    text-decoration: underline;
+}
+
+/* Broken/not found link */
+span.note-link-broken {
+    color: var(--error-color, #dc3545);
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+/* Toolbar button styling */
+.toolbar-btn.btn-note-reference {
+    /* Same as other toolbar buttons */
+}
+
+.toolbar-btn.btn-note-reference i {
+    font-size: 14px;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .note-reference-search input {
+    background: var(--dark-input-bg, #2a2a2a);
+    border-color: var(--dark-border-color, #444);
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-search input:focus {
+    border-color: var(--primary-color, #2196F3);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+[data-theme="dark"] .note-reference-list {
+    border-color: var(--dark-border-color, #444);
+}
+
+[data-theme="dark"] .note-reference-item {
+    border-bottom-color: var(--dark-border-color, #3a3a3a);
+}
+
+[data-theme="dark"] .note-reference-item:hover {
+    background-color: rgba(33, 150, 243, 0.15);
+}
+
+[data-theme="dark"] .note-reference-item-title {
+    color: var(--dark-text-color, #e0e0e0);
+}
+
+[data-theme="dark"] .note-reference-item-folder {
+    color: var(--dark-text-muted, #888);
+}
+
+[data-theme="dark"] a.note-internal-link {
+    color: #64b5f6;
+}
+
+[data-theme="dark"] a.note-internal-link:hover {
+    text-decoration: underline;
+}
+
+[data-theme="dark"] span.note-link-broken {
+    color: #f48fb1;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .note-reference-modal-content {
+        width: 95%;
+        max-height: 80vh;
+    }
+    
+    .note-reference-list {
+        max-height: 250px;
+    }
+    
+    .note-reference-item {
+        padding: 14px 12px;
+    }
+}
