@@ -77,6 +77,38 @@ body.dark-mode .slash-command-icon {
     color: #9ca3af;
 }
 
+/* ============================================
+   Image Context Menu (Dark Mode)
+   ============================================ */
+
+html[data-theme='dark'] .image-menu,
+body.dark-mode .image-menu {
+    background: #2a2a2a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .image-menu-item,
+body.dark-mode .image-menu-item {
+    color: #e0e0e0;
+    border-bottom-color: #404040;
+}
+
+html[data-theme='dark'] .image-menu-item:hover,
+body.dark-mode .image-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .image-menu-item i,
+body.dark-mode .image-menu-item i {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i,
+body.dark-mode .image-menu-item[data-action='delete-image'] i {
+    color: #dc3545;
+}
+
 /* Search bar */
 html[data-theme='dark'] .searchbar-input,
 body.dark-mode .searchbar-input {
