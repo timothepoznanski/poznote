@@ -260,8 +260,8 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         var saveToolbarModeBtn = document.getElementById('saveToolbarModeModalBtn');
         if (saveToolbarModeBtn) {
             saveToolbarModeBtn.addEventListener('click', function(){
-                var select = document.getElementById('toolbarModeSelect');
-                var selected = select && select.value ? select.value : 'both';
+                var radioChecked = document.querySelector('input[name="toolbarMode"]:checked');
+                var selected = radioChecked && radioChecked.value ? radioChecked.value : 'both';
                 var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','toolbar_mode'); setForm.append('value', selected);
                 fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){
                     try{ closeModal('toolbarModeModal'); }catch(e){};
@@ -299,9 +299,9 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
             var v = j && j.success ? j.value : 'both';
             if (!v) v = 'both';
-            var select = document.getElementById('toolbarModeSelect');
-            if (select) {
-                try { select.value = v; } catch(e) {}
+            var radioToCheck = document.querySelector('input[name="toolbarMode"][value="' + v + '"]');
+            if (radioToCheck) {
+                radioToCheck.checked = true;
             }
             modal.style.display = 'flex';
         }).catch(function(){ modal.style.display = 'flex'; });
