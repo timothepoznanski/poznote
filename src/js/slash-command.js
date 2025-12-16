@@ -562,6 +562,9 @@
         slashTextNode = null;
         slashOffset = -1;
         filterText = '';
+
+        // Restore cursor in case it was hidden
+        document.body.style.cursor = '';
     }
 
     function updateMenuContent() {
@@ -1083,6 +1086,14 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        // Hide cursor until mouse moves
+        document.body.style.cursor = 'none';
+        const showCursor = () => {
+            document.body.style.cursor = '';
+            document.removeEventListener('mousemove', showCursor);
+        };
+        document.addEventListener('mousemove', showCursor);
     }
 
     function handleInput(e) {
