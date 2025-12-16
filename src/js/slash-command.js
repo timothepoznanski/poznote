@@ -1050,6 +1050,11 @@
             return;
         }
 
+        // Disable slash menu on mobile (screen width < 768px)
+        if (window.innerWidth < 768) {
+            return;
+        }
+
         hideSlashMenu();
 
         const sel = window.getSelection();
