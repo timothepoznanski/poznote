@@ -202,6 +202,25 @@
 
         const range = selection.getRangeAt(0);
 
+        // Check if we're inside a formatting element (code, strong, em, mark, s, etc.)
+        let currentNode = range.startContainer;
+        if (currentNode.nodeType === 3) {
+            currentNode = currentNode.parentNode;
+        }
+
+        // Find if we're inside a formatting element
+        const formattingTags = ['CODE', 'STRONG', 'EM', 'MARK', 'S', 'SPAN', 'B', 'I', 'U'];
+        let formattingElement = null;
+        let node = currentNode;
+        
+        while (node && !node.classList?.contains('noteentry')) {
+            if (formattingTags.includes(node.tagName)) {
+                formattingElement = node;
+                break;
+            }
+            node = node.parentNode;
+        }
+
         // Create span that resets all formatting to default
         const span = document.createElement('span');
         span.style.color = 'rgb(55, 53, 47)';
@@ -216,7 +235,13 @@
         span.appendChild(textNode);
         
         range.deleteContents();
-        range.insertNode(span);
+        
+        // If inside a formatting element, insert after it
+        if (formattingElement) {
+            formattingElement.parentNode.insertBefore(span, formattingElement.nextSibling);
+        } else {
+            range.insertNode(span);
+        }
         
         const newRange = document.createRange();
         newRange.setStart(textNode, 1);
@@ -1122,10 +1147,7 @@
         const lastChar = textBefore.charAt(textBefore.length - 1);
 
         if (lastChar === '/') {
-            const charBeforeSlash = textBefore.length > 1 ? textBefore.charAt(textBefore.length - 2) : '';
-            if (charBeforeSlash === '' || charBeforeSlash === ' ' || charBeforeSlash === '\n' || charBeforeSlash === '\u00A0') {
-                showSlashMenu();
-            }
+            showSlashMenu();
         } else if (slashMenuElement) {
             // If menu is open, update filter from editor
             setTimeout(updateFilterFromEditor, 0);
