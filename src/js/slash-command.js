@@ -223,7 +223,8 @@
 
         // Create span that resets all formatting to default
         const span = document.createElement('span');
-        span.style.color = 'rgb(55, 53, 47)';
+        // Don't hardcode a light-theme text color; inherit from the editor (works in dark mode too).
+        span.style.color = 'inherit';
         span.style.backgroundColor = 'transparent';
         span.style.fontWeight = 'normal';
         span.style.fontStyle = 'normal';
