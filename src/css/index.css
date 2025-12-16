@@ -27,6 +27,18 @@
     display: none !important;
 }
 
+/* Hide specific toolbar buttons on desktop only (keep on mobile) */
+@media screen and (min-width: 769px) {
+    .btn-excalidraw,
+    .btn-emoji,
+    .btn-table,
+    .btn-checklist,
+    .btn-separator,
+    .btn-note-reference {
+        display: none !important;
+    }
+}
+
 /* Folder visibility: when not hidden, ensure folder headers and contents use block layout */
 .folder-header {
     display: block;
@@ -3935,20 +3947,6 @@ a.links_arbo_left.dragging,
 }
 
 /* ============================================
-   Toolbar Mode Styles
-   ============================================ */
-
-/* In "Slash command only" mode, hide non-formatting insert/action icons.
-   Never hide Bullet list, Numbered list, or Title. */
-body.toolbar-mode-slash .btn-excalidraw,
-body.toolbar-mode-slash .btn-emoji,
-body.toolbar-mode-slash .btn-table,
-body.toolbar-mode-slash .btn-checklist,
-body.toolbar-mode-slash .btn-separator,
-body.toolbar-mode-slash .btn-note-reference {
-    display: none !important;
-}
-
 .folder-content .links_arbo_left {
     pointer-events: auto;
 }

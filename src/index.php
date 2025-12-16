@@ -1077,7 +1077,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/search-highlight.js"></script>
 <script src="js/toolbar.js"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
-<script src="js/toolbar-mode.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js"></script>

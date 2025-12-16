@@ -1070,11 +1070,6 @@
     }
 
     function showSlashMenu() {
-        // Slash menu disabled when toolbar_mode is "full"
-        if (document.body.classList.contains('toolbar-mode-full')) {
-            return;
-        }
-
         // Disable slash menu on mobile (screen width < 768px)
         if (window.innerWidth < 768) {
             return;

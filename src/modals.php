@@ -335,31 +335,6 @@
     </div>
 </div>
 
-<!-- Toolbar mode modal -->
-<div id="toolbarModeModal" class="modal">
-    <div class="modal-content">
-        <h3>Toolbar Mode</h3>
-        <div class="modal-body">
-            <label style="display: flex; align-items: center; padding: 8px 0; cursor: pointer;">
-                <input type="radio" name="toolbarMode" value="full" style="margin: 0 12px 0 0; width: 20px; height: 20px; cursor: pointer; vertical-align: middle;">
-                <span style="font-size: 15px; line-height: 20px;">Toolbar only</span>
-            </label>
-            <label style="display: flex; align-items: center; padding: 8px 0; cursor: pointer;">
-                <input type="radio" name="toolbarMode" value="slash" style="margin: 0 12px 0 0; width: 20px; height: 20px; cursor: pointer; vertical-align: middle;">
-                <span style="font-size: 15px; line-height: 20px;">Slash command only</span>
-            </label>
-            <label style="display: flex; align-items: center; padding: 8px 0; cursor: pointer;">
-                <input type="radio" name="toolbarMode" value="both" style="margin: 0 12px 0 0; width: 20px; height: 20px; cursor: pointer; vertical-align: middle;" checked>
-                <span style="font-size: 15px; line-height: 20px;">Toolbar icons + slash command menu</span>
-            </label>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('toolbarModeModal')">Cancel</button>
-            <button type="button" class="btn-primary" id="saveToolbarModeModalBtn">Save</button>
-        </div>
-    </div>
-</div>
-
 <!-- Timezone modal -->
 <div id="timezoneModal" class="modal">
     <div class="modal-content">
