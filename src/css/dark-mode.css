@@ -48,6 +48,33 @@ body.dark-mode .workspace-dropdown-icon {
     color: #a0a0a0;
 }
 
+/* ============================================
+   Slash Command Menu (Dark Mode)
+   ============================================ */
+
+html[data-theme='dark'] .slash-command-menu,
+body.dark-mode .slash-command-menu {
+    background: #111827;
+    border-color: #374151;
+}
+
+html[data-theme='dark'] .slash-command-item:hover,
+html[data-theme='dark'] .slash-command-item.selected,
+body.dark-mode .slash-command-item:hover,
+body.dark-mode .slash-command-item.selected {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .slash-command-label,
+body.dark-mode .slash-command-label {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .slash-command-icon,
+body.dark-mode .slash-command-icon {
+    color: #9ca3af;
+}
+
 /* Search bar */
 html[data-theme='dark'] .searchbar-input,
 body.dark-mode .searchbar-input {

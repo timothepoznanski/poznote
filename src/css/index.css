@@ -3859,6 +3859,96 @@ a.links_arbo_left.dragging,
     pointer-events: auto;
 }
 
+/* ============================================
+   Slash Command Menu
+   ============================================ */
+
+.slash-command-menu {
+    position: fixed;
+    z-index: 9999;
+    width: 280px;
+    overflow: visible;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.slash-command-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.slash-command-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.slash-command-item:hover,
+.slash-command-item.selected {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.slash-command-icon {
+    width: 18px;
+    min-width: 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.slash-command-label {
+    font-size: 14px;
+    color: #111827;
+    flex: 1;
+}
+
+.slash-command-submenu-indicator {
+    margin-left: auto;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.slash-command-submenu {
+    width: 200px;
+}
+
+.slash-command-submenu .slash-command-item {
+    padding: 6px 10px;
+}
+
+.slash-command-empty {
+    padding: 10px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* ============================================
+   Toolbar Mode Styles
+   ============================================ */
+
+/* In "Slash command only" mode, hide non-formatting insert/action icons.
+   Never hide Bullet list, Numbered list, or Title. */
+body.toolbar-mode-slash .btn-excalidraw,
+body.toolbar-mode-slash .btn-emoji,
+body.toolbar-mode-slash .btn-table,
+body.toolbar-mode-slash .btn-checklist,
+body.toolbar-mode-slash .btn-separator,
+body.toolbar-mode-slash .btn-note-reference {
+    display: none !important;
+}
+
 .folder-content .links_arbo_left {
     pointer-events: auto;
 }

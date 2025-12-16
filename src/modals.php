@@ -335,6 +335,24 @@
     </div>
 </div>
 
+<!-- Toolbar mode modal -->
+<div id="toolbarModeModal" class="modal">
+    <div class="modal-content">
+        <h3>Toolbar Mode</h3>
+        <div class="modal-body">
+            <select id="toolbarModeSelect" style="width:100%; padding:8px; margin-top:10px; border:1px solid #ddd; border-radius:4px; font-size:14px;">
+                <option value="full">Toolbar only</option>
+                <option value="slash">Slash command only</option>
+                <option value="both" selected>Toolbar icons + slash command menu</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('toolbarModeModal')">Cancel</button>
+            <button type="button" class="btn-primary" id="saveToolbarModeModalBtn">Save</button>
+        </div>
+    </div>
+</div>
+
 <!-- Timezone modal -->
 <div id="timezoneModal" class="modal">
     <div class="modal-content">

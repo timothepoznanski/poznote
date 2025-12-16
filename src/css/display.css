@@ -84,6 +84,7 @@ body {
 .fa-moon::before { content: "\f186"; }
 .fa-sun::before { content: "\f185"; }
 .fa-border-outer::before { content: "\f851"; }
+.fa-sliders::before { content: "\f1de"; }
 
 .fa-border-outer,
 .fa-arrow-left,
@@ -95,7 +96,8 @@ body {
 .fa-folder-open,
 .fa-list-ol,
 .fa-moon,
-.fa-sun {
+.fa-sun,
+.fa-sliders {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;
     font-style: normal;

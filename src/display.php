@@ -88,6 +88,13 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
+            <div class="settings-card" id="toolbar-mode-card" onclick="openToolbarModeModal();">
+                <div class="settings-card-icon"><i class="fa-sliders"></i></div>
+                <div class="settings-card-content">
+                    <h3>Toolbar Mode <span id="toolbar-mode-badge" class="setting-status">loading...</span></h3>
+                </div>
+            </div>
+
             <div class="settings-card" onclick="showTimezonePrompt();">
                 <div class="settings-card-icon"><i class="fal fa-clock"></i></div>
                 <div class="settings-card-content">
@@ -278,9 +285,57 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 }).catch(function(){ alert('Error saving preference'); });
             });
         }
+
+        var saveToolbarModeBtn = document.getElementById('saveToolbarModeModalBtn');
+        if (saveToolbarModeBtn) {
+            saveToolbarModeBtn.addEventListener('click', function(){
+                var select = document.getElementById('toolbarModeSelect');
+                var selected = select && select.value ? select.value : 'both';
+                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','toolbar_mode'); setForm.append('value', selected);
+                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){
+                    try{ closeModal('toolbarModeModal'); }catch(e){};
+
+                    // Refresh badge
+                    if (typeof window.refreshToolbarModeBadge === 'function') {
+                        window.refreshToolbarModeBadge();
+                    }
+
+                    // Update main window toolbar mode if open
+                    try{
+                        if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
+                            if (typeof window.opener.loadToolbarMode === 'function') {
+                                window.opener.loadToolbarMode();
+                            } else {
+                                window.opener.location.reload();
+                            }
+                        }
+                    }catch(e){}
+                }).catch(function(){ alert('Error saving preference'); });
+            });
+        }
     });
     </script>
     <script>
+    // Toolbar mode modal handler
+    function openToolbarModeModal() {
+        var modal = document.getElementById('toolbarModeModal');
+        if (!modal) return;
+
+        var form = new FormData();
+        form.append('action','get');
+        form.append('key','toolbar_mode');
+
+        fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+            var v = j && j.success ? j.value : 'both';
+            if (!v) v = 'both';
+            var select = document.getElementById('toolbarModeSelect');
+            if (select) {
+                try { select.value = v; } catch(e) {}
+            }
+            modal.style.display = 'flex';
+        }).catch(function(){ modal.style.display = 'flex'; });
+    }
+
     // Note sort preference
     (function(){
         var select = document.getElementById('noteSortSelect');
@@ -386,6 +441,35 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             });
         }
 
+        // Load Toolbar Mode
+        function refreshToolbarModeBadge() {
+            getSetting('toolbar_mode', function(value) {
+                var badge = document.getElementById('toolbar-mode-badge');
+                if (badge) {
+                    var modeValue = value || 'both';
+                    var modeLabel = 'Toolbar icons + slash command menu';
+
+                    switch(modeValue) {
+                        case 'full':
+                            modeLabel = 'Toolbar only';
+                            break;
+                        case 'slash':
+                            modeLabel = 'Slash command only';
+                            break;
+                        case 'both':
+                            modeLabel = 'Toolbar icons + slash command menu';
+                            break;
+                        default:
+                            modeLabel = 'Toolbar icons + slash command menu';
+                            break;
+                    }
+
+                    badge.textContent = modeLabel;
+                    badge.className = 'setting-status enabled';
+                }
+            });
+        }
+
         // Load Timezone
         function refreshTimezoneBadge() {
             getSetting('timezone', function(value) {
@@ -406,12 +490,14 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshToolbarModeBadge();
         refreshTimezoneBadge();
         
         // Make refresh functions available globally
         window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
         window.refreshFontSizeBadge = refreshFontSizeBadge;
         window.refreshNoteSortBadge = refreshNoteSortBadge;
+        window.refreshToolbarModeBadge = refreshToolbarModeBadge;
         window.refreshTimezoneBadge = refreshTimezoneBadge;
     })();
     </script>
