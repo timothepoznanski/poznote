@@ -276,7 +276,7 @@
         },
         {
             id: 'format',
-            icon: 'fa-font',
+            icon: 'fa-bold',
             label: 'Format text',
             submenu: [
                 { id: 'red', icon: 'fa-palette', label: 'Red', action: () => insertColor('#e74c3c') },
@@ -289,7 +289,7 @@
         },
         {
             id: 'normal',
-            icon: 'fa-text-height',
+            icon: 'fa-align-left',
             label: 'Normal text',
             action: function () {
                 insertNormalText();
