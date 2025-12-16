@@ -34,6 +34,203 @@
         }
     }
 
+    function insertBold() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create bold element
+        const strong = document.createElement('strong');
+        const textNode = document.createTextNode('\u200B'); // Zero-width space to place cursor
+        strong.appendChild(textNode);
+        
+        // Insert at cursor position
+        range.deleteContents();
+        range.insertNode(strong);
+        
+        // Place cursor inside bold element after the zero-width space
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        // Trigger input event for autosave
+        const noteEntry = strong.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertItalic() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create italic element
+        const em = document.createElement('em');
+        const textNode = document.createTextNode('\u200B');
+        em.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(em);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        const noteEntry = em.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertColor(color) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create span with color
+        const span = document.createElement('span');
+        if (color !== 'black') {
+            span.style.color = color;
+        }
+        const textNode = document.createTextNode('\u200B');
+        span.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(span);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        const noteEntry = span.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertHighlight() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create mark element (highlight)
+        const mark = document.createElement('mark');
+        const textNode = document.createTextNode('\u200B');
+        mark.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(mark);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        const noteEntry = mark.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertStrikethrough() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create strikethrough element
+        const s = document.createElement('s');
+        const textNode = document.createTextNode('\u200B');
+        s.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(s);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        const noteEntry = s.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertCode() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create code element
+        const code = document.createElement('code');
+        const textNode = document.createTextNode('\u200B');
+        code.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(code);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        const noteEntry = code.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    function insertNormalText() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create span that resets all formatting to default
+        const span = document.createElement('span');
+        span.style.color = 'rgb(55, 53, 47)';
+        span.style.backgroundColor = 'transparent';
+        span.style.fontWeight = 'normal';
+        span.style.fontStyle = 'normal';
+        span.style.textDecoration = 'none';
+        span.style.fontSize = 'inherit';
+        span.style.fontFamily = 'inherit';
+        
+        const textNode = document.createTextNode('\u200B');
+        span.appendChild(textNode);
+        
+        range.deleteContents();
+        range.insertNode(span);
+        
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        // Trigger input event for autosave
+        const noteEntry = span.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
     function insertList(ordered) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -76,6 +273,27 @@
                 { id: 'h2', label: 'Heading 2', action: () => insertHeading(2) },
                 { id: 'h3', label: 'Heading 3', action: () => insertHeading(3) }
             ]
+        },
+        {
+            id: 'format',
+            icon: 'fa-font',
+            label: 'Format text',
+            submenu: [
+                { id: 'red', icon: 'fa-palette', label: 'Red', action: () => insertColor('#e74c3c') },
+                { id: 'bold', icon: 'fa-bold', label: 'Bold', action: () => insertBold() },
+                { id: 'italic', icon: 'fa-italic', label: 'Italic', action: () => insertItalic() },
+                { id: 'highlight', icon: 'fa-fill-drip', label: 'Highlight', action: () => insertHighlight() },
+                { id: 'strikethrough', icon: 'fa-strikethrough', label: 'Strikethrough', action: () => insertStrikethrough() },
+                { id: 'code', icon: 'fa-code', label: 'Code', action: () => insertCode() }
+            ]
+        },
+        {
+            id: 'normal',
+            icon: 'fa-text-height',
+            label: 'Normal text',
+            action: function () {
+                insertNormalText();
+            }
         },
         {
             id: 'bullet-list',
@@ -158,10 +376,13 @@
 
     let slashMenuElement = null;
     let submenuElement = null;
+    let subSubmenuElement = null;
     let selectedIndex = 0;
     let selectedSubmenuIndex = 0;
+    let selectedSubSubmenuIndex = 0;
     let filteredCommands = [];
     let currentSubmenu = null;
+    let currentSubSubmenu = null;
     let slashTextNode = null;  // Le nœud texte contenant le slash
     let slashOffset = -1;      // La position du slash dans le nœud
     let filterText = '';
@@ -211,7 +432,7 @@
                 const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
                 return (
                     '<div class="slash-command-item' + selectedClass + '" data-command-id="' + cmd.id + '" data-has-submenu="' + hasSubmenu + '">' +
-                    '<i class="slash-command-icon ' + cmd.icon + '"></i>' +
+                    '<i class="slash-command-icon fa ' + cmd.icon + '"></i>' +
                     '<span class="slash-command-label">' + escapeHtml(cmd.label) + '</span>' +
                     submenuIndicator +
                     '</div>'
@@ -224,8 +445,29 @@
         return items
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
+                const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const submenuIndicator = hasSubmenu ? '<i class="fa fa-chevron-right slash-command-submenu-indicator"></i>' : '';
+                const iconHtml = item.icon ? '<i class="fa ' + item.icon + '" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' : '';
                 return (
-                    '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '">' +
+                    '<div class="slash-command-item' + selectedClass + '" data-submenu-id="' + item.id + '" data-has-sub-submenu="' + hasSubmenu + '">' +
+                    iconHtml +
+                    '<span class="slash-command-label">' + escapeHtml(item.label) + '</span>' +
+                    submenuIndicator +
+                    '</div>'
+                );
+            })
+            .join('');
+    }
+
+    function buildSubSubmenuHTML(items) {
+        return items
+            .map((item, idx) => {
+                const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
+                const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
+                const iconHtml = item.icon ? '<i class="' + item.icon + '"' + iconStyle + '></i>' : '';
+                return (
+                    '<div class="slash-command-item' + selectedClass + '" data-sub-submenu-id="' + item.id + '">' +
+                    iconHtml +
                     '<span class="slash-command-label">' + escapeHtml(item.label) + '</span>' +
                     '</div>'
                 );
@@ -256,12 +498,34 @@
         slashMenuElement.style.top = Math.max(padding, y) + 'px';
     }
 
+    function hideSubSubmenu() {
+        if (!subSubmenuElement) return;
+
+        try {
+            subSubmenuElement.removeEventListener('mousedown', handleMenuMouseDown);
+            subSubmenuElement.removeEventListener('click', handleSubSubmenuClick);
+        } catch (e) {}
+
+        try {
+            subSubmenuElement.remove();
+        } catch (e) {
+            if (subSubmenuElement.parentNode) subSubmenuElement.parentNode.removeChild(subSubmenuElement);
+        }
+
+        subSubmenuElement = null;
+        currentSubSubmenu = null;
+        selectedSubSubmenuIndex = 0;
+    }
+
     function hideSubmenu() {
         if (!submenuElement) return;
+
+        hideSubSubmenu();
 
         try {
             submenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             submenuElement.removeEventListener('click', handleSubmenuClick);
+            submenuElement.removeEventListener('mouseover', handleSubmenuMouseOver);
         } catch (e) {}
 
         try {
@@ -350,6 +614,50 @@
 
         submenuElement.addEventListener('mousedown', handleMenuMouseDown);
         submenuElement.addEventListener('click', handleSubmenuClick);
+        submenuElement.addEventListener('mouseover', handleSubmenuMouseOver);
+    }
+
+    function showSubSubmenu(item, parentItem) {
+        if (!item.submenu || !item.submenu.length) return;
+
+        hideSubSubmenu();
+
+        currentSubSubmenu = item.submenu;
+        selectedSubSubmenuIndex = 0;
+
+        subSubmenuElement = document.createElement('div');
+        subSubmenuElement.className = 'slash-command-menu slash-command-submenu';
+        subSubmenuElement.innerHTML = buildSubSubmenuHTML(item.submenu);
+
+        document.body.appendChild(subSubmenuElement);
+
+        // Position à droite de l'item parent
+        const parentRect = parentItem.getBoundingClientRect();
+        const submenuRect = subSubmenuElement.getBoundingClientRect();
+
+        const padding = 8;
+        let x = parentRect.right + 4;
+        let y = parentRect.top;
+
+        // Si déborde à droite, afficher à gauche
+        if (x + submenuRect.width > window.innerWidth - padding) {
+            x = parentRect.left - submenuRect.width - 4;
+        }
+
+        // Si déborde en bas
+        if (y + submenuRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
+        }
+
+        subSubmenuElement.style.left = Math.max(padding, x) + 'px';
+        subSubmenuElement.style.top = Math.max(padding, y) + 'px';
+
+        requestAnimationFrame(() => {
+            if (subSubmenuElement) subSubmenuElement.classList.add('show');
+        });
+
+        subSubmenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        subSubmenuElement.addEventListener('click', handleSubSubmenuClick);
     }
 
     function deleteSlashText() {
@@ -388,13 +696,28 @@
         }
     }
 
-    function executeCommand(commandId, isSubmenuItem) {
+    function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
 
-        if (isSubmenuItem && currentSubmenu) {
-            const item = currentSubmenu.find(i => i.id === commandId);
+        if (isSubSubmenuItem && currentSubSubmenu) {
+            const item = currentSubSubmenu.find(i => i.id === commandId);
             if (item && item.action) {
                 actionToExecute = item.action;
+            }
+        } else if (isSubmenuItem && currentSubmenu) {
+            const item = currentSubmenu.find(i => i.id === commandId);
+            if (item) {
+                // Si cet item a un sous-menu, l'afficher
+                if (item.submenu && item.submenu.length > 0) {
+                    const menuItem = submenuElement.querySelector('[data-submenu-id="' + commandId + '"]');
+                    if (menuItem) {
+                        showSubSubmenu(item, menuItem);
+                    }
+                    return;
+                }
+                if (item.action) {
+                    actionToExecute = item.action;
+                }
             }
         } else {
             const cmd = SLASH_COMMANDS.find(c => c.id === commandId);
@@ -456,7 +779,32 @@
         if (!item) return;
 
         const submenuId = item.getAttribute('data-submenu-id');
-        if (submenuId) executeCommand(submenuId, true);
+        if (submenuId) executeCommand(submenuId, true, false);
+    }
+
+    function handleSubSubmenuClick(e) {
+        const item = e.target.closest && e.target.closest('.slash-command-item');
+        if (!item) return;
+
+        const subSubmenuId = item.getAttribute('data-sub-submenu-id');
+        if (subSubmenuId) executeCommand(subSubmenuId, false, true);
+    }
+
+    function handleSubmenuMouseOver(e) {
+        const item = e.target.closest && e.target.closest('.slash-command-item');
+        if (!item) return;
+
+        const hasSubSubmenu = item.getAttribute('data-has-sub-submenu') === 'true';
+        const submenuId = item.getAttribute('data-submenu-id');
+        
+        if (hasSubSubmenu && submenuId && currentSubmenu) {
+            const subItem = currentSubmenu.find(i => i.id === submenuId);
+            if (subItem) {
+                showSubSubmenu(subItem, item);
+            }
+        } else {
+            hideSubSubmenu();
+        }
     }
 
     function handleMenuMouseOver(e) {
@@ -479,7 +827,63 @@
     function handleKeydown(e) {
         if (!slashMenuElement) return;
 
-        // Si un sous-menu est ouvert
+        // Si un sous-sous-menu est ouvert (niveau 3)
+        if (subSubmenuElement && currentSubSubmenu) {
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (currentSubSubmenu.length) {
+                        selectedSubSubmenuIndex = (selectedSubSubmenuIndex + 1) % currentSubSubmenu.length;
+                        subSubmenuElement.innerHTML = buildSubSubmenuHTML(currentSubSubmenu);
+                    }
+                    break;
+
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentSubSubmenu.length) {
+                        selectedSubSubmenuIndex = (selectedSubSubmenuIndex - 1 + currentSubSubmenu.length) % currentSubSubmenu.length;
+                        subSubmenuElement.innerHTML = buildSubSubmenuHTML(currentSubSubmenu);
+                    }
+                    break;
+
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    hideSubSubmenu();
+                    break;
+
+                case 'Enter':
+                    e.preventDefault();
+                    if (currentSubSubmenu.length) {
+                        executeCommand(currentSubSubmenu[selectedSubSubmenuIndex].id, false, true);
+                    }
+                    break;
+
+                case 'Escape':
+                    e.preventDefault();
+                    hideSubSubmenu();
+                    break;
+
+                default:
+                    if (e.key.length === 1 || e.key === 'Delete' || e.key === 'Backspace') {
+                        hideSubSubmenu();
+                        hideSubmenu();
+                        if (e.key === 'Backspace') {
+                            if (filterText.length === 0) {
+                                hideSlashMenu();
+                                savedNoteEntry = null;
+                            } else {
+                                setTimeout(updateFilterFromEditor, 0);
+                            }
+                        } else {
+                            setTimeout(updateFilterFromEditor, 0);
+                        }
+                    }
+                    break;
+            }
+            return;
+        }
+
+        // Si un sous-menu est ouvert (niveau 2)
         if (submenuElement && currentSubmenu) {
             switch (e.key) {
                 case 'ArrowDown':
@@ -503,10 +907,23 @@
                     hideSubmenu();
                     break;
 
+                case 'ArrowRight':
+                    e.preventDefault();
+                    if (currentSubmenu.length) {
+                        const item = currentSubmenu[selectedSubmenuIndex];
+                        if (item.submenu && item.submenu.length > 0) {
+                            const menuItem = submenuElement.querySelector('[data-submenu-id="' + item.id + '"]');
+                            if (menuItem) {
+                                showSubSubmenu(item, menuItem);
+                            }
+                        }
+                    }
+                    break;
+
                 case 'Enter':
                     e.preventDefault();
                     if (currentSubmenu.length) {
-                        executeCommand(currentSubmenu[selectedSubmenuIndex].id, true);
+                        executeCommand(currentSubmenu[selectedSubmenuIndex].id, true, false);
                     }
                     break;
 
@@ -704,8 +1121,9 @@
 
         const isClickInsideMenu = slashMenuElement.contains(e.target);
         const isClickInsideSubmenu = submenuElement && submenuElement.contains(e.target);
+        const isClickInsideSubSubmenu = subSubmenuElement && subSubmenuElement.contains(e.target);
         
-        if (!isClickInsideMenu && !isClickInsideSubmenu) {
+        if (!isClickInsideMenu && !isClickInsideSubmenu && !isClickInsideSubSubmenu) {
             hideSlashMenu();
             savedNoteEntry = null;
         }
