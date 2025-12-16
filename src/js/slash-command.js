@@ -10,45 +10,28 @@
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const container = range.commonAncestorContainer;
-        const element = container.nodeType === 3 ? container.parentElement : container;
         const tag = 'h' + level;
-
-        // Check if already in a heading
-        const existingHeading = element.closest('h1, h2, h3, h4, h5, h6');
-        if (existingHeading) {
-            // Already a heading, change the level
-            if (existingHeading.tagName.toLowerCase() !== tag) {
-                const newHeading = document.createElement(tag);
-                newHeading.innerHTML = existingHeading.innerHTML;
-                existingHeading.replaceWith(newHeading);
-                // Place cursor at end
-                range.selectNodeContents(newHeading);
-                range.collapse(false);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-            return;
-        }
 
         // Create new heading
         const heading = document.createElement(tag);
+        heading.appendChild(document.createElement('br'));
         
-        // If we have selected content, wrap it
-        if (!range.collapsed) {
-            heading.appendChild(range.extractContents());
-        } else {
-            heading.appendChild(document.createElement('br'));
-        }
-
+        // Insert at cursor position
+        range.deleteContents();
         range.insertNode(heading);
         
         // Place cursor inside heading
         const newRange = document.createRange();
-        newRange.selectNodeContents(heading);
-        newRange.collapse(false);
+        newRange.setStart(heading, 0);
+        newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
+        
+        // Trigger input event for autosave
+        const noteEntry = heading.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     }
 
     function insertList(ordered) {
@@ -56,52 +39,29 @@
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const container = range.commonAncestorContainer;
-        const element = container.nodeType === 3 ? container.parentElement : container;
-
-        // Check if already in a list
-        const existingList = element.closest('ul, ol');
-        if (existingList) {
-            // Toggle list type or unwrap if same type
-            const listTag = ordered ? 'ol' : 'ul';
-            if (existingList.tagName.toLowerCase() === listTag) {
-                // Same type, unwrap the list
-                const items = Array.from(existingList.querySelectorAll('li'));
-                items.forEach(li => {
-                    const p = document.createElement('p');
-                    p.innerHTML = li.innerHTML;
-                    existingList.parentNode.insertBefore(p, existingList);
-                });
-                existingList.remove();
-            } else {
-                // Different type, convert
-                const newList = document.createElement(listTag);
-                newList.innerHTML = existingList.innerHTML;
-                existingList.replaceWith(newList);
-            }
-            return;
-        }
 
         // Create new list
         const list = document.createElement(ordered ? 'ol' : 'ul');
         const li = document.createElement('li');
-        
-        // If we have selected content, wrap it
-        if (!range.collapsed) {
-            li.appendChild(range.extractContents());
-        } else {
-            li.appendChild(document.createElement('br'));
-        }
-
+        li.appendChild(document.createElement('br'));
         list.appendChild(li);
+        
+        // Insert at cursor position
+        range.deleteContents();
         range.insertNode(list);
         
         // Place cursor inside li
         const newRange = document.createRange();
-        newRange.selectNodeContents(li);
-        newRange.collapse(false);
+        newRange.setStart(li, 0);
+        newRange.collapse(true);
         selection.removeAllRanges();
         selection.addRange(newRange);
+        
+        // Trigger input event for autosave
+        const noteEntry = list.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     }
 
     // Slash command menu items - actions match toolbar exactly
@@ -114,10 +74,7 @@
             submenu: [
                 { id: 'h1', label: 'Heading 1', action: () => insertHeading(1) },
                 { id: 'h2', label: 'Heading 2', action: () => insertHeading(2) },
-                { id: 'h3', label: 'Heading 3', action: () => insertHeading(3) },
-                { id: 'h4', label: 'Heading 4', action: () => insertHeading(4) },
-                { id: 'h5', label: 'Heading 5', action: () => insertHeading(5) },
-                { id: 'h6', label: 'Heading 6', action: () => insertHeading(6) }
+                { id: 'h3', label: 'Heading 3', action: () => insertHeading(3) }
             ]
         },
         {
@@ -459,19 +416,19 @@
 
         if (!actionToExecute) return;
 
-        // Supprimer le slash et le texte de filtre AVANT de cacher le menu
+        // Supprimer le slash et le texte de filtre
         deleteSlashText();
         
         hideSlashMenu();
 
-        // Re-focus sur la note si nécessaire
+        // Re-focus sur la note
         if (savedNoteEntry) {
             try { 
-                savedNoteEntry.focus(); 
+                savedNoteEntry.focus();
             } catch (e) {}
         }
 
-        // Exécuter la commande
+        // Exécuter la commande immédiatement (la sélection est déjà restaurée par deleteSlashText)
         try {
             actionToExecute();
         } catch (e) {
