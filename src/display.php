@@ -95,13 +95,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 </div>
             </div>
 
-            <div class="settings-card" id="emoji-icons-card">
-                <div class="settings-card-icon"><i class="fa-grin"></i></div>
-                <div class="settings-card-content">
-                    <h3>Show Emoji Icons <span id="emoji-icons-status" class="setting-status disabled">disabled</span></h3>
-                </div>
-            </div>
-
             <div class="settings-card" id="show-created-card">
                 <div class="settings-card-icon"><i class="fa-calendar-alt"></i></div>
                 <div class="settings-card-content">
@@ -161,28 +154,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <script>
     // Toggle logic copied/adapted from settings.php
     (function(){
-        // Emoji
-        var cardEmoji = document.getElementById('emoji-icons-card');
-        var statusEmoji = document.getElementById('emoji-icons-status');
-        function refreshEmoji(){
-            var form = new FormData(); form.append('action','get'); form.append('key','emoji_icons_enabled');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusEmoji){ statusEmoji.textContent = enabled ? 'enabled' : 'disabled'; statusEmoji.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); }
-                if(enabled) document.body.classList.remove('emoji-hidden'); else document.body.classList.add('emoji-hidden');
-            }).catch(()=>{});
-        }
-        if(cardEmoji){ cardEmoji.addEventListener('click', function(){
-            var form = new FormData(); form.append('action','get'); form.append('key','emoji_icons_enabled');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                var toSet = currently ? '0' : '1';
-                var setForm = new FormData(); setForm.append('action','set'); setForm.append('key','emoji_icons_enabled'); setForm.append('value', toSet);
-                return fetch('api_settings.php',{method:'POST',body:setForm});
-            }).then(function(){ refreshEmoji(); if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); }).catch(e=>console.error(e));
-        }); }
-        refreshEmoji();
-
         // Show created
         var cardCreated = document.getElementById('show-created-card');
         var statusCreated = document.getElementById('show-created-status');
@@ -278,6 +249,8 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                 }).catch(function(){ alert('Error saving preference'); });
             });
         }
+
+
     });
     </script>
     <script>
@@ -386,6 +359,35 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             });
         }
 
+        // Load Toolbar Mode
+        function refreshToolbarModeBadge() {
+            getSetting('toolbar_mode', function(value) {
+                var badge = document.getElementById('toolbar-mode-badge');
+                if (badge) {
+                    var modeValue = value || 'both';
+                    var modeLabel = 'Toolbar icons + slash command menu';
+
+                    switch(modeValue) {
+                        case 'full':
+                            modeLabel = 'Toolbar only';
+                            break;
+                        case 'slash':
+                            modeLabel = 'Slash command only';
+                            break;
+                        case 'both':
+                            modeLabel = 'Toolbar icons + slash command menu';
+                            break;
+                        default:
+                            modeLabel = 'Toolbar icons + slash command menu';
+                            break;
+                    }
+
+                    badge.textContent = modeLabel;
+                    badge.className = 'setting-status enabled';
+                }
+            });
+        }
+
         // Load Timezone
         function refreshTimezoneBadge() {
             getSetting('timezone', function(value) {
@@ -406,12 +408,14 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshToolbarModeBadge();
         refreshTimezoneBadge();
         
         // Make refresh functions available globally
         window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
         window.refreshFontSizeBadge = refreshFontSizeBadge;
         window.refreshNoteSortBadge = refreshNoteSortBadge;
+        window.refreshToolbarModeBadge = refreshToolbarModeBadge;
         window.refreshTimezoneBadge = refreshTimezoneBadge;
     })();
     </script>

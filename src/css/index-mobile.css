@@ -163,3 +163,14 @@ body::-webkit-scrollbar {
     padding: 10px 0;
 }
 
+/* Hide Excalidraw button on mobile */
+.btn-excalidraw {
+    display: none !important;
+}
+
+/* Slash command menu on mobile */
+.slash-command-menu {
+    width: min(92vw, 360px);
+    max-height: none;
+}
+
