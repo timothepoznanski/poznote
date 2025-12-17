@@ -13,8 +13,7 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
     
-    // Note: Database schema migrations are handled by init-permissions.sh at container startup
-    // This ensures the migration happens before any PHP processes start, avoiding locking issues
+    // Note: Database schema is ensured at runtime by this file (CREATE TABLE IF NOT EXISTS, ALTER TABLE, indexes)
     
     // Register custom SQLite function to clean HTML content for search
     $con->sqliteCreateFunction('search_clean_entry', function($html) {
