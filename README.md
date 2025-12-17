@@ -7,7 +7,7 @@
 <h1 align="center">Poznote</h1>
 
 <p align="center">
-Poznote is a powerful, open-source note-taking and documentation platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
+Poznote is a lightweight yet powerful, open-source note-taking and documentation platform.<br>
 </p>
 
 <p align="center">
