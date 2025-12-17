@@ -11,7 +11,7 @@ Poznote is a powerful, open-source note-taking and documentation platform.<br>Ca
 </p>
 
 <p align="center">
-  <img src="github.png" alt="Poznote" width="70%">
+  <img src="github.png" alt="Poznote" width="100%">
 </p>
 
 ## Features
