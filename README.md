@@ -6,8 +6,12 @@
 
 <h1 align="center">Poznote</h1>
 
+<h3 align="center">
+Poznote is a lightweight open-source note-taking and documentation platform.<br><br>
+</h3>
+
 <p align="center">
-Poznote is a powerful, open-source note-taking and documentation platform.<br>Capture, organize, and access your notes while keeping full ownership of your data.
+  <img src="github.png" alt="Poznote" width="100%">
 </p>
 
 <p align="center">
@@ -58,9 +62,9 @@ Password: `poznote`
 
 ## Install
 
-Choose your preferred installation method below.
+> The official image on GHCR is multi-arch (linux/amd64, linux/arm64) and works on Windows/macOS via Docker Desktop (Linux containers).
 
-**Docker image architecture:** The official image on GHCR is multi-arch and supports `linux/amd64` and `linux/arm64` (Raspberry Pi / ARM-based home servers). Make sure your device runs a 64-bit OS for ARM (`arm64`).
+Choose your preferred installation method below:
 
 <a id="windows"></a>
 <details>
@@ -169,21 +173,48 @@ docker compose up -d
 <details>
 <summary><strong>🍎 macOS</strong></summary>
 
-#### Help Needed from the Community! 
+#### Step 1: Prerequisite
 
-Unfortunately, I don't have access to a Mac to test and document the installation procedure for macOS.
+Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
 
-**If you're a macOS user and successfully install Poznote, I would greatly appreciate your help!** Please consider:
+#### Step 2: Deploy Poznote
 
-- Testing the installation process on your Mac
-- Documenting any macOS-specific steps or requirements
-- Sharing your experience via [GitHub Issues](https://github.com/timothepoznanski/poznote/issues) or [Pull Request](https://github.com/timothepoznanski/poznote/pulls)
+Open Terminal and run the following commands.
 
-**Expected process** (untested):
-- Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
-- Follow similar steps to Linux using Terminal
+Create a new directory for Poznote:
+```bash
+mkdir poznote
+```
 
-Your contribution would help make Poznote accessible to the entire macOS community! 🙏
+Navigate to the Poznote directory:
+```bash
+cd poznote
+```
+
+Download the environment file with default credentials and port configuration:
+```bash
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+```
+
+Edit the `.env` file so that it fits your needs:
+```bash
+nano .env
+```
+
+Download the Docker Compose configuration file for Poznote service:
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+```
+
+Download the latest Poznote Docker image:
+```bash
+docker compose pull
+```
+
+Start Poznote container in detached mode (runs in background):
+```bash
+docker compose up -d
+```
 
 </details>
 
