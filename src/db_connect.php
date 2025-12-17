@@ -46,70 +46,19 @@ try {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         trash INTEGER DEFAULT 0,
         heading TEXT,
+        subheading TEXT,
+        location TEXT,
         entry TEXT,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated DATETIME,
         tags TEXT,
         folder TEXT DEFAULT "Default",
+        folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL,
         workspace TEXT DEFAULT "Poznote",
         favorite INTEGER DEFAULT 0,
         attachments TEXT,
         type TEXT DEFAULT "note"
     )');
-
-    // Add location column if it doesn't exist (for backward compatibility)
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN location TEXT');
-    } catch(PDOException $e) {
-        // Column might already exist, ignore error
-    }
-
-    // Add subheading column (renamed from location) for new code paths. Keep location for compatibility.
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN subheading TEXT');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-
-    // Add type column for note types (regular note, tasklist, etc.)
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN type TEXT DEFAULT "note"');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-
-    // Migrate existing values: if subheading empty and location present, copy location -> subheading
-    try {
-        $con->exec("UPDATE entries SET subheading = location WHERE (subheading IS NULL OR subheading = '') AND (location IS NOT NULL AND location <> '')");
-    } catch(PDOException $e) {
-        // ignore migration errors
-    }
-
-    // Add folder_id column to reference folders by ID instead of name
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-    
-    // Migrate existing folder names to folder_id
-    try {
-        // For each unique folder name in entries, find or create a corresponding folder ID
-        $con->exec("
-            UPDATE entries 
-            SET folder_id = (
-                SELECT f.id 
-                FROM folders f 
-                WHERE f.name = entries.folder 
-                AND (f.workspace = entries.workspace OR (f.workspace IS NULL AND entries.workspace = 'Poznote'))
-                LIMIT 1
-            )
-            WHERE folder_id IS NULL AND folder IS NOT NULL AND folder != ''
-        ");
-    } catch(PDOException $e) {
-        // ignore migration errors
-        error_log("folder_id migration warning: " . $e->getMessage());
-    }
 
     // Create folders table for empty folders (scoped by workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
