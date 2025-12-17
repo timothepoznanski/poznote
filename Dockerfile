@@ -40,6 +40,7 @@ COPY init.sh /usr/local/bin/init.sh
 # Finalize filesystem: init script, writable data dir, and build-time version marker
 RUN chmod +x /usr/local/bin/init.sh \
     && mkdir -p /var/www/html/data \
+    && mkdir -p /var/log/supervisor /var/run \
     && printf '%s\n' "<?php" "define('APP_VERSION', '${APP_VERSION}');" > /var/www/html/version.php \
     && chown -R www-data:www-data /var/www/html \
     && chmod 755 /var/www/html

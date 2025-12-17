@@ -460,24 +460,6 @@ function restoreDatabaseFromFile($sqlFile) {
         }
         chmod($dbPath, 0664);
         
-        // CRITICAL: Run database schema migration IMMEDIATELY after restore
-        // Use standalone migration to avoid db_connect.php circular dependency
-        require_once __DIR__ . '/db_migration.php';
-        $migrationResult = migrateDatabase($dbPath);
-        
-        if ($migrationResult['success'] && $migrationResult['migrated']) {
-            error_log('Database migration completed after restore: parent_id column added');
-        } else if (!$migrationResult['success']) {
-            error_log('Database migration warning after restore: ' . ($migrationResult['error'] ?? 'Unknown error'));
-            // Don't fail the restore, just log the warning
-        }
-        
-        // Remove migration marker so init-permissions.sh can also verify
-        $markerFile = dirname($dbPath) . '/.parent_id_migrated';
-        if (file_exists($markerFile)) {
-            unlink($markerFile);
-        }
-        
         return ['success' => true];
     } else {
         $errorMessage = implode("\n", $output);
@@ -485,8 +467,7 @@ function restoreDatabaseFromFile($sqlFile) {
     }
 }
 
-// Note: migrateDatabaseSchema has been moved to db_migration.php as migrateDatabase()
-// to avoid circular dependencies with db_connect.php
+// Note: schema migrations are handled at runtime by db_connect.php
 
 /**
  * Restore entries from directory

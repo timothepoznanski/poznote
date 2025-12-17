@@ -12,10 +12,7 @@ try {
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
-    
-    // Note: Database schema migrations are handled by init-permissions.sh at container startup
-    // This ensures the migration happens before any PHP processes start, avoiding locking issues
-    
+        
     // Register custom SQLite function to clean HTML content for search
     $con->sqliteCreateFunction('search_clean_entry', function($html) {
         if (empty($html)) {
@@ -47,70 +44,19 @@ try {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         trash INTEGER DEFAULT 0,
         heading TEXT,
+        subheading TEXT,
+        location TEXT,
         entry TEXT,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated DATETIME,
         tags TEXT,
         folder TEXT DEFAULT "Default",
+        folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL,
         workspace TEXT DEFAULT "Poznote",
         favorite INTEGER DEFAULT 0,
         attachments TEXT,
         type TEXT DEFAULT "note"
     )');
-
-    // Add location column if it doesn't exist (for backward compatibility)
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN location TEXT');
-    } catch(PDOException $e) {
-        // Column might already exist, ignore error
-    }
-
-    // Add subheading column (renamed from location) for new code paths. Keep location for compatibility.
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN subheading TEXT');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-
-    // Add type column for note types (regular note, tasklist, etc.)
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN type TEXT DEFAULT "note"');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-
-    // Migrate existing values: if subheading empty and location present, copy location -> subheading
-    try {
-        $con->exec("UPDATE entries SET subheading = location WHERE (subheading IS NULL OR subheading = '') AND (location IS NOT NULL AND location <> '')");
-    } catch(PDOException $e) {
-        // ignore migration errors
-    }
-
-    // Add folder_id column to reference folders by ID instead of name
-    try {
-        $con->exec('ALTER TABLE entries ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL');
-    } catch(PDOException $e) {
-        // ignore if already exists
-    }
-    
-    // Migrate existing folder names to folder_id
-    try {
-        // For each unique folder name in entries, find or create a corresponding folder ID
-        $con->exec("
-            UPDATE entries 
-            SET folder_id = (
-                SELECT f.id 
-                FROM folders f 
-                WHERE f.name = entries.folder 
-                AND (f.workspace = entries.workspace OR (f.workspace IS NULL AND entries.workspace = 'Poznote'))
-                LIMIT 1
-            )
-            WHERE folder_id IS NULL AND folder IS NOT NULL AND folder != ''
-        ");
-    } catch(PDOException $e) {
-        // ignore migration errors
-        error_log("folder_id migration warning: " . $e->getMessage());
-    }
 
     // Create folders table for empty folders (scoped by workspace)
     $con->exec('CREATE TABLE IF NOT EXISTS folders (
@@ -121,10 +67,6 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
-
-    // Drop old index if it exists
-    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace');
-    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace_parent');
 
     // Ensure unique folder names per workspace and parent
     // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
