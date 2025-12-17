@@ -11,21 +11,21 @@ Poznote is a powerful, open-source note-taking and documentation platform.<br>Ca
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/222627e6-2baf-497d-b763-1e055fec6d46" alt="HTML Notes" width="45%">
+  <img src="github.png" alt="HTML Notes" width="45%">
   &nbsp; &nbsp;
-  <img src="https://github.com/user-attachments/assets/867c6187-6fbb-42cb-b8c8-7105b66e5468" alt="Todo Lists" width="45%">
+  <img src="github.png" alt="Todo Lists" width="45%">
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/4a9fabfe-9956-4cef-a40d-01f7e78219b3" alt="Excalidraw" width="45%">
+  <img src="github.png" alt="Excalidraw" width="45%">
   &nbsp; &nbsp;
-  <img src="https://github.com/user-attachments/assets/760ea811-dd64-40ea-aa88-f21ab73acdb9" alt="Code Blocks" width="45%">
+  <img src="github.png" alt="Code Blocks" width="45%">
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/24889f4f-8517-4353-8d48-cdf4d6a094ce" alt="Markdown" width="45%">
+  <img src="github.png" alt="Markdown" width="45%">
   &nbsp; &nbsp;
-  <img src="https://github.com/user-attachments/assets/82de65ec-c702-4f07-a12a-a6b4455f2f22" alt="Mermaid" width="45%">
+  <img src="github.png" alt="Mermaid" width="45%">
 </p>
 
 ## Features
