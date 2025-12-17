@@ -12,9 +12,7 @@ try {
     $con = new PDO('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA foreign_keys = ON');
-    
-    // Note: Database schema is ensured at runtime by this file (CREATE TABLE IF NOT EXISTS, ALTER TABLE, indexes)
-    
+        
     // Register custom SQLite function to clean HTML content for search
     $con->sqliteCreateFunction('search_clean_entry', function($html) {
         if (empty($html)) {
@@ -69,10 +67,6 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
-
-    // Drop old index if it exists
-    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace');
-    $con->exec('DROP INDEX IF EXISTS idx_folders_name_workspace_parent');
 
     // Ensure unique folder names per workspace and parent
     // For subfolders (parent_id IS NOT NULL): same name allowed in different parents
