@@ -6,9 +6,9 @@
 
 <h1 align="center">Poznote</h1>
 
-<h3 align="center">
+<h4 align="center">
 Poznote is a lightweight yet powerful, open-source note-taking and documentation platform.<br>
-</h3>
+</h4>
 
 <p align="center">
   <img src="github.png" alt="Poznote" width="100%">
