@@ -155,21 +155,48 @@ docker compose up -d
 <details>
 <summary><strong>🍎 macOS</strong></summary>
 
-#### Help Needed from the Community! 
+#### Step 1: Prerequisite
 
-Unfortunately, I don't have access to a Mac to test and document the installation procedure for macOS.
+Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
 
-**If you're a macOS user and successfully install Poznote, I would greatly appreciate your help!** Please consider:
+#### Step 2: Deploy Poznote
 
-- Testing the installation process on your Mac
-- Documenting any macOS-specific steps or requirements
-- Sharing your experience via [GitHub Issues](https://github.com/timothepoznanski/poznote/issues) or [Pull Request](https://github.com/timothepoznanski/poznote/pulls)
+Open Terminal and run the following commands.
 
-**Expected process** (untested):
-- Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
-- Follow similar steps to Linux using Terminal
+Create a new directory for Poznote:
+```bash
+mkdir poznote
+```
 
-Your contribution would help make Poznote accessible to the entire macOS community! 🙏
+Navigate to the Poznote directory:
+```bash
+cd poznote
+```
+
+Download the environment file with default credentials and port configuration:
+```bash
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+```
+
+Edit the `.env` file so that it fits your needs:
+```bash
+nano .env
+```
+
+Download the Docker Compose configuration file for Poznote service:
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+```
+
+Download the latest Poznote Docker image:
+```bash
+docker compose pull
+```
+
+Start Poznote container in detached mode (runs in background):
+```bash
+docker compose up -d
+```
 
 </details>
 
