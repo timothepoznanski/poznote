@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        copy_src_files: false  # Don't copy src in image, use volume mount instead
     restart: always      
     environment:
       SQLITE_DATABASE: /var/www/html/data/database/poznote.db

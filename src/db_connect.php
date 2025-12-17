@@ -92,27 +92,6 @@ try {
     } catch(PDOException $e) {
         // ignore if already exists
     }
-
-    // Ensure all folder names from entries exist in folders table (one-time migration)
-    // DISABLED: This auto-creation causes duplicates with subfolder support
-    // Now that we use folder_id, we should not auto-create folders based on names
-    /*
-    try {
-        // Use INSERT OR IGNORE to create missing folders in one query per folder
-        $con->exec("
-            INSERT OR IGNORE INTO folders (name, workspace)
-            SELECT DISTINCT 
-                folder as name, 
-                COALESCE(workspace, 'Poznote') as workspace
-            FROM entries 
-            WHERE folder IS NOT NULL 
-            AND folder != '' 
-            AND folder != 'Favorites'
-        ");
-    } catch(PDOException $e) {
-        error_log("Folder creation warning: " . $e->getMessage());
-    }
-    */
     
     // Migrate existing folder names to folder_id
     try {
@@ -227,22 +206,14 @@ try {
             $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
             $folderId = $folderData ? (int)$folderData['id'] : null;
             
-            // Create welcome note content
-            $welcomeContent = <<<'HTML'
-<p>Poznote is your personal note-taking workspace designed for simplicity and efficiency.</p>
+            // Create welcome note content (kept in a separate template file)
+            $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
+            $welcomeContent = @file_get_contents($welcomeTemplateFile);
 
-<h3>🚀 Quick Start</h3>
-<ul>
-<li><strong>Create Notes</strong>: Click the "+ New" button to create HTML notes, Markdown notes, or Task Lists</li>
-<li><strong>Organize</strong>: Use folders and workspaces to keep your notes organized</li>
-<li><strong>Search</strong>: Find anything instantly with tags and full-text search</li>
-</ul>
-
-<h3>💡 Learn More</h3>
-<p>For pro tips, visit <strong>Settings</strong> and check the <strong>"Tips & Tricks"</strong> section.</p>
-
-<p><em>You can delete this welcome note whenever you want. Happy note-taking! ✨</em></p>
-HTML;
+            // Fallback in case the template file is missing
+            if ($welcomeContent === false || trim($welcomeContent) === '') {
+                $welcomeContent = '<p>Welcome to Poznote.</p>';
+            }
 
             // Insert the welcome note
             $now_utc = gmdate('Y-m-d H:i:s', time());
@@ -276,27 +247,5 @@ HTML;
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
-
-// Do NOT set timezone here - keep PHP in UTC so datetime('now') stores UTC timestamps
-// Timezone conversion should only happen when displaying dates to the user
-// The user's timezone preference is loaded from settings table when needed for display
-/*
-// Set timezone from database settings or use default
-try {
-    $timezone = DEFAULT_TIMEZONE;
-    if (isset($con)) {
-        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-        $stmt->execute(['timezone']);
-        $saved_timezone = $stmt->fetchColumn();
-        if ($saved_timezone && $saved_timezone !== '') {
-            $timezone = $saved_timezone;
-        }
-    }
-    date_default_timezone_set($timezone);
-} catch (Exception $e) {
-    // Ignore errors, use default timezone
-    date_default_timezone_set(DEFAULT_TIMEZONE);
-}
-*/
 
 ?>
