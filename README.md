@@ -46,7 +46,7 @@ Password: `poznote`
 
 Choose your preferred installation method below.
 
-**Docker image architecture:** The official image on GHCR is multi-arch and supports `linux/amd64` and `linux/arm64` (Raspberry Pi / ARM-based home servers). Make sure your device runs a 64-bit OS for ARM (`arm64`).
+> **Docker image architecture:** The official image on GHCR is multi-arch and supports `linux/amd64` and `linux/arm64`.
 
 <a id="windows"></a>
 <details>
