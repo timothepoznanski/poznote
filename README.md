@@ -6,6 +6,12 @@
 
 <h1 align="center">Poznote</h1>
 
+<p align="center">
+  <a href="https://ko-fi.com/timothepoznanski">
+    <img src="https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?logo=ko-fi&logoColor=white" alt="Buy me a Ko-fi">
+  </a>
+</p>
+
 <h3 align="center">
 Poznote is a lightweight open-source note-taking and documentation platform.<br><br>
 </h3>
