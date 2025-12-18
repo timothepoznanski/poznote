@@ -887,7 +887,7 @@ $body_classes = trim($extra_body_classes);
                     $editable = 'true';
                     $excalidraw_attr = '';
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
