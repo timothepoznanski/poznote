@@ -720,7 +720,7 @@ function initializeMarkdownNote(noteId) {
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
-    editorDiv.setAttribute('data-ph', 'Write your markdown here...');
+    editorDiv.setAttribute('data-ph', 'Write your markdown or use / to open commands menu here...');
     
     editorContainer.appendChild(editorDiv);
     
