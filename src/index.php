@@ -680,7 +680,8 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
 
                     // Mobile overflow menu button (shown only on mobile via CSS)
-                    echo '<button type="button" class="toolbar-btn mobile-more-btn" title="Menu" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
+                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="Menu" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
 
                     // Mobile dropdown menu (actions moved here on mobile)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="Menu actions">';

@@ -174,17 +174,18 @@ body::-webkit-scrollbar {
 }
 
 .note-edit-toolbar .mobile-home-btn,
-.note-edit-toolbar .btn-favorite,
-.note-edit-toolbar .btn-share,
-.note-edit-toolbar .btn-attachment,
-.note-edit-toolbar .markdown-view-mode-btn,
-.note-edit-toolbar .markdown-help-btn,
-.note-edit-toolbar .mobile-more-btn {
+.note-edit-toolbar .btn-favorite:not(.hide-on-selection),
+.note-edit-toolbar .btn-share:not(.hide-on-selection),
+.note-edit-toolbar .btn-attachment:not(.hide-on-selection),
+.note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
+.note-edit-toolbar .markdown-help-btn:not(.hide-on-selection),
+.note-edit-toolbar .mobile-more-btn:not(.hide-on-selection) {
     display: flex !important;
 }
 
-.mobile-more-btn {
-    display: flex !important;
+/* When text is selected inside a note, show formatting buttons on mobile too */
+.note-edit-toolbar .text-format-btn.show-on-selection {
+    display: inline-flex !important;
 }
 
 /* Mobile toolbar dropdown menu */
