@@ -837,7 +837,7 @@ If you:
 - Want access from anywhere (phone, tablet, computer) with almost zero setup
 - Have no experience with server management or don't want to manage server and security
 - Don't know how to use command line or don't want to use command line
-- Prefer one-click updates
+- Prefer one-click updates or automatic updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
 **👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
