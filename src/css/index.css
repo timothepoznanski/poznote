@@ -2981,8 +2981,10 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-trash-restore-alt::before { content: "\f2ea"; }
 .fa-grip-vertical::before { content: "\f58e"; }
 .fa-grip-lines-vertical::before { content: "\f7a5"; }
+.fa-times-circle::before { content: "\f057"; }
 
 .fa-question-circle,
+.fa-times-circle,
 .fa-eye,
 .fa-clock,
 .fa-caret-down,
@@ -3104,6 +3106,18 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-bold:hover {
   transform: scale(1.2);
   color: #007DB8 !important;
+}
+
+/* Red color for cancel icon in mobile slash menu */
+.slash-command-icon.fa-times-circle,
+.slash-command-item .slash-command-icon.fa-times-circle {
+  color: #ef4444 !important;
+  font-weight: 400;
+}
+
+/* Red text for Cancel item in slash menu */
+.slash-command-item[data-command-id="open-keyboard"] .slash-command-label {
+  color: #ef4444 !important;
 }
 
 /* General rule for any input that might have search type */

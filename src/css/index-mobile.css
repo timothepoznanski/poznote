@@ -211,7 +211,28 @@ body::-webkit-scrollbar {
 /* Slash command menu on mobile */
 .slash-command-menu {
     width: min(92vw, 360px);
-    max-height: none;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.slash-command-menu .slash-command-item {
+    padding: 12px 14px;
+    gap: 12px;
+}
+
+.slash-command-menu .slash-command-label {
+    font-size: 15px;
+}
+
+.slash-command-menu .slash-command-icon {
+    font-size: 16px;
+}
+
+/* Mobile action separator in slash menu */
+.slash-command-separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 6px 0;
 }
 
 /* Responsive tables in note view (mobile)

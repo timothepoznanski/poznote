@@ -77,6 +77,11 @@ body.dark-mode .slash-command-icon {
     color: #9ca3af;
 }
 
+html[data-theme='dark'] .slash-command-separator,
+body.dark-mode .slash-command-separator {
+    background: #404040;
+}
+
 /* ============================================
    Image Context Menu (Dark Mode)
    ============================================ */

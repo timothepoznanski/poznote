@@ -552,6 +552,7 @@
             id: 'emoji',
             icon: 'fa-smile',
             label: 'Emoji',
+            mobileHidden: true,
             action: function () {
                 if (typeof window.toggleEmojiPicker === 'function') {
                     window.toggleEmojiPicker();
@@ -585,6 +586,24 @@
             action: function () {
                 if (typeof window.openNoteReferenceModal === 'function') {
                     window.openNoteReferenceModal();
+                }
+            }
+        },
+        {
+            id: 'open-keyboard',
+            icon: 'fa-times-circle',
+            label: 'Cancel',
+            mobileOnly: true,
+            keepSlash: true,
+            action: function () {
+                // Save reference before clearing
+                const editable = savedEditableElement;
+                hideSlashMenu();
+                savedNoteEntry = null;
+                savedEditableElement = null;
+                // Focus after clearing to open keyboard
+                if (editable) {
+                    editable.focus();
                 }
             }
         }
@@ -629,6 +648,7 @@
             id: 'emoji',
             icon: 'fa-smile',
             label: 'Emoji',
+            mobileHidden: true,
             action: function () {
                 if (typeof window.toggleEmojiPicker === 'function') {
                     window.toggleEmojiPicker();
@@ -658,6 +678,24 @@
             action: function () {
                 if (typeof window.openNoteReferenceModal === 'function') {
                     window.openNoteReferenceModal();
+                }
+            }
+        },
+        {
+            id: 'open-keyboard',
+            icon: 'fa-times-circle',
+            label: 'Cancel',
+            mobileOnly: true,
+            keepSlash: true,
+            action: function () {
+                // Save reference before clearing
+                const editable = savedEditableElement;
+                hideSlashMenu();
+                savedNoteEntry = null;
+                savedEditableElement = null;
+                // Focus after clearing to open keyboard
+                if (editable) {
+                    editable.focus();
                 }
             }
         }
@@ -707,16 +745,17 @@
     }
 
     function getFilteredCommands(searchText) {
-        const isMobile = window.innerWidth < 800;
+        const isMobile = window.innerWidth < 768;
         const commands = (activeCommands || SLASH_COMMANDS).filter(cmd => {
             if (isMobile && cmd.mobileHidden) return false;
+            if (!isMobile && cmd.mobileOnly) return false;
             return true;
         });
 
         if (!searchText) return commands;
 
         const search = searchText.toLowerCase();
-        return commands.filter(cmd => cmd.label.toLowerCase().includes(search));
+        return commands.filter(cmd => cmd.label && cmd.label.toLowerCase().includes(search));
     }
 
     function buildMenuHTML() {
@@ -788,13 +827,28 @@
 
         const rect = range.getBoundingClientRect();
         const menuRect = slashMenuElement.getBoundingClientRect();
+        const isMobile = window.innerWidth < 768;
 
         const padding = 8;
-        const x = Math.min(rect.left, window.innerWidth - menuRect.width - padding);
-        const y = Math.min(rect.bottom + 6, window.innerHeight - menuRect.height - padding);
-
-        slashMenuElement.style.left = Math.max(padding, x) + 'px';
-        slashMenuElement.style.top = Math.max(padding, y) + 'px';
+        
+        if (isMobile) {
+            // On mobile, center horizontally and position near cursor
+            const menuWidth = menuRect.width || 360;
+            const x = Math.max(padding, (window.innerWidth - menuWidth) / 2);
+            // Position below cursor, but ensure it fits on screen
+            let y = rect.bottom + 10;
+            // If menu would go below viewport, position above cursor instead
+            if (y + menuRect.height > window.innerHeight - padding) {
+                y = Math.max(padding, rect.top - menuRect.height - 10);
+            }
+            slashMenuElement.style.left = x + 'px';
+            slashMenuElement.style.top = y + 'px';
+        } else {
+            const x = Math.min(rect.left, window.innerWidth - menuRect.width - padding);
+            const y = Math.min(rect.bottom + 6, window.innerHeight - menuRect.height - padding);
+            slashMenuElement.style.left = Math.max(padding, x) + 'px';
+            slashMenuElement.style.top = Math.max(padding, y) + 'px';
+        }
     }
 
     function hideSubSubmenu() {
@@ -1001,11 +1055,13 @@
 
     function executeCommand(commandId, isSubmenuItem, isSubSubmenuItem) {
         let actionToExecute = null;
+        let foundCmd = null;
 
         if (isSubSubmenuItem && currentSubSubmenu) {
             const item = currentSubSubmenu.find(i => i.id === commandId);
             if (item && item.action) {
                 actionToExecute = item.action;
+                foundCmd = item;
             }
         } else if (isSubmenuItem && currentSubmenu) {
             const item = currentSubmenu.find(i => i.id === commandId);
@@ -1020,6 +1076,7 @@
                 }
                 if (item.action) {
                     actionToExecute = item.action;
+                    foundCmd = item;
                 }
             }
         } else {
@@ -1037,13 +1094,17 @@
 
             if (cmd.action) {
                 actionToExecute = cmd.action;
+                foundCmd = cmd;
             }
         }
 
         if (!actionToExecute) return;
 
-        // Supprimer le slash et le texte de filtre
-        deleteSlashText();
+        // Supprimer le slash et le texte de filtre (sauf si keepSlash est true)
+        const shouldKeepSlash = foundCmd && foundCmd.keepSlash;
+        if (!shouldKeepSlash) {
+            deleteSlashText();
+        }
         
         hideSlashMenu();
 
@@ -1054,15 +1115,17 @@
             console.error('Error executing command:', e);
         }
 
-        // Re-focus after insertion to avoid caret jumping on focus.
-        if (savedEditableElement) {
-            try {
-                savedEditableElement.focus();
-            } catch (e) {}
-        } else if (savedNoteEntry) {
-            try {
-                savedNoteEntry.focus();
-            } catch (e) {}
+        // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
+        if (!shouldKeepSlash) {
+            if (savedEditableElement) {
+                try {
+                    savedEditableElement.focus();
+                } catch (e) {}
+            } else if (savedNoteEntry) {
+                try {
+                    savedNoteEntry.focus();
+                } catch (e) {}
+            }
         }
 
         savedNoteEntry = null;
@@ -1328,33 +1391,13 @@
     function updateFilterFromEditor() {
         if (!slashMenuElement || !slashTextNode || slashOffset < 0) return;
 
-        const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-
-        const currentRange = sel.getRangeAt(0);
-        const currentNode = currentRange.startContainer;
-        const currentOffset = currentRange.startOffset;
-
-        // Si on est toujours dans le même nœud texte
-        if (currentNode === slashTextNode && currentNode.nodeType === 3) {
-            // Le texte filtré est entre slashOffset+1 (après le slash) et currentOffset
-            const text = slashTextNode.textContent;
-            filterText = text.substring(slashOffset + 1, currentOffset);
-            selectedIndex = 0;
-            updateMenuContent();
-        } else {
-            // Si on a changé de nœud, fermer le menu
-            hideSlashMenu();
-            savedNoteEntry = null;
-        }
+        // Close the menu immediately when user types after / (no filtering)
+        hideSlashMenu();
+        savedNoteEntry = null;
+        return;
     }
 
     function showSlashMenu() {
-        // Disable slash menu on mobile (screen width < 768px)
-        if (window.innerWidth < 768) {
-            return;
-        }
-
         hideSlashMenu();
 
         const sel = window.getSelection();
@@ -1403,6 +1446,12 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        // On mobile, close keyboard when menu opens
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && savedEditableElement) {
+            savedEditableElement.blur();
+        }
 
         // Hide cursor until mouse moves
         document.body.style.cursor = 'none';
