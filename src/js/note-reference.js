@@ -246,8 +246,9 @@
         const isMarkdown = noteEntry && noteEntry.closest('.innernote[data-markdown-note="true"]');
         
         if (isMarkdown) {
-            // For markdown notes, insert [[Note Title]] syntax
-            const referenceText = `[[${heading}]]`;
+            // For markdown notes, insert standard Markdown link syntax
+            // The markdown renderer will recognize internal note URLs and turn them into in-app links.
+            const referenceText = `[${heading}](index.php?note=${noteId})`;
             document.execCommand('insertText', false, referenceText);
         } else {
             // For HTML notes, insert a clickable link
