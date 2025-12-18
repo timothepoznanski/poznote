@@ -13,7 +13,7 @@
 </div>
 
 <h3 align="center">
-Poznote is a lightweight open-source note-taking and documentation platform.<br><br>
+Poznote is a lightweight, open-source personal note-taking and documentation platform.<br><br>
 </h3>
 
 <p align="center">
