@@ -226,6 +226,50 @@ input[type="password"]::placeholder {
     font-size: 1rem;
 }
 
+/* ============================================
+   Dark Mode (Login Page)
+   ============================================ */
+
+html[data-theme='dark'] body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .login-title {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] label,
+html[data-theme='dark'] .remember-me-label {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] input[type="text"],
+html[data-theme='dark'] input[type="password"] {
+    background-color: #2a2a2a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] input[type="text"]:focus,
+html[data-theme='dark'] input[type="password"]:focus {
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
+}
+
+html[data-theme='dark'] input[type="text"]::placeholder,
+html[data-theme='dark'] input[type="password"]::placeholder {
+    color: #808080;
+}
+
+html[data-theme='dark'] .github-link a {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .github-link a:hover {
+    color: #4a9eff;
+}
+
 /* Responsive Design */
 @media (max-width: 800px) {
     body {

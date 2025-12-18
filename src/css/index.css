@@ -22,6 +22,11 @@
     display: none !important;
 }
 
+/* Mobile overflow menu button (only visible on mobile) */
+.mobile-more-btn {
+    display: none !important;
+}
+
 /* Hide emoji buttons when emoji icons are disabled */
 .emoji-hidden .btn-emoji {
     display: none !important;
@@ -2890,6 +2895,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-caret-down::before { content: "\f0d7"; }
 .fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
+.fa-ellipsis::before { content: "\f141"; }
 .fa-folder::before { content: "\f07b"; }
 .fa-folder-open::before { content: "\f07c"; }
 .fa-edit::before { content: "\f044"; }
@@ -2974,6 +2980,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-eye,
 .fa-clock,
 .fa-caret-down,
+.fa-ellipsis,
 .fa-mobile,
 .fa-border-outer,
 .fa-paint-brush,

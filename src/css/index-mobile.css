@@ -168,6 +168,46 @@ body::-webkit-scrollbar {
     display: none !important;
 }
 
+/* Mobile note toolbar: keep only primary icons + overflow menu */
+.note-edit-toolbar .toolbar-btn {
+    display: none !important;
+}
+
+.note-edit-toolbar .mobile-home-btn,
+.note-edit-toolbar .btn-favorite:not(.hide-on-selection),
+.note-edit-toolbar .btn-share:not(.hide-on-selection),
+.note-edit-toolbar .btn-attachment:not(.hide-on-selection),
+.note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
+.note-edit-toolbar .markdown-help-btn:not(.hide-on-selection),
+.note-edit-toolbar .mobile-more-btn:not(.hide-on-selection) {
+    display: flex !important;
+}
+
+/* When text is selected inside a note, show formatting buttons on mobile too */
+.note-edit-toolbar .text-format-btn.show-on-selection {
+    display: inline-flex !important;
+}
+
+/* Mobile toolbar dropdown menu */
+.note-edit-toolbar .mobile-toolbar-menu {
+    right: 0;
+    top: 100%;
+    z-index: 2000;
+}
+
+.note-edit-toolbar .mobile-toolbar-menu[hidden] {
+    display: none !important;
+}
+
+/* Ensure dropdown items look like menu buttons */
+.note-edit-toolbar .mobile-toolbar-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-style: normal;
+}
+
 /* Slash command menu on mobile */
 .slash-command-menu {
     width: min(92vw, 360px);

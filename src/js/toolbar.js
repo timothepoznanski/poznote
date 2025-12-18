@@ -688,6 +688,13 @@ function toggleEmojiPicker() {
     existingPicker.remove();
     return;
   }
+
+  // If the cursor is not in an editable note, warn immediately
+  // instead of waiting until an emoji is selected.
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
+    return;
+  }
   
   // Create emoji popup
   const picker = document.createElement('div');
@@ -1454,19 +1461,24 @@ if (!window._checklistSaveHookInstalled) {
  */
 function insertChecklist() {
   // Check if cursor is in editable note
-  const sel = window.getSelection();
-  if (!sel.rangeCount) {
-    window.showError('Please place your cursor in the note', 'Error');
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
     return;
   }
-  
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) {
+    window.showCursorWarning();
+    return;
+  }
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   const noteentry = container.closest && container.closest('.noteentry');
-  
+
   if (!noteentry) {
-    window.showError('Please place your cursor inside the note', 'Error');
+    window.showCursorWarning();
     return;
   }
   
@@ -1537,3 +1549,81 @@ function insertChecklist() {
 
 // Export function
 window.insertChecklist = insertChecklist;
+
+// Mobile toolbar overflow menu helpers
+// (Used by inline onclick handlers generated in index.php)
+(function () {
+  'use strict';
+
+  function getToolbarRoot(el) {
+    return el && el.closest ? el.closest('.note-edit-toolbar') : null;
+  }
+
+  function getMenu(toolbar) {
+    return toolbar ? toolbar.querySelector('.mobile-toolbar-menu') : null;
+  }
+
+  function closeMenu(toolbar) {
+    const menu = getMenu(toolbar);
+    if (!menu) return;
+    menu.hidden = true;
+    const toggleBtn = toolbar.querySelector('.mobile-more-btn');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  function openMenu(toolbar) {
+    const menu = getMenu(toolbar);
+    if (!menu) return;
+    menu.hidden = false;
+    const toggleBtn = toolbar.querySelector('.mobile-more-btn');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  window.toggleMobileToolbarMenu = function (btn) {
+    const toolbar = getToolbarRoot(btn);
+    if (!toolbar) return;
+
+    // Close any other open menus
+    document.querySelectorAll('.note-edit-toolbar .mobile-toolbar-menu:not([hidden])').forEach(m => {
+      const root = m.closest('.note-edit-toolbar');
+      if (root && root !== toolbar) closeMenu(root);
+    });
+
+    const menu = getMenu(toolbar);
+    if (!menu) return;
+    if (menu.hidden) openMenu(toolbar);
+    else closeMenu(toolbar);
+  };
+
+  window.triggerMobileToolbarAction = function (menuItemEl, targetSelector) {
+    const toolbar = getToolbarRoot(menuItemEl);
+    if (!toolbar) return;
+    closeMenu(toolbar);
+
+    const target = toolbar.querySelector(targetSelector);
+    if (target && typeof target.click === 'function') {
+      target.click();
+    }
+  };
+
+  // Global close on outside click + Escape
+  document.addEventListener('click', function (e) {
+    const openMenus = document.querySelectorAll('.note-edit-toolbar .mobile-toolbar-menu:not([hidden])');
+    if (!openMenus.length) return;
+    openMenus.forEach(menu => {
+      const toolbar = menu.closest('.note-edit-toolbar');
+      if (!toolbar) return;
+      const toggleBtn = toolbar.querySelector('.mobile-more-btn');
+      const clickedInside = menu.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
+      if (!clickedInside) closeMenu(toolbar);
+    });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.note-edit-toolbar .mobile-toolbar-menu:not([hidden])').forEach(menu => {
+      const toolbar = menu.closest('.note-edit-toolbar');
+      if (toolbar) closeMenu(toolbar);
+    });
+  });
+})();

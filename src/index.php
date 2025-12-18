@@ -678,6 +678,33 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+
+                    // Mobile overflow menu button (shown only on mobile via CSS)
+                    // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="Menu" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
+
+                    // Mobile dropdown menu (actions moved here on mobile)
+                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="Menu actions">';
+
+                    // For markdown notes, avoid showing rich-text insertion actions in the mobile menu
+                    if ($note_type !== 'markdown') {
+                        // Emoji is hidden for tasklist notes
+                        if ($note_type !== 'tasklist') {
+                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
+                        }
+
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-table\')"><i class="fa-table"></i> Table</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-checklist\')"><i class="fa-list-check"></i> Checklist</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-separator\')"><i class="fa-minus"></i> Separator</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-note-reference\')"><i class="fa-at"></i> Note link</button>';
+                    }
+
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> Duplicate</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> Move</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> Download</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> Delete</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> Information</button>';
+                    echo '</div>';
                         
                     // Generate dates safely for JavaScript with robust encoding
                     $created_raw = $row['created'] ?? '';
@@ -887,7 +914,7 @@ $body_classes = trim($extra_body_classes);
                     $editable = 'true';
                     $excalidraw_attr = '';
                     
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, paste images, or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
