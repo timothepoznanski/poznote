@@ -916,48 +916,139 @@ function setupNoteDragDropEvents() {
     var noteLinks = document.querySelectorAll('.links_arbo_left');
     
     noteLinks.forEach(function(link, index) {
-        // Force draggable attribute both ways
-        link.setAttribute('draggable', 'true');
-        link.draggable = true;
+        var isMobile = window.innerWidth <= 800;
+
+        // On mobile, disable HTML5 dragging on note links.
+        // Draggable anchors can intermittently swallow taps (treated as scroll/drag),
+        // which prevents the note open + horizontal scroll from triggering.
+        if (isMobile) {
+            link.removeAttribute('draggable');
+            link.draggable = false;
+        } else {
+            // Force draggable attribute both ways (desktop drag & drop)
+            link.setAttribute('draggable', 'true');
+            link.draggable = true;
+        }
         
         // Remove existing event listeners if any
         link.removeEventListener('dragstart', handleNoteDragStart);
         link.removeEventListener('dragend', handleNoteDragEnd);
         
-        // Add fresh event listeners
-        link.addEventListener('dragstart', handleNoteDragStart, false);
-        link.addEventListener('dragend', handleNoteDragEnd, false);
+        // Add fresh event listeners (desktop only)
+        if (!isMobile) {
+            link.addEventListener('dragstart', handleNoteDragStart, false);
+            link.addEventListener('dragend', handleNoteDragEnd, false);
+        }
         
-        // Handle click events separately
+        // Handle click/tap events separately
         var dataOnclick = link.getAttribute('data-onclick') || link.getAttribute('onclick');
         if (dataOnclick) {
             link.removeAttribute('onclick'); // Remove to avoid conflicts
+
+            // Centralized executor so we can call it from click and tap fallbacks
+            function executeDataOnclick(evt) {
+                try {
+                    // Ensure mobile scroll flag is set even if other listeners were canceled
+                    if (window.innerWidth <= 800 && typeof sessionStorage !== 'undefined') {
+                        sessionStorage.setItem('shouldScrollToNote', 'true');
+                    }
+
+                    var func = new Function('event', dataOnclick);
+                    func.call(link, evt);
+                } catch (err) {
+                    console.error('Error executing click handler:', err);
+                }
+            }
+
+            // Robust mobile tap fallback:
+            // Some mobile browsers cancel the click if a tiny scroll/drag is detected,
+            // so we also trigger on pointerup for touch pointers with a small movement threshold.
+            if (isMobile) {
+                var tapState = {
+                    active: false,
+                    startX: 0,
+                    startY: 0,
+                    startT: 0,
+                    moved: false,
+                    pointerId: null
+                };
+
+                // Avoid duplicate loads: if tap fallback fires, ignore the subsequent click.
+                function markTapFired() {
+                    link.dataset.tapFired = '1';
+                    setTimeout(function() {
+                        try { delete link.dataset.tapFired; } catch (e) { link.dataset.tapFired = ''; }
+                    }, 500);
+                }
+
+                link.addEventListener('pointerdown', function(e) {
+                    if (e.pointerType !== 'touch') return;
+                    tapState.active = true;
+                    tapState.moved = false;
+                    tapState.startX = e.clientX;
+                    tapState.startY = e.clientY;
+                    tapState.startT = Date.now();
+                    tapState.pointerId = e.pointerId;
+                }, { passive: true });
+
+                link.addEventListener('pointermove', function(e) {
+                    if (!tapState.active) return;
+                    if (e.pointerType !== 'touch') return;
+                    // If finger moved more than ~10px, treat it as scroll/drag
+                    var dx = Math.abs(e.clientX - tapState.startX);
+                    var dy = Math.abs(e.clientY - tapState.startY);
+                    if (dx > 10 || dy > 10) {
+                        tapState.moved = true;
+                    }
+                }, { passive: true });
+
+                link.addEventListener('pointerup', function(e) {
+                    if (!tapState.active) return;
+                    if (e.pointerType !== 'touch') return;
+                    if (tapState.pointerId !== null && e.pointerId !== tapState.pointerId) return;
+
+                    var dt = Date.now() - tapState.startT;
+                    var shouldTrigger = !tapState.moved && dt < 700; // ignore long-press / scroll
+
+                    tapState.active = false;
+                    tapState.pointerId = null;
+
+                    if (!shouldTrigger) return;
+
+                    // Prevent navigation and execute note load
+                    if (e.cancelable) e.preventDefault();
+                    e.stopPropagation();
+
+                    markTapFired();
+                    executeDataOnclick(e);
+                }, false);
+
+                link.addEventListener('pointercancel', function() {
+                    tapState.active = false;
+                    tapState.pointerId = null;
+                }, false);
+            }
             
             link.addEventListener('click', function(e) {
+                // If mobile tap fallback already handled this interaction, ignore click.
+                if (link.dataset && link.dataset.tapFired === '1') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
                 // Prevent default link behavior to avoid page reload
                 e.preventDefault();
                 e.stopPropagation();
                 
                 // On mobile, execute immediately without delay for better responsiveness
-                var isMobile = window.innerWidth <= 800;
-                
                 if (isMobile) {
                     // Execute immediately on mobile
-                    try {
-                        var func = new Function('event', dataOnclick);
-                        func.call(link, e);
-                    } catch (err) {
-                        console.error('Error executing click handler:', err);
-                    }
+                    executeDataOnclick(e);
                 } else {
                     // Small delay on desktop to distinguish from drag
                     setTimeout(function() {
-                        try {
-                            var func = new Function('event', dataOnclick);
-                            func.call(link, e);
-                        } catch (err) {
-                            console.error('Error executing click handler:', err);
-                        }
+                        executeDataOnclick(e);
                     }, 50);
                 }
                 
