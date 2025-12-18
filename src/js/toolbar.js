@@ -686,6 +686,7 @@ function toggleEmojiPicker() {
   
   if (existingPicker) {
     existingPicker.remove();
+    window.savedEmojiRange = null;
     return;
   }
 
@@ -694,6 +695,14 @@ function toggleEmojiPicker() {
   if (!isCursorInEditableNote()) {
     window.showCursorWarning();
     return;
+  }
+
+  // Save current selection so clicking inside the picker doesn't lose the caret.
+  try {
+    const sel = window.getSelection();
+    window.savedEmojiRange = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+  } catch (e) {
+    window.savedEmojiRange = null;
   }
   
   // Create emoji popup
@@ -720,20 +729,49 @@ function toggleEmojiPicker() {
   document.body.appendChild(picker);
   
   // Position picker with overflow management
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  const isMobile = isMobileDevice();
+
+  let anchorRect = null;
   const emojiBtn = document.querySelector('.btn-emoji');
   if (emojiBtn) {
     const rect = emojiBtn.getBoundingClientRect();
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const isMobile = isMobileDevice();
-    
-    // Picker dimensions according to screen
-    const pickerWidth = isMobile ? Math.min(300, windowWidth - 40) : 360;
-    const pickerHeight = isMobile ? 450 : 550;
-    
-    picker.style.position = 'fixed';
-    picker.style.width = pickerWidth + 'px';
-    picker.style.maxHeight = pickerHeight + 'px';
+    let isVisible = rect.width > 0 && rect.height > 0;
+    try {
+      const style = window.getComputedStyle(emojiBtn);
+      if (style && (style.display === 'none' || style.visibility === 'hidden')) isVisible = false;
+    } catch (e) {}
+
+    if (isVisible) {
+      anchorRect = rect;
+    }
+  }
+
+  if (!anchorRect) {
+    try {
+      const range = window.savedEmojiRange;
+      if (range) {
+        const rect = range.getBoundingClientRect();
+        if (rect && (rect.top || rect.left || rect.bottom || rect.right)) {
+          anchorRect = rect;
+        } else {
+          const rects = range.getClientRects();
+          if (rects && rects.length) anchorRect = rects[0];
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Picker dimensions according to screen
+  const pickerWidth = isMobile ? Math.min(300, windowWidth - 40) : 360;
+  const pickerHeight = isMobile ? 450 : 550;
+  picker.style.position = 'fixed';
+  picker.style.width = pickerWidth + 'px';
+  picker.style.maxHeight = pickerHeight + 'px';
+
+  if (anchorRect) {
+    const rect = anchorRect;
     
     // Calculate vertical position
     let top = rect.bottom + 10;
@@ -752,7 +790,7 @@ function toggleEmojiPicker() {
       // On mobile, center in screen
       left = (windowWidth - pickerWidth) / 2;
     } else {
-      // On desktop, center on button
+      // On desktop, center on anchor
       left = rect.left - (pickerWidth / 2) + (rect.width / 2);
       if (left + pickerWidth > windowWidth - 20) {
         left = windowWidth - pickerWidth - 20;
@@ -764,6 +802,10 @@ function toggleEmojiPicker() {
     
     picker.style.top = top + 'px';
     picker.style.left = left + 'px';
+  } else {
+    // Fallback: center on screen
+    picker.style.top = Math.max(20, (windowHeight - pickerHeight) / 2) + 'px';
+    picker.style.left = Math.max(20, (windowWidth - pickerWidth) / 2) + 'px';
   }
   
   // Handle emoji clicks
@@ -780,6 +822,7 @@ function toggleEmojiPicker() {
     document.addEventListener('click', function closeEmojiPicker(e) {
       if (!picker.contains(e.target) && !e.target.closest('.btn-emoji')) {
         picker.remove();
+        window.savedEmojiRange = null;
         document.removeEventListener('click', closeEmojiPicker);
       }
     });
@@ -787,13 +830,39 @@ function toggleEmojiPicker() {
 }
 
 function insertEmoji(emoji) {
+  // Restore selection saved when opening the picker.
+  const sel = window.getSelection();
+  try {
+    if (window.savedEmojiRange) {
+      sel.removeAllRanges();
+      sel.addRange(window.savedEmojiRange);
+    }
+  } catch (e) {}
+
+  // Ensure focus is back on the editor before inserting.
+  try {
+    if (sel && sel.rangeCount) {
+      const rangeForFocus = sel.getRangeAt(0);
+      let focusContainer = rangeForFocus.commonAncestorContainer;
+      if (focusContainer && focusContainer.nodeType === 3) focusContainer = focusContainer.parentNode;
+      const focusTarget = (focusContainer && focusContainer.closest && (focusContainer.closest('.markdown-editor') || focusContainer.closest('[contenteditable="true"]')));
+      if (focusTarget && typeof focusTarget.focus === 'function') {
+        try {
+          focusTarget.focus({ preventScroll: true });
+        } catch (e) {
+          focusTarget.focus();
+        }
+      }
+    }
+  } catch (e) {}
+
   // Vérifier si le curseur est dans une zone éditable
   if (!isCursorInEditableNote()) {
     window.showCursorWarning();
+    window.savedEmojiRange = null;
     return;
   }
   
-  const sel = window.getSelection();
   if (!sel.rangeCount) return;
   
   const range = sel.getRangeAt(0);
@@ -805,6 +874,8 @@ function insertEmoji(emoji) {
   
   // Insert emoji
   document.execCommand('insertText', false, emoji);
+
+  window.savedEmojiRange = null;
   
   // Trigger input event
   if (noteentry) {
@@ -1555,6 +1626,35 @@ window.insertChecklist = insertChecklist;
 (function () {
   'use strict';
 
+  let savedMobileToolbarRange = null;
+
+  function captureCurrentSelectionRange(toolbar) {
+    try {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount) {
+        const r = sel.getRangeAt(0);
+        let container = r.commonAncestorContainer;
+        if (container && container.nodeType === 3) container = container.parentNode;
+
+        // Only capture if the selection is inside the same note card.
+        if (toolbar) {
+          const noteCard = toolbar.closest ? toolbar.closest('.notecard') : null;
+          const selectionCard = container && container.closest ? container.closest('.notecard') : null;
+          if (noteCard && selectionCard && noteCard !== selectionCard) {
+            savedMobileToolbarRange = null;
+            return;
+          }
+        }
+
+        savedMobileToolbarRange = r.cloneRange();
+      } else {
+        savedMobileToolbarRange = null;
+      }
+    } catch (e) {
+      savedMobileToolbarRange = null;
+    }
+  }
+
   function getToolbarRoot(el) {
     return el && el.closest ? el.closest('.note-edit-toolbar') : null;
   }
@@ -1591,14 +1691,42 @@ window.insertChecklist = insertChecklist;
 
     const menu = getMenu(toolbar);
     if (!menu) return;
-    if (menu.hidden) openMenu(toolbar);
-    else closeMenu(toolbar);
+    if (menu.hidden) {
+      // Capture selection before the menu steals focus.
+      captureCurrentSelectionRange(toolbar);
+      openMenu(toolbar);
+    } else {
+      closeMenu(toolbar);
+      savedMobileToolbarRange = null;
+    }
   };
 
   window.triggerMobileToolbarAction = function (menuItemEl, targetSelector) {
     const toolbar = getToolbarRoot(menuItemEl);
     if (!toolbar) return;
+
+    // Preserve selection before closing the menu.
+    const rangeToRestore = savedMobileToolbarRange;
     closeMenu(toolbar);
+    savedMobileToolbarRange = null;
+
+    // For emoji insertion, restore caret so toggleEmojiPicker/isCursorInEditableNote succeeds.
+    if (targetSelector === '.btn-emoji' && rangeToRestore) {
+      try {
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(rangeToRestore);
+        }
+
+        // Also keep a copy for the picker insertion pipeline.
+        try {
+          window.savedEmojiRange = rangeToRestore.cloneRange();
+        } catch (e) {
+          window.savedEmojiRange = rangeToRestore;
+        }
+      } catch (e) {}
+    }
 
     const target = toolbar.querySelector(targetSelector);
     if (target && typeof target.click === 'function') {
@@ -1615,7 +1743,10 @@ window.insertChecklist = insertChecklist;
       if (!toolbar) return;
       const toggleBtn = toolbar.querySelector('.mobile-more-btn');
       const clickedInside = menu.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target));
-      if (!clickedInside) closeMenu(toolbar);
+      if (!clickedInside) {
+        closeMenu(toolbar);
+        savedMobileToolbarRange = null;
+      }
     });
   });
 
@@ -1623,7 +1754,10 @@ window.insertChecklist = insertChecklist;
     if (e.key !== 'Escape') return;
     document.querySelectorAll('.note-edit-toolbar .mobile-toolbar-menu:not([hidden])').forEach(menu => {
       const toolbar = menu.closest('.note-edit-toolbar');
-      if (toolbar) closeMenu(toolbar);
+      if (toolbar) {
+        closeMenu(toolbar);
+        savedMobileToolbarRange = null;
+      }
     });
   });
 })();

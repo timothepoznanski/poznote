@@ -633,6 +633,16 @@
             ]
         },
         {
+            id: 'emoji',
+            icon: 'fa-smile',
+            label: 'Emoji',
+            action: function () {
+                if (typeof window.toggleEmojiPicker === 'function') {
+                    window.toggleEmojiPicker();
+                }
+            }
+        },
+        {
             id: 'table',
             icon: 'fa-table',
             label: 'Table',
