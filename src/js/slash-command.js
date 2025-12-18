@@ -1,8 +1,205 @@
 // Slash Command Menu for Poznote
-// Shows a command menu when user types "/" in an HTML note
+// Shows a command menu when user types "/" in an HTML note or in a Markdown note (edit mode)
 
 (function () {
     'use strict';
+
+    // ----------------------------
+    // Markdown insertion helpers
+    // ----------------------------
+    function getCurrentMarkdownEditorFromSelection() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return null;
+
+        let container = selection.getRangeAt(0).commonAncestorContainer;
+        if (container && container.nodeType === 3) container = container.parentNode;
+        if (!container || !container.closest) return null;
+
+        const editor = container.closest('.markdown-editor');
+        if (!editor) return null;
+
+        // Ensure editor is actually in edit mode (visible)
+        try {
+            if (window.getComputedStyle(editor).display === 'none') return null;
+        } catch (e) {}
+
+        return editor;
+    }
+
+    function getSelectionOffsetsWithin(rootEl) {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return null;
+
+        const range = selection.getRangeAt(0);
+        if (!rootEl || !rootEl.contains(range.startContainer) || !rootEl.contains(range.endContainer)) {
+            return null;
+        }
+
+        const preStart = range.cloneRange();
+        preStart.selectNodeContents(rootEl);
+        preStart.setEnd(range.startContainer, range.startOffset);
+        const start = preStart.toString().length;
+
+        const preEnd = range.cloneRange();
+        preEnd.selectNodeContents(rootEl);
+        preEnd.setEnd(range.endContainer, range.endOffset);
+        const end = preEnd.toString().length;
+
+        return { start: Math.min(start, end), end: Math.max(start, end) };
+    }
+
+    function getMarkdownEditorText(rootEl) {
+        if (!rootEl) return '';
+
+        // Prefer the same normalization as the markdown editor uses (handles DIV/BR quirks)
+        try {
+            if (typeof window.normalizeContentEditableText === 'function') {
+                return window.normalizeContentEditableText(rootEl);
+            }
+        } catch (e) {}
+
+        // Fallback: innerText preserves visual newlines better than textContent
+        return rootEl.innerText || rootEl.textContent || '';
+    }
+
+    function findTextNodeAtOffset(rootEl, offset) {
+        const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
+        let node = walker.nextNode();
+        let remaining = offset;
+
+        while (node) {
+            const len = node.nodeValue ? node.nodeValue.length : 0;
+            if (remaining <= len) {
+                return { node, offset: remaining };
+            }
+            remaining -= len;
+            node = walker.nextNode();
+        }
+
+        // Fallback: put caret at end
+        return { node: rootEl, offset: rootEl.childNodes ? rootEl.childNodes.length : 0 };
+    }
+
+    function setSelectionByOffsets(rootEl, startOffset, endOffset) {
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        const startPos = findTextNodeAtOffset(rootEl, Math.max(0, startOffset));
+        const endPos = findTextNodeAtOffset(rootEl, Math.max(0, endOffset));
+
+        const range = document.createRange();
+        try {
+            range.setStart(startPos.node, startPos.offset);
+            range.setEnd(endPos.node, endPos.offset);
+        } catch (e) {
+            // Last resort: collapse at end
+            try {
+                range.selectNodeContents(rootEl);
+                range.collapse(false);
+            } catch (e2) {}
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function replaceMarkdownRange(rootEl, start, end, replacement, selectStartAfter, selectEndAfter) {
+        if (!rootEl) return;
+
+        const fullText = getMarkdownEditorText(rootEl);
+        const safeStart = Math.max(0, Math.min(start, fullText.length));
+        const safeEnd = Math.max(safeStart, Math.min(end, fullText.length));
+
+        const newText = fullText.slice(0, safeStart) + replacement + fullText.slice(safeEnd);
+        // Force a plain-text representation with explicit \n so offsets stay stable.
+        rootEl.textContent = newText;
+
+        const newSelStart = typeof selectStartAfter === 'number' ? selectStartAfter : (safeStart + replacement.length);
+        const newSelEnd = typeof selectEndAfter === 'number' ? selectEndAfter : newSelStart;
+        setSelectionByOffsets(rootEl, newSelStart, newSelEnd);
+
+        try {
+            rootEl.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (e) {}
+    }
+
+    function insertMarkdownAtCursor(text, caretDeltaFromInsertEnd) {
+        // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
+        const editor = getCurrentMarkdownEditorFromSelection();
+        if (!editor) return;
+
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        if (!editor.contains(range.startContainer)) return;
+
+        const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
+        const caretPos = Math.max(0, Math.min(text.length, text.length + caretDelta));
+
+        range.deleteContents();
+        const node = document.createTextNode(text);
+        range.insertNode(node);
+
+        const newRange = document.createRange();
+        newRange.setStart(node, caretPos);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        try {
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (e) {}
+    }
+
+    function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
+        const editor = getCurrentMarkdownEditorFromSelection();
+        if (!editor) return;
+
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        if (!editor.contains(range.startContainer) || !editor.contains(range.endContainer)) return;
+
+        const selectedText = range.toString();
+
+        if (!selectedText) {
+            const replacement = prefix + suffix;
+            const node = document.createTextNode(replacement);
+            range.deleteContents();
+            range.insertNode(node);
+
+            const caretInside = typeof emptyInnerCaretOffset === 'number' ? emptyInnerCaretOffset : prefix.length;
+            const newRange = document.createRange();
+            newRange.setStart(node, Math.max(0, Math.min(replacement.length, caretInside)));
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+        } else {
+            const replacement = prefix + selectedText + suffix;
+            const node = document.createTextNode(replacement);
+            range.deleteContents();
+            range.insertNode(node);
+
+            // Keep the original text selected (inside the wrapper)
+            const newRange = document.createRange();
+            newRange.setStart(node, prefix.length);
+            newRange.setEnd(node, prefix.length + selectedText.length);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+        }
+
+        try {
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (e) {}
+    }
+
+    function insertMarkdownPrefixAtLineStart(prefix) {
+        // For Markdown, the slash command is typically typed at the insertion point.
+        // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
+        insertMarkdownAtCursor(prefix, 0);
+    }
 
     // Helper functions to replace deprecated execCommand
     function insertHeading(level) {
@@ -291,6 +488,14 @@
     // Order matches toolbar
     const SLASH_COMMANDS = [
         {
+            id: 'normal',
+            icon: 'fa-align-left',
+            label: 'Back to normal text',
+            action: function () {
+                insertNormalText();
+            }
+        },
+        {
             id: 'title',
             icon: 'fa-text-height',
             label: 'Title',
@@ -314,28 +519,23 @@
             ]
         },
         {
-            id: 'normal',
-            icon: 'fa-align-left',
-            label: 'Normal text',
-            action: function () {
-                insertNormalText();
-            }
-        },
-        {
-            id: 'bullet-list',
+            id: 'list',
             icon: 'fa-list-ul',
-            label: 'Bullet list',
-            action: function () {
-                insertList(false);
-            }
-        },
-        {
-            id: 'numbered-list',
-            icon: 'fa-list-ol',
-            label: 'Numbered list',
-            action: function () {
-                insertList(true);
-            }
+            label: 'List',
+            submenu: [
+                { id: 'bullets', icon: 'fa-list-ul', label: 'Bullet list', action: () => insertList(false) },
+                { id: 'numbers', icon: 'fa-list-ol', label: 'Numbered list', action: () => insertList(true) },
+                {
+                    id: 'checklist',
+                    icon: 'fa-list-check',
+                    label: 'Checklist',
+                    action: () => {
+                        if (typeof window.insertChecklist === 'function') {
+                            window.insertChecklist();
+                        }
+                    }
+                }
+            ]
         },
         {
             id: 'excalidraw',
@@ -369,16 +569,6 @@
             }
         },
         {
-            id: 'checklist',
-            icon: 'fa-list-check',
-            label: 'Checklist',
-            action: function () {
-                if (typeof window.insertChecklist === 'function') {
-                    window.insertChecklist();
-                }
-            }
-        },
-        {
             id: 'separator',
             icon: 'fa-minus',
             label: 'Separator',
@@ -386,6 +576,79 @@
                 if (typeof window.insertSeparator === 'function') {
                     window.insertSeparator();
                 }
+            }
+        },
+        {
+            id: 'note-reference',
+            icon: 'fa-at',
+            label: 'Link to note',
+            action: function () {
+                if (typeof window.openNoteReferenceModal === 'function') {
+                    window.openNoteReferenceModal();
+                }
+            }
+        }
+    ];
+
+    // Slash command menu items for Markdown notes (edit mode)
+    // Keep labels close to the HTML menu, but insert Markdown syntax.
+    const MARKDOWN_SLASH_COMMANDS = [
+        {
+            id: 'title',
+            icon: 'fa-text-height',
+            label: 'Title',
+            submenu: [
+                { id: 'h1', label: 'Heading 1', action: () => insertMarkdownPrefixAtLineStart('# ') },
+                { id: 'h2', label: 'Heading 2', action: () => insertMarkdownPrefixAtLineStart('## ') },
+                { id: 'h3', label: 'Heading 3', action: () => insertMarkdownPrefixAtLineStart('### ') }
+            ]
+        },
+        {
+            id: 'format',
+            icon: 'fa-bold',
+            label: 'Format text',
+            submenu: [
+                { id: 'bold', icon: 'fa-bold', label: 'Bold', action: () => wrapMarkdownSelection('**', '**', 2) },
+                { id: 'italic', icon: 'fa-italic', label: 'Italic', action: () => wrapMarkdownSelection('*', '*', 1) },
+                { id: 'strikethrough', icon: 'fa-strikethrough', label: 'Strikethrough', action: () => wrapMarkdownSelection('~~', '~~', 2) },
+                { id: 'inline-code', icon: 'fa-terminal', label: 'Inline code', action: () => wrapMarkdownSelection('`', '`', 1) },
+                { id: 'code-block', icon: 'fa-code', label: 'Code block', action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
+            ]
+        },
+        {
+            id: 'list',
+            icon: 'fa-list-ul',
+            label: 'List',
+            submenu: [
+                { id: 'bullets', icon: 'fa-list-ul', label: 'Bullet list', action: () => insertMarkdownPrefixAtLineStart('- ') },
+                { id: 'numbers', icon: 'fa-list-ol', label: 'Numbered list', action: () => insertMarkdownPrefixAtLineStart('1. ') },
+                { id: 'checklist', icon: 'fa-list-check', label: 'Checklist', action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+            ]
+        },
+        {
+            id: 'emoji',
+            icon: 'fa-smile',
+            label: 'Emoji',
+            action: function () {
+                if (typeof window.toggleEmojiPicker === 'function') {
+                    window.toggleEmojiPicker();
+                }
+            }
+        },
+        {
+            id: 'table',
+            icon: 'fa-table',
+            label: 'Table',
+            action: function () {
+                insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+            }
+        },
+        {
+            id: 'separator',
+            icon: 'fa-minus',
+            label: 'Separator',
+            action: function () {
+                insertMarkdownAtCursor('\n---\n', 0);
             }
         },
         {
@@ -413,8 +676,10 @@
     let slashOffset = -1;      // La position du slash dans le nœud
     let filterText = '';
     let savedNoteEntry = null;
+    let savedEditableElement = null;
+    let activeCommands = SLASH_COMMANDS;
 
-    function isInHtmlNote() {
+    function getEditorContext() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return false;
 
@@ -425,17 +690,25 @@
         const editableElement = container.closest && container.closest('[contenteditable="true"]');
         const noteEntry = container.closest && container.closest('.noteentry');
 
-        if (!editableElement || !noteEntry) return false;
+        if (!editableElement || !noteEntry) return null;
 
         const noteType = noteEntry.getAttribute('data-note-type');
-        if (noteType === 'tasklist' || noteType === 'markdown') return false;
+        if (noteType === 'tasklist') return null;
 
-        return true;
+        if (noteType === 'markdown') {
+            // Slash menu only in Markdown edit mode (inside .markdown-editor)
+            if (!editableElement.classList || !editableElement.classList.contains('markdown-editor')) return null;
+            try {
+                if (window.getComputedStyle(editableElement).display === 'none') return null;
+            } catch (e) {}
+        }
+
+        return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 800;
-        const commands = SLASH_COMMANDS.filter(cmd => {
+        const commands = (activeCommands || SLASH_COMMANDS).filter(cmd => {
             if (isMobile && cmd.mobileHidden) return false;
             return true;
         });
@@ -716,8 +989,9 @@
                 sel.removeAllRanges();
                 sel.addRange(newRange);
 
-                if (savedNoteEntry) {
-                    savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                const target = savedEditableElement || savedNoteEntry;
+                if (target) {
+                    target.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             }
         } catch (e) {
@@ -749,7 +1023,7 @@
                 }
             }
         } else {
-            const cmd = SLASH_COMMANDS.find(c => c.id === commandId);
+            const cmd = (activeCommands || SLASH_COMMANDS).find(c => c.id === commandId);
             if (!cmd) return;
 
             // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
@@ -773,13 +1047,6 @@
         
         hideSlashMenu();
 
-        // Re-focus sur la note
-        if (savedNoteEntry) {
-            try { 
-                savedNoteEntry.focus();
-            } catch (e) {}
-        }
-
         // Exécuter la commande immédiatement (la sélection est déjà restaurée par deleteSlashText)
         try {
             actionToExecute();
@@ -787,7 +1054,19 @@
             console.error('Error executing command:', e);
         }
 
+        // Re-focus after insertion to avoid caret jumping on focus.
+        if (savedEditableElement) {
+            try {
+                savedEditableElement.focus();
+            } catch (e) {}
+        } else if (savedNoteEntry) {
+            try {
+                savedNoteEntry.focus();
+            } catch (e) {}
+        }
+
         savedNoteEntry = null;
+        savedEditableElement = null;
     }
 
     function handleMenuMouseDown(e) {
@@ -1093,6 +1372,18 @@
 
         let containerElement = container.parentNode;
         savedNoteEntry = containerElement.closest && containerElement.closest('.noteentry');
+        savedEditableElement = containerElement.closest && containerElement.closest('[contenteditable="true"]');
+
+        const ctx = getEditorContext();
+        if (!ctx) {
+            savedNoteEntry = null;
+            savedEditableElement = null;
+            slashTextNode = null;
+            slashOffset = -1;
+            return;
+        }
+
+        activeCommands = ctx.noteType === 'markdown' ? MARKDOWN_SLASH_COMMANDS : SLASH_COMMANDS;
 
         filterText = '';
         selectedIndex = 0;
@@ -1124,8 +1415,13 @@
 
     function handleInput(e) {
         const target = e.target;
-        if (!target || !target.classList || !target.classList.contains('noteentry')) return;
-        if (!isInHtmlNote()) return;
+        if (!target) return;
+
+        const noteEntry = target.closest && target.closest('.noteentry');
+        if (!noteEntry) return;
+
+        const ctx = getEditorContext();
+        if (!ctx) return;
 
         const sel = window.getSelection();
         if (!sel.rangeCount) return;

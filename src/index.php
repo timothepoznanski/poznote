@@ -686,13 +686,13 @@ $body_classes = trim($extra_body_classes);
                     // Mobile dropdown menu (actions moved here on mobile)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="Menu actions">';
 
+                    // Emoji is hidden for tasklist notes
+                    if ($note_type !== 'tasklist') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
+                    }
+
                     // For markdown notes, avoid showing rich-text insertion actions in the mobile menu
                     if ($note_type !== 'markdown') {
-                        // Emoji is hidden for tasklist notes
-                        if ($note_type !== 'tasklist') {
-                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
-                        }
-
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-table\')"><i class="fa-table"></i> Table</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-checklist\')"><i class="fa-list-check"></i> Checklist</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-separator\')"><i class="fa-minus"></i> Separator</button>';

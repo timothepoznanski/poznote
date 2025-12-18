@@ -214,3 +214,24 @@ body::-webkit-scrollbar {
     max-height: none;
 }
 
+/* Responsive tables in note view (mobile)
+   - Prevent tables from forcing a wider-than-screen layout
+   - Keep native table layout (do NOT use display:block on <table>)
+   - Make the table fill the available width and let cell contents wrap
+*/
+.noteentry table,
+.markdown-preview table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.noteentry table td,
+.noteentry table th,
+.markdown-preview table td,
+.markdown-preview table th {
+    min-width: 0 !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
