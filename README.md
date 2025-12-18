@@ -486,6 +486,23 @@ curl -u 'username:password' \
   "http://YOUR_SERVER/api_list_notes.php?workspace=Personal"
 ```
 
+**Get Note Content**
+
+Get the raw content of a note by ID:
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_note_content.php?id=123"
+```
+
+Resolve a note by title (reference) inside a workspace, then return its content:
+```bash
+curl -u 'username:password' \
+  --get \
+  --data-urlencode "reference=My Note" \
+  --data-urlencode "workspace=Personal" \
+  "http://YOUR_SERVER/api_note_content.php"
+```
+
 **Create Note**
 
 Create a new note with title, content, tags, folder and workspace:

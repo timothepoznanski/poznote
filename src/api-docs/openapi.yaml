@@ -119,6 +119,74 @@ paths:
         '200':
           description: Success
 
+  /api_note_content.php:
+    get:
+      tags:
+        - Notes Management
+      summary: Get note content
+      description: |
+        Returns the raw stored content for a note.
+
+        Provide either:
+        - `id` (recommended). You may also provide `workspace` to scope the lookup.
+        - or `reference` + `workspace` to resolve by title within a workspace.
+          `reference` can be a numeric id or a (partial) title.
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: "Note ID (recommended)"
+          schema:
+            type: integer
+            example: 123
+        - name: reference
+          in: query
+          required: false
+          description: "Note reference (numeric id or partial title). Requires workspace when used."
+          schema:
+            type: string
+            example: "My Note"
+        - name: workspace
+          in: query
+          required: false
+          description: "Workspace name (optional with id, required with reference)"
+          schema:
+            type: string
+            example: "Poznote"
+      responses:
+        '200':
+          description: Note content returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  id:
+                    type: integer
+                    example: 123
+                  heading:
+                    type: string
+                    example: "My Note"
+                  workspace:
+                    type: string
+                    nullable: true
+                    example: "Poznote"
+                  type:
+                    type: string
+                    example: "markdown"
+                  content:
+                    type: string
+                    description: "Raw stored note content (Markdown/HTML/JSON depending on type)"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Note not found
+        '500':
+          description: Server error
+
   /api_create_note.php:
     post:
       tags:

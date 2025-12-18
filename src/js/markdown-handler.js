@@ -182,6 +182,19 @@ function initMermaid() {
 
 function parseMarkdown(text) {
     if (!text) return '';
+
+    function tryParseInternalNoteId(url) {
+        if (!url) return null;
+
+        // Accept common internal patterns like:
+        // - index.php?note=123
+        // - /index.php?note=123
+        // - index.php?workspace=Foo&note=123
+        // - ?note=123
+        const match = String(url).match(/(?:^|\/)?index\.php\?[^\s#]*\bnote=(\d+)\b|^\?[^\s#]*\bnote=(\d+)\b/);
+        const id = match ? (match[1] || match[2]) : null;
+        return id ? parseInt(id, 10) : null;
+    }
     
     // First, extract and protect images and links from HTML escaping
     // We'll use placeholders and restore them later
@@ -206,7 +219,17 @@ function parseMarkdown(text) {
     text = text.replace(/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function(match, linkText, url, title) {
         let placeholder = '\x00PLNK' + protectedIndex + '\x00';
         let linkTag;
-        if (title) {
+
+        const internalNoteId = tryParseInternalNoteId(url);
+        if (internalNoteId) {
+            // Internal note link: keep navigation in-app (handled by note-reference.js)
+            // Do not force target=_blank.
+            if (title) {
+                linkTag = '<a href="' + url + '" class="note-internal-link" data-note-id="' + internalNoteId + '" data-note-reference="true" title="' + title + '">' + linkText + '</a>';
+            } else {
+                linkTag = '<a href="' + url + '" class="note-internal-link" data-note-id="' + internalNoteId + '" data-note-reference="true">' + linkText + '</a>';
+            }
+        } else if (title) {
             linkTag = '<a href="' + url + '" title="' + title + '" target="_blank" rel="noopener">' + linkText + '</a>';
         } else {
             linkTag = '<a href="' + url + '" target="_blank" rel="noopener">' + linkText + '</a>';
@@ -697,7 +720,7 @@ function initializeMarkdownNote(noteId) {
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
-    editorDiv.setAttribute('data-ph', 'Write your markdown here...');
+    editorDiv.setAttribute('data-ph', 'Write your markdown or use / to open commands menu here...');
     
     editorContainer.appendChild(editorDiv);
     
