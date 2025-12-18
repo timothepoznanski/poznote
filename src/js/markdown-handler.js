@@ -780,7 +780,7 @@ function initializeMarkdownNote(noteId) {
             } else {
                 currentMode = 'preview';
                 viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
-                viewModeBtn.title = 'witch to edit mode';
+                viewModeBtn.title = 'Switch to edit mode';
             }
             
             viewModeBtn.setAttribute('data-current-mode', currentMode);
