@@ -691,8 +691,8 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
                     }
 
-                    // For markdown notes, avoid showing rich-text insertion actions in the mobile menu
-                    if ($note_type !== 'markdown') {
+                    // For markdown and tasklist notes, avoid showing rich-text insertion actions in the mobile menu
+                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-table\')"><i class="fa-table"></i> Table</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-checklist\')"><i class="fa-list-check"></i> Checklist</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-separator\')"><i class="fa-minus"></i> Separator</button>';
@@ -913,8 +913,16 @@ $body_classes = trim($extra_body_classes);
                     // All notes are now editable, including Excalidraw notes
                     $editable = 'true';
                     $excalidraw_attr = '';
-                    
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'" data-ph="Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor." contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+
+                    $placeholder_desktop = 'Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor.';
+                    $placeholder_mobile = 'Enter text or paste images here...';
+                    $placeholder_attr = ' data-ph="' . htmlspecialchars($placeholder_desktop, ENT_QUOTES) . '"';
+                    // On mobile, slash command is not enabled for HTML + Markdown notes
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        $placeholder_attr .= ' data-ph-mobile="' . htmlspecialchars($placeholder_mobile, ENT_QUOTES) . '"';
+                    }
+
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
