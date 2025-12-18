@@ -177,6 +177,8 @@ body::-webkit-scrollbar {
 .note-edit-toolbar .btn-favorite,
 .note-edit-toolbar .btn-share,
 .note-edit-toolbar .btn-attachment,
+.note-edit-toolbar .markdown-view-mode-btn,
+.note-edit-toolbar .markdown-help-btn,
 .note-edit-toolbar .mobile-more-btn {
     display: flex !important;
 }
