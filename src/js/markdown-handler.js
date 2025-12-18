@@ -720,7 +720,13 @@ function initializeMarkdownNote(noteId) {
     editorDiv.className = 'markdown-editor';
     editorDiv.contentEditable = true;
     editorDiv.textContent = markdownContent;
-    editorDiv.setAttribute('data-ph', 'Write your markdown or use / to open commands menu here...');
+    var isMobileViewport = false;
+    try {
+        isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+    } catch (e) {
+        isMobileViewport = false;
+    }
+    editorDiv.setAttribute('data-ph', isMobileViewport ? 'Write your markdown here...' : 'Write your markdown or use / to open commands menu here...');
     
     editorContainer.appendChild(editorDiv);
     
