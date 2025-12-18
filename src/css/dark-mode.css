@@ -249,6 +249,30 @@ body.dark-mode .toolbar-btn:hover {
     background-color: #333;
 }
 
+/* Mobile toolbar dropdown menu */
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-menu,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-menu {
+    background: #1a1a1a;
+    border: 1px solid #404040;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item {
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item:hover,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item:hover {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-item i,
+body.dark-mode .note-edit-toolbar .mobile-toolbar-item i {
+    color: #4a9eff;
+}
+
 /* Tags */
 html[data-theme='dark'] .name_tags,
 body.dark-mode .name_tags {
