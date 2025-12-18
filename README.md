@@ -7,16 +7,16 @@
 <h1 align="center">Poznote</h1>
 
 <p align="center">
-  <a href="https://github.com/timothepoznanski/poznote/stargazers">
+  <a href="https://github.com/timothepoznanski/poznote/stargazers" style="text-decoration:none;">
     <img src="https://img.shields.io/github/stars/timothepoznanski/poznote?style=flat&logo=github" alt="GitHub stars">
   </a>
-  <a href="https://github.com/timothepoznanski/poznote/blob/main/LICENCE">
+  <a href="https://github.com/timothepoznanski/poznote/blob/main/LICENCE" style="text-decoration:none;">
     <img src="https://img.shields.io/github/license/timothepoznanski/poznote?style=flat" alt="Open-source license">
   </a>
-  <a href="https://github.com/timothepoznanski/poznote/pkgs/container/poznote">
+  <a href="https://github.com/timothepoznanski/poznote/pkgs/container/poznote" style="text-decoration:none;">
     <img src="https://img.shields.io/badge/Docker-GHCR-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker image on GHCR">
   </a>
-  <a href="https://ko-fi.com/timothepoznanski">
+  <a href="https://ko-fi.com/timothepoznanski" style="text-decoration:none;">
     <img src="https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?logo=ko-fi&logoColor=white" alt="Buy me a Ko-fi">
   </a>
 </p>
