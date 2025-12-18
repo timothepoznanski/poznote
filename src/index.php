@@ -691,8 +691,8 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
                     }
 
-                    // For markdown notes, avoid showing rich-text insertion actions in the mobile menu
-                    if ($note_type !== 'markdown') {
+                    // For markdown and tasklist notes, avoid showing rich-text insertion actions in the mobile menu
+                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-table\')"><i class="fa-table"></i> Table</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-checklist\')"><i class="fa-list-check"></i> Checklist</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-separator\')"><i class="fa-minus"></i> Separator</button>';
