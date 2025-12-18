@@ -488,6 +488,14 @@
     // Order matches toolbar
     const SLASH_COMMANDS = [
         {
+            id: 'normal',
+            icon: 'fa-align-left',
+            label: 'Back to normal text',
+            action: function () {
+                insertNormalText();
+            }
+        },
+        {
             id: 'title',
             icon: 'fa-text-height',
             label: 'Title',
@@ -511,28 +519,23 @@
             ]
         },
         {
-            id: 'normal',
-            icon: 'fa-align-left',
-            label: 'Normal text',
-            action: function () {
-                insertNormalText();
-            }
-        },
-        {
-            id: 'bullet-list',
+            id: 'list',
             icon: 'fa-list-ul',
-            label: 'Bullet list',
-            action: function () {
-                insertList(false);
-            }
-        },
-        {
-            id: 'numbered-list',
-            icon: 'fa-list-ol',
-            label: 'Numbered list',
-            action: function () {
-                insertList(true);
-            }
+            label: 'List',
+            submenu: [
+                { id: 'bullets', icon: 'fa-list-ul', label: 'Bullet list', action: () => insertList(false) },
+                { id: 'numbers', icon: 'fa-list-ol', label: 'Numbered list', action: () => insertList(true) },
+                {
+                    id: 'checklist',
+                    icon: 'fa-list-check',
+                    label: 'Checklist',
+                    action: () => {
+                        if (typeof window.insertChecklist === 'function') {
+                            window.insertChecklist();
+                        }
+                    }
+                }
+            ]
         },
         {
             id: 'excalidraw',
@@ -562,16 +565,6 @@
             action: function () {
                 if (typeof window.toggleTablePicker === 'function') {
                     window.toggleTablePicker();
-                }
-            }
-        },
-        {
-            id: 'checklist',
-            icon: 'fa-list-check',
-            label: 'Checklist',
-            action: function () {
-                if (typeof window.insertChecklist === 'function') {
-                    window.insertChecklist();
                 }
             }
         },
