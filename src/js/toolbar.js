@@ -688,6 +688,13 @@ function toggleEmojiPicker() {
     existingPicker.remove();
     return;
   }
+
+  // If the cursor is not in an editable note, warn immediately
+  // instead of waiting until an emoji is selected.
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
+    return;
+  }
   
   // Create emoji popup
   const picker = document.createElement('div');
@@ -1454,19 +1461,24 @@ if (!window._checklistSaveHookInstalled) {
  */
 function insertChecklist() {
   // Check if cursor is in editable note
-  const sel = window.getSelection();
-  if (!sel.rangeCount) {
-    window.showError('Please place your cursor in the note', 'Error');
+  if (!isCursorInEditableNote()) {
+    window.showCursorWarning();
     return;
   }
-  
+
+  const sel = window.getSelection();
+  if (!sel.rangeCount) {
+    window.showCursorWarning();
+    return;
+  }
+
   const range = sel.getRangeAt(0);
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
   const noteentry = container.closest && container.closest('.noteentry');
-  
+
   if (!noteentry) {
-    window.showError('Please place your cursor inside the note', 'Error');
+    window.showCursorWarning();
     return;
   }
   
