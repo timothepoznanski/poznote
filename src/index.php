@@ -686,19 +686,6 @@ $body_classes = trim($extra_body_classes);
                     // Mobile dropdown menu (actions moved here on mobile)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="Menu actions">';
 
-                    // Emoji is hidden for tasklist notes
-                    if ($note_type !== 'tasklist') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-emoji\')"><i class="fa-smile"></i> Emoji</button>';
-                    }
-
-                    // For markdown and tasklist notes, avoid showing rich-text insertion actions in the mobile menu
-                    if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-table\')"><i class="fa-table"></i> Table</button>';
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-checklist\')"><i class="fa-list-check"></i> Checklist</button>';
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-separator\')"><i class="fa-minus"></i> Separator</button>';
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'\.btn-note-reference\')"><i class="fa-at"></i> Note link</button>';
-                    }
-
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> Duplicate</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> Move</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> Download</button>';

@@ -1050,40 +1050,9 @@ function toggleTablePicker() {
   header.textContent = 'Insert Table';
   picker.appendChild(header);
   
-  // Create grid container
-  const grid = document.createElement('div');
-  grid.className = 'table-picker-grid';
-  
-  const maxRows = 10;
-  const maxCols = 10;
-  
-  // Create grid cells
-  for (let row = 0; row < maxRows; row++) {
-    for (let col = 0; col < maxCols; col++) {
-      const cell = document.createElement('div');
-      cell.className = 'table-picker-cell';
-      cell.dataset.row = row + 1;
-      cell.dataset.col = col + 1;
-      grid.appendChild(cell);
-    }
-  }
-  
-  picker.appendChild(grid);
-  
-  // Create label
-  const label = document.createElement('div');
-  label.className = 'table-picker-label';
-  label.textContent = '1 × 1';
-  picker.appendChild(label);
-  
   // Create direct input section
   const inputSection = document.createElement('div');
   inputSection.className = 'table-picker-input-section';
-  
-  const inputLabel = document.createElement('div');
-  inputLabel.className = 'table-picker-input-label';
-  inputLabel.textContent = 'Or enter dimensions:';
-  inputSection.appendChild(inputLabel);
   
   const inputContainer = document.createElement('div');
   inputContainer.className = 'table-picker-input-container';
@@ -1139,101 +1108,94 @@ function toggleTablePicker() {
   
   // Append to body
   document.body.appendChild(picker);
-  
-  // Position picker near table button
-  const tableBtn = document.querySelector('.btn-table');
-  if (tableBtn) {
-    const rect = tableBtn.getBoundingClientRect();
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const isMobile = isMobileDevice();
-    
-    // Picker dimensions
-    const pickerWidth = isMobile ? Math.min(280, windowWidth - 40) : 320;
-    const pickerHeight = 320;
-    
-    picker.style.position = 'fixed';
-    picker.style.width = pickerWidth + 'px';
-    
-    // Calculate vertical position
-    let top = rect.bottom + 10;
-    if (top + pickerHeight > windowHeight - 20) {
-      // If picker overflows bottom, place above button
-      top = rect.top - pickerHeight - 10;
-      if (top < 20) {
-        // If it doesn't fit above either, center vertically
-        top = Math.max(20, (windowHeight - pickerHeight) / 2);
+
+  // Position near the caret (robust on mobile) and keep fully visible.
+  const getCaretClientRect = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+
+    const range = sel.getRangeAt(0).cloneRange();
+    range.collapse(true);
+
+    const rects = range.getClientRects();
+    if (rects && rects.length) return rects[rects.length - 1];
+
+    const marker = document.createElement('span');
+    marker.textContent = '\u200b';
+    marker.setAttribute('data-table-picker-caret', '1');
+    marker.style.display = 'inline-block';
+    marker.style.width = '0px';
+    marker.style.height = '1em';
+    marker.style.lineHeight = '1';
+    marker.style.overflow = 'hidden';
+    marker.style.pointerEvents = 'none';
+    marker.style.userSelect = 'none';
+
+    try {
+      range.insertNode(marker);
+      return marker.getBoundingClientRect();
+    } finally {
+      if (marker.parentNode) marker.parentNode.removeChild(marker);
+
+      // Restore selection to avoid any surprises for the user.
+      const restore = window.getSelection();
+      if (restore) {
+        restore.removeAllRanges();
+        restore.addRange(range);
       }
     }
-    
-    // Calculate horizontal position
-    let left;
-    if (isMobile) {
-      // On mobile, center in screen
-      left = (windowWidth - pickerWidth) / 2;
+  };
+
+  const viewport = window.visualViewport;
+  const viewportWidth = viewport ? viewport.width : window.innerWidth;
+  const viewportHeight = viewport ? viewport.height : window.innerHeight;
+  const viewportOffsetLeft = viewport ? viewport.offsetLeft : 0;
+  const viewportOffsetTop = viewport ? viewport.offsetTop : 0;
+
+  const isMobile = isMobileDevice();
+  const pickerWidth = isMobile ? Math.min(280, viewportWidth - 40) : 320;
+
+  picker.style.position = 'fixed';
+  picker.style.width = pickerWidth + 'px';
+
+  // Measure real height after width is applied.
+  const pickerHeight = picker.offsetHeight || 200;
+
+  const margin = 10;
+  let left = viewportOffsetLeft + (viewportWidth - pickerWidth) / 2;
+  let top = viewportOffsetTop + margin;
+
+  const caretRect = getCaretClientRect();
+  if (caretRect) {
+    const anchorX = caretRect.left + caretRect.width / 2;
+    const spaceAbove = caretRect.top;
+    const spaceBelow = viewportHeight - caretRect.bottom;
+
+    // Prefer above, else below, else center.
+    if (spaceAbove >= pickerHeight + margin) {
+      top = viewportOffsetTop + caretRect.top - pickerHeight - margin;
+    } else if (spaceBelow >= pickerHeight + margin) {
+      top = viewportOffsetTop + caretRect.bottom + margin;
     } else {
-      // On desktop, center on button
-      left = rect.left - (pickerWidth / 2) + (rect.width / 2);
-      if (left + pickerWidth > windowWidth - 20) {
-        left = windowWidth - pickerWidth - 20;
-      }
-      if (left < 20) {
-        left = 20;
-      }
+      top = viewportOffsetTop + (viewportHeight - pickerHeight) / 2;
     }
-    
-    picker.style.top = top + 'px';
-    picker.style.left = left + 'px';
+
+    left = viewportOffsetLeft + (anchorX - pickerWidth / 2);
   }
+
+  // Clamp inside viewport.
+  const minLeft = viewportOffsetLeft + margin;
+  const maxLeft = viewportOffsetLeft + viewportWidth - pickerWidth - margin;
+  const minTop = viewportOffsetTop + margin;
+  const maxTop = viewportOffsetTop + viewportHeight - pickerHeight - margin;
+
+  picker.style.left = Math.max(minLeft, Math.min(left, maxLeft)) + 'px';
+  picker.style.top = Math.max(minTop, Math.min(top, maxTop)) + 'px';
   
   // Show picker with animation
   setTimeout(() => {
     picker.classList.add('show');
   }, 10);
-  
-  // Handle hover over grid
-  let currentRows = 0;
-  let currentCols = 0;
-  
-  grid.addEventListener('mouseover', function(e) {
-    if (e.target.classList.contains('table-picker-cell')) {
-      const row = parseInt(e.target.dataset.row);
-      const col = parseInt(e.target.dataset.col);
-      
-      currentRows = row;
-      currentCols = col;
-      
-      // Highlight cells
-      const cells = grid.querySelectorAll('.table-picker-cell');
-      cells.forEach(cell => {
-        const cellRow = parseInt(cell.dataset.row);
-        const cellCol = parseInt(cell.dataset.col);
-        
-        if (cellRow <= row && cellCol <= col) {
-          cell.classList.add('highlighted');
-        } else {
-          cell.classList.remove('highlighted');
-        }
-      });
-      
-      // Update label
-      label.textContent = `${row} × ${col}`;
-    }
-  });
-  
-  // Handle click on grid
-  grid.addEventListener('click', function(e) {
-    if (e.target.classList.contains('table-picker-cell')) {
-      const rows = parseInt(e.target.dataset.row);
-      const cols = parseInt(e.target.dataset.col);
-      
-      insertTable(rows, cols);
-      picker.classList.remove('show');
-      setTimeout(() => {
-        picker.remove();
-      }, 200);
-    }
-  });
   
   // Handle insert button click
   insertBtn.addEventListener('click', function(e) {
