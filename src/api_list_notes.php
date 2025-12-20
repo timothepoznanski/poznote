@@ -9,6 +9,7 @@ requireApiAuth();
 header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'functions.php';
 
 $workspace = $_GET['workspace'] ?? $_POST['workspace'] ?? null;
 $folder = $_GET['folder'] ?? $_POST['folder'] ?? null;
@@ -22,7 +23,7 @@ try {
         if ((int)$chk->fetchColumn() === 0) {
             // Special-case: map 'Poznote' if requested even when absent in table (db_connect ensures default exists),
             // otherwise return an explicit error for unknown workspace.
-            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
             exit;
         }
     }
@@ -57,13 +58,13 @@ try {
         }
         
         // Build folder paths recursively
-        function getFolderPath($folderId, $folderData) {
+        function buildFolderPathFromArray($folderId, $folderData) {
             if (!isset($folderData[$folderId])) {
                 return '';
             }
             $folder = $folderData[$folderId];
             if ($folder['parent_id']) {
-                $parentPath = getFolderPath($folder['parent_id'], $folderData);
+                $parentPath = buildFolderPathFromArray($folder['parent_id'], $folderData);
                 return $parentPath . '/' . $folder['name'];
             }
             return $folder['name'];
@@ -74,7 +75,7 @@ try {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folder['name'],
-                'path' => getFolderPath($folderId, $folderData)
+                'path' => buildFolderPathFromArray($folderId, $folderData)
             ];
         }
         

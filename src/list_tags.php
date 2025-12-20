@@ -4,6 +4,7 @@ requireAuth();
 
 require_once 'config.php';
 include 'db_connect.php';
+include 'functions.php';
 
 // Build query with folder exclusions like in index.php
 $where_conditions = ["trash = 0"];
@@ -49,13 +50,15 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 $count_tags = count($tags_list);
 
 sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
+
+$currentLang = getUserLanguage();
 ?>
 <!DOCTYPE html>
-<html lang="en" class="tags-page">
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="tags-page">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tags - Poznote</title>
+	<title><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?> - <?php echo t_h('app.name'); ?></title>
 <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
 <meta name="color-scheme" content="dark light">
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -68,10 +71,10 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 <body class="tags-page">
 	<div class="tags-container">
 		<div class="tags-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="Back to notes">
-				Back to notes
+			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="<?php echo t_h('common.back_to_notes'); ?>">
+				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<h1 class="tags-header">Tags</h1>
+			<h1 class="tags-header"><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
 		</div>
 		
         
@@ -81,19 +84,25 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 				type="text" 
 				id="tagsSearchInput"
 				class="tags-search-input"
-				placeholder="Filter tags..."
+				placeholder="<?php echo t_h('tags.search.placeholder', [], 'Filter tags...'); ?>"
 				autocomplete="off"
 			>
 		</form>
 		
 		<div class="tags-info">
-			There <?php echo ($count_tags == 1) ? 'is' : 'are'; ?> <?php echo $count_tags; ?> tag<?php echo ($count_tags == 1) ? '' : 's'; ?> total
+			<?php
+				if ($count_tags === 1) {
+					echo t_h('tags.count.one', ['count' => $count_tags], 'There is {{count}} tag total');
+				} else {
+					echo t_h('tags.count.other', ['count' => $count_tags], 'There are {{count}} tags total');
+				}
+			?>
 		</div>
 		
 		<div class="tags-grid" id="tagsList">
 		<?php
 		if (empty($tags_list)) {
-			echo '<div class="no-tags">No tags found.</div>';
+			echo '<div class="no-tags">' . t_h('tags.empty', [], 'No tags found.') . '</div>';
 		} else {
 			foreach($tags_list as $tag) {
 				if (!empty(trim($tag))) {
@@ -112,7 +121,7 @@ sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 		// Expose current workspace to the tags page JS so redirects include it
 		var pageWorkspace = <?php echo json_encode($workspace); ?>;
 	</script>
-	
+	<script src="js/globals.js"></script>
 	<script src="js/list_tags.js"></script>
 	<script src="js/clickable-tags.js"></script>
 	<script>

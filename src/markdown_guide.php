@@ -1,14 +1,18 @@
 <?php
 require_once 'auth.php';
 requireAuth();
+require_once 'config.php';
+require_once 'db_connect.php';
+require_once 'functions.php';
 $v = '20251213.2'; // Cache version
+$currentLang = getUserLanguage();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo htmlspecialchars($currentLang); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown Guide - Poznote</title>
+    <title><?php echo t_h('markdown_guide.page_title'); ?> - Poznote</title>
     <style>
         * {
             box-sizing: border-box;
@@ -250,88 +254,81 @@ $v = '20251213.2'; // Cache version
     </script>
 </head>
 <body>
-    <button onclick="window.close(); setTimeout(function(){ window.history.back(); }, 100);" class="back-link">Back to notes</button>
+    <button onclick="window.close(); setTimeout(function(){ window.history.back(); }, 100);" class="back-link"><?php echo t_h('common.back_to_notes'); ?></button>
     
-    <h1>Markdown Guide</h1>
+    <h1><?php echo t_h('markdown_guide.title'); ?></h1>
 
-    <nav class="toc" aria-label="Table of contents">
-        <h2>Table of contents</h2>
+    <nav class="toc" aria-label="<?php echo t_h('markdown_guide.toc.label'); ?>">
+        <h2><?php echo t_h('markdown_guide.toc.title'); ?></h2>
         <ul>
-            <li><a href="#headers">Headers</a></li>
-            <li><a href="#text-formatting">Text Formatting</a></li>
-            <li><a href="#unordered-lists">Unordered Lists</a></li>
-            <li><a href="#ordered-lists">Ordered Lists</a></li>
-            <li><a href="#checkboxes">Checkboxes</a></li>
-            <li><a href="#images">Images</a></li>
-            <li><a href="#urls">URLs</a></li>
-            <li><a href="#code-blocks">Code Blocks</a></li>
-            <li><a href="#quotes">Quotes</a></li>
-            <li><a href="#line-breaks">Line Breaks</a></li>
-            <li><a href="#horizontal-rule">Horizontal Rule</a></li>
-            <li><a href="#tables">Tables</a></li>
-            <li><a href="#mermaid">Mermaid Diagrams</a></li>
+            <li><a href="#headers"><?php echo t_h('markdown_guide.sections.headers.title'); ?></a></li>
+            <li><a href="#text-formatting"><?php echo t_h('markdown_guide.sections.text_formatting.title'); ?></a></li>
+            <li><a href="#unordered-lists"><?php echo t_h('markdown_guide.sections.unordered_lists.title'); ?></a></li>
+            <li><a href="#ordered-lists"><?php echo t_h('markdown_guide.sections.ordered_lists.title'); ?></a></li>
+            <li><a href="#checkboxes"><?php echo t_h('markdown_guide.sections.checkboxes.title'); ?></a></li>
+            <li><a href="#images"><?php echo t_h('markdown_guide.sections.images.title'); ?></a></li>
+            <li><a href="#urls"><?php echo t_h('markdown_guide.sections.urls.title'); ?></a></li>
+            <li><a href="#code-blocks"><?php echo t_h('markdown_guide.sections.code_blocks.title'); ?></a></li>
+            <li><a href="#quotes"><?php echo t_h('markdown_guide.sections.quotes.title'); ?></a></li>
+            <li><a href="#line-breaks"><?php echo t_h('markdown_guide.sections.line_breaks.title'); ?></a></li>
+            <li><a href="#horizontal-rule"><?php echo t_h('markdown_guide.sections.horizontal_rule.title'); ?></a></li>
+            <li><a href="#tables"><?php echo t_h('markdown_guide.sections.tables.title'); ?></a></li>
+            <li><a href="#mermaid"><?php echo t_h('markdown_guide.sections.mermaid.title'); ?></a></li>
         </ul>
     </nav>
 
     <section id="headers" class="section">
-        <h2>Headers</h2>
+        <h2><?php echo t_h('markdown_guide.sections.headers.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre># Heading 1
-## Heading 2
-### Heading 3</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("# " . t('markdown_guide.sections.headers.heading1', 'En-tête 1') . "\n## " . t('markdown_guide.sections.headers.heading2', 'En-tête 2') . "\n### " . t('markdown_guide.sections.headers.heading3', 'En-tête 3')); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
-                    <div class="r-h1">Heading 1</div>
-                    <div class="r-h2">Heading 2</div>
-                    <div class="r-h3">Heading 3</div>
+                    <div class="r-h1"><?php echo t_h('markdown_guide.sections.headers.heading1', 'En-tête 1'); ?></div>
+                    <div class="r-h2"><?php echo t_h('markdown_guide.sections.headers.heading2', 'En-tête 2'); ?></div>
+                    <div class="r-h3"><?php echo t_h('markdown_guide.sections.headers.heading3', 'En-tête 3'); ?></div>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="text-formatting" class="section">
-        <h2>Text Formatting</h2>
+        <h2><?php echo t_h('markdown_guide.sections.text_formatting.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>**bold text**
-*italic text*
-~~strikethrough~~
-`inline code`</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("**" . t('markdown_guide.sections.text_formatting.bold') . "**\n*" . t('markdown_guide.sections.text_formatting.italic') . "*\n~~" . t('markdown_guide.sections.text_formatting.strikethrough') . "~~\n`" . t('markdown_guide.sections.text_formatting.inline_code') . "`"); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
-                    <p style="margin: 0 0 8px 0;"><strong>bold text</strong></p>
-                    <p style="margin: 0 0 8px 0;"><em>italic text</em></p>
-                    <p style="margin: 0 0 8px 0;"><del>strikethrough</del></p>
-                    <p style="margin: 0;"><code>inline code</code></p>
+                    <p style="margin: 0 0 8px 0;"><strong><?php echo t_h('markdown_guide.sections.text_formatting.bold'); ?></strong></p>
+                    <p style="margin: 0 0 8px 0;"><em><?php echo t_h('markdown_guide.sections.text_formatting.italic'); ?></em></p>
+                    <p style="margin: 0 0 8px 0;"><del><?php echo t_h('markdown_guide.sections.text_formatting.strikethrough'); ?></del></p>
+                    <p style="margin: 0;"><code><?php echo t_h('markdown_guide.sections.text_formatting.inline_code'); ?></code></p>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="unordered-lists" class="section">
-        <h2>Unordered Lists</h2>
+        <h2><?php echo t_h('markdown_guide.sections.unordered_lists.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>- Item one
-- Item two
-  - Nested item</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("- " . t('markdown_guide.sections.unordered_lists.item_one') . "\n- " . t('markdown_guide.sections.unordered_lists.item_two') . "\n  - " . t('markdown_guide.sections.unordered_lists.nested_item')); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <ul>
-                        <li>Item one</li>
-                        <li>Item two
+                        <li><?php echo t_h('markdown_guide.sections.unordered_lists.item_one'); ?></li>
+                        <li><?php echo t_h('markdown_guide.sections.unordered_lists.item_two'); ?>
                             <ul>
-                                <li>Nested item</li>
+                                <li><?php echo t_h('markdown_guide.sections.unordered_lists.nested_item'); ?></li>
                             </ul>
                         </li>
                     </ul>
@@ -341,21 +338,19 @@ $v = '20251213.2'; // Cache version
     </section>
 
     <section id="ordered-lists" class="section">
-        <h2>Ordered Lists</h2>
+        <h2><?php echo t_h('markdown_guide.sections.ordered_lists.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>1. First
-2. Second
-3. Third</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("1. " . t('markdown_guide.sections.ordered_lists.first') . "\n2. " . t('markdown_guide.sections.ordered_lists.second') . "\n3. " . t('markdown_guide.sections.ordered_lists.third')); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <ol>
-                        <li>First</li>
-                        <li>Second</li>
-                        <li>Third</li>
+                        <li><?php echo t_h('markdown_guide.sections.ordered_lists.first'); ?></li>
+                        <li><?php echo t_h('markdown_guide.sections.ordered_lists.second'); ?></li>
+                        <li><?php echo t_h('markdown_guide.sections.ordered_lists.third'); ?></li>
                     </ol>
                 </div>
             </div>
@@ -363,19 +358,19 @@ $v = '20251213.2'; // Cache version
     </section>
 
     <section id="checkboxes" class="section">
-        <h2>Checkboxes</h2>
+        <h2><?php echo t_h('markdown_guide.sections.checkboxes.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>- [ ] Unchecked item (one space only!)
-- [x] Checked item</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>- [ ] <?php echo t_h('markdown_guide.sections.checkboxes.unchecked_note'); ?>
+- [x] <?php echo t_h('markdown_guide.sections.checkboxes.checked'); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <ul class="task-list">
-                        <li><input type="checkbox" disabled> <span>Unchecked item</span></li>
-                        <li><input type="checkbox" checked disabled> <span>Checked item</span></li>
+                        <li><input type="checkbox" disabled> <span><?php echo t_h('markdown_guide.sections.checkboxes.unchecked'); ?></span></li>
+                        <li><input type="checkbox" checked disabled> <span><?php echo t_h('markdown_guide.sections.checkboxes.checked'); ?></span></li>
                     </ul>
                 </div>
             </div>
@@ -383,22 +378,22 @@ $v = '20251213.2'; // Cache version
     </section>
 
     <section id="images" class="section">
-        <h2>Images</h2>
+        <h2><?php echo t_h('markdown_guide.sections.images.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>![Alt text](image-url.jpg)</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("![" . t('markdown_guide.sections.images.alt_text') . "](image-url.jpg)"); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
-                    <svg width="280" height="120" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alt text">
+                    <svg width="280" height="120" viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="<?php echo t_h('markdown_guide.sections.images.alt_text'); ?>">
                         <rect x="1" y="1" width="278" height="118" fill="#f5f5f5" stroke="#ddd" />
                         <rect x="16" y="20" width="80" height="60" fill="#fff" stroke="#ddd" />
                         <path d="M20 74 L44 50 L64 70 L82 56 L92 74" fill="none" stroke="#666" stroke-width="2" />
                         <circle cx="34" cy="38" r="6" fill="#666" />
-                        <text x="110" y="54" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="14" fill="#666">Alt text</text>
-                        <text x="110" y="74" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="12" fill="#666">(image preview)</text>
+                        <text x="110" y="54" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="14" fill="#666"><?php echo t_h('markdown_guide.sections.images.alt_text'); ?></text>
+                        <text x="110" y="74" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-size="12" fill="#666"><?php echo t_h('markdown_guide.sections.images.preview'); ?></text>
                     </svg>
                 </div>
             </div>
@@ -406,26 +401,26 @@ $v = '20251213.2'; // Cache version
     </section>
 
     <section id="urls" class="section">
-        <h2>URLs</h2>
+        <h2><?php echo t_h('markdown_guide.sections.urls.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>[Link text](https://example.com)</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo htmlspecialchars("[" . t('markdown_guide.sections.urls.link_text') . "](https://example.com)"); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
-                    <a href="https://example.com" target="_blank" rel="noopener noreferrer">Link text</a>
+                    <a href="https://example.com" target="_blank" rel="noopener noreferrer"><?php echo t_h('markdown_guide.sections.urls.link_text'); ?></a>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="code-blocks" class="section">
-        <h2>Code Blocks</h2>
+        <h2><?php echo t_h('markdown_guide.sections.code_blocks.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
                 <pre>```js
 function hello(name) {
   return `Hello ${name}`;
@@ -433,7 +428,7 @@ function hello(name) {
 ```</pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <pre style="margin: 0;"><code>function hello(name) {
   return `Hello ${name}`;
@@ -444,19 +439,19 @@ function hello(name) {
     </section>
 
     <section id="quotes" class="section">
-        <h2>Quotes</h2>
+        <h2><?php echo t_h('markdown_guide.sections.quotes.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>&gt; This is a quote
-&gt; spanning two lines</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>&gt; <?php echo t_h('markdown_guide.sections.quotes.quote_text'); ?>
+&gt; <?php echo t_h('markdown_guide.sections.quotes.quote_line2'); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <blockquote style="margin: 0;">
-                        This is a quote<br>
-                        spanning two lines
+                        <?php echo t_h('markdown_guide.sections.quotes.quote_text'); ?><br>
+                        <?php echo t_h('markdown_guide.sections.quotes.quote_line2'); ?>
                     </blockquote>
                 </div>
             </div>
@@ -464,33 +459,33 @@ function hello(name) {
     </section>
 
     <section id="line-breaks" class="section">
-        <h2>Line Breaks</h2>
-        <p>A single line break in edit mode creates a line break in the preview.</p>
+        <h2><?php echo t_h('markdown_guide.sections.line_breaks.title'); ?></h2>
+        <p><?php echo t_h('markdown_guide.sections.line_breaks.description'); ?></p>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>First line
-Second line</pre>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre><?php echo t_h('markdown_guide.sections.line_breaks.first_line'); ?>
+<?php echo t_h('markdown_guide.sections.line_breaks.second_line'); ?></pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
-                    First line<br>
-                    Second line
+                    <?php echo t_h('markdown_guide.sections.line_breaks.first_line'); ?><br>
+                    <?php echo t_h('markdown_guide.sections.line_breaks.second_line'); ?>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="horizontal-rule" class="section">
-        <h2>Horizontal Rule</h2>
+        <h2><?php echo t_h('markdown_guide.sections.horizontal_rule.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
                 <pre>---</pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <hr style="margin: 0;">
                 </div>
@@ -499,23 +494,23 @@ Second line</pre>
     </section>
 
     <section id="tables" class="section">
-        <h2>Tables</h2>
+        <h2><?php echo t_h('markdown_guide.sections.tables.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
-                <pre>| Name | Value |
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>| <?php echo t_h('markdown_guide.sections.tables.col_name'); ?> | <?php echo t_h('markdown_guide.sections.tables.col_value'); ?> |
 | ---  | ---   |
 | A    | 10    |
 | B    | 25    |</pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <table>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th style="text-align: right;">Value</th>
+                                <th><?php echo t_h('markdown_guide.sections.tables.col_name'); ?></th>
+                                <th style="text-align: right;"><?php echo t_h('markdown_guide.sections.tables.col_value'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -535,24 +530,24 @@ Second line</pre>
     </section>
 
     <section id="mermaid" class="section">
-        <h2>Mermaid Diagrams</h2>
+        <h2><?php echo t_h('markdown_guide.sections.mermaid.title'); ?></h2>
         <div class="example">
             <div>
-                <h3>Syntax</h3>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
                 <pre>```mermaid
 flowchart TD
-  A[Write Markdown] --&gt; B{Need a diagram?}
-  B -- Yes --&gt; C[Use Mermaid]
-  B -- No --&gt; D[Keep writing]
+  A[<?php echo t_h('markdown_guide.sections.mermaid.node_a'); ?>] --&gt; B{<?php echo t_h('markdown_guide.sections.mermaid.node_b'); ?>}
+  B -- <?php echo t_h('markdown_guide.sections.mermaid.edge_yes'); ?> --&gt; C[<?php echo t_h('markdown_guide.sections.mermaid.node_c'); ?>]
+  B -- <?php echo t_h('markdown_guide.sections.mermaid.edge_no'); ?> --&gt; D[<?php echo t_h('markdown_guide.sections.mermaid.node_d'); ?>]
 ```</pre>
             </div>
             <div>
-                <h3>Result</h3>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
                 <div class="result">
                     <div class="mermaid">flowchart TD
-  A[Write Markdown] --> B{Need a diagram?}
-  B -- Yes --> C[Use Mermaid]
-  B -- No --> D[Keep writing]</div>
+  A[<?php echo t_h('markdown_guide.sections.mermaid.node_a'); ?>] --> B{<?php echo t_h('markdown_guide.sections.mermaid.node_b'); ?>}
+  B -- <?php echo t_h('markdown_guide.sections.mermaid.edge_yes'); ?> --> C[<?php echo t_h('markdown_guide.sections.mermaid.node_c'); ?>]
+  B -- <?php echo t_h('markdown_guide.sections.mermaid.edge_no'); ?> --> D[<?php echo t_h('markdown_guide.sections.mermaid.node_d'); ?>]</div>
                 </div>
             </div>
         </div>

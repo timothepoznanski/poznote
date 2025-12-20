@@ -1,8 +1,12 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
+require_once 'functions.php';
 include 'db_connect.php';
 
 // Get note ID from URL
@@ -35,7 +39,7 @@ if (!$note) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Attachments - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
+    <title><?php echo t_h('attachments.page.title'); ?> - <?php echo htmlspecialchars($note['heading']); ?> - Poznote</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
@@ -48,8 +52,8 @@ if (!$note) {
 </head>
 <body>
     <div class="settings-container">
-        <h1>Manage Attachments</h1>
-        <p>Manage attachments for note: <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
+        <h1><?php echo t_h('attachments.page.title'); ?></h1>
+        <p><?php echo t_h('attachments.page.subtitle'); ?> <strong><?php echo htmlspecialchars($note['heading']); ?></strong></p>
         
         <?php 
             $back_params = [];
@@ -60,28 +64,28 @@ if (!$note) {
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
     <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
-            Back to Notes
+            <?php echo t_h('common.back_to_notes'); ?>
         </a>
 
         <br><br>
 
         <!-- Upload Section -->
         <div class="settings-section">
-            <h3>Upload New Attachment</h3>
+            <h3><?php echo t_h('attachments.page.upload_section_title'); ?></h3>
             
             <div class="attachment-upload-section">
-                <div class="drag-drop-info">You can drag and drop your file below:</div><br>
+                <div class="drag-drop-info"><?php echo t_h('attachments.page.drag_drop_info'); ?></div><br>
                 <div class="form-group">
                     <input type="file" id="attachmentFile" class="file-input" onchange="showFileName()">
                     <div class="accepted-types">
-                        All file types accepted (max 200MB)
+                        <?php echo t_h('attachments.page.all_types_accepted'); ?>
                     </div>
                     <br>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>
                 
                 <button type="button" onclick="uploadAttachment(event)" class="btn btn-primary" id="uploadBtn" disabled>
-                    Upload File
+                    <?php echo t_h('attachments.page.upload_button'); ?>
                 </button>
             </div>
             
@@ -89,16 +93,16 @@ if (!$note) {
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-text" id="progressText">Uploading...</div>
+                <div class="progress-text" id="progressText"><?php echo t_h('attachments.upload.button_uploading', [], 'Uploading...'); ?></div>
             </div>
         </div>
 
         <!-- Attachments List Section -->
         <div class="settings-section">
-            <h3>Current Attachments</h3>
+            <h3><?php echo t_h('attachments.page.current_attachments', [], 'Current Attachments'); ?></h3>
             <div id="attachmentsList" class="attachments-display">
                 <div class="loading-attachments">
-                    Loading attachments...
+                    <?php echo t_h('attachments.page.loading_attachments', [], 'Loading attachments...'); ?>
                 </div>
             </div>
         </div>
@@ -111,6 +115,32 @@ if (!$note) {
     const noteId = <?php echo $note_id; ?>;
     const noteWorkspace = <?php echo $workspace ? json_encode($workspace) : 'undefined'; ?>;
         let uploadInProgress = false;
+
+        const TXT_UPLOADING = <?php echo json_encode(t('attachments.upload.button_uploading', [], 'Uploading...')); ?>;
+        const TXT_SELECT_FILE = <?php echo json_encode(t('attachments.errors.select_file', [], 'Please select a file to upload.')); ?>;
+        const TXT_FILE_TOO_LARGE = <?php echo json_encode(t('attachments.errors.file_too_large', ['maxSize' => '200MB'], 'The file is too large (max: {{maxSize}}).')); ?>;
+        const TXT_UPLOAD_SUCCESS = <?php echo json_encode(t('attachments.messages.upload_success', [], 'File uploaded successfully!')); ?>;
+        const TXT_UPLOAD_FAILED_PREFIX = <?php echo json_encode(t('attachments.errors.upload_failed', ['error' => '{{error}}'], 'Upload failed: {{error}}')); ?>;
+        const TXT_UPLOAD_FAILED_GENERIC = <?php echo json_encode(t('attachments.errors.upload_failed_generic', [], 'Upload failed. Please try again.')); ?>;
+        const TXT_UPLOAD_FAILED_CONNECTION = <?php echo json_encode(t('attachments.errors.upload_failed_connection', [], 'Upload failed. Please check your connection.')); ?>;
+        const TXT_LOADING_FAILED = <?php echo json_encode(t('attachments.errors.loading_failed', [], 'Failed to load attachments')); ?>;
+        const TXT_LOADING_ERROR = <?php echo json_encode(t('attachments.errors.loading_error', [], 'Error loading attachments')); ?>;
+        const TXT_NO_ATTACHMENTS = <?php echo json_encode(t('attachments.empty', [], 'No attachments.')); ?>;
+        const TXT_PREVIEW_ALT = <?php echo json_encode(t('attachments.page.preview_alt', [], 'Preview')); ?>;
+        const TXT_UPLOADED_PREFIX = <?php echo json_encode(t('attachments.page.uploaded_prefix', [], 'Uploaded: ')); ?>;
+        const TXT_VIEW = <?php echo json_encode(t('attachments.actions.view', [], 'View')); ?>;
+        const TXT_DELETE = <?php echo json_encode(t('attachments.actions.delete', [], 'Delete')); ?>;
+        const TXT_OPEN_NEW_TAB = <?php echo json_encode(t('attachments.page.open_in_new_tab', [], 'Open in new tab')); ?>;
+        const TXT_DOWNLOAD = <?php echo json_encode(t('common.download', [], 'Download')); ?>;
+        const TXT_DELETED_SUCCESS = <?php echo json_encode(t('attachments.messages.deleted_success', [], 'Attachment deleted successfully')); ?>;
+        const TXT_DELETE_FAILED_PREFIX = <?php echo json_encode(t('attachments.errors.deletion_failed', ['error' => '{{error}}'], 'Deletion failed: {{error}}')); ?>;
+        const TXT_DELETE_FAILED_GENERIC = <?php echo json_encode(t('attachments.errors.deletion_failed_generic', [], 'Deletion failed.')); ?>;
+        const FILESIZE_UNITS = <?php echo json_encode([
+            t('attachments.size.units.bytes', [], 'bytes'),
+            t('attachments.size.units.kb', [], 'KB'),
+            t('attachments.size.units.mb', [], 'MB'),
+            t('attachments.size.units.gb', [], 'GB'),
+        ]); ?>;
 
         // Load attachments when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -189,7 +219,7 @@ if (!$note) {
             const progressText = document.getElementById('progressText');
             
             if (!fileInput.files.length) {
-                showNotification('Please select a file', 'error');
+                showNotification(TXT_SELECT_FILE, 'error');
                 return;
             }
 
@@ -197,7 +227,7 @@ if (!$note) {
             const maxSize = 200 * 1024 * 1024; // 200MB
             
             if (file.size > maxSize) {
-                showNotification('File too large. Maximum size is 200MB.', 'error');
+                showNotification(TXT_FILE_TOO_LARGE, 'error');
                 return;
             }
 
@@ -220,7 +250,7 @@ if (!$note) {
                 if (e.lengthComputable) {
                     const percent = Math.round((e.loaded / e.total) * 100);
                     progressFill.style.width = percent + '%';
-                    progressText.textContent = `Uploading... ${percent}%`;
+                    progressText.textContent = `${TXT_UPLOADING} ${percent}%`;
                 }
             });
 
@@ -231,17 +261,17 @@ if (!$note) {
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (response.success) {
-                        showNotification('File uploaded successfully!', 'success');
+                        showNotification(TXT_UPLOAD_SUCCESS, 'success');
                         fileInput.value = '';
                         document.getElementById('selectedFileName').style.display = 'none';
                         document.getElementById('uploadBtn').disabled = true;
                         loadAttachments(); // Reload the list
                     } else {
-                        showNotification('Upload failed: ' + response.message, 'error');
+                        showNotification(TXT_UPLOAD_FAILED_PREFIX.replaceAll('{{error}}', String(response.message || '')), 'error');
                         document.getElementById('uploadBtn').disabled = false;
                     }
                 } catch (e) {
-                    showNotification('Upload failed. Please try again.', 'error');
+                    showNotification(TXT_UPLOAD_FAILED_GENERIC, 'error');
                     document.getElementById('uploadBtn').disabled = false;
                 }
             });
@@ -249,7 +279,7 @@ if (!$note) {
             xhr.addEventListener('error', function() {
                 uploadInProgress = false;
                 progressDiv.style.display = 'none';
-                showNotification('Upload failed. Please check your connection.', 'error');
+                showNotification(TXT_UPLOAD_FAILED_CONNECTION, 'error');
                 document.getElementById('uploadBtn').disabled = false;
             });
 
@@ -265,12 +295,12 @@ if (!$note) {
                         displayAttachments(data.attachments);
                     } else {
                         document.getElementById('attachmentsList').innerHTML = 
-                            '<div class="error-message">Failed to load attachments</div>';
+                            '<div class="error-message">' + TXT_LOADING_FAILED + '</div>';
                     }
                 })
                 .catch(error => {
                     document.getElementById('attachmentsList').innerHTML = 
-                        '<div class="error-message">Error loading attachments</div>';
+                        '<div class="error-message">' + TXT_LOADING_ERROR + '</div>';
                 });
         }
 
@@ -278,7 +308,7 @@ if (!$note) {
             const container = document.getElementById('attachmentsList');
             
             if (attachments.length === 0) {
-                container.innerHTML = '<div class="no-attachments">No attachments yet</div>';
+                container.innerHTML = '<div class="no-attachments">' + TXT_NO_ATTACHMENTS + '</div>';
                 return;
             }
             
@@ -296,7 +326,7 @@ if (!$note) {
                 
                 let previewContent = '';
                 if (isImage) {
-                    previewContent = `<img src="${fileUrl}" alt="Preview" class="attachment-thumbnail" onclick="previewImage('${fileUrl}', '${fileName}')">`;
+                    previewContent = `<img src="${fileUrl}" alt="${TXT_PREVIEW_ALT}" class="attachment-thumbnail" onclick="previewImage('${fileUrl}', '${fileName}')">`;
                 } else if (isPDF) {
                     previewContent = `<div class="pdf-thumbnail" onclick="previewPDF('${fileUrl}', '${fileName}')">
                         <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
@@ -318,18 +348,18 @@ if (!$note) {
                             <div class="attachment-name" title="${fileName}">${shortName}</div>
                             <div class="attachment-meta">
                                 <span class="attachment-size">${fileSize}</span>
-                                <span class="attachment-date">Uploaded: ${uploadDate}</span>
+                                <span class="attachment-date">${TXT_UPLOADED_PREFIX}${uploadDate}</span>
                             </div>
                         </div>
                         <div class="attachment-actions">
-                            <button onclick="downloadAttachment('${attachment.id}')" class="btn-icon btn-download" title="View">
+                            <button onclick="downloadAttachment('${attachment.id}')" class="btn-icon btn-download" title="${TXT_VIEW}">
                                 <!-- Eye / view icon -->
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                             </button>
-                            <button onclick="showDeleteAttachmentConfirm('${attachment.id}')" class="btn-icon btn-delete" title="Delete">
+                            <button onclick="showDeleteAttachmentConfirm('${attachment.id}')" class="btn-icon btn-delete" title="${TXT_DELETE}">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3,6 5,6 21,6"></polyline>
                                     <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>
@@ -395,11 +425,9 @@ if (!$note) {
                 </div>
                 <embed src="${pdfUrl}" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">
                 <div class="pdf-preview-actions">
-                    <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">
-                        Open in new tab
-                    </button>
+                    <button onclick="window.open('${pdfUrl}', '_blank')" class="btn btn-primary">${TXT_OPEN_NEW_TAB}</button>
                     <button onclick="downloadAttachment('${pdfUrl.split('attachment_id=')[1]}')" class="btn btn-secondary">
-                        Download
+                        ${TXT_DOWNLOAD}
                     </button>
                 </div>
             </div>
@@ -427,14 +455,14 @@ if (!$note) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('Attachment deleted successfully', 'success');
+                    showNotification(TXT_DELETED_SUCCESS, 'success');
                     loadAttachments(); // Reload the list
                 } else {
-                    showNotification('Failed to delete attachment: ' + data.message, 'error');
+                    showNotification(TXT_DELETE_FAILED_PREFIX.replaceAll('{{error}}', String(data.message || '')), 'error');
                 }
             })
             .catch(error => {
-                showNotification('Error deleting attachment', 'error');
+                showNotification(TXT_DELETE_FAILED_GENERIC, 'error');
             });
         }
 
@@ -491,7 +519,7 @@ if (!$note) {
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = FILESIZE_UNITS;
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
@@ -563,7 +591,7 @@ if (!$note) {
 
             notification.className = cssClass;
             // If the success message is the specific upload success message, show text only (no icon)
-            if (type === 'success' && message === 'File uploaded successfully!') {
+            if (type === 'success' && message === TXT_UPLOAD_SUCCESS) {
                 notification.textContent = message;
             } else {
                 notification.innerHTML = message;
@@ -604,11 +632,11 @@ if (!$note) {
     <!-- Delete Attachment Confirmation Modal -->
     <div id="deleteAttachmentConfirmModal" class="modal">
         <div class="modal-content">
-            <h3>Delete Attachment</h3>
-            <p>Do you want to delete this attachment? This action cannot be undone.</p>
+            <h3><?php echo t_h('attachments.modals.delete.title', [], 'Delete Attachment'); ?></h3>
+            <p><?php echo t_h('attachments.modals.delete.message', [], 'Do you want to delete this attachment? This action cannot be undone.'); ?></p>
             <div class="modal-buttons">
-                <button type="button" class="btn-cancel" onclick="closeDeleteAttachmentConfirmModal()">Cancel</button>
-                <button type="button" class="btn-danger" onclick="executeDeleteAttachment()">Delete</button>
+                <button type="button" class="btn-cancel" onclick="closeDeleteAttachmentConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
+                <button type="button" class="btn-danger" onclick="executeDeleteAttachment()"><?php echo t_h('attachments.actions.delete', [], 'Delete'); ?></button>
             </div>
         </div>
     </div>

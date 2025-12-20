@@ -81,3 +81,77 @@ window.addEventListener('resize', function() {
     clearTimeout(window._poznoteAriaTimeout);
     window._poznoteAriaTimeout = setTimeout(updateMobileDesktopAria, 120);
 });
+
+// --- i18n (client-side) ---
+// Loads merged translations from api_i18n.php and exposes window.t(key, vars, fallback)
+(function() {
+    if (window.t && window.loadPoznoteI18n) return;
+
+    window.POZNOTE_I18N = window.POZNOTE_I18N || { lang: 'en', strings: {} };
+
+    function getByPath(obj, key) {
+        if (!obj || !key) return null;
+        var parts = String(key).split('.');
+        var cur = obj;
+        for (var i = 0; i < parts.length; i++) {
+            if (!cur || typeof cur !== 'object' || !(parts[i] in cur)) return null;
+            cur = cur[parts[i]];
+        }
+        return (typeof cur === 'string') ? cur : null;
+    }
+
+    window.t = function(key, vars, fallback) {
+        var str = getByPath(window.POZNOTE_I18N && window.POZNOTE_I18N.strings, key);
+        if (str == null) str = (fallback != null ? String(fallback) : String(key));
+        if (vars && typeof vars === 'object') {
+            for (var k in vars) {
+                if (!Object.prototype.hasOwnProperty.call(vars, k)) continue;
+                str = str.split('{{' + k + '}}').join(String(vars[k]));
+            }
+        }
+        return str;
+    };
+
+    window.applyI18nToDom = function(root) {
+        try {
+            root = root || document;
+            var nodes = root.querySelectorAll('[data-i18n]');
+            for (var i = 0; i < nodes.length; i++) {
+                var el = nodes[i];
+                var key = el.getAttribute('data-i18n');
+                var mode = el.getAttribute('data-i18n-mode') || 'text'; // text | html
+                var value = window.t(key);
+                if (mode === 'html') el.innerHTML = value;
+                else el.textContent = value;
+            }
+            var placeholders = root.querySelectorAll('[data-i18n-placeholder]');
+            for (var j = 0; j < placeholders.length; j++) {
+                var inp = placeholders[j];
+                var pKey = inp.getAttribute('data-i18n-placeholder');
+                inp.setAttribute('placeholder', window.t(pKey));
+            }
+            if (window.POZNOTE_I18N && window.POZNOTE_I18N.lang) {
+                document.documentElement.setAttribute('lang', window.POZNOTE_I18N.lang);
+            }
+        } catch (e) {
+            // ignore
+        }
+    };
+
+    window.loadPoznoteI18n = function() {
+        return fetch('api_i18n.php', { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(j) {
+                if (j && j.success && j.strings) {
+                    window.POZNOTE_I18N = { lang: j.lang || 'en', strings: j.strings };
+                    window.applyI18nToDom(document);
+                    try { document.dispatchEvent(new CustomEvent('poznote:i18n:loaded', { detail: window.POZNOTE_I18N })); } catch(e) {}
+                }
+            })
+            .catch(function(){});
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        window.loadPoznoteI18n();
+    });
+})();

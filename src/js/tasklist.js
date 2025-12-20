@@ -78,7 +78,7 @@ function renderTaskList(noteId, tasks) {
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
           <input type="text" class="task-input" id="task-input-${noteId}"
-              placeholder="Write a new task and press enter to add it to the list..." maxlength="4000">
+              placeholder="${window.t ? window.t('tasklist.input_placeholder', null, 'Write a new task and press enter to add it to the list...') : 'Write a new task and press enter to add it to the list...'}" maxlength="4000">
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}
@@ -136,7 +136,7 @@ function renderTasks(tasks, noteId) {
             <button class="task-delete-btn" onclick="deleteTask(${task.id}, ${task.noteId || 'null'})">
                 <i class="fa-trash"></i>
             </button>
-            <div class="task-drag-handle" title="Drag to reorder">
+            <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
                 <i class="fa-grip-vertical"></i>
             </div>`;
         } else {
@@ -145,7 +145,7 @@ function renderTasks(tasks, noteId) {
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
-            <div class="task-drag-handle" title="Drag to reorder">
+            <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
                 <i class="fa-grip-vertical"></i>
             </div>`;
         }
@@ -864,3 +864,11 @@ function enableDragAndDrop(noteId) {
         }
     }, 500);
 }
+
+// Listen for i18n loaded event to update task input placeholders
+document.addEventListener('poznote:i18n:loaded', function() {
+    // Update all task input placeholders with translations
+    document.querySelectorAll('.task-input').forEach(function(input) {
+        input.placeholder = window.t ? window.t('tasklist.input_placeholder', null, 'Write a new task and press enter to add it to the list...') : 'Write a new task and press enter to add it to the list...';
+    });
+});

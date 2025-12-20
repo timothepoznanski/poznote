@@ -26,14 +26,15 @@ function linkify_html($text) {
 
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 $pageWorkspace = trim(getWorkspaceFilter());
+$currentLang = getUserLanguage();
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 <head>
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-<title>Trash - Poznote</title>
+	<title><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?> - <?php echo t_h('app.name'); ?></title>
 	<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
 	<meta name="color-scheme" content="dark light">
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -45,11 +46,11 @@ $pageWorkspace = trim(getWorkspaceFilter());
 </head>
 <body class="trash-page">
 	<div class="trash-container">
-		<h2 class="trash-header">Trash</h2>
+		<h2 class="trash-header"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></h2>
 		
 	<?php if (!empty($search)): ?>
 			<div class="trash-search-notice">
-				Results for "<?php echo htmlspecialchars($search); ?>"
+				<?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
 		<span class="trash-clear-search" onclick="clearSearchAndReturn()">
 					<i class="fa-times"></i>
 				</span>
@@ -62,18 +63,18 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				name="search" 
 				id="searchInput"
 				class="trash-search-input"
-				placeholder="Search in trash..." 
+				placeholder="<?php echo t_h('trash.search.placeholder', [], 'Search in trash...'); ?>" 
 				value="<?php echo htmlspecialchars($search); ?>"
 				autocomplete="off"
 			>
 		</form>
 		
 		<div class="trash-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="Back to notes">
-				Back to notes
+			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="<?php echo t_h('common.back_to_notes'); ?>">
+				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button class="btn btn-danger" id="emptyTrashBtn" title="Empty trash">
-				Empty trash
+			<button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
+				<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>
 			</button>
 		</div>
 		
@@ -127,6 +128,7 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				$entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
 				$heading = $row['heading'];
 				$updated = formatDateTime(strtotime($row['updated']));
+				$lastModifiedLabel = t_h('trash.note.last_modified_on', ['date' => $updated], 'Last modified on {{date}}');
 				
 				// If this is a tasklist type, try to parse the stored JSON and render a readable task list
 				$displayContent = $entryfinal;
@@ -158,17 +160,17 @@ $pageWorkspace = trim(getWorkspaceFilter());
 				echo '<div id="note'.$id.'" class="trash-notecard">'
 					.'<div class="trash-innernote">'
 					.'<div class="trash-action-icons">'
-					.'<i title="Restore this note" class="fa-trash-restore-alt" data-noteid="'.$id.'"></i>'
-					.'<i title="Delete permanently" class="fa-trash" data-noteid="'.$id.'"></i>'
+					.'<i title="'.t_h('trash.actions.restore_note_tooltip', [], 'Restore this note').'" class="fa-trash-restore-alt" data-noteid="'.$id.'"></i>'
+					.'<i title="'.t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently').'" class="fa-trash" data-noteid="'.$id.'"></i>'
 					.'</div>'
-					.'<div class="lastupdated">Last modified on '.$updated.'</div>'
+					.'<div class="lastupdated">'.$lastModifiedLabel.'</div>'
 					.'<h3 class="css-title">'.htmlspecialchars($heading, ENT_QUOTES).'</h3>'
 					.'<hr>'
 					.'<div class="noteentry">'.$displayContent.'</div>'
 					.'</div></div>';
 			}
 		} else {
-			echo '<div class="trash-no-notes">No notes in trash.</div>';
+			echo '<div class="trash-no-notes">' . t_h('trash.empty', [], 'No notes in trash.') . '</div>';
 		}
 		?>
 		</div>
@@ -177,11 +179,11 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<!-- Empty Trash Confirmation Modal -->
 	<div id="emptyTrashConfirmModal" class="modal">
 		<div class="modal-content">
-			<h3>Empty Trash</h3>
-			<p>Do you want to empty the trash completely? This action cannot be undone.</p>
+			<h3><?php echo t_h('trash.modals.empty.title', [], 'Empty Trash'); ?></h3>
+			<p><?php echo t_h('trash.modals.empty.message', [], 'Do you want to empty the trash completely? This action cannot be undone.'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeEmptyTrashConfirmModal()">Cancel</button>
-				<button type="button" class="btn-danger" onclick="executeEmptyTrash()">Empty Trash</button>
+				<button type="button" class="btn-cancel" onclick="closeEmptyTrashConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-danger" onclick="executeEmptyTrash()"><?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -189,10 +191,10 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<!-- Information Modal -->
 	<div id="infoModal" class="modal">
 		<div class="modal-content">
-			<h3 id="infoModalTitle">Information</h3>
+			<h3 id="infoModalTitle"><?php echo t_h('common.information'); ?></h3>
 			<p id="infoModalMessage"></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-primary" onclick="closeInfoModal()">Close</button>
+				<button type="button" class="btn-primary" onclick="closeInfoModal()"><?php echo t_h('common.close'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -200,11 +202,11 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<!-- Restore Confirmation Modal -->
 	<div id="restoreConfirmModal" class="modal">
 		<div class="modal-content">
-			<h3>Restore Note</h3>
-			<p>Do you want to restore this note?</p>
+			<h3><?php echo t_h('trash.modals.restore.title', [], 'Restore Note'); ?></h3>
+			<p><?php echo t_h('trash.modals.restore.message', [], 'Do you want to restore this note?'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeRestoreConfirmModal()">Cancel</button>
-				<button type="button" class="btn-primary" onclick="executeRestoreNote()">Restore</button>
+				<button type="button" class="btn-cancel" onclick="closeRestoreConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-primary" onclick="executeRestoreNote()"><?php echo t_h('trash.actions.restore', [], 'Restore'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -212,11 +214,11 @@ $pageWorkspace = trim(getWorkspaceFilter());
 	<!-- Delete Confirmation Modal -->
 	<div id="deleteConfirmModal" class="modal">
 		<div class="modal-content">
-			<h3>Permanently Delete Note</h3>
-			<p>Do you want to permanently delete this note? This action cannot be undone.</p>
+			<h3><?php echo t_h('trash.modals.delete.title', [], 'Permanently Delete Note'); ?></h3>
+			<p><?php echo t_h('trash.modals.delete.message', [], 'Do you want to permanently delete this note? This action cannot be undone.'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeDeleteConfirmModal()">Cancel</button>
-				<button type="button" class="btn-danger" onclick="executePermanentDelete()">Delete Forever</button>
+				<button type="button" class="btn-cancel" onclick="closeDeleteConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-danger" onclick="executePermanentDelete()"><?php echo t_h('trash.actions.delete_forever', [], 'Delete Forever'); ?></button>
 			</div>
 		</div>
 	</div>

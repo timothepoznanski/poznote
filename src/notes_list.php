@@ -22,7 +22,7 @@ try {
 echo "<div class='folder-header' data-folder='Trash'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-trash folder-icon'></i>";
-echo "<span class='folder-name'>Trash</span>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
 echo "<span class='folder-note-count' id='count-Trash'>(" . $trash_count . ")</span>";
 echo "</div></div>";
 
@@ -59,7 +59,7 @@ try {
 echo "<div class='folder-header' data-folder='Tags'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-tags folder-icon'></i>";
-echo "<span class='folder-name'>Tags</span>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'Tags') . "</span>";
 echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
 
@@ -120,7 +120,11 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Disable double-click rename for system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash'];
         $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
-        echo "<span class='folder-name' ondblclick='" . $ondbl . "'>$folderName</span>";
+        $folderDisplayName = $folderName;
+        if ($folderName === 'Favorites') {
+            $folderDisplayName = t('notes_list.system_folders.favorites', [], 'Favorites');
+        }
+        echo "<span class='folder-name' ondblclick='" . $ondbl . "'>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
         $noteCount = count($notes);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
@@ -148,8 +152,21 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
         $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
+        // Translate default note titles (New note, Nouvelle note, etc.)
+        $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
+        
+        // Check if the title matches a default note pattern in any supported language
+        if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
+            // Default title - translate to current language
+            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
+                $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
+            } else {
+                $noteTitle = t('index.note.new_note', [], 'New note');
+            }
+        }
+        
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' draggable='true'$onclickHandler>";
-        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "<span class='note-title'>" . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }
@@ -205,7 +222,7 @@ if (empty($folder_filter)) {
     echo '<div id="root-drop-zone" class="root-drop-zone" style="display: none;">';
     echo '<div class="drop-zone-content">';
     echo '<i class="fa-home drop-zone-icon"></i>';
-    echo '<span class="drop-zone-text">Drop here to remove from folder</span>';
+    echo '<span class="drop-zone-text">' . t_h('notes_list.drop_zone.remove_from_folder', [], 'Drop here to remove from folder') . '</span>';
     echo '</div>';
     echo '</div>';
 }
@@ -238,7 +255,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
-        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }
@@ -265,7 +282,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
         
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
-        echo "<span class='note-title'>" . ($row1["heading"] ?: 'New note') . "</span>";
+        echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
     }

@@ -88,7 +88,7 @@ if ($note_id === 0) {
         $wsStmt->execute([$workspace]);
         if ($wsStmt->fetchColumn() == 0) {
             http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
             exit;
         }
     }

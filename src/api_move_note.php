@@ -195,7 +195,7 @@ try {
         http_response_code(409);
         echo json_encode([
             'success' => false, 
-            'message' => 'A note with the same title already exists in the destination folder.'
+            'message' => t('folders.move_note.errors.duplicate_title', [], 'A note with the same title already exists in the destination folder.')
         ]);
         exit;
     }

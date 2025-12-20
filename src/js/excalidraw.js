@@ -1,14 +1,34 @@
 // Excalidraw integration for Poznote
 // Handles creation and opening of Excalidraw diagram notes
 
+function excaTr(key, vars, fallback) {
+    try {
+        if (typeof window !== 'undefined' && typeof window.t === 'function') {
+            return window.t(key, vars || {}, fallback);
+        }
+    } catch (e) {
+        // ignore
+    }
+    let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
+    if (vars && typeof vars === 'object') {
+        Object.keys(vars).forEach((k) => {
+            text = text.replaceAll('{{' + k + '}}', String(vars[k]));
+        });
+    }
+    return text;
+}
+
 // Open existing Excalidraw note for editing
 function openExcalidrawNote(noteId) {
     // Disable Excalidraw editing on mobile devices (< 800px)
     if (window.innerWidth < 800) {
         if (typeof window.showError === 'function') {
-            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+            window.showError(
+                excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
+                excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
+            );
         } else {
-            alert('Excalidraw editing is disabled on mobile devices.');
+            alert(excaTr('excalidraw.messages.disabled_mobile', {}, 'Excalidraw editing is disabled on mobile devices.'));
         }
         return false;
     }
@@ -55,9 +75,12 @@ function insertExcalidrawDiagram() {
     // Disable Excalidraw insertion on mobile devices (< 800px)
     if (window.innerWidth < 800) {
         if (typeof window.showError === 'function') {
-            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+            window.showError(
+                excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
+                excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
+            );
         } else {
-            alert('Excalidraw editing is disabled on screens smaller than 800px.');
+            alert(excaTr('excalidraw.messages.disabled_under_800', {}, 'Excalidraw editing is disabled on screens smaller than 800px.'));
         }
         return false;
     }
@@ -67,7 +90,10 @@ function insertExcalidrawDiagram() {
         if (typeof window.showCursorWarning === 'function') {
             window.showCursorWarning();
         } else {
-            window.showError('Please position your cursor in the note content area before inserting a diagram.', 'Cursor Position');
+            window.showError(
+                excaTr('modal_alerts.cursor_warning.message', {}, 'Please click inside the editor before continuing.'),
+                excaTr('modal_alerts.cursor_warning.title', {}, 'Cursor Position Required')
+            );
         }
         return;
     }
@@ -75,19 +101,28 @@ function insertExcalidrawDiagram() {
     // Check if the current note has content
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        window.showError('Please save the note before adding diagrams', 'Unsaved note');
+        window.showError(
+            excaTr('excalidraw.errors.save_before_adding', {}, 'Please save the note before adding diagrams'),
+            excaTr('excalidraw.titles.unsaved_note', {}, 'Unsaved note')
+        );
         return;
     }
     
     // Get the current note content
     const noteEntry = document.getElementById('entry' + currentNoteId);
     if (!noteEntry) {
-        window.showError('Note editor not found', 'Error');
+        window.showError(
+            excaTr('excalidraw.errors.note_editor_not_found', {}, 'Note editor not found'),
+            excaTr('common.error', {}, 'Error')
+        );
         return;
     }
     
     // Show loading spinner
-    const spinner = window.showLoadingSpinner('Saving note...', 'Saving');
+    const spinner = window.showLoadingSpinner(
+        excaTr('excalidraw.spinner.saving_note', {}, 'Saving note...'),
+        excaTr('excalidraw.spinner.saving_title', {}, 'Saving')
+    );
     
     // Create a unique ID for this diagram
     const diagramId = 'excalidraw-' + Date.now();
@@ -108,7 +143,10 @@ function insertExcalidrawDiagram() {
                     spinner.close();
                 }
                 if (typeof window.showError === 'function') {
-                    window.showError('Failed to save note. Please try again.', 'Save Error');
+                    window.showError(
+                        excaTr('excalidraw.errors.failed_to_save_try_again', {}, 'Failed to save note. Please try again.'),
+                        excaTr('ui.alerts.save_error', {}, 'Save Error')
+                    );
                 }
             }
         })
@@ -119,7 +157,14 @@ function insertExcalidrawDiagram() {
             }
             console.error('Error saving note:', error);
             if (typeof window.showError === 'function') {
-                window.showError('Error saving note: ' + (error.message || 'Unknown error'), 'Save Error');
+                window.showError(
+                    excaTr(
+                        'excalidraw.errors.error_saving_note_prefix',
+                        { error: (error && error.message) ? error.message : excaTr('common.unknown_error', {}, 'Unknown error') },
+                        'Error saving note: {{error}}'
+                    ),
+                    excaTr('ui.alerts.save_error', {}, 'Save Error')
+                );
             }
         });
 }
@@ -222,9 +267,12 @@ function openExcalidrawEditor(diagramId) {
     // Disable Excalidraw editing on mobile devices (< 800px)
     if (window.innerWidth < 800) {
         if (typeof window.showError === 'function') {
-            window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+            window.showError(
+                excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
+                excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
+            );
         } else {
-            alert('Excalidraw editing is disabled on mobile devices.');
+            alert(excaTr('excalidraw.messages.disabled_mobile', {}, 'Excalidraw editing is disabled on mobile devices.'));
         }
         return false;
     }
@@ -232,7 +280,10 @@ function openExcalidrawEditor(diagramId) {
     // Store the current note context
     const currentNoteId = getCurrentNoteId();
     if (!currentNoteId) {
-        window.showError('Please save the note before editing diagrams', 'Unsaved note');
+        window.showError(
+            excaTr('excalidraw.errors.save_before_editing', {}, 'Please save the note before editing diagrams'),
+            excaTr('excalidraw.titles.unsaved_note', {}, 'Unsaved note')
+        );
         return;
     }
     
@@ -342,9 +393,15 @@ function insertHtmlAtCursor(html) {
     // If we still couldn't insert, show a notification
     if (!insertionSuccessful) {
         if (window.showNotificationPopup) {
-            showNotificationPopup('Could not find note content area to insert diagram', 'warning');
+            showNotificationPopup(
+                excaTr('excalidraw.errors.insert_area_not_found', {}, 'Could not find note content area to insert diagram'),
+                'warning'
+            );
         } else {
-            window.showError('Unable to find note content area to insert diagram', 'Insertion Error');
+            window.showError(
+                excaTr('excalidraw.errors.insert_area_not_found', {}, 'Could not find note content area to insert diagram'),
+                excaTr('excalidraw.titles.insertion_error', {}, 'Insertion Error')
+            );
         }
     }
 }
@@ -363,7 +420,10 @@ function downloadExcalidrawImage(noteId) {
     img.onerror = function() {
         // PNG doesn't exist, show error message
         console.error('Excalidraw PNG not found for note ' + noteId);
-        window.showError('Excalidraw image not found. Please open the diagram in the editor and save it first.', 'Image not found');
+        window.showError(
+            excaTr('excalidraw.errors.image_not_found', {}, 'Excalidraw image not found. Please open the diagram in the editor and save it first.'),
+            excaTr('excalidraw.titles.image_not_found', {}, 'Image not found')
+        );
     };
     img.src = pngPath;
 }
@@ -382,9 +442,12 @@ function downloadImageFromUrl(imageSrc, filename) {
 // Function to show alert when trying to edit Excalidraw on mobile
 function showMobileExcalidrawAlert() {
     if (typeof window.showError === 'function') {
-        window.showError('Excalidraw editing is disabled on small screens for a better user experience.', 'Editing not available');
+        window.showError(
+            excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
+            excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
+        );
     } else {
-        alert('Excalidraw editing is disabled on screens smaller than 800px.');
+        alert(excaTr('excalidraw.messages.disabled_under_800', {}, 'Excalidraw editing is disabled on screens smaller than 800px.'));
     }
 }
 

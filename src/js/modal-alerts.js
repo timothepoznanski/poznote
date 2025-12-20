@@ -3,6 +3,23 @@
  * Replaces standard alert() and confirm() with styled modals
  */
 
+function tr(key, vars, fallback) {
+    try {
+        if (typeof window !== 'undefined' && typeof window.t === 'function') {
+            return window.t(key, vars || {}, fallback);
+        }
+    } catch (e) {
+        // ignore
+    }
+    let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
+    if (vars && typeof vars === 'object') {
+        Object.keys(vars).forEach((k) => {
+            text = text.replaceAll('{{' + k + '}}', String(vars[k]));
+        });
+    }
+    return text;
+}
+
 class ModalAlert {
     constructor() {
         this.currentModal = null;
@@ -25,7 +42,7 @@ class ModalAlert {
                 alertType: type,
                 title: title || this.getDefaultTitle(type),
                 buttons: [
-                    { text: 'Close', type: 'primary', action: () => resolve() }
+                    { text: tr('common.close', {}, 'Close'), type: 'primary', action: () => resolve() }
                 ]
             };
             
@@ -39,16 +56,16 @@ class ModalAlert {
      * @param {string} title - Optional title
      * @returns {Promise<boolean>} - Resolves with true/false
      */
-    confirm(message, title = 'Confirmation') {
+    confirm(message, title = null) {
         return new Promise((resolve) => {
             const config = {
                 type: 'confirm',
                 message,
                 alertType: 'warning',
-                title,
+                title: title || tr('common.confirmation', {}, 'Confirmation'),
                 buttons: [
-                    { text: 'Cancel', type: 'secondary', action: () => resolve(false) },
-                    { text: 'Confirm', type: 'primary', action: () => resolve(true) }
+                    { text: tr('common.cancel', {}, 'Cancel'), type: 'secondary', action: () => resolve(false) },
+                    { text: tr('common.confirm', {}, 'Confirm'), type: 'primary', action: () => resolve(true) }
                 ]
             };
             
@@ -62,7 +79,10 @@ class ModalAlert {
      * @param {string} title - Optional title
      * @returns {Object} - Object with close method
      */
-    showSpinner(message = 'Loading...', title = 'Please wait') {
+    showSpinner(message = null, title = null) {
+        if (message === null) message = tr('common.loading', {}, 'Loading...');
+        if (title === null) title = tr('common.please_wait', {}, 'Please wait');
+
         const overlay = document.createElement('div');
         overlay.className = 'alert-modal-overlay spinner-overlay';
         
@@ -238,12 +258,12 @@ class ModalAlert {
 
     getDefaultTitle(type) {
         const titles = {
-            info: 'Information',
-            warning: 'Attention',
-            error: 'Error',
-            success: 'Succès'
+            info: tr('common.information', {}, 'Information'),
+            warning: tr('common.warning', {}, 'Warning'),
+            error: tr('common.error', {}, 'Error'),
+            success: tr('common.success', {}, 'Success')
         };
-        return titles[type] || 'Information';
+        return titles[type] || tr('common.information', {}, 'Information');
     }
 
     getIcon(type) {
@@ -273,32 +293,40 @@ window.confirm = function(message) {
 };
 
 // Convenience functions
-window.showWarning = function(message, title = 'Warning') {
+window.showWarning = function(message, title = null) {
+    if (title === null) title = tr('common.warning', {}, 'Warning');
     return window.modalAlert.alert(message, 'warning', title);
 };
 
-window.showError = function(message, title = 'Error') {
+window.showError = function(message, title = null) {
+    if (title === null) title = tr('common.error', {}, 'Error');
     return window.modalAlert.alert(message, 'error', title);
 };
 
-window.showSuccess = function(message, title = 'Success') {
+window.showSuccess = function(message, title = null) {
+    if (title === null) title = tr('common.success', {}, 'Success');
     return window.modalAlert.alert(message, 'success', title);
 };
 
-window.showInfo = function(message, title = 'Information') {
+window.showInfo = function(message, title = null) {
+    if (title === null) title = tr('common.information', {}, 'Information');
     return window.modalAlert.alert(message, 'info', title);
 };
 
 // Special function for cursor warnings
 window.showCursorWarning = function() {
     return window.modalAlert.alert(
-        'Please place the cursor in the note editing area where you want to insert content.',
+        tr(
+            'modal_alerts.cursor_warning.message',
+            {},
+            'Please place the cursor in the note editing area where you want to insert content.'
+        ),
         'warning',
-        'Cursor Position Required'
+        tr('modal_alerts.cursor_warning.title', {}, 'Cursor Position Required')
     );
 };
 
 // Loading spinner function
-window.showLoadingSpinner = function(message = 'Loading...', title = 'Please wait') {
+window.showLoadingSpinner = function(message = null, title = null) {
     return window.modalAlert.showSpinner(message, title);
 };

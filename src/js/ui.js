@@ -7,17 +7,17 @@ function showNotificationPopup(message, type) {
     if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
         // Map type to modal alert type
         var alertType = 'info';
-        var title = 'Notification';
+        var title = (typeof window.t === 'function') ? window.t('common.notification') : 'Notification';
         
         if (type === 'error') {
             alertType = 'error';
-            title = 'Error';
+            title = (typeof window.t === 'function') ? window.t('common.error') : 'Error';
         } else if (type === 'warning') {
             alertType = 'warning';
-            title = 'Warning';
+            title = (typeof window.t === 'function') ? window.t('common.warning') : 'Warning';
         } else if (type === 'success') {
             alertType = 'success';
-            title = 'Success';
+            title = (typeof window.t === 'function') ? window.t('common.success') : 'Success';
         }
         
         window.modalAlert.alert(message, alertType, title);
@@ -229,7 +229,8 @@ function showLoginDisplayNamePrompt() {
     if (!modal || !input || !saveBtn) {
         console.warn('Missing login modal elements', {modal: !!modal, input: !!input, saveBtn: !!saveBtn});
         // Fallback to prompt if modal is not present
-        var val = prompt('Nom d\'affichage de connexion (vide pour effacer):');
+        var promptText = (typeof window.t === 'function') ? window.t('ui.login_display.prompt') : 'Login display name (empty to clear):';
+        var val = prompt(promptText);
         if (val === null) return;
         
         var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: val });
@@ -241,13 +242,13 @@ function showLoginDisplayNamePrompt() {
         .then(function(r) { return r.json(); })
         .then(function(resp) { 
             if (resp && resp.success) {
-                alert('Saved'); 
+                alert((typeof window.t === 'function') ? window.t('ui.alerts.saved') : 'Saved');
             } else {
-                alert('Save error'); 
+                alert((typeof window.t === 'function') ? window.t('ui.alerts.save_error') : 'Save error');
             }
         })
         .catch(function() { 
-            alert('Network error'); 
+            alert((typeof window.t === 'function') ? window.t('ui.alerts.network_error') : 'Network error');
         });
         return;
     }
@@ -495,7 +496,7 @@ function createInputModal() {
         '</div>' +
         '<div class="modal-body">' +
         '<label id="inputModalLabel" for="inputModalInput" style="display:block; margin-bottom:6px; font-weight:600;"></label>' +
-        '<input type="text" id="inputModalInput" placeholder="Enter text" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
+        '<input type="text" id="inputModalInput" placeholder="' + (window.t ? window.t('modals.input.placeholder', null, 'Enter text') : 'Enter text') + '" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">' +
         '</div>' +
         '<div class="modal-buttons">' +
         '<button type="button" class="btn-cancel" onclick="closeInputModal()">Cancel</button>' +
@@ -555,7 +556,9 @@ function showLinkModal(defaultUrl, defaultText, callback) {
     // Update modal title and enable/disable remove button based on whether we're editing an existing link
     var isEditingLink = defaultUrl && defaultUrl !== 'https://';
     if (modalTitle) {
-        modalTitle.textContent = isEditingLink ? 'Manage Link' : 'Add Link';
+        modalTitle.textContent = isEditingLink ? 
+            (typeof window.t === 'function' ? window.t('editor.link.title') : 'Manage Link') : 
+            (typeof window.t === 'function' ? window.t('editor.link.add_title') : 'Add Link');
     }
     if (removeLinkBtn) {
         if (isEditingLink) {
@@ -580,22 +583,24 @@ function createLinkModal() {
     var modalHtml = '<div id="linkModal" class="modal" style="display: none;">' +
         '<div class="modal-content">' +
         '<div class="modal-header">' +
-        '<h3>Manage Link</h3>' +
+        '<h3>' + (window.t ? window.t('editor.link.title', null, 'Manage Link') : 'Manage Link') + '</h3>' +
         '</div>' +
         '<div class="modal-body">' +
         '<div style="margin-bottom: 10px;">' +
-        '<label for="linkModalUrl" style="display: block; font-weight: bold; margin-bottom: 5px;">URL:</label>' +
-        '<input type="url" id="linkModalUrl" placeholder="https://example.com" />' +
+        '<label for="linkModalUrl" style="display: block; font-weight: bold; margin-bottom: 5px;">' + (window.t ? window.t('editor.link.url_label', null, 'URL:') : 'URL:') + '</label>' +
+        '<input type="url" id="linkModalUrl" placeholder="' + (window.t ? window.t('editor.link.url_placeholder', null, 'https://example.com') : 'https://example.com') + '" />' +
         '</div>' +
         '<div>' +
-        '<label for="linkModalText" style="display: block; font-weight: bold; margin-bottom: 5px;">Link text (optional):</label>' +
-        '<input type="text" id="linkModalText" placeholder="Displayed text" />' +
+        '<label for="linkModalText" style="display: block; font-weight: bold; margin-bottom: 5px;">' + (window.t ? window.t('editor.link.text_label', null, 'Link text (optional):') : 'Link text (optional):') + '</label>' +
+        '<input type="text" id="linkModalText" placeholder="' + (window.t ? window.t('editor.link.text_placeholder', null, 'Displayed text') : 'Displayed text') + '" />' +
         '</div>' +
         '</div>' +
-    '<div class="modal-buttons">' +
-    '<button type="button" class="btn btn-disabled" id="linkModalRemove" style="margin-right: auto;" disabled>Remove link</button>' +
-    '<button type="button" class="btn btn-cancel" id="linkModalCancel">Cancel</button>' +
-    '<button type="button" class="btn btn-primary" id="linkModalAdd">Save</button>' +
+    '<div class="modal-buttons" style="justify-content: space-between;">' +
+    '<button type="button" class="btn btn-disabled" id="linkModalRemove" disabled>' + (window.t ? window.t('editor.link.remove', null, 'Remove link') : 'Remove link') + '</button>' +
+    '<div style="display: flex; gap: 10px;">' +
+    '<button type="button" class="btn btn-cancel" id="linkModalCancel">' + (window.t ? window.t('editor.link.cancel', null, 'Cancel') : 'Cancel') + '</button>' +
+    '<button type="button" class="btn btn-primary" id="linkModalAdd">' + (window.t ? window.t('editor.link.save', null, 'Save') : 'Save') + '</button>' +
+    '</div>' +
         '</div>' +
         '</div>' +
         '</div>';

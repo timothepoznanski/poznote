@@ -3,6 +3,40 @@
  * Handles database, notes, and attachments import functionality
  */
 
+function tr(key, fallback, vars) {
+    if (window.t) return window.t(key, vars || null, fallback);
+    if (vars && typeof vars === 'object') {
+        for (const k in vars) fallback = String(fallback).split('{{' + k + '}}').join(String(vars[k]));
+    }
+    return fallback;
+}
+
+// Custom alert helpers (used by inline onclick and this script)
+if (typeof window.showCustomAlert !== 'function') {
+    window.showCustomAlert = function (title, message) {
+        const alertEl = document.getElementById('customAlert');
+        const titleEl = document.getElementById('alertTitle');
+        const messageEl = document.getElementById('alertMessage');
+
+        if (titleEl) titleEl.textContent = title != null ? String(title) : '';
+        if (messageEl) messageEl.textContent = message != null ? String(message) : '';
+
+        if (alertEl) {
+            alertEl.style.display = 'flex';
+        } else {
+            // Fallback if markup is missing
+            alert((title ? title + '\n\n' : '') + (message || ''));
+        }
+    };
+}
+
+if (typeof window.hideCustomAlert !== 'function') {
+    window.hideCustomAlert = function () {
+        const alertEl = document.getElementById('customAlert');
+        if (alertEl) alertEl.style.display = 'none';
+    };
+}
+
 // Initialize event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Close modal when clicking outside
@@ -31,7 +65,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function showCompleteRestoreConfirmation() {
     const fileInput = document.getElementById('complete_backup_file');
     if (!fileInput.files.length) {
-        showCustomAlert('No ZIP File Selected', 'Please select a complete backup ZIP file before proceeding with the restore.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
+            tr('restore_import.alerts.no_zip_selected_restore', 'Please select a complete backup ZIP file before proceeding with the restore.')
+        );
         return;
     }
     
@@ -44,9 +81,17 @@ function showCompleteRestoreConfirmation() {
     const warningText = modalContent.querySelector('p');
     
     if (sizeMB > 500) {
-        warningText.innerHTML = '<strong>Warning:</strong> This file is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail for large files. Consider using chunked upload instead.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>';
+        warningText.innerHTML = tr(
+            'restore_import.modals.complete_restore.warning_large_html',
+            '<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files. Consider using chunked upload instead.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
+            { size: sizeMB.toFixed(1) }
+        );
     } else {
-        warningText.innerHTML = '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.';
+        warningText.innerHTML = tr(
+            'restore_import.modals.complete_restore.warning_html',
+            '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.',
+            null
+        );
     }
     
     modal.style.display = 'flex';
@@ -69,7 +114,7 @@ function proceedWithCompleteRestore() {
         // Submit the form
         completeForm.submit();
     } else {
-        alert('Complete restore form not found. Please try again.');
+        alert(tr('restore_import.errors.complete_restore_form_not_found', 'Complete restore form not found. Please try again.'));
     }
 }
 
@@ -80,10 +125,10 @@ function toggleAdvancedImport() {
     
     if (advancedOptions.style.display === 'none') {
         advancedOptions.style.display = 'block';
-        toggleButton.innerHTML = '<i class="fa-chevron-up"></i> Hide Advanced Import Options';
+        toggleButton.innerHTML = '<i class="fa-chevron-up"></i> ' + tr('restore_import.advanced.hide', 'Hide Advanced Import Options');
     } else {
         advancedOptions.style.display = 'none';
-        toggleButton.innerHTML = '<i class="fa-chevron-down"></i> Show Advanced Import Options';
+        toggleButton.innerHTML = '<i class="fa-chevron-down"></i> ' + tr('restore_import.advanced.show', 'Show Advanced Import Options');
     }
 }
 
@@ -91,7 +136,10 @@ function toggleAdvancedImport() {
 function showImportConfirmation() {
     const fileInput = document.getElementById('backup_file');
     if (!fileInput.files.length) {
-        showCustomAlert('No SQL File Selected', 'Please select a SQL file before proceeding with the database import.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_sql_selected_title', 'No SQL File Selected'),
+            tr('restore_import.alerts.no_sql_selected_body', 'Please select a SQL file before proceeding with the database import.')
+        );
         return;
     }
     document.getElementById('importConfirmModal').style.display = 'flex';
@@ -110,7 +158,7 @@ function proceedWithImport() {
         }
         form.submit();
     } else {
-        alert('Form not found. Please try again.');
+        alert(tr('restore_import.errors.form_not_found', 'Form not found. Please try again.'));
     }
 }
 
@@ -118,7 +166,10 @@ function proceedWithImport() {
 function showNotesImportConfirmation() {
     const fileInput = document.getElementById('notes_file');
     if (!fileInput.files.length) {
-        showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing HTML notes before proceeding with the import.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
+            tr('restore_import.alerts.no_zip_selected_notes', 'Please select a ZIP file containing HTML notes before proceeding with the import.')
+        );
         return;
     }
     document.getElementById('notesImportConfirmModal').style.display = 'flex';
@@ -142,7 +193,10 @@ function proceedWithNotesImport() {
 function showAttachmentsImportConfirmation() {
     const fileInput = document.getElementById('attachments_file');
     if (!fileInput.files.length) {
-        showCustomAlert('No ZIP File Selected', 'Please select a ZIP file containing attachments before proceeding with the import.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
+            tr('restore_import.alerts.no_zip_selected_attachments', 'Please select a ZIP file containing attachments before proceeding with the import.')
+        );
         return;
     }
     document.getElementById('attachmentsImportConfirmModal').style.display = 'flex';
@@ -167,7 +221,10 @@ function showIndividualNotesImportConfirmation() {
     const fileInput = document.getElementById('individual_notes_files');
     
     if (!fileInput.files.length) {
-        showCustomAlert('No Files Selected', 'Please select one or more HTML or Markdown files before proceeding with the import.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_files_selected_title', 'No Files Selected'),
+            tr('restore_import.alerts.no_files_selected_body', 'Please select one or more HTML or Markdown files before proceeding with the import.')
+        );
         return;
     }
     
@@ -176,13 +233,27 @@ function showIndividualNotesImportConfirmation() {
     const fileCount = fileInput.files.length;
     
     if (fileCount > maxFiles) {
-        showCustomAlert('Too Many Files Selected', `You can import a maximum of ${maxFiles} files at once. You have selected ${fileCount} files. Please select fewer files and try again.`);
+        showCustomAlert(
+            tr('restore_import.alerts.too_many_files_title', 'Too Many Files Selected'),
+            tr(
+                'restore_import.alerts.too_many_files_body',
+                'You can import a maximum of {{max}} files at once. You have selected {{count}} files. Please select fewer files and try again.',
+                { max: maxFiles, count: fileCount }
+            )
+        );
         return;
     }
     
     // Update summary text
-    const fileText = fileCount === 1 ? '1 note' : `${fileCount} notes`;
-    const summary = `This will import ${fileText} into the Poznote workspace without assigning them to a folder.`;
+    const fileText = fileCount === 1
+        ? tr('restore_import.individual_notes.file_count_one', '1 note')
+        : tr('restore_import.individual_notes.file_count_many', '{{count}} notes', { count: fileCount });
+
+    const summary = tr(
+        'restore_import.individual_notes.summary',
+        'This will import {{fileText}} into the Poznote workspace without assigning them to a folder.',
+        { fileText: fileText }
+    );
     document.getElementById('individualNotesImportSummary').textContent = summary;
     
     document.getElementById('individualNotesImportConfirmModal').style.display = 'flex';
@@ -204,7 +275,10 @@ function proceedWithIndividualNotesImport() {
 function showChunkedRestoreConfirmation() {
     const fileInput = document.getElementById('chunked_backup_file');
     if (!fileInput.files.length) {
-        showCustomAlert('No ZIP File Selected', 'Please select a complete backup ZIP file before proceeding with the chunked restore.');
+        showCustomAlert(
+            tr('restore_import.alerts.no_zip_selected_title', 'No ZIP File Selected'),
+            tr('restore_import.alerts.no_zip_selected_chunked', 'Please select a complete backup ZIP file before proceeding with the chunked restore.')
+        );
         return;
     }
     
@@ -217,9 +291,17 @@ function showChunkedRestoreConfirmation() {
     const warningText = modalContent.querySelector('p');
     
     if (sizeMB < 500) {
-        warningText.innerHTML = '<strong>Note:</strong> This file is ' + sizeMB.toFixed(1) + 'MB. Standard upload is usually faster for small files, but chunked upload will work too.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>';
+        warningText.innerHTML = tr(
+            'restore_import.modals.chunked_restore.note_small_html',
+            '<strong>Note:</strong> This file is {{size}}MB. Standard upload is usually faster for small files, but chunked upload will work too.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
+            { size: sizeMB.toFixed(1) }
+        );
     } else {
-        warningText.innerHTML = '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.';
+        warningText.innerHTML = tr(
+            'restore_import.modals.chunked_restore.warning_html',
+            '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.',
+            null
+        );
     }
     
     modal.style.display = 'flex';
@@ -303,7 +385,7 @@ function startChunkedRestore() {
     const file = fileInput.files[0];
     
     if (!file) {
-        alert('Please select a backup file first.');
+        alert(tr('restore_import.errors.select_backup_first', 'Please select a backup file first.'));
         return;
     }
 
@@ -320,29 +402,36 @@ function startChunkedRestore() {
         onProgress: (percent) => {
             progressBar.style.width = percent + '%';
             progressBar.textContent = Math.round(percent) + '%';
-            statusText.textContent = `Uploading... ${Math.round(percent)}% complete`;
+            statusText.textContent = tr(
+                'restore_import.chunked.status_uploading',
+                'Uploading... {{percent}}% complete',
+                { percent: Math.round(percent) }
+            );
         },
         onComplete: () => {
             progressBar.style.width = '100%';
             progressBar.textContent = '100%';
-            statusText.textContent = 'Restoration completed successfully!';
+            statusText.textContent = tr('restore_import.chunked.status_completed', 'Restoration completed successfully!');
             
             // Add a success message and manual reload option instead of auto-reload
             setTimeout(() => {
                 const successMsg = document.createElement('div');
                 successMsg.className = 'alert alert-success';
-                successMsg.innerHTML = '<strong>Success!</strong> Your backup has been restored. <button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-left: 10px;">Refresh Page</button>';
+                successMsg.innerHTML = tr(
+                    'restore_import.chunked.success_html',
+                    '<strong>Success!</strong> Your backup has been restored. <button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-left: 10px;">Refresh Page</button>'
+                );
                 document.getElementById('chunkedUploadStatus').appendChild(successMsg);
             }, 500);
         },
         onError: (error) => {
-            statusText.textContent = `Error: ${error.message}`;
+            statusText.textContent = tr('restore_import.chunked.status_error', 'Error: {{message}}', { message: error.message });
             progressBar.style.backgroundColor = '#dc3545';
             
             // Show retry option
             const retryBtn = document.createElement('button');
             retryBtn.className = 'btn btn-secondary';
-            retryBtn.textContent = 'Retry';
+            retryBtn.textContent = tr('restore_import.chunked.retry', 'Retry');
             retryBtn.onclick = () => {
                 location.reload();
             };

@@ -60,6 +60,11 @@ function updateSearchResults(count, searchTerm) {
         resultsDiv.style.display = 'none';
     } else {
         resultsDiv.style.display = 'block';
-        resultsDiv.textContent = `${count} tag(s) found for "${searchTerm}"`;
+        const term = String(searchTerm).trim();
+        if (count === 1) {
+            resultsDiv.textContent = (window.t ? window.t('tags.search.results_one', { count, term }, '1 tag found for "{{term}}"') : `1 tag found for "${term}"`);
+        } else {
+            resultsDiv.textContent = (window.t ? window.t('tags.search.results_other', { count, term }, '{{count}} tags found for "{{term}}"') : `${count} tags found for "${term}"`);
+        }
     }
 }

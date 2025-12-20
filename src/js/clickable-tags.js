@@ -73,7 +73,9 @@ function convertTagsToEditable(noteId) {
     const tagInput = document.createElement('input');
     tagInput.className = 'tag-input';
     tagInput.type = 'text';
-    tagInput.placeholder = tagsValue ? 'Add tag...' : 'Add tags...';
+    tagInput.placeholder = tagsValue 
+        ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...') 
+        : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
     tagInput.setAttribute('autocomplete', 'off');
     tagInput.setAttribute('autocorrect', 'off');
     tagInput.setAttribute('spellcheck', 'false');
@@ -530,6 +532,14 @@ function updateTagsInput(noteId, container) {
     
     tagsInput.value = tags.join(' ');
     
+    // Update the placeholder based on whether there are tags
+    const tagInput = container.querySelector('.tag-input');
+    if (tagInput) {
+        tagInput.placeholder = tags.length > 0
+            ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
+            : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
+    }
+    
     // Trigger auto-save for this specific note (without changing global noteid)
     triggerAutoSaveForNote(noteId);
     
@@ -753,4 +763,18 @@ function redirectToTag(tag) {
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;
 window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
+
+// Listen for i18n loaded event to update tag input placeholders
+document.addEventListener('poznote:i18n:loaded', function() {
+    // Update all tag input placeholders with translations
+    document.querySelectorAll('.tag-input').forEach(function(input) {
+        const container = input.closest('.editable-tags-container');
+        if (container) {
+            const tagElements = container.querySelectorAll('.clickable-tag');
+            input.placeholder = tagElements.length > 0
+                ? (window.t ? window.t('tags.add_single', null, 'Add tag...') : 'Add tag...')
+                : (window.t ? window.t('tags.add_multiple', null, 'Add tags...') : 'Add tags...');
+        }
+    });
+});
 window.redirectToTag = redirectToTag;

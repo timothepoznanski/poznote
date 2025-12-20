@@ -16,7 +16,9 @@ $is_embedded_diagram = !empty($diagram_id);
 
 // Load existing note data if editing
 $existing_data = null;
-$note_title = $is_embedded_diagram ? 'Embedded Diagram' : 'New note';
+$note_title = $is_embedded_diagram
+    ? t('excalidraw.editor.titles.embedded_diagram', [], 'Embedded Diagram')
+    : t('excalidraw.editor.titles.new_note', [], 'New note');
 
 if ($note_id > 0) {
     $stmt = $con->prepare('SELECT heading, entry, type FROM entries WHERE id = ?');
@@ -167,13 +169,13 @@ if ($note_id > 0) {
         <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 5000;">
             <div style="display: flex; gap: 8px; align-items: center;">
                 <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
-                    Save
+                    <?php echo t_h('common.save', [], 'Save'); ?>
                 </button>
                 <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
-                    Save and exit
+                    <?php echo t_h('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'); ?>
                 </button>
                 <button id="cancelBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #dc2626; border: 1px solid #dc2626; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
-                    Exit without saving
+                    <?php echo t_h('excalidraw.editor.toolbar.exit_without_saving', [], 'Exit without saving'); ?>
                 </button>
             </div>
             <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
@@ -183,12 +185,28 @@ if ($note_id > 0) {
         <!-- Excalidraw container -->
         <div id="app" style="flex: 1; background: #fff;">
             <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 18px; font-family: 'Inter', sans-serif;">
-                Loading Excalidraw Poznote...
+                <?php echo t_h('excalidraw.editor.loading', [], 'Loading Excalidraw Poznote...'); ?>
             </div>
         </div>
     </div>
 
     <script>
+    const TXT_EDITOR_NOT_READY = <?php echo json_encode(t('excalidraw.editor.alerts.editor_not_ready', [], 'Editor not ready')); ?>;
+    const TXT_SAVING = <?php echo json_encode(t('excalidraw.editor.toolbar.saving', [], 'Saving...')); ?>;
+    const TXT_SAVED = <?php echo json_encode(t('excalidraw.editor.toolbar.saved', [], 'Saved!')); ?>;
+    const TXT_SAVE = <?php echo json_encode(t('common.save', [], 'Save')); ?>;
+    const TXT_SAVE_AND_EXIT = <?php echo json_encode(t('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit')); ?>;
+    const TXT_FAILED_TO_LOAD = <?php echo json_encode(t('excalidraw.editor.errors.failed_to_load', [], 'Error: Failed to load Excalidraw. Please refresh the page.')); ?>;
+    const TXT_INIT_ERROR_TEMPLATE = <?php echo json_encode(t('excalidraw.editor.errors.initializing_prefix', ['error' => '{{error}}'], 'Error initializing Excalidraw: {{error}}')); ?>;
+    const TXT_ERROR_TEMPLATE = <?php echo json_encode(t('excalidraw.editor.alerts.error_prefix', ['error' => '{{error}}'], 'Error: {{error}}')); ?>;
+    const TXT_SAVE_FAILED = <?php echo json_encode(t('excalidraw.editor.errors.save_failed', [], 'Save failed')); ?>;
+
+    function tpl(template, vars) {
+        return String(template).replace(/\{\{(\w+)\}\}/g, (match, key) => {
+            return Object.prototype.hasOwnProperty.call(vars, key) ? String(vars[key]) : match;
+        });
+    }
+
     let noteId = <?php echo $note_id; ?>;
     const workspace = <?php echo json_encode($workspace); ?>;
     const diagramId = <?php echo json_encode($diagram_id); ?>;
@@ -348,7 +366,7 @@ if ($note_id > 0) {
         setTimeout(function() {
             if (!window.PoznoteExcalidraw) {
                 console.error('PoznoteExcalidraw not found');
-                document.getElementById('loading').innerHTML = 'Error: Failed to load Excalidraw. Please refresh the page.';
+                document.getElementById('loading').innerHTML = TXT_FAILED_TO_LOAD;
                 return;
             }
             
@@ -377,7 +395,7 @@ if ($note_id > 0) {
                 
             } catch (error) {
                 console.error('Error initializing Excalidraw:', error);
-                document.getElementById('loading').innerHTML = 'Error initializing Excalidraw: ' + error.message;
+                document.getElementById('loading').innerHTML = tpl(TXT_INIT_ERROR_TEMPLATE, { error: error.message });
             }
         }, 1000);
     });
@@ -393,11 +411,11 @@ if ($note_id > 0) {
         // Save button handler
     document.getElementById('saveBtn').onclick = async function() {
         if (!excalidrawAPI) {
-            alert('Editor not ready');
+            alert(TXT_EDITOR_NOT_READY);
             return;
         }
         
-        this.textContent = 'Saving...';
+        this.textContent = TXT_SAVING;
         
         try {
             const elements = excalidrawAPI.getSceneElements();
@@ -442,24 +460,24 @@ if ($note_id > 0) {
             hasChanges = false;
             updateSaveButtonsState();
             
-            this.textContent = 'Saved!';
-            setTimeout(() => { this.textContent = 'Save'; }, 2000);
+            this.textContent = TXT_SAVED;
+            setTimeout(() => { this.textContent = TXT_SAVE; }, 2000);
             
         } catch (e) {
             console.error('Save error:', e);
-            alert('Error: ' + e.message);
-            this.textContent = 'Save';
+            alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
+            this.textContent = TXT_SAVE;
         }
     };
 
     // Save and exit button handler
     document.getElementById('saveAndExitBtn').onclick = async function() {
         if (!excalidrawAPI) {
-            alert('Editor not ready');
+            alert(TXT_EDITOR_NOT_READY);
             return;
         }
         
-        this.textContent = 'Saving...';
+        this.textContent = TXT_SAVING;
         
         try {
             const elements = excalidrawAPI.getSceneElements();
@@ -506,8 +524,8 @@ if ($note_id > 0) {
             
         } catch (e) {
             console.error('Save error:', e);
-            alert('Error: ' + e.message);
-            this.textContent = 'Save and exit';
+            alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
+            this.textContent = TXT_SAVE_AND_EXIT;
         }
     };
         
@@ -565,7 +583,7 @@ if ($note_id > 0) {
             //     window.location.href = 'index.php?' + params.toString();
             // }
         } else {
-            throw new Error(result.message || 'Save failed');
+            throw new Error(result.message || TXT_SAVE_FAILED);
         }
     }
     
@@ -606,19 +624,19 @@ if ($note_id > 0) {
                 window.history.replaceState({}, '', url);
             }
         } else {
-            throw new Error(result.message || 'Save failed');
+            throw new Error(result.message || TXT_SAVE_FAILED);
         }
     }
     </script>
     <!-- Library Warning Modal -->
     <div id="libraryWarningModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; color: #d97706; font-size: 18px; font-weight: 600;">Warning</h3>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;">The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.</p>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;">You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.</p>
+            <h3 style="margin-top: 0; color: #d97706; font-size: 18px; font-weight: 600;"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
+            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
+            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button id="libraryWarningCancel" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;">Cancel</button>
-                <button id="libraryWarningOk" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;">I Understand</button>
+                <button id="libraryWarningCancel" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button id="libraryWarningOk" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
             </div>
         </div>
     </div>

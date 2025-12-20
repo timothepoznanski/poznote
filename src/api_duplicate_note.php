@@ -39,6 +39,13 @@ if (!$originalNote) {
 
 // Generate a unique heading for the duplicate (within the same folder)
 $originalHeading = $originalNote['heading'];
+
+// If original heading is empty, treat it as the default translated title
+if (empty($originalHeading)) {
+    $originalHeading = t('index.note.new_note', [], 'New note');
+}
+
+// Generate unique title (will add (1), (2), etc. at the end)
 $newHeading = generateUniqueTitle($originalHeading, null, $originalNote['workspace'], $originalNote['folder_id']);
 
 // Insert the duplicate note

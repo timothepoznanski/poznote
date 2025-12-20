@@ -42,11 +42,11 @@ try {
     exit;
 }
 
-$title = $note['heading'] ?: 'New note';
+$title = $note['heading'] ?: t('index.note.new_note', [], 'New note');
 
 // Format dates
 function formatDateString($dateStr) {
-    if (empty($dateStr)) return 'Not available';
+    if (empty($dateStr)) return t('common.not_available', [], 'Not available');
     try {
         // Dates are stored in UTC in the database
         // Convert to the user's configured timezone for display
@@ -55,13 +55,13 @@ function formatDateString($dateStr) {
         $date->setTimezone(new DateTimeZone($timezone));
         return $date->format('d/m/Y H:i');
     } catch (Exception $e) {
-        return 'Not available';
+        return t('common.not_available', [], 'Not available');
     }
 }
 
 $createdText = formatDateString($note['created']);
 $updatedText = formatDateString($note['updated']);
-$folderText = $note['folder'] ?: 'No folder';
+$folderText = $note['folder'] ?: t('modals.folder.no_folder', [], 'No folder');
 $isFavorite = (int)$note['favorite'] === 1;
 
 // Build full path of the note with appropriate extension
@@ -73,7 +73,7 @@ $tags = [];
 if (!empty($note['tags'])) {
     $tags = array_filter(array_map('trim', explode(',', $note['tags'])));
 }
-$tagsText = empty($tags) ? 'No tags' : implode(', ', $tags);
+$tagsText = empty($tags) ? t('info.empty.no_tags', [], 'No tags') : implode(', ', $tags);
 
 // Count attachments
 $attachmentsCount = 0;
@@ -92,14 +92,14 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     }
 }
 
-$subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
+$subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_specified', [], 'Not specified'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Note Information - <?php echo htmlspecialchars($title); ?></title>
+    <title><?php echo t_h('info.page_title', [], 'Note Information'); ?> - <?php echo htmlspecialchars($title); ?></title>
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -111,77 +111,85 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
 <body>
     <div class="info-page">
         <div class="info-buttons-back-container">
-            <button id="backToNoteBtn" class="btn btn-secondary" onclick="goBackToNote()" title="Back to note">
-                Back to note
+            <button id="backToNoteBtn" class="btn btn-secondary" onclick="goBackToNote()" title="<?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>">
+                <?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>
             </button>
         </div>
         
         <div class="info-content">
             <div class="info-row">
-                <div class="info-label">Note title:</div>
+                <div class="info-label"><?php echo t_h('info.labels.note_title', [], 'Note title:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($title); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Workspace:</div>
+                <div class="info-label"><?php echo t_h('info.labels.workspace', [], 'Workspace:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Folder:</div>
+                <div class="info-label"><?php echo t_h('info.labels.folder', [], 'Folder:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($folderText); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Created:</div>
+                <div class="info-label"><?php echo t_h('info.labels.created', [], 'Created:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($createdText); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Last Modified:</div>
+                <div class="info-label"><?php echo t_h('info.labels.last_modified', [], 'Last Modified:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($updatedText); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Subheading:</div>
+                <div class="info-label"><?php echo t_h('info.labels.subheading', [], 'Subheading:'); ?></div>
                 <div class="info-value">
                     <span id="subheading-display" style="cursor:pointer;" role="button" tabindex="0" onclick='editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? ''), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);'><?php echo htmlspecialchars($subheadingText); ?></span>
                     <input type="text" id="subheading-input" style="display: none;" />
                     <div id="subheading-buttons" style="display: none; margin-left: 10px;">
-                        <button type="button" class="btn-save" onclick="saveSubheading(<?php echo $note_id; ?>)">Save</button>
-                        <button type="button" class="btn-cancel" onclick="cancelSubheadingEdit()">Cancel</button>
+                        <button type="button" class="btn-save" onclick="saveSubheading(<?php echo $note_id; ?>)"><?php echo t_h('common.save', [], 'Save'); ?></button>
+                        <button type="button" class="btn-cancel" onclick="cancelSubheadingEdit()"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                     </div>
                 </div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Tags:</div>
+                <div class="info-label"><?php echo t_h('info.labels.tags', [], 'Tags:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($tagsText); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Favorite:</div>
+                <div class="info-label"><?php echo t_h('info.labels.favorite', [], 'Favorite:'); ?></div>
                 <div class="info-value">
                     <?php if ($isFavorite): ?>
-                        <span class="favorite-yes"></i> Yes</span>
+                        <span class="favorite-yes"></i> <?php echo t_h('common.yes', [], 'Yes'); ?></span>
                     <?php else: ?>
-                        <span class="favorite-no"></i> No</span>
+                        <span class="favorite-no"></i> <?php echo t_h('common.no', [], 'No'); ?></span>
                     <?php endif; ?>
                 </div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Attachments:</div>
-                <div class="info-value"><?php echo $attachmentsCount; ?> file(s)</div>
+                <div class="info-label"><?php echo t_h('info.labels.attachments', [], 'Attachments:'); ?></div>
+                <div class="info-value">
+                    <?php
+                        if ((int)$attachmentsCount === 1) {
+                            echo t_h('info.attachments.count_singular', ['count' => $attachmentsCount], '1 file');
+                        } else {
+                            echo t_h('info.attachments.count_plural', ['count' => $attachmentsCount], '{{count}} files');
+                        }
+                    ?>
+                </div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Note ID:</div>
+                <div class="info-label"><?php echo t_h('info.labels.note_id', [], 'Note ID:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($note_id); ?></div>
             </div>
 
             <div class="info-row">
-                <div class="info-label">Full Path:</div>
+                <div class="info-label"><?php echo t_h('info.labels.full_path', [], 'Full Path:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($fullPath); ?></div>
             </div>
         </div>
@@ -229,16 +237,26 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: 'Not specified');
             .then(data => {
                 if (data.success) {
                     // Mettre à jour l'affichage et quitter le mode édition
-                    document.getElementById('subheading-display').textContent = newSub || 'Not specified';
+                    document.getElementById('subheading-display').textContent = newSub || (window.t ? window.t('common.not_specified', null, 'Not specified') : 'Not specified');
                     cancelSubheadingEdit();
                     // Success: no popup shown per user request
                 } else {
-                    showNotificationPopup('Failed to update heading: ' + (data.message || 'Unknown error'), 'error');
+                    showNotificationPopup(
+                        (window.t
+                            ? window.t('info.errors.failed_to_update_subheading_prefix', { error: (data.message || 'Unknown error') }, 'Failed to update heading: {{error}}')
+                            : ('Failed to update heading: ' + (data.message || 'Unknown error'))),
+                        'error'
+                    );
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotificationPopup('Network error while updating heading', 'error');
+                showNotificationPopup(
+                    (window.t
+                        ? window.t('info.errors.network_error_updating_subheading', null, 'Network error while updating heading')
+                        : 'Network error while updating heading'),
+                    'error'
+                );
             });
         }
         

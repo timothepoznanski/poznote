@@ -1,5 +1,22 @@
 // Attached file and image drag management
 
+function tr(key, vars, fallback) {
+    try {
+        if (typeof window !== 'undefined' && typeof window.t === 'function') {
+            return window.t(key, vars || {}, fallback);
+        }
+    } catch (e) {
+        // ignore
+    }
+    let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
+    if (vars && typeof vars === 'object') {
+        Object.keys(vars).forEach((k) => {
+            text = text.replaceAll('{{' + k + '}}', String(vars[k]));
+        });
+    }
+    return text;
+}
+
 // Utility functions to check cursor position
 function isCursorInEditableNote() {
     const selection = window.getSelection();
@@ -42,19 +59,19 @@ function uploadAttachment() {
     var file = fileInput.files[0];
     
     if (!file) {
-        showAttachmentError('Please select a file');
+        showAttachmentError(tr('attachments.errors.select_file', {}, 'Please select a file'));
         return;
     }
     
     if (!currentNoteIdForAttachments) {
-        showAttachmentError('No note selected');
+        showAttachmentError(tr('attachments.errors.no_note_selected', {}, 'No note selected'));
         return;
     }
     
     // Check file size (200MB limit)
     var maxSize = 200 * 1024 * 1024; // 200MB in bytes
     if (file.size > maxSize) {
-        showAttachmentError('Fichier trop volumineux. Taille maximale : 200MB.');
+        showAttachmentError(tr('attachments.errors.file_too_large', {}, 'File too large. Maximum size: 200MB.'));
         return;
     }
     
@@ -63,7 +80,7 @@ function uploadAttachment() {
     // Show progress
     var uploadButton = document.querySelector('.attachment-upload button');
     var originalText = uploadButton.textContent;
-    uploadButton.textContent = 'Uploading...';
+    uploadButton.textContent = tr('attachments.upload.button_uploading', {}, 'Uploading...');
     uploadButton.disabled = true;
     
     var formData = new FormData();
@@ -77,7 +94,7 @@ function uploadAttachment() {
     })
     .then(function(response) {
         if (!response.ok) {
-            throw new Error('HTTP Error: ' + response.status);
+            throw new Error(tr('attachments.errors.http_error', { status: response.status }, 'HTTP Error: {{status}}'));
         }
         return response.text();
     })
@@ -86,7 +103,7 @@ function uploadAttachment() {
         try {
             data = JSON.parse(text);
         } catch (e) {
-            throw new Error('Invalid server response');
+            throw new Error(tr('attachments.errors.invalid_server_response', {}, 'Invalid server response'));
         }
         
         if (data.success) {
@@ -101,11 +118,11 @@ function uploadAttachment() {
             loadAttachments(currentNoteIdForAttachments);
             updateAttachmentCountInMenu(currentNoteIdForAttachments);
         } else {
-            showAttachmentError('Upload failed: ' + data.message);
+            showAttachmentError(tr('attachments.errors.upload_failed', { error: data.message }, 'Upload failed: {{error}}'));
         }
     })
     .catch(function(error) {
-        showAttachmentError('Upload failed: ' + error.message);
+        showAttachmentError(tr('attachments.errors.upload_failed', { error: error.message }, 'Upload failed: {{error}}'));
     })
     .finally(function() {
         uploadButton.textContent = originalText;
@@ -130,11 +147,13 @@ function displayAttachments(attachments) {
     var container = document.getElementById('attachmentsList');
     
     if (attachments.length === 0) {
-        container.innerHTML = '<p>No attachments</p>';
+        container.innerHTML = '<p>' + tr('attachments.empty', {}, 'No attachments') + '</p>';
         return;
     }
     
     var html = '';
+    var titleView = tr('attachments.actions.view', {}, 'View');
+    var titleDelete = tr('attachments.actions.delete', {}, 'Delete');
     for (var i = 0; i < attachments.length; i++) {
         var attachment = attachments[i];
         var fileSize = formatFileSize(attachment.file_size);
@@ -146,10 +165,10 @@ function displayAttachments(attachments) {
         html += '<small>' + fileSize + ' - ' + uploadDate + '</small>';
         html += '</div>';
         html += '<div class="attachment-actions">';
-    html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="View">';
+    html += '<button onclick="downloadAttachment(\'' + attachment.id + '\')" title="' + titleView + '">';
     html += '<i class="fa-eye"></i>';
         html += '</button>';
-        html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="Delete" class="delete-btn">';
+        html += '<button onclick="deleteAttachment(\'' + attachment.id + '\')" title="' + titleDelete + '" class="delete-btn">';
         html += '<i class="fa-trash"></i>';
         html += '</button>';
         html += '</div>';
@@ -162,7 +181,7 @@ function displayAttachments(attachments) {
 function downloadAttachment(attachmentId, noteId) {
     var noteIdToUse = noteId || currentNoteIdForAttachments;
     if (!noteIdToUse) {
-        showNotificationPopup('No note selected', 'error');
+        showNotificationPopup(tr('attachments.errors.no_note_selected', {}, 'No note selected'), 'error');
         return;
     }
     window.open('api_attachments.php?action=download&note_id=' + noteIdToUse + '&attachment_id=' + attachmentId, '_blank');
@@ -171,7 +190,7 @@ function downloadAttachment(attachmentId, noteId) {
 function deleteAttachment(attachmentId) {
     // NOTE: confirmation removed - delete immediately when called
     if (!currentNoteIdForAttachments) {
-        showNotificationPopup('No note selected', 'error');
+        showNotificationPopup(tr('attachments.errors.no_note_selected', {}, 'No note selected'), 'error');
         return;
     }
 
@@ -190,11 +209,11 @@ function deleteAttachment(attachmentId) {
             loadAttachments(currentNoteIdForAttachments);
             updateAttachmentCountInMenu(currentNoteIdForAttachments);
         } else {
-            showNotificationPopup('Deletion failed: ' + data.message, 'error');
+            showNotificationPopup(tr('attachments.errors.deletion_failed', { error: data.message }, 'Deletion failed: {{error}}'), 'error');
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Deletion failed', 'error');
+        showNotificationPopup(tr('attachments.errors.deletion_failed_generic', {}, 'Deletion failed'), 'error');
     });
 }
 
@@ -269,7 +288,8 @@ function updateAttachmentCountInMenu(noteId) {
                     }
                     
                     // Build the HTML content
-                    var attachmentsHtml = '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\'' + noteId + '\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
+                    var openAttachmentsLabel = tr('attachments.actions.open_attachments', {}, 'Open attachments');
+                    var attachmentsHtml = '<button type="button" class="icon-attachment-btn" title="' + openAttachmentsLabel + '" onclick="showAttachmentDialog(\'' + noteId + '\')" aria-label="' + openAttachmentsLabel + '"><span class="fa-paperclip icon_attachment"></span></button>';
                     attachmentsHtml += '<span class="note-attachments-list">';
                     
                     var attachmentLinks = [];
@@ -277,7 +297,8 @@ function updateAttachmentCountInMenu(noteId) {
                         var attachment = data.attachments[j];
                         if (attachment.id && attachment.original_filename) {
                             var safeFilename = attachment.original_filename.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                            attachmentLinks.push('<a href="#" class="attachment-link" onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="Download ' + safeFilename + '">' + safeFilename + '</a>');
+                            var dlTitle = tr('attachments.actions.download', { filename: safeFilename }, 'Download {{filename}}');
+                            attachmentLinks.push('<a href="#" class="attachment-link" onclick="downloadAttachment(\'' + attachment.id + '\', \'' + noteId + '\')" title="' + dlTitle + '">' + safeFilename + '</a>');
                         }
                     }
                     attachmentsHtml += attachmentLinks.join(' ');
@@ -297,9 +318,13 @@ function updateAttachmentCountInMenu(noteId) {
 }
 
 function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Octets';
+    var unitBytes = tr('attachments.size.units.bytes', {}, 'B');
+    var unitKB = tr('attachments.size.units.kb', {}, 'KB');
+    var unitMB = tr('attachments.size.units.mb', {}, 'MB');
+    var unitGB = tr('attachments.size.units.gb', {}, 'GB');
+    if (bytes === 0) return '0 ' + unitBytes;
     var k = 1024;
-    var sizes = ['Octets', 'KB', 'MB', 'GB'];
+    var sizes = [unitBytes, unitKB, unitMB, unitGB];
     var i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }

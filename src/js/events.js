@@ -8,6 +8,14 @@ var lastSavedTags = null;
 var isOnline = navigator.onLine;
 var notesNeedingRefresh = new Set(); // Track notes that were left before auto-save completed
 
+function tr(key, vars, fallback) {
+    try {
+        return window.t ? window.t(key, vars || {}, fallback) : fallback;
+    } catch (e) {
+        return fallback;
+    }
+}
+
 // Expose critical functions globally early to prevent ReferenceError during HTML event handlers
 // These may be called before events.js is fully loaded due to inline onfocus handlers
 
@@ -715,7 +723,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
     notification.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 16px; height: 16px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <span>Saving changes...</span>
+            <span>${tr('autosave.notification.saving', {}, 'Saving changes...')}</span>
         </div>
     `;
     
@@ -761,7 +769,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
             notification.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="width: 16px; height: 16px; color: #fff; font-weight: bold;">✓</div>
-                    <span>Saved!</span>
+                    <span>${tr('autosave.notification.saved', {}, 'Saved!')}</span>
                 </div>
             `;
             
@@ -788,7 +796,7 @@ function showSaveInProgressNotification(onCompleteCallback) {
         notification.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 16px; height: 16px; color: #fff; font-weight: bold;">✓</div>
-                <span>Saved!</span>
+                <span>${tr('autosave.notification.saved', {}, 'Saved!')}</span>
             </div>
         `;
         
@@ -2085,10 +2093,14 @@ function checkUnsavedBeforeLeaving(targetNoteId) {
     if (String(currentNoteId) === String(targetNoteId)) return true;
     
     if (hasUnsavedChanges(currentNoteId)) {
-        var message = "⚠️ Unsaved Changes Detected\n\n" +
-                     "You have unsaved changes that will be lost if you switch now.\n\n" +
-                     "Click OK to save and continue, or Cancel to stay.\n" +
-                     "(Auto-save occurs 2 seconds after you stop typing)";
+        var message = tr(
+            'autosave.confirm_switch',
+            {},
+            "⚠️ Unsaved Changes Detected\n\n" +
+            "You have unsaved changes that will be lost if you switch now.\n\n" +
+            "Click OK to save and continue, or Cancel to stay.\n" +
+            "(Auto-save occurs 2 seconds after you stop typing)"
+        );
         
         if (confirm(message)) {
             // Force immediate save
@@ -2132,9 +2144,21 @@ function emergencySave(noteId) {
     
     var headi = titleInput.value || '';
     
-    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
-    if (headi === '' && titleInput.placeholder && /^New note( \(\d+\))?$/.test(titleInput.placeholder)) {
-        headi = titleInput.placeholder;
+    // If title is empty, only use placeholder if it matches default note title patterns
+    // Support both English and French (and potentially other languages)
+    if (headi === '' && titleInput.placeholder) {
+        var placeholderPatterns = [
+            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
+            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
+        ];
+        
+        var isDefaultPlaceholder = placeholderPatterns.some(function(pattern) {
+            return pattern.test(titleInput.placeholder);
+        });
+        
+        if (isDefaultPlaceholder) {
+            headi = titleInput.placeholder;
+        }
     }
     
     var ent = entryElem.innerHTML.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
@@ -2227,7 +2251,11 @@ window.addEventListener('beforeunload', function(e) {
         }
         
         // Show browser warning
-        var message = '⚠️ You have unsaved changes. Are you sure you want to leave?';
+        var message = tr(
+            'autosave.beforeunload_warning',
+            {},
+            '⚠️ You have unsaved changes. Are you sure you want to leave?'
+        );
         e.preventDefault();
         e.returnValue = message;
         return message;
@@ -2238,9 +2266,13 @@ window.addEventListener('beforeunload', function(e) {
 window.addEventListener('popstate', function(e) {
     var currentNoteId = window.noteid;
     if (hasUnsavedChanges(currentNoteId)) {
-        var message = "⚠️ Unsaved Changes\n\n" +
-                     "You have unsaved changes that will be lost.\n" +
-                     "Save before navigating away?";
+        var message = tr(
+            'autosave.confirm_navigation',
+            {},
+            "⚠️ Unsaved Changes\n\n" +
+            "You have unsaved changes that will be lost.\n" +
+            "Save before navigating away?"
+        );
         
         if (confirm(message)) {
             // Force immediate save

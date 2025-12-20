@@ -18,6 +18,12 @@ class SearchManager {
         
         // Initialize both desktop and mobile
         this.initializeSearch();
+        
+        // Listen for i18n loaded event to update placeholders with translations
+        document.addEventListener('poznote:i18n:loaded', () => {
+            this.updatePlaceholder(false); // Desktop
+            this.updatePlaceholder(true);  // Mobile
+        });
     }
 
     /**
@@ -245,10 +251,10 @@ class SearchManager {
     updatePlaceholder(isMobile) {
         const elements = this.getElements(isMobile);
         const activeType = this.getActiveSearchType(isMobile);
-        
+
         const placeholders = {
-            notes: 'Search for one or more words...',
-            tags: 'Search for one or more tags...'
+            notes: (window.t ? window.t('search.placeholder_notes', null, 'Search for one or more words...') : 'Search for one or more words...'),
+            tags: (window.t ? window.t('search.placeholder_tags', null, 'Search for one or more tags...') : 'Search for one or more tags...')
         };
         
         if (elements.searchInput) {
@@ -646,7 +652,12 @@ class SearchManager {
         const allSingleChar = searchTerms.every(term => term.length === 1);
         
         if (allSingleChar && searchTerms.length > 0) {
-            this.showValidationError(isMobile, 'Searching with single-letter words may return too many results. Try using longer words for more precise search.');
+            this.showValidationError(
+                isMobile,
+                (window.t
+                    ? window.t('search.validation.single_letter_warning', null, 'Searching with single-letter words may return too many results. Try using longer words for more precise search.')
+                    : 'Searching with single-letter words may return too many results. Try using longer words for more precise search.')
+            );
             return false;
         }
         
@@ -1064,9 +1075,15 @@ class SearchManager {
     /**
      * Show validation error
      */
-    showValidationError(isMobile, message = 'Please select at least one search option (Notes or Tags)') {
+    showValidationError(isMobile, message) {
         const elements = this.getElements(isMobile);
         this.hideValidationError(isMobile);
+
+        if (!message) {
+            message = window.t
+                ? window.t('search.validation.select_type', null, 'Please select at least one search option (Notes or Tags)')
+                : 'Please select at least one search option (Notes or Tags)';
+        }
 
         const errorDiv = document.createElement('div');
         errorDiv.className = 'search-validation-error';

@@ -73,7 +73,12 @@ function updateSearchResults(count, searchTerm) {
         resultsDiv.style.display = 'none';
     } else {
         resultsDiv.style.display = 'block';
-        resultsDiv.textContent = `${count} note(s) found for "${searchTerm}"`;
+        const term = String(searchTerm).trim();
+        if (count === 1) {
+            resultsDiv.textContent = (window.t ? window.t('trash.search.results_one', { count, term }, '1 note found for "{{term}}"') : `1 note found for "${term}"`);
+        } else {
+            resultsDiv.textContent = (window.t ? window.t('trash.search.results_other', { count, term }, '{{count}} notes found for "{{term}}"') : `${count} notes found for "${term}"`);
+        }
     }
 }
 
@@ -103,12 +108,17 @@ function restoreNote(noteid) {
                 noteElement.style.display = 'none';
             }
         } else {
-            showInfoModal('Restore Error', 'Error restoring the note: ' + (data.error || data.message || 'Unknown error'));
+            const title = (window.t ? window.t('trash.alerts.restore_error_title', {}, 'Restore Error') : 'Restore Error');
+            const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
+            const msgPrefix = (window.t ? window.t('trash.alerts.restore_error_prefix', {}, 'Error restoring the note: ') : 'Error restoring the note: ');
+            showInfoModal(title, msgPrefix + (data.error || data.message || unknown));
         }
     })
     .catch(error => {
         console.error('Error during restoration:', error);
-        showInfoModal('Restore Error', 'Error restoring the note');
+        const title = (window.t ? window.t('trash.alerts.restore_error_title', {}, 'Restore Error') : 'Restore Error');
+        const msg = (window.t ? window.t('trash.alerts.restore_error_generic', {}, 'Error restoring the note') : 'Error restoring the note');
+        showInfoModal(title, msg);
     });
 }
 
@@ -130,12 +140,16 @@ function permanentlyDeleteNote(noteid) {
                 noteElement.style.display = 'none';
             }
         } else {
-            showInfoModal('Delete Error', 'Error during permanent deletion: ' + data);
+            const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
+            const msgPrefix = (window.t ? window.t('trash.alerts.delete_error_prefix', {}, 'Error during permanent deletion: ') : 'Error during permanent deletion: ');
+            showInfoModal(title, msgPrefix + data);
         }
     })
     .catch(error => {
         console.error('Error during deletion:', error);
-        showInfoModal('Delete Error', 'Error during permanent deletion of the note');
+        const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
+        const msg = (window.t ? window.t('trash.alerts.delete_error_generic', {}, 'Error during permanent deletion of the note') : 'Error during permanent deletion of the note');
+        showInfoModal(title, msg);
     });
 }
 
@@ -155,12 +169,17 @@ function emptyTrash() {
             // Success - redirect to trash.php to refresh page
             window.location.href = 'trash.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
         } else {
-            showInfoModal('Empty Trash Error', 'Error emptying trash: ' + (data.error || 'Unknown error'));
+            const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
+            const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
+            const msgPrefix = (window.t ? window.t('trash.alerts.empty_error_prefix', {}, 'Error emptying trash: ') : 'Error emptying trash: ');
+            showInfoModal(title, msgPrefix + (data.error || unknown));
         }
     })
     .catch(error => {
         console.error('Error during trash emptying:', error);
-        showInfoModal('Empty Trash Error', 'Error emptying trash');
+        const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
+        const msg = (window.t ? window.t('trash.alerts.empty_error_generic', {}, 'Error emptying trash') : 'Error emptying trash');
+        showInfoModal(title, msg);
     });
 }
 

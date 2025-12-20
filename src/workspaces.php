@@ -6,6 +6,8 @@ require_once 'config.php';
 include 'db_connect.php';
 include 'functions.php';
 
+$currentLang = getUserLanguage();
+
 // Ensure workspaces table exists
 $con->exec("CREATE TABLE IF NOT EXISTS workspaces (name TEXT PRIMARY KEY)");
 
@@ -25,23 +27,23 @@ if ($_POST) {
     try {
         if (isset($_POST['action']) && $_POST['action'] === 'create') {
             $name = trim($_POST['name'] ?? '');
-            if ($name === '') throw new Exception('Workspace name cannot be empty');
+            if ($name === '') throw new Exception(t('workspaces.errors.name_empty', [], 'Workspace name cannot be empty', $currentLang));
             // validate allowed characters: letters, digits, hyphen, underscore
-            if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) throw new Exception('Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).');
+            if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).', $currentLang));
             $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $stmt->execute([$name]);
             
-            $message = 'Workspace created';
+            $message = t('workspaces.messages.created', [], 'Workspace created', $currentLang);
         } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');
-            if ($name === '') throw new Exception('Workspace name required');
-            if ($name === 'Poznote') throw new Exception('Cannot delete the default workspace');
+            if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
+            if ($name === 'Poznote') throw new Exception(t('workspaces.errors.cannot_delete_default', [], 'Cannot delete the default workspace', $currentLang));
 
             // Ensure workspace exists before deletion
             $check = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
             $check->execute([$name]);
             if ((int)$check->fetchColumn() === 0) {
-                throw new Exception('Workspace not found');
+                throw new Exception(t('workspaces.errors.not_found', [], 'Workspace not found', $currentLang));
             }
 
                 // Check if this workspace is set as the default workspace
@@ -182,7 +184,7 @@ if ($_POST) {
                     // ignore logging errors
                 }
 
-                $message = 'Workspace deleted and all associated notes, folders and attachments removed';
+                $message = t('workspaces.messages.deleted_all', [], 'Workspace deleted and all associated notes, folders and attachments removed', $currentLang);
                 // If this was an AJAX delete, return JSON response immediately
                 if (!empty($isAjax)) {
                     header('Content-Type: application/json');
@@ -194,12 +196,12 @@ if ($_POST) {
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
-            if ($name === '') throw new Exception('Workspace name required');
+            if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
             // Do not allow renaming the reserved default workspace
-            if ($name === 'Poznote') throw new Exception('Cannot rename the default workspace');
+            if ($name === 'Poznote') throw new Exception(t('workspaces.errors.cannot_rename_default', [], 'Cannot rename the default workspace', $currentLang));
 
             // validate new name characters
-            if ($new_name !== '' && !preg_match('/^[A-Za-z0-9_-]+$/', $new_name)) throw new Exception('Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).');
+            if ($new_name !== '' && !preg_match('/^[A-Za-z0-9_-]+$/', $new_name)) throw new Exception(t('workspaces.errors.invalid_new_name', [], 'Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).', $currentLang));
 
             // If new_name provided and different, rename the workspace across DB and labels
             if ($new_name !== '' && $new_name !== $name) {
@@ -218,7 +220,7 @@ if ($_POST) {
                     $del->execute([$name]);
 
                     $con->commit();
-                    $message = 'Workspace renamed across notes and labels';
+                    $message = t('workspaces.messages.renamed', [], 'Workspace renamed across notes and labels', $currentLang);
                     // Also, if a display label provided, store it for the new name below
                     $name = $new_name;
                 } catch (Exception $e) {
@@ -237,8 +239,8 @@ if ($_POST) {
     elseif (isset($_POST['action']) && $_POST['action'] === 'move_notes') {
             $name = trim($_POST['name'] ?? '');
             $target = trim($_POST['target'] ?? '');
-            if ($name === '' || $target === '') throw new Exception('Workspace name and target required');
-            if ($name === $target) throw new Exception('Source and target workspaces must differ');
+            if ($name === '' || $target === '') throw new Exception(t('workspaces.errors.name_and_target_required', [], 'Workspace name and target required', $currentLang));
+            if ($name === $target) throw new Exception(t('workspaces.errors.source_target_must_differ', [], 'Source and target workspaces must differ', $currentLang));
 
             // Ensure target exists
             $ins = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
@@ -349,7 +351,7 @@ if ($_POST) {
                 error_log('Folder remapping failed during workspace move: ' . $e->getMessage());
             }
 
-            $message = 'Notes moved to ' . htmlspecialchars($target);
+            $message = t('workspaces.messages.notes_moved_to', ['target' => htmlspecialchars($target)], 'Notes moved to {{target}}', $currentLang);
 
             // If an AJAX client requested JSON, return structured response and exit
             if (!empty($isAjax)) {
@@ -390,12 +392,13 @@ try {
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars($currentLang); ?>">
 <head>
-    <title>Manage Workspaces - Poznote</title>
+    <title><?php echo t_h('workspaces.page.title', [], 'Manage Workspaces - Poznote', $currentLang); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
+    <script src="js/globals.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/workspaces.css">
@@ -429,14 +432,14 @@ try {
 </head>
 <body>
     <div class="settings-container">
-        <h1> Workspaces</h1>
-        <p>Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.</p>
+        <h1><?php echo t_h('settings.cards.workspaces', [], 'Workspaces', $currentLang); ?></h1>
+        <p><?php echo t_h('workspaces.description', [], 'Workspaces allow you to organize your notes into separate environments within a single Poznote instance - like having different notebooks for work, personal life, or projects.', $currentLang); ?></p>
 
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            Back to Notes
+            <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
         </a>
         <a href="settings.php" class="btn btn-secondary">
-            Back to Settings
+            <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
         </a>
 
         <br><br>
@@ -451,21 +454,21 @@ try {
         </div>
 
         <div class="settings-section">
-            <h3> Create a new workspace</h3>
+            <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace', $currentLang); ?></h3>
             <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
                 <input type="hidden" name="action" value="create">
                 <div class="form-group">
-                    <input id="workspace-name" name="name" type="text" placeholder="Enter workspace name" />
+                    <input id="workspace-name" name="name" type="text" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name', $currentLang); ?>" />
                 </div>
-                <button type="submit" class="btn btn-primary"> Create</button>
+                <button type="submit" class="btn btn-primary"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
             </form>
         </div>
 
         <div class="settings-section">
-            <h3> Existing workspaces</h3>
+            <h3><?php echo t_h('workspaces.sections.existing.title', [], 'Existing workspaces', $currentLang); ?></h3>
             <div class="workspace-list">
                 <?php if (empty($workspaces)): ?>
-                    <div>No workspaces defined.</div>
+                    <div><?php echo t_h('workspaces.sections.existing.empty', [], 'No workspaces defined.', $currentLang); ?></div>
                 <?php else: ?>
                     <ul>
                         <?php foreach ($workspaces as $ws): ?>
@@ -480,11 +483,11 @@ try {
                                             <?php
                                                 $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                                 if ($cnt === 0) {
-                                                    $cnt_text = '0 notes';
+                                                    $cnt_text = t('workspaces.count.notes_0', [], '0 notes', $currentLang);
                                                 } elseif ($cnt === 1) {
-                                                    $cnt_text = '1 note';
+                                                    $cnt_text = t('workspaces.count.notes_1', [], '1 note', $currentLang);
                                                 } else {
-                                                    $cnt_text = $cnt . ' notes';
+                                                    $cnt_text = t('workspaces.count.notes_n', ['count' => $cnt], '{{count}} notes', $currentLang);
                                                 }
                                             ?>
                                             <span class="workspace-count"><?php echo htmlspecialchars($cnt_text); ?></span>
@@ -493,26 +496,26 @@ try {
                                 </div>
                                 <div class="ws-col ws-col-action">
                                     <?php if ($ws !== 'Poznote'): ?>
-                                        <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">Rename</button>
+                                        <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                     <?php else: ?>
-                                        <button class="btn btn-rename action-btn" disabled>Rename</button>
+                                        <button class="btn btn-rename action-btn" disabled><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-select">
                                     <?php if ($ws !== ''): ?>
-                                        <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">Select</button>
+                                        <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
-                                <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">Move notes</button></div>
+                                <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button></div>
                                 <div class="ws-col ws-col-delete">
                                     <?php if ($ws !== 'Poznote'): ?>
                                         <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">Delete</button>
+                                            <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
                                         </form>
                                     <?php else: ?>
-                                        <button class="btn btn-danger action-btn" disabled>Delete</button>
+                                        <button class="btn btn-danger action-btn" disabled><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
                             </li>
@@ -524,13 +527,16 @@ try {
 
         <!-- Default Workspace Setting -->
         <div class="settings-section">
-            <h3> Default Workspace</h3>
-            <p>Choose which workspace opens when you start Poznote.<br>Select "Last workspace opened" to always open the workspace you were using previously.</p>
+            <h3><?php echo t_h('workspaces.default.title', [], 'Default Workspace', $currentLang); ?></h3>
+            <p>
+                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?><br>
+                <?php echo t_h('workspaces.default.description_2', ['last' => t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang)], 'Select "{{last}}" to always open the workspace you were using previously.', $currentLang); ?>
+            </p>
             <div class="form-group">
                 <select id="defaultWorkspaceSelect" style="width: 300px; padding: 8px; font-size: 14px; margin-right: 10px;">
-                    <option value="">Loading...</option>
+                    <option value=""><?php echo t_h('common.loading', [], 'Loading...', $currentLang); ?></option>
                 </select>
-                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> Save Default</button>
+                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> <?php echo t_h('workspaces.default.save_button', [], 'Save Default', $currentLang); ?></button>
             </div>
             <div id="defaultWorkspaceStatus" style="margin-top: 8px; color: #10b981; display: none;"></div>
         </div>
@@ -549,6 +555,26 @@ try {
     <script src="js/theme-manager.js"></script>
     <script src="js/workspaces.js"></script>
     <script>
+        function tr(key, vars, fallback) {
+            try {
+                if (window.t) return window.t(key, vars || {}, fallback);
+            } catch (e) {}
+            var out = (fallback != null ? String(fallback) : String(key));
+            if (vars) {
+                for (var k in vars) {
+                    if (!Object.prototype.hasOwnProperty.call(vars, k)) continue;
+                    out = out.split('{{' + k + '}}').join(String(vars[k]));
+                }
+            }
+            return out;
+        }
+
+        function formatNotesCount(num) {
+            if (num === 0) return tr('workspaces.count.notes_0', {}, '0 notes');
+            if (num === 1) return tr('workspaces.count.notes_1', {}, '1 note');
+            return tr('workspaces.count.notes_n', { count: num }, '{{count}} notes');
+        }
+
         // Initialize workspace page when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for rename and select buttons
@@ -601,7 +627,7 @@ try {
                 // confirm handler
                 document.getElementById('confirmMoveBtn').onclick = function(){
                     var target = sel.value;
-                    if (!target) { alert('Choose a target'); return; }
+                    if (!target) { alert(tr('workspaces.move.choose_target', {}, 'Choose a target')); return; }
                     
                     // disable to prevent double clicks
                     var confirmBtn = document.getElementById('confirmMoveBtn');
@@ -627,7 +653,7 @@ try {
                         // Re-enable button
                         try { confirmBtn.disabled = false; } catch(e) {}
                         if (json && json.success) {
-                            showAjaxAlert('Moved ' + (json.moved||0) + ' notes to ' + json.target, 'success');
+                            showAjaxAlert(tr('workspaces.move.moved_to', { count: (json.moved||0), target: json.target }, 'Moved {{count}} notes to {{target}}'), 'success');
                             // Update counts in the displayed workspace list
                             try {
                                 (function(){
@@ -649,7 +675,7 @@ try {
                                                     num = m ? parseInt(m[1], 10) : 0;
                                                 }
                                                 num = Math.max(0, num + delta);
-                                                cEl.textContent = num + (num === 1 ? ' note' : ' notes');
+                                                cEl.textContent = formatNotesCount(num);
                                                 break;
                                             }
                                         }
@@ -675,11 +701,11 @@ try {
                             // Close the modal on success
                             try { closeMoveModal(); } catch(e) {}
                         } else {
-                            showAjaxAlert('Error: ' + (json.error || 'Unknown'), 'danger');
+                            showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                         }
                     }).catch(function(err){
                         try { confirmBtn.disabled = false; } catch(e) {}
-                        showAjaxAlert('Error moving notes: ' + (err.message || 'Unknown error'), 'danger');
+                        showAjaxAlert(tr('workspaces.move.error_moving_notes', { error: (err.message || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error moving notes: {{error}}'), 'danger');
                     });
                 };
             }
@@ -706,7 +732,7 @@ try {
                 // Add special option for last workspace opened
                 var optLast = document.createElement('option');
                 optLast.value = '__last_opened__';
-                optLast.textContent = 'Last workspace opened';
+                optLast.textContent = tr('workspaces.default.last_opened', {}, 'Last workspace opened');
                 select.appendChild(optLast);
                 
                 <?php foreach ($workspaces as $w): ?>
@@ -753,20 +779,20 @@ try {
                         if (result && result.success) {
                             if (status) {
                                 var displayText = selectedWorkspace === '__last_opened__' 
-                                    ? 'Last workspace opened' 
+                                    ? tr('workspaces.default.last_opened', {}, 'Last workspace opened') 
                                     : selectedWorkspace;
-                                status.textContent = '✓ Default workspace set to: ' + displayText;
+                                status.textContent = tr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                                 status.style.display = 'block';
                                 setTimeout(function() {
                                     status.style.display = 'none';
                                 }, 3000);
                             }
                         } else {
-                            alert('Error saving default workspace');
+                            alert(tr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
                         }
                     })
                     .catch(function() {
-                        alert('Error saving default workspace');
+                        alert(tr('workspaces.default.error_saving', {}, 'Error saving default workspace'));
                     });
             }
             

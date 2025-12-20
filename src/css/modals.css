@@ -209,6 +209,11 @@
     box-sizing: border-box;
 }
 
+/* Link modal - wider to accommodate longer button texts in other languages */
+#linkModal .modal-content {
+    max-width: 520px;
+}
+
 /* Ensure the buttons in the input modal appear inline on desktop */
 #inputModal .modal-buttons {
     display: flex;
@@ -244,6 +249,28 @@
     font-size: 15px;
 }
 #noteSortModal .modal-body input[type="radio"] {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+
+/* Language Modal */
+#languageModal .modal-body {
+    margin-bottom: 6px;
+}
+#languageModal .modal-body > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#languageModal .modal-body label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+}
+#languageModal .modal-body input[type="radio"] {
     width: auto !important;
     height: auto !important;
     margin: 0 !important;

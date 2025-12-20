@@ -14,7 +14,8 @@ class ChunkedUploader {
 
     async uploadFile(file, endpoint = '/api_chunked_restore.php') {
         if (!file) {
-            throw new Error('No file provided');
+            const msg = (window.t ? window.t('restore_import.chunked.errors.no_file_provided', null, 'No file provided') : 'No file provided');
+            throw new Error(msg);
         }
 
         this.file = file;
@@ -70,7 +71,8 @@ class ChunkedUploader {
                 const result = await response.json();
 
                 if (!result.success) {
-                    throw new Error(result.error || 'Upload failed');
+                    const fallback = (window.t ? window.t('restore_import.chunked.errors.upload_failed', null, 'Upload failed') : 'Upload failed');
+                    throw new Error(result.error || fallback);
                 }
 
                 return result;
@@ -105,7 +107,8 @@ class ChunkedUploader {
         const result = await response.json();
 
         if (!result.success) {
-            throw new Error(result.error || 'Assembly failed');
+            const fallback = (window.t ? window.t('restore_import.chunked.errors.assembly_failed', null, 'Assembly failed') : 'Assembly failed');
+            throw new Error(result.error || fallback);
         }
 
         return result;
@@ -124,7 +127,7 @@ class ChunkedUploader {
                 body: formData
             });
         } catch (error) {
-            console.warn('Cleanup failed:', error);
+            console.warn((window.t ? window.t('restore_import.chunked.errors.cleanup_failed_prefix', null, 'Cleanup failed:') : 'Cleanup failed:'), error);
         }
     }
 
@@ -137,7 +140,12 @@ class ChunkedUploader {
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = [
+        (window.t ? window.t('restore_import.units.bytes', null, 'Bytes') : 'Bytes'),
+        (window.t ? window.t('restore_import.units.kb', null, 'KB') : 'KB'),
+        (window.t ? window.t('restore_import.units.mb', null, 'MB') : 'MB'),
+        (window.t ? window.t('restore_import.units.gb', null, 'GB') : 'GB')
+    ];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }

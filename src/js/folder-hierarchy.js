@@ -102,7 +102,10 @@ function createSubfolder(parentFolderKey) {
         }
     }
     
-    showInputModal('New Subfolder', 'Enter subfolder name (within ' + displayName + ')', '', function(folderName) {
+    const modalTitle = window.t ? window.t('folders.subfolder.modal_title', {}, 'New Subfolder') : 'New Subfolder';
+    const modalMessage = window.t ? window.t('folders.subfolder.modal_message', { parent: displayName }, 'Enter subfolder name (within {{parent}})') : 'Enter subfolder name (within ' + displayName + ')';
+    
+    showInputModal(modalTitle, modalMessage, '', function(folderName) {
         if (!folderName) return;
         
         var formData = new FormData();

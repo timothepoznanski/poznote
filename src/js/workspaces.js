@@ -1,5 +1,19 @@
 // Workspace management
 
+function tr(key, vars, fallback) {
+    try {
+        if (window.t) return window.t(key, vars || {}, fallback);
+    } catch (e) {}
+    var out = (fallback != null ? String(fallback) : String(key));
+    if (vars) {
+        for (var k in vars) {
+            if (!Object.prototype.hasOwnProperty.call(vars, k)) continue;
+            out = out.split('{{' + k + '}}').join(String(vars[k]));
+        }
+    }
+    return out;
+}
+
 function initializeWorkspaces() {
     var wsSelector = document.getElementById('workspaceSelector');
     
@@ -114,7 +128,7 @@ function toggleWorkspaceMenu(event) {
 }
 
 function loadAndShowWorkspaceMenu(menu) {
-    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>Loading workspaces...</div>';
+    menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>' + tr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
     menu.style.display = 'block';
     
     fetch('api_workspaces.php?action=list')
@@ -123,11 +137,11 @@ function loadAndShowWorkspaceMenu(menu) {
             if (data.success) {
                 displayWorkspaceMenu(menu, data.workspaces);
             } else {
-                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>Error loading workspaces</div>';
+                menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + tr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
             }
         })
         .catch(function(error) {
-            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>Error loading workspaces</div>';
+            menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-exclamation-triangle"></i>' + tr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
         });
 }
 
@@ -173,12 +187,12 @@ function displayWorkspaceMenu(menu, workspaces) {
     menuHtml += '<div class="workspace-menu-divider"></div>';
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'workspaces.php\';">';
     menuHtml += '<i class="fa-cog"></i>';
-    menuHtml += '<span>Workspaces</span>';
+    menuHtml += '<span>' + tr('settings.cards.workspaces', {}, 'Workspaces') + '</span>';
     menuHtml += '</div>';
     // Add Logout right after Settings
     menuHtml += '<div class="workspace-menu-item" onclick="window.location.href=\'logout.php\';">';
     menuHtml += '<i class="fa-sign-out-alt"></i>';
-    menuHtml += '<span>Logout</span>';
+    menuHtml += '<span>' + tr('workspaces.menu.logout', {}, 'Logout') + '</span>';
     menuHtml += '</div>';
     
     menu.innerHTML = menuHtml;
@@ -361,8 +375,8 @@ function validateCreateWorkspaceForm(){
     var el = document.getElementById('workspace-name');
     if (!el) return true;
     var v = el.value.trim();
-    if (v === '') { showTopAlert('Enter a workspace name', 'danger'); scrollToTopAlert(); return false; }
-    if (!isValidWorkspaceName(v)) { showTopAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger'); scrollToTopAlert(); return false; }
+    if (v === '') { showTopAlert(tr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger'); scrollToTopAlert(); return false; }
+    if (!isValidWorkspaceName(v)) { showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger'); scrollToTopAlert(); return false; }
     return true;
 }
 
@@ -400,15 +414,15 @@ function handleRenameButtonClick(e) {
         document.getElementById('confirmRenameBtn').onclick = function() {
             var newName = document.getElementById('renameNewName').value.trim();
             if (!newName) {
-                showTopAlert('Please enter a new name', 'danger');
+                showTopAlert(tr('workspaces.validation.enter_new_name', {}, 'Please enter a new name'), 'danger');
                 return;
             }
             if (!isValidWorkspaceName(newName)) {
-                showTopAlert('Invalid name: use letters, numbers, dash or underscore only', 'danger');
+                showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
                 return;
             }
             if (newName === currentName) {
-                showTopAlert('New name must be different from current name', 'danger');
+                showTopAlert(tr('workspaces.validation.new_name_must_differ', {}, 'New name must be different from current name'), 'danger');
                 return;
             }
 
@@ -436,7 +450,7 @@ function handleRenameButtonClick(e) {
                 try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
 
                 if (json && json.success) {
-                    showAjaxAlert('Workspace renamed successfully', 'success');
+                    showAjaxAlert(tr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
                     // Close modal
                     try { closeRenameModal(); } catch(e) {}
                     // Reload page to show updated workspace name
@@ -444,12 +458,12 @@ function handleRenameButtonClick(e) {
                         window.location.reload();
                     }, 1000);
                 } else {
-                    showAjaxAlert('Error: ' + (json.error || 'Unknown error'), 'danger');
+                    showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                 }
             })
             .catch(function() {
                 try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
-                showAjaxAlert('Error renaming workspace', 'danger');
+                showAjaxAlert(tr('workspaces.alerts.rename_error', {}, 'Error renaming workspace'), 'danger');
             });
         };
     }
@@ -517,7 +531,7 @@ function handleDeleteButtonClick(e) {
             .then(function(resp) { return resp.json(); })
             .then(function(json) {
                 if (json && json.success) {
-                    showAjaxAlert('Workspace deleted successfully', 'success');
+                    showAjaxAlert(tr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
                     // Close modal
                     try { closeDeleteModal(); } catch(e) {}
                     // If the deleted workspace was the one stored in localStorage, clear it so other pages don't link to a removed workspace
@@ -559,13 +573,13 @@ function handleDeleteButtonClick(e) {
                         window.location.reload();
                     }, 1000);
                 } else {
-                    showAjaxAlert('Error: ' + (json.error || 'Unknown error'), 'danger');
+                    showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
                     confirmBtn.disabled = false; // re-enable on error
                 }
             })
             .catch(function() {
                 confirmBtn.disabled = false; // re-enable on error
-                showAjaxAlert('Error deleting workspace', 'danger');
+                showAjaxAlert(tr('workspaces.alerts.delete_error', {}, 'Error deleting workspace'), 'danger');
             });
         };
     }

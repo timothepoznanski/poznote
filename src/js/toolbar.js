@@ -5,15 +5,23 @@
   'use strict';
 
   const COLORS = [
-    { name: 'Black', value: 'rgb(55,53,47)' },
-    { name: 'Red', value: 'red' },
-    { name: 'Orange', value: 'orange' },
-    { name: 'Yellow', value: 'yellow' },
-    { name: 'Green', value: 'green' },
-    { name: 'Blue', value: 'blue' },
-    { name: 'Purple', value: 'purple' },
-    { name: 'None', value: 'none' }
+    { key: 'editor.colors.black', fallback: 'Black', value: 'rgb(55,53,47)' },
+    { key: 'editor.colors.red', fallback: 'Red', value: 'red' },
+    { key: 'editor.colors.orange', fallback: 'Orange', value: 'orange' },
+    { key: 'editor.colors.yellow', fallback: 'Yellow', value: 'yellow' },
+    { key: 'editor.colors.green', fallback: 'Green', value: 'green' },
+    { key: 'editor.colors.blue', fallback: 'Blue', value: 'blue' },
+    { key: 'editor.colors.purple', fallback: 'Purple', value: 'purple' },
+    { key: 'editor.colors.none', fallback: 'None', value: 'none' }
   ];
+
+  function tr(key, fallback, vars) {
+    if (window.t) return window.t(key, vars || null, fallback);
+    if (vars && typeof vars === 'object') {
+      for (const k in vars) fallback = String(fallback).split('{{' + k + '}}').join(String(vars[k]));
+    }
+    return fallback;
+  }
 
   // Save/restore selection helpers
   function saveSelection() {
@@ -128,7 +136,7 @@
       item.type = 'button';
       item.className = 'color-item';
       item.setAttribute('data-color', c.value);
-      item.setAttribute('title', c.name);
+      item.setAttribute('title', tr(c.key, c.fallback));
       // Visual: a small swatch and label (screen readers)
       const sw = document.createElement('span');
       sw.className = 'color-swatch';
@@ -304,13 +312,13 @@ function changeFontSize() {
   
   // Font size options with labels
   const fontSizes = [
-    { value: '1', label: 'Very small', preview: 'Aa' },
-    { value: '2', label: 'Small', preview: 'Aa' },
-    { value: '3', label: 'Normal', preview: 'Aa' },
-    { value: '4', label: 'Large', preview: 'Aa' },
-    { value: '5', label: 'Very large', preview: 'Aa' },
-    { value: '6', label: 'Huge', preview: 'Aa' },
-    { value: '7', label: 'Giant', preview: 'Aa' }
+    { value: '1', key: 'editor.font_size.very_small', fallback: 'Very small', preview: 'Aa' },
+    { value: '2', key: 'editor.font_size.small', fallback: 'Small', preview: 'Aa' },
+    { value: '3', key: 'editor.font_size.normal', fallback: 'Normal', preview: 'Aa' },
+    { value: '4', key: 'editor.font_size.large', fallback: 'Large', preview: 'Aa' },
+    { value: '5', key: 'editor.font_size.very_large', fallback: 'Very large', preview: 'Aa' },
+    { value: '6', key: 'editor.font_size.huge', fallback: 'Huge', preview: 'Aa' },
+    { value: '7', key: 'editor.font_size.giant', fallback: 'Giant', preview: 'Aa' }
   ];
 
   // Build popup content
@@ -318,7 +326,7 @@ function changeFontSize() {
   fontSizes.forEach(size => {
     popupHTML += `
       <div class="font-size-item" data-size="${size.value}">
-        <span class="size-label">${size.label}</span>
+        <span class="size-label">${tr(size.key, size.fallback)}</span>
         <span class="size-preview size-${size.value}">${size.preview}</span>
       </div>
     `;
@@ -713,7 +721,8 @@ function toggleEmojiPicker() {
   const emojis = ['😀', '😃', '😄', '😊', '😍', '😘', '😎', '🤔', '😅', '😂', '😢', '😭', '😡', '👍', '👎', '👉', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '❤️', '➜', '🚧', '✅', '🟩', '🟪', '☑️', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '⚠️', '🚩', '🟢', '🔴', '🔵', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];  
   
   // Create picker content
-  let content = '<div class="emoji-hint">💡 On Windows, press <kbd>Win</kbd> + <kbd>;</kbd> to open native emoji picker</div>';
+  const defaultHint = '💡 On Windows, press <kbd>Win</kbd> + <kbd>;</kbd> to open native emoji picker';
+  let content = '<div class="emoji-hint">' + tr('editor.emoji.hint_windows', defaultHint) + '</div>';
   content += '<div class="emoji-category">';
   content += '<div class="emoji-grid">';
   
@@ -1047,7 +1056,7 @@ function toggleTablePicker() {
   // Create header
   const header = document.createElement('div');
   header.className = 'table-picker-header';
-  header.textContent = 'Insert Table';
+  header.textContent = tr('editor.table_picker.title', 'Insert Table');
   picker.appendChild(header);
   
   // Create direct input section
@@ -1062,7 +1071,7 @@ function toggleTablePicker() {
   rowsWrapper.className = 'table-picker-input-wrapper';
   
   const rowsLabel = document.createElement('label');
-  rowsLabel.textContent = 'Rows:';
+  rowsLabel.textContent = tr('editor.table_picker.rows_label', 'Rows:');
   rowsLabel.className = 'table-picker-input-field-label';
   rowsWrapper.appendChild(rowsLabel);
   
@@ -1072,7 +1081,7 @@ function toggleTablePicker() {
   rowsInput.min = '1';
   rowsInput.max = '20';
   rowsInput.value = '3';
-  rowsInput.placeholder = 'Rows';
+  rowsInput.placeholder = tr('editor.table_picker.rows_placeholder', 'Rows');
   rowsWrapper.appendChild(rowsInput);
   
   inputContainer.appendChild(rowsWrapper);
@@ -1082,7 +1091,7 @@ function toggleTablePicker() {
   colsWrapper.className = 'table-picker-input-wrapper';
   
   const colsLabel = document.createElement('label');
-  colsLabel.textContent = 'Cols:';
+  colsLabel.textContent = tr('editor.table_picker.cols_label', 'Cols:');
   colsLabel.className = 'table-picker-input-field-label';
   colsWrapper.appendChild(colsLabel);
   
@@ -1092,7 +1101,7 @@ function toggleTablePicker() {
   colsInput.min = '1';
   colsInput.max = '20';
   colsInput.value = '3';
-  colsInput.placeholder = 'Cols';
+  colsInput.placeholder = tr('editor.table_picker.cols_placeholder', 'Cols');
   colsWrapper.appendChild(colsInput);
   
   inputContainer.appendChild(colsWrapper);
@@ -1100,7 +1109,7 @@ function toggleTablePicker() {
   // Insert button
   const insertBtn = document.createElement('button');
   insertBtn.className = 'table-picker-insert-btn';
-  insertBtn.textContent = 'Insert';
+  insertBtn.textContent = tr('editor.table_picker.insert', 'Insert');
   inputContainer.appendChild(insertBtn);
   
   inputSection.appendChild(inputContainer);

@@ -135,9 +135,27 @@ function saveNoteToServer() {
     // Prepare data
     var headi = titleInput.value || '';
     
-    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
-    if (headi === '' && titleInput.placeholder && /^New note( \(\d+\))?$/.test(titleInput.placeholder)) {
-        headi = titleInput.placeholder;
+    // If title is empty, only use placeholder if it matches default note title patterns
+    // Support both English and French (and potentially other languages)
+    if (headi === '' && titleInput.placeholder) {
+        var placeholderPatterns = [
+            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
+            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
+        ];
+        
+        var isDefaultPlaceholder = placeholderPatterns.some(function(pattern) {
+            return pattern.test(titleInput.placeholder);
+        });
+        
+        if (isDefaultPlaceholder) {
+            headi = titleInput.placeholder;
+        }
+    }
+    
+    // If still empty, don't save to avoid "heading is required" error
+    if (headi === '' || headi.trim() === '') {
+        console.log('[Poznote Auto-Save] Skipping save: note has no title');
+        return;
     }
     
     // Serialize checklist data before saving
@@ -202,7 +220,6 @@ function saveNoteToServer() {
         if (data.success) {
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
         } else {
-            console.error('[Poznote Auto-Save] Save error:', data.message || 'Unknown error');
             // Show user-visible error notification
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(data.message || 'Error saving note', 'error');
@@ -394,10 +411,25 @@ function updateNoteTitleInLeftColumn() {
     
     var newTitle = elements.title.value.trim();
     
-    // If title is empty, check if the placeholder contains a default title like "New note" or "New note (x)"
-    if (newTitle === '' && elements.title.placeholder && /^New note( \(\d+\))?$/.test(elements.title.placeholder)) {
-        newTitle = elements.title.placeholder;
-    } else if (newTitle === '') {
+    // If title is empty, only use placeholder if it matches default note title patterns
+    // Support both English and French (and potentially other languages)
+    if (newTitle === '' && elements.title.placeholder) {
+        var placeholderPatterns = [
+            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
+            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
+        ];
+        
+        var isDefaultPlaceholder = placeholderPatterns.some(function(pattern) {
+            return pattern.test(elements.title.placeholder);
+        });
+        
+        if (isDefaultPlaceholder) {
+            newTitle = elements.title.placeholder;
+        }
+    }
+    
+    // Si le titre est toujours vide après avoir vérifié le placeholder
+    if (newTitle === '') {
         newTitle = 'Note sans titre';
     }
     
