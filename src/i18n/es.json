@@ -658,6 +658,10 @@
     },
     "export": {
       "title": "Exportar nota",
+      "markdown": {
+        "title": "Exportar como Markdown",
+        "description": "Descargar como archivo MD con título y etiquetas en formato markdown"
+      },
       "html": {
         "title": "Exportar como HTML",
         "description": "Descargar como archivo HTML con todo el formato preservado"

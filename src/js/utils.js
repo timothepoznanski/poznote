@@ -1489,6 +1489,20 @@ function showExportModal(noteId, filename, title, noteType) {
     
     var modal = document.getElementById('exportModal');
     if (modal) {
+        // Show/hide options based on note type
+        var markdownOption = modal.querySelector('.export-option-markdown');
+        var htmlOption = modal.querySelector('.export-option-html');
+        
+        if (noteType === 'markdown') {
+            // For markdown notes: show MD and PDF options, hide HTML option
+            if (markdownOption) markdownOption.style.display = 'flex';
+            if (htmlOption) htmlOption.style.display = 'none';
+        } else {
+            // For other notes: show HTML and PDF options, hide MD option
+            if (markdownOption) markdownOption.style.display = 'none';
+            if (htmlOption) htmlOption.style.display = 'flex';
+        }
+        
         modal.style.display = 'flex';
     }
 }
@@ -1497,7 +1511,9 @@ function showExportModal(noteId, filename, title, noteType) {
 function selectExportType(type) {
     closeModal('exportModal');
     
-    if (type === 'html') {
+    if (type === 'markdown') {
+        exportNoteAsMarkdown(currentExportNoteId, currentExportFilename, currentExportNoteType);
+    } else if (type === 'html') {
         exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
     } else if (type === 'print') {
         exportNoteToPrint(currentExportNoteId, currentExportNoteType);
@@ -1510,6 +1526,21 @@ function exportNoteAsHTML(noteId, url, filename, noteType) {
     var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
                  '&type=' + encodeURIComponent(noteType) + 
                  '&format=html';
+    
+    var link = document.createElement('a');
+    link.href = apiUrl;
+    link.download = '';  // Let the server set the filename via Content-Disposition
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Export note as Markdown
+function exportNoteAsMarkdown(noteId, filename, noteType) {
+    // Use the export API endpoint with markdown format
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
+                 '&type=' + encodeURIComponent(noteType) + 
+                 '&format=markdown';
     
     var link = document.createElement('a');
     link.href = apiUrl;
