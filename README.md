@@ -551,6 +551,21 @@ curl -X DELETE -u 'username:password' \
   http://YOUR_SERVER/api_delete_note.php
 ```
 
+**Export Note**
+
+Export a note as a styled HTML document (download):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=attachment" \
+  -o exported-note.html
+```
+
+Export a note for browser viewing/printing (inline):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=inline"
+```
+
 **Move Note**
 
 Move a note to a different folder or workspace:
@@ -837,6 +852,10 @@ curl -u 'username:password' \
 </details>
 
 ## Use Poznote in the Cloud
+
+<p align="center">
+  <img src="railway-template.png" alt="Railway Template" width="100%">
+</p>
 
 If you:
 

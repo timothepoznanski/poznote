@@ -327,6 +327,111 @@ paths:
         '200':
           description: Note moved to trash or permanently deleted successfully
 
+  /api_export_note.php:
+    get:
+      tags:
+        - Notes Management
+      summary: Export note
+      description: |
+        Export a note as a styled HTML document with title, tags, and formatted content.
+        Supports two disposition modes:
+        - `attachment` (default): Forces download as .html file
+        - `inline`: Renders in browser for printing or viewing
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: "Note ID (required)"
+          schema:
+            type: integer
+            example: 123
+        - name: type
+          in: query
+          required: true
+          description: "Note type (required)"
+          schema:
+            type: string
+            enum: [note, markdown, tasklist]
+            example: "note"
+        - name: format
+          in: query
+          required: false
+          description: "Export format (optional, default: html)"
+          schema:
+            type: string
+            enum: [html]
+            default: html
+            example: "html"
+        - name: disposition
+          in: query
+          required: false
+          description: "Content disposition (optional, default: attachment)"
+          schema:
+            type: string
+            enum: [attachment, inline]
+            default: attachment
+            example: "attachment"
+      responses:
+        '200':
+          description: Note exported successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: "Styled HTML document with embedded CSS, title, tags, and note content"
+        '400':
+          description: Invalid parameters (missing ID, invalid format/disposition)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Note ID is required"
+        '403':
+          description: Invalid file path (security check failed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Invalid file path"
+        '404':
+          description: Note not found or file missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Note not found"
+        '500':
+          description: Export failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Export failed: [error details]"
+
   /api_list_trash.php:
     get:
       tags:
