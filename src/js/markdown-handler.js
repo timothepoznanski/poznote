@@ -51,8 +51,17 @@ function normalizeContentEditableText(element) {
     return content;
 }
 
-function initMermaid() {
-    if (typeof mermaid !== 'undefined') {
+function initMermaid(retryCount) {
+    retryCount = retryCount || 0;
+    if (typeof mermaid === 'undefined') {
+        // Mermaid may be loaded async; retry a few times without delaying normal rendering.
+        if (retryCount < 10) {
+            setTimeout(function() {
+                initMermaid(retryCount + 1);
+            }, 200);
+        }
+        return;
+    }
         function escapeHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -108,6 +117,8 @@ function initMermaid() {
                 var mermaidDiv = document.createElement('div');
                 mermaidDiv.className = 'mermaid';
                 mermaidDiv.textContent = diagramText;
+                // Persist the original diagram source so re-renders don't try to parse the rendered SVG.
+                mermaidDiv.setAttribute('data-mermaid-source', diagramText.trim());
 
                 if (pre && pre.parentNode) {
                     pre.parentNode.replaceChild(mermaidDiv, pre);
@@ -121,30 +132,82 @@ function initMermaid() {
 
         var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
 
+        // Initialize Mermaid only once per theme to prevent issues with re-initialization
+        if (!window.mermaidInitialized || window.mermaidTheme !== theme) {
+            mermaid.initialize({ startOnLoad: false, theme: theme });
+            window.mermaidInitialized = true;
+            window.mermaidTheme = theme;
+        }
+
         // Validate diagrams first (gives a clearer error than Mermaid's default icon)
         var mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
         if (mermaidNodes.length === 0) return;
 
-        // Store original text (so we can show it on error)
+        // Build a list of nodes that actually need rendering.
+        // Important: if a node is already rendered (SVG / data-processed) but the source is missing,
+        // do NOT try to re-parse its textContent (it will be SVG/CSS text and will error).
+        var nodesToRender = [];
         for (var j = 0; j < mermaidNodes.length; j++) {
             var n = mermaidNodes[j];
-            if (!n.getAttribute('data-mermaid-source')) {
-                n.setAttribute('data-mermaid-source', (n.textContent || '').trim());
+            var existingSource = (n.getAttribute('data-mermaid-source') || '').trim();
+            var alreadyRendered = false;
+            try {
+                alreadyRendered = !!(n.getAttribute && n.getAttribute('data-processed')) ||
+                    (n.querySelector && n.querySelector('svg')) ||
+                    (typeof n.innerHTML === 'string' && n.innerHTML.indexOf('<svg') !== -1);
+            } catch (eRenderCheck) {
+                alreadyRendered = false;
             }
+
+            var renderedTheme = '';
+            try {
+                renderedTheme = (n.getAttribute('data-mermaid-render-theme') || '').trim();
+            } catch (eThemeRead) {
+                renderedTheme = '';
+            }
+
+            // If already rendered and theme hasn't changed, leave it alone.
+            // This prevents re-parsing SVG textContent and avoids flicker.
+            if (alreadyRendered && renderedTheme === theme) {
+                continue;
+            }
+
+            // If we don't have a saved source, only try fallback for NOT-rendered nodes.
+            // Rendered nodes without a source must stay as-is.
+            if (!existingSource) {
+                if (alreadyRendered) {
+                    continue;
+                }
+                var fallbackSource = (n.textContent || '').trim();
+                if (!fallbackSource) continue;
+                n.setAttribute('data-mermaid-source', fallbackSource);
+                existingSource = fallbackSource;
+            }
+
+            // At this point, we have a source and we want to (re)render.
+            // Mermaid will skip nodes marked as processed, so clear it when re-rendering.
+            try {
+                n.removeAttribute('data-processed');
+            } catch (eProcessed) {}
+
+            n.textContent = existingSource;
+            nodesToRender.push(n);
         }
 
-        try {
-            mermaid.initialize({ startOnLoad: false, theme: theme });
+        if (nodesToRender.length === 0) return;
 
+        try {
             // If mermaid.parse is available, validate each diagram and render only valid ones
             if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
                 var validNodes = [];
-                var checks = mermaidNodes.map(function(node) {
+                var checks = nodesToRender.map(function(node) {
                     var src = node.getAttribute('data-mermaid-source') || '';
                     if (!src.trim()) return Promise.resolve();
                     return Promise.resolve(mermaid.parse(src))
                         .then(function() {
-                            // Restore source in case it was altered
+                            // Ensure the node contains only the source text when (re)rendering
+                            // and that it won't be skipped due to a stale processed flag.
+                            try { node.removeAttribute('data-processed'); } catch (eDp1) {}
                             node.textContent = src;
                             validNodes.push(node);
                         })
@@ -158,26 +221,46 @@ function initMermaid() {
                     return mermaid.run({
                         nodes: validNodes,
                         suppressErrors: true
+                    }).then(function() {
+                        for (var k = 0; k < validNodes.length; k++) {
+                            try {
+                                validNodes[k].setAttribute('data-mermaid-render-theme', theme);
+                            } catch (eSetTheme1) {}
+                        }
                     });
                 }).catch(function(e1) {
                     console.error('Mermaid rendering failed', e1);
                 });
             } else {
                 mermaid.run({
-                    nodes: document.querySelectorAll('.mermaid'),
+                    nodes: nodesToRender,
                     suppressErrors: true
+                }).then(function() {
+                    for (var k2 = 0; k2 < nodesToRender.length; k2++) {
+                        try {
+                            nodesToRender[k2].setAttribute('data-mermaid-render-theme', theme);
+                        } catch (eSetTheme2) {}
+                    }
                 });
             }
         } catch (e) {
             // Fallback for older versions
             try {
-                mermaid.initialize({ startOnLoad: false, theme: theme });
-                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+                if (!window.mermaidInitialized || window.mermaidTheme !== theme) {
+                    mermaid.initialize({ startOnLoad: false, theme: theme });
+                    window.mermaidInitialized = true;
+                    window.mermaidTheme = theme;
+                }
+                mermaid.init(undefined, nodesToRender);
+                for (var k3 = 0; k3 < nodesToRender.length; k3++) {
+                    try {
+                        nodesToRender[k3].setAttribute('data-mermaid-render-theme', theme);
+                    } catch (eSetTheme3) {}
+                }
             } catch (e2) {
                 console.error('Mermaid initialization failed', e2);
             }
         }
-    }
 }
 
 function parseMarkdown(text) {
