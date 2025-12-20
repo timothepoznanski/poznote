@@ -55,7 +55,7 @@ if (!in_array($noteType, $validTypes)) {
 
 // Get the note from database to verify it exists and user has access
 try {
-    $stmt = $con->prepare('SELECT id, heading, type FROM entries WHERE id = ? AND trash = 0');
+    $stmt = $con->prepare('SELECT id, heading, type, tags FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$noteId]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -130,7 +130,7 @@ $downloadFilename .= $extension;
 $content = file_get_contents($filePath);
 
 // Generate complete HTML with proper styling for all note types
-function generateStyledHtml($content, $title, $noteType) {
+function generateStyledHtml($content, $title, $noteType, $tags = '') {
     // Clean up content: remove copy buttons and other UI elements that shouldn't be exported
     // Use DOMDocument for proper HTML manipulation
     $doc = new DOMDocument();
@@ -294,6 +294,26 @@ function generateStyledHtml($content, $title, $noteType) {
             padding: 10px;
             border-radius: 4px;
         }
+        .note-metadata {
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .note-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .note-tag {
+            display: inline-block;
+            background-color: #e8f4f8;
+            color: #0066cc;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
     ';
     
     $html = '<!DOCTYPE html>' . "\n";
@@ -305,13 +325,31 @@ function generateStyledHtml($content, $title, $noteType) {
     $html .= '<style>' . $commonStyles . '</style>' . "\n";
     $html .= '</head>' . "\n";
     $html .= '<body>' . "\n";
+    $html .= '<div class="note-metadata">' . "\n";
     $html .= '<h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1>' . "\n";
+    
+    // Add tags if present
+    if (!empty($tags)) {
+        $tagsArray = array_filter(array_map('trim', explode(',', $tags)));
+        if (count($tagsArray) > 0) {
+            $html .= '<div class="note-tags">' . "\n";
+            foreach ($tagsArray as $tag) {
+                $html .= '<span class="note-tag">' . htmlspecialchars($tag, ENT_QUOTES) . '</span>' . "\n";
+            }
+            $html .= '</div>' . "\n";
+        }
+    }
+    
+    $html .= '</div>' . "\n";
     $html .= $content;
     $html .= '</body>' . "\n";
     $html .= '</html>';
     
     return $html;
 }
+
+// Get tags from the note row
+$tags = $row['tags'] ?? '';
 
 // If this is a tasklist type, convert JSON to HTML
 if ($noteType === 'tasklist') {
@@ -330,14 +368,14 @@ if ($noteType === 'tasklist') {
         }
         $tasksContent .= '</div>' . "\n";
         $tasksContent .= '</div>' . "\n";
-        $content = generateStyledHtml($tasksContent, $title, $noteType);
+        $content = generateStyledHtml($tasksContent, $title, $noteType, $tags);
     } else {
         // If JSON parse fails, wrap raw content in pre tag
-        $content = generateStyledHtml('<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>', $title, $noteType);
+        $content = generateStyledHtml('<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>', $title, $noteType, $tags);
     }
 } elseif ($noteType === 'note' || $noteType === 'markdown') {
     // For regular HTML and markdown notes, wrap in styled HTML
-    $content = generateStyledHtml($content, $title, $noteType);
+    $content = generateStyledHtml($content, $title, $noteType, $tags);
 }
 
 // Send the file to the browser
