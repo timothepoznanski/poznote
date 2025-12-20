@@ -329,11 +329,11 @@
                         <p><?php echo t_h('modals.export.html.description', [], 'Download as HTML file with all formatting preserved'); ?></p>
                     </div>
                 </div>
-                <div class="export-option" onclick="selectExportType('pdf')">
-                    <i class="fal fa-file-pdf"></i>
+                <div class="export-option" onclick="selectExportType('print')">
+                    <i class="fal fa-print"></i>
                     <div>
-                        <span><?php echo t_h('modals.export.pdf.title', [], 'Export as PDF'); ?></span>
-                        <p><?php echo t_h('modals.export.pdf.description', [], 'Print to PDF using your browser'); ?></p>
+                        <span><?php echo t_h('modals.export.print.title', [], 'Print to PDF (Browser)'); ?></span>
+                        <p><?php echo t_h('modals.export.print.description', [], 'Use browser\'s native print dialog to save as PDF'); ?></p>
                     </div>
                 </div>
             </div>

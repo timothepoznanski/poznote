@@ -2957,7 +2957,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-edit::before { content: "\f044"; }
 .fa-download::before { content: "\f019"; }
 .fa-file-code::before { content: "\f1c9"; }
-.fa-file-pdf::before { content: "\f1c1"; }
 .fa-maximize::before { content: "\f31e"; }
 .fa-expand::before { content: "\f065"; }
 .fa-trash::before { content: "\f2ed"; }

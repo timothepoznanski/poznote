@@ -662,9 +662,9 @@
         "title": "Exportar como HTML",
         "description": "Descargar como archivo HTML con todo el formato preservado"
       },
-      "pdf": {
-        "title": "Exportar como PDF",
-        "description": "Imprimir como PDF usando su navegador"
+      "print": {
+        "title": "Imprimir a PDF (Navegador)",
+        "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
       }
     },
     "note_sort": {

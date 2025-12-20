@@ -1107,7 +1107,6 @@ $body_classes = trim($extra_body_classes);
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>
 <script src="js/events.js"></script>
-<script src="js/html2pdf.bundle.min.js?v=<?php echo $v; ?>"></script>
 <script src="js/utils.js"></script>
 <script src="js/search-highlight.js"></script>
 <script src="js/toolbar.js"></script>

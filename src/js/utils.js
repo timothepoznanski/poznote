@@ -1499,15 +1499,17 @@ function selectExportType(type) {
     
     if (type === 'html') {
         exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
-    } else if (type === 'pdf') {
-        exportNoteAsPDF(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
+    } else if (type === 'print') {
+        exportNoteToPrint(currentExportNoteId, currentExportNoteType);
     }
 }
 
 // Export note as HTML
 function exportNoteAsHTML(noteId, url, filename, noteType) {
-    // Use the API endpoint for secure note download
-    var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
+    // Use the unified export API endpoint
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
+                 '&type=' + encodeURIComponent(noteType) + 
+                 '&format=html';
     
     var link = document.createElement('a');
     link.href = apiUrl;
@@ -1517,54 +1519,31 @@ function exportNoteAsHTML(noteId, url, filename, noteType) {
     document.body.removeChild(link);
 }
 
-// Export note as PDF
-function exportNoteAsPDF(noteId, url, filename, noteType) {
-    // Check if html2pdf is loaded
-    if (typeof html2pdf !== 'function') {
-        console.error('html2pdf library not loaded');
-        alert('PDF export is not available. Please refresh the page.');
+// Export note using browser's native print dialog
+function exportNoteToPrint(noteId, noteType) {
+    // Open the export URL directly so relative assets resolve correctly,
+    // and the printed content matches exactly what the HTML export generates.
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
+                 '&type=' + encodeURIComponent(noteType) + 
+                 '&format=html' +
+                 '&disposition=inline';
+
+    var printWindow = window.open(apiUrl, '_blank', 'width=800,height=600');
+    if (!printWindow) {
+        alert('Please allow pop-ups to use the print feature.');
         return;
     }
-    
-    // Ensure filename has a default value
-    if (!filename || filename === null || filename === undefined) {
-        filename = 'poznote-export-' + noteId + '.pdf';
-    } else {
-        // Remove extension if present and add .pdf
-        filename = filename.replace(/\.[^/.]+$/, '') + '.pdf';
-    }
-    
-    // Get the HTML content from the API
-    var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
-    
-    fetch(apiUrl)
-        .then(function(response) { return response.text(); })
-        .then(function(htmlContent) {
-            // Create a temporary container
-            var container = document.createElement('div');
-            container.innerHTML = htmlContent;
-            
-            // Configure PDF options
-            var opt = {
-                margin: 10,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            // Generate and save PDF automatically
-            html2pdf().set(opt).from(container).save();
-        })
-        .catch(function(error) {
-            console.error('Error exporting to PDF:', error);
-            alert('Error exporting to PDF. Please try again.');
-        });
+
+    printWindow.onload = function() {
+        setTimeout(function() {
+            printWindow.print();
+        }, 250);
+    };
 }
 
 // Legacy function for backward compatibility
 function downloadNote(noteId, url, filename, noteType) {
-    showExportModal(noteId, url, filename, noteType);
+    showExportModal(noteId, filename, null, noteType);
 }
 
 // Function to download a file

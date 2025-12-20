@@ -662,9 +662,9 @@
         "title": "Export as HTML",
         "description": "Download as HTML file with all formatting preserved"
       },
-      "pdf": {
-        "title": "Export as PDF",
-        "description": "Print to PDF using your browser"
+      "print": {
+        "title": "Print to PDF (Browser)",
+        "description": "Use browser's native print dialog to save as PDF"
       }
     },
     "note_sort": {
