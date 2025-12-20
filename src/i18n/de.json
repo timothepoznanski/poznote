@@ -658,6 +658,10 @@
     },
     "export": {
       "title": "Notiz exportieren",
+      "markdown": {
+        "title": "Als Markdown exportieren",
+        "description": "Als MD-Datei mit Titel und Tags im Markdown-Format herunterladen"
+      },
       "html": {
         "title": "Als HTML exportieren",
         "description": "Als HTML-Datei mit vollständig erhaltener Formatierung herunterladen"

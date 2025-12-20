@@ -322,7 +322,16 @@
         <h3><?php echo t_h('modals.export.title', [], 'Export Note'); ?></h3>
         <div class="modal-body">
             <div class="export-options">
-                <div class="export-option" onclick="selectExportType('html')">
+                <!-- Markdown export option (shown only for markdown notes) -->
+                <div class="export-option export-option-markdown" onclick="selectExportType('markdown')" style="display:none;">
+                    <i class="fal fa-file-alt"></i>
+                    <div>
+                        <span><?php echo t_h('modals.export.markdown.title', [], 'Export as Markdown'); ?></span>
+                        <p><?php echo t_h('modals.export.markdown.description', [], 'Download as MD file with title and tags in markdown format'); ?></p>
+                    </div>
+                </div>
+                <!-- HTML export option (shown only for non-markdown notes) -->
+                <div class="export-option export-option-html" onclick="selectExportType('html')">
                     <i class="fal fa-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.html.title', [], 'Export as HTML'); ?></span>
