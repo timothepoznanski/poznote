@@ -129,48 +129,197 @@ $downloadFilename .= $extension;
 // Read the file content
 $content = file_get_contents($filePath);
 
+// Generate complete HTML with proper styling for all note types
+function generateStyledHtml($content, $title, $noteType) {
+    // Common CSS styles for all exported notes
+    $commonStyles = '
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 { 
+            margin-bottom: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.3em;
+        }
+        h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0.75em 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 0.3em;
+        }
+        h3 {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin: 0.83em 0;
+        }
+        h4, h5, h6 {
+            font-weight: bold;
+            margin: 1em 0;
+        }
+        p {
+            margin: 0 0 1em 0;
+            line-height: 1.6;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.9em;
+            color: #333;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            border-radius: 0;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 16px;
+            margin: 1em 0;
+            color: #666;
+            font-style: italic;
+        }
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin: 0.5em 0;
+            line-height: 1.6;
+        }
+        ul {
+            list-style-type: disc;
+        }
+        ol {
+            list-style-type: decimal;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 1em 0;
+        }
+        hr {
+            border: 0;
+            border-top: 2px solid #e0e0e0;
+            margin: 2em 0;
+        }
+        strong {
+            font-weight: bold;
+        }
+        em {
+            font-style: italic;
+        }
+        del {
+            text-decoration: line-through;
+            color: #999;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        ul.task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        li.task-list-item {
+            list-style: none;
+            position: relative;
+            padding-left: 0;
+        }
+        li.task-list-item input[type="checkbox"] {
+            margin-right: 0.5em;
+            cursor: default;
+            vertical-align: middle;
+        }
+        .mermaid {
+            margin: 1em 0;
+            text-align: center;
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    ';
+    
+    $html = '<!DOCTYPE html>' . "\n";
+    $html .= '<html lang="en">' . "\n";
+    $html .= '<head>' . "\n";
+    $html .= '<meta charset="utf-8">' . "\n";
+    $html .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . "\n";
+    $html .= '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>' . "\n";
+    $html .= '<style>' . $commonStyles . '</style>' . "\n";
+    $html .= '</head>' . "\n";
+    $html .= '<body>' . "\n";
+    $html .= '<h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1>' . "\n";
+    $html .= $content;
+    $html .= '</body>' . "\n";
+    $html .= '</html>';
+    
+    return $html;
+}
+
 // If this is a tasklist type, convert JSON to HTML
 if ($noteType === 'tasklist') {
     $decoded = json_decode($content, true);
     if (is_array($decoded)) {
-        $tasksHtml = '<!DOCTYPE html>' . "\n";
-        $tasksHtml .= '<html>' . "\n";
-        $tasksHtml .= '<head>' . "\n";
-        $tasksHtml .= '<meta charset="utf-8">' . "\n";
-        $tasksHtml .= '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>' . "\n";
-        $tasksHtml .= '<style>' . "\n";
-        $tasksHtml .= 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }' . "\n";
-        $tasksHtml .= 'h1 { margin-bottom: 20px; }' . "\n";
-        $tasksHtml .= '.task-list-container { margin-top: 20px; }' . "\n";
-        $tasksHtml .= '.tasks-list { list-style: none; padding: 0; }' . "\n";
-        $tasksHtml .= '.task-item { padding: 8px 0; display: flex; align-items: center; }' . "\n";
-        $tasksHtml .= '.task-item input[type="checkbox"] { margin-right: 10px; cursor: default; }' . "\n";
-        $tasksHtml .= '.task-item.completed .task-text { text-decoration: line-through; color: #888; }' . "\n";
-        $tasksHtml .= '.task-text { flex: 1; }' . "\n";
-        $tasksHtml .= '</style>' . "\n";
-        $tasksHtml .= '</head>' . "\n";
-        $tasksHtml .= '<body>' . "\n";
-        $tasksHtml .= '<h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1>' . "\n";
-        $tasksHtml .= '<div class="task-list-container">' . "\n";
-        $tasksHtml .= '<div class="tasks-list">' . "\n";
+        $tasksContent = '<div class="task-list-container">' . "\n";
+        $tasksContent .= '<div class="tasks-list">' . "\n";
         foreach ($decoded as $task) {
             $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
-            $tasksHtml .= '<div class="task-item'.$completed.'">';
-            $tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
-            $tasksHtml .= '<span class="task-text">'.$text.'</span>';
-            $tasksHtml .= '</div>' . "\n";
+            $tasksContent .= '<div class="task-item'.$completed.'">';
+            $tasksContent .= '<input type="checkbox" disabled'.$checked.' /> ';
+            $tasksContent .= '<span class="task-text">'.$text.'</span>';
+            $tasksContent .= '</div>' . "\n";
         }
-        $tasksHtml .= '</div>' . "\n";
-        $tasksHtml .= '</div>' . "\n";
-        $tasksHtml .= '</body>' . "\n";
-        $tasksHtml .= '</html>';
-        $content = $tasksHtml;
+        $tasksContent .= '</div>' . "\n";
+        $tasksContent .= '</div>' . "\n";
+        $content = generateStyledHtml($tasksContent, $title, $noteType);
     } else {
         // If JSON parse fails, wrap raw content in pre tag
-        $content = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' . htmlspecialchars($title, ENT_QUOTES) . '</title></head><body><h1>' . htmlspecialchars($title, ENT_QUOTES) . '</h1><pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre></body></html>';
+        $content = generateStyledHtml('<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>', $title, $noteType);
     }
+} elseif ($noteType === 'note' || $noteType === 'markdown') {
+    // For regular HTML and markdown notes, wrap in styled HTML
+    $content = generateStyledHtml($content, $title, $noteType);
 }
 
 // Send the file to the browser
