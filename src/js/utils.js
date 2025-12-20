@@ -1476,9 +1476,40 @@ function hideMoveFolderError() {
 
 
 // Function to download a note (handles markdown and HTML)
-function downloadNote(noteId, url, filename, noteType) {
-    // Use the API endpoint for secure note download
-    var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
+// Store current export note info
+var currentExportNoteId = null;
+var currentExportNoteType = null;
+var currentExportFilename = null;
+
+// Show export modal
+function showExportModal(noteId, filename, title, noteType) {
+    currentExportNoteId = noteId;
+    currentExportNoteType = noteType;
+    currentExportFilename = filename;
+    
+    var modal = document.getElementById('exportModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Select export type and execute
+function selectExportType(type) {
+    closeModal('exportModal');
+    
+    if (type === 'html') {
+        exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
+    } else if (type === 'print') {
+        exportNoteToPrint(currentExportNoteId, currentExportNoteType);
+    }
+}
+
+// Export note as HTML
+function exportNoteAsHTML(noteId, url, filename, noteType) {
+    // Use the unified export API endpoint
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
+                 '&type=' + encodeURIComponent(noteType) + 
+                 '&format=html';
     
     var link = document.createElement('a');
     link.href = apiUrl;
@@ -1486,6 +1517,33 @@ function downloadNote(noteId, url, filename, noteType) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// Export note using browser's native print dialog
+function exportNoteToPrint(noteId, noteType) {
+    // Open the export URL directly so relative assets resolve correctly,
+    // and the printed content matches exactly what the HTML export generates.
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) + 
+                 '&type=' + encodeURIComponent(noteType) + 
+                 '&format=html' +
+                 '&disposition=inline';
+
+    var printWindow = window.open(apiUrl, '_blank', 'width=800,height=600');
+    if (!printWindow) {
+        alert('Please allow pop-ups to use the print feature.');
+        return;
+    }
+
+    printWindow.onload = function() {
+        setTimeout(function() {
+            printWindow.print();
+        }, 250);
+    };
+}
+
+// Legacy function for backward compatibility
+function downloadNote(noteId, url, filename, noteType) {
+    showExportModal(noteId, filename, null, noteType);
 }
 
 // Function to download a file

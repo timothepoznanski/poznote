@@ -656,6 +656,17 @@
         "description": "Crear un nuevo entorno de espacio de trabajo"
       }
     },
+    "export": {
+      "title": "Exportar nota",
+      "html": {
+        "title": "Exportar como HTML",
+        "description": "Descargar como archivo HTML con todo el formato preservado"
+      },
+      "print": {
+        "title": "Imprimir a PDF (Navegador)",
+        "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
+      }
+    },
     "note_sort": {
       "title": "Orden de clasificación de notas",
       "description": "Elige cómo se ordenan las notas en la lista de notas:",

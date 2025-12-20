@@ -11,6 +11,7 @@ WWW_DATA_UID=$(id -u www-data)
 
 # Ensure data directory exists with correct permissions
 mkdir -p "$DATA_DIR"
+mkdir -p "$DATA_DIR/database"
 
 # Check if we're using old Debian permissions (UID 33) and migrate to Alpine (UID 82)
 if [ -d "$DATA_DIR" ] && [ "$(stat -c '%u' "$DATA_DIR" 2>/dev/null || stat -f '%u' "$DATA_DIR")" = "33" ] && [ "$WWW_DATA_UID" = "82" ]; then
