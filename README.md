@@ -853,6 +853,10 @@ curl -u 'username:password' \
 
 ## Use Poznote in the Cloud
 
+<p align="center">
+  <img src="railway-template.png" alt="Railway Template" width="100%">
+</p>
+
 If you:
 
 - Want access from anywhere (phone, tablet, computer) with almost zero setup
