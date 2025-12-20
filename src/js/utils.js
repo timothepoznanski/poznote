@@ -1498,9 +1498,9 @@ function selectExportType(type) {
     closeModal('exportModal');
     
     if (type === 'html') {
-        exportNoteAsHTML(currentExportNoteId, currentExportFilename, null, currentExportNoteType);
+        exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
     } else if (type === 'pdf') {
-        exportNoteAsPDF(currentExportNoteId, currentExportFilename, null, currentExportNoteType);
+        exportNoteAsPDF(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
     }
 }
 
@@ -1519,36 +1519,42 @@ function exportNoteAsHTML(noteId, url, filename, noteType) {
 
 // Export note as PDF
 function exportNoteAsPDF(noteId, url, filename, noteType) {
-    // First, get the HTML content from the API
+    // Check if html2pdf is loaded
+    if (typeof html2pdf !== 'function') {
+        console.error('html2pdf library not loaded');
+        alert('PDF export is not available. Please refresh the page.');
+        return;
+    }
+    
+    // Ensure filename has a default value
+    if (!filename || filename === null || filename === undefined) {
+        filename = 'poznote-export-' + noteId + '.pdf';
+    } else {
+        // Remove extension if present and add .pdf
+        filename = filename.replace(/\.[^/.]+$/, '') + '.pdf';
+    }
+    
+    // Get the HTML content from the API
     var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
     
     fetch(apiUrl)
         .then(function(response) { return response.text(); })
         .then(function(htmlContent) {
-            // Create a temporary iframe to render the content
-            var iframe = document.createElement('iframe');
-            iframe.style.position = 'absolute';
-            iframe.style.width = '210mm';  // A4 width
-            iframe.style.height = '297mm'; // A4 height
-            iframe.style.left = '-9999px';
-            document.body.appendChild(iframe);
+            // Create a temporary container
+            var container = document.createElement('div');
+            container.innerHTML = htmlContent;
             
-            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(htmlContent);
-            iframeDoc.close();
+            // Configure PDF options
+            var opt = {
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
             
-            // Wait for content to load
-            setTimeout(function() {
-                // Use browser's print to PDF functionality
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-                
-                // Clean up after a delay
-                setTimeout(function() {
-                    document.body.removeChild(iframe);
-                }, 1000);
-            }, 500);
+            // Generate and save PDF automatically
+            html2pdf().set(opt).from(container).save();
         })
         .catch(function(error) {
             console.error('Error exporting to PDF:', error);
