@@ -551,6 +551,21 @@ curl -X DELETE -u 'username:password' \
   http://YOUR_SERVER/api_delete_note.php
 ```
 
+**Export Note**
+
+Export a note as a styled HTML document (download):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=attachment" \
+  -o exported-note.html
+```
+
+Export a note for browser viewing/printing (inline):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=inline"
+```
+
 **Move Note**
 
 Move a note to a different folder or workspace:
