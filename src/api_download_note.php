@@ -131,6 +131,24 @@ $content = file_get_contents($filePath);
 
 // Generate complete HTML with proper styling for all note types
 function generateStyledHtml($content, $title, $noteType) {
+    // Clean up content: remove copy buttons and other UI elements that shouldn't be exported
+    // Use DOMDocument for proper HTML manipulation
+    $doc = new DOMDocument();
+    // Suppress warnings for malformed HTML
+    libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    
+    // Remove copy buttons
+    $xpath = new DOMXPath($doc);
+    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
+    foreach ($copyButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+    
+    // Get cleaned content
+    $content = $doc->saveHTML();
+    
     // Common CSS styles for all exported notes
     $commonStyles = '
         body {
