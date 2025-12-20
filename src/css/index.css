@@ -686,6 +686,56 @@ body {
     color: #374151;
 }
 
+/* Export modal options */
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.export-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.export-option:hover {
+    background-color: #f9fafb;
+    border-color: #007DB8;
+}
+
+.export-option i {
+    font-size: 1.5em;
+    color: #007DB8;
+    width: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.export-option div {
+    flex: 1;
+}
+
+.export-option span {
+    display: block;
+    font-weight: 600;
+    font-size: 1em;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.export-option p {
+    margin: 0;
+    font-size: 0.875em;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
 .resize-handle {
     width: 3px;
     height: 100vh;
@@ -2906,6 +2956,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-folder-open::before { content: "\f07c"; }
 .fa-edit::before { content: "\f044"; }
 .fa-download::before { content: "\f019"; }
+.fa-file-code::before { content: "\f1c9"; }
+.fa-file-pdf::before { content: "\f1c1"; }
 .fa-maximize::before { content: "\f31e"; }
 .fa-expand::before { content: "\f065"; }
 .fa-trash::before { content: "\f2ed"; }

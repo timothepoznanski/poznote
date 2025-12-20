@@ -316,6 +316,34 @@
     </div>
 </div>
 
+<!-- Export Modal -->
+<div id="exportModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.export.title', [], 'Export Note'); ?></h3>
+        <div class="modal-body">
+            <div class="export-options">
+                <div class="export-option" onclick="selectExportType('html')">
+                    <i class="fal fa-file-code"></i>
+                    <div>
+                        <span><?php echo t_h('modals.export.html.title', [], 'Export as HTML'); ?></span>
+                        <p><?php echo t_h('modals.export.html.description', [], 'Download as HTML file with all formatting preserved'); ?></p>
+                    </div>
+                </div>
+                <div class="export-option" onclick="selectExportType('pdf')">
+                    <i class="fal fa-file-pdf"></i>
+                    <div>
+                        <span><?php echo t_h('modals.export.pdf.title', [], 'Export as PDF'); ?></span>
+                        <p><?php echo t_h('modals.export.pdf.description', [], 'Print to PDF using your browser'); ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('exportModal')"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
     <div class="modal-content">

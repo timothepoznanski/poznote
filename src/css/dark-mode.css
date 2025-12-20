@@ -254,6 +254,34 @@ body.dark-mode .toolbar-btn:hover {
     background-color: #333;
 }
 
+/* Export modal options */
+html[data-theme='dark'] .export-option,
+body.dark-mode .export-option {
+    border-color: #404040;
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .export-option:hover,
+body.dark-mode .export-option:hover {
+    background-color: #2a2a2a;
+    border-color: #007DB8;
+}
+
+html[data-theme='dark'] .export-option span,
+body.dark-mode .export-option span {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .export-option p,
+body.dark-mode .export-option p {
+    color: #9ca3af;
+}
+
+html[data-theme='dark'] .export-option i,
+body.dark-mode .export-option i {
+    color: #007DB8;
+}
+
 /* Mobile toolbar dropdown menu */
 html[data-theme='dark'] .note-edit-toolbar .mobile-toolbar-menu,
 body.dark-mode .note-edit-toolbar .mobile-toolbar-menu {

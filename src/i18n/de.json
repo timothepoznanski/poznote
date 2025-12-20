@@ -656,6 +656,17 @@
         "description": "Eine neue Arbeitsbereichsumgebung erstellen"
       }
     },
+    "export": {
+      "title": "Notiz exportieren",
+      "html": {
+        "title": "Als HTML exportieren",
+        "description": "Als HTML-Datei mit vollständig erhaltener Formatierung herunterladen"
+      },
+      "pdf": {
+        "title": "Als PDF exportieren",
+        "description": "Mit Ihrem Browser als PDF drucken"
+      }
+    },
     "note_sort": {
       "title": "Notizen-Sortierreihenfolge",
       "description": "Wählen Sie aus, wie Notizen in der Notizenliste geordnet werden:",

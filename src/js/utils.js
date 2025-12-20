@@ -1476,7 +1476,36 @@ function hideMoveFolderError() {
 
 
 // Function to download a note (handles markdown and HTML)
-function downloadNote(noteId, url, filename, noteType) {
+// Store current export note info
+var currentExportNoteId = null;
+var currentExportNoteType = null;
+var currentExportFilename = null;
+
+// Show export modal
+function showExportModal(noteId, filename, title, noteType) {
+    currentExportNoteId = noteId;
+    currentExportNoteType = noteType;
+    currentExportFilename = filename;
+    
+    var modal = document.getElementById('exportModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// Select export type and execute
+function selectExportType(type) {
+    closeModal('exportModal');
+    
+    if (type === 'html') {
+        exportNoteAsHTML(currentExportNoteId, currentExportFilename, null, currentExportNoteType);
+    } else if (type === 'pdf') {
+        exportNoteAsPDF(currentExportNoteId, currentExportFilename, null, currentExportNoteType);
+    }
+}
+
+// Export note as HTML
+function exportNoteAsHTML(noteId, url, filename, noteType) {
     // Use the API endpoint for secure note download
     var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
     
@@ -1486,6 +1515,50 @@ function downloadNote(noteId, url, filename, noteType) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// Export note as PDF
+function exportNoteAsPDF(noteId, url, filename, noteType) {
+    // First, get the HTML content from the API
+    var apiUrl = 'api_download_note.php?id=' + encodeURIComponent(noteId) + '&type=' + encodeURIComponent(noteType);
+    
+    fetch(apiUrl)
+        .then(function(response) { return response.text(); })
+        .then(function(htmlContent) {
+            // Create a temporary iframe to render the content
+            var iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.width = '210mm';  // A4 width
+            iframe.style.height = '297mm'; // A4 height
+            iframe.style.left = '-9999px';
+            document.body.appendChild(iframe);
+            
+            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(htmlContent);
+            iframeDoc.close();
+            
+            // Wait for content to load
+            setTimeout(function() {
+                // Use browser's print to PDF functionality
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                // Clean up after a delay
+                setTimeout(function() {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            }, 500);
+        })
+        .catch(function(error) {
+            console.error('Error exporting to PDF:', error);
+            alert('Error exporting to PDF. Please try again.');
+        });
+}
+
+// Legacy function for backward compatibility
+function downloadNote(noteId, url, filename, noteType) {
+    showExportModal(noteId, url, filename, noteType);
 }
 
 // Function to download a file

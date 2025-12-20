@@ -656,6 +656,17 @@
         "description": "Create a new workspace environment"
       }
     },
+    "export": {
+      "title": "Export Note",
+      "html": {
+        "title": "Export as HTML",
+        "description": "Download as HTML file with all formatting preserved"
+      },
+      "pdf": {
+        "title": "Export as PDF",
+        "description": "Print to PDF using your browser"
+      }
+    },
     "note_sort": {
       "title": "Note sort order",
       "description": "Choose how notes are ordered in the notes list:",
