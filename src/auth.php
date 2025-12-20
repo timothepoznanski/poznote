@@ -15,6 +15,41 @@ define("AUTH_PASSWORD", $_ENV['POZNOTE_PASSWORD'] ?? 'admin123');
 define("REMEMBER_ME_COOKIE", 'poznote_remember_' . ($configured_port ?? '8040'));
 define("REMEMBER_ME_DURATION", 30 * 24 * 60 * 60); // 30 days
 
+function api_t($key, $vars = [], $default = null) {
+    // Lazy-load i18n helpers when auth.php is used standalone
+    if (!function_exists('t')) {
+        $functionsPath = __DIR__ . '/functions.php';
+        if (is_file($functionsPath)) {
+            require_once $functionsPath;
+        }
+    }
+
+    // Try to initialize DB connection so getUserLanguage() can read settings.language.
+    // This is intentionally lazy to avoid DB side-effects on regular page loads.
+    if (!isset($GLOBALS['con'])) {
+        $configPath = __DIR__ . '/config.php';
+        $dbPath = __DIR__ . '/db_connect.php';
+        if (is_file($configPath)) {
+            require_once $configPath;
+        }
+        if (is_file($dbPath)) {
+            require_once $dbPath;
+        }
+    }
+
+    if (function_exists('t')) {
+        return t($key, $vars, $default);
+    }
+
+    $text = $default !== null ? (string)$default : (string)$key;
+    if (is_array($vars) && !empty($vars)) {
+        foreach ($vars as $k => $v) {
+            $text = str_replace('{{' . $k . '}}', (string)$v, $text);
+        }
+    }
+    return $text;
+}
+
 function isAuthenticated() {
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
@@ -89,18 +124,20 @@ function requireApiAuth() {
     
     // If no session, try HTTP Basic Auth
     if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+        $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
         header('HTTP/1.1 401 Unauthorized');
         header('WWW-Authenticate: Basic realm="Poznote API"');
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Authentication required']);
+        echo json_encode(['error' => $msg]);
         exit;
     }
     
     // Validate credentials
     if ($_SERVER['PHP_AUTH_USER'] !== AUTH_USERNAME || $_SERVER['PHP_AUTH_PW'] !== AUTH_PASSWORD) {
+        $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Invalid credentials']);
+        echo json_encode(['error' => $msg]);
         exit;
     }
 }

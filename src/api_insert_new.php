@@ -31,7 +31,7 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 		$wsStmt->execute([$workspace]);
 		if ($wsStmt->fetchColumn() == 0) {
 			header('Content-Type: application/json; charset=utf-8');
-			echo json_encode(['status' => 0, 'error' => 'Workspace not found']);
+			echo json_encode(['status' => 0, 'error' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
 			exit;
 		}
 	}
@@ -70,8 +70,11 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
     }
     // Note: If folder not found in folders table but folder name is set, 
     // folder_id will remain null (note without folder)
-  }	// Generate unique title for new notes (folder-aware and workspace-aware)
-	$uniqueTitle = generateUniqueTitle('New note', null, $workspace, $folder_id);
+  }	
+  
+  // Generate unique title for new notes (folder-aware and workspace-aware)
+  // Use translated "New note" text
+	$uniqueTitle = generateUniqueTitle(t('index.note.new_note', [], 'New note'), null, $workspace, $folder_id);
 
 	// Insert the new note (include workspace, type, and folder_id)
 	$query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, ?, ?)";

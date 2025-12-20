@@ -16,15 +16,17 @@ extract($search_params); // Extracts variables: $search, $tags_search, $note, et
 // Preserve note parameter if provided (now using ID)
 $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 
+$currentLang = getUserLanguage();
+
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title>Settings - Poznote</title>
+    <title><?php echo t_h('settings.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -46,7 +48,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
         <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
-            Back to Notes
+            <?php echo t_h('common.back_to_notes'); ?>
         </a>
         <br><br>
         
@@ -57,7 +59,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-layer-group"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Workspaces</h3>
+                    <h3><?php echo t_h('settings.cards.workspaces'); ?></h3>
                 </div>
             </div>
                         
@@ -67,7 +69,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-upload"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Backup / Export</h3>
+                    <h3><?php echo t_h('settings.cards.backup_export'); ?></h3>
                 </div>
             </div>
             
@@ -77,7 +79,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-download"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Restore / Import</h3>
+                    <h3><?php echo t_h('settings.cards.restore_import'); ?></h3>
                 </div>
             </div>
 
@@ -88,7 +90,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <span class="update-badge" style="display: none;"></span>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Check for Updates</h3>
+                    <h3><?php echo t_h('settings.cards.check_updates'); ?></h3>
                 </div>
             </div>
 
@@ -98,7 +100,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-lightbulb"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Tips & Tricks</h3>
+                    <h3><?php echo t_h('settings.cards.tips'); ?></h3>
                 </div>
             </div>
 
@@ -108,7 +110,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-code"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Rest API</h3>
+                    <h3><?php echo t_h('settings.cards.api_docs'); ?></h3>
                 </div>
             </div>
 
@@ -118,7 +120,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-code-branch"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Documentation</h3>
+                    <h3><?php echo t_h('settings.cards.documentation'); ?></h3>
                 </div>
             </div>
 
@@ -128,7 +130,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-newspaper"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Poznote News</h3>
+                    <h3><?php echo t_h('settings.cards.news'); ?></h3>
                 </div>
             </div>
 
@@ -138,7 +140,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-globe"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Poznote Website</h3>
+                    <h3><?php echo t_h('settings.cards.website'); ?></h3>
                 </div>
             </div>
 
@@ -148,7 +150,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
                     <i class="fa-coffee"></i>
                 </div>
                 <div class="settings-card-content">
-                    <h3>Support Developer</h3>
+                    <h3><?php echo t_h('settings.cards.support'); ?></h3>
                 </div>
             </div>
         </div>
@@ -165,6 +167,36 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
     <script src="js/font-size-settings.js"></script>
     
     <script>
+        // Language setting
+        (function() {
+            var select = document.getElementById('languageSelect');
+            var status = document.getElementById('languageStatus');
+            if (!select) return;
+            select.addEventListener('change', function() {
+                var lang = select.value;
+                if (status) status.textContent = <?php echo json_encode(t('settings.language.reload_hint')); ?>;
+                var form = new FormData();
+                form.append('action', 'set');
+                form.append('key', 'language');
+                form.append('value', lang);
+                fetch('api_settings.php', { method: 'POST', body: form, credentials: 'same-origin' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(j) {
+                        if (j && j.success) {
+                            if (window.opener && window.opener.location) {
+                                try { window.opener.location.reload(); } catch(e) {}
+                            }
+                            window.location.reload();
+                        } else {
+                            if (status) status.textContent = <?php echo json_encode(t('settings.language.save_error')); ?>;
+                        }
+                    })
+                    .catch(function() {
+                        if (status) status.textContent = <?php echo json_encode(t('settings.language.save_error')); ?>;
+                    });
+            });
+        })();
+
         // Update Back to Notes link with workspace from localStorage
         (function() {
             try {

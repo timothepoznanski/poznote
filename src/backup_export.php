@@ -10,6 +10,8 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     exit;
 }
 
+$currentLang = getUserLanguage();
+
 $message = '';
 $error = '';
 
@@ -22,14 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = createBackup();
             // createBackup() handles download directly, so we only get here on error
             if (!$result['success']) {
-                $error = "Export error: " . $result['error'];
+                $error = t('backup_export.errors.export_error', ['error' => $result['error']]);
             }
             break;
         case 'complete_backup':
             $result = createCompleteBackup();
             // createCompleteBackup() handles download directly, so we only get here on error
             if (!$result['success']) {
-                $error = "Complete backup error: " . $result['error'];
+                $error = t('backup_export.errors.complete_backup_error', ['error' => $result['error']]);
             }
             break;
     }
@@ -37,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 function generateSQLDump() {
     global $con;
-    
-    $sql = "-- Poznote Database Dump\n-- Generated on " . date('Y-m-d H:i:s') . "\n\n";
+
+    $sql = "-- " . t('backup_export.dump.title') . "\n";
+    $sql .= "-- " . t('backup_export.dump.generated_on', ['date' => date('Y-m-d H:i:s')]) . "\n\n";
     
     // Get all table names
     $tables = $con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
@@ -81,7 +84,7 @@ function createCompleteBackup() {
     
     $zip = new ZipArchive();
     if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-        return ['success' => false, 'error' => 'Cannot create ZIP file'];
+        return ['success' => false, 'error' => t('backup_export.errors.cannot_create_zip')];
     }
     
     // Add SQL dump
@@ -91,7 +94,7 @@ function createCompleteBackup() {
     } else {
         $zip->close();
         unlink($zipFileName);
-        return ['success' => false, 'error' => 'Failed to create database backup'];
+        return ['success' => false, 'error' => t('backup_export.errors.failed_to_create_db_backup')];
     }
     
     // Add all note entries (HTML and Markdown)
@@ -121,7 +124,7 @@ function createCompleteBackup() {
     $query = "SELECT id, heading, tags, folder, folder_id, workspace, attachments, type FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
     $result = $con->query($query);
     // Generate a simple, icon-free index.html header
-    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Poznote Index</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
+    $indexContent = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>" . htmlspecialchars(t('backup_export.index.title'), ENT_QUOTES) . "</title>\n<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\nul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n.attachments { color: #17a2b8; }\n</style>\n</head>\n<body>\n";
     
     $currentWorkspace = '';
     $currentFolder = '';
@@ -276,7 +279,7 @@ function createCompleteBackup() {
         exit;
     } else {
         unlink($zipFileName);
-        return ['success' => false, 'error' => 'Failed to create backup file'];
+        return ['success' => false, 'error' => t('backup_export.errors.failed_to_create_backup_file')];
     }
 }
 
@@ -286,9 +289,9 @@ function createBackup() {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
 <head>
-    <title>Backup / Export - Poznote</title>
+    <title><?php echo t_h('backup_export.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
@@ -297,24 +300,25 @@ function createBackup() {
     <link rel="stylesheet" href="css/backup_export.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/globals.js"></script>
     <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="backup-container">
-        <h1>Backup / Export</h1>
+        <h1><?php echo t_h('backup_export.page.title'); ?></h1>
         
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            Back to Notes
+            <?php echo t_h('common.back_to_notes'); ?>
         </a>
         <a href="settings.php" class="btn btn-secondary">
-            Back to Settings
+            <?php echo t_h('common.back_to_settings'); ?>
         </a>
 
     <br><br>
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
-            <h3>Complete Backup</h3>
+            <h3><?php echo t_h('backup_export.sections.complete_backup.title'); ?></h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
                     <?php echo htmlspecialchars($message); ?>
@@ -325,22 +329,28 @@ function createBackup() {
                     <?php echo htmlspecialchars($error); ?>
                 </div>
             <?php endif; ?>
-            <p>Download a complete backup containing database, notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span> in a single ZIP file.<br><br>Two use cases:<br></p>
+            <p>
+                <?php echo t_h('backup_export.sections.complete_backup.description_prefix'); ?>
+                <span style="color: #dc3545; font-weight: bold;"><?php echo t_h('backup_export.common.all_workspaces'); ?></span>
+                <?php echo t_h('backup_export.sections.complete_backup.description_suffix'); ?>
+                <br><br>
+                <?php echo t_h('backup_export.sections.complete_backup.use_cases'); ?><br>
+            </p>
             <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
-                <li><strong>Restore:</strong> Import this backup to recover your data in case of loss</li><br>
-                <li><strong>Offline Reading:</strong> Open the included <b>index.html</b> to browse your notes without Poznote</li><br>
+                <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_restore_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_restore_text'); ?></li><br>
+                <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_offline_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text'); ?> <b>index.html</b> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text_suffix'); ?></li><br>
             </ul>
             
             <form id="completeBackupForm" method="post">
                 <input type="hidden" name="action" value="complete_backup">
                 <button id="completeBackupBtn" type="submit" class="btn btn-primary">
-                    <span>Download Complete Backup (ZIP)</span>
+                    <span><?php echo t_h('backup_export.buttons.download_complete_backup'); ?></span>
                 </button>
                 <!-- Spinner shown while creating ZIP/download is in progress -->
                 <div id="backupSpinner" class="backup-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
                     <div class="spinner-circle" aria-hidden="true"></div>
-                    <span class="sr-only">Preparing backup...</span>
-                    <span class="backup-spinner-text">Preparing backup... This may take a few moments.</span>
+                    <span class="sr-only"><?php echo t_h('backup_export.spinner.preparing'); ?></span>
+                    <span class="backup-spinner-text"><?php echo t_h('backup_export.spinner.preparing_long'); ?></span>
                 </div>
             </form>
         </div>

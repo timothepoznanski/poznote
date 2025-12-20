@@ -4,6 +4,23 @@
 (function() {
     'use strict';
 
+    function tr(key, vars, fallback) {
+        try {
+            if (typeof window !== 'undefined' && typeof window.t === 'function') {
+                return window.t(key, vars || {}, fallback);
+            }
+        } catch (e) {
+            // ignore
+        }
+        let text = (fallback !== undefined && fallback !== null) ? String(fallback) : String(key);
+        if (vars && typeof vars === 'object') {
+            Object.keys(vars).forEach((k) => {
+                text = text.replaceAll('{{' + k + '}}', String(vars[k]));
+            });
+        }
+        return text;
+    }
+
     // Store the selection/range before opening the modal
     let savedSelection = null;
     let savedRange = null;
@@ -123,7 +140,7 @@
         const recentLabel = document.querySelector('.note-reference-recent-label');
         if (!listContainer) return;
         
-        listContainer.innerHTML = '<div class="note-reference-loading"><i class="fa-spinner fa-spin"></i> Loading...</div>';
+        listContainer.innerHTML = '<div class="note-reference-loading"><i class="fa-spinner fa-spin"></i> ' + tr('note_reference.loading', {}, 'Loading...') + '</div>';
         
         try {
             // Get current workspace
@@ -134,7 +151,7 @@
             const data = await response.json();
             
             if (!data.success || !data.notes) {
-                listContainer.innerHTML = '<div class="note-reference-empty">No notes found</div>';
+                listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.empty.no_notes_found', {}, 'No notes found') + '</div>';
                 return;
             }
             
@@ -183,8 +200,8 @@
             
             if (displayNotes.length === 0) {
                 listContainer.innerHTML = searchQuery 
-                    ? '<div class="note-reference-empty">No notes match your search</div>'
-                    : '<div class="note-reference-empty">No other notes available</div>';
+                    ? '<div class="note-reference-empty">' + tr('note_reference.empty.no_match', {}, 'No notes match your search') + '</div>'
+                    : '<div class="note-reference-empty">' + tr('note_reference.empty.no_other', {}, 'No other notes available') + '</div>';
                 return;
             }
             
@@ -200,7 +217,7 @@
                     item.classList.add('is-recent');
                 }
                 
-                const heading = note.heading || 'Untitled';
+                const heading = note.heading || tr('note_reference.untitled', {}, 'Untitled');
                 const folder = note.folder || '';
                 
                 item.innerHTML = `
@@ -219,7 +236,7 @@
             
         } catch (error) {
             console.error('Error loading notes:', error);
-            listContainer.innerHTML = '<div class="note-reference-empty">Error loading notes</div>';
+            listContainer.innerHTML = '<div class="note-reference-empty">' + tr('note_reference.error.loading_notes', {}, 'Error loading notes') + '</div>';
         }
     }
 

@@ -726,7 +726,16 @@ function initializeMarkdownNote(noteId) {
     } catch (e) {
         isMobileViewport = false;
     }
-    editorDiv.setAttribute('data-ph', isMobileViewport ? 'Write your markdown here...' : 'Write your markdown or use / to open commands menu here...');
+    const mobilePlaceholder = window.t ? window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown here...') : 'Write your markdown here...';
+    const desktopPlaceholder = window.t ? window.t('editor.markdown_placeholder', null, 'Write your markdown or use / to open commands menu here...') : 'Write your markdown or use / to open commands menu here...';
+    editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePlaceholder : desktopPlaceholder);
+    
+    // Update placeholder when translations load
+    document.addEventListener('poznote:i18n:loaded', function() {
+        const mobilePh = window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown here...');
+        const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown or use / to open commands menu here...');
+        editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePh : desktopPh);
+    });
     
     editorContainer.appendChild(editorDiv);
     

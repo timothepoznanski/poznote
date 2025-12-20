@@ -226,7 +226,7 @@ function showShareModal(url, options) {
     // No close (×) icon for the share modal per UX request
 
     const h3 = document.createElement('h3');
-    h3.textContent = 'Public URL';
+    h3.textContent = window.t ? window.t('index.share_modal.title', null, 'Public URL') : 'Public URL';
     content.appendChild(h3);
 
     const p = document.createElement('p');
@@ -264,7 +264,7 @@ function showShareModal(url, options) {
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn-cancel';
-    cancelBtn.textContent = 'Close';
+    cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
     // red styling for cancel
     cancelBtn.style.background = '#dc3545';
     cancelBtn.style.color = '#ffffff';
@@ -279,7 +279,7 @@ function showShareModal(url, options) {
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
-        openBtn.textContent = 'Open';
+        openBtn.textContent = window.t ? window.t('index.share_modal.open', null, 'Open') : 'Open';
         // green styling for open
         openBtn.style.background = '#28a745';
         openBtn.style.color = '#ffffff';
@@ -303,7 +303,7 @@ function showShareModal(url, options) {
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn-primary';
-        copyBtn.textContent = 'Copy';
+        copyBtn.textContent = window.t ? window.t('index.share_modal.copy', null, 'Copy') : 'Copy';
         copyBtn.onclick = async function(ev) {
             // Prevent clicks from bubbling to global handlers
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
@@ -340,7 +340,7 @@ function showShareModal(url, options) {
             const revokeBtn = document.createElement('button');
             revokeBtn.type = 'button';
             revokeBtn.className = 'btn-revoke';
-            revokeBtn.textContent = 'Revoke';
+            revokeBtn.textContent = window.t ? window.t('index.share_modal.revoke', null, 'Revoke') : 'Revoke';
             revokeBtn.style.background = '#6c757d';
             revokeBtn.style.color = '#ffffff';
             revokeBtn.style.border = 'none';
@@ -375,7 +375,7 @@ function showShareModal(url, options) {
             const renewBtn = document.createElement('button');
             renewBtn.type = 'button';
             renewBtn.className = 'btn-renew';
-            renewBtn.textContent = 'Renew';
+            renewBtn.textContent = window.t ? window.t('index.share_modal.renew', null, 'Renew') : 'Renew';
             renewBtn.style.background = '#007DB8';
             renewBtn.style.color = '#ffffff';
             renewBtn.style.border = 'none';
@@ -413,7 +413,7 @@ function showShareModal(url, options) {
         const createBtn = document.createElement('button');
         createBtn.type = 'button';
         createBtn.className = 'btn-create-share';
-        createBtn.textContent = 'Create url';
+        createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
         createBtn.style.background = '#28a745';
         createBtn.style.color = '#ffffff';
         createBtn.style.border = 'none';
@@ -423,7 +423,7 @@ function showShareModal(url, options) {
 
     // If there's no URL provided, show placeholder text
     if (!url) {
-        urlDiv.textContent = '(No public link yet)';
+        urlDiv.textContent = window.t ? window.t('index.share_modal.no_link_yet', null, '(No public link yet)') : '(No public link yet)';
     }
 
     content.appendChild(buttonsDiv);

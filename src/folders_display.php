@@ -179,13 +179,13 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
     } else {
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='Create'></i>";
+        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.create', [], 'Create') . "'></i>";
         // Only show move button if folder has notes
         if ($noteCount > 0) {
-            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='Move all files to another folder'></i>";
+            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files to another folder') . "'></i>";
         }
-        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='Rename folder'></i>";
-        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='Delete folder'></i>";
+        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename folder') . "'></i>";
+        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete folder') . "'></i>";
     }
     
     return $actions;

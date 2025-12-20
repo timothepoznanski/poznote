@@ -6,6 +6,14 @@
     let activeCell = null;
     let contextMenu = null;
 
+    function tr(key, fallback, vars) {
+        if (window.t) return window.t(key, vars || null, fallback);
+        if (vars && typeof vars === 'object') {
+            for (const k in vars) fallback = String(fallback).split('{{' + k + '}}').join(String(vars[k]));
+        }
+        return fallback;
+    }
+
     /**
      * Creates the context menu for tables
      */
@@ -31,16 +39,16 @@
         `;
 
         const menuItems = [
-            { label: 'Insert row above', action: 'insertRowAbove', icon: '↑' },
-            { label: 'Insert row below', action: 'insertRowBelow', icon: '↓' },
+            { label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' },
+            { label: tr('table.context_menu.insert_row_below', 'Insert row below'), action: 'insertRowBelow', icon: '↓' },
             { separator: true },
-            { label: 'Insert column left', action: 'insertColLeft', icon: '←' },
-            { label: 'Insert column right', action: 'insertColRight', icon: '→' },
+            { label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' },
+            { label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' },
             { separator: true },
-            { label: 'Delete row', action: 'deleteRow', icon: '🗑️', danger: true },
-            { label: 'Delete column', action: 'deleteCol', icon: '🗑️', danger: true },
+            { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
+            { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
             { separator: true },
-            { label: 'Delete table', action: 'deleteTable', icon: '🗑️', danger: true }
+            { label: tr('table.context_menu.delete_table', 'Delete table'), action: 'deleteTable', icon: '🗑️', danger: true }
         ];
 
         menuItems.forEach(item => {
@@ -230,7 +238,7 @@
     function deleteRow(tbody, index) {
         const rows = tbody.querySelectorAll('tr');
         if (rows.length <= 1) {
-            alert('Cannot delete the last row of the table.');
+            alert(tr('table.context_menu.errors.cannot_delete_last_row', 'Cannot delete the last row of the table.'));
             return;
         }
         rows[index].remove();
@@ -243,7 +251,7 @@
         // Check that at least 2 columns remain
         const firstRowCells = rows[0].querySelectorAll('td, th');
         if (firstRowCells.length <= 1) {
-            alert('Cannot delete the last column of the table.');
+            alert(tr('table.context_menu.errors.cannot_delete_last_column', 'Cannot delete the last column of the table.'));
             return;
         }
 
@@ -259,7 +267,7 @@
      * Deletes the entire table
      */
     function deleteTable() {
-        if (confirm('Do you really want to delete this table?')) {
+        if (confirm(tr('table.context_menu.confirm.delete_table', 'Do you really want to delete this table?'))) {
             activeTable.remove();
             
             // Trigger input event to save

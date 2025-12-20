@@ -3,6 +3,33 @@
 error_reporting(E_ERROR | E_PARSE);
 ini_set('display_errors', 0);
 
+// Ensure we never respond with an empty body (which breaks response.json())
+// even if a fatal error occurs.
+ob_start();
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if (!$error) {
+        return;
+    }
+    $fatalTypes = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
+    if (!in_array($error['type'], $fatalTypes, true)) {
+        return;
+    }
+
+    while (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
+
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+    }
+    echo json_encode([
+        'success' => false,
+        'error' => 'Internal server error'
+    ]);
+});
+
 require 'auth.php';
 requireApiAuth();
 
@@ -56,6 +83,7 @@ function buildFolderHierarchy($folders) {
 $action = $_POST['action'] ?? '';
 $workspace = $_POST['workspace'] ?? null;
 
+try {
 switch($action) {
     case 'create':
         $folderName = trim($_POST['folder_name'] ?? '');
@@ -369,7 +397,7 @@ switch($action) {
             if ($duplicateCheckStmt->fetchColumn() > 0) {
                 echo json_encode([
                     'success' => false, 
-                    'error' => 'A note with the same title already exists in the destination folder.'
+                    'error' => t('folders.move_note.errors.duplicate_title', [], 'A note with the same title already exists in the destination folder.')
                 ]);
                 exit;
             }
@@ -410,17 +438,23 @@ switch($action) {
         $hierarchical = isset($_POST['hierarchical']) && $_POST['hierarchical'] === 'true';
         
         $query = "SELECT id, name, parent_id FROM folders";
+        $params = [];
         if ($workspace !== null) {
-            $query .= " WHERE (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            $query .= " WHERE (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $params = [$workspace, $workspace];
         }
         $query .= " ORDER BY name";
-        
-        $result = $con->query($query);
-        
+
+        $stmt = $con->prepare($query);
+        if (!$stmt || !$stmt->execute($params)) {
+            echo json_encode(['success' => false, 'error' => 'Database query failed']);
+            break;
+        }
+
         $folders = [];
-        
+
         // Add folders from folders table with IDs
-        while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $folders[] = [
                 'id' => (int)$row['id'],
                 'name' => $row['name'],
@@ -860,7 +894,7 @@ switch($action) {
             if ($duplicateCheckStmt->fetchColumn() > 0) {
                 echo json_encode([
                     'success' => false, 
-                    'error' => 'A note with the same title already exists at the root level.'
+                    'error' => t('folders.move_note.errors.duplicate_title_root', [], 'A note with the same title already exists at the root level.')
                 ]);
                 exit;
             }
@@ -887,5 +921,13 @@ switch($action) {
     default:
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
         break;
+}
+} catch (Throwable $e) {
+    error_log('api_folders.php fatal: ' . $e->getMessage());
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+    }
+    echo json_encode(['success' => false, 'error' => 'Internal server error']);
 }
 ?>

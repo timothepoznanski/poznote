@@ -74,10 +74,10 @@
         
         if (badge) {
             if (theme === 'dark') {
-                badge.textContent = 'dark mode';
+                badge.textContent = (window.t ? window.t('theme.badge.dark', null, 'dark mode') : 'dark mode');
                 badge.className = 'setting-status enabled';
             } else {
-                badge.textContent = 'light mode';
+                badge.textContent = (window.t ? window.t('theme.badge.light', null, 'light mode') : 'light mode');
                 badge.className = 'setting-status enabled';
             }
         }
@@ -91,6 +91,16 @@
             }
         }
     }
+
+    // When client-side i18n finishes loading, re-render the badge label
+    // (initial render may have used fallback English strings).
+    document.addEventListener('poznote:i18n:loaded', function() {
+        try {
+            updateToggleButton(getCurrentTheme());
+        } catch (e) {
+            // ignore
+        }
+    });
 
     // Get current theme
     function getCurrentTheme() {

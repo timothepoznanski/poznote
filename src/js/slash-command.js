@@ -486,220 +486,228 @@
 
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
-    const SLASH_COMMANDS = [
-        {
-            id: 'normal',
-            icon: 'fa-align-left',
-            label: 'Back to normal text',
-            action: function () {
-                insertNormalText();
-            }
-        },
-        {
-            id: 'title',
-            icon: 'fa-text-height',
-            label: 'Title',
-            submenu: [
-                { id: 'h1', label: 'Heading 1', action: () => insertHeading(1) },
-                { id: 'h2', label: 'Heading 2', action: () => insertHeading(2) },
-                { id: 'h3', label: 'Heading 3', action: () => insertHeading(3) }
-            ]
-        },
-        {
-            id: 'format',
-            icon: 'fa-bold',
-            label: 'Format text',
-            submenu: [
-                { id: 'red', icon: 'fa-palette', label: 'Red', action: () => insertColor('#e74c3c') },
-                { id: 'bold', icon: 'fa-bold', label: 'Bold', action: () => insertBold() },
-                { id: 'italic', icon: 'fa-italic', label: 'Italic', action: () => insertItalic() },
-                { id: 'highlight', icon: 'fa-fill-drip', label: 'Highlight', action: () => insertHighlight() },
-                { id: 'strikethrough', icon: 'fa-strikethrough', label: 'Strikethrough', action: () => insertStrikethrough() },
-                { id: 'code', icon: 'fa-code', label: 'Code', action: () => insertCode() }
-            ]
-        },
-        {
-            id: 'list',
-            icon: 'fa-list-ul',
-            label: 'List',
-            submenu: [
-                { id: 'bullets', icon: 'fa-list-ul', label: 'Bullet list', action: () => insertList(false) },
-                { id: 'numbers', icon: 'fa-list-ol', label: 'Numbered list', action: () => insertList(true) },
-                {
-                    id: 'checklist',
-                    icon: 'fa-list-check',
-                    label: 'Checklist',
-                    action: () => {
-                        if (typeof window.insertChecklist === 'function') {
-                            window.insertChecklist();
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            id: 'excalidraw',
-            icon: 'fal fa-paint-brush',
-            label: 'Excalidraw',
-            action: function () {
-                if (typeof window.insertExcalidrawDiagram === 'function') {
-                    window.insertExcalidrawDiagram();
+    // Use a function to get translated labels at runtime
+    function getSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        return [
+            {
+                id: 'normal',
+                icon: 'fa-align-left',
+                label: t('slash_menu.back_to_normal', null, 'Back to normal text'),
+                action: function () {
+                    insertNormalText();
                 }
             },
-            mobileHidden: true
-        },
-        {
-            id: 'emoji',
-            icon: 'fa-smile',
-            label: 'Emoji',
-            mobileHidden: true,
-            action: function () {
-                if (typeof window.toggleEmojiPicker === 'function') {
-                    window.toggleEmojiPicker();
+            {
+                id: 'title',
+                icon: 'fa-text-height',
+                label: t('slash_menu.title', null, 'Title'),
+                submenu: [
+                    { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertHeading(1) },
+                    { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => insertHeading(2) },
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertHeading(3) }
+                ]
+            },
+            {
+                id: 'format',
+                icon: 'fa-bold',
+                label: t('slash_menu.format_text', null, 'Format text'),
+                submenu: [
+                    { id: 'red', icon: 'fa-palette', label: t('slash_menu.red', null, 'Red'), action: () => insertColor('#e74c3c') },
+                    { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
+                    { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
+                    { id: 'highlight', icon: 'fa-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
+                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() },
+                    { id: 'code', icon: 'fa-code', label: t('slash_menu.code', null, 'Code'), action: () => insertCode() }
+                ]
+            },
+            {
+                id: 'list',
+                icon: 'fa-list-ul',
+                label: t('slash_menu.list', null, 'List'),
+                submenu: [
+                    { id: 'bullets', icon: 'fa-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
+                    { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
+                    {
+                        id: 'checklist',
+                        icon: 'fa-list-check',
+                        label: t('slash_menu.checklist', null, 'Checklist'),
+                        action: () => {
+                            if (typeof window.insertChecklist === 'function') {
+                                window.insertChecklist();
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                id: 'excalidraw',
+                icon: 'fal fa-paint-brush',
+                label: t('slash_menu.excalidraw', null, 'Excalidraw'),
+                action: function () {
+                    if (typeof window.insertExcalidrawDiagram === 'function') {
+                        window.insertExcalidrawDiagram();
+                    }
+                },
+                mobileHidden: true
+            },
+            {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        window.toggleEmojiPicker();
+                    }
+                }
+            },
+            {
+                id: 'table',
+                icon: 'fa-table',
+                label: t('slash_menu.table', null, 'Table'),
+                action: function () {
+                    if (typeof window.toggleTablePicker === 'function') {
+                        window.toggleTablePicker();
+                    }
+                }
+            },
+            {
+                id: 'separator',
+                icon: 'fa-minus',
+                label: t('slash_menu.separator', null, 'Separator'),
+                action: function () {
+                    if (typeof window.insertSeparator === 'function') {
+                        window.insertSeparator();
+                    }
+                }
+            },
+            {
+                id: 'note-reference',
+                icon: 'fa-at',
+                label: t('slash_menu.link_to_note', null, 'Link to note'),
+                action: function () {
+                    if (typeof window.openNoteReferenceModal === 'function') {
+                        window.openNoteReferenceModal();
+                    }
+                }
+            },
+            {
+                id: 'open-keyboard',
+                icon: 'fa-times-circle',
+                label: t('slash_menu.cancel', null, 'Cancel'),
+                mobileOnly: true,
+                keepSlash: true,
+                action: function () {
+                    // Save reference before clearing
+                    const editable = savedEditableElement;
+                    hideSlashMenu();
+                    savedNoteEntry = null;
+                    savedEditableElement = null;
+                    // Focus after clearing to open keyboard
+                    if (editable) {
+                        editable.focus();
+                    }
                 }
             }
-        },
-        {
-            id: 'table',
-            icon: 'fa-table',
-            label: 'Table',
-            action: function () {
-                if (typeof window.toggleTablePicker === 'function') {
-                    window.toggleTablePicker();
-                }
-            }
-        },
-        {
-            id: 'separator',
-            icon: 'fa-minus',
-            label: 'Separator',
-            action: function () {
-                if (typeof window.insertSeparator === 'function') {
-                    window.insertSeparator();
-                }
-            }
-        },
-        {
-            id: 'note-reference',
-            icon: 'fa-at',
-            label: 'Link to note',
-            action: function () {
-                if (typeof window.openNoteReferenceModal === 'function') {
-                    window.openNoteReferenceModal();
-                }
-            }
-        },
-        {
-            id: 'open-keyboard',
-            icon: 'fa-times-circle',
-            label: 'Cancel',
-            mobileOnly: true,
-            keepSlash: true,
-            action: function () {
-                // Save reference before clearing
-                const editable = savedEditableElement;
-                hideSlashMenu();
-                savedNoteEntry = null;
-                savedEditableElement = null;
-                // Focus after clearing to open keyboard
-                if (editable) {
-                    editable.focus();
-                }
-            }
-        }
-    ];
+        ];
+    }
 
     // Slash command menu items for Markdown notes (edit mode)
     // Keep labels close to the HTML menu, but insert Markdown syntax.
-    const MARKDOWN_SLASH_COMMANDS = [
-        {
-            id: 'title',
-            icon: 'fa-text-height',
-            label: 'Title',
-            submenu: [
-                { id: 'h1', label: 'Heading 1', action: () => insertMarkdownPrefixAtLineStart('# ') },
-                { id: 'h2', label: 'Heading 2', action: () => insertMarkdownPrefixAtLineStart('## ') },
-                { id: 'h3', label: 'Heading 3', action: () => insertMarkdownPrefixAtLineStart('### ') }
-            ]
-        },
-        {
-            id: 'format',
-            icon: 'fa-bold',
-            label: 'Format text',
-            submenu: [
-                { id: 'bold', icon: 'fa-bold', label: 'Bold', action: () => wrapMarkdownSelection('**', '**', 2) },
-                { id: 'italic', icon: 'fa-italic', label: 'Italic', action: () => wrapMarkdownSelection('*', '*', 1) },
-                { id: 'strikethrough', icon: 'fa-strikethrough', label: 'Strikethrough', action: () => wrapMarkdownSelection('~~', '~~', 2) },
-                { id: 'inline-code', icon: 'fa-terminal', label: 'Inline code', action: () => wrapMarkdownSelection('`', '`', 1) },
-                { id: 'code-block', icon: 'fa-code', label: 'Code block', action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
-            ]
-        },
-        {
-            id: 'list',
-            icon: 'fa-list-ul',
-            label: 'List',
-            submenu: [
-                { id: 'bullets', icon: 'fa-list-ul', label: 'Bullet list', action: () => insertMarkdownPrefixAtLineStart('- ') },
-                { id: 'numbers', icon: 'fa-list-ol', label: 'Numbered list', action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                { id: 'checklist', icon: 'fa-list-check', label: 'Checklist', action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
-            ]
-        },
-        {
-            id: 'emoji',
-            icon: 'fa-smile',
-            label: 'Emoji',
-            mobileHidden: true,
-            action: function () {
-                if (typeof window.toggleEmojiPicker === 'function') {
-                    window.toggleEmojiPicker();
+    function getMarkdownSlashCommands() {
+        const t = window.t || ((key, params, fallback) => fallback);
+        return [
+            {
+                id: 'title',
+                icon: 'fa-text-height',
+                label: t('slash_menu.title', null, 'Title'),
+                submenu: [
+                    { id: 'h1', label: t('slash_menu.heading_1', null, 'Heading 1'), action: () => insertMarkdownPrefixAtLineStart('# ') },
+                    { id: 'h2', label: t('slash_menu.heading_2', null, 'Heading 2'), action: () => insertMarkdownPrefixAtLineStart('## ') },
+                    { id: 'h3', label: t('slash_menu.heading_3', null, 'Heading 3'), action: () => insertMarkdownPrefixAtLineStart('### ') }
+                ]
+            },
+            {
+                id: 'format',
+                icon: 'fa-bold',
+                label: t('slash_menu.format_text', null, 'Format text'),
+                submenu: [
+                    { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => wrapMarkdownSelection('**', '**', 2) },
+                    { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => wrapMarkdownSelection('*', '*', 1) },
+                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) },
+                    { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
+                ]
+            },
+            {
+                id: 'list',
+                icon: 'fa-list-ul',
+                label: t('slash_menu.list', null, 'List'),
+                submenu: [
+                    { id: 'bullets', icon: 'fa-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
+                    { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
+                    { id: 'checklist', icon: 'fa-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+                ]
+            },
+            {
+                id: 'emoji',
+                icon: 'fa-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.toggleEmojiPicker === 'function') {
+                        window.toggleEmojiPicker();
+                    }
+                }
+            },
+            {
+                id: 'table',
+                icon: 'fa-table',
+                label: t('slash_menu.table', null, 'Table'),
+                action: function () {
+                    insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                }
+            },
+            {
+                id: 'separator',
+                icon: 'fa-minus',
+                label: t('slash_menu.separator', null, 'Separator'),
+                action: function () {
+                    insertMarkdownAtCursor('\n---\n', 0);
+                }
+            },
+            {
+                id: 'note-reference',
+                icon: 'fa-at',
+                label: t('slash_menu.link_to_note', null, 'Link to note'),
+                action: function () {
+                    if (typeof window.openNoteReferenceModal === 'function') {
+                        window.openNoteReferenceModal();
+                    }
+                }
+            },
+            {
+                id: 'open-keyboard',
+                icon: 'fa-times-circle',
+                label: t('slash_menu.cancel', null, 'Cancel'),
+                mobileOnly: true,
+                keepSlash: true,
+                action: function () {
+                    // Save reference before clearing
+                    const editable = savedEditableElement;
+                    hideSlashMenu();
+                    savedNoteEntry = null;
+                    savedEditableElement = null;
+                    // Focus after clearing to open keyboard
+                    if (editable) {
+                        editable.focus();
+                    }
                 }
             }
-        },
-        {
-            id: 'table',
-            icon: 'fa-table',
-            label: 'Table',
-            action: function () {
-                insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
-            }
-        },
-        {
-            id: 'separator',
-            icon: 'fa-minus',
-            label: 'Separator',
-            action: function () {
-                insertMarkdownAtCursor('\n---\n', 0);
-            }
-        },
-        {
-            id: 'note-reference',
-            icon: 'fa-at',
-            label: 'Link to note',
-            action: function () {
-                if (typeof window.openNoteReferenceModal === 'function') {
-                    window.openNoteReferenceModal();
-                }
-            }
-        },
-        {
-            id: 'open-keyboard',
-            icon: 'fa-times-circle',
-            label: 'Cancel',
-            mobileOnly: true,
-            keepSlash: true,
-            action: function () {
-                // Save reference before clearing
-                const editable = savedEditableElement;
-                hideSlashMenu();
-                savedNoteEntry = null;
-                savedEditableElement = null;
-                // Focus after clearing to open keyboard
-                if (editable) {
-                    editable.focus();
-                }
-            }
-        }
-    ];
+        ];
+    }
+
 
     let slashMenuElement = null;
     let submenuElement = null;
@@ -715,7 +723,7 @@
     let filterText = '';
     let savedNoteEntry = null;
     let savedEditableElement = null;
-    let activeCommands = SLASH_COMMANDS;
+    let activeCommands = null;
 
     function getEditorContext() {
         const selection = window.getSelection();
@@ -746,7 +754,7 @@
 
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 768;
-        const commands = (activeCommands || SLASH_COMMANDS).filter(cmd => {
+        const commands = (activeCommands || getSlashCommands()).filter(cmd => {
             if (isMobile && cmd.mobileHidden) return false;
             if (!isMobile && cmd.mobileOnly) return false;
             return true;
@@ -1080,7 +1088,7 @@
                 }
             }
         } else {
-            const cmd = (activeCommands || SLASH_COMMANDS).find(c => c.id === commandId);
+            const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
             if (!cmd) return;
 
             // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
@@ -1426,7 +1434,7 @@
             return;
         }
 
-        activeCommands = ctx.noteType === 'markdown' ? MARKDOWN_SLASH_COMMANDS : SLASH_COMMANDS;
+        activeCommands = ctx.noteType === 'markdown' ? getMarkdownSlashCommands() : getSlashCommands();
 
         filterText = '';
         selectedIndex = 0;

@@ -2,6 +2,7 @@
 // Debug display disabled for production
 // (Previously enabled with display_errors / error_reporting for debugging)
 require 'auth.php';
+require_once 'functions.php';
 
 $error = '';
 
@@ -16,14 +17,29 @@ try {
         $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
         $stmt->execute(['login_display_name']);
         $login_display_name = $stmt->fetchColumn();
+
+        // Also read preferred language for login page i18n
+        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['language']);
+        $currentLang = $stmt->fetchColumn();
+        if (!is_string($currentLang) || $currentLang === '') {
+            $currentLang = 'en';
+        }
+        $currentLang = strtolower(trim($currentLang));
+        if (!preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $currentLang)) {
+            $currentLang = 'en';
+        }
+
         $tmpCon = null;
     } catch (Exception $e) {
         // ignore DB errors and leave display name empty
         $login_display_name = '';
+        $currentLang = 'en';
     }
     if ($login_display_name === false) $login_display_name = '';
 } catch (Exception $e) {
     $login_display_name = '';
+    $currentLang = 'en';
 }
 
 // If already authenticated, redirect to home
@@ -39,7 +55,7 @@ if (isAuthenticated()) {
             window.location.href = "index.php";
         }
     </script>';
-    echo '</head><body>Redirecting...</body></html>';
+    echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
     exit;
 }
 
@@ -61,19 +77,19 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
                 window.location.href = "index.php";
             }
         </script>';
-        echo '</head><body>Redirecting...</body></html>';
+        echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
         exit;
     } else {
-        $error = 'Incorrect username or password.';
+        $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
     }
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo htmlspecialchars($currentLang ?? 'en', ENT_QUOTES); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Poznote</title>
+    <title><?php echo t_h('login.page.title', [], 'Login', $currentLang ?? 'en'); ?> - <?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?></title>
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -87,17 +103,17 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <img src="favicon.ico" alt="Poznote" class="logo-favicon">
+                <img src="favicon.ico" alt="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>" class="logo-favicon">
             </div>
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
         
         <form method="POST">
             <div class="form-group">
-                <input type="text" id="username" name="username" placeholder="Username" required autofocus autocomplete="username">
+                <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username', [], 'Username', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
             </div>
             <div class="form-group">
-                <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+                <input type="password" id="password" name="password" placeholder="<?php echo t_h('login.fields.password', [], 'Password', $currentLang ?? 'en'); ?>" required autocomplete="current-password">
                 <?php if ($error): ?>
                     <div class="error"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
@@ -106,15 +122,15 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             <div class="form-group remember-me-group">
                 <label class="remember-me-label">
                     <input type="checkbox" name="remember_me" value="1" id="remember_me">
-                    <span>Remember me for 30 days</span>
+                    <span><?php echo t_h('login.remember_me', [], 'Remember me for 30 days', $currentLang ?? 'en'); ?></span>
                 </label>
             </div>
             
-            <button type="submit" class="login-button">Login</button>
+            <button type="submit" class="login-button"><?php echo t_h('login.button', [], 'Login', $currentLang ?? 'en'); ?></button>
         </form>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
-                    Poznote documentation
+                    <?php echo t_h('login.documentation', [], 'Poznote documentation', $currentLang ?? 'en'); ?>
                 </a>
             </p>
         </div>

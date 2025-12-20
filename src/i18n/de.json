@@ -1,0 +1,1154 @@
+{
+  "app": {
+    "name": "Poznote"
+  },
+  "common": {
+    "back_to_notes": "Zurück zu den Notizen",
+    "back_to_settings": "Zurück zu den Einstellungen",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "confirmation": "Bestätigung",
+    "save": "Speichern",
+    "download": "Herunterladen",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "duplicate": "Duplizieren",
+    "move": "Verschieben",
+    "rename": "Umbenennen",
+    "menu": "Menü",
+    "enabled": "aktiviert",
+    "disabled": "deaktiviert",
+    "loading": "Lädt...",
+    "please_wait": "Bitte warten...",
+    "information": "Information",
+    "error": "Fehler",
+    "warning": "Warnung",
+    "success": "Erfolg",
+    "notification": "Benachrichtigung",
+    "saved": "gespeichert",
+    "not_defined": "nicht festgelegt",
+    "unknown_error": "Unbekannter Fehler",
+    "yes": "Ja",
+    "no": "Nein",
+    "not_available": "Nicht verfügbar",
+    "not_specified": "Nicht angegeben"
+  },
+  "folders": {
+    "delete": {
+      "confirm_main": "Sind Sie sicher, dass Sie den Ordner \"{{folder}}\" löschen möchten?",
+      "details": {
+        "subfolder_singular_html": "<strong>• {{count}}</strong> Unterordner wird ebenfalls gelöscht",
+        "subfolder_plural_html": "<strong>• {{count}}</strong> Unterordner werden ebenfalls gelöscht",
+        "note_singular_html": "<strong>• {{count}}</strong> Notiz wird in den Papierkorb verschoben",
+        "note_plural_html": "<strong>• {{count}}</strong> Notizen werden in den Papierkorb verschoben"
+      }
+    },
+    "move_all": {
+      "same_source_target": "Quell- und Zielordner können nicht identisch sein",
+      "moving": "Verschiebe...",
+      "files_count_singular": "1 Datei wird verschoben",
+      "files_count_plural": "{{count}} Dateien werden verschoben",
+      "empty_folder": "Dieser Ordner ist leer",
+      "unable_to_count_files": "Dateien können nicht gezählt werden"
+    },
+    "errors": {
+      "check_content_prefix": "Fehler beim Überprüfen des Ordnerinhalts: {{error}}",
+      "move_files_prefix": "Fehler beim Verschieben von Dateien: {{error}}",
+      "cannot_rename_system_folders": "Systemordner können nicht umbenannt werden",
+      "generic_prefix": "Fehler: {{error}}",
+      "create_title": "Fehler beim Erstellen des Ordners",
+      "create_prefix": "Fehler beim Erstellen des Ordners: {{error}}",
+      "delete_prefix": "Fehler beim Löschen des Ordners: {{error}}",
+      "rename_prefix": "Fehler beim Umbenennen des Ordners: {{error}}",
+      "load_prefix": "Fehler beim Laden der Ordner: {{error}}",
+      "empty_folder_prefix": "Fehler beim Leeren des Ordners: {{error}}"
+    },
+    "validation": {
+      "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
+    },
+    "empty": {
+      "title": "Ordner leeren",
+      "confirm_message": "Sind Sie sicher, dass Sie alle Notizen aus \"{{folder}}\" in den Papierkorb verschieben möchten?",
+      "confirm_button": "Notizen in den Papierkorb senden",
+      "success_moved_to_trash": "Alle Notizen aus Ordner in den Papierkorb verschoben: {{folder}}"
+    },
+    "move_note": {
+      "select_note_first": "Bitte wählen Sie zuerst eine Notiz aus, bevor Sie sie in einen Ordner verschieben.",
+      "select_target_folder": "Bitte wählen Sie einen Zielordner aus",
+      "create_and_move": "Erstellen & Verschieben",
+      "errors": {
+        "move_prefix": "Fehler beim Verschieben der Notiz: {{error}}",
+        "duplicate_title": "Eine Notiz mit demselben Titel existiert bereits im Zielordner.",
+        "duplicate_title_root": "Eine Notiz mit demselben Titel existiert bereits auf der Stammebene."
+      }
+    },
+    "subfolder": {
+      "modal_title": "Neuer Unterordner",
+      "modal_message": "Unterordnername eingeben (innerhalb von {{parent}})"
+    }
+  },
+  "modal_alerts": {
+    "cursor_warning": {
+      "title": "Cursor-Position erforderlich",
+      "message": "Bitte klicken Sie innerhalb des Editors, bevor Sie fortfahren."
+    }
+  },
+  "excalidraw": {
+    "titles": {
+      "editing_not_available": "Bearbeitung nicht verfügbar",
+      "unsaved_note": "Ungespeicherte Notiz",
+      "insertion_error": "Einfügefehler",
+      "image_not_found": "Bild nicht gefunden"
+    },
+    "editor": {
+      "titles": {
+        "embedded_diagram": "Eingebettetes Diagramm",
+        "new_note": "Neue Notiz"
+      },
+      "toolbar": {
+        "save_and_exit": "Speichern und beenden",
+        "exit_without_saving": "Beenden ohne zu speichern",
+        "saving": "Speichere...",
+        "saved": "Gespeichert!"
+      },
+      "loading": "Poznote Excalidraw wird geladen...",
+      "alerts": {
+        "editor_not_ready": "Editor nicht bereit",
+        "error_prefix": "Fehler: {{error}}"
+      },
+      "errors": {
+        "failed_to_load": "Fehler: Excalidraw konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
+        "initializing_prefix": "Fehler beim Initialisieren von Excalidraw: {{error}}",
+        "save_failed": "Speichern fehlgeschlagen"
+      },
+      "library_warning": {
+        "line1": "Die Schaltfläche \"Zu Excalidraw hinzufügen\" auf der externen Bibliotheksseite funktioniert bei dieser selbst gehosteten Version nicht.",
+        "line2": "Sie müssen die Bibliotheksdatei (.excalidrawlib) herunterladen und manuell über die \"Öffnen\"-Schaltfläche im Bibliotheksmenü importieren.",
+        "ok": "Ich verstehe"
+      }
+    },
+    "messages": {
+      "disabled_small_screens": "Excalidraw-Bearbeitung ist auf kleinen Bildschirmen für eine bessere Benutzererfahrung deaktiviert.",
+      "disabled_mobile": "Excalidraw-Bearbeitung ist auf mobilen Geräten deaktiviert.",
+      "disabled_under_800": "Excalidraw-Bearbeitung ist auf Bildschirmen kleiner als 800px deaktiviert."
+    },
+    "spinner": {
+      "saving_note": "Notiz wird gespeichert...",
+      "saving_title": "Speichere"
+    },
+    "errors": {
+      "save_before_adding": "Bitte speichern Sie die Notiz, bevor Sie Diagramme hinzufügen",
+      "save_before_editing": "Bitte speichern Sie die Notiz, bevor Sie Diagramme bearbeiten",
+      "note_editor_not_found": "Notiz-Editor nicht gefunden",
+      "failed_to_save_try_again": "Notiz konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "error_saving_note_prefix": "Fehler beim Speichern der Notiz: {{error}}",
+      "insert_area_not_found": "Notizinhaltsbereich zum Einfügen des Diagramms konnte nicht gefunden werden",
+      "image_not_found": "Excalidraw-Bild nicht gefunden. Bitte öffnen Sie das Diagramm im Editor und speichern Sie es zuerst."
+    }
+  },
+  "note_reference": {
+    "loading": "Lädt...",
+    "untitled": "Ohne Titel",
+    "modal": {
+      "search_placeholder": "Nach einer Notiz suchen...",
+      "recent_notes": "Kürzliche Notizen"
+    },
+    "empty": {
+      "no_notes_found": "Keine Notizen gefunden",
+      "no_match": "Keine Notizen entsprechen Ihrer Suche",
+      "no_other": "Keine anderen Notizen verfügbar"
+    },
+    "error": {
+      "loading_notes": "Fehler beim Laden der Notizen"
+    }
+  },
+  "attachments": {
+    "empty": "Keine Anhänge.",
+    "upload": {
+      "button_uploading": "Wird hochgeladen..."
+    },
+    "actions": {
+      "view": "Anzeigen",
+      "delete": "Löschen",
+      "open_attachments": "Anhänge öffnen",
+      "download": "Herunterladen {{filename}}"
+    },
+    "errors": {
+      "select_file": "Bitte wählen Sie eine Datei zum Hochladen aus.",
+      "no_note_selected": "Keine Notiz ausgewählt.",
+      "file_too_large": "Die Datei ist zu groß (max: {{maxSize}}).",
+      "http_error": "HTTP-Fehler: {{status}}",
+      "invalid_server_response": "Ungültige Serverantwort.",
+      "upload_failed": "Hochladen fehlgeschlagen: {{error}}",
+      "deletion_failed": "Löschen fehlgeschlagen: {{error}}",
+      "deletion_failed_generic": "Löschen fehlgeschlagen.",
+      "loading_failed": "Anhänge konnten nicht geladen werden",
+      "loading_error": "Fehler beim Laden der Anhänge",
+      "upload_failed_generic": "Hochladen fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "upload_failed_connection": "Hochladen fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung."
+    },
+    "messages": {
+      "upload_success": "Datei erfolgreich hochgeladen!",
+      "deleted_success": "Anhang erfolgreich gelöscht"
+    },
+    "page": {
+      "title": "Anhänge verwalten",
+      "subtitle": "Anhänge für Notiz verwalten:",
+      "upload_section_title": "Neuen Anhang hochladen",
+      "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
+      "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
+      "upload_button": "Datei hochladen",
+      "current_attachments": "Aktuelle Anhänge",
+      "loading_attachments": "Anhänge werden geladen...",
+      "preview_alt": "Vorschau",
+      "uploaded_prefix": "Hochgeladen: ",
+      "open_in_new_tab": "In neuem Tab öffnen"
+    },
+    "modals": {
+      "delete": {
+        "title": "Anhang löschen",
+        "message": "Möchten Sie diesen Anhang löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+      }
+    },
+    "size": {
+      "units": {
+        "bytes": "Bytes",
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+      }
+    }
+  },
+  "auth": {
+    "api": {
+      "authentication_required": "Authentifizierung erforderlich",
+      "invalid_credentials": "Ungültige Anmeldedaten"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": {
+      "label": "Sprache",
+      "english": "Englisch",
+      "french": "Französisch",
+      "spanish": "Spanisch",
+      "portuguese": "Portugiesisch",
+      "german": "Deutsch",
+      "saved": "Sprache gespeichert",
+      "save_error": "Sprache konnte nicht gespeichert werden",
+      "reload_hint": "Lädt neu…"
+    },
+    "cards": {
+      "workspaces": "Arbeitsbereiche",
+      "backup_export": "Sicherung / Export",
+      "restore_import": "Wiederherstellen / Importieren",
+      "check_updates": "Nach Updates suchen",
+      "tips": "Tipps & Tricks",
+      "api_docs": "REST-API",
+      "documentation": "Dokumentation",
+      "news": "Poznote-News",
+      "website": "Poznote-Website",
+      "support": "Entwickler unterstützen"
+    }
+  },
+  "workspaces": {
+    "page": {
+      "title": "Arbeitsbereiche verwalten - Poznote"
+    },
+    "description": "Arbeitsbereiche ermöglichen es Ihnen, Ihre Notizen in separate Umgebungen innerhalb einer einzigen Poznote-Instanz zu organisieren - wie verschiedene Notizbücher für Arbeit, Privatleben oder Projekte.",
+    "sections": {
+      "create": {
+        "title": "Einen neuen Arbeitsbereich erstellen",
+        "placeholder": "Arbeitsbereichsnamen eingeben"
+      },
+      "existing": {
+        "title": "Vorhandene Arbeitsbereiche",
+        "empty": "Keine Arbeitsbereiche definiert."
+      }
+    },
+    "actions": {
+      "select": "Auswählen",
+      "move_notes": "Notizen verschieben"
+    },
+    "count": {
+      "notes_0": "0 Notizen",
+      "notes_1": "1 Notiz",
+      "notes_n": "{{count}} Notizen"
+    },
+    "default": {
+      "title": "Standard-Arbeitsbereich",
+      "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
+      "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
+      "last_opened": "Zuletzt geöffneter Arbeitsbereich",
+      "save_button": "Standard speichern",
+      "status_set_to": "✓ Standard-Arbeitsbereich gesetzt auf: {{workspace}}",
+      "error_saving": "Fehler beim Speichern des Standard-Arbeitsbereichs"
+    },
+    "validation": {
+      "enter_name": "Arbeitsbereichsnamen eingeben",
+      "invalid_name": "Ungültiger Name: nur Buchstaben, Zahlen, Bindestrich oder Unterstrich verwenden",
+      "enter_new_name": "Bitte geben Sie einen neuen Namen ein",
+      "new_name_must_differ": "Neuer Name muss sich vom aktuellen unterscheiden"
+    },
+    "alerts": {
+      "unknown_error": "Unbekannter Fehler",
+      "error_prefix": "Fehler: {{error}}",
+      "renamed_success": "Arbeitsbereich erfolgreich umbenannt",
+      "deleted_success": "Arbeitsbereich erfolgreich gelöscht",
+      "rename_error": "Fehler beim Umbenennen des Arbeitsbereichs",
+      "delete_error": "Fehler beim Löschen des Arbeitsbereichs"
+    },
+    "move": {
+      "choose_target": "Ziel wählen",
+      "moved_to": "{{count}} Notizen nach {{target}} verschoben",
+      "error_moving_notes": "Fehler beim Verschieben der Notizen: {{error}}"
+    },
+    "menu": {
+      "loading": "Arbeitsbereiche werden geladen...",
+      "error_loading": "Fehler beim Laden der Arbeitsbereiche",
+      "logout": "Abmelden"
+    },
+    "errors": {
+      "name_empty": "Arbeitsbereichsname darf nicht leer sein",
+      "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
+      "name_required": "Arbeitsbereichsname erforderlich",
+      "cannot_delete_default": "Standard-Arbeitsbereich kann nicht gelöscht werden",
+      "not_found": "Arbeitsbereich nicht gefunden",
+      "cannot_rename_default": "Standard-Arbeitsbereich kann nicht umbenannt werden",
+      "invalid_new_name": "Ungültiger neuer Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
+      "name_and_target_required": "Arbeitsbereichsname und Ziel erforderlich",
+      "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
+    },
+    "messages": {
+      "created": "Arbeitsbereich erstellt",
+      "deleted_all": "Arbeitsbereich gelöscht und alle zugehörigen Notizen, Ordner und Anhänge entfernt",
+      "renamed": "Arbeitsbereich in allen Notizen und Labels umbenannt",
+      "notes_moved_to": "Notizen verschoben nach {{target}}"
+    },
+    "confirm_delete": {
+      "title": "Arbeitsbereich löschen bestätigen",
+      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Standard-Arbeitsbereich verschoben."
+    }
+  },
+  "display": {
+    "title": "Anzeige",
+    "cards": {
+      "theme_mode": "Thema-Modus",
+      "login_display": "Login-Anzeige",
+      "note_font_size": "Schriftgröße des Notizinhalts",
+      "note_sort_order": "Notizen-Sortierreihenfolge",
+      "timezone": "Zeitzone",
+      "show_note_created": "Erstellungsdatum der Notiz anzeigen",
+      "show_note_subheading": "Notiz-Untertitel anzeigen",
+      "show_folder_counts": "Ordner-Notizzähler anzeigen",
+      "show_folder_actions": "Ordner-Aktionen anzeigen"
+    },
+    "badges": {
+      "font_size_default": "Standard ({{size}}px)",
+      "toolbar_mode": {
+        "full": "Nur Symbolleiste",
+        "slash": "Nur Schrägstrich-Befehl",
+        "both": "Symbolleistensymbole + Schrägstrich-Befehlsmenü"
+      }
+    },
+    "alerts": {
+      "error_saving_preference": "Fehler beim Speichern der Einstellung"
+    },
+    "timezone": {
+      "alerts": {
+        "updated_success": "Zeitzone erfolgreich aktualisiert. Die Änderungen werden sofort wirksam.",
+        "update_error": "Fehler beim Aktualisieren der Zeitzone"
+      }
+    }
+  },
+  "sidebar": {
+    "display": "Anzeige",
+    "settings": "Einstellungen",
+    "create": "Erstellen"
+  },
+  "search": {
+    "placeholder": "Suchen...",
+    "clear": "Suche löschen",
+    "placeholder_notes": "Nach einem oder mehreren Wörtern suchen...",
+    "placeholder_tags": "Nach einem oder mehreren Tags suchen...",
+    "validation": {
+      "select_type": "Bitte wählen Sie mindestens eine Suchoption aus (Notizen oder Tags)",
+      "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche."
+    }
+  },
+  "autosave": {
+    "confirm_switch": "⚠️ Ungespeicherte Änderungen erkannt\n\nSie haben ungespeicherte Änderungen, die verloren gehen, wenn Sie jetzt wechseln.\n\nKlicken Sie auf OK, um zu speichern und fortzufahren, oder Abbrechen, um zu bleiben.\n(Auto-Speicherung erfolgt 2 Sekunden nachdem Sie aufgehört haben zu tippen)",
+    "beforeunload_warning": "⚠️ Sie haben ungespeicherte Änderungen. Sind Sie sicher, dass Sie gehen möchten?",
+    "confirm_navigation": "⚠️ Ungespeicherte Änderungen\n\nSie haben ungespeicherte Änderungen, die verloren gehen.\nVor dem Navigieren speichern?",
+    "notification": {
+      "saving": "Änderungen werden gespeichert...",
+      "saved": "Gespeichert!"
+    }
+  },
+  "tasklist": {
+    "input_placeholder": "Neue Aufgabe schreiben und Enter drücken, um sie zur Liste hinzuzufügen...",
+    "drag_to_reorder": "Zum Neuanordnen ziehen"
+  },
+  "tags": {
+    "add_single": "Tag hinzufügen...",
+    "add_multiple": "Tags hinzufügen...",
+    "search": {
+      "placeholder": "Tags filtern...",
+      "results_one": "1 Tag für \"{{term}}\" gefunden",
+      "results_other": "{{count}} Tags für \"{{term}}\" gefunden"
+    },
+    "count": {
+      "one": "Es gibt insgesamt {{count}} Tag",
+      "other": "Es gibt insgesamt {{count}} Tags"
+    },
+    "empty": "Keine Tags gefunden."
+  },
+  "trash": {
+    "search": {
+      "placeholder": "Im Papierkorb suchen...",
+      "results_for": "Ergebnisse für \"{{term}}\"",
+      "results_one": "1 Notiz für \"{{term}}\" gefunden",
+      "results_other": "{{count}} Notizen für \"{{term}}\" gefunden"
+    },
+    "actions": {
+      "empty_trash": "Papierkorb leeren",
+      "restore": "Wiederherstellen",
+      "delete_forever": "Endgültig löschen",
+      "restore_note_tooltip": "Diese Notiz wiederherstellen",
+      "delete_permanently_tooltip": "Endgültig löschen"
+    },
+    "note": {
+      "last_modified_on": "Zuletzt geändert am {{date}}"
+    },
+    "empty": "Keine Notizen im Papierkorb.",
+    "modals": {
+      "empty": {
+        "title": "Papierkorb leeren",
+        "message": "Möchten Sie den Papierkorb vollständig leeren? Diese Aktion kann nicht rückgängig gemacht werden."
+      },
+      "restore": {
+        "title": "Notiz wiederherstellen",
+        "message": "Möchten Sie diese Notiz wiederherstellen?"
+      },
+      "delete": {
+        "title": "Notiz endgültig löschen",
+        "message": "Möchten Sie diese Notiz endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+      }
+    },
+    "alerts": {
+      "restore_error_title": "Wiederherstellungsfehler",
+      "restore_error_prefix": "Fehler beim Wiederherstellen der Notiz: ",
+      "restore_error_generic": "Fehler beim Wiederherstellen der Notiz",
+      "delete_error_title": "Löschfehler",
+      "delete_error_prefix": "Fehler beim endgültigen Löschen: ",
+      "delete_error_generic": "Fehler beim endgültigen Löschen der Notiz",
+      "empty_error_title": "Papierkorb-leeren-Fehler",
+      "empty_error_prefix": "Fehler beim Leeren des Papierkorbs: ",
+      "empty_error_generic": "Fehler beim Leeren des Papierkorbs"
+    }
+  },
+  "editor": {
+    "markdown_placeholder": "Schreiben Sie Ihr Markdown oder verwenden Sie /, um das Befehlsmenü zu öffnen...",
+    "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier...",
+    "images": {
+      "delete_confirm": {
+        "title": "Bild löschen",
+        "message": "Sind Sie sicher, dass Sie dieses Bild löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+      }
+    },
+    "colors": {
+      "black": "Schwarz",
+      "red": "Rot",
+      "orange": "Orange",
+      "yellow": "Gelb",
+      "green": "Grün",
+      "blue": "Blau",
+      "purple": "Lila",
+      "none": "Keine"
+    },
+    "font_size": {
+      "very_small": "Sehr klein",
+      "small": "Klein",
+      "normal": "Normal",
+      "large": "Groß",
+      "very_large": "Sehr groß",
+      "huge": "Riesig",
+      "giant": "Gigantisch"
+    },
+    "emoji": {
+      "hint_windows": "Unter Windows drücken Sie Win + ;, um die Emoji-Auswahl zu öffnen"
+    },
+    "table_picker": {
+      "title": "Tabelle einfügen",
+      "rows_label": "Zeilen:",
+      "rows_placeholder": "Zeilen",
+      "cols_label": "Spalten:",
+      "cols_placeholder": "Spalten",
+      "insert": "Einfügen"
+    },
+    "toolbar": {
+      "back_to_notes": "Zurück zu den Notizen",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "underline": "Unterstrichen",
+      "strikethrough": "Durchgestrichen",
+      "link": "Link",
+      "text_color": "Textfarbe",
+      "highlight": "Hervorheben",
+      "bullet_list": "Aufzählung",
+      "numbered_list": "Nummerierte Liste",
+      "font_size": "Schriftgröße",
+      "code_block": "Code-Block",
+      "inline_code": "Inline-Code",
+      "clear_formatting": "Formatierung löschen",
+      "insert_excalidraw": "Excalidraw-Diagramm einfügen",
+      "insert_emoji": "Emoji einfügen",
+      "insert_table": "Tabelle einfügen",
+      "insert_checklist": "Checkliste einfügen",
+      "add_separator": "Trennlinie hinzufügen",
+      "insert_note_reference": "Notiz-Referenz einfügen"
+    },
+    "link": {
+      "add_title": "Link hinzufügen",
+      "title": "Link verwalten",
+      "url_label": "URL:",
+      "url_placeholder": "https://beispiel.com",
+      "text_label": "Link-Text (optional):",
+      "text_placeholder": "Angezeigter Text",
+      "remove": "Link entfernen",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    }
+  },
+  "info": {
+    "page_title": "Notiz-Informationen",
+    "actions": {
+      "back_to_note": "Zurück zur Notiz"
+    },
+    "labels": {
+      "note_title": "Notiz-Titel:",
+      "workspace": "Arbeitsbereich:",
+      "folder": "Ordner:",
+      "created": "Erstellt:",
+      "last_modified": "Zuletzt geändert:",
+      "subheading": "Untertitel:",
+      "tags": "Tags:",
+      "favorite": "Favorit:",
+      "attachments": "Anhänge:",
+      "note_id": "Notiz-ID:",
+      "full_path": "Vollständiger Pfad:"
+    },
+    "attachments": {
+      "count_singular": "1 Datei",
+      "count_plural": "{{count}} Dateien"
+    },
+    "empty": {
+      "no_tags": "Keine Tags"
+    },
+    "errors": {
+      "failed_to_update_subheading_prefix": "Aktualisierung der Überschrift fehlgeschlagen: {{error}}",
+      "network_error_updating_subheading": "Netzwerkfehler beim Aktualisieren der Überschrift"
+    }
+  },
+  "modals": {
+    "update": {
+      "title": "📱 Anwendungsversion",
+      "backup_warning": "Erstellen Sie ein Backup Ihrer Daten, bevor Sie aktualisieren",
+      "backup_hint": "Sie können ein Backup in <strong>Einstellungen > Backup</strong> erstellen",
+      "current_version": "Aktuelle Version:",
+      "latest_available": "Neueste verfügbare:",
+      "self_hosted": "Selbst-gehostete Anweisungen",
+      "cloud": "Cloud-Anweisungen"
+    },
+    "update_check": {
+      "title": "Nach Updates suchen...",
+      "status": "Bitte warten Sie, während wir nach Updates suchen..."
+    },
+    "login_display": {
+      "title": "Login-Anzeigename",
+      "description": "Legen Sie den Namen fest, der auf dem Login-Bildschirm angezeigt wird.",
+      "placeholder": "Anzeigename"
+    },
+    "language": {
+      "description": "Wählen Sie Ihre bevorzugte Sprache:"
+    },
+    "input": {
+      "placeholder": "Text eingeben"
+    },
+    "font_size": {
+      "title": "Schriftgröße des Notizinhalts",
+      "description": "Wählen Sie die Standardschriftgröße für Ihre Notizen:",
+      "label": "Schriftgröße (px):",
+      "default_value": "{{size}} px ist der Standardwert",
+      "preview": "Dies ist ein Vorschaubtext"
+    },
+    "confirm": {
+      "title": "Aktion bestätigen",
+      "message": "Sind Sie sicher, dass Sie fortfahren möchten?",
+      "save_and_exit": "Speichern und beenden",
+      "exit_without_saving": "Beenden ohne zu speichern"
+    },
+    "folder": {
+      "new_title": "Neuer Ordner",
+      "new_placeholder": "Neuer Ordnername",
+      "create": "Erstellen",
+      "rename_title": "Ordner umbenennen",
+      "rename_placeholder": "Neuer Ordnername",
+      "delete_title": "Ordner löschen",
+      "delete_folder": "Ordner löschen",
+      "change_folder": "Ordner ändern",
+      "move_prefix": "Verschieben",
+      "move_suffix": "zu:",
+      "move_prompt": "Verschieben \"{{title}}\" zu:",
+      "no_folder": "Kein Ordner"
+    },
+    "move_note_folder": {
+      "title": "Notiz in Ordner verschieben",
+      "workspace_destination": "Arbeitsbereich-Ziel auswählen:",
+      "target_folder": "Zielordner auswählen:",
+      "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
+    },
+    "move_folder_files": {
+      "title": "Alle Dateien verschieben",
+      "prompt_prefix": "Alle Dateien verschieben von",
+      "prompt_suffix": "zu:",
+      "select_target": "Zielordner auswählen...",
+      "hint_move_single": "Um eine einzelne Notiz in einen anderen Arbeitsbereich zu verschieben, verwenden Sie die Schaltfläche \"Notiz verschieben\" in der Symbolleiste",
+      "hint_move_all": "Um alle Notizen von einem Arbeitsbereich in einen anderen zu verschieben, gehen Sie zu Einstellungen → Arbeitsbereiche",
+      "move_all": "Alle Dateien verschieben"
+    },
+    "workspaces": {
+      "move_notes_title": "Notizen verschieben von",
+      "select_target_workspace": "Ziel-Arbeitsbereich auswählen",
+      "rename_title": "Arbeitsbereich umbenennen",
+      "new_name": "Neuer Name",
+      "delete_title": "Arbeitsbereich löschen bestätigen",
+      "delete_description": "Geben Sie den Arbeitsbereichsnamen ein, um die Löschung zu bestätigen. Alle Notizen und Ordner werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
+      "delete_placeholder": "Arbeitsbereichsnamen eingeben, um zu bestätigen",
+      "delete_button": "Arbeitsbereich löschen"
+    },
+    "create": {
+      "title_in_folder": "Erstellen in {{folder}}",
+      "folder_fallback": "Ordner",
+      "note": {
+        "title": "Notiz",
+        "description": "Rich-Text mit Formatierung, Bildern, Links und Excalidraw-Diagrammen"
+      },
+      "markdown": {
+        "title": "Markdown-Notiz",
+        "description": "Leichte Auszeichnungssprache für strukturierten Text"
+      },
+      "task_list": {
+        "title": "Aufgabenliste",
+        "description": "Checkliste mit Kontrollkästchen für Aufgaben und Elemente"
+      },
+      "subfolder": {
+        "title": "Unterordner",
+        "description": "Einen Unterordner innerhalb dieses Ordners erstellen"
+      },
+      "folder": {
+        "title": "Ordner",
+        "description": "Ihre Notizen in Ordnern organisieren"
+      },
+      "workspace": {
+        "title": "Arbeitsbereich",
+        "description": "Eine neue Arbeitsbereichsumgebung erstellen"
+      }
+    },
+    "note_sort": {
+      "title": "Notizen-Sortierreihenfolge",
+      "description": "Wählen Sie aus, wie Notizen in der Notizenliste geordnet werden:",
+      "options": {
+        "last_modified": "Zuletzt geändert",
+        "last_created": "Zuletzt erstellt",
+        "alphabetical": "Alphabetisch"
+      }
+    },
+    "timezone": {
+      "title": "Zeitzone",
+      "description": "Wählen Sie Ihre Zeitzone:",
+      "groups": {
+        "europe": "Europa",
+        "america": "Amerika",
+        "asia": "Asien",
+        "pacific": "Pazifik",
+        "africa": "Afrika"
+      }
+    }
+  },
+  "notes_list": {
+    "system_folders": {
+      "trash": "Papierkorb",
+      "tags": "Tags",
+      "favorites": "Favoriten"
+    },
+    "drop_zone": {
+      "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
+    },
+    "folder_actions": {
+      "create": "Erstellen",
+      "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
+      "rename_folder": "Ordner umbenennen",
+      "delete_folder": "Ordner löschen"
+    }
+  },
+  "update": {
+    "new_available": "🎉 Neues Update verfügbar!",
+    "description": "Eine neue Version von Poznote ist verfügbar. Ihre Daten werden während des Updates erhalten bleiben.",
+    "up_to_date": "✅ Poznote ist auf dem neuesten Stand",
+    "error_loading_version": "Fehler beim Laden der Version"
+  },
+  "slash_menu": {
+    "back_to_normal": "Zurück zu normalem Text",
+    "title": "Titel",
+    "heading_1": "Überschrift 1",
+    "heading_2": "Überschrift 2",
+    "heading_3": "Überschrift 3",
+    "format_text": "Text formatieren",
+    "red": "Rot",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "highlight": "Hervorheben",
+    "strikethrough": "Durchgestrichen",
+    "code": "Code",
+    "inline_code": "Inline-Code",
+    "code_block": "Code-Block",
+    "list": "Liste",
+    "bullet_list": "Aufzählung",
+    "numbered_list": "Nummerierte Liste",
+    "checklist": "Checkliste",
+    "excalidraw": "Excalidraw",
+    "emoji": "Emoji",
+    "table": "Tabelle",
+    "separator": "Trennlinie",
+    "link_to_note": "Link zur Notiz",
+    "cancel": "Abbrechen"
+  },
+  "api": {
+    "settings": {
+      "key_required": "Schlüssel erforderlich",
+      "invalid_action": "ungültige Aktion",
+      "internal_error": "interner Fehler"
+    },
+    "errors": {
+      "workspace_not_found": "Arbeitsbereich nicht gefunden",
+      "method_not_allowed": "Methode nicht erlaubt",
+      "invalid_action": "Ungültige Aktion",
+      "internal_server_error": "Interner Serverfehler",
+      "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner."
+    }
+  },
+  "ui": {
+    "login_display": {
+      "prompt": "Login-Anzeigename (leer zum Löschen):"
+    },
+    "alerts": {
+      "saved": "Gespeichert",
+      "save_error": "Speicherfehler",
+      "network_error": "Netzwerkfehler"
+    }
+  },
+  "theme": {
+    "badge": {
+      "dark": "Dunkelmodus",
+      "light": "Hellmodus"
+    }
+  },
+  "table": {
+    "context_menu": {
+      "insert_row_above": "Zeile oben einfügen",
+      "insert_row_below": "Zeile unten einfügen",
+      "insert_column_left": "Spalte links einfügen",
+      "insert_column_right": "Spalte rechts einfügen",
+      "delete_row": "Zeile löschen",
+      "delete_column": "Spalte löschen",
+      "delete_table": "Tabelle löschen",
+      "errors": {
+        "cannot_delete_last_row": "Die letzte Zeile der Tabelle kann nicht gelöscht werden.",
+        "cannot_delete_last_column": "Die letzte Spalte der Tabelle kann nicht gelöscht werden."
+      },
+      "confirm": {
+        "delete_table": "Möchten Sie diese Tabelle wirklich löschen?"
+      }
+    }
+  },
+  "index": {
+    "errors": {
+      "create_task_list": "Fehler beim Erstellen der Aufgabenliste",
+      "create_task_list_prefix": "Fehler beim Erstellen der Aufgabenliste: ",
+      "create_markdown_note": "Fehler beim Erstellen der Markdown-Notiz",
+      "create_markdown_note_prefix": "Fehler beim Erstellen der Markdown-Notiz: ",
+      "failed_to_save_subheading": "Untertitel konnte nicht gespeichert werden"
+    },
+    "toolbar": {
+      "favorite_add": "Zu Favoriten hinzufügen",
+      "favorite_remove": "Aus Favoriten entfernen",
+      "share_note": "Notiz teilen",
+      "attachments_with_count": "Anhänge ({{count}})",
+      "menu_actions": "Menüaktionen"
+    },
+    "share_modal": {
+      "title": "Öffentliche URL",
+      "close": "Schließen",
+      "open": "Öffnen",
+      "copy": "Kopieren",
+      "revoke": "Widerrufen",
+      "renew": "Erneuern",
+      "create_url": "URL erstellen",
+      "no_link_yet": "(Noch kein öffentlicher Link)"
+    },
+    "note": {
+      "new_note": "Neue Notiz",
+      "new_note_numbered": "Neue Notiz ({{number}})",
+      "title_placeholder": "Titel ?"
+    },
+    "subheading": {
+      "placeholder": "Untertitel hier hinzufügen"
+    },
+    "editor": {
+      "placeholder_desktop": "Text eingeben, / verwenden, um das Befehlsmenü zu öffnen, Bilder einfügen oder ein Bild am Cursor ablegen.",
+      "placeholder_mobile": "Text eingeben oder Bilder einfügen..."
+    }
+  },
+  "image_menu": {
+    "view_large": "Groß anzeigen",
+    "download": "Herunterladen",
+    "resize": "Größe ändern",
+    "edit": "Bearbeiten",
+    "add_border": "Rand hinzufügen",
+    "remove_border": "Rand entfernen",
+    "add_border_no_padding": "Rand ohne Innenabstand hinzufügen",
+    "remove_border_no_padding": "Rand ohne Innenabstand entfernen",
+    "delete_image": "Bild löschen"
+  },
+  "backup_export": {
+    "page": {
+      "title": "Sicherung / Export"
+    },
+    "common": {
+      "all_workspaces": "alle Arbeitsbereiche"
+    },
+    "sections": {
+      "complete_backup": {
+        "title": "Vollständige Sicherung",
+        "description_prefix": "Laden Sie eine vollständige Sicherung herunter, die Datenbank, Notizen und Anhänge für",
+        "description_suffix": "in einer einzigen ZIP-Datei enthält.",
+        "use_cases": "Zwei Anwendungsfälle:",
+        "use_case_restore_label": "Wiederherstellen",
+        "use_case_restore_text": "Importieren Sie diese Sicherung, um Ihre Daten bei Verlust wiederherzustellen",
+        "use_case_offline_label": "Offline-Lesen",
+        "use_case_offline_text": "Öffnen Sie die enthaltene",
+        "use_case_offline_text_suffix": "um Ihre Notizen ohne Poznote zu durchsuchen"
+      }
+    },
+    "buttons": {
+      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)"
+    },
+    "spinner": {
+      "preparing": "Sicherung wird vorbereitet...",
+      "preparing_long": "Sicherung wird vorbereitet... Dies kann einige Momente dauern."
+    },
+    "errors": {
+      "export_error": "Exportfehler: {{error}}",
+      "complete_backup_error": "Vollständiger Sicherungsfehler: {{error}}",
+      "cannot_create_zip": "ZIP-Datei kann nicht erstellt werden",
+      "failed_to_create_db_backup": "Datenbanksicherung konnte nicht erstellt werden",
+      "failed_to_create_backup_file": "Sicherungsdatei konnte nicht erstellt werden"
+    },
+    "dump": {
+      "title": "Poznote Datenbank-Dump",
+      "generated_on": "Erstellt am {{date}}"
+    },
+    "index": {
+      "title": "Poznote-Index"
+    }
+  },
+  "login": {
+    "page": {
+      "title": "Anmeldung"
+    },
+    "redirecting": "Weiterleitung...",
+    "fields": {
+      "username": "Benutzername",
+      "password": "Passwort"
+    },
+    "remember_me": "30 Tage merken",
+    "button": "Anmelden",
+    "documentation": "Poznote-Dokumentation",
+    "errors": {
+      "invalid_credentials": "Falscher Benutzername oder Passwort."
+    }
+  },
+  "restore_import": {
+    "page": {
+      "title": "Wiederherstellen / Importieren",
+      "more_info_prefix": "Wenn Sie mehr darüber erfahren möchten, warum wir mehrere Wiederherstellungsmethoden haben:",
+      "more_info_link": "siehe Dokumentation hier"
+    },
+    "advanced": {
+      "show": "Erweiterte Importoptionen anzeigen",
+      "hide": "Erweiterte Importoptionen ausblenden"
+    },
+    "messages": {
+      "database_restored": "Datenbank erfolgreich wiederhergestellt!",
+      "complete_backup_restored": "{{message}}",
+      "notes_imported": "{{message}}",
+      "attachments_imported": "{{message}}"
+    },
+    "errors": {
+      "complete_restore_form_not_found": "Vollständiges Wiederherstellungsformular nicht gefunden. Bitte versuchen Sie es erneut.",
+      "form_not_found": "Formular nicht gefunden. Bitte versuchen Sie es erneut.",
+      "select_backup_first": "Bitte wählen Sie zuerst eine Sicherungsdatei aus.",
+      "restore_error": "Wiederherstellungsfehler: {{error}}",
+      "no_backup_file_or_upload": "Keine Sicherungsdatei bereitgestellt oder Upload-Fehler.",
+      "complete_restore_error": "Vollständiger Wiederherstellungsfehler: {{error}} - {{message}}",
+      "no_complete_backup_file_or_upload": "Keine vollständige Sicherungsdatei bereitgestellt oder Upload-Fehler.",
+      "import_error": "Importfehler: {{error}}",
+      "no_notes_file_or_upload": "Keine Notizdatei bereitgestellt oder Upload-Fehler.",
+      "no_attachments_file_or_upload": "Keine Anhangsdatei bereitgestellt oder Upload-Fehler.",
+      "no_notes_selected_or_upload": "Keine Notizen ausgewählt oder Upload-Fehler.",
+      "file_type_zip_only": "Nur ZIP-Dateien sind erlaubt.",
+      "error_uploading_file": "Fehler beim Hochladen der Datei.",
+      "cannot_find_entries_directory": "Eintragsverzeichnis kann nicht gefunden werden.",
+      "cannot_open_zip": "ZIP-Datei kann nicht geöffnet werden.",
+      "failed_extract_content": "Inhalt aus {{file}} konnte nicht extrahiert werden."
+    },
+    "spinner": {
+      "processing": "Wiederherstellung wird verarbeitet...",
+      "processing_long": "Wiederherstellung wird verarbeitet... Dies kann einige Momente dauern."
+    },
+    "chunked": {
+      "preparing_upload": "Upload wird vorbereitet...",
+      "errors": {
+        "no_file_provided": "Keine Datei bereitgestellt",
+        "upload_failed": "Upload fehlgeschlagen",
+        "assembly_failed": "Zusammenstellung fehlgeschlagen",
+        "cleanup_failed_prefix": "Bereinigung fehlgeschlagen:"
+      },
+      "status_uploading": "Wird hochgeladen... {{percent}}% abgeschlossen",
+      "status_completed": "Wiederherstellung erfolgreich abgeschlossen!",
+      "status_error": "Fehler: {{message}}",
+      "retry": "Erneut versuchen",
+      "success_html": "<strong>Erfolg!</strong> Ihre Sicherung wurde wiederhergestellt. <button class=\"btn btn-primary btn-sm\" onclick=\"location.reload()\" style=\"margin-left: 10px;\">Seite neu laden</button>"
+    },
+    "units": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB"
+    },
+    "direct_copy": {
+      "backup_file_found": "Sicherungsdatei gefunden:",
+      "ready_to_restore": "Bereit zur Wiederherstellung?",
+      "replace_all_data_warning": "Dies ersetzt alle Daten in ALLEN Arbeitsbereichen.",
+      "no_backup_found_prefix": "Keine Sicherungsdatei im Container gefunden unter",
+      "no_backup_found_hint": "Bitte führen Sie zuerst den docker cp-Befehl aus.",
+      "completed_successfully_prefix": "Direkte Dateikopie-Wiederherstellung erfolgreich abgeschlossen!",
+      "failed_prefix": "Direkte Dateikopie-Wiederherstellung fehlgeschlagen:",
+      "backup_not_found_for_restoration": "Sicherungsdatei für Wiederherstellung nicht gefunden.",
+      "buttons": {
+        "yes_restore_direct_copy": "Ja, von direkter Kopie wiederherstellen"
+      }
+    },
+    "individual_notes": {
+      "default_title_with_date": "Importierte Notiz {{date}}",
+      "file_count_one": "1 Notiz",
+      "file_count_many": "{{count}} Notizen",
+      "summary": "Dies importiert {{fileText}} in den Poznote-Arbeitsbereich, ohne sie einem Ordner zuzuweisen.",
+      "errors": {
+        "too_many_files": "Zu viele Dateien ausgewählt. Maximum erlaubt: {{max}}. Sie haben ausgewählt: {{count}}.",
+        "workspace_not_found": "Arbeitsbereich existiert nicht",
+        "entries_dir_not_found": "Eintragsverzeichnis kann nicht gefunden werden",
+        "upload_error": "Upload-Fehler",
+        "invalid_file_type": "Ungültiger Dateityp (nur {{allowed}} erlaubt)",
+        "cannot_read_file": "Datei kann nicht gelesen werden"
+      }
+    },
+    "sections": {
+      "restore_from_backup": {
+        "title": "Möchten Sie von einer Sicherungsdatei wiederherstellen?"
+      },
+      "standard_restore": {
+        "title": "Ist Ihre Sicherungsdatei kleiner als 500MB?",
+        "description": "Laden Sie eine vollständige ZIP-Sicherungsdatei hoch. Diese Methode ist schnell und einfach.",
+        "helper": "Empfohlene maximale Größe: 500MB. Für größere Dateien verwenden Sie den Chunk-Upload unten."
+      },
+      "chunked_restore": {
+        "title": "Ist Ihre Sicherungsdatei zwischen 500MB und 800MB?",
+        "description": "Laden Sie eine vollständige ZIP-Sicherungsdatei hoch. Verwenden Sie diese Methode, um HTTP-Timeouts und Speicherprobleme zu vermeiden.",
+        "helper": "Empfohlen für Dateien über 500MB bis 800MB. Dateien werden in 5MB-Chunks hochgeladen."
+      },
+      "direct_copy_restore": {
+        "title": "Ist Ihre Sicherungsdatei über 800MB?",
+        "description_prefix": "Für sehr große Sicherungsdateien verwenden Sie diese einfache direkte Dateikopiermethode.",
+        "description_link": "Siehe Dokumentation für Details"
+      },
+      "individual_notes": {
+        "title": "Möchten Sie HTML- oder Markdown-Dateien importieren?",
+        "description_html": "Notizen werden in den <b>Poznote</b>-Arbeitsbereich importiert, ohne einem Ordner zugewiesen zu werden.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
+        "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown"
+      }
+    },
+    "buttons": {
+      "start_restore": "Wiederherstellung starten",
+      "start_import_individual_notes": "Import einzelner Notizen starten"
+    },
+    "modals": {
+      "import_confirm": {
+        "title": "Sind Sie sicher?",
+        "body": "Dies ersetzt Notiztitel, Tags, Suchindex und Metadaten, aber nicht den tatsächlichen Notizinhalt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirm": "Ja, Importieren"
+      },
+      "complete_restore": {
+        "title": "Vollständige Wiederherstellung?",
+        "warning_large_html": "<strong>Warnung:</strong> Diese Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen für große Dateien. Erwägen Sie Chunk-Upload stattdessen.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
+        "warning_html": "<strong>Warnung:</strong> Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
+        "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
+        "confirm": "Ja, Vollständige Wiederherstellung"
+      },
+      "chunked_restore": {
+        "note_small_html": "<strong>Hinweis:</strong> Diese Datei ist {{size}}MB. Standard-Upload ist normalerweise schneller für kleine Dateien, aber Chunk-Upload funktioniert auch.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
+        "warning_html": "<strong>Warnung:</strong> Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her."
+      },
+      "complete_restore_chunked": {
+        "title": "Vollständige Wiederherstellung (Chunked)?",
+        "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
+        "confirm": "Ja, Vollständige Wiederherstellung"
+      },
+      "import_notes": {
+        "title": "Notizen importieren?",
+        "body": "Dies importiert alle HTML-Dateien aus der ZIP. Dateien werden zu Ihrer bestehenden Notizensammlung hinzugefügt.",
+        "confirm": "Ja, Notizen importieren"
+      },
+      "import_attachments": {
+        "title": "Anhänge importieren?",
+        "body": "Dies importiert alle Dateien aus der ZIP in den Anhangsordner. Dateien werden zu Ihren bestehenden Anhängen hinzugefügt.",
+        "confirm": "Ja, Anhänge importieren"
+      },
+      "complete_restore_direct_copy": {
+        "title": "Vollständige Wiederherstellung (Direkte Kopie)?",
+        "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
+        "confirm": "Ja, Vollständige Wiederherstellung"
+      },
+      "import_individual_notes": {
+        "title": "Einzelne Notizen importieren?",
+        "body": "Dies importiert Notizen in den Poznote-Arbeitsbereich.",
+        "confirm": "Ja, Notizen importieren"
+      }
+    },
+    "alerts": {
+      "ok": "OK",
+      "no_zip_selected_title": "Keine ZIP-Datei ausgewählt",
+      "no_zip_selected_restore": "Bitte wählen Sie eine vollständige ZIP-Sicherungsdatei aus, bevor Sie fortfahren.",
+      "no_zip_selected_notes": "Bitte wählen Sie eine ZIP-Datei mit HTML-Notizen aus, bevor Sie mit dem Import fortfahren.",
+      "no_zip_selected_attachments": "Bitte wählen Sie eine ZIP-Datei mit Anhängen aus, bevor Sie mit dem Import fortfahren.",
+      "no_zip_selected_chunked": "Bitte wählen Sie eine vollständige ZIP-Sicherungsdatei aus, bevor Sie mit der Chunk-Wiederherstellung fortfahren.",
+      "no_sql_selected_title": "Keine SQL-Datei ausgewählt",
+      "no_sql_selected_body": "Bitte wählen Sie eine SQL-Datei aus, bevor Sie mit dem Datenbankimport fortfahren.",
+      "no_files_selected_title": "Keine Dateien ausgewählt",
+      "no_files_selected_body": "Bitte wählen Sie eine oder mehrere HTML- oder Markdown-Dateien aus, bevor Sie mit dem Import fortfahren.",
+      "too_many_files_title": "Zu viele Dateien ausgewählt",
+      "too_many_files_body": "Sie können maximal {{max}} Dateien auf einmal importieren. Sie haben {{count}} Dateien ausgewählt. Bitte wählen Sie weniger Dateien aus und versuchen Sie es erneut.",
+      "no_file_selected": {
+        "title": "Keine Datei ausgewählt",
+        "body": "Bitte wählen Sie eine Datei aus, bevor Sie mit dem Import fortfahren."
+      }
+    },
+    "inline": {
+      "standard": {
+        "button": "Vollständige Wiederherstellung starten (Standard)",
+        "too_large": "⚠️ Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen - erwägen Sie Chunk-Upload stattdessen."
+      },
+      "chunked": {
+        "button_prefix": "Chunk-Wiederherstellung starten",
+        "small_file_note": "Hinweis: Für kleine Dateien ist Standard-Upload normalerweise schneller. Aber Sie können Chunk-Upload trotzdem verwenden, falls bevorzugt."
+      }
+    }
+  },
+  "markdown_guide": {
+    "page_title": "Markdown-Anleitung",
+    "title": "Markdown-Anleitung",
+    "toc": {
+      "label": "Inhaltsverzeichnis",
+      "title": "Inhaltsverzeichnis"
+    },
+    "common": {
+      "syntax": "Syntax",
+      "result": "Ergebnis"
+    },
+    "sections": {
+      "headers": {
+        "title": "Überschriften",
+        "heading1": "Überschrift 1",
+        "heading2": "Überschrift 2",
+        "heading3": "Überschrift 3"
+      },
+      "text_formatting": {
+        "title": "Textformatierung",
+        "bold": "fetter Text",
+        "italic": "kursiver Text",
+        "strikethrough": "durchgestrichener Text",
+        "inline_code": "Inline-Code"
+      },
+      "unordered_lists": {
+        "title": "Ungeordnete Listen",
+        "item_one": "Erstes Element",
+        "item_two": "Zweites Element",
+        "nested_item": "Verschachteltes Element"
+      },
+      "ordered_lists": {
+        "title": "Geordnete Listen",
+        "first": "Erstes",
+        "second": "Zweites",
+        "third": "Drittes"
+      },
+      "checkboxes": {
+        "title": "Kontrollkästchen",
+        "unchecked_note": "Nicht markiertes Element (nur ein Leerzeichen!)",
+        "unchecked": "Nicht markiertes Element",
+        "checked": "Markiertes Element"
+      },
+      "images": {
+        "title": "Bilder",
+        "alt_text": "Alternativtext",
+        "preview": "(Bildvorschau)"
+      },
+      "urls": {
+        "title": "URLs",
+        "link_text": "Link-Text"
+      },
+      "code_blocks": {
+        "title": "Code-Blöcke"
+      },
+      "quotes": {
+        "title": "Zitate",
+        "quote_text": "Dies ist ein Zitat",
+        "quote_line2": "das sich über zwei Zeilen erstreckt"
+      },
+      "line_breaks": {
+        "title": "Zeilenumbrüche",
+        "description": "Ein einzelner Zeilenumbruch im Bearbeitungsmodus erzeugt einen Zeilenumbruch in der Vorschau.",
+        "first_line": "Erste Zeile",
+        "second_line": "Zweite Zeile"
+      },
+      "horizontal_rule": {
+        "title": "Horizontale Linie"
+      },
+      "tables": {
+        "title": "Tabellen",
+        "col_name": "Name",
+        "col_value": "Wert"
+      },
+      "mermaid": {
+        "title": "Mermaid-Diagramme",
+        "node_a": "Markdown schreiben",
+        "node_b": "Diagramm benötigt?",
+        "node_c": "Mermaid verwenden",
+        "node_d": "Weiterschreiben",
+        "edge_yes": "Ja",
+        "edge_no": "Nein"
+      }
+    }
+  }
+}

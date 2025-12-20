@@ -108,6 +108,8 @@ try {
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
+    // UI language (default: English)
+    $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
     // Controls to show/hide metadata under note title in notes list (enabled by default)
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
     // Renamed setting: show_note_subheading (was show_note_location)

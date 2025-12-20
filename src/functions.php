@@ -2,6 +2,89 @@
 date_default_timezone_set('UTC');
 
 /**
+ * Internationalization (i18n)
+ * - Uses JSON dictionaries in src/i18n/{lang}.json
+ * - Active language stored in settings table key: 'language'
+ * - Fallback to English when a key is missing
+ */
+
+function getUserLanguage() {
+    global $con;
+    try {
+        if (isset($con)) {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['language']);
+            $lang = $stmt->fetchColumn();
+            if ($lang && is_string($lang)) {
+                $lang = strtolower(trim($lang));
+                // Basic allowlist: keep it simple and safe
+                if (preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $lang)) {
+                    return $lang;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        // Ignore errors
+    }
+    return 'en';
+}
+
+function loadI18nDictionary($lang) {
+    static $cache = [];
+
+    $lang = strtolower(trim((string)$lang));
+    if ($lang === '') $lang = 'en';
+    if (isset($cache[$lang])) return $cache[$lang];
+
+    $file = __DIR__ . '/i18n/' . $lang . '.json';
+    $json = @file_get_contents($file);
+    if ($json === false) {
+        $cache[$lang] = [];
+        return $cache[$lang];
+    }
+
+    $data = json_decode($json, true);
+    if (!is_array($data)) $data = [];
+    $cache[$lang] = $data;
+    return $data;
+}
+
+function i18nGet($dict, $key) {
+    if (!is_array($dict)) return null;
+    $parts = explode('.', $key);
+    $cur = $dict;
+    foreach ($parts as $p) {
+        if (!is_array($cur) || !array_key_exists($p, $cur)) return null;
+        $cur = $cur[$p];
+    }
+    return is_string($cur) ? $cur : null;
+}
+
+function t($key, $vars = [], $default = null, $lang = null) {
+    if ($lang === null) {
+        $lang = getUserLanguage();
+    }
+
+    $dict = loadI18nDictionary($lang);
+    $en = ($lang === 'en') ? $dict : loadI18nDictionary('en');
+
+    $text = i18nGet($dict, $key);
+    if ($text === null) $text = i18nGet($en, $key);
+    if ($text === null) $text = ($default !== null ? (string)$default : (string)$key);
+
+    if (is_array($vars) && !empty($vars)) {
+        foreach ($vars as $k => $v) {
+            $text = str_replace('{{' . $k . '}}', (string)$v, $text);
+        }
+    }
+    return $text;
+}
+
+function t_h($key, $vars = [], $default = null, $lang = null) {
+    return htmlspecialchars(t($key, $vars, $default, $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+/**
  * Get the user's configured timezone from the database
  * Returns 'UTC' if no timezone is configured
  * @return string The timezone identifier (e.g., 'Europe/Paris')

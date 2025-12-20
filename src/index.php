@@ -346,12 +346,12 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="Display"><i class="fa-eye"></i></button>
-                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="Settings">
+                <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="<?php echo t_h('sidebar.display'); ?>"><i class="fa-eye"></i></button>
+                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings'); ?>">
                     <i class="fa-cog"></i>
                     <span class="update-badge" style="display: none;"></span>
                 </button>
-                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="Create"><i class="fa-plus-circle"></i></button>
+                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
@@ -362,10 +362,10 @@ $body_classes = trim($extra_body_classes);
                 <div class="unified-search-container">
                     <div class="searchbar-row searchbar-icon-row">
                         <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="Rechercher..." value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                             <span class="searchbar-icon"><span class="fa-search"></span></span>
                             <?php if (!empty($search) || !empty($tags_search)): ?>
-                                <button type="button" class="searchbar-clear" title="Clear search" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
+                                <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -494,14 +494,14 @@ $body_classes = trim($extra_body_classes);
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
                     window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
-                    showNotificationPopup(res.error || 'Error creating task list', 'error');
+                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
                 }
             } catch(e) {
-                showNotificationPopup('Error creating task list: ' + data, 'error');
+                showNotificationPopup((window.t ? window.t('index.errors.create_task_list_prefix', null, 'Error creating task list: ') : 'Error creating task list: ') + data, 'error');
             }
         })
         .catch(function(error) {
-            showNotificationPopup('Network error: ' + error.message, 'error');
+            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
         });
     }
     
@@ -531,14 +531,14 @@ $body_classes = trim($extra_body_classes);
                     var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
                     window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
-                    showNotificationPopup(res.error || 'Error creating markdown note', 'error');
+                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
                 }
             } catch(e) {
-                showNotificationPopup('Error creating markdown note: ' + data, 'error');
+                showNotificationPopup((window.t ? window.t('index.errors.create_markdown_note_prefix', null, 'Error creating markdown note: ') : 'Error creating markdown note: ') + data, 'error');
             }
         })
         .catch(function(error) {
-            showNotificationPopup('Network error: ' + error.message, 'error');
+            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
         });
     }
     
@@ -624,38 +624,38 @@ $body_classes = trim($extra_body_classes);
                     }
                 
                     // Home button (mobile only)
-                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="Back to notes" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="' . t_h('editor.toolbar.back_to_notes') . '" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
                     
                     // Text formatting buttons (save button removed - auto-save is now automatic)
-                    echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="Bold" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="Italic" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="Underline" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="Strikethrough" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="Link" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="Text color" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="Highlight" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="Bullet list" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="Numbered list" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="Font size" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="Code block" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="Inline code" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="Clear formatting" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="' . t_h('editor.toolbar.italic') . '" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="' . t_h('editor.toolbar.underline') . '" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="' . t_h('editor.toolbar.strikethrough') . '" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="' . t_h('editor.toolbar.link') . '" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="' . t_h('editor.toolbar.text_color') . '" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="' . t_h('editor.toolbar.highlight') . '" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('editor.toolbar.font_size') . '" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
                     if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="Insert Excalidraw diagram" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
                     }
                 
                     // Hide emoji button for tasklist notes
                     if ($note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="Insert emoji" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="' . t_h('editor.toolbar.insert_emoji') . '" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
                     }
                     
                     // Table and separator buttons
-                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="Insert table" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="Insert checklist" onclick="insertChecklist()"><i class="fa-list-check"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="Add separator" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="Insert note reference" onclick="openNoteReferenceModal()"><i class="fa-at"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="' . t_h('editor.toolbar.insert_table') . '" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="' . t_h('editor.toolbar.insert_checklist') . '" onclick="insertChecklist()"><i class="fa-list-check"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="' . t_h('editor.toolbar.add_separator') . '" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="' . t_h('editor.toolbar.insert_note_reference') . '" onclick="openNoteReferenceModal()"><i class="fa-at"></i></button>';
 
                 
                     // Favorite / Share / Attachment buttons
@@ -669,28 +669,30 @@ $body_classes = trim($extra_body_classes);
                 
                     $is_favorite = $row['favorite'] ?? 0;
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
-                    $favorite_title = $is_favorite ? 'Remove from favorites' : 'Add to favorites';
+                    $favorite_title = $is_favorite
+                        ? t_h('index.toolbar.favorite_remove', [], 'Remove from favorites')
+                        : t_h('index.toolbar.favorite_add', [], 'Add to favorites');
 
                     echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
                     $share_class = $is_shared ? ' is-shared' : '';
                     
                     // Share button
-                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="Share note" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="Attachments ('.$attachments_count.')" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
 
                     // Mobile overflow menu button (shown only on mobile via CSS)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
-                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="Menu" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
 
                     // Mobile dropdown menu (actions moved here on mobile)
-                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="Menu actions">';
+                    echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> Duplicate</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> Move</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> Download</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> Delete</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> Information</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
                     echo '</div>';
                         
                     // Generate dates safely for JavaScript with robust encoding
@@ -722,7 +724,7 @@ $body_classes = trim($extra_body_classes);
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? 'No folder';
+                    $folder_name = $row['folder'] ?? t('modals.folder.no_folder', [], 'No folder');
                     // Get the complete folder path including parents
                     $folder_id = $row['folder_id'] ?? null;
                     $folder_path = $folder_id ? getFolderPath($folder_id, $con) : $folder_name;
@@ -748,14 +750,14 @@ $body_classes = trim($extra_body_classes);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
                     // Individual action buttons
-                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="Duplicate"><i class="fa-copy"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="Move"><i class="fa-folder-open"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fa-copy"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="'.t_h('common.move', [], 'Move').'"><i class="fa-folder-open"></i></button>';
                     
                     // Download button for all note types
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="Download" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" onclick="downloadNote(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="Delete"><i class="fa-trash"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="Information" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="'.t_h('common.delete', [], 'Delete').'"><i class="fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
                 
                     echo '</div>';
                     echo '</div>';
@@ -764,8 +766,8 @@ $body_classes = trim($extra_body_classes);
                     // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                     echo '<div class="note-tags-row">';
                     echo '<div class="folder-wrapper">';
-                    echo '<span class="fa-folder icon_folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="Change folder"></span>';
-                    echo '<span class="folder_name" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="Change folder">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    echo '<span class="fa-folder icon_folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
+                    echo '<span class="folder_name" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     echo '</div>';
                     echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
                     echo '<span class="name_tags">'
@@ -779,13 +781,14 @@ $body_classes = trim($extra_body_classes);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
                             echo '<div class="note-attachments-row">';
                             // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                            echo '<button type="button" class="icon-attachment-btn" title="Open attachments" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="Open attachments"><span class="fa-paperclip icon_attachment"></span></button>';
+                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fa-paperclip icon_attachment"></span></button>';
                             echo '<span class="note-attachments-list">';
                             $attachment_links = [];
                             foreach ($attachments_data as $attachment) {
                                 if (isset($attachment['id']) && isset($attachment['original_filename'])) {
-                                    $safe_filename = htmlspecialchars($attachment['original_filename'], ENT_QUOTES);
-                                    $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="Download '.$safe_filename.'">'.$safe_filename.'</a>';
+                                    $original_filename = (string)$attachment['original_filename'];
+                                    $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
+                                    $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
                                 }
                             }
                             echo implode(' ', $attachment_links);
@@ -799,11 +802,20 @@ $body_classes = trim($extra_body_classes);
                     echo '<input type="hidden" id="folderId'.$row['id'].'" value="'.htmlspecialchars($row['folder_id'] ?: '', ENT_QUOTES).'"/>';
                     
                     // Title - disable for protected note
-                    // If the heading is "New note" or "New note (x)", treat it as a placeholder
+                    // If the heading is "New note" or "Nouvelle note" (or numbered variants), treat it as a placeholder
                     $heading = htmlspecialchars_decode($row['heading'] ?: 'New note');
-                    $isDefaultTitle = preg_match('/^New note( \(\d+\))?$/', $heading);
+                    $defaultMatch = [];
+                    // Check for default titles in all supported languages
+                    $isDefaultTitle = preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)(?: \((\d+)\))?$/', $heading, $defaultMatch);
                     $titleValue = $isDefaultTitle ? '' : htmlspecialchars($heading, ENT_QUOTES, 'UTF-8');
-                    $titlePlaceholder = $isDefaultTitle ? htmlspecialchars($heading, ENT_QUOTES, 'UTF-8') : 'Title ?';
+                    if ($isDefaultTitle) {
+                        $defaultNum = isset($defaultMatch[1]) && $defaultMatch[1] !== '' ? $defaultMatch[1] : null;
+                        $titlePlaceholder = $defaultNum
+                            ? t_h('index.note.new_note_numbered', ['number' => $defaultNum], 'New note ({{number}})')
+                            : t_h('index.note.new_note', [], 'New note');
+                    } else {
+                        $titlePlaceholder = t_h('index.note.title_placeholder', [], 'Title ?');
+                    }
                     echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
@@ -850,12 +862,12 @@ $body_classes = trim($extra_body_classes);
                             if ($has_subheading) {
                                 echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . $subheading_display . '</span>';
                             } else {
-                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>Add subheading here</em></span>';
+                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>'.t_h('index.subheading.placeholder', [], 'Add subheading here').'</em></span>';
                             }
                         }
                         echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
-                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">Save</button>';
-                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">Cancel</button>';
+                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">'.t_h('common.save', [], 'Save').'</button>';
+                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">'.t_h('common.cancel', [], 'Cancel').'</button>';
                         echo '</div>';
                     }
                 
@@ -901,8 +913,8 @@ $body_classes = trim($extra_body_classes);
                     $editable = 'true';
                     $excalidraw_attr = '';
 
-                    $placeholder_desktop = 'Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor.';
-                    $placeholder_mobile = 'Enter text or paste images here...';
+                    $placeholder_desktop = t('index.editor.placeholder_desktop', [], 'Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor.');
+                    $placeholder_mobile = t('index.editor.placeholder_mobile', [], 'Enter text or paste images here...');
                     $placeholder_attr = ' data-ph="' . htmlspecialchars($placeholder_desktop, ENT_QUOTES) . '"';
                     // On mobile, slash command is not enabled for HTML + Markdown notes
                     if ($note_type === 'note' || $note_type === 'markdown') {
@@ -1038,9 +1050,9 @@ $body_classes = trim($extra_body_classes);
                     disp.textContent = newVal || '';
                     cancelSubheadingInline(noteId);
                 } else {
-                    alert('Failed to save heading');
+                    alert(window.t ? window.t('index.errors.failed_to_save_subheading', null, 'Failed to save heading') : 'Failed to save heading');
                 }
-            }).catch(function(e){ console.error(e); alert('Network error'); });
+            }).catch(function(e){ console.error(e); alert(window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error'); });
         }
         
         function openNoteInfoEdit(noteId) {

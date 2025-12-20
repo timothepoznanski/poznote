@@ -10,6 +10,8 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     exit;
 }
 
+$currentLang = getUserLanguage();
+
 $message = '';
 $error = '';
 
@@ -32,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreBackup($_FILES['backup_file']);
                 if ($result['success']) {
-                    $restore_message = "Database restored successfully!";
+                    $restore_message = t('restore_import.messages.database_restored');
                 } else {
-                    $restore_error = "Restore error: " . $result['error'];
+                    $restore_error = t('restore_import.errors.restore_error', ['error' => $result['error']]);
                 }
             } else {
-                $restore_error = "No backup file selected or upload error.";
+                $restore_error = t('restore_import.errors.no_backup_file_or_upload');
             }
             break;
             
@@ -45,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['complete_backup_file']) && $_FILES['complete_backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreCompleteBackup($_FILES['complete_backup_file']);
                 if ($result['success']) {
-                    $restore_message = "Complete backup restored successfully! " . $result['message'];
+                    $restore_message = t('restore_import.messages.complete_backup_restored', ['message' => $result['message']]);
                 } else {
-                    $restore_error = "Complete restore error: " . $result['error'] . " - " . $result['message'];
+                    $restore_error = t('restore_import.errors.complete_restore_error', ['error' => $result['error'], 'message' => $result['message']]);
                 }
             } else {
-                $restore_error = "No complete backup file selected or upload error.";
+                $restore_error = t('restore_import.errors.no_complete_backup_file_or_upload');
             }
             break;
             
@@ -58,12 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['notes_file']) && $_FILES['notes_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importNotesZip($_FILES['notes_file']);
                 if ($result['success']) {
-                    $import_notes_message = "Notes imported successfully! " . $result['message'];
+                    $import_notes_message = t('restore_import.messages.notes_imported', ['message' => $result['message']]);
                 } else {
-                    $import_notes_error = "Import error: " . $result['error'];
+                    $import_notes_error = t('restore_import.errors.import_error', ['error' => $result['error']]);
                 }
             } else {
-                $import_notes_error = "No notes file selected or upload error.";
+                $import_notes_error = t('restore_import.errors.no_notes_file_or_upload');
             }
             break;
             
@@ -71,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['attachments_file']) && $_FILES['attachments_file']['error'] === UPLOAD_ERR_OK) {
                 $result = importAttachmentsZip($_FILES['attachments_file']);
                 if ($result['success']) {
-                    $import_attachments_message = "Attachments imported successfully! " . $result['message'];
+                    $import_attachments_message = t('restore_import.messages.attachments_imported', ['message' => $result['message']]);
                 } else {
-                    $import_attachments_error = "Import error: " . $result['error'];
+                    $import_attachments_error = t('restore_import.errors.import_error', ['error' => $result['error']]);
                 }
             } else {
-                $import_attachments_error = "No attachments file selected or upload error.";
+                $import_attachments_error = t('restore_import.errors.no_attachments_file_or_upload');
             }
             break;
             
@@ -86,12 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $folder = $_POST['target_folder'] ?? null;
                 $result = importIndividualNotes($_FILES['individual_notes_files'], $workspace, $folder);
                 if ($result['success']) {
-                    $import_individual_notes_message = "Notes imported successfully! " . $result['message'];
+                    $import_individual_notes_message = t('restore_import.messages.notes_imported', ['message' => $result['message']]);
                 } else {
-                    $import_individual_notes_error = "Import error: " . $result['error'];
+                    $import_individual_notes_error = t('restore_import.errors.import_error', ['error' => $result['error']]);
                 }
             } else {
-                $import_individual_notes_error = "No notes selected or upload error.";
+                $import_individual_notes_error = t('restore_import.errors.no_notes_selected_or_upload');
             }
             break;
     }
@@ -135,14 +137,14 @@ function importNotesZip($uploadedFile) {
     
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
-        return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
+        return ['success' => false, 'error' => t('restore_import.errors.file_type_zip_only')];
     }
     
     $tempFile = '/tmp/poznote_notes_import_' . uniqid() . '.zip';
     
     // Move uploaded file
     if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
-        return ['success' => false, 'error' => 'Error uploading file'];
+        return ['success' => false, 'error' => t('restore_import.errors.error_uploading_file')];
     }
     
     // Get entries directory using the proper function
@@ -150,7 +152,7 @@ function importNotesZip($uploadedFile) {
     
     if (!$entriesPath || !is_dir($entriesPath)) {
         unlink($tempFile);
-        return ['success' => false, 'error' => 'Cannot find entries directory'];
+        return ['success' => false, 'error' => t('restore_import.errors.cannot_find_entries_directory')];
     }
     
     // Extract ZIP
@@ -159,7 +161,7 @@ function importNotesZip($uploadedFile) {
     
     if ($res !== TRUE) {
         unlink($tempFile);
-        return ['success' => false, 'error' => 'Cannot open ZIP file'];
+        return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
     $importedCount = 0;
@@ -192,7 +194,7 @@ function importNotesZip($uploadedFile) {
         // Extract file content
         $content = $zip->getFromIndex($i);
         if ($content === false) {
-            $errors[] = "Failed to extract content from {$baseFilename}";
+            $errors[] = t('restore_import.errors.failed_extract_content', ['file' => $baseFilename]);
             continue;
         }
         
@@ -218,7 +220,7 @@ function importNotesZip($uploadedFile) {
         }
         
         // Extract title from content
-        $title = 'Imported Note';
+        $title = t('restore_import.import_notes.default_title');
         if ($noteType === 'markdown') {
             // For markdown files, try to extract title from first line if it's a heading
             $lines = explode("\n", $content);
@@ -250,7 +252,7 @@ function importNotesZip($uploadedFile) {
         // Write file to entries directory
         $targetFile = $entriesPath . '/' . $baseFilename;
         if (file_put_contents($targetFile, $content) === false) {
-            $errors[] = "Failed to write file {$baseFilename}";
+            $errors[] = t('restore_import.errors.failed_write_file', ['file' => $baseFilename]);
             continue;
         }
         chmod($targetFile, 0644);
@@ -285,7 +287,7 @@ function importNotesZip($uploadedFile) {
                 $importedCount++;
             }
         } catch (Exception $e) {
-            $errors[] = "Database error for {$baseFilename}: " . $e->getMessage();
+            $errors[] = t('restore_import.errors.database_error_for_file', ['file' => $baseFilename, 'message' => $e->getMessage()]);
             continue;
         }
     }
@@ -301,9 +303,9 @@ function importNotesZip($uploadedFile) {
 
     unlink($tempFile);
     
-    $message = "Processed note files: {$importedCount} imported, {$updatedCount} updated (HTML, Markdown, and Tasklist).";
+    $message = t('restore_import.import_notes.summary', ['imported' => $importedCount, 'updated' => $updatedCount]);
     if (!empty($errors)) {
-        $message .= " Errors: " . implode('; ', $errors);
+        $message .= ' ' . t('restore_import.errors.errors_prefix') . ' ' . implode('; ', $errors);
     }
     
     return ['success' => true, 'message' => $message];
@@ -312,14 +314,14 @@ function importNotesZip($uploadedFile) {
 function importAttachmentsZip($uploadedFile) {
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
-        return ['success' => false, 'error' => 'File type not allowed. Use a .zip file'];
+        return ['success' => false, 'error' => t('restore_import.errors.file_type_zip_only')];
     }
     
     $tempFile = '/tmp/poznote_attachments_import_' . uniqid() . '.zip';
     
     // Move uploaded file
     if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
-        return ['success' => false, 'error' => 'Error uploading file'];
+        return ['success' => false, 'error' => t('restore_import.errors.error_uploading_file')];
     }
     
     // Get attachments directory using the proper function
@@ -327,7 +329,7 @@ function importAttachmentsZip($uploadedFile) {
     
     if (!$attachmentsPath || !is_dir($attachmentsPath)) {
         unlink($tempFile);
-        return ['success' => false, 'error' => 'Cannot find attachments directory'];
+        return ['success' => false, 'error' => t('restore_import.errors.cannot_find_attachments_directory')];
     }
     
     // Extract ZIP
@@ -336,7 +338,7 @@ function importAttachmentsZip($uploadedFile) {
     
     if ($res !== TRUE) {
         unlink($tempFile);
-        return ['success' => false, 'error' => 'Cannot open ZIP file'];
+        return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
     $importedCount = 0;
@@ -368,7 +370,7 @@ function importAttachmentsZip($uploadedFile) {
     $zip->close();
     unlink($tempFile);
     
-    return ['success' => true, 'message' => "Imported {$importedCount} attachment files."];
+    return ['success' => true, 'message' => t('restore_import.import_attachments.summary', ['count' => $importedCount])];
 }
 
 function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = null) {
@@ -379,19 +381,22 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
-        return ['success' => false, 'error' => "Too many files selected. Maximum allowed: {$maxFiles}. You selected: {$fileCount}."];
+        return [
+            'success' => false,
+            'error' => t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => $fileCount])
+        ];
     }
     
     // Validate workspace exists
     $stmt = $con->prepare("SELECT name FROM workspaces WHERE name = ?");
     $stmt->execute([$workspace]);
     if (!$stmt->fetch()) {
-        return ['success' => false, 'error' => 'Workspace does not exist'];
+        return ['success' => false, 'error' => t('restore_import.individual_notes.errors.workspace_not_found')];
     }
     
     $entriesPath = getEntriesPath();
     if (!$entriesPath || !is_dir($entriesPath)) {
-        return ['success' => false, 'error' => 'Cannot find entries directory'];
+        return ['success' => false, 'error' => t('restore_import.individual_notes.errors.entries_dir_not_found')];
     }
     
     $importedCount = 0;
@@ -405,7 +410,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         // Skip if there was an upload error
         if ($uploadedFiles['error'][$i] !== UPLOAD_ERR_OK) {
             $errorCount++;
-            $errors[] = $uploadedFiles['name'][$i] . ': Upload error';
+            $errors[] = $uploadedFiles['name'][$i] . ': ' . t('restore_import.individual_notes.errors.upload_error');
             continue;
         }
         
@@ -416,7 +421,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         // Validate file type
         if (!in_array($fileExtension, ['html', 'md', 'markdown'])) {
             $errorCount++;
-            $errors[] = $fileName . ': Invalid file type (only .html, .md, .markdown allowed)';
+            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown']);
             continue;
         }
         
@@ -424,7 +429,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         $content = file_get_contents($tmpName);
         if ($content === false) {
             $errorCount++;
-            $errors[] = $fileName . ': Cannot read file';
+            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.cannot_read_file');
             continue;
         }
         
@@ -437,7 +442,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         // Sanitize title
         $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         if (empty($title)) {
-            $title = 'Imported Note ' . date('Y-m-d H:i:s');
+            $title = t('restore_import.individual_notes.default_title_with_date', ['date' => date('Y-m-d H:i:s')]);
         }
         
         try {
@@ -505,9 +510,9 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
 <head>
-    <title>Restore / Import - Poznote</title>
+    <title><?php echo t_h('restore_import.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
@@ -516,16 +521,17 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <link rel="stylesheet" href="css/restore_import.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/dark-mode.css">
+    <script src="js/globals.js"></script>
     <script src="js/theme-manager.js"></script>
 </head>
 <body>
     <div class="backup-container">
-        <h1>Restore / Import</h1>
+        <h1><?php echo t_h('restore_import.page.title'); ?></h1>
         <a id="backToNotesLink" href="index.php" class="btn btn-secondary">
-            Back to Notes
+            <?php echo t_h('common.back_to_notes'); ?>
         </a>
         <a href="settings.php" class="btn btn-secondary">
-            Back to Settings
+            <?php echo t_h('common.back_to_settings'); ?>
         </a>
 
         <br><br>
@@ -579,14 +585,18 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             </div>
         <?php endif; ?>
         
-        <div> If you want to know more about why we have several restore methods : <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">see documentation here</a>.
+        <div>
+            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
+            <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                <?php echo t_h('restore_import.page.more_info_link'); ?>
+            </a>.
         <br><br>
         
         <!-- Parent Restore Section -->
         <div class="backup-section parent-section">
             <h3 class="accordion-header" onclick="toggleAccordion('restoreBackup')">
                 <span class="accordion-icon" id="restoreBackupIcon">▶</span>
-                Want to restore from a backup file?
+                <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
             </h3>
             <div id="restoreBackup" class="accordion-content" style="display: none;">
             
@@ -594,26 +604,26 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <div class="backup-section child-section">
             <h3 class="accordion-header" onclick="toggleAccordion('standardRestore')">
                 <span class="accordion-icon" id="standardRestoreIcon">▶</span>
-                Is your backup file less than 500MB? 
+                <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
             </h3>
             <div id="standardRestore" class="accordion-content" style="display: none;">
-            <p>Upload a complete backup ZIP file. This method is fast and simple.</p>
+            <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
 
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="complete_restore">
                 <div class="form-group">
                     <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
-                    <small class="form-text text-muted">Maximum recommended size: 500MB. For larger files, use chunked upload below.</small>
+                    <small class="form-text text-muted"><?php echo t_h('restore_import.sections.standard_restore.helper'); ?></small>
                 </div>
                 
                 <button type="button" id="completeRestoreBtn" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
-                    <span> Start Restore
+                    <span><?php echo t_h('restore_import.buttons.start_restore'); ?></span>
                 </button>
                 <!-- Spinner shown while processing restore -->
                 <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
                     <div class="restore-spinner-circle" aria-hidden="true"></div>
-                    <span class="sr-only">Processing restore...</span>
-                    <span class="restore-spinner-text">Processing restore... This may take a few moments.</span>
+                    <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
+                    <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
                 </div>
             </form>
             </div>
@@ -623,24 +633,25 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <div class="backup-section child-section">
             <h3 class="accordion-header" onclick="toggleAccordion('chunkedRestore')">
                 <span class="accordion-icon" id="chunkedRestoreIcon">▶</span>
-                Is your backup file between 500MB and 800MB?
+                <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
             </h3>
             <div id="chunkedRestore" class="accordion-content" style="display: none;">
-            <p>Upload a complete backup ZIP file. Use this method to avoid HTTP timeouts and memory issues.</p>            <div id="chunkedUploadStatus" style="display: none;">
+            <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
+            <div id="chunkedUploadStatus" style="display: none;">
                 <div class="progress-bar">
                     <div id="chunkedProgress" class="progress-fill" style="width: 0%;">0%</div>
                 </div>
-                <div id="chunkedStatusText">Preparing upload...</div>
+                <div id="chunkedStatusText"><?php echo t_h('restore_import.chunked.preparing_upload'); ?></div>
             </div>
 
             <div id="chunkedUploadForm">
                 <div class="form-group">
                     <input type="file" id="chunked_backup_file" accept=".zip">
-                    <small class="form-text text-muted">Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.</small>
+                    <small class="form-text text-muted"><?php echo t_h('restore_import.sections.chunked_restore.helper'); ?></small>
                 </div>
                 
                 <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" onclick="startChunkedRestore()" disabled>
-                    Start Restore
+                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
                 </button>
             </div>
             </div>
@@ -650,15 +661,20 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <div class="backup-section child-section">
             <h3 class="accordion-header" onclick="toggleAccordion('directCopyRestore')">
                 <span class="accordion-icon" id="directCopyRestoreIcon">▶</span>
-                Is your backup file over 800MB?
+                <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
             </h3>
             <div id="directCopyRestore" class="accordion-content" style="display: none;">
-            <p>For very large backup files, use this simple direct file copy method. <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">See documentation for details</a>.</p>
+            <p>
+                <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
+                <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                    <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
+                </a>.
+            </p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
                 <button type="button" class="btn btn-primary" onclick="showDirectCopyRestoreConfirmation()">
-                    Start Restore
+                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
                 </button>
             </form>
 
@@ -669,21 +685,21 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     $fileSize = filesize($cliBackupPath);
                     $fileSizeMB = round($fileSize / 1024 / 1024, 2);
                     echo "<div class='alert alert-info'>";
-                    echo "<strong>Backup file found:</strong> {$fileSizeMB}MB<br>";
-                    echo "<strong>Ready to restore?</strong> This will replace all data in ALL workspaces.";
+                    echo "<strong>" . t_h('restore_import.direct_copy.backup_file_found') . "</strong> {$fileSizeMB}MB<br>";
+                    echo "<strong>" . t_h('restore_import.direct_copy.ready_to_restore') . "</strong> " . t_h('restore_import.direct_copy.replace_all_data_warning');
                     echo "</div>";
 
                     // Show confirmation form
                     echo "<form method='post' id='directCopyRestoreForm' style='margin-top: 10px;'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
                     echo "<button type='button' class='btn btn-warning' onclick='showDirectCopyRestoreConfirmation()'>";
-                    echo "Yes, Restore from Direct Copy";
+                    echo t_h('restore_import.direct_copy.buttons.yes_restore_direct_copy');
                     echo "</button>";
                     echo "</form>";
                 } else {
                     echo "<div class='alert alert-warning'>";
-                    echo "No backup file found in container at <code>/tmp/backup_restore.zip</code><br>";
-                    echo "Please run the docker cp command first.";
+                    echo t_h('restore_import.direct_copy.no_backup_found_prefix') . " <code>/tmp/backup_restore.zip</code><br>";
+                    echo t_h('restore_import.direct_copy.no_backup_found_hint');
                     echo "</div>";
                 }
                 ?>
@@ -695,14 +711,14 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 if (file_exists($cliBackupPath)) {
                     $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip'], true);
                     if ($result['success']) {
-                        echo "<div class='alert alert-success'>Direct file copy restore completed successfully! " . htmlspecialchars($result['message']) . "</div>";
+                        echo "<div class='alert alert-success'>" . t_h('restore_import.direct_copy.completed_successfully_prefix') . " " . htmlspecialchars($result['message']) . "</div>";
                         // Clean up the file after successful restore
                         unlink($cliBackupPath);
                     } else {
-                        echo "<div class='alert alert-danger'>Direct file copy restore failed: " . htmlspecialchars($result['error']) . "</div>";
+                        echo "<div class='alert alert-danger'>" . t_h('restore_import.direct_copy.failed_prefix') . " " . htmlspecialchars($result['error']) . "</div>";
                     }
                 } else {
-                    echo "<div class='alert alert-danger'>Backup file not found for restoration.</div>";
+                    echo "<div class='alert alert-danger'>" . t_h('restore_import.direct_copy.backup_not_found_for_restoration') . "</div>";
                 }
                 ?>
             <?php endif; ?>
@@ -716,10 +732,10 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         <div class="backup-section">
             <h3 class="accordion-header" onclick="toggleAccordion('individualNotes')">
                 <span class="accordion-icon" id="individualNotesIcon">▶</span>
-                Want to import HTML or Markdown files?
+                <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
             </h3>
             <div id="individualNotes" class="accordion-content" style="display: none;">
-            <p>Notes will be imported into the <b>Poznote</b> workspace without being assigned to a folder.<br><br>The title will be automatically created from the file name (without the extension).</p>
+            <p><?php echo t('restore_import.sections.individual_notes.description_html'); ?></p>
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
@@ -727,12 +743,12 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 
                 <div class="form-group">
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown" multiple required>
-                    <small class="form-text text-muted">You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown</small>
+                    <small class="form-text text-muted"><?php echo t_h('restore_import.sections.individual_notes.helper'); ?></small>
                 </div>
                 <br>
                 
                 <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()">
-                    Start Import Individual Notes
+                    <?php echo t_h('restore_import.buttons.start_import_individual_notes'); ?>
                 </button>
             </form>
             </div>
@@ -745,15 +761,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Simple Import Confirmation Modal -->
     <div id="importConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Are you sure?</h3>
-            <p>This will replace note titles, tags, search index and metadata, but not the actual note content. This action cannot be undone.</p>
+            <h3><?php echo t_h('restore_import.modals.import_confirm.title'); ?></h3>
+            <p><?php echo t_h('restore_import.modals.import_confirm.body'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideImportConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithImport()">
-                    Yes, Import
+                    <?php echo t_h('restore_import.modals.import_confirm.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -762,15 +778,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Complete Restore Confirmation Modal -->
     <div id="completeRestoreConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Complete Restore?</h3>
-            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            <h3><?php echo t_h('restore_import.modals.complete_restore.title'); ?></h3>
+            <p><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideCompleteRestoreConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithCompleteRestore()">
-                    Yes, Complete Restore
+                    <?php echo t_h('restore_import.modals.complete_restore.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -779,15 +795,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Chunked Restore Confirmation Modal -->
     <div id="chunkedRestoreConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Complete Restore (Chunked)?</h3>
-            <p id="chunkedRestoreWarning"><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            <h3><?php echo t_h('restore_import.modals.complete_restore_chunked.title'); ?></h3>
+            <p id="chunkedRestoreWarning"><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore_chunked.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideChunkedRestoreConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithChunkedRestore()">
-                    Yes, Complete Restore
+                    <?php echo t_h('restore_import.modals.complete_restore_chunked.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -796,15 +812,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Notes Import Confirmation Modal -->
     <div id="notesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Import Notes?</h3>
-            <p>This will import all HTML files from the ZIP. Files will be added to your existing notes collection.</p>
+            <h3><?php echo t_h('restore_import.modals.import_notes.title'); ?></h3>
+            <p><?php echo t_h('restore_import.modals.import_notes.body'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideNotesImportConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithNotesImport()">
-                    Yes, Import Notes
+                    <?php echo t_h('restore_import.modals.import_notes.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -813,15 +829,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Attachments Import Confirmation Modal -->
     <div id="attachmentsImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Import Attachments?</h3>
-            <p>This will import all files from the ZIP to attachments folder. Files will be added to your existing attachments.</p>
+            <h3><?php echo t_h('restore_import.modals.import_attachments.title'); ?></h3>
+            <p><?php echo t_h('restore_import.modals.import_attachments.body'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideAttachmentsImportConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithAttachmentsImport()">
-                    Yes, Import Attachments
+                    <?php echo t_h('restore_import.modals.import_attachments.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -830,15 +846,15 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Direct Copy Restore Confirmation Modal -->
     <div id="directCopyRestoreConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Complete Restore (Direct Copy)?</h3>
-            <p><strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</p>
+            <h3><?php echo t_h('restore_import.modals.complete_restore_direct_copy.title'); ?></h3>
+            <p><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore_direct_copy.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideDirectCopyRestoreConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithDirectCopyRestore()">
-                    Yes, Complete Restore
+                    <?php echo t_h('restore_import.modals.complete_restore_direct_copy.confirm'); ?>
                 </button>
             </div>
         </div>
@@ -847,25 +863,25 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <!-- Individual Notes Import Confirmation Modal -->
     <div id="individualNotesImportConfirmModal" class="import-confirm-modal">
         <div class="import-confirm-modal-content">
-            <h3>Import Individual Notes?</h3>
-            <p id="individualNotesImportSummary">This will import notes into the Poznote workspace.</p>
+            <h3><?php echo t_h('restore_import.modals.import_individual_notes.title'); ?></h3>
+            <p id="individualNotesImportSummary"><?php echo t_h('restore_import.modals.import_individual_notes.body'); ?></p>
             
             <div class="import-confirm-buttons">
                 <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
-                    Cancel
+                    <?php echo t_h('common.cancel'); ?>
                 </button>
                 <button type="button" class="btn-confirm" onclick="proceedWithIndividualNotesImport()">
-                    Yes, Import Notes
+                    <?php echo t_h('restore_import.modals.import_individual_notes.confirm'); ?>
                 </button>
             </div>
         </div>
     </div>
     <div id="customAlert" class="custom-alert">
         <div class="custom-alert-content">
-            <h3 id="alertTitle">No File Selected</h3>
-            <p id="alertMessage">Please select a file before proceeding with the import.</p>
+            <h3 id="alertTitle"><?php echo t_h('restore_import.alerts.no_file_selected.title'); ?></h3>
+            <p id="alertMessage"><?php echo t_h('restore_import.alerts.no_file_selected.body'); ?></p>
             <button type="button" class="alert-ok-button" onclick="hideCustomAlert()">
-                OK
+                <?php echo t_h('restore_import.alerts.ok'); ?>
             </button>
         </div>
     </div>
@@ -873,19 +889,32 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     <script src="js/restore-import.js"></script>
     <script src="js/chunked-uploader.js"></script>
     <script>
-        // Accordion functionality
-        function toggleAccordion(sectionId) {
-            const content = document.getElementById(sectionId);
-            const icon = document.getElementById(sectionId + 'Icon');
-            
-            if (content.style.display === 'none' || content.style.display === '') {
-                content.style.display = 'block';
-                icon.textContent = '▼';
-            } else {
-                content.style.display = 'none';
-                icon.textContent = '▶';
+        (function () {
+            const trLocal = (key, fallback, vars) => {
+                if (typeof window.t === 'function') {
+                    return window.t(key, vars || null, fallback);
+                }
+                if (fallback != null) {
+                    return fallback;
+                }
+                return key;
+            };
+
+            // Accordion functionality (onclick handlers expect a global)
+            if (typeof window.toggleAccordion !== 'function') {
+                window.toggleAccordion = function (sectionId) {
+                    const content = document.getElementById(sectionId);
+                    const icon = document.getElementById(sectionId + 'Icon');
+
+                    if (content.style.display === 'none' || content.style.display === '') {
+                        content.style.display = 'block';
+                        icon.textContent = '▼';
+                    } else {
+                        content.style.display = 'none';
+                        icon.textContent = '▶';
+                    }
+                };
             }
-        }
 
         // Standard upload file size check
         document.getElementById('complete_backup_file').addEventListener('change', function(e) {
@@ -897,13 +926,20 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 const sizeMB = file.size / (1024 * 1024);
                 
                 button.disabled = false;
-                button.textContent = 'Start Complete Restore (Standard)';
+                button.textContent = trLocal('restore_import.inline.standard.button', 'Start Complete Restore (Standard)');
                 
                 if (sizeMB > 500) {
-                    sizeText.textContent = '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.';
+                    sizeText.textContent = trLocal(
+                        'restore_import.inline.standard.too_large',
+                        '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.',
+                        { size: sizeMB.toFixed(1) }
+                    );
                     sizeText.style.color = '#dc3545';
                 } else {
-                    sizeText.textContent = 'Maximum recommended size: 500MB. For larger files, use chunked upload below.';
+                    sizeText.textContent = trLocal(
+                        'restore_import.sections.standard_restore.helper',
+                        'Maximum recommended size: 500MB. For larger files, use chunked upload below.'
+                    );
                     sizeText.style.color = '#6c757d';
                 }
             }
@@ -922,26 +958,40 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 const sizeMB = file.size / (1024 * 1024);
                 
                 button.disabled = false;
-                button.textContent = `Start Chunked Restore (${formatFileSize(file.size)})`;
+                button.textContent = `${trLocal('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore')} (${formatFileSize(file.size)})`;
                 button.onclick = showChunkedRestoreConfirmation;
                 
                 if (sizeMB < 500) {
-                    sizeText.textContent = 'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.';
+                    sizeText.textContent = trLocal(
+                        'restore_import.inline.chunked.small_file_note',
+                        'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.'
+                    );
                 } else {
-                    sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
+                    sizeText.textContent = trLocal(
+                        'restore_import.sections.chunked_restore.helper',
+                        'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
+                    );
                 }
             } else {
                 button.disabled = true;
-                button.textContent = 'Start Chunked Restore';
+                button.textContent = trLocal('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore');
                 button.onclick = showChunkedRestoreConfirmation;
-                sizeText.textContent = 'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.';
+                sizeText.textContent = trLocal(
+                    'restore_import.sections.chunked_restore.helper',
+                    'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
+                );
             }
         });
 
         function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
+            if (bytes === 0) return '0 ' + trLocal('restore_import.units.bytes', 'Bytes');
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = [
+                trLocal('restore_import.units.bytes', 'Bytes'),
+                trLocal('restore_import.units.kb', 'KB'),
+                trLocal('restore_import.units.mb', 'MB'),
+                trLocal('restore_import.units.gb', 'GB')
+            ];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
@@ -952,6 +1002,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 chunkedUploader.cleanup();
             }
         });
+        })();
     </script>
 </body>
 </html>

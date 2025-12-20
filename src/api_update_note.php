@@ -106,7 +106,7 @@ if (!empty($workspace)) {
     $wsStmt->execute([$workspace]);
     if ($wsStmt->fetchColumn() == 0) {
         http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+        echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
         exit;
     }
 }
@@ -195,7 +195,7 @@ $checkStmt->execute($params);
 $conflictId = $checkStmt->fetchColumn();
 if ($conflictId !== false && $conflictId !== null && $conflictId != 0) {
     http_response_code(409);
-    echo json_encode(['success' => false, 'message' => 'Another note with the same title exists in this folder.']);
+    echo json_encode(['success' => false, 'message' => t('api.errors.duplicate_title_in_folder', [], 'Another note with the same title exists in this folder.')]);
     exit;
 }
 

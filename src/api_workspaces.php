@@ -4,6 +4,7 @@ requireApiAuth();
 header('Content-Type: application/json');
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'functions.php';
 
 // For GET requests (list), use query params. For POST requests, require JSON.
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -64,7 +65,7 @@ try {
         $check = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
         $check->execute([$name]);
         if ((int)$check->fetchColumn() === 0) {
-            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
             exit;
         }
         
@@ -139,7 +140,7 @@ try {
         $checkOld = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
         $checkOld->execute([$old]);
         if ((int)$checkOld->fetchColumn() === 0) {
-            echo json_encode(['success' => false, 'message' => 'Workspace not found']);
+            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
             exit;
         }
         // Ensure the target name does not already exist

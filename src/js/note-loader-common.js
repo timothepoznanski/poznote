@@ -681,14 +681,17 @@ function handleImageClick(event) {
                            img.closest('.markdown-editor') !== null ||
                            img.closest('.note-entry[data-note-format="markdown"]') !== null;
     
+    // Helper function for translations
+    const t = window.t || ((key, params, fallback) => fallback);
+    
     let menuHTML = `
         <div class="image-menu-item" data-action="view-large">
             <i class="fa-expand"></i>
-            View Large
+            ${t('image_menu.view_large', null, 'View Large')}
         </div>
         <div class="image-menu-item" data-action="download">
             <i class="fa-download"></i>
-            Download
+            ${t('image_menu.download', null, 'Download')}
         </div>
     `;
     
@@ -697,7 +700,7 @@ function handleImageClick(event) {
         menuHTML += `
         <div class="image-menu-item" data-action="resize">
             <i class="fa-maximize"></i>
-            Resize
+            ${t('image_menu.resize', null, 'Resize')}
         </div>
     `;
     }
@@ -707,7 +710,7 @@ function handleImageClick(event) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
                 <i class="fa-edit"></i>
-                Edit
+                ${t('image_menu.edit', null, 'Edit')}
             </div>
         ` + menuHTML;
     }
@@ -717,7 +720,7 @@ function handleImageClick(event) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
                 <i class="fa-edit"></i>
-                Edit
+                ${t('image_menu.edit', null, 'Edit')}
             </div>
         ` + menuHTML;
     }
@@ -729,11 +732,11 @@ function handleImageClick(event) {
         menuHTML += `
             <div class="image-menu-item" data-action="toggle-border">
                 <i class="fal fa-square"></i>
-                ${hasBorder ? 'Remove' : 'Add'} Border
+                ${hasBorder ? t('image_menu.remove_border', null, 'Remove Border') : t('image_menu.add_border', null, 'Add Border')}
             </div>
             <div class="image-menu-item" data-action="toggle-border-no-padding">
                 <i class="fal fa-square"></i>
-                ${hasBorderNoPadding ? 'Remove' : 'Add'} Border without padding
+                ${hasBorderNoPadding ? t('image_menu.remove_border_no_padding', null, 'Remove Border without padding') : t('image_menu.add_border_no_padding', null, 'Add Border without padding')}
             </div>
         `;
         
@@ -741,7 +744,7 @@ function handleImageClick(event) {
         menuHTML += `
             <div class="image-menu-item" data-action="delete-image" style="color: #dc3545;">
                 <i class="fas fa-trash"></i>
-                Delete Image
+                ${t('image_menu.delete_image', null, 'Delete Image')}
             </div>
         `;
     }
@@ -1082,8 +1085,8 @@ function deleteImage(img) {
     // Show confirmation modal
     if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
         window.modalAlert.confirm(
-            'Are you sure you want to delete this image? This action cannot be undone.',
-            'Delete Image'
+            (window.t ? window.t('editor.images.delete_confirm.message', {}, 'Are you sure you want to delete this image? This action cannot be undone.') : 'Are you sure you want to delete this image? This action cannot be undone.'),
+            (window.t ? window.t('editor.images.delete_confirm.title', {}, 'Delete Image') : 'Delete Image')
         ).then(function(confirmed) {
             if (confirmed) {
                 performImageDeletion(img);
@@ -1091,7 +1094,7 @@ function deleteImage(img) {
         });
     } else {
         // Fallback to native confirm if modal not available
-        if (confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+        if (confirm(window.t ? window.t('editor.images.delete_confirm.message', {}, 'Are you sure you want to delete this image? This action cannot be undone.') : 'Are you sure you want to delete this image? This action cannot be undone.')) {
             performImageDeletion(img);
         }
     }

@@ -93,7 +93,11 @@ function duplicateNote(noteId) {
 var currentFolderToDelete = {id: null, name: null};
 
 function newFolder() {
-    showInputModal('New Folder', 'New folder name', '', function(folderName) {
+    showInputModal(
+        (window.t ? window.t('modals.folder.new_title', null, 'New Folder') : 'New Folder'),
+        (window.t ? window.t('modals.folder.new_placeholder', null, 'New folder name') : 'New folder name'),
+        '',
+        function(folderName) {
         if (!folderName) return;
         
         var data = {
@@ -125,21 +129,38 @@ function newFolder() {
             } else {
                 // Use modal alert instead of notification popup
                 if (typeof window.showError === 'function') {
-                    window.showError(data.message || data.error || 'Unknown error', 'Error Creating Folder');
+                    window.showError(
+                        data.message || data.error || 'Unknown error',
+                        (window.t ? window.t('folders.errors.create_title', null, 'Error Creating Folder') : 'Error Creating Folder')
+                    );
                 } else {
-                    showNotificationPopup('Error creating folder: ' + (data.message || data.error), 'error');
+                    showNotificationPopup(
+                        (window.t
+                            ? window.t('folders.errors.create_prefix', { error: (data.message || data.error) }, 'Error creating folder: {{error}}')
+                            : ('Error creating folder: ' + (data.message || data.error))),
+                        'error'
+                    );
                 }
             }
         })
         .catch(function(error) {
             // Use modal alert instead of notification popup
             if (typeof window.showError === 'function') {
-                window.showError(error.message, 'Error Creating Folder');
+                window.showError(
+                    error.message,
+                    (window.t ? window.t('folders.errors.create_title', null, 'Error Creating Folder') : 'Error Creating Folder')
+                );
             } else {
-                showNotificationPopup('Error creating folder: ' + error.message, 'error');
+                showNotificationPopup(
+                    (window.t
+                        ? window.t('folders.errors.create_prefix', { error: error.message }, 'Error creating folder: {{error}}')
+                        : ('Error creating folder: ' + error.message)),
+                    'error'
+                );
             }
         });
-    });
+    }
+    );
 }
 
 function deleteFolder(folderId, folderName) {
@@ -174,7 +195,9 @@ function deleteFolder(folderId, folderName) {
             var noteElement = document.getElementById('deleteFolderNote');
             
             if (mainMessage) {
-                mainMessage.textContent = 'Are you sure you want to delete the folder "' + folderName + '"?';
+                mainMessage.textContent = window.t
+                    ? window.t('folders.delete.confirm_main', { folder: folderName }, 'Are you sure you want to delete the folder "{{folder}}"?')
+                    : ('Are you sure you want to delete the folder "' + folderName + '"?');
             }
             
             if (detailsList) {
@@ -183,14 +206,26 @@ function deleteFolder(folderId, folderName) {
                 if (subfolderCount > 0) {
                     var subfolderLi = document.createElement('li');
                     subfolderLi.style.marginBottom = '5px';
-                    subfolderLi.innerHTML = '<strong>• ' + subfolderCount + '</strong> subfolder' + (subfolderCount > 1 ? 's' : '') + ' will also be deleted';
+                    if (window.t) {
+                        subfolderLi.innerHTML = (subfolderCount > 1)
+                            ? window.t('folders.delete.details.subfolder_plural_html', { count: subfolderCount }, '<strong>• {{count}}</strong> subfolders will also be deleted')
+                            : window.t('folders.delete.details.subfolder_singular_html', { count: subfolderCount }, '<strong>• {{count}}</strong> subfolder will also be deleted');
+                    } else {
+                        subfolderLi.innerHTML = '<strong>• ' + subfolderCount + '</strong> subfolder' + (subfolderCount > 1 ? 's' : '') + ' will also be deleted';
+                    }
                     detailsList.appendChild(subfolderLi);
                 }
                 
                 if (noteCount > 0) {
                     var noteLi = document.createElement('li');
                     noteLi.style.marginBottom = '5px';
-                    noteLi.innerHTML = '<strong>• ' + noteCount + '</strong> note' + (noteCount > 1 ? 's' : '') + ' will be moved to trash';
+                    if (window.t) {
+                        noteLi.innerHTML = (noteCount > 1)
+                            ? window.t('folders.delete.details.note_plural_html', { count: noteCount }, '<strong>• {{count}}</strong> notes will be moved to trash')
+                            : window.t('folders.delete.details.note_singular_html', { count: noteCount }, '<strong>• {{count}}</strong> note will be moved to trash');
+                    } else {
+                        noteLi.innerHTML = '<strong>• ' + noteCount + '</strong> note' + (noteCount > 1 ? 's' : '') + ' will be moved to trash';
+                    }
                     detailsList.appendChild(noteLi);
                 }
             }
@@ -201,11 +236,17 @@ function deleteFolder(folderId, folderName) {
             
             showDeleteFolderModal(folderId, folderName, null);
         } else {
-            showNotificationPopup('Error checking folder content: ' + data.error, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.check_content_prefix', { error: data.error }, 'Error checking folder content: {{error}}') : ('Error checking folder content: ' + data.error)),
+                'error'
+            );
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error checking folder content: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.check_content_prefix', { error: String(error) }, 'Error checking folder content: {{error}}') : ('Error checking folder content: ' + error)),
+            'error'
+        );
     });
 }
 
@@ -273,11 +314,17 @@ function executeDeleteFolderOperation(folderId, folderName) {
             // Reload to update UI
             window.location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.generic_prefix', { error: data.error }, 'Error: {{error}}') : ('Error: ' + data.error)),
+                'error'
+            );
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error deleting folder: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.delete_prefix', { error: String(error) }, 'Error deleting folder: {{error}}') : ('Error deleting folder: ' + error)),
+            'error'
+        );
     });
 }
 
@@ -347,11 +394,14 @@ function showNewWorkspacePrompt() {
                 window.location.href = url.toString();
             }
         } else {
-            showNotificationPopup('Error creating workspace: ' + (res.message || 'unknown'), 'error');
+            showNotificationPopup(
+                (window.t ? window.t('workspaces.alerts.error_prefix', { error: (res.message || window.t('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}') : ('Error: ' + (res.message || 'Unknown error'))),
+                'error'
+            );
         }
     })
     .catch(function(err) { 
-        showNotificationPopup('Network error', 'error'); 
+        showNotificationPopup(window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error', 'error'); 
     });
 }
 
@@ -361,11 +411,14 @@ function deleteCurrentWorkspace() {
     
     var name = sel.value;
     if (!name || name === 'Poznote') { 
-        showNotificationPopup('Cannot delete default workspace', 'error'); 
+        showNotificationPopup(window.t ? window.t('workspaces.errors.cannot_delete_default', {}, 'Cannot delete the default workspace') : 'Cannot delete the default workspace', 'error'); 
         return; 
     }
     
-    window.modalAlert.confirm('Supprimer l\'espace de travail "' + name + '"? Les notes seront déplacées vers l\'espace de travail par défaut.', 'Confirmer la suppression')
+    window.modalAlert.confirm(
+        (window.t ? window.t('workspaces.confirm_delete.message', { workspace: name }, 'Delete workspace "{{workspace}}"? Notes will be moved to the default workspace.') : ('Delete workspace "' + name + '"? Notes will be moved to the default workspace.')),
+        (window.t ? window.t('workspaces.confirm_delete.title', {}, 'Confirm delete workspace') : 'Confirm delete workspace')
+    )
         .then(function(confirmed) {
             if (confirmed) {
                 var params = new URLSearchParams({ action: 'delete', name: name });
@@ -568,8 +621,8 @@ function showUpdateInstructions(hasUpdate = false) {
         var backupWarning = document.getElementById('updateBackupWarning');
         
         if (hasUpdate) {
-            if (titleEl) titleEl.textContent = '🎉 New Update Available!';
-            if (messageEl) messageEl.textContent = 'A new version of Poznote is available. Your data will be preserved during the update.';
+            if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, '🎉 New Update Available!') : '🎉 New Update Available!';
+            if (messageEl) messageEl.textContent = window.t ? window.t('update.description', null, 'A new version of Poznote is available. Your data will be preserved during the update.') : 'A new version of Poznote is available. Your data will be preserved during the update.';
             if (updateButtonsContainer) {
                 updateButtonsContainer.style.display = 'flex';
             }
@@ -577,7 +630,7 @@ function showUpdateInstructions(hasUpdate = false) {
                 backupWarning.style.display = 'block';
             }
         } else {
-            if (titleEl) titleEl.textContent = '✅ Poznote is Up to date';
+            if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, '✅ Poznote is Up to date') : '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
             if (updateButtonsContainer) {
                 updateButtonsContainer.style.display = 'none';
@@ -615,12 +668,12 @@ function showUpdateInstructions(hasUpdate = false) {
                 } else {
                     // Error
                     if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
-                    if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
+                    if (availableVersionEl) availableVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
                 }
             })
             .catch(function(error) {
-                if (currentVersionEl) currentVersionEl.textContent = 'Error loading version';
-                if (availableVersionEl) availableVersionEl.textContent = 'Error loading version';
+                if (currentVersionEl) currentVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
+                if (availableVersionEl) availableVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
             });
         
         modal.style.display = 'flex';
@@ -749,12 +802,21 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
     .then(function(data) {
         if (data.success) {
             var filesCount = data.notes.length;
-            var filesText = filesCount === 1 ? '1 file will be moved' : filesCount + ' files will be moved';
+            var filesText;
+            if (window.t) {
+                filesText = (filesCount === 1)
+                    ? window.t('folders.move_all.files_count_singular', { count: filesCount }, '1 file will be moved')
+                    : window.t('folders.move_all.files_count_plural', { count: filesCount }, '{{count}} files will be moved');
+            } else {
+                filesText = filesCount === 1 ? '1 file will be moved' : filesCount + ' files will be moved';
+            }
             document.getElementById('filesCountText').textContent = filesText;
             
             // If folder is empty, show message and disable move button
             if (filesCount === 0) {
-                document.getElementById('filesCountText').textContent = 'This folder is empty';
+                document.getElementById('filesCountText').textContent = window.t
+                    ? window.t('folders.move_all.empty_folder', null, 'This folder is empty')
+                    : 'This folder is empty';
                 document.querySelector('#moveFolderFilesModal .btn-primary').disabled = true;
             } else {
                 document.querySelector('#moveFolderFilesModal .btn-primary').disabled = false;
@@ -762,7 +824,9 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
         }
     })
     .catch(function(error) {
-        document.getElementById('filesCountText').textContent = 'Unable to count files';
+        document.getElementById('filesCountText').textContent = window.t
+            ? window.t('folders.move_all.unable_to_count_files', null, 'Unable to count files')
+            : 'Unable to count files';
     });
     
     // Populate target folder dropdown
@@ -777,7 +841,11 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
-    select.innerHTML = '<option value="">No folder</option>';
+    select.innerHTML = '';
+    var defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = window.t ? window.t('modals.folder.no_folder', null, 'No folder') : 'No folder';
+    select.appendChild(defaultOption);
     
     // Get all folders
     fetch('api_list_notes.php', {
@@ -807,7 +875,10 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error loading folders: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error)),
+            'error'
+        );
     });
 
     // If this dropdown is used for the 'move note' modal, wire change handler to enable the Move button
@@ -833,7 +904,10 @@ function executeMoveAllFiles() {
     // Allow empty value for "No folder" (value will be "" or "0")
     // Only check if source and target are the same
     if (sourceFolderId == targetFolderId && targetFolderId !== '' && targetFolderId !== '0') {
-        showNotificationPopup('Source and target folders cannot be the same', 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.move_all.same_source_target', null, 'Source and target folders cannot be the same') : 'Source and target folders cannot be the same'),
+            'error'
+        );
         return;
     }
     
@@ -841,7 +915,7 @@ function executeMoveAllFiles() {
     var moveButton = document.querySelector('#moveFolderFilesModal .btn-primary');
     var originalText = moveButton.textContent;
     moveButton.disabled = true;
-    moveButton.textContent = 'Moving...';
+    moveButton.textContent = window.t ? window.t('folders.move_all.moving', null, 'Moving...') : 'Moving...';
     
     // Move all files
     // Use "0" for "No folder" if targetFolderId is empty
@@ -878,14 +952,20 @@ function executeMoveAllFiles() {
             // Refresh the page to reflect changes
             location.reload();
         } else {
-            showNotificationPopup('Error moving files: ' + data.error, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.move_files_prefix', { error: data.error }, 'Error moving files: {{error}}') : ('Error moving files: ' + data.error)),
+                'error'
+            );
             // Re-enable button on error
             moveButton.disabled = false;
             moveButton.textContent = originalText;
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error moving files: ' + error.message, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.move_files_prefix', { error: error.message }, 'Error moving files: {{error}}') : ('Error moving files: ' + error.message)),
+            'error'
+        );
         // Re-enable button on error
         moveButton.disabled = false;
         moveButton.textContent = originalText;
@@ -895,7 +975,10 @@ function executeMoveAllFiles() {
 function editFolderName(folderId, oldName) {
     // Prevent renaming system folders
     if (oldName === 'Favorites' || oldName === 'Tags' || oldName === 'Trash') {
-        showNotificationPopup('Cannot rename system folders', 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.cannot_rename_system_folders', null, 'Cannot rename system folders') : 'Cannot rename system folders'),
+            'error'
+        );
         return;
     }
     
@@ -912,7 +995,10 @@ function saveFolderName() {
     var folderId = document.getElementById('editFolderName').dataset.folderId;
     
     if (!newName) {
-        showNotificationPopup('Please enter a folder name', 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.validation.enter_folder_name', null, 'Please enter a folder name') : 'Please enter a folder name'),
+            'error'
+        );
         return;
     }
     
@@ -944,11 +1030,17 @@ function saveFolderName() {
             // Folder renamed successfully - no notification needed
             location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.generic_prefix', { error: data.error }, 'Error: {{error}}') : ('Error: ' + data.error)),
+                'error'
+            );
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error renaming folder: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.rename_prefix', { error: String(error) }, 'Error renaming folder: {{error}}') : ('Error renaming folder: ' + error)),
+            'error'
+        );
     });
 }
 
@@ -966,13 +1058,13 @@ function toggleFolder(folderId) {
     var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');
     // Determine folder name to avoid changing icon for the Favorites pseudo-folder
     var folderHeader = document.querySelector('[data-folder-id="' + folderId + '"]').parentElement;
-    var folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
-    var folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+    var folderKey = folderHeader ? folderHeader.getAttribute('data-folder') : '';
+    var isFavoritesFolder = folderKey === 'Favorites';
     
     if (content.style.display === 'none') {
         content.style.display = 'block';
         // show open folder icon
-        if (icon && folderNameText !== 'Favorites') {
+        if (icon && !isFavoritesFolder) {
             icon.classList.remove('fa-folder');
             icon.classList.add('fa-folder-open');
         }
@@ -980,7 +1072,7 @@ function toggleFolder(folderId) {
     } else {
         content.style.display = 'none';
         // show closed folder icon
-        if (icon && folderNameText !== 'Favorites') {
+        if (icon && !isFavoritesFolder) {
             icon.classList.remove('fa-folder-open');
             icon.classList.add('fa-folder');
         }
@@ -1005,8 +1097,8 @@ function restoreFolderStates() {
         
         // Get the folder name to check if it's Favorites
         const folderHeader = toggleElement.closest('.folder-header');
-        const folderNameElem = folderHeader ? folderHeader.querySelector('.folder-name') : null;
-        const folderNameText = folderNameElem ? folderNameElem.textContent.trim() : '';
+        const folderKey = folderHeader ? folderHeader.getAttribute('data-folder') : '';
+        const isFavoritesFolder = folderKey === 'Favorites';
         
         // Check localStorage for this folder's state
         const savedState = localStorage.getItem('folder_' + folderId);
@@ -1015,14 +1107,14 @@ function restoreFolderStates() {
         if (savedState === 'open') {
             // User explicitly opened this folder - keep it open
             folderContent.style.display = 'block';
-            if (icon && folderNameText !== 'Favorites') {
+            if (icon && !isFavoritesFolder) {
                 icon.classList.remove('fa-folder');
                 icon.classList.add('fa-folder-open');
             }
         } else if (savedState === 'closed') {
             // User explicitly closed this folder - keep it closed
             folderContent.style.display = 'none';
-            if (icon && folderNameText !== 'Favorites') {
+            if (icon && !isFavoritesFolder) {
                 icon.classList.remove('fa-folder-open');
                 icon.classList.add('fa-folder');
             }
@@ -1034,14 +1126,16 @@ function restoreFolderStates() {
 
 function emptyFolder(folderId, folderName) {
     showConfirmModal(
-        'Empty Folder',
-        'Are you sure you want to move all notes from "' + folderName + '" to trash?',
+        (window.t ? window.t('folders.empty.title', null, 'Empty Folder') : 'Empty Folder'),
+        (window.t
+            ? window.t('folders.empty.confirm_message', { folder: folderName }, 'Are you sure you want to move all notes from "{{folder}}" to trash?')
+            : ('Are you sure you want to move all notes from "' + folderName + '" to trash?')),
         function() {
             executeEmptyFolder(folderId, folderName);
         },
         { 
             danger: true,
-            confirmText: 'Send notes to trash',
+            confirmText: (window.t ? window.t('folders.empty.confirm_button', null, 'Send notes to trash') : 'Send notes to trash'),
             hideSaveAndExit: true
         }
     );
@@ -1063,14 +1157,24 @@ function executeEmptyFolder(folderId, folderName) {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            showNotificationPopup('All notes moved to trash from folder: ' + folderName);
+            showNotificationPopup(
+                (window.t
+                    ? window.t('folders.empty.success_moved_to_trash', { folder: folderName }, 'All notes moved to trash from folder: {{folder}}')
+                    : ('All notes moved to trash from folder: ' + folderName))
+            );
             location.reload();
         } else {
-            showNotificationPopup('Error: ' + data.error, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.generic_prefix', { error: data.error }, 'Error: {{error}}') : ('Error: ' + data.error)),
+                'error'
+            );
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error emptying folder: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.empty_folder_prefix', { error: String(error) }, 'Error emptying folder: {{error}}') : ('Error emptying folder: ' + error)),
+            'error'
+        );
     });
 }
 
@@ -1079,7 +1183,9 @@ function executeEmptyFolder(folderId, folderName) {
 function showMoveFolderDialog(noteId) {
     // Check if a valid note is selected
     if (!noteId || noteId == -1 || noteId == '' || noteId == null || noteId === undefined) {
-        showNotificationPopup('Please select a note first before moving it to a folder.');
+        showNotificationPopup(
+            (window.t ? window.t('folders.move_note.select_note_first', null, 'Please select a note first before moving it to a folder.') : 'Please select a note first before moving it to a folder.')
+        );
         return;
     }
     
@@ -1149,13 +1255,31 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
     var params = new URLSearchParams({
         action: 'list'
     });
+    try {
+        var ws = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : null;
+        if (ws) {
+            params.append('workspace', ws);
+        }
+    } catch (e) {}
     
     fetch("api_folders.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
     })
-    .then(function(response) { return response.json(); })
+    .then(function(response) {
+        return response.text().then(function(text) {
+            if (!text || !text.trim()) {
+                throw new Error('Empty response (HTTP ' + response.status + ')');
+            }
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                var snippet = text.trim().slice(0, 300);
+                throw new Error('Invalid JSON (HTTP ' + response.status + '): ' + snippet);
+            }
+        });
+    })
     .then(function(data) {
         if (data.success) {
             // Store all folders (excluding current folder)
@@ -1185,7 +1309,9 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error loading folders: ' + error);
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error))
+        );
     });
 }
 
@@ -1208,7 +1334,19 @@ function onWorkspaceChange() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString()
     })
-    .then(function(response) { return response.json(); })
+    .then(function(response) {
+        return response.text().then(function(text) {
+            if (!text || !text.trim()) {
+                throw new Error('Empty response (HTTP ' + response.status + ')');
+            }
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                var snippet = text.trim().slice(0, 300);
+                throw new Error('Invalid JSON (HTTP ' + response.status + '): ' + snippet);
+            }
+        });
+    })
     .then(function(data) {
         if (data.success) {
             // Store all folders for the new workspace
@@ -1217,7 +1355,7 @@ function onWorkspaceChange() {
             // Update the target folder dropdown with folders from the new workspace
             var select = document.getElementById('moveNoteTargetSelect');
             if (select) {
-                select.innerHTML = '<option value="">No folder</option>';
+                select.innerHTML = '<option value="">' + (window.t ? window.t('modals.folder.no_folder', null, 'No folder') : 'No folder') + '</option>';
                 
                 // Populate with folders from the new workspace
                 if (Array.isArray(allFolders)) {
@@ -1240,6 +1378,9 @@ function onWorkspaceChange() {
     })
     .catch(function(error) {
         console.error('Error loading folders for workspace:', error);
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error))
+        );
     });
 }
 
@@ -1250,13 +1391,13 @@ function updateMoveButton(searchTerm, exactMatch) {
     var button = document.getElementById('moveActionButton');
     
     if (!searchTerm) {
-        button.textContent = 'Move';
+        button.textContent = window.t ? window.t('common.move', null, 'Move') : 'Move';
         button.disabled = true;
     } else if (exactMatch) {
-        button.textContent = 'Move';
+        button.textContent = window.t ? window.t('common.move', null, 'Move') : 'Move';
         button.disabled = false;
     } else {
-        button.textContent = 'Create & Move';
+        button.textContent = window.t ? window.t('folders.move_note.create_and_move', null, 'Create & Move') : 'Create & Move';
         button.disabled = false;
     }
 }
@@ -1271,7 +1412,9 @@ function moveNoteToFolder() {
         targetFolderId = select.value;
     } else {
         // No select available — require explicit selection
-        showMoveFolderError('Please select a target folder');
+        showMoveFolderError(
+            window.t ? window.t('folders.move_note.select_target_folder', null, 'Please select a target folder') : 'Please select a target folder'
+        );
         return;
     }
     
@@ -1298,11 +1441,17 @@ function moveNoteToFolder() {
             location.reload();
         } else {
             var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
-            showNotificationPopup('Error: ' + err, 'error');
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.generic_prefix', { error: err }, 'Error: {{error}}') : ('Error: ' + err)),
+                'error'
+            );
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error moving note: ' + error, 'error');
+        showNotificationPopup(
+            (window.t ? window.t('folders.move_note.errors.move_prefix', { error: String(error) }, 'Error moving note: {{error}}') : ('Error moving note: ' + error)),
+            'error'
+        );
     });
 }
 
@@ -1372,14 +1521,22 @@ function showCreateModal(folderId = null, folderName = null) {
     var subfolderOption = document.getElementById('subfolderOption');
     
     if (isCreatingInFolder) {
-        modalTitle.textContent = 'Create in ' + (folderName || 'folder');
+        if (window.t) {
+            modalTitle.textContent = window.t(
+                'modals.create.title_in_folder',
+                { folder: (folderName || window.t('modals.create.folder_fallback', null, 'folder')) },
+                'Create in {{folder}}'
+            );
+        } else {
+            modalTitle.textContent = 'Create in ' + (folderName || 'folder');
+        }
         if (otherSection) otherSection.style.display = 'none';
         // Allow subfolder creation for all folders
         if (subfolderOption) {
             subfolderOption.style.display = 'flex';
         }
     } else {
-        modalTitle.textContent = 'Create';
+        modalTitle.textContent = window.t ? window.t('common.create', null, 'Create') : 'Create';
         if (otherSection) otherSection.style.display = 'block';
         if (subfolderOption) subfolderOption.style.display = 'none';
     }

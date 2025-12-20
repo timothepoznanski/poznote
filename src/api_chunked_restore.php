@@ -12,20 +12,21 @@ ini_set('log_errors', 1);
 require_once 'auth.php';
 require_once 'config.php';
 require_once 'functions.php';
+require_once 'db_connect.php';
 
 header('Content-Type: application/json');
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     http_response_code(401);
-    echo json_encode(['error' => 'Authentication required']);
+    echo json_encode(['error' => t('auth.api.authentication_required', [], 'Authentication required')]);
     exit;
 }
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode(['error' => t('api.errors.method_not_allowed', [], 'Method not allowed')]);
     exit;
 }
 
@@ -44,13 +45,13 @@ try {
             break;
         default:
             http_response_code(400);
-            echo json_encode(['error' => 'Invalid action']);
+            echo json_encode(['error' => t('api.errors.invalid_action', [], 'Invalid action')]);
             break;
     }
 } catch (Exception $e) {
     error_log('Chunked restore error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Internal server error']);
+    echo json_encode(['error' => t('api.errors.internal_server_error', [], 'Internal server error')]);
 }
 
 function handleChunkUpload() {
