@@ -3,8 +3,10 @@
 // (Previously enabled with display_errors / error_reporting for debugging)
 require 'auth.php';
 require_once 'functions.php';
+require_once 'oidc.php';
 
 $error = '';
+$oidcError = '';
 
 // Load configured login display name if present
 try {
@@ -83,6 +85,11 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
         $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
     }
 }
+
+// OIDC error feedback (generic)
+if (isset($_GET['oidc_error']) && $_GET['oidc_error'] === '1') {
+    $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang ?? 'en', ENT_QUOTES); ?>">
@@ -128,6 +135,14 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
             
             <button type="submit" class="login-button"><?php echo t_h('login.button', [], 'Login', $currentLang ?? 'en'); ?></button>
         </form>
+
+        <?php if (function_exists('oidc_is_enabled') && oidc_is_enabled()): ?>
+            <a class="login-button oidc-button" href="oidc_login.php"><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
+        <?php endif; ?>
+
+        <?php if ($oidcError): ?>
+            <div class="error" style="margin-top: 0.75rem; text-align: center;"><?php echo htmlspecialchars($oidcError); ?></div>
+        <?php endif; ?>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
                     <?php echo t_h('login.documentation', [], 'Poznote documentation', $currentLang ?? 'en'); ?>

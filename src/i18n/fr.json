@@ -890,9 +890,11 @@
     },
     "remember_me": "Se souvenir de moi pendant 30 jours",
     "button": "Se connecter",
+    "oidc_button": "Continuer avec {{provider}}",
     "documentation": "Documentation Poznote",
     "errors": {
-      "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect."
+      "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect.",
+      "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer."
     }
   },
   "restore_import": {

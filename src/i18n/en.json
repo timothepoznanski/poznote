@@ -890,9 +890,11 @@
     },
     "remember_me": "Remember me for 30 days",
     "button": "Login",
+    "oidc_button": "Continue with {{provider}}",
     "documentation": "Poznote documentation",
     "errors": {
-      "invalid_credentials": "Incorrect username or password."
+      "invalid_credentials": "Incorrect username or password.",
+      "oidc_failed": "SSO login failed. Please try again."
     }
   },
   "restore_import": {

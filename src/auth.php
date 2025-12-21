@@ -100,11 +100,28 @@ function authenticate($username, $password, $rememberMe = false) {
 }
 
 function logout() {
+    $oidcLogoutUrl = null;
+    if (isset($_SESSION['auth_method']) && $_SESSION['auth_method'] === 'oidc') {
+        $oidcPath = __DIR__ . '/oidc.php';
+        if (is_file($oidcPath)) {
+            require_once $oidcPath;
+            if (function_exists('oidc_logout_redirect_url')) {
+                $oidcLogoutUrl = oidc_logout_redirect_url();
+            }
+        }
+    }
+
     session_destroy();
     // Remove remember me cookie
     if (isset($_COOKIE[REMEMBER_ME_COOKIE])) {
         setcookie(REMEMBER_ME_COOKIE, '', time() - 3600, '/', '', false, true);
     }
+
+    if (is_string($oidcLogoutUrl) && $oidcLogoutUrl !== '') {
+        header('Location: ' . $oidcLogoutUrl);
+        exit;
+    }
+
     header('Location: login.php');
     exit;
 }

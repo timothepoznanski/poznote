@@ -125,6 +125,18 @@ input[type="password"]::placeholder {
     margin-top: 0.5rem;
 }
 
+.oidc-button {
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    background: #2d3748;
+    margin-top: 0.75rem;
+}
+
+.oidc-button:hover {
+    background: #1a202c;
+}
+
 .login-button:hover {
     background: #2c5282;
 }

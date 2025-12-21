@@ -69,8 +69,8 @@ jobs:
       - name: Delete oldest release and tag
         if: steps.check_version.outputs.needs_update == 'true'
         run: |
-          # Keep only the 10 most recent releases
-          KEEP_COUNT=10
+          # Keep only the 20 most recent releases
+          KEEP_COUNT=20
           
           # Verify GitHub CLI is available (should be pre-installed on GitHub runners)
           if ! command -v gh &> /dev/null; then
@@ -78,8 +78,8 @@ jobs:
             exit 0
           fi
           
-          # Get all releases sorted by creation date (newest first)
-          all_releases=$(gh release list --limit 1000 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[].tagName')
+          # Get all releases sorted by creation date (newest first), excluding test versions
+          all_releases=$(gh release list --limit 1000 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[] | select(.tagName | contains("-test") | not) | .tagName')
           
           # Count total releases
           total_releases=$(echo "$all_releases" | wc -l)
@@ -89,7 +89,7 @@ jobs:
             # Get releases to delete (everything after the first KEEP_COUNT)
             releases_to_delete=$(echo "$all_releases" | tail -n +$((KEEP_COUNT + 1)))
             
-            echo "🗑️  Deleting old releases (keeping $KEEP_COUNT most recent):"
+            echo "🗑️  Deleting old releases (keeping $KEEP_COUNT most recent, excluding test versions):"
             
             # Delete each old release and its tag
             while IFS= read -r tag; do
@@ -209,8 +209,8 @@ jobs:
         run: |
           echo "🧹 Cleaning up old Docker images..."
           
-          # Keep only the 10 most recent Docker image versions
-          KEEP_COUNT=10
+          # Keep only the 20 most recent Docker image versions
+          KEEP_COUNT=20
           PACKAGE_NAME="poznote"
           
           # Debug: Get all package versions with their tags for analysis

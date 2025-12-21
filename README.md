@@ -247,6 +247,7 @@ After installation, access Poznote in your web browser:
 # Other information
 
 - [Change Settings](#change-settings)
+- [Authentication](#authentication)
 - [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
@@ -284,6 +285,79 @@ Restart Poznote with new configuration:
 ```bash
 docker compose up -d
 ```
+
+## Authentication
+
+Poznote supports two authentication methods:
+
+### Traditional Authentication
+
+By default, Poznote uses traditional username/password authentication. Configure your credentials in the `.env` file:
+
+```bash
+POZNOTE_USERNAME=your_username
+POZNOTE_PASSWORD=your_secure_password
+```
+
+### OIDC / SSO Authentication (Optional)
+
+Poznote can optionally authenticate users via OpenID Connect (authorization code + PKCE) for sign-on integration.
+
+This allows users to log in using external identity providers such as:
+
+- Auth0
+- Keycloak
+- Azure Active Directory
+- Google Identity
+- Okta
+- And any other OIDC-compliant provider
+
+#### Configuration
+
+Add the following variables to your `.env` file and restart the container:
+
+```bash
+# Enable OIDC authentication
+POZNOTE_OIDC_ENABLED=true
+
+# Display name for the OIDC provider (shown on login button)
+POZNOTE_OIDC_PROVIDER_NAME=YourCompany
+
+# OIDC Provider Configuration
+POZNOTE_OIDC_ISSUER=https://your-identity-provider.com
+POZNOTE_OIDC_CLIENT_ID=your_client_id
+POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
+
+# Optional: Custom scopes (default: "openid profile email")
+# POZNOTE_OIDC_SCOPES="openid profile email"
+
+# Optional: Override auto-discovery URL
+# POZNOTE_OIDC_DISCOVERY_URL=https://your-idp.com/.well-known/openid-configuration
+
+# Optional: Custom redirect URI (default: auto-generated)
+# POZNOTE_OIDC_REDIRECT_URI=https://your-domain.com/oidc_callback.php
+
+# Optional: Custom logout endpoint for RP-initiated logout
+# POZNOTE_OIDC_END_SESSION_ENDPOINT=https://your-idp.com/logout
+
+# Optional: Where to redirect after logout (default: login page)
+# POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI=https://your-domain.com/login.php
+```
+
+#### How it works
+
+When OIDC is enabled:
+1. The login page displays a "Continue with [Provider Name]" button
+2. Clicking the button redirects users to your identity provider
+3. After successful authentication, users are redirected back to Poznote
+4. Poznote validates the OIDC tokens and creates a session
+
+#### Security Notes
+
+- OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure
+- Uses PKCE (Proof Key for Code Exchange) for enhanced security
+- Supports RP-initiated logout for clean session termination
+- All OIDC communication uses HTTPS
 
 ## Password Recovery
 
@@ -344,12 +418,12 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
 
-  - **Supported formats:** `.html`, `.md`, `.markdown`, or `.zip` files
-  - **ZIP archives:** Can contain up to 300 files (`.html`, `.md`, `.markdown`)
-  - **Individual files:** Up to 50 files can be selected at once
-  - **Workspace selection:** Choose the target workspace for imported notes
-  - **Folder selection:** Optionally select a specific folder within the workspace
-  - **Drag & drop:** Simply drag files or ZIP archives onto the upload area
+  - Support `.html`, `.md`, `.markdown`, or `.zip` files types
+  - ZIP archives can contain up to 300 files (`.html`, `.md`, `.markdown`)
+  - Up to 50 files can be selected at once
+  - Choose the target workspace for imported notes
+  - Optionally select a specific folder within the workspace
+  - Simply drag files or ZIP archives onto the upload area
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 
