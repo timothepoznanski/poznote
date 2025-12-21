@@ -57,6 +57,7 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 - Dark Mode
 - Excalidraw Integration
 - Mermaid Diagrams
+- OpenID Connect
 
 ## Try the Poznote demo
 
