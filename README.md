@@ -680,6 +680,86 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api_create_folder.php
 ```
 
+**Create Subfolder (parent/child)**
+
+Create a subfolder by specifying a parent folder path:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "2024",
+    "parent_folder": "My Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+You can also target a specific parent folder by ID:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "Q1",
+    "parent_folder_id": 12,
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+**Create Nested Folders in One Call (path notation)**
+
+Create a nested structure in one request:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_path": "Projects/2024/Q1",
+    "workspace": "Personal",
+    "create_parents": true
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+**List Folders (flat or hierarchy)**
+
+List folders (flat list with `path`):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_list_folders.php?workspace=Personal"
+```
+
+List folders as a hierarchy tree (nested `children`):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_list_folders.php?workspace=Personal&include_hierarchy=true"
+```
+
+**Move Folder to a Different Parent**
+
+Move a folder by path:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_path": "Projects/2024/Q1",
+    "new_parent_folder": "Archive/2023",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_move_folder.php
+```
+
+Move a folder by ID:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_id": 34,
+    "new_parent_folder_id": 56,
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_move_folder.php
+```
+
 **Delete Folder**
 
 Delete a folder and move its contents to no folder (uncategorized):

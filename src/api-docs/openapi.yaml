@@ -70,6 +70,36 @@ components:
           type: string
           format: date-time
 
+    Folder:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        name:
+          type: string
+          example: "Projects"
+        workspace:
+          type: string
+          example: "Personal"
+        parent_id:
+          type: integer
+          nullable: true
+          example: null
+        path:
+          type: string
+          example: "Projects/2024/Q1"
+
+    FolderNode:
+      allOf:
+        - $ref: '#/components/schemas/Folder'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/FolderNode'
+
 paths:
   /api_list_notes.php:
     get:
@@ -812,27 +842,208 @@ paths:
       tags:
         - Folders Management
       summary: Create folder
-      description: Create a new folder in a workspace
+      description: |
+        Create a new folder in a workspace.
+
+        Supports both:
+        - Simple folders: `folder_name`
+        - Subfolders: `folder_name` + `parent_folder` (path) or `parent_folder_id`
+        - Nested path creation: `folder_path` with optional `create_parents`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required:
+                    - folder_name
+                  properties:
+                    folder_name:
+                      type: string
+                      description: "Folder name (required)"
+                      example: "Work Projects"
+                    parent_folder:
+                      type: string
+                      description: "Optional parent folder path (e.g., 'Projects/2024')"
+                      example: "Projects"
+                    parent_folder_id:
+                      type: integer
+                      description: "Optional parent folder id (alternative to parent_folder)"
+                      example: 12
+                    workspace:
+                      type: string
+                      description: "Workspace name (optional, default: Poznote)"
+                      example: "Personal"
+                - type: object
+                  required:
+                    - folder_path
+                  properties:
+                    folder_path:
+                      type: string
+                      description: "Folder path to create (e.g., 'Projects/2024/Q1')"
+                      example: "Projects/2024/Q1"
+                    create_parents:
+                      type: boolean
+                      description: "If true, creates missing parent folders"
+                      example: true
+                    workspace:
+                      type: string
+                      description: "Workspace name (optional, default: Poznote)"
+                      example: "Personal"
+      responses:
+        '200':
+          description: Folder created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Folder created successfully"
+                  folder:
+                    $ref: '#/components/schemas/Folder'
+                  created_parents:
+                    type: array
+                    description: "Only present for folder_path creation when parent folders are created"
+                    items:
+                      $ref: '#/components/schemas/Folder'
+        '400':
+          description: Invalid request
+        '404':
+          description: Workspace or parent folder not found
+        '409':
+          description: Folder already exists
+
+  /api_list_folders.php:
+    get:
+      tags:
+        - Folders Management
+      summary: List folders
+      description: |
+        List folders for a workspace.
+
+        - When `include_hierarchy=false` (default), returns a flat list with a computed `path`.
+        - When `include_hierarchy=true`, returns a tree with `children`.
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Workspace name (optional, default: Poznote)"
+          schema:
+            type: string
+            example: "Personal"
+        - name: include_hierarchy
+          in: query
+          required: false
+          description: "If true, return folders as a nested tree"
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Folders returned successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      workspace:
+                        type: string
+                        example: "Personal"
+                      include_hierarchy:
+                        type: boolean
+                        example: false
+                      folders:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Folder'
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      workspace:
+                        type: string
+                        example: "Personal"
+                      include_hierarchy:
+                        type: boolean
+                        example: true
+                      folders:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FolderNode'
+        '404':
+          description: Workspace not found
+
+  /api_move_folder.php:
+    post:
+      tags:
+        - Folders Management
+      summary: Move folder
+      description: |
+        Move a folder under a new parent (or to root).
+
+        Provide either `folder_id` or `folder_path` to identify the folder.
+        Optionally provide `new_parent_folder_id` or `new_parent_folder` to choose the destination parent.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - folder_name
               properties:
-                folder_name:
-                  type: string
-                  description: "Folder name (required)"
-                  example: "Work Projects"
                 workspace:
                   type: string
-                  description: "Workspace name (optional, default: Poznote)"
+                  description: "Workspace name (optional; required when using folder_path)"
                   example: "Personal"
+                folder_id:
+                  type: integer
+                  description: "Folder id to move (alternative to folder_path)"
+                  example: 34
+                folder_path:
+                  type: string
+                  description: "Folder path to move (alternative to folder_id)"
+                  example: "Projects/2024/Q1"
+                new_parent_folder_id:
+                  type: integer
+                  nullable: true
+                  description: "Destination parent folder id (null/0 moves to root)"
+                  example: 12
+                new_parent_folder:
+                  type: string
+                  description: "Destination parent folder path (alternative to new_parent_folder_id)"
+                  example: "Archive/2023"
       responses:
         '200':
-          description: Folder created successfully
+          description: Folder moved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Folder moved successfully"
+                  folder:
+                    $ref: '#/components/schemas/Folder'
+        '400':
+          description: Invalid request
+        '404':
+          description: Folder/workspace/parent not found
+        '409':
+          description: Conflict (cycle or name already exists in destination)
 
   /api_delete_folder.php:
     delete:
