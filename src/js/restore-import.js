@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load workspaces for individual notes import
     loadWorkspacesForImport();
+    
+    // Setup drag and drop visual feedback
+    setupDragAndDrop();
 });
 
 // Complete Restore Functions
@@ -298,8 +301,40 @@ function proceedWithIndividualNotesImport() {
     const form = document.getElementById('individualNotesForm');
     if (form) {
         hideIndividualNotesImportConfirmation();
+        showIndividualNotesImportSpinner();
         form.submit();
     }
+}
+
+// Show/hide spinner for individual notes import
+function showIndividualNotesImportSpinner() {
+    try {
+        const spinner = document.getElementById('individualNotesImportSpinner');
+        const btn = document.getElementById('individualNotesImportBtn');
+        if (spinner) {
+            spinner.style.display = 'inline-flex';
+            spinner.setAttribute('aria-hidden', 'false');
+        }
+        if (btn) {
+            btn.disabled = true;
+            btn.setAttribute('aria-disabled', 'true');
+        }
+    } catch (e) { /* ignore */ }
+}
+
+function hideIndividualNotesImportSpinner() {
+    try {
+        const spinner = document.getElementById('individualNotesImportSpinner');
+        const btn = document.getElementById('individualNotesImportBtn');
+        if (spinner) {
+            spinner.style.display = 'none';
+            spinner.setAttribute('aria-hidden', 'true');
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.setAttribute('aria-disabled', 'false');
+        }
+    } catch (e) { /* ignore */ }
 }
 
 // Chunked Restore Functions
@@ -517,29 +552,42 @@ function loadWorkspacesForImport() {
 
 // Load folders for selected workspace
 function loadFoldersForImport(workspace) {
+    console.log('loadFoldersForImport called with:', workspace);
+    
     const folderSelect = document.getElementById('target_folder_select');
-    if (!folderSelect) return;
+    if (!folderSelect) {
+        console.error('folderSelect element not found!');
+        return;
+    }
     
     // Reset to "No folder" option
     folderSelect.innerHTML = '<option value="">' + 
         tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)') + 
         '</option>';
     
-    if (!workspace) return;
+    if (!workspace) {
+        console.log('No workspace selected, skipping folder load');
+        return;
+    }
+    
+    console.log('Loading folders for workspace:', workspace);
     
     // Fetch folders for the selected workspace
     fetch('api_folders.php', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
+        body: new URLSearchParams({
             action: 'list',
-            workspace: workspace
+            workspace: workspace,
+            hierarchical: 'true'
         })
     })
         .then(response => response.json())
         .then(data => {
+            console.log('Folders response:', data);
+            
             if (data.success && data.folders) {
                 // Flatten the hierarchical structure for simple display
                 const flattenFolders = (folders, prefix = '') => {
@@ -556,6 +604,7 @@ function loadFoldersForImport(workspace) {
                 };
                 
                 const flatFolders = flattenFolders(data.folders);
+                console.log('Flattened folders:', flatFolders);
                 
                 flatFolders.forEach(folder => {
                     const option = document.createElement('option');
@@ -568,4 +617,93 @@ function loadFoldersForImport(workspace) {
         .catch(error => {
             console.error('Error loading folders:', error);
         });
+}
+
+// Setup drag and drop visual feedback for file inputs
+function setupDragAndDrop() {
+    const fileInputs = [
+        { id: 'individual_notes_files', key: 'restore_import.drag_drop.individual_notes', fallback: 'Drop files here' },
+        { id: 'complete_backup_file', key: 'restore_import.drag_drop.complete_backup', fallback: 'Drop backup ZIP here' },
+        { id: 'backup_file', key: 'restore_import.drag_drop.database', fallback: 'Drop SQL file here' },
+        { id: 'notes_file', key: 'restore_import.drag_drop.notes', fallback: 'Drop notes ZIP here' },
+        { id: 'attachments_file', key: 'restore_import.drag_drop.attachments', fallback: 'Drop attachments ZIP here' },
+        { id: 'chunked_backup_file', key: 'restore_import.drag_drop.chunked_backup', fallback: 'Drop backup ZIP here' }
+    ];
+    
+    fileInputs.forEach(config => {
+        const input = document.getElementById(config.id);
+        if (!input) return;
+        
+        const container = input.closest('.form-group') || input.parentElement;
+        if (!container) return;
+        
+        // Create drop overlay element
+        const dropOverlay = document.createElement('div');
+        dropOverlay.className = 'drop-overlay';
+        dropOverlay.style.display = 'none';
+        
+        const dropText = document.createElement('div');
+        dropText.className = 'drop-overlay-text';
+        dropText.innerHTML = '📁 <span class="drop-message"></span>';
+        dropOverlay.appendChild(dropText);
+        container.appendChild(dropOverlay);
+        
+        // Function to update text with translation
+        const updateDropText = () => {
+            const message = dropText.querySelector('.drop-message');
+            if (message) {
+                message.textContent = tr(config.key, config.fallback);
+            }
+        };
+        
+        // Update text initially and when translations load
+        updateDropText();
+        if (window.loadPoznoteI18n) {
+            setTimeout(updateDropText, 100);
+        }
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            container.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        // Show overlay when item is dragged over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            container.addEventListener(eventName, () => {
+                container.classList.add('drag-over');
+                dropOverlay.style.display = 'flex';
+                updateDropText(); // Update text on drag in case translations loaded
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            container.addEventListener(eventName, () => {
+                container.classList.remove('drag-over');
+                dropOverlay.style.display = 'none';
+            }, false);
+        });
+        
+        // Handle dropped files
+        container.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                input.files = files;
+                // Trigger change event to update file input display
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        }, false);
+    });
+    
+    // Prevent default drag behaviors on body
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+}
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
 }

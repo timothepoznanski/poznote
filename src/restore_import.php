@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 if ($result['success']) {
-                    $import_individual_notes_message = t('restore_import.messages.notes_imported', ['message' => $result['message']]);
+                    $import_individual_notes_message = $result['message'];
                 } else {
                     $import_individual_notes_error = t('restore_import.errors.import_error', ['error' => $result['error']]);
                 }
@@ -534,7 +534,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
     $zip->close();
     unlink($tempFile);
     
-    $message = "Imported {$importedCount} note(s) from ZIP into workspace '{$workspace}', folder '{$folder}'.";
+    $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
+    $message = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
     if ($errorCount > 0) {
         $message .= " {$errorCount} error(s): " . implode('; ', array_slice($errors, 0, 5));
     }
@@ -665,7 +666,8 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
         }
     }
     
-    $message = "Imported {$importedCount} note(s) into workspace '{$workspace}', folder '{$folder}'.";
+    $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
+    $message = t('restore_import.messages.notes_imported', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) into workspace "{{workspace}}", folder "{{folder}}".');
     if ($errorCount > 0) {
         $message .= " {$errorCount} error(s): " . implode('; ', $errors);
     }
@@ -909,33 +911,46 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
                 
-                <div class="form-group">
-                    <label for="target_workspace_select"><strong><?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?></strong></label>
-                    <select id="target_workspace_select" name="target_workspace" class="form-control" required onchange="loadFoldersForImport(this.value)">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="target_workspace_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                        <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
+                    </label>
+                    <select id="target_workspace_select" name="target_workspace" class="form-control" required onchange="loadFoldersForImport(this.value)" style="font-size: 15px; padding: 0.5rem;">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="target_folder_select"><strong><?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?></strong> (<?php echo t_h('common.optional', 'optional'); ?>)</label>
-                    <select id="target_folder_select" name="target_folder" class="form-control">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="target_folder_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                        <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
+                        <span style="font-weight: 400; color: #666; font-size: 0.9em;">(<?php echo t_h('restore_import.sections.individual_notes.optional', 'optional'); ?>)</span>
+                    </label>
+                    <select id="target_folder_select" name="target_folder" class="form-control" style="font-size: 15px; padding: 0.5rem;">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="individual_notes_files"><strong><?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?></strong></label>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.zip" multiple required>
-                    <small class="form-text text-muted">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="individual_notes_files" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                        <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
+                    </label>
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.zip" multiple required style="padding: 0.5rem;">
+                    <small class="form-text text-muted" style="display: block; margin-top: 0.5rem; line-height: 1.5;">
                         <?php echo t_h('restore_import.sections.individual_notes.files_info', 'Multiple files (max 50) or single ZIP archive (max 300 files)'); ?><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .zip'); ?>
                     </small>
                 </div>
-                <br>
                 
-                <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()">
-                    Start Import
+                <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()" style="margin-top: 1rem;" id="individualNotesImportBtn">
+                    <?php echo t_h('restore_import.buttons.start_import_individual_notes', 'Start Import'); ?>
                 </button>
+                
+                <!-- Spinner shown while processing import -->
+                <div id="individualNotesImportSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none; margin-top: 1rem;">
+                    <div class="restore-spinner-circle" aria-hidden="true"></div>
+                    <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
+                    <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.importing_notes', 'Importation des notes en cours...'); ?></span>
+                </div>
             </form>
             </div>
         </div>

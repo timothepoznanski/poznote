@@ -908,8 +908,9 @@
     "messages": {
       "database_restored": "Database restored successfully!",
       "complete_backup_restored": "{{message}}",
-      "notes_imported": "{{message}}",
-      "attachments_imported": "{{message}}"
+      "notes_imported": "Imported {{count}} note(s) into workspace \"{{workspace}}\", folder \"{{folder}}\".",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "Imported {{count}} note(s) from ZIP into workspace \"{{workspace}}\", folder \"{{folder}}\"."
     },
     "errors": {
       "complete_restore_form_not_found": "Complete restore form not found. Please try again.",
@@ -931,7 +932,8 @@
     },
     "spinner": {
       "processing": "Processing restore...",
-      "processing_long": "Processing restore... This may take a few moments."
+      "processing_long": "Processing restore... This may take a few moments.",
+      "importing_notes": "Importing notes..."
     },
     "chunked": {
       "preparing_upload": "Preparing upload...",
@@ -978,7 +980,9 @@
         "upload_error": "Upload error",
         "invalid_file_type": "Invalid file type (only {{allowed}} allowed)",
         "cannot_read_file": "Cannot read file"
-      }
+      },
+      "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
+      "summary_zip_with_location": "This will extract and import all HTML and Markdown files from the ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
@@ -1003,18 +1007,27 @@
         "workspace": "Target Workspace",
         "loading": "Loading...",
         "folder": "Target Folder",
+        "optional": "optional",
         "no_folder": "No folder (root level)",
         "select_files": "Select Files",
         "files_info": "Multiple files (max 50) or single ZIP archive (max 300 files)",
         "supported_formats": "Supported: .html, .md, .markdown, .zip",
         "title": "Want to import HTML or Markdown files?",
-        "description_html": "Import individual HTML or Markdown files, or a ZIP archive containing multiple files. Select your target workspace and optionally assign notes to a specific folder.<br><br>The title will be automatically created from the file name (without the extension).",
+        "description_html": "Import individual HTML or Markdown files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension).",
         "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown"
       }
     },
     "buttons": {
       "start_restore": "Start Restore",
       "start_import_individual_notes": "Start Import Individual Notes"
+    },
+    "drag_drop": {
+      "individual_notes": "Drop files here",
+      "complete_backup": "Drop backup ZIP here",
+      "database": "Drop SQL file here",
+      "notes": "Drop notes ZIP here",
+      "attachments": "Drop attachments ZIP here",
+      "chunked_backup": "Drop backup ZIP here"
     },
     "modals": {
       "import_confirm": {
@@ -1075,7 +1088,9 @@
       "no_file_selected": {
         "title": "No File Selected",
         "body": "Please select a file before proceeding with the import."
-      }
+      },
+      "no_workspace_title": "No Workspace Selected",
+      "no_workspace_body": "Please select a workspace for the imported notes."
     },
     "inline": {
       "standard": {

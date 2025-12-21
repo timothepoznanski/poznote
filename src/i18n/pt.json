@@ -908,8 +908,9 @@
     "messages": {
       "database_restored": "Banco de dados restaurado com sucesso!",
       "complete_backup_restored": "{{message}}",
-      "notes_imported": "{{message}}",
-      "attachments_imported": "{{message}}"
+      "notes_imported": "Importadas {{count}} nota(s) para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "Importadas {{count}} nota(s) do ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\"."
     },
     "errors": {
       "complete_restore_form_not_found": "Formulário de restauração completa não encontrado. Por favor, tente novamente.",
@@ -931,7 +932,8 @@
     },
     "spinner": {
       "processing": "Processando restauração...",
-      "processing_long": "Processando restauração... Isso pode levar alguns momentos."
+      "processing_long": "Processando restauração... Isso pode levar alguns momentos.",
+      "importing_notes": "Importando notas..."
     },
     "chunked": {
       "preparing_upload": "Preparando upload...",
@@ -978,7 +980,9 @@
         "upload_error": "Erro de upload",
         "invalid_file_type": "Tipo de arquivo inválido (apenas {{allowed}} permitido)",
         "cannot_read_file": "Não é possível ler arquivo"
-      }
+      },
+      "summary_with_location": "Isto importará {{fileText}} para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
+      "summary_zip_with_location": "Isto extrairá e importará todos os arquivos HTML e Markdown do arquivo ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
@@ -1003,18 +1007,27 @@
         "workspace": "Espaço de trabalho destino",
         "loading": "Carregando...",
         "folder": "Pasta destino",
+        "optional": "opcional",
         "no_folder": "Sem pasta (nível raiz)",
         "select_files": "Selecionar arquivos",
         "files_info": "Vários arquivos (máx 50) ou arquivo ZIP único (máx 300 arquivos)",
         "supported_formats": "Suportados: .html, .md, .markdown, .zip",
         "title": "Quer importar arquivos HTML ou Markdown?",
-        "description_html": "Importe arquivos HTML ou Markdown individuais, ou um arquivo ZIP contendo vários arquivos. Selecione seu espaço de trabalho de destino e atribua opcionalmente as notas a uma pasta específica.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
+        "description_html": "Importe arquivos HTML ou Markdown individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
         "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown"
       }
     },
     "buttons": {
       "start_restore": "Iniciar Restauração",
       "start_import_individual_notes": "Iniciar Importação de Notas Individuais"
+    },
+    "drag_drop": {
+      "individual_notes": "Soltar arquivos aqui",
+      "complete_backup": "Soltar ZIP de backup aqui",
+      "database": "Soltar arquivo SQL aqui",
+      "notes": "Soltar ZIP de notas aqui",
+      "attachments": "Soltar ZIP de anexos aqui",
+      "chunked_backup": "Soltar ZIP de backup aqui"
     },
     "modals": {
       "import_confirm": {
@@ -1075,7 +1088,9 @@
       "no_file_selected": {
         "title": "Nenhum Arquivo Selecionado",
         "body": "Por favor, selecione um arquivo antes de prosseguir com a importação."
-      }
+      },
+      "no_workspace_title": "Nenhum espaço de trabalho selecionado",
+      "no_workspace_body": "Por favor selecione um espaço de trabalho para as notas importadas."
     },
     "inline": {
       "standard": {
