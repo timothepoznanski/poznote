@@ -908,8 +908,9 @@
     "messages": {
       "database_restored": "Base de données restaurée avec succès !",
       "complete_backup_restored": "{{message}}",
-      "notes_imported": "{{message}}",
-      "attachments_imported": "{{message}}"
+      "notes_imported": "Importé {{count}} note(s) dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "Importé {{count}} note(s) depuis le ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
     },
     "errors": {
       "complete_restore_form_not_found": "Formulaire de restauration complète introuvable. Veuillez réessayer.",
@@ -931,7 +932,8 @@
     },
     "spinner": {
       "processing": "Restauration en cours...",
-      "processing_long": "Restauration en cours... Cela peut prendre quelques instants."
+      "processing_long": "Restauration en cours... Cela peut prendre quelques instants.",
+      "importing_notes": "Importation des notes en cours..."
     },
     "chunked": {
       "preparing_upload": "Préparation du téléversement...",
@@ -978,7 +980,9 @@
         "upload_error": "Erreur de téléversement",
         "invalid_file_type": "Type de fichier invalide (uniquement {{allowed}})",
         "cannot_read_file": "Impossible de lire le fichier"
-      }
+      },
+      "summary_with_location": "Cela importera {{fileText}} dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
+      "summary_zip_with_location": "Cela extraira et importera tous les fichiers HTML et Markdown depuis l'archive ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
@@ -1000,8 +1004,16 @@
         "description_link": "Voir la documentation pour plus de détails"
       },
       "individual_notes": {
+        "workspace": "Workspace cible",
+        "loading": "Chargement...",
+        "folder": "Dossier cible",
+        "optional": "optionnel",
+        "no_folder": "Aucun dossier (racine)",
+        "select_files": "Sélectionner les fichiers",
+        "files_info": "Plusieurs fichiers (max 50) ou archive ZIP unique (max 300 fichiers)",
+        "supported_formats": "Formats supportés : .html, .md, .markdown, .zip",
         "title": "Vous voulez importer des fichiers HTML ou Markdown ?",
-        "description_html": "Les notes seront importées dans l’espace de travail <b>Poznote</b> sans être assignées à un dossier.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l’extension).",
+        "description_html": "Importez des fichiers HTML ou Markdown individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension).",
         "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown"
       }
     },
@@ -1068,7 +1080,9 @@
       "no_file_selected": {
         "title": "Aucun fichier sélectionné",
         "body": "Veuillez sélectionner un fichier avant de lancer l’import."
-      }
+      },
+      "no_workspace_title": "Aucun espace de travail sélectionné",
+      "no_workspace_body": "Veuillez sélectionner un espace de travail pour les notes importées."
     },
     "inline": {
       "standard": {
@@ -1079,6 +1093,14 @@
         "button_prefix": "Démarrer la restauration par blocs",
         "small_file_note": "Note : pour les petits fichiers, le téléversement standard est généralement plus rapide. Mais vous pouvez quand même utiliser le téléversement par blocs si vous le souhaitez."
       }
+    },
+    "drag_drop": {
+      "individual_notes": "Déposer les fichiers ici",
+      "complete_backup": "Déposer le ZIP de sauvegarde ici",
+      "database": "Déposer le fichier SQL ici",
+      "notes": "Déposer le ZIP de notes ici",
+      "attachments": "Déposer le ZIP de pièces jointes ici",
+      "chunked_backup": "Déposer le ZIP de sauvegarde ici"
     }
   },
   "markdown_guide": {

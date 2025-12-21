@@ -908,8 +908,9 @@
     "messages": {
       "database_restored": "Datenbank erfolgreich wiederhergestellt!",
       "complete_backup_restored": "{{message}}",
-      "notes_imported": "{{message}}",
-      "attachments_imported": "{{message}}"
+      "notes_imported": "{{count}} Notiz(en) in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importiert.",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "{{count}} Notiz(en) aus ZIP in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importiert."
     },
     "errors": {
       "complete_restore_form_not_found": "Vollständiges Wiederherstellungsformular nicht gefunden. Bitte versuchen Sie es erneut.",
@@ -931,7 +932,8 @@
     },
     "spinner": {
       "processing": "Wiederherstellung wird verarbeitet...",
-      "processing_long": "Wiederherstellung wird verarbeitet... Dies kann einige Momente dauern."
+      "processing_long": "Wiederherstellung wird verarbeitet... Dies kann einige Momente dauern.",
+      "importing_notes": "Notizen werden importiert..."
     },
     "chunked": {
       "preparing_upload": "Upload wird vorbereitet...",
@@ -978,7 +980,9 @@
         "upload_error": "Upload-Fehler",
         "invalid_file_type": "Ungültiger Dateityp (nur {{allowed}} erlaubt)",
         "cannot_read_file": "Datei kann nicht gelesen werden"
-      }
+      },
+      "summary_with_location": "Dies wird {{fileText}} in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importieren.",
+      "summary_zip_with_location": "Dies wird alle HTML- und Markdown-Dateien aus dem ZIP-Archiv in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" extrahieren und importieren."
     },
     "sections": {
       "restore_from_backup": {
@@ -1000,14 +1004,30 @@
         "description_link": "Siehe Dokumentation für Details"
       },
       "individual_notes": {
+        "workspace": "Ziel-Arbeitsbereich",
+        "loading": "Laden...",
+        "folder": "Zielordner",
+        "optional": "optional",
+        "no_folder": "Kein Ordner (Root-Ebene)",
+        "select_files": "Dateien auswählen",
+        "files_info": "Mehrere Dateien (max 50) oder einzelnes ZIP-Archiv (max 300 Dateien)",
+        "supported_formats": "Unterstützt: .html, .md, .markdown, .zip",
         "title": "Möchten Sie HTML- oder Markdown-Dateien importieren?",
-        "description_html": "Notizen werden in den <b>Poznote</b>-Arbeitsbereich importiert, ohne einem Ordner zugewiesen zu werden.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
+        "description_html": "Importieren Sie einzelne HTML- oder Markdown-Dateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
         "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown"
       }
     },
     "buttons": {
       "start_restore": "Wiederherstellung starten",
       "start_import_individual_notes": "Import einzelner Notizen starten"
+    },
+    "drag_drop": {
+      "individual_notes": "Dateien hier ablegen",
+      "complete_backup": "Sicherungs-ZIP hier ablegen",
+      "database": "SQL-Datei hier ablegen",
+      "notes": "Notizen-ZIP hier ablegen",
+      "attachments": "Anhänge-ZIP hier ablegen",
+      "chunked_backup": "Sicherungs-ZIP hier ablegen"
     },
     "modals": {
       "import_confirm": {
@@ -1068,7 +1088,9 @@
       "no_file_selected": {
         "title": "Keine Datei ausgewählt",
         "body": "Bitte wählen Sie eine Datei aus, bevor Sie mit dem Import fortfahren."
-      }
+      },
+      "no_workspace_title": "Kein Arbeitsbereich ausgewählt",
+      "no_workspace_body": "Bitte wählen Sie einen Arbeitsbereich für die importierten Notizen aus."
     },
     "inline": {
       "standard": {

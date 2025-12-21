@@ -252,6 +252,7 @@ After installation, access Poznote in your web browser:
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
+- [Troubleshooting](#troubleshooting)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
@@ -341,13 +342,14 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 <a id="import-individual-notes"></a>
 **📥 Import Individual Notes**
 
-Import one or more HTML or Markdown notes directly:
+Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
 
-  - Upload `.html`, `.md`, or `.markdown` files
-  - Multiple files can be selected at once
-  - Notes are imported into the Poznote workspace
-  - Titles are automatically extracted from file content or filename
-  - Supports both full HTML documents and simple fragments
+  - **Supported formats:** `.html`, `.md`, `.markdown`, or `.zip` files
+  - **ZIP archives:** Can contain up to 300 files (`.html`, `.md`, `.markdown`)
+  - **Individual files:** Up to 50 files can be selected at once
+  - **Workspace selection:** Choose the target workspace for imported notes
+  - **Folder selection:** Optionally select a specific folder within the workspace
+  - **Drag & drop:** Simply drag files or ZIP archives onto the upload area
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 
@@ -432,6 +434,35 @@ And then you will have two completely isolated instances, for example:
 - Alice's Poznote: http://localhost:8041
 
 > 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
+
+## Troubleshooting
+
+### Permission denied when using Docker
+
+If you encounter errors like:
+- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
+- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
+- The `database` folder is created with `root:root` instead of `www-data:www-data`
+
+This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
+
+**Solution:** Before starting the container, set the correct permissions on your host machine:
+
+```bash
+# Navigate to your Poznote directory
+cd poznote
+
+# Create the data directory structure with correct permissions
+mkdir -p data/database
+
+# Set ownership to UID 82 (www-data in Alpine Linux)
+sudo chown -R 82:82 data
+
+# Start the container
+docker compose up -d
+```
+
+> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
 
 ## Tech Stack
 
@@ -647,6 +678,86 @@ curl -X POST -u 'username:password' \
     "workspace": "Personal"
   }' \
   http://YOUR_SERVER/api_create_folder.php
+```
+
+**Create Subfolder (parent/child)**
+
+Create a subfolder by specifying a parent folder path:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "2024",
+    "parent_folder": "My Projects",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+You can also target a specific parent folder by ID:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_name": "Q1",
+    "parent_folder_id": 12,
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+**Create Nested Folders in One Call (path notation)**
+
+Create a nested structure in one request:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_path": "Projects/2024/Q1",
+    "workspace": "Personal",
+    "create_parents": true
+  }' \
+  http://YOUR_SERVER/api_create_folder.php
+```
+
+**List Folders (flat or hierarchy)**
+
+List folders (flat list with `path`):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_list_folders.php?workspace=Personal"
+```
+
+List folders as a hierarchy tree (nested `children`):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_list_folders.php?workspace=Personal&include_hierarchy=true"
+```
+
+**Move Folder to a Different Parent**
+
+Move a folder by path:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_path": "Projects/2024/Q1",
+    "new_parent_folder": "Archive/2023",
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_move_folder.php
+```
+
+Move a folder by ID:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{
+    "folder_id": 34,
+    "new_parent_folder_id": 56,
+    "workspace": "Personal"
+  }' \
+  http://YOUR_SERVER/api_move_folder.php
 ```
 
 **Delete Folder**
