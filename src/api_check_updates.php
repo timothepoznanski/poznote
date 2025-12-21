@@ -68,6 +68,16 @@ function checkForUpdates() {
         
         $result['remote_version'] = $remote_version;
         
+        // Check if remote version is a test version (contains -test)
+        $is_test_version = (strpos($remote_version, '-test') !== false);
+        
+        // Don't show test versions as available updates
+        if ($is_test_version) {
+            $result['has_updates'] = false;
+            $result['remote_version'] = $remote_version;
+            return $result;
+        }
+        
         // Compare versions using semantic versioning
         $result['has_updates'] = version_compare($remote_version, $current_version_clean, '>');
         

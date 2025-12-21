@@ -71,8 +71,16 @@ function getVersionInfo() {
         $current_clean = ltrim($current_version, 'v');
         $latest_clean = ltrim($latest_version, 'v');
         
-        // Compare versions using semantic versioning
-        $comparison = version_compare($latest_clean, $current_clean);
+        // Check if latest version is a test version (contains -test)
+        $is_test_version = (strpos($latest_clean, '-test') !== false);
+        
+        // If it's a test version, don't show it as an available update
+        if ($is_test_version) {
+            $comparison = -1; // Treat test versions as older
+        } else {
+            // Compare versions using semantic versioning
+            $comparison = version_compare($latest_clean, $current_clean);
+        }
         
         $result['is_up_to_date'] = ($comparison <= 0);
         $result['has_update'] = ($comparison > 0);
