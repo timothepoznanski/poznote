@@ -252,6 +252,7 @@ After installation, access Poznote in your web browser:
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
+- [Troubleshooting](#troubleshooting)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
@@ -432,6 +433,35 @@ And then you will have two completely isolated instances, for example:
 - Alice's Poznote: http://localhost:8041
 
 > 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
+
+## Troubleshooting
+
+### Permission denied when using Docker
+
+If you encounter errors like:
+- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
+- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
+- The `database` folder is created with `root:root` instead of `www-data:www-data`
+
+This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
+
+**Solution:** Before starting the container, set the correct permissions on your host machine:
+
+```bash
+# Navigate to your Poznote directory
+cd poznote
+
+# Create the data directory structure with correct permissions
+mkdir -p data/database
+
+# Set ownership to UID 82 (www-data in Alpine Linux)
+sudo chown -R 82:82 data
+
+# Start the container
+docker compose up -d
+```
+
+> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
 
 ## Tech Stack
 
