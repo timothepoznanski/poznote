@@ -418,12 +418,12 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
 
-  - **Supported formats:** `.html`, `.md`, `.markdown`, or `.zip` files
-  - **ZIP archives:** Can contain up to 300 files (`.html`, `.md`, `.markdown`)
-  - **Individual files:** Up to 50 files can be selected at once
-  - **Workspace selection:** Choose the target workspace for imported notes
-  - **Folder selection:** Optionally select a specific folder within the workspace
-  - **Drag & drop:** Simply drag files or ZIP archives onto the upload area
+  - Support `.html`, `.md`, `.markdown`, or `.zip` files types
+  - ZIP archives can contain up to 300 files (`.html`, `.md`, `.markdown`)
+  - Up to 50 files can be selected at once
+  - Choose the target workspace for imported notes
+  - Optionally select a specific folder within the workspace
+  - Simply drag files or ZIP archives onto the upload area
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 
