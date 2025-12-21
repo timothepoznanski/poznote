@@ -12,7 +12,6 @@
     "save": "Salvar",
     "download": "Baixar",
     "create": "Criar",
-    "delete": "Excluir",
     "duplicate": "Duplicar",
     "move": "Mover",
     "rename": "Renomear",
@@ -890,9 +889,11 @@
     },
     "remember_me": "Lembrar-me por 30 dias",
     "button": "Login",
+    "oidc_button": "Continuar com {{provider}}",
     "documentation": "Documentação do Poznote",
     "errors": {
-      "invalid_credentials": "Nome de usuário ou senha incorretos."
+      "invalid_credentials": "Nome de usuário ou senha incorretos.",
+      "oidc_failed": "Falha no login SSO. Por favor, tente novamente."
     }
   },
   "restore_import": {

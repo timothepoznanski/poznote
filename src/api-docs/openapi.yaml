@@ -7,6 +7,10 @@ info:
     **Authentication:** All endpoints support both HTTP Basic Authentication and Session Authentication.
     - Use HTTP Basic Auth (`-u username:password`) for scripts and automation
     - Use Session Auth for browser-based access (Swagger UI)
+
+    **OIDC / SSO (optional):** Poznote can be configured to authenticate users via OpenID Connect.
+    - Start the flow: `GET /oidc_login.php`
+    - Callback: `GET /oidc_callback.php`
     
     [View complete curl examples in the README](https://github.com/timothepoznanski/poznote#api-documentation)
   version: 1.0.0
@@ -34,7 +38,9 @@ components:
     SessionAuth:
       type: apiKey
       in: cookie
-      name: PHPSESSID
+      # Poznote sets a custom PHP session cookie name based on the configured port.
+      # Default is typically: POZNOTE_SESSION_8040
+      name: POZNOTE_SESSION_8040
 
   schemas:
     Note:
@@ -101,6 +107,33 @@ components:
                 $ref: '#/components/schemas/FolderNode'
 
 paths:
+  /oidc_login.php:
+    get:
+      tags:
+        - System Information
+      summary: Start OIDC login (SSO)
+      description: |
+        Starts the OpenID Connect login flow and redirects the browser to the configured Identity Provider.
+
+        This is a browser endpoint (not intended for scripts).
+      responses:
+        '302':
+          description: Redirect to OIDC provider
+
+  /oidc_callback.php:
+    get:
+      tags:
+        - System Information
+      summary: OIDC callback
+      description: |
+        Callback endpoint for the OpenID Connect authorization code flow.
+        Exchanges the `code` for tokens, validates the `id_token`, then creates a session.
+
+        This is a browser endpoint (not intended for scripts).
+      responses:
+        '200':
+          description: HTML redirect page
+
   /api_list_notes.php:
     get:
       tags:
