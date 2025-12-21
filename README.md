@@ -342,13 +342,14 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 <a id="import-individual-notes"></a>
 **📥 Import Individual Notes**
 
-Import one or more HTML or Markdown notes directly:
+Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
 
-  - Upload `.html`, `.md`, or `.markdown` files
-  - Multiple files can be selected at once
-  - Notes are imported into the Poznote workspace
-  - Titles are automatically extracted from file content or filename
-  - Supports both full HTML documents and simple fragments
+  - **Supported formats:** `.html`, `.md`, `.markdown`, or `.zip` files
+  - **ZIP archives:** Can contain up to 300 files (`.html`, `.md`, `.markdown`)
+  - **Individual files:** Up to 50 files can be selected at once
+  - **Workspace selection:** Choose the target workspace for imported notes
+  - **Folder selection:** Optionally select a specific folder within the workspace
+  - **Drag & drop:** Simply drag files or ZIP archives onto the upload area
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 
