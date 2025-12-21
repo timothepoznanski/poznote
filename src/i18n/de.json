@@ -1000,8 +1000,15 @@
         "description_link": "Siehe Dokumentation für Details"
       },
       "individual_notes": {
+        "workspace": "Ziel-Arbeitsbereich",
+        "loading": "Laden...",
+        "folder": "Zielordner",
+        "no_folder": "Kein Ordner (Root-Ebene)",
+        "select_files": "Dateien auswählen",
+        "files_info": "Mehrere Dateien (max 50) oder einzelnes ZIP-Archiv (max 300 Dateien)",
+        "supported_formats": "Unterstützt: .html, .md, .markdown, .zip",
         "title": "Möchten Sie HTML- oder Markdown-Dateien importieren?",
-        "description_html": "Notizen werden in den <b>Poznote</b>-Arbeitsbereich importiert, ohne einem Ordner zugewiesen zu werden.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
+        "description_html": "Importieren Sie einzelne HTML- oder Markdown-Dateien oder ein ZIP-Archiv mit mehreren Dateien. Wählen Sie Ihren Ziel-Arbeitsbereich und weisen Sie optional Notizen einem bestimmten Ordner zu.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
         "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown"
       }
     },

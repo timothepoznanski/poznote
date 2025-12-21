@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
             hideCustomAlert();
         }
     });
+    
+    // Load workspaces for individual notes import
+    loadWorkspacesForImport();
 });
 
 // Complete Restore Functions
@@ -219,43 +222,71 @@ function proceedWithAttachmentsImport() {
 // Individual Notes Import Functions
 function showIndividualNotesImportConfirmation() {
     const fileInput = document.getElementById('individual_notes_files');
+    const workspaceSelect = document.getElementById('target_workspace_select');
+    const folderSelect = document.getElementById('target_folder_select');
     
     if (!fileInput.files.length) {
         showCustomAlert(
             tr('restore_import.alerts.no_files_selected_title', 'No Files Selected'),
-            tr('restore_import.alerts.no_files_selected_body', 'Please select one or more HTML or Markdown files before proceeding with the import.')
+            tr('restore_import.alerts.no_files_selected_body', 'Please select one or more HTML, Markdown files, or a ZIP archive before proceeding with the import.')
         );
         return;
     }
     
-    // Check file count limit
-    const maxFiles = 20;
-    const fileCount = fileInput.files.length;
-    
-    if (fileCount > maxFiles) {
+    // Validate workspace selection
+    if (!workspaceSelect.value) {
         showCustomAlert(
-            tr('restore_import.alerts.too_many_files_title', 'Too Many Files Selected'),
-            tr(
-                'restore_import.alerts.too_many_files_body',
-                'You can import a maximum of {{max}} files at once. You have selected {{count}} files. Please select fewer files and try again.',
-                { max: maxFiles, count: fileCount }
-            )
+            tr('restore_import.alerts.no_workspace_title', 'No Workspace Selected'),
+            tr('restore_import.alerts.no_workspace_body', 'Please select a workspace for the imported notes.')
         );
         return;
     }
     
-    // Update summary text
-    const fileText = fileCount === 1
-        ? tr('restore_import.individual_notes.file_count_one', '1 note')
-        : tr('restore_import.individual_notes.file_count_many', '{{count}} notes', { count: fileCount });
-
-    const summary = tr(
-        'restore_import.individual_notes.summary',
-        'This will import {{fileText}} into the Poznote workspace without assigning them to a folder.',
-        { fileText: fileText }
-    );
-    document.getElementById('individualNotesImportSummary').textContent = summary;
+    const fileCount = fileInput.files.length;
+    const workspace = workspaceSelect.options[workspaceSelect.selectedIndex].text;
+    const folder = folderSelect.value ? folderSelect.options[folderSelect.selectedIndex].text : tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)');
     
+    // Check if it's a single ZIP file
+    const isSingleZip = fileCount === 1 && fileInput.files[0].name.toLowerCase().endsWith('.zip');
+    
+    let summary = '';
+    
+    if (isSingleZip) {
+        // For ZIP files, show different confirmation message
+        summary = tr(
+            'restore_import.individual_notes.summary_zip_with_location',
+            'This will extract and import all HTML and Markdown files from the ZIP archive into workspace "{{workspace}}", folder "{{folder}}".',
+            { workspace: workspace, folder: folder }
+        );
+    } else {
+        // Check file count limit for non-ZIP uploads
+        const maxFiles = 50;
+        
+        if (fileCount > maxFiles) {
+            showCustomAlert(
+                tr('restore_import.alerts.too_many_files_title', 'Too Many Files Selected'),
+                tr(
+                    'restore_import.alerts.too_many_files_body',
+                    'You can import a maximum of {{max}} files at once. You have selected {{count}} files. Please select fewer files and try again.',
+                    { max: maxFiles, count: fileCount }
+                )
+            );
+            return;
+        }
+        
+        // Update summary text for individual files
+        const fileText = fileCount === 1
+            ? tr('restore_import.individual_notes.file_count_one', '1 note')
+            : tr('restore_import.individual_notes.file_count_many', '{{count}} notes', { count: fileCount });
+
+        summary = tr(
+            'restore_import.individual_notes.summary_with_location',
+            'This will import {{fileText}} into workspace "{{workspace}}", folder "{{folder}}".',
+            { fileText: fileText, workspace: workspace, folder: folder }
+        );
+    }
+    
+    document.getElementById('individualNotesImportSummary').textContent = summary;
     document.getElementById('individualNotesImportConfirmModal').style.display = 'flex';
 }
 
@@ -441,4 +472,100 @@ function startChunkedRestore() {
 
     // Start upload
     chunkedUploader.uploadFile(file, 'api_chunked_restore.php');
+}
+
+// Load workspaces for individual notes import
+function loadWorkspacesForImport() {
+    const workspaceSelect = document.getElementById('target_workspace_select');
+    if (!workspaceSelect) return;
+    
+    fetch('api_workspaces.php?action=list')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.workspaces) {
+                workspaceSelect.innerHTML = '';
+                
+                // Add workspaces to select
+                data.workspaces.forEach(workspace => {
+                    const option = document.createElement('option');
+                    option.value = workspace.name;
+                    option.textContent = workspace.name;
+                    
+                    // Select 'Poznote' by default if it exists
+                    if (workspace.name === 'Poznote') {
+                        option.selected = true;
+                    }
+                    
+                    workspaceSelect.appendChild(option);
+                });
+                
+                // Load folders for the default selected workspace
+                const selectedWorkspace = workspaceSelect.value;
+                if (selectedWorkspace) {
+                    loadFoldersForImport(selectedWorkspace);
+                }
+            } else {
+                console.error('Failed to load workspaces:', data);
+                workspaceSelect.innerHTML = '<option value="Poznote">Poznote</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading workspaces:', error);
+            workspaceSelect.innerHTML = '<option value="Poznote">Poznote</option>';
+        });
+}
+
+// Load folders for selected workspace
+function loadFoldersForImport(workspace) {
+    const folderSelect = document.getElementById('target_folder_select');
+    if (!folderSelect) return;
+    
+    // Reset to "No folder" option
+    folderSelect.innerHTML = '<option value="">' + 
+        tr('restore_import.sections.individual_notes.no_folder', 'No folder (root level)') + 
+        '</option>';
+    
+    if (!workspace) return;
+    
+    // Fetch folders for the selected workspace
+    fetch('api_folders.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            action: 'list',
+            workspace: workspace
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.folders) {
+                // Flatten the hierarchical structure for simple display
+                const flattenFolders = (folders, prefix = '') => {
+                    let result = [];
+                    folders.forEach(folder => {
+                        const displayName = prefix + folder.name;
+                        result.push({ name: folder.name, displayName: displayName });
+                        
+                        if (folder.children && folder.children.length > 0) {
+                            result = result.concat(flattenFolders(folder.children, displayName + ' / '));
+                        }
+                    });
+                    return result;
+                };
+                
+                const flatFolders = flattenFolders(data.folders);
+                
+                flatFolders.forEach(folder => {
+                    const option = document.createElement('option');
+                    option.value = folder.name;
+                    option.textContent = folder.displayName;
+                    folderSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading folders:', error);
+        });
 }

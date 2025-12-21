@@ -1000,8 +1000,15 @@
         "description_link": "Veja a documentação para detalhes"
       },
       "individual_notes": {
+        "workspace": "Espaço de trabalho destino",
+        "loading": "Carregando...",
+        "folder": "Pasta destino",
+        "no_folder": "Sem pasta (nível raiz)",
+        "select_files": "Selecionar arquivos",
+        "files_info": "Vários arquivos (máx 50) ou arquivo ZIP único (máx 300 arquivos)",
+        "supported_formats": "Suportados: .html, .md, .markdown, .zip",
         "title": "Quer importar arquivos HTML ou Markdown?",
-        "description_html": "As notas serão importadas para o espaço de trabalho <b>Poznote</b> sem serem atribuídas a uma pasta.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
+        "description_html": "Importe arquivos HTML ou Markdown individuais, ou um arquivo ZIP contendo vários arquivos. Selecione seu espaço de trabalho de destino e atribua opcionalmente as notas a uma pasta específica.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
         "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown"
       }
     },

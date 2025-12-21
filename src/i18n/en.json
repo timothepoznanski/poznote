@@ -1000,8 +1000,15 @@
         "description_link": "See documentation for details"
       },
       "individual_notes": {
+        "workspace": "Target Workspace",
+        "loading": "Loading...",
+        "folder": "Target Folder",
+        "no_folder": "No folder (root level)",
+        "select_files": "Select Files",
+        "files_info": "Multiple files (max 50) or single ZIP archive (max 300 files)",
+        "supported_formats": "Supported: .html, .md, .markdown, .zip",
         "title": "Want to import HTML or Markdown files?",
-        "description_html": "Notes will be imported into the <b>Poznote</b> workspace without being assigned to a folder.<br><br>The title will be automatically created from the file name (without the extension).",
+        "description_html": "Import individual HTML or Markdown files, or a ZIP archive containing multiple files. Select your target workspace and optionally assign notes to a specific folder.<br><br>The title will be automatically created from the file name (without the extension).",
         "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown"
       }
     },
