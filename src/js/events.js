@@ -309,8 +309,8 @@ function handleChecklistKeydown(e) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
-    } else if (e.key === 'Backspace') {
-        // Handle Backspace key
+    } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        // Handle Backspace/Delete key
         var checklistItem = input.closest('.checklist-item');
         if (!checklistItem) return;
         
@@ -319,10 +319,12 @@ function handleChecklistKeydown(e) {
         
         // Check if cursor is at the beginning of the input
         var cursorPos = input.selectionStart;
+        var cursorEnd = input.selectionEnd;
         var textValue = input.value;
         
-        if (cursorPos === 0 && textValue === '') {
-            // Empty item at the beginning - delete it
+        // Only handle deletion at the beginning (Backspace) or when item is empty
+        if (e.key === 'Backspace' && cursorPos === 0 && cursorEnd === 0) {
+            // Cursor at beginning - merge with previous item or delete if empty
             e.preventDefault();
             
             // IMPORTANT: Set noteid from the noteentry element
@@ -337,40 +339,52 @@ function handleChecklistKeydown(e) {
             // Get the previous item to focus on
             var previousItem = checklistItem.previousElementSibling;
             
-            // Remove current item
-            checklistItem.remove();
-            
-            // If there are no more items in the checklist, remove the entire checklist
-            var remainingItems = checklist.querySelectorAll('.checklist-item');
-            if (remainingItems.length === 0) {
-                // Create a paragraph before removing the checklist
-                var paragraph = document.createElement('p');
-                paragraph.textContent = '';
+            if (textValue === '') {
+                // Empty item - delete it
+                checklistItem.remove();
                 
-                checklist.parentNode.insertBefore(paragraph, checklist);
-                checklist.remove();
-                
-                // Focus the new paragraph
-                var range = document.createRange();
-                range.selectNodeContents(paragraph);
-                range.collapse(true);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                paragraph.focus();
+                // If there are no more items in the checklist, remove the entire checklist
+                var remainingItems = checklist.querySelectorAll('.checklist-item');
+                if (remainingItems.length === 0) {
+                    // Create a paragraph before removing the checklist
+                    var paragraph = document.createElement('p');
+                    paragraph.innerHTML = '<br>';
+                    
+                    checklist.parentNode.insertBefore(paragraph, checklist);
+                    checklist.remove();
+                    
+                    // Focus the new paragraph
+                    var range = document.createRange();
+                    range.selectNodeContents(paragraph);
+                    range.collapse(true);
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    paragraph.focus();
+                } else if (previousItem && previousItem.classList.contains('checklist-item')) {
+                    // Focus on the previous item's input
+                    var previousInput = previousItem.querySelector('.checklist-input');
+                    if (previousInput) {
+                        previousInput.focus();
+                        // Move cursor to the end of the previous item
+                        previousInput.setSelectionRange(previousInput.value.length, previousInput.value.length);
+                    }
+                } else {
+                    // Focus on the first remaining item
+                    var firstInput = checklist.querySelector('.checklist-input');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }
             } else if (previousItem && previousItem.classList.contains('checklist-item')) {
-                // Focus on the previous item's input
+                // Not empty - merge with previous item
                 var previousInput = previousItem.querySelector('.checklist-input');
                 if (previousInput) {
+                    var previousLength = previousInput.value.length;
+                    previousInput.value = previousInput.value + textValue;
                     previousInput.focus();
-                    // Move cursor to the end of the previous item
-                    previousInput.setSelectionRange(previousInput.value.length, previousInput.value.length);
-                }
-            } else {
-                // Focus on the first remaining item
-                var firstInput = checklist.querySelector('.checklist-input');
-                if (firstInput) {
-                    firstInput.focus();
+                    previousInput.setSelectionRange(previousLength, previousLength);
+                    checklistItem.remove();
                 }
             }
             
@@ -383,7 +397,7 @@ function handleChecklistKeydown(e) {
                 window.markNoteAsModified();
             }
         }
-        // Note: We do NOT prevent default for non-empty items or when cursor is not at start
+        // Note: We do NOT prevent default for other cases
         // This allows normal text deletion to work
     } else if (e.key === 'ArrowDown' || e.key === 'Down') {
         // Handle arrow down - navigate to next checklist item
@@ -404,8 +418,24 @@ function handleChecklistKeydown(e) {
                     // Move cursor to the beginning of the next item
                     nextInput.setSelectionRange(0, 0);
                 }
+            } else {
+                // No next item - try to exit checklist and focus next element
+                e.preventDefault();
+                var checklist = checklistItem.closest('.checklist');
+                if (checklist && checklist.nextElementSibling) {
+                    var nextElement = checklist.nextElementSibling;
+                    // Focus next editable element
+                    if (nextElement.isContentEditable) {
+                        nextElement.focus();
+                        var range = document.createRange();
+                        range.selectNodeContents(nextElement);
+                        range.collapse(true);
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                }
             }
-            // If there's no next item, allow default behavior to exit the checklist
         }
     } else if (e.key === 'ArrowUp' || e.key === 'Up') {
         // Handle arrow up - navigate to previous checklist item
@@ -425,8 +455,46 @@ function handleChecklistKeydown(e) {
                     // Move cursor to the end of the previous item
                     previousInput.setSelectionRange(previousInput.value.length, previousInput.value.length);
                 }
+            } else {
+                // No previous item - try to exit checklist and focus previous element
+                e.preventDefault();
+                var checklist = checklistItem.closest('.checklist');
+                if (checklist && checklist.previousElementSibling) {
+                    var prevElement = checklist.previousElementSibling;
+                    // Focus previous editable element
+                    if (prevElement.isContentEditable) {
+                        prevElement.focus();
+                        var range = document.createRange();
+                        range.selectNodeContents(prevElement);
+                        range.collapse(false); // false = end of content
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                } else {
+                    // No previous element - create one before the checklist
+                    var noteentry = checklist.closest('.noteentry');
+                    if (noteentry && checklist.parentNode === noteentry) {
+                        var paragraph = document.createElement('p');
+                        paragraph.innerHTML = '<br>';
+                        checklist.parentNode.insertBefore(paragraph, checklist);
+                        
+                        // Focus the new paragraph
+                        paragraph.focus();
+                        var range = document.createRange();
+                        range.selectNodeContents(paragraph);
+                        range.collapse(true);
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        
+                        // Mark as modified
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+                    }
+                }
             }
-            // If there's no previous item, allow default behavior to exit the checklist
         }
     }
 }
