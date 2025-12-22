@@ -1524,37 +1524,40 @@ function insertChecklist() {
     return;
   }
   
+  // Generate a unique temporary ID to identify the inserted checklist
+  const tempId = 'temp-checklist-' + Date.now();
+  
   // Create checklist HTML with 1 item only - using simple input
   const checklistHTML = `
-<ul class="checklist" style="list-style: none; padding-left: 0; margin: 8px 0;">
+<ul class="checklist" id="${tempId}" style="list-style: none; padding-left: 0; margin: 8px 0;">
   <li class="checklist-item"><input type="checkbox" class="checklist-checkbox"> <input type="text" class="checklist-input" style="border: none; background: none; padding: 0; font-family: inherit; font-size: inherit; width: calc(100% - 30px);"></li>
 </ul>
 <p><br></p>`;
 
   try {
-    // Try to insert using execCommand
+    // Insert using execCommand
     const success = document.execCommand('insertHTML', false, checklistHTML);
     
     if (success) {
-      // Find the checklist that was just inserted and focus on its input
-      const allChecklists = noteentry.querySelectorAll('.checklist');
-      if (allChecklists.length > 0) {
-        const insertedChecklist = allChecklists[allChecklists.length - 1];
-        const input = insertedChecklist.querySelector('.checklist-input');
+      // Find the checklist we just inserted using the temporary ID
+      const insertedChecklist = document.getElementById(tempId);
+      
+      if (insertedChecklist) {
+        // Remove the temporary ID
+        insertedChecklist.removeAttribute('id');
         
-        setTimeout(() => {
-          // Focus on the input
-          if (input) input.focus();
-          
-          // Trigger save with 15-second delay (same as regular text editing)
-          if (typeof window.markNoteAsModified === 'function') {
-            window.markNoteAsModified();
-          } else if (typeof window.saveNoteImmediately === 'function') {
-            window.saveNoteImmediately();
-          } else {
-            // Auto-save handles state management automatically
-          }
-        }, 10);
+        // Focus on the input
+        const input = insertedChecklist.querySelector('.checklist-input');
+        if (input) {
+          setTimeout(() => {
+            input.focus();
+          }, 10);
+        }
+        
+        // Trigger save
+        if (typeof window.markNoteAsModified === 'function') {
+          window.markNoteAsModified();
+        }
       }
       
       return;
@@ -1567,7 +1570,10 @@ function insertChecklist() {
   try {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = checklistHTML;
-    const checklist = tempDiv.firstChild;
+    const checklist = tempDiv.firstElementChild;
+    
+    // Remove the temporary ID since we have a direct reference
+    checklist.removeAttribute('id');
     
     range.insertNode(checklist);
     range.setStartAfter(checklist);
@@ -1576,11 +1582,11 @@ function insertChecklist() {
     sel.addRange(range);
     
     const input = checklist.querySelector('.checklist-input');
-    
-    setTimeout(() => {
-      // Focus on the input of the checklist we just inserted
-      if (input) input.focus();
-    }, 10);
+    if (input) {
+      setTimeout(() => {
+        input.focus();
+      }, 10);
+    }
     
     noteentry.dispatchEvent(new Event('input', { bubbles: true }));
   } catch (e) {
