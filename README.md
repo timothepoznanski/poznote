@@ -427,8 +427,8 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
 
   - Support `.html`, `.md`, `.markdown`, or `.zip` files types
-  - ZIP archives can contain up to 300 files (`.html`, `.md`, `.markdown`)
-  - Up to 50 files can be selected at once
+  - ZIP archives can contain up to 300 files — configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env` (default: 300)
+  - Up to 50 files can be selected at once — configurable via `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` in your `.env` (default: 50)
   - Choose the target workspace for imported notes
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
