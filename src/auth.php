@@ -139,11 +139,25 @@ function requireApiAuth() {
         return;
     }
     
-    // If no session, try HTTP Basic Auth
+    // Check if Basic Auth is disabled (e.g., when forcing OIDC-only)
+    $basicAuthDisabled = defined('OIDC_DISABLE_BASIC_AUTH') && OIDC_DISABLE_BASIC_AUTH;
+    
+    // If no session, try HTTP Basic Auth (unless disabled)
     if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
         $msg = api_t('auth.api.authentication_required', [], 'Authentication required');
         header('HTTP/1.1 401 Unauthorized');
-        header('WWW-Authenticate: Basic realm="Poznote API"');
+        if (!$basicAuthDisabled) {
+            header('WWW-Authenticate: Basic realm="Poznote API"');
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+    
+    // If Basic Auth is disabled, reject it
+    if ($basicAuthDisabled) {
+        $msg = api_t('auth.api.basic_auth_disabled', [], 'Basic authentication is disabled');
+        header('HTTP/1.1 403 Forbidden');
         header('Content-Type: application/json');
         echo json_encode(['error' => $msg]);
         exit;

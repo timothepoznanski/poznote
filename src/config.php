@@ -23,4 +23,6 @@
     define('OIDC_END_SESSION_ENDPOINT', (string)($_ENV['POZNOTE_OIDC_END_SESSION_ENDPOINT'] ?? ''));
     // Optional: disable normal login when OIDC is enabled (force SSO-only login)
     define('OIDC_DISABLE_NORMAL_LOGIN', filter_var($_ENV['POZNOTE_OIDC_DISABLE_NORMAL_LOGIN'] ?? false, FILTER_VALIDATE_BOOL));
+    // Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)
+    define('OIDC_DISABLE_BASIC_AUTH', filter_var($_ENV['POZNOTE_OIDC_DISABLE_BASIC_AUTH'] ?? false, FILTER_VALIDATE_BOOL));
 ?>

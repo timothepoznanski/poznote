@@ -434,7 +434,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
     $importedCount = 0;
     $errorCount = 0;
     $errors = [];
-    $maxFiles = 300;
+    $maxFiles = (int)($_ENV['POZNOTE_IMPORT_MAX_ZIP_FILES'] ?? 300);
     
     // Iterate through all files in ZIP
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -547,7 +547,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     global $con;
     
     // Check file count limit
-    $maxFiles = 50;
+    $maxFiles = (int)($_ENV['POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES'] ?? 50);
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
