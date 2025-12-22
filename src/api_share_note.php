@@ -43,7 +43,7 @@ try {
         }
         $token = $row['token'];
         
-        // Build URL with theme parameter
+        // Build pretty URLs (same as create/renew)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
@@ -51,11 +51,13 @@ try {
             $scriptDir = '';
         }
         $scriptDir = rtrim($scriptDir, '/\\');
-        $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
-        $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token . $themeParam;
-        
+        $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+        $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
+        $url_path = $base . '/' . rawurlencode($token);
+        $url_workspace = $base . '/workspace/' . rawurlencode($token);
+
         header('Content-Type: application/json');
-        echo json_encode(['shared' => true, 'url' => $url]);
+        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace]);
         exit;
     } elseif ($action === 'revoke') {
         // Delete any share for this note
@@ -67,29 +69,57 @@ try {
     } elseif ($action === 'renew') {
         // Generate a new token and update existing row (or insert)
         $token = bin2hex(random_bytes(16));
+        // Theme passed optionally — store with the token (do not expose in URL)
+        $theme = isset($data['theme']) ? trim($data['theme']) : null;
         // If exists update, else insert
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token) VALUES (?, ?)');
-            $stmt->execute([$note_id, $token]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme]);
         }
     } else {
         // Default: create (same as renew semantics)
-        $token = bin2hex(random_bytes(16));
-        // Insert or replace existing token for this note
-        // Use REPLACE INTO to simplify logic (works with unique token constraint)
-        try {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token) VALUES (?, ?)');
-            $stmt->execute([$note_id, $token]);
-        } catch (Exception $e) {
-            // If insert fails (unique token?), try update
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $note_id]);
+        // Allow an optional custom token (slug) provided by the client
+        $custom = isset($data['custom_token']) ? trim($data['custom_token']) : '';
+        if ($custom !== '') {
+            // Validate custom token: allow letters, numbers, dash, underscore and dots; length 4-128
+            if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
+                header('Content-Type: application/json');
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                exit;
+            }
+            // Ensure uniqueness (except when it's already used by this note)
+            $stmt = $con->prepare('SELECT note_id FROM shared_notes WHERE token = ? LIMIT 1');
+            $stmt->execute([$custom]);
+            $existing = $stmt->fetchColumn();
+            if ($existing && intval($existing) !== $note_id) {
+                header('Content-Type: application/json');
+                http_response_code(409);
+                echo json_encode(['error' => 'Token already in use']);
+                exit;
+            }
+            $token = $custom;
+        } else {
+            $token = bin2hex(random_bytes(16));
+        }
+
+        // Insert or update existing token for this note; also store optional theme
+        $theme = isset($data['theme']) ? trim($data['theme']) : null;
+        $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
+        $stmt->execute([$note_id]);
+        $existsRow = $stmt->fetchColumn();
+        if ($existsRow) {
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $note_id]);
+        } else {
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme]);
         }
     }
 
@@ -108,12 +138,14 @@ try {
         $scriptDir = '';
     }
     $scriptDir = rtrim($scriptDir, '/\\');
-    // Include theme parameter if provided
-    $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
-    $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token . $themeParam;
+    // Build three variants without the theme parameter so the mode is not visible in the public URL
+    $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+    $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
+    $url_path = $base . '/' . rawurlencode($token);
+    $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
     header('Content-Type: application/json');
-    echo json_encode(['url' => $url, 'shared' => true]);
+    echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'shared' => true]);
     exit;
 } catch (Exception $e) {
     header('Content-Type: application/json');

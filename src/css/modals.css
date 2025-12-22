@@ -80,6 +80,12 @@
 /* Base modal content styles */
 .modal-content {
     background-color: #fefefe;
+/* ==========================================
+   Share Modal Specific Styles
+   Centralized styles for the dynamically-created
+   share modal (moved here from inline JS styles)
+   ========================================== */
+
     padding: 28px;
     border: none;
     border-radius: 8px;
@@ -123,7 +129,7 @@
     justify-content: flex-end;
     flex-shrink: 0;
     margin-top: auto;
-    padding-top: 24px;
+    /* padding-top: 24px; */
     /* allow buttons to wrap instead of forcing a horizontal scroll */
     flex-wrap: wrap;
 }
@@ -1506,9 +1512,136 @@
     border: none;
 }
 
-/* Share modal specific styles - make it wider to fit all buttons on one line */
+/* ==========================================
+   Share Modal Specific Styles
+   Centralized styles for the dynamically-created
+   share modal (moved here from inline JS styles)
+   ========================================== */
+
+/* Share modal - wider to fit all buttons on one line */
 #shareModal .modal-content {
     max-width: 600px;
+}
+
+#shareModal .share-url {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-sizing: border-box;
+    white-space: normal;
+    word-break: break-all;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    cursor: text;
+    border-radius: 6px;
+    margin-bottom: 30px; /* 30px spacing between URL and buttons */
+    color: #333;
+}
+
+#shareModal .share-modal-buttons {
+    border-top: none;
+    display: flex;
+    gap: 12px;
+    margin-top: 0; /* spacing handled by .share-url margin-bottom */
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+#shareModal .share-custom-wrap {
+    margin: 0 0 12px 0;
+}
+
+#shareModal .share-custom-label {
+    display: block;
+    margin: 30px 0 6px 0; /* 30px gap before the custom token label */
+    font-size: 13px;
+    color: #666;
+}
+
+#shareModal .share-custom-label .optional-text {
+    color: #dc3545;
+}
+
+#shareModal .share-custom-input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+/* Button color variations specific to the share modal */
+#shareModal .btn-cancel {
+    background: #dc3545;
+    color: #ffffff;
+    border: none;
+}
+
+#shareModal .btn-open {
+    background: #28a745;
+    color: #ffffff;
+    border: none;
+}
+
+#shareModal .btn-primary {
+    background: #007DB8;
+    color: #ffffff;
+    border: none;
+}
+
+#shareModal .btn-revoke {
+    background: #6c757d;
+    color: #ffffff;
+    border: none;
+}
+
+#shareModal .btn-renew {
+    background: #007DB8;
+    color: #ffffff;
+    border: none;
+}
+
+#shareModal .btn-create-share {
+    background: #28a745;
+    color: #ffffff;
+    border: none;
+}
+
+/* Dark mode styles for share modal */
+html[data-theme='dark'] #shareModal .modal-content {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .share-url {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    padding: 0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-label {
+    color: #a0a0a0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-label .optional-text {
+    color: #dc3545;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-input {
+    background: #1a1a1a;
+    border: 1px solid #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .share-custom-input::placeholder {
+    color: #666;
 }
 
 /* ===========================================

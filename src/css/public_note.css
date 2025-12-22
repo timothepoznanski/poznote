@@ -321,3 +321,49 @@ pre:hover .code-block-copy-btn {
     line-height: 1.6;
 }
 
+/* Theme toggle button */
+.public-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.public-note-header h1 {
+    margin: 0;
+}
+
+.theme-toggle-btn {
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+    background: #f5f5f5;
+    border-color: #999;
+}
+
+.theme-toggle-btn i {
+    pointer-events: none;
+}
+
+/* Dark mode styles for theme toggle */
+html[data-theme='dark'] .theme-toggle-btn {
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .theme-toggle-btn:hover {
+    background: #2d2d2d;
+    border-color: #666;
+}
+
