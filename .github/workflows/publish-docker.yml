@@ -200,6 +200,25 @@ jobs:
         if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/setup-buildx-action@v3
 
+      - name: Determine Docker tags
+        if: steps.check_version.outputs.needs_update == 'true'
+        id: docker_tags
+        run: |
+          VERSION="${{ steps.check_version.outputs.version_clean }}"
+          TAGS="ghcr.io/${{ github.repository_owner }}/poznote:$VERSION"
+          
+          # Only add 'latest' tag for stable versions (not test versions)
+          if [[ "$VERSION" != *"-test"* ]]; then
+            TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest"
+            echo "📦 Stable version detected - will tag as 'latest'"
+          else
+            echo "🧪 Test version detected - will NOT tag as 'latest'"
+          fi
+          
+          echo "tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/build-push-action@v6
@@ -211,9 +230,7 @@ jobs:
             BUILD_DATE=${{ github.event.head_commit.timestamp }}
             VERSION=${{ steps.check_version.outputs.version_clean }}
             APP_VERSION=${{ steps.check_version.outputs.version_clean }}
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/poznote:${{ steps.check_version.outputs.version_clean }}
-            ghcr.io/${{ github.repository_owner }}/poznote:latest
+          tags: ${{ steps.docker_tags.outputs.tags }}
 
       - name: Clean up old Docker images
         if: steps.check_version.outputs.needs_update == 'true'
