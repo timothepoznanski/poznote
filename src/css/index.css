@@ -3710,10 +3710,11 @@ body.dark-mode .create-section h4 {
 }
 
 .checklist-item {
-    /* margin: 6px 0; */
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
+    margin: 4px 0;
+    line-height: 1.6;
 }
 
 .checklist-checkbox {
@@ -3721,7 +3722,9 @@ body.dark-mode .create-section h4 {
     width: 18px;
     height: 18px;
     flex-shrink: 0;
-    margin: 2px 0;
+    margin-top: 3px;
+    /* Prevent checkbox from being editable */
+    pointer-events: auto;
 }
 
 .checklist-text {
@@ -3731,6 +3734,11 @@ body.dark-mode .create-section h4 {
     border: none !important;
     box-shadow: none !important;
     background-color: transparent !important;
+    padding: 0;
+    margin: 0;
+    min-height: 1.6em;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .checklist-text:focus {
@@ -3740,11 +3748,23 @@ body.dark-mode .create-section h4 {
     background-color: transparent !important;
 }
 
+.checklist-text:empty:before {
+    content: attr(data-placeholder);
+    color: #999;
+    pointer-events: none;
+}
+
+/* Legacy support for old input-based checklists */
 .checklist-input {
     outline: none !important;
     border: none !important;
     box-shadow: none !important;
     background-color: transparent !important;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    flex: 1;
+    min-width: 0;
 }
 
 .checklist-input:focus {
@@ -3767,19 +3787,35 @@ body.dark-mode .create-section h4 {
     box-shadow: none !important;
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
-    background-color: transparent !important;
 }
 
+/* Checked state styles */
+.checklist-item-checked .checklist-text,
 .checklist-checkbox:checked + .checklist-text {
     text-decoration: line-through;
     opacity: 0.6;
     color: #999;
 }
 
+/* Legacy support */
+.checklist-checkbox:checked + .checklist-input {
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #999;
+}
+
 /* Dark mode */
+html[data-theme='dark'] .checklist-item-checked .checklist-text,
 html[data-theme='dark'] .checklist-checkbox:checked + .checklist-text,
+body.dark-mode .checklist-item-checked .checklist-text,
 body.dark-mode .checklist-checkbox:checked + .checklist-text {
     color: #666;
+}
+
+/* Nested checklist indentation */
+.checklist-item .checklist {
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 /* Root Drop Zone Styles */
