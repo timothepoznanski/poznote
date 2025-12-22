@@ -4,11 +4,56 @@ require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'markdown_parser.php';
 
+// Support token via query param or pretty URL (/token or /workspace/token)
 $token = $_GET['token'] ?? '';
-if (!$token) {
-    http_response_code(400);
-    echo 'Token missing';
-    exit;
+if (empty($token)) {
+    // Try PATH_INFO (if PHP is configured to populate it)
+    $pathToken = '';
+    if (!empty($_SERVER['PATH_INFO'])) {
+        $p = trim($_SERVER['PATH_INFO'], '/');
+        if ($p !== '') {
+            // If workspace prefix present, strip it
+            if (preg_match('#^workspace/([^/]+)$#', $p, $m)) {
+                $pathToken = $m[1];
+            } else {
+                $parts = explode('/', $p);
+                $pathToken = end($parts);
+            }
+        }
+    }
+
+    // If PATH_INFO didn't work, examine REQUEST_URI while stripping script dir
+    if (empty($pathToken) && !empty($_SERVER['REQUEST_URI'])) {
+        $uri = $_SERVER['REQUEST_URI'];
+        $uri = preg_replace('/\?.*$/', '', $uri);
+        $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+        if ($scriptDir && strpos($uri, $scriptDir) === 0) {
+            $uri = substr($uri, strlen($scriptDir));
+        }
+        $uri = trim($uri, '/');
+        if ($uri !== '' && $uri !== 'index.php') {
+            if (preg_match('#^workspace/([^/]+)$#', $uri, $m)) {
+                $pathToken = $m[1];
+            } else {
+                $parts = explode('/', $uri);
+                // If the URL points to a static file (has a dot) skip
+                $last = end($parts);
+                if ($last && strpos($last, '.') === false) {
+                    $pathToken = $last;
+                }
+            }
+        }
+    }
+
+    if (!empty($pathToken)) {
+        $token = $pathToken;
+    }
+
+    if (empty($token)) {
+        http_response_code(400);
+        echo 'Token missing';
+        exit;
+    }
 }
 
 try {

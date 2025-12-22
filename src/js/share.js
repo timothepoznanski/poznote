@@ -140,14 +140,23 @@ async function createPublicShare(noteId) {
     try {
         // Get current theme from localStorage
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        
+        // If modal has a custom token input, include it
+        let customToken = '';
+        try {
+            const el = document.getElementById('shareCustomToken');
+            if (el && el.value) customToken = el.value.trim();
+        } catch (e) {}
+
+        const body = { note_id: noteId, theme: theme };
+        if (customToken) body.custom_token = customToken;
+
         const resp = await fetch('api_share_note.php', {
             method: 'POST',
             credentials: 'same-origin', // send session cookie
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ note_id: noteId, theme: theme })
+            body: JSON.stringify(body)
         });
 
         if (!resp.ok) {
@@ -415,6 +424,23 @@ function showShareModal(url, options) {
         }
     } else {
         // If not shared, show Create button
+        // Add an optional input for a custom slug/token
+        const inputWrap = document.createElement('div');
+        inputWrap.style.margin = '8px 0 12px 0';
+        const label = document.createElement('label');
+        label.textContent = window.t ? window.t('index.share_modal.custom_slug', null, 'Custom slug (optional)') : 'Custom slug (optional)';
+        label.style.display = 'block';
+        label.style.marginBottom = '6px';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'shareCustomToken';
+        input.placeholder = window.t ? window.t('index.share_modal.custom_slug_placeholder', null, 'letters, numbers, -, _, .') : 'letters, numbers, -, _, .';
+        input.style.width = '100%';
+        input.style.boxSizing = 'border-box';
+        inputWrap.appendChild(label);
+        inputWrap.appendChild(input);
+        content.appendChild(inputWrap);
+
         const createBtn = document.createElement('button');
         createBtn.type = 'button';
         createBtn.className = 'btn-create-share';
