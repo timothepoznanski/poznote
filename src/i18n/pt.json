@@ -794,14 +794,17 @@
       "create_task_list_prefix": "Erro ao criar lista de tarefas: ",
       "create_markdown_note": "Erro ao criar nota markdown",
       "create_markdown_note_prefix": "Erro ao criar nota markdown: ",
-      "failed_to_save_subheading": "Falha ao salvar subtítulo"
+      "failed_to_save_subheading": "Falha ao salvar subtítulo",
+      "conversion_failed_prefix": "Falha na conversão: {{error}}",
+      "network_error_converting": "Erro de rede ao converter a nota"
     },
     "toolbar": {
       "favorite_add": "Adicionar aos favoritos",
       "favorite_remove": "Remover dos favoritos",
       "share_note": "Compartilhar nota",
       "attachments_with_count": "Anexos ({{count}})",
-      "menu_actions": "Ações do menu"
+      "menu_actions": "Ações do menu",
+      "convert_to_html": "Converter markdown para HTML"
     },
     "share_modal": {
       "title": "URL Pública",

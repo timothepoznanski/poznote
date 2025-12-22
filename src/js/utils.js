@@ -89,6 +89,61 @@ function duplicateNote(noteId) {
     });
 }
 
+function convertMarkdownToHTML(noteId) {
+    if (typeof showConfirmModal === 'function') {
+        showConfirmModal(
+            (window.t ? window.t('info.confirm.convert_title', null, 'Convert to HTML') : 'Convert to HTML'),
+            (window.t ? window.t('info.confirm.convert_to_html', null, 'Convert this markdown note to HTML') : 'Convert this markdown note to HTML'),
+            function() {
+                performMarkdownConversion(noteId);
+            },
+            {
+                confirmText: (window.t ? window.t('info.confirm.convert_title', null, 'Convert to HTML') : 'Convert to HTML'),
+                hideSaveAndExit: true
+            }
+        );
+    } else {
+        if (confirm((window.t ? window.t('info.confirm.convert_to_html', null, 'Are you sure you want to convert this markdown note to HTML? This will enable slash commands and other HTML features. This action can be reversed by re-importing the note as markdown.') : 'Are you sure you want to convert this markdown note to HTML? This will enable slash commands and other HTML features. This action can be reversed by re-importing the note as markdown.'))) {
+            performMarkdownConversion(noteId);
+        }
+    }
+}
+
+function performMarkdownConversion(noteId) {
+    fetch('api_convert_to_html.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'note_id=' + encodeURIComponent(noteId)
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Reload the page to show the converted note
+            window.location.reload();
+        } else {
+            showNotificationPopup(
+                (window.t
+                        ? window.t('index.errors.conversion_failed_prefix', { error: (data.error || 'Unknown error') }, 'Conversion failed: {{error}}')
+                        : ('Conversion failed: ' + (data.error || 'Unknown error'))),
+                    'error'
+                );
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            showNotificationPopup(
+                (window.t
+                    ? window.t('index.errors.network_error_converting', null, 'Network error while converting note')
+                    : 'Network error while converting note'),
+                'error'
+            );
+        });
+}
+
 // Folder management
 var currentFolderToDelete = {id: null, name: null};
 

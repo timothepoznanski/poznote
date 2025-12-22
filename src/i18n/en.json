@@ -795,14 +795,17 @@
       "create_task_list_prefix": "Error creating task list: ",
       "create_markdown_note": "Error creating markdown note",
       "create_markdown_note_prefix": "Error creating markdown note: ",
-      "failed_to_save_subheading": "Failed to save subheading"
+      "failed_to_save_subheading": "Failed to save subheading",
+      "conversion_failed_prefix": "Conversion failed: {{error}}",
+      "network_error_converting": "Network error while converting note"
     },
     "toolbar": {
       "favorite_add": "Add to favorites",
       "favorite_remove": "Remove from favorites",
       "share_note": "Share note",
       "attachments_with_count": "Attachments ({{count}})",
-      "menu_actions": "Menu actions"
+      "menu_actions": "Menu actions",
+      "convert_to_html": "Convert markdown to HTML"
     },
     "share_modal": {
       "title": "Public URL",
