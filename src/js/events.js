@@ -167,9 +167,18 @@ function setupNoteEditingEvents() {
     
     // Handle Enter key and delete empty checklists
     document.body.addEventListener('keydown', function(e) {
+        // Handle checklist input navigation
         if (e.target && e.target.classList && e.target.classList.contains('checklist-input')) {
             handleChecklistKeydown(e);
             return;
+        }
+        
+        // Handle arrow up/down navigation between noteentry and checklists
+        if (e.key === 'ArrowUp' || e.key === 'Up' || e.key === 'Delete') {
+            var noteentry = e.target.closest('.noteentry');
+            if (noteentry && noteentry.isContentEditable) {
+                handleNoteentryKeydown(e);
+            }
         }
         
         handleTagsKeydown(e);
@@ -494,6 +503,119 @@ function handleChecklistKeydown(e) {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+function handleNoteentryKeydown(e) {
+    var target = e.target;
+    
+    // Only handle ArrowUp and Delete when we're in a noteentry (contenteditable)
+    if (!target.classList.contains('noteentry')) return;
+    
+    var sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    
+    var range = sel.getRangeAt(0);
+    
+    // Handle ArrowUp - navigate to previous checklist
+    if (e.key === 'ArrowUp' || e.key === 'Up') {
+        // Find the element containing the cursor
+        var node = range.startContainer;
+        var currentElement = node.nodeType === 3 ? node.parentNode : node;
+        
+        // Find the current block element (P, DIV, H1, etc.)
+        var currentBlock = currentElement;
+        while (currentBlock && currentBlock !== target) {
+            if (['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(currentBlock.tagName)) {
+                break;
+            }
+            currentBlock = currentBlock.parentNode;
+        }
+        
+        if (!currentBlock || currentBlock === target) return;
+        
+        // Simple check: is there any previous sibling that's a checklist?
+        var prevSibling = currentBlock.previousElementSibling;
+        if (!prevSibling || !prevSibling.classList.contains('checklist')) return;
+        
+        // More reliable check: get the selection and compare positions
+        // We want to intercept only if we're at/near the visual start of the block
+        try {
+            // Get all text content before the cursor position
+            var preRange = document.createRange();
+            preRange.selectNodeContents(currentBlock);
+            preRange.setEnd(range.startContainer, range.startOffset);
+            var textBeforeCursor = preRange.toString();
+            
+            // Only intercept if there's no significant text before cursor
+            // (allows for whitespace/newlines)
+            if (textBeforeCursor.trim().length > 0) return;
+            
+        } catch (e) {
+            // If range creation fails, fall back to simple offset check
+            if (range.startOffset > 0) return;
+        }
+        
+        // We're at the start and there's a checklist above - navigate to it
+        e.preventDefault();
+        
+        var items = prevSibling.querySelectorAll('.checklist-item');
+        if (items.length > 0) {
+            var lastInput = items[items.length - 1].querySelector('.checklist-input');
+            if (lastInput) {
+                lastInput.focus();
+                setTimeout(function() {
+                    var len = lastInput.value.length;
+                    lastInput.setSelectionRange(len, len);
+                }, 10);
+            }
+        }
+    }
+    // Handle Delete - merge with next checklist
+    else if (e.key === 'Delete') {
+        // Find the element containing the cursor
+        var node = range.endContainer;
+        var currentElement = node.nodeType === 3 ? node.parentNode : node;
+        
+        // Find the current block element
+        var currentBlock = currentElement;
+        while (currentBlock && currentBlock !== target) {
+            if (['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(currentBlock.tagName)) {
+                break;
+            }
+            currentBlock = currentBlock.parentNode;
+        }
+        
+        if (!currentBlock || currentBlock === target) return;
+        
+        // Check if next sibling is a checklist
+        var nextSibling = currentBlock.nextElementSibling;
+        if (!nextSibling || !nextSibling.classList.contains('checklist')) return;
+        
+        // Check if we're at the end of our current block
+        var testRange = document.createRange();
+        testRange.setStart(range.endContainer, range.endOffset);
+        testRange.setEnd(currentBlock, currentBlock.childNodes.length);
+        
+        var textAfter = testRange.toString();
+        if (textAfter.replace(/[\r\n]/g, '').trim().length > 0) return;
+        
+        // We're at the end and there's a checklist below - navigate to it
+        e.preventDefault();
+        
+        var items = nextSibling.querySelectorAll('.checklist-item');
+        if (items.length > 0) {
+            var firstInput = items[0].querySelector('.checklist-input');
+            if (firstInput) {
+                if (currentBlock.textContent.trim() === '') {
+                    currentBlock.remove();
+                }
+                firstInput.focus();
+                setTimeout(function() {
+                    firstInput.setSelectionRange(0, 0);
+                }, 10);
             }
         }
     }
