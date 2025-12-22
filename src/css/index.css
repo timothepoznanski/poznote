@@ -3040,7 +3040,11 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-grip-vertical::before { content: "\f58e"; }
 .fa-grip-lines-vertical::before { content: "\f7a5"; }
 .fa-times-circle::before { content: "\f057"; }
+.fa-arrow-up::before { content: "\f062"; }
+.fa-arrow-down::before { content: "\f063"; }
 
+.fa-question-circle,
+.fa-times-circle,
 .fa-question-circle,
 .fa-times-circle,
 .fa-eye,
@@ -3095,6 +3099,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-sync-alt,
 .fa-upload,
 .fa-arrow-left,
+.fa-arrow-up,
+.fa-arrow-down,
 .fa-info,
 .fa-file-alt,
 .fa-plus,

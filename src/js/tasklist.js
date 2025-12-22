@@ -188,22 +188,54 @@ function addTask(noteId) {
     // default important flag
     newTask.important = false;
 
-    tasks.push(newTask);
-    noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+    // Get task insert order preference from database (default: bottom)
+    const formGet = new FormData();
+    formGet.append('action', 'get');
+    formGet.append('key', 'tasklist_insert_order');
+    
+    fetch('api_settings.php', { method: 'POST', body: formGet })
+        .then(r => r.json())
+        .then(data => {
+            const insertOrder = (data && data.success && data.value) ? data.value : 'bottom';
+            
+            if (insertOrder === 'top') {
+                // Insert at the beginning (top)
+                tasks.unshift(newTask);
+            } else {
+                // Insert at the end (bottom) - default behavior
+                tasks.push(newTask);
+            }
+            
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
-    // Re-render tasks
-    const tasksList = document.getElementById(`tasks-list-${noteId}`);
-    if (tasksList) {
-        tasksList.innerHTML = renderTasks(tasks, noteId);
-        // Re-enable DnD after DOM change
-        enableDragAndDrop(noteId);
-    }
+            // Re-render tasks
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                // Re-enable DnD after DOM change
+                enableDragAndDrop(noteId);
+            }
 
-    // Clear input
-    input.value = '';
+            // Clear input
+            input.value = '';
 
-    // Mark as modified
-    markTaskListAsModified(noteId);
+            // Mark as modified
+            markTaskListAsModified(noteId);
+        })
+        .catch(err => {
+            console.error('Error getting task order preference:', err);
+            // Fallback to bottom insertion on error
+            tasks.push(newTask);
+            noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
+
+            const tasksList = document.getElementById(`tasks-list-${noteId}`);
+            if (tasksList) {
+                tasksList.innerHTML = renderTasks(tasks, noteId);
+                enableDragAndDrop(noteId);
+            }
+            input.value = '';
+            markTaskListAsModified(noteId);
+        });
 }
 
 // Toggle task completion
@@ -528,6 +560,91 @@ window.editTask = editTask;
 window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
 window.toggleImportant = toggleImportant;
+window.toggleTaskInsertOrder = toggleTaskInsertOrder;
+
+// Toggle the task insert order preference (top vs bottom)
+function toggleTaskInsertOrder() {
+    // Get current order from database
+    const formGet = new FormData();
+    formGet.append('action', 'get');
+    formGet.append('key', 'tasklist_insert_order');
+    
+    fetch('api_settings.php', { method: 'POST', body: formGet })
+        .then(r => r.json())
+        .then(data => {
+            const currentOrder = (data && data.success && data.value) ? data.value : 'bottom';
+            const newOrder = currentOrder === 'top' ? 'bottom' : 'top';
+            
+            // Save new order to database
+            const formSet = new FormData();
+            formSet.append('action', 'set');
+            formSet.append('key', 'tasklist_insert_order');
+            formSet.append('value', newOrder);
+            
+            return fetch('api_settings.php', { method: 'POST', body: formSet })
+                .then(r => r.json())
+                .then(() => {
+                    // Update button appearance
+                    updateTaskInsertOrderButton(newOrder);
+                    
+                    // Show a brief notification
+                    const message = newOrder === 'top' 
+                        ? (window.t ? window.t('tasklist.add_to_top', null, 'Add new tasks at the top') : 'Add new tasks at the top')
+                        : (window.t ? window.t('tasklist.add_to_bottom', null, 'Add new tasks at the bottom') : 'Add new tasks at the bottom');
+                    
+                    // Use existing notification system if available
+                    if (typeof window.showTemporaryNotification === 'function') {
+                        window.showTemporaryNotification(message, 2000);
+                    }
+                });
+        })
+        .catch(err => {
+            console.error('Error toggling task order:', err);
+        });
+}
+
+// Update the task insert order button appearance
+function updateTaskInsertOrderButton(orderValue) {
+    const btn = document.querySelector('.btn-task-order');
+    if (!btn) return;
+    
+    // If orderValue is provided, use it; otherwise fetch from database
+    if (orderValue) {
+        applyOrderToButton(orderValue);
+    } else {
+        const formGet = new FormData();
+        formGet.append('action', 'get');
+        formGet.append('key', 'tasklist_insert_order');
+        
+        fetch('api_settings.php', { method: 'POST', body: formGet })
+            .then(r => r.json())
+            .then(data => {
+                const currentOrder = (data && data.success && data.value) ? data.value : 'bottom';
+                applyOrderToButton(currentOrder);
+            })
+            .catch(() => {
+                applyOrderToButton('bottom'); // fallback to default
+            });
+    }
+    
+    function applyOrderToButton(currentOrder) {
+        const icon = btn.querySelector('i');
+        
+        if (currentOrder === 'top') {
+            btn.classList.add('active');
+            if (icon) {
+                icon.className = 'fa-arrow-up';
+            }
+            btn.title = window.t ? window.t('tasklist.add_to_top', null, 'Add new tasks at the top') : 'Add new tasks at the top';
+        } else {
+            btn.classList.remove('active');
+            if (icon) {
+                icon.className = 'fa-arrow-down';
+            }
+            btn.title = window.t ? window.t('tasklist.add_to_bottom', null, 'Add new tasks at the bottom') : 'Add new tasks at the bottom';
+        }
+    }
+}
 
 // Enable HTML5 drag & drop reordering for a specific note task list
 function enableDragAndDrop(noteId) {
@@ -871,4 +988,12 @@ document.addEventListener('poznote:i18n:loaded', function() {
     document.querySelectorAll('.task-input').forEach(function(input) {
         input.placeholder = window.t ? window.t('tasklist.input_placeholder', null, 'Write a new task and press enter to add it to the list...') : 'Write a new task and press enter to add it to the list...';
     });
+    
+    // Update task insert order button
+    updateTaskInsertOrderButton();
+});
+
+// Initialize task insert order button on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateTaskInsertOrderButton();
 });

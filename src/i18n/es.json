@@ -388,7 +388,9 @@
   },
   "tasklist": {
     "input_placeholder": "Escribe una nueva tarea y presiona enter para agregarla a la lista...",
-    "drag_to_reorder": "Arrastrar para reordenar"
+    "drag_to_reorder": "Arrastrar para reordenar",
+    "add_to_top": "Agregar nuevas tareas arriba",
+    "add_to_bottom": "Agregar nuevas tareas abajo"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",

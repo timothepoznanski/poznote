@@ -290,3 +290,22 @@
 .innernote[data-tasklist-note="true"] .btn-checklist {
     display: none !important;
 }
+
+/* Task order button styles */
+.btn-task-order {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.btn-task-order.active {
+    background-color: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+.btn-task-order:hover {
+    background-color: rgba(0, 125, 184, 0.05);
+}
+
+.btn-task-order.active:hover {
+    background-color: rgba(0, 125, 184, 0.15);
+}
