@@ -218,7 +218,7 @@ function parseMarkdown($text) {
                     if ($isTaskList) {
                         $isChecked = strtolower($matches[2]) === 'x';
                         $checkbox = '<input type="checkbox" ' . ($isChecked ? 'checked ' : '') . 'disabled>';
-                        $itemHtml = '<li class="task-list-item">' . $checkbox . ' ' . $applyInlineStyles($content);
+                        $itemHtml = '<li class="task-list-item">' . $checkbox . ' <span>' . $applyInlineStyles($content) . '</span>';
                     } else {
                         $itemHtml = '<li>' . $applyInlineStyles($content);
                     }

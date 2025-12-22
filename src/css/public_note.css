@@ -228,6 +228,20 @@ pre:hover .code-block-copy-btn {
     vertical-align: middle;
 }
 
+/* Nested task lists need indentation */
+.public-note .content li.task-list-item > ul.task-list,
+.public-note .content li.task-list-item > ul,
+.public-note .content li.task-list-item > ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+/* Style for checked task items */
+.public-note .content li.task-list-item input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: #888;
+}
+
 /* Horizontal rule */
 .public-note .content hr {
     border: 0;

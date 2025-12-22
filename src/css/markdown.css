@@ -219,6 +219,20 @@
     vertical-align: middle;
 }
 
+/* Nested task lists need indentation */
+.markdown-preview li.task-list-item > ul.task-list,
+.markdown-preview li.task-list-item > ul,
+.markdown-preview li.task-list-item > ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+/* Style for checked task items */
+.markdown-preview li.task-list-item input[type="checkbox"]:checked + span {
+    text-decoration: line-through;
+    color: #888;
+}
+
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
     border: 2px dashed #007DB8 !important;

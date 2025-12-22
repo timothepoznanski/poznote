@@ -539,7 +539,7 @@ function parseMarkdown(text) {
                     if (isTaskList) {
                         let isChecked = listMatch[2].toLowerCase() === 'x';
                         let checkbox = '<input type="checkbox" ' + (isChecked ? 'checked ' : '') + 'disabled>';
-                        itemHtml = '<li class="task-list-item">' + checkbox + ' ' + applyInlineStyles(content);
+                        itemHtml = '<li class="task-list-item">' + checkbox + ' <span>' + applyInlineStyles(content) + '</span>';
                     } else {
                         itemHtml = '<li>' + applyInlineStyles(content);
                     }
