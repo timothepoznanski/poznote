@@ -93,7 +93,9 @@ try {
         $scriptDir = '';
     }
     $scriptDir = rtrim($scriptDir, '/\\');
-    $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token;
+    // Include theme parameter if provided
+    $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
+    $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token . $themeParam;
 
     header('Content-Type: application/json');
     echo json_encode(['url' => $url, 'shared' => true]);

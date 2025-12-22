@@ -107,14 +107,29 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
 }, $content);
 
 ?>
+<?php
+// Get theme from URL parameter (dark or light)
+$theme = isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light']) ? $_GET['theme'] : 'light';
+?>
 <!doctype html>
-<html>
+<html data-theme="<?php echo htmlspecialchars($theme); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
+    <script>
+        // Apply theme immediately to prevent flash
+        (function() {
+            var theme = '<?php echo $theme; ?>';
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+        })();
+    </script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
+    <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode.css') ? filemtime(__DIR__ . '/css/dark-mode.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/tasks.css">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
@@ -156,7 +171,7 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
                 '</code></pre>';
         }
 
-        var theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default';
+        var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
         try {
             // Support Mermaid blocks that ended up rendered as regular code blocks
             // e.g. <pre><code class="language-mermaid">...</code></pre>

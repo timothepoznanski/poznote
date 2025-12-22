@@ -138,13 +138,16 @@ async function createPublicShare(noteId) {
     if (!noteId) return;
 
     try {
+        // Get current theme from localStorage
+        const theme = localStorage.getItem('poznote-theme') || 'light';
+        
         const resp = await fetch('api_share_note.php', {
             method: 'POST',
             credentials: 'same-origin', // send session cookie
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ note_id: noteId })
+            body: JSON.stringify({ note_id: noteId, theme: theme })
         });
 
         if (!resp.ok) {
