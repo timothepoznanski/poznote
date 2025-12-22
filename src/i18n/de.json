@@ -817,7 +817,9 @@
       "revoke": "Widerrufen",
       "renew": "Erneuern",
       "create_url": "URL erstellen",
-      "no_link_yet": "(Noch kein öffentlicher Link)"
+      "no_link_yet": "(Noch kein öffentlicher Link)",
+      "custom_token": "Benutzerdefiniertes Token (optional)",
+      "custom_token_placeholder": "my_custom_token-1"
     },
     "note": {
       "new_note": "Neue Notiz",

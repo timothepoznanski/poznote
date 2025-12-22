@@ -817,7 +817,9 @@
       "revoke": "Révoquer",
       "renew": "Renouveler",
       "create_url": "Créer l'url",
-      "no_link_yet": "(Aucun lien public pour le moment)"
+      "no_link_yet": "(Aucun lien public pour le moment)",
+      "custom_token": "Token personnalisé (optionnel)",
+      "custom_token_placeholder": "my_custom_token-1"
     },
     "note": {
       "new_note": "Nouvelle note",

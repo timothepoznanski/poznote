@@ -428,13 +428,15 @@ function showShareModal(url, options) {
         const inputWrap = document.createElement('div');
         inputWrap.style.margin = '8px 0 12px 0';
         const label = document.createElement('label');
-        label.textContent = window.t ? window.t('index.share_modal.custom_slug', null, 'Custom slug (optional)') : 'Custom slug (optional)';
+        label.textContent = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
         label.style.display = 'block';
-        label.style.marginBottom = '6px';
+        label.style.margin = '20px 0 6px 0';
+        label.style.fontSize = '13px';
+        label.style.color = '#666';
         const input = document.createElement('input');
         input.type = 'text';
         input.id = 'shareCustomToken';
-        input.placeholder = window.t ? window.t('index.share_modal.custom_slug_placeholder', null, 'letters, numbers, -, _, .') : 'letters, numbers, -, _, .';
+        input.placeholder = window.t ? window.t('index.share_modal.custom_token_placeholder', null, 'my_custom_token-1') : 'my_custom_token-1';
         input.style.width = '100%';
         input.style.boxSizing = 'border-box';
         inputWrap.appendChild(label);
