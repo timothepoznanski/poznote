@@ -746,12 +746,38 @@ function redirectToTag(tag) {
         workspaceSource = 'default';
     }
     
-    // Build URL with workspace parameter - FORCE inclusion of workspace parameter
-    let finalUrl;
-    if (currentWorkspace) {
-        finalUrl = 'index.php?tags_search=' + encodeURIComponent(tag) + '&workspace=' + encodeURIComponent(currentWorkspace);
+    // Get current search parameters
+    let urlParams = new URLSearchParams(window.location.search);
+    let currentTagsSearch = urlParams.get('tags_search') || '';
+    
+    // Parse the current tags (space or comma separated)
+    let currentTags = [];
+    if (currentTagsSearch.trim()) {
+        currentTags = currentTagsSearch.split(/[\s,]+/).filter(t => t.trim() !== '');
+    }
+    
+    // Check if the clicked tag is already in the search
+    const tagIndex = currentTags.findIndex(t => t.toLowerCase() === tag.toLowerCase());
+    let newTagsSearch = '';
+    
+    if (tagIndex > -1) {
+        // Tag is already selected - remove it
+        currentTags.splice(tagIndex, 1);
+        newTagsSearch = currentTags.join(' ');
     } else {
-        finalUrl = 'index.php?tags_search=' + encodeURIComponent(tag) + '&workspace=Poznote';
+        // Tag is not selected - add it
+        currentTags.push(tag);
+        newTagsSearch = currentTags.join(' ');
+    }
+    
+    // Build URL with updated tags parameter
+    let finalUrl;
+    if (newTagsSearch.trim()) {
+        // If there are still tags, navigate with them
+        finalUrl = 'index.php?tags_search=' + encodeURIComponent(newTagsSearch) + '&workspace=' + encodeURIComponent(currentWorkspace);
+    } else {
+        // If no tags left, clear the search (like clicking the clear search button)
+        finalUrl = 'index.php?workspace=' + encodeURIComponent(currentWorkspace);
     }
     
     // Navigate to the URL

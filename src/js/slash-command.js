@@ -484,6 +484,206 @@
         }
     }
 
+    function insertImage() {
+        // Create a temporary file input for images
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files && fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Check if we're in a markdown note
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                
+                const range = selection.getRangeAt(0);
+                let container = range.commonAncestorContainer;
+                if (container.nodeType === 3) container = container.parentNode;
+                
+                const noteEntry = container.closest('.noteentry');
+                const isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') && 
+                                 noteEntry.getAttribute('data-note-type') === 'markdown';
+                
+                if (isMarkdown) {
+                    // Handle markdown image insertion
+                    const noteId = noteEntry.id.replace('entry', '');
+                    const loadingText = '![Uploading ' + file.name + '...]()';
+                    
+                    // Insert loading text
+                    const editor = noteEntry.querySelector('.markdown-editor');
+                    if (editor) {
+                        range.deleteContents();
+                        const textNode = document.createTextNode(loadingText);
+                        range.insertNode(textNode);
+                        
+                        // Trigger input event
+                        editor.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        // Upload the file
+                        const formData = new FormData();
+                        formData.append('action', 'upload');
+                        formData.append('note_id', noteId);
+                        formData.append('file', file);
+                        if (typeof selectedWorkspace !== 'undefined') {
+                            formData.append('workspace', selectedWorkspace || 'Poznote');
+                        }
+                        
+                        fetch('api_attachments.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const imageMarkdown = '![' + file.name + '](api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + data.attachment_id + ')';
+                                
+                                // Replace loading text
+                                const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                                let textNodes = [];
+                                let node;
+                                while (node = walker.nextNode()) {
+                                    textNodes.push(node);
+                                }
+                                
+                                for (let i = 0; i < textNodes.length; i++) {
+                                    const textNode = textNodes[i];
+                                    const text = textNode.textContent;
+                                    if (text.indexOf(loadingText) !== -1) {
+                                        textNode.textContent = text.replace(loadingText, imageMarkdown);
+                                        break;
+                                    }
+                                }
+                                
+                                editor.dispatchEvent(new Event('input', { bubbles: true }));
+                                
+                                // Mark note as modified
+                                if (typeof window.markNoteAsModified === 'function') {
+                                    window.markNoteAsModified();
+                                }
+                                
+                                // Re-initialize image click handlers
+                                if (typeof reinitializeImageClickHandlers === 'function') {
+                                    setTimeout(() => reinitializeImageClickHandlers(), 200);
+                                }
+                                
+                                // Save after upload
+                                setTimeout(() => {
+                                    if (typeof window.saveNoteImmediately === 'function') {
+                                        window.saveNoteImmediately();
+                                    }
+                                }, 500);
+                            } else {
+                                // Remove loading text on error
+                                const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                                let textNodes = [];
+                                let node;
+                                while (node = walker.nextNode()) {
+                                    textNodes.push(node);
+                                }
+                                
+                                for (let i = 0; i < textNodes.length; i++) {
+                                    const textNode = textNodes[i];
+                                    const text = textNode.textContent;
+                                    if (text.indexOf(loadingText) !== -1) {
+                                        textNode.textContent = text.replace(loadingText, '');
+                                        break;
+                                    }
+                                }
+                                
+                                editor.dispatchEvent(new Event('input', { bubbles: true }));
+                                
+                                if (typeof showNotificationPopup === 'function') {
+                                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            // Remove loading text on error
+                            const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                            let textNodes = [];
+                            let node;
+                            while (node = walker.nextNode()) {
+                                textNodes.push(node);
+                            }
+                            
+                            for (let i = 0; i < textNodes.length; i++) {
+                                const textNode = textNodes[i];
+                                const text = textNode.textContent;
+                                if (text.indexOf(loadingText) !== -1) {
+                                    textNode.textContent = text.replace(loadingText, '');
+                                    break;
+                                }
+                            }
+                            
+                            editor.dispatchEvent(new Event('input', { bubbles: true }));
+                            
+                            if (typeof showNotificationPopup === 'function') {
+                                showNotificationPopup('Upload failed: ' + error.message, 'error');
+                            }
+                        });
+                    }
+                } else {
+                    // Handle HTML image insertion
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const dataUrl = ev.target.result;
+                        const imgHtml = '<img src="' + dataUrl + '" alt="image" />';
+                        
+                        // Insert at cursor using the same method as drag-and-drop
+                        const inserted = insertHTMLAtSelection(imgHtml);
+                        
+                        if (!inserted) {
+                            // Fallback: insert at end of note
+                            const noteEntry = container.closest('.noteentry');
+                            if (noteEntry) {
+                                noteEntry.innerHTML += imgHtml;
+                            }
+                        }
+                        
+                        // Get note ID for saving
+                        const noteEntry = container.closest('.noteentry');
+                        if (noteEntry) {
+                            const targetNoteId = noteEntry.id.replace('entry', '');
+                            if (targetNoteId && targetNoteId !== '' && targetNoteId !== 'search') {
+                                window.noteid = targetNoteId;
+                            }
+                        }
+                        
+                        // Mark note as modified
+                        if (typeof window.markNoteAsModified === 'function') {
+                            window.markNoteAsModified();
+                        }
+                        
+                        // Re-initialize image click handlers
+                        if (typeof reinitializeImageClickHandlers === 'function') {
+                            setTimeout(() => reinitializeImageClickHandlers(), 50);
+                        }
+                        
+                        // Save after insertion
+                        setTimeout(() => {
+                            if (typeof saveNoteToServer === 'function') {
+                                saveNoteToServer();
+                            } else if (typeof window.saveNoteImmediately === 'function') {
+                                window.saveNoteImmediately();
+                            }
+                        }, 100);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // Remove the temporary input
+            document.body.removeChild(fileInput);
+        });
+        
+        // Add to DOM and trigger click
+        document.body.appendChild(fileInput);
+        fileInput.click();
+    }
+
     // Slash command menu items - actions match toolbar exactly
     // Order matches toolbar
     // Use a function to get translated labels at runtime
@@ -539,6 +739,14 @@
                         }
                     }
                 ]
+            },
+            {
+                id: 'image',
+                icon: 'fa-image',
+                label: t('slash_menu.image', null, 'Image'),
+                action: function () {
+                    insertImage();
+                }
             },
             {
                 id: 'excalidraw',
@@ -649,6 +857,14 @@
                     { id: 'numbers', icon: 'fa-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
                     { id: 'checklist', icon: 'fa-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
                 ]
+            },
+            {
+                id: 'image',
+                icon: 'fa-image',
+                label: t('slash_menu.image', null, 'Image'),
+                action: function () {
+                    insertImage();
+                }
             },
             {
                 id: 'emoji',

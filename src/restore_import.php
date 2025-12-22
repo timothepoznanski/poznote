@@ -184,11 +184,43 @@ function importNotesZip($uploadedFile) {
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
+    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    
+    // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
+    $validFileCount = 0;
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $filename = $stat['name'];
+        
+        // Skip directories and non-note files
+        if (substr($filename, -1) === '/' || !preg_match('/\.(html|md)$/i', $filename)) {
+            continue;
+        }
+        
+        // Get the base filename without path
+        $baseFilename = basename($filename);
+        
+        // Only count files that follow the ID.extension pattern
+        if (preg_match('/^(\d+)\.(html|md)$/i', $baseFilename)) {
+            $validFileCount++;
+        }
+    }
+    
+    // Check if the number of valid files exceeds the limit
+    if ($validFileCount > $maxFiles) {
+        $zip->close();
+        unlink($tempFile);
+        return [
+            'success' => false,
+            'error' => t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => $validFileCount])
+        ];
+    }
+    
     $importedCount = 0;
     $updatedCount = 0;
     $errors = [];
     
-    // Extract each file and create/update database entries
+    // Second pass: extract each file and create/update database entries
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $filename = $stat['name'];
@@ -431,12 +463,43 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
+    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    
+    // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
+    $validFileCount = 0;
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+        
+        // Skip directories and hidden files
+        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
+            continue;
+        }
+        
+        // Get file extension
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Only count HTML, MD, and Markdown files
+        if (in_array($fileExtension, ['html', 'md', 'markdown'])) {
+            $validFileCount++;
+        }
+    }
+    
+    // Check if the number of valid files exceeds the limit
+    if ($validFileCount > $maxFiles) {
+        $zip->close();
+        unlink($tempFile);
+        return [
+            'success' => false,
+            'error' => t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => $validFileCount])
+        ];
+    }
+    
     $importedCount = 0;
     $errorCount = 0;
     $errors = [];
-    $maxFiles = 300;
     
-    // Iterate through all files in ZIP
+    // Second pass: actually import the files
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $fileName = $stat['name'];
@@ -452,12 +515,6 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
         // Only process HTML, MD, and Markdown files
         if (!in_array($fileExtension, ['html', 'md', 'markdown'])) {
             continue;
-        }
-        
-        // Check file limit
-        if ($importedCount + $errorCount >= $maxFiles) {
-            $errors[] = t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => $zip->numFiles]);
-            break;
         }
         
         // Extract file content
@@ -547,7 +604,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     global $con;
     
     // Check file count limit
-    $maxFiles = 50;
+    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
     $fileCount = count($uploadedFiles['name']);
     
     if ($fileCount > $maxFiles) {
@@ -936,7 +993,13 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                     </label>
                     <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.zip" multiple required style="padding: 0.5rem;">
                     <small class="form-text text-muted" style="display: block; margin-top: 0.5rem; line-height: 1.5;">
-                        <?php echo t_h('restore_import.sections.individual_notes.files_info', 'Multiple files (max 50) or single ZIP archive (max 300 files)'); ?><br>
+                        <span style="color: #dc3545; font-weight: 600;">
+                        <?php 
+                        $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
+                        $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+                        echo 'Multiple files (max ' . $maxIndividualFiles . ') or single ZIP archive (max ' . $maxZipFiles . ' files)'; 
+                        ?>
+                        </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .zip'); ?>
                     </small>
                 </div>
@@ -1100,6 +1163,10 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
                 }
                 return key;
             };
+
+            // Import limits configuration from PHP environment
+            window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES = <?php echo (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50); ?>;
+            window.POZNOTE_IMPORT_MAX_ZIP_FILES = <?php echo (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300); ?>;
 
             // Accordion functionality (onclick handlers expect a global)
             if (typeof window.toggleAccordion !== 'function') {

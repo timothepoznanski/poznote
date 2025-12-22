@@ -263,7 +263,7 @@ function showIndividualNotesImportConfirmation() {
         );
     } else {
         // Check file count limit for non-ZIP uploads
-        const maxFiles = 50;
+        const maxFiles = window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES || 50;
         
         if (fileCount > maxFiles) {
             showCustomAlert(

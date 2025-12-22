@@ -58,9 +58,20 @@ jobs:
       - name: Create GitHub release
         if: steps.check_version.outputs.needs_update == 'true'
         run: |
-          gh release create ${{ steps.check_version.outputs.version }} \
-            --title "Release ${{ steps.check_version.outputs.version }}" \
-            --notes "Automatic release for version ${{ steps.check_version.outputs.version }}
+          VERSION="${{ steps.check_version.outputs.version }}"
+          
+          # Check if this is a test version
+          if [[ "$VERSION" == *"-test"* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+            echo "📋 Creating pre-release for test version: $VERSION"
+          else
+            PRERELEASE_FLAG=""
+            echo "📦 Creating stable release: $VERSION"
+          fi
+          
+          gh release create $VERSION $PRERELEASE_FLAG \
+            --title "Release $VERSION" \
+            --notes "Automatic release for version $VERSION
 
           This release was automatically created when a new version was detected in the repository."
         env:
@@ -78,8 +89,8 @@ jobs:
             exit 0
           fi
           
-          # Get all releases sorted by creation date (newest first), excluding test versions
-          all_releases=$(gh release list --limit 1000 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[] | select(.tagName | contains("-test") | not) | .tagName')
+          # Get all releases sorted by creation date (newest first), excluding pre-releases
+          all_releases=$(gh release list --limit 1000 --json tagName,createdAt,isPrerelease --jq 'sort_by(.createdAt) | reverse | .[] | select(.isPrerelease | not) | .tagName')
           
           # Count total releases
           total_releases=$(echo "$all_releases" | wc -l)
