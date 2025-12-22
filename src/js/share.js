@@ -385,11 +385,13 @@ function showShareModal(url, options) {
             renewBtn.onclick = async function(ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
                 try {
+                    // Get current theme from localStorage
+                    const theme = localStorage.getItem('poznote-theme') || 'light';
                     const resp = await fetch('api_share_note.php', {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ note_id: noteId, action: 'renew' })
+                        body: JSON.stringify({ note_id: noteId, action: 'renew', theme: theme })
                     });
                     if (resp.ok) {
                         const ct = resp.headers.get('content-type') || '';
@@ -445,11 +447,13 @@ window.createPublicShare = createPublicShare;
 async function getPublicShare(noteId) {
     if (!noteId) return { shared: false };
     try {
+        // Get current theme from localStorage
+        const theme = localStorage.getItem('poznote-theme') || 'light';
         const resp = await fetch('api_share_note.php', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note_id: noteId, action: 'get' })
+            body: JSON.stringify({ note_id: noteId, action: 'get', theme: theme })
         });
         if (!resp.ok) return { shared: false };
         const ct = resp.headers.get('content-type') || '';

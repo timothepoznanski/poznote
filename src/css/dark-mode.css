@@ -1806,6 +1806,41 @@ body.dark-mode .image-resize-handle {
     border-color: #2a2a2a;
 }
 
+/* Public note dark mode styles */
+html[data-theme='dark'] .public-note .content code,
+body.dark-mode .public-note .content code {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .public-note .content pre,
+body.dark-mode .public-note .content pre {
+    background-color: #2a2a2a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .public-note .content pre code,
+body.dark-mode .public-note .content pre code {
+    background-color: transparent;
+}
+
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn,
+html[data-theme='dark'] .code-block-copy-btn,
+body.dark-mode .public-note .content pre .code-block-copy-btn,
+body.dark-mode .code-block-copy-btn {
+    background: rgba(42, 42, 42, 0.9);
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
+html[data-theme='dark'] .code-block-copy-btn:hover,
+body.dark-mode .public-note .content pre .code-block-copy-btn:hover,
+body.dark-mode .code-block-copy-btn:hover {
+    background-color: #333;
+    color: #fff;
+}
+
 html[data-theme='dark'] .image-resize-handle:hover,
 body.dark-mode .image-resize-handle:hover {
     background: #0099e6;

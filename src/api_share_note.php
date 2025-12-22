@@ -42,6 +42,21 @@ try {
             exit;
         }
         $token = $row['token'];
+        
+        // Build URL with theme parameter
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+        if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
+            $scriptDir = '';
+        }
+        $scriptDir = rtrim($scriptDir, '/\\');
+        $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
+        $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token . $themeParam;
+        
+        header('Content-Type: application/json');
+        echo json_encode(['shared' => true, 'url' => $url]);
+        exit;
     } elseif ($action === 'revoke') {
         // Delete any share for this note
         $stmt = $con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
