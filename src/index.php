@@ -642,6 +642,24 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
                 
+                    // Task list order button (only visible for tasklist notes)
+                    if ($note_type === 'tasklist') {
+                        // Get current setting from database
+                        $task_order = 'bottom'; // default
+                        try {
+                            $order_stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                            $order_stmt->execute(['tasklist_insert_order']);
+                            $order_val = $order_stmt->fetchColumn();
+                            if ($order_val === 'top') $task_order = 'top';
+                        } catch (Exception $e) {
+                            // Use default on error
+                        }
+                        $order_icon = $task_order === 'top' ? 'fa-arrow-up' : 'fa-arrow-down';
+                        $order_title = $task_order === 'top' ? t_h('tasklist.add_to_top') : t_h('tasklist.add_to_bottom');
+                        $active_class = $task_order === 'top' ? ' active' : '';
+                        echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" onclick="toggleTaskInsertOrder()"><i class="' . $order_icon . '"></i></button>';
+                    }
+                
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
                     if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
                         echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';

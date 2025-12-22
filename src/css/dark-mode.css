@@ -1467,6 +1467,23 @@ body.dark-mode .task-important-btn.is-favorite i {
     color: #ff6b6b !important;
 }
 
+/* Task order button styles */
+html[data-theme='dark'] .btn-task-order.active,
+body.dark-mode .btn-task-order.active {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #4da6ff;
+}
+
+html[data-theme='dark'] .btn-task-order:hover,
+body.dark-mode .btn-task-order:hover {
+    background-color: rgba(0, 125, 184, 0.1);
+}
+
+html[data-theme='dark'] .btn-task-order.active:hover,
+body.dark-mode .btn-task-order.active:hover {
+    background-color: rgba(0, 125, 184, 0.25);
+}
+
 /* Tag suggestions dropdown */
 html[data-theme='dark'] .tag-suggestions,
 body.dark-mode .tag-suggestions {
