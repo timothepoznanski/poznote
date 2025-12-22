@@ -25,8 +25,8 @@ function getVersionInfo() {
             return $result;
         }
         
-        // Query GitHub API to get the latest release
-        $github_api_url = 'https://api.github.com/repos/timothepoznanski/poznote/releases/latest';
+        // Query GitHub API to get all releases and find the latest stable one
+        $github_api_url = 'https://api.github.com/repos/timothepoznanski/poznote/releases';
         
         $context = stream_context_create([
             'http' => [
@@ -42,28 +42,36 @@ function getVersionInfo() {
         $response = @file_get_contents($github_api_url, false, $context);
         
         if ($response === false) {
-            // Fallback: try to get tags directly
-            $github_tags_url = 'https://api.github.com/repos/timothepoznanski/poznote/tags';
-            $response = @file_get_contents($github_tags_url, false, $context);
-            
-            if ($response === false) {
-                $result['error'] = 'Cannot reach GitHub API';
-                $result['is_up_to_date'] = null;
-                return $result;
-            }
-            
-            $tags_data = json_decode($response, true);
-            if (empty($tags_data)) {
-                $result['error'] = 'No tags found in repository';
-                $result['is_up_to_date'] = null;
-                return $result;
-            }
-            
-            $latest_version = ltrim($tags_data[0]['name'], 'v');
-        } else {
-            $release_data = json_decode($response, true);
-            $latest_version = ltrim($release_data['tag_name'], 'v');
+            $result['error'] = 'Cannot reach GitHub API';
+            $result['is_up_to_date'] = null;
+            return $result;
         }
+        
+        $releases_data = json_decode($response, true);
+        if (empty($releases_data)) {
+            $result['error'] = 'No releases found in repository';
+            $result['is_up_to_date'] = null;
+            return $result;
+        }
+        
+        // Filter out pre-releases and find the latest stable release
+        $stable_releases = array_filter($releases_data, function($release) {
+            return !$release['prerelease'];
+        });
+        
+        if (empty($stable_releases)) {
+            $result['error'] = 'No stable releases found in repository';
+            $result['is_up_to_date'] = null;
+            return $result;
+        }
+        
+        // Sort by published date (newest first)
+        usort($stable_releases, function($a, $b) {
+            return strtotime($b['published_at']) - strtotime($a['published_at']);
+        });
+        
+        $latest_release = $stable_releases[0];
+        $latest_version = ltrim($latest_release['tag_name'], 'v');
         
         $result['latest_version'] = $latest_version;
         
@@ -71,16 +79,8 @@ function getVersionInfo() {
         $current_clean = ltrim($current_version, 'v');
         $latest_clean = ltrim($latest_version, 'v');
         
-        // Check if latest version is a test version (contains -test)
-        $is_test_version = (strpos($latest_clean, '-test') !== false);
-        
-        // If it's a test version, don't show it as an available update
-        if ($is_test_version) {
-            $comparison = -1; // Treat test versions as older
-        } else {
-            // Compare versions using semantic versioning
-            $comparison = version_compare($latest_clean, $current_clean);
-        }
+        // Compare versions using semantic versioning
+        $comparison = version_compare($latest_clean, $current_clean);
         
         $result['is_up_to_date'] = ($comparison <= 0);
         $result['has_update'] = ($comparison > 0);
