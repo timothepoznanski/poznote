@@ -436,6 +436,11 @@ body.dark-mode .modal-content h3 {
     color: #4a9eff;
 }
 
+html[data-theme='dark'] #confirmModal .modal-content h3,
+body.dark-mode #confirmModal .modal-content h3 {
+    color: #d0d0d0;
+}
+
 html[data-theme='dark'] .modal-content input,
 html[data-theme='dark'] .modal-content select,
 html[data-theme='dark'] .modal-content textarea,
@@ -936,7 +941,7 @@ body.dark-mode .noteentry code,
 body.dark-mode .noteentry pre,
 body.dark-mode .code-block,
 body.dark-mode pre.code-block {
-    background-color: #1e1e1e !important;
+    background-color: #262424 !important;
     color: #e0e0e0 !important;
     border-color: #404040 !important;
 }
