@@ -21,6 +21,6 @@
     define('OIDC_REDIRECT_URI', (string)($_ENV['POZNOTE_OIDC_REDIRECT_URI'] ?? ''));
     // Optional: specify provider end-session endpoint (if your provider supports RP-initiated logout)
     define('OIDC_END_SESSION_ENDPOINT', (string)($_ENV['POZNOTE_OIDC_END_SESSION_ENDPOINT'] ?? ''));
-    // If not set, post-logout redirect is derived from current request base URL
-    define('OIDC_POST_LOGOUT_REDIRECT_URI', (string)($_ENV['POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI'] ?? ''));
+    // Optional: disable normal login when OIDC is enabled (force SSO-only login)
+    define('OIDC_DISABLE_NORMAL_LOGIN', filter_var($_ENV['POZNOTE_OIDC_DISABLE_NORMAL_LOGIN'] ?? false, FILTER_VALIDATE_BOOL));
 ?>

@@ -343,6 +343,9 @@ POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
 
 # Optional: Where to redirect after logout (default: login page)
 # POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI=https://your-domain.com/login.php
+
+# Optional: Disable normal login when OIDC is enabled (force SSO-only login)
+# POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
 ```
 
 #### How it works
@@ -352,6 +355,8 @@ When OIDC is enabled:
 2. Clicking the button redirects users to your identity provider
 3. After successful authentication, users are redirected back to Poznote
 4. Poznote validates the OIDC tokens and creates a session
+
+If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is set to `true`, the normal username/password login form will be hidden, forcing users to authenticate only through OIDC.
 
 #### Security Notes
 
