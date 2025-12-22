@@ -563,7 +563,31 @@ function handleNoteentryKeydown(e) {
         
         var items = prevSibling.querySelectorAll('.checklist-item');
         if (items.length > 0) {
-            var lastInput = items[items.length - 1].querySelector('.checklist-input');
+            var lastItem = items[items.length - 1];
+            // Try new system first (checklist-text spans)
+            var lastText = lastItem.querySelector('.checklist-text');
+            if (lastText) {
+                // Position cursor at end of the text span
+                var textNode = lastText.lastChild || lastText;
+                if (textNode.nodeType === 3) {
+                    var r = document.createRange();
+                    r.setStart(textNode, textNode.textContent.length);
+                    r.collapse(true);
+                    var s = window.getSelection();
+                    s.removeAllRanges();
+                    s.addRange(r);
+                } else {
+                    var r = document.createRange();
+                    r.selectNodeContents(lastText);
+                    r.collapse(false);
+                    var s = window.getSelection();
+                    s.removeAllRanges();
+                    s.addRange(r);
+                }
+                return;
+            }
+            // Fallback to old system (checklist-input)
+            var lastInput = lastItem.querySelector('.checklist-input');
             if (lastInput) {
                 lastInput.focus();
                 setTimeout(function() {
