@@ -2270,6 +2270,13 @@ code {
     color: #333;
 }
 
+/* Code inside pre blocks should not have background */
+pre code, .noteentry pre code {
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
 /* Force same font for all elements with inline styles in code blocks */
 pre span[style],
 code span[style],
@@ -3049,6 +3056,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-folder-open,
 .fa-edit,
 .fa-download,
+.fa-file-code,
 .fa-maximize,
 .fa-expand,
 .fa-trash,

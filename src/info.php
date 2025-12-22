@@ -105,10 +105,12 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/info.css">
+    <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <script src="js/theme-manager.js"></script>
 </head>
 <body>
+    
     <div class="info-page">
         <div class="info-buttons-back-container">
             <button id="backToNoteBtn" class="btn btn-secondary" onclick="goBackToNote()" title="<?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>">
@@ -196,8 +198,8 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
     </div>
 
     <script src="js/ui.js"></script>
+    <script src="js/modal-alerts.js"></script>
     <script>
-        // If requested via query param, auto-open subheading edit
         <?php if (isset($_GET['edit_subheading']) && $_GET['edit_subheading'] == '1'): ?>
             document.addEventListener('DOMContentLoaded', function() {
                 try { editSubheadingInline(<?php echo json_encode($note['subheading'] ?? ($note['location'] ?? ''), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>); } catch(e) { console.error(e); }

@@ -795,14 +795,17 @@
       "create_task_list_prefix": "Erreur lors de la création de la liste de tâches : ",
       "create_markdown_note": "Erreur lors de la création de la note Markdown",
       "create_markdown_note_prefix": "Erreur lors de la création de la note Markdown : ",
-      "failed_to_save_subheading": "Échec de l’enregistrement du sous-titre"
+      "failed_to_save_subheading": "Échec de l'enregistrement du sous-titre",
+      "conversion_failed_prefix": "Échec de la conversion : {{error}}",
+      "network_error_converting": "Erreur réseau lors de la conversion de la note"
     },
     "toolbar": {
       "favorite_add": "Ajouter aux favoris",
       "favorite_remove": "Retirer des favoris",
       "share_note": "Partager la note",
       "attachments_with_count": "Pièces jointes ({{count}})",
-      "menu_actions": "Actions du menu"
+      "menu_actions": "Actions du menu",
+      "convert_to_html": "Convertir le markdown en HTML"
     },
     "share_modal": {
       "title": "URL publique",
