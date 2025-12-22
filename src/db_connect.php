@@ -105,6 +105,24 @@ try {
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
 
+    // Add 'theme' column to shared_notes if it doesn't exist (for storing chosen display mode)
+    try {
+        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasTheme = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'theme') {
+                $hasTheme = true;
+                break;
+            }
+        }
+        if (!$hasTheme) {
+            $con->exec("ALTER TABLE shared_notes ADD COLUMN theme TEXT");
+        }
+    } catch (Exception $e) {
+        // Non-fatal: if this fails, continue without theme support
+        error_log('Could not add theme column to shared_notes: ' . $e->getMessage());
+    }
+
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");

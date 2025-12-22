@@ -138,8 +138,6 @@ async function createPublicShare(noteId) {
     if (!noteId) return;
 
     try {
-        // Get current theme from localStorage
-        const theme = localStorage.getItem('poznote-theme') || 'light';
         // If modal has a custom token input, include it
         let customToken = '';
         try {
@@ -147,6 +145,7 @@ async function createPublicShare(noteId) {
             if (el && el.value) customToken = el.value.trim();
         } catch (e) {}
 
+        const theme = localStorage.getItem('poznote-theme') || 'light';
         const body = { note_id: noteId, theme: theme };
         if (customToken) body.custom_token = customToken;
 
@@ -229,11 +228,11 @@ function showShareModal(url, options) {
     // Build modal using same structure and classes as other modals (modal -> modal-content -> modal-buttons)
     const modal = document.createElement('div');
     modal.id = 'shareModal';
-    modal.className = 'modal';
+    modal.className = 'modal share-modal';
     modal.style.display = 'flex';
 
     const content = document.createElement('div');
-    content.className = 'modal-content';
+    content.className = 'modal-content share-modal-content';
 
     // No close (×) icon for the share modal per UX request
 
@@ -248,25 +247,12 @@ function showShareModal(url, options) {
     // Show the full URL as plain, non-selectable text (no input frame)
     const urlDiv = document.createElement('div');
     urlDiv.id = 'shareModalUrl';
+    urlDiv.className = 'share-url';
     urlDiv.textContent = url;
-    urlDiv.style.width = '100%';
-    urlDiv.style.padding = '0';
-    urlDiv.style.border = 'none';
-    urlDiv.style.background = 'transparent';
-    urlDiv.style.boxSizing = 'border-box';
-    urlDiv.style.whiteSpace = 'normal';
-    urlDiv.style.wordBreak = 'break-all';
-    urlDiv.style.userSelect = 'none';
-    urlDiv.style.webkitUserSelect = 'none';
-    urlDiv.style.MozUserSelect = 'none';
-    urlDiv.style.cursor = 'default';
-    // Ensure text is fully visible; allow wrapping
     content.appendChild(urlDiv);
 
     const buttonsDiv = document.createElement('div');
-    buttonsDiv.className = 'modal-buttons';
-    // Remove the dividing line above buttons for this share modal
-    buttonsDiv.style.borderTop = 'none';
+    buttonsDiv.className = 'modal-buttons share-modal-buttons';
 
     // Get options
     const noteId = options && options.noteId ? options.noteId : null;
@@ -277,10 +263,7 @@ function showShareModal(url, options) {
     cancelBtn.type = 'button';
     cancelBtn.className = 'btn-cancel';
     cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
-    // red styling for cancel
-    cancelBtn.style.background = '#dc3545';
-    cancelBtn.style.color = '#ffffff';
-    cancelBtn.style.border = 'none';
+    // styling handled by CSS classes
     cancelBtn.onclick = function() { closeModal('shareModal'); };
     buttonsDiv.appendChild(cancelBtn);
 
@@ -292,10 +275,7 @@ function showShareModal(url, options) {
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
         openBtn.textContent = window.t ? window.t('index.share_modal.open', null, 'Open') : 'Open';
-        // green styling for open
-        openBtn.style.background = '#28a745';
-        openBtn.style.color = '#ffffff';
-        openBtn.style.border = 'none';
+        // styling handled by CSS classes
         openBtn.onclick = function(ev) {
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
             // Read the current URL from the modal each time so Renew updates are respected
@@ -353,9 +333,7 @@ function showShareModal(url, options) {
             revokeBtn.type = 'button';
             revokeBtn.className = 'btn-revoke';
             revokeBtn.textContent = window.t ? window.t('index.share_modal.revoke', null, 'Revoke') : 'Revoke';
-            revokeBtn.style.background = '#6c757d';
-            revokeBtn.style.color = '#ffffff';
-            revokeBtn.style.border = 'none';
+            // styling handled by CSS classes
             revokeBtn.onclick = async function(ev) {
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
             // Call API to revoke
@@ -388,9 +366,7 @@ function showShareModal(url, options) {
             renewBtn.type = 'button';
             renewBtn.className = 'btn-renew';
             renewBtn.textContent = window.t ? window.t('index.share_modal.renew', null, 'Renew') : 'Renew';
-            renewBtn.style.background = '#007DB8';
-            renewBtn.style.color = '#ffffff';
-            renewBtn.style.border = 'none';
+            // styling handled by CSS classes
             renewBtn.onclick = async function(ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
                 try {
@@ -426,19 +402,22 @@ function showShareModal(url, options) {
         // If not shared, show Create button
         // Add an optional input for a custom slug/token
         const inputWrap = document.createElement('div');
-        inputWrap.style.margin = '8px 0 12px 0';
+        inputWrap.className = 'share-custom-wrap';
         const label = document.createElement('label');
-        label.textContent = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
-        label.style.display = 'block';
-        label.style.margin = '20px 0 6px 0';
-        label.style.fontSize = '13px';
-        label.style.color = '#666';
+        const labelText = window.t ? window.t('index.share_modal.custom_token', null, 'Custom token (optional)') : 'Custom token (optional)';
+        // Split label to make "(optional)" red
+        const labelParts = labelText.match(/^(.+?)(\(.*?\))$/);
+        if (labelParts) {
+            label.innerHTML = labelParts[1] + '<span class="optional-text">' + labelParts[2] + '</span>';
+        } else {
+            label.textContent = labelText;
+        }
+        label.className = 'share-custom-label';
         const input = document.createElement('input');
         input.type = 'text';
         input.id = 'shareCustomToken';
         input.placeholder = window.t ? window.t('index.share_modal.custom_token_placeholder', null, 'my_custom_token-1') : 'my_custom_token-1';
-        input.style.width = '100%';
-        input.style.boxSizing = 'border-box';
+        input.className = 'share-custom-input';
         inputWrap.appendChild(label);
         inputWrap.appendChild(input);
         content.appendChild(inputWrap);
@@ -447,16 +426,14 @@ function showShareModal(url, options) {
         createBtn.type = 'button';
         createBtn.className = 'btn-create-share';
         createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create url') : 'Create url';
-        createBtn.style.background = '#28a745';
-        createBtn.style.color = '#ffffff';
-        createBtn.style.border = 'none';
+        // create button styled via CSS class
         createBtn.onclick = function() { createPublicShare(noteId); };
         buttonsDiv.appendChild(createBtn);
     }
 
     // If there's no URL provided, show placeholder text
     if (!url) {
-        urlDiv.textContent = window.t ? window.t('index.share_modal.no_link_yet', null, '(No public link yet)') : '(No public link yet)';
+        urlDiv.textContent = window.t ? window.t('index.share_modal.no_link_yet', null, 'No public link yet') : 'No public link yet';
     }
 
     content.appendChild(buttonsDiv);
@@ -475,13 +452,11 @@ window.createPublicShare = createPublicShare;
 async function getPublicShare(noteId) {
     if (!noteId) return { shared: false };
     try {
-        // Get current theme from localStorage
-        const theme = localStorage.getItem('poznote-theme') || 'light';
         const resp = await fetch('api_share_note.php', {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note_id: noteId, action: 'get', theme: theme })
+            body: JSON.stringify({ note_id: noteId, action: 'get' })
         });
         if (!resp.ok) return { shared: false };
         const ct = resp.headers.get('content-type') || '';

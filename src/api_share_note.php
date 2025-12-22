@@ -43,7 +43,7 @@ try {
         }
         $token = $row['token'];
         
-        // Build URL with theme parameter
+        // Build pretty URLs (same as create/renew)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
@@ -51,11 +51,13 @@ try {
             $scriptDir = '';
         }
         $scriptDir = rtrim($scriptDir, '/\\');
-        $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
-        $url = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '') . '/public_note.php?token=' . $token . $themeParam;
-        
+        $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+        $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
+        $url_path = $base . '/' . rawurlencode($token);
+        $url_workspace = $base . '/workspace/' . rawurlencode($token);
+
         header('Content-Type: application/json');
-        echo json_encode(['shared' => true, 'url' => $url]);
+        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace]);
         exit;
     } elseif ($action === 'revoke') {
         // Delete any share for this note
@@ -67,16 +69,18 @@ try {
     } elseif ($action === 'renew') {
         // Generate a new token and update existing row (or insert)
         $token = bin2hex(random_bytes(16));
+        // Theme passed optionally — store with the token (do not expose in URL)
+        $theme = isset($data['theme']) ? trim($data['theme']) : null;
         // If exists update, else insert
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token) VALUES (?, ?)');
-            $stmt->execute([$note_id, $token]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme]);
         }
     } else {
         // Default: create (same as renew semantics)
@@ -105,16 +109,17 @@ try {
             $token = bin2hex(random_bytes(16));
         }
 
-        // Insert or update existing token for this note
+        // Insert or update existing token for this note; also store optional theme
+        $theme = isset($data['theme']) ? trim($data['theme']) : null;
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token) VALUES (?, ?)');
-            $stmt->execute([$note_id, $token]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme]);
         }
     }
 
@@ -133,13 +138,11 @@ try {
         $scriptDir = '';
     }
     $scriptDir = rtrim($scriptDir, '/\\');
-    // Include theme parameter if provided
-    $themeParam = isset($data['theme']) ? '&theme=' . urlencode($data['theme']) : '';
+    // Build three variants without the theme parameter so the mode is not visible in the public URL
     $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
-    // Build three variants: legacy query param, root path, and workspace path
-    $url_query = $base . '/public_note.php?token=' . rawurlencode($token) . $themeParam;
-    $url_path = $base . '/' . rawurlencode($token) . ($themeParam ? ('?' . ltrim($themeParam, '&')) : '');
-    $url_workspace = $base . '/workspace/' . rawurlencode($token) . ($themeParam ? ('?' . ltrim($themeParam, '&')) : '');
+    $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
+    $url_path = $base . '/' . rawurlencode($token);
+    $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
     header('Content-Type: application/json');
     echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'shared' => true]);

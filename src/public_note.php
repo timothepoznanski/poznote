@@ -57,7 +57,7 @@ if (empty($token)) {
 }
 
 try {
-    $stmt = $con->prepare('SELECT note_id, created FROM shared_notes WHERE token = ?');
+    $stmt = $con->prepare('SELECT note_id, created, theme FROM shared_notes WHERE token = ?');
     $stmt->execute([$token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -153,8 +153,13 @@ $content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
 
 ?>
 <?php
-// Get theme from URL parameter (dark or light)
-$theme = isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light']) ? $_GET['theme'] : 'light';
+// Determine theme: prefer stored theme on the shared link, else URL param, else default 'light'
+$theme = 'light';
+if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
+    $theme = $row['theme'];
+} elseif (isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light'])) {
+    $theme = $_GET['theme'];
+}
 ?>
 <!doctype html>
 <html data-theme="<?php echo htmlspecialchars($theme); ?>">
@@ -173,6 +178,7 @@ $theme = isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light']) ? 
         })();
     </script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/dark-mode.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode.css') ? filemtime(__DIR__ . '/css/dark-mode.css') : '1'; ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
@@ -182,12 +188,80 @@ $theme = isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light']) ? 
 </head>
 <body>
     <div class="public-note">
-    <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
+        <div class="public-note-header">
+            <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
+            <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
         <div class="content"><?php echo $content; ?></div>
     </div>
 </body>
 <script src="js/copy-code-on-focus.js"></script>
 <script>
+    // Theme toggle functionality
+    (function() {
+        var themeToggle = document.getElementById('themeToggle');
+        var root = document.documentElement;
+        
+        function updateThemeIcon(theme) {
+            var icon = themeToggle.querySelector('i');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+        
+        function setTheme(theme) {
+            root.setAttribute('data-theme', theme);
+            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+            localStorage.setItem('poznote-public-theme', theme);
+            updateThemeIcon(theme);
+            
+            // Reinitialize mermaid with new theme if present
+            if (typeof mermaid !== 'undefined') {
+                var mermaidTheme = theme === 'dark' ? 'dark' : 'default';
+                try {
+                    mermaid.initialize({ startOnLoad: false, theme: mermaidTheme });
+                    var mermaidNodes = document.querySelectorAll('.mermaid');
+                    if (mermaidNodes.length > 0) {
+                        // Re-render mermaid diagrams with new theme
+                        mermaidNodes.forEach(function(node) {
+                            var source = node.getAttribute('data-mermaid-source') || '';
+                            if (source) {
+                                node.textContent = source;
+                            }
+                        });
+                        mermaid.run({ nodes: mermaidNodes });
+                    }
+                } catch (e) {
+                    console.error('Mermaid theme update failed', e);
+                }
+            }
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            var currentTheme = root.getAttribute('data-theme');
+            var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+        
+        // Check localStorage on page load (visitor preference overrides server theme)
+        var savedTheme = localStorage.getItem('poznote-public-theme');
+        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+            var serverTheme = root.getAttribute('data-theme');
+            if (savedTheme !== serverTheme) {
+                setTheme(savedTheme);
+            } else {
+                updateThemeIcon(savedTheme);
+            }
+        } else {
+            updateThemeIcon(root.getAttribute('data-theme'));
+        }
+    })();
+    
     if (typeof mermaid !== 'undefined') {
         function escapeHtml(str) {
             return String(str)
