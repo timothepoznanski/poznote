@@ -104,6 +104,8 @@ class ModalAlert {
         const body = document.createElement('div');
         body.className = 'alert-modal-body';
         body.textContent = message;
+        // Allow displayed newlines (\n) in translations to render as line breaks
+        body.style.whiteSpace = 'pre-wrap';
         
         // Assemble modal
         header.appendChild(titleElement);
@@ -170,6 +172,8 @@ class ModalAlert {
         const body = document.createElement('div');
         body.className = 'alert-modal-body';
         body.textContent = config.message;
+        // Allow displayed newlines (\n) in translations to render as line breaks
+        body.style.whiteSpace = 'pre-wrap';
         
         const footer = document.createElement('div');
         footer.className = 'alert-modal-footer';

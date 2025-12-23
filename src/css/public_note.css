@@ -223,9 +223,10 @@ pre:hover .code-block-copy-btn {
 }
 
 .public-note .content li.task-list-item input[type="checkbox"] {
-    margin-right: 0.5em;
+    margin-right: 0.8em;
     cursor: default;
     vertical-align: middle;
+    display: inline-block;
 }
 
 /* Nested task lists need indentation */
@@ -240,6 +241,29 @@ pre:hover .code-block-copy-btn {
 .public-note .content li.task-list-item input[type="checkbox"]:checked + span {
     text-decoration: line-through;
     color: #888;
+}
+
+/* Tasklist note styles (JSON-based tasklists) */
+.public-note .content .task-item input[type="checkbox"] {
+    margin-right: 0.8em;
+    cursor: default;
+    vertical-align: middle;
+}
+
+.public-note .content .task-item.completed .task-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+/* Important task styling for public view */
+.public-note .content .task-item.important {
+    border-color: #ffcccc;
+    background: #fff6f6;
+}
+
+.public-note .content .task-item.important .task-text {
+    color: #c62828;
+    font-weight: 600;
 }
 
 /* Horizontal rule */
@@ -365,5 +389,16 @@ html[data-theme='dark'] .theme-toggle-btn {
 html[data-theme='dark'] .theme-toggle-btn:hover {
     background: #2d2d2d;
     border-color: #666;
+}
+
+/* Dark mode styles for important tasks */
+html[data-theme='dark'] .public-note .content .task-item.important {
+    border-color: #5a2a2a;
+    background: #2d1a1a;
+}
+
+html[data-theme='dark'] .public-note .content .task-item.important .task-text {
+    color: #ff6b6b;
+    font-weight: 600;
 }
 

@@ -754,7 +754,13 @@
       "method_not_allowed": "Method not allowed",
       "invalid_action": "Invalid action",
       "internal_server_error": "Internal server error",
-      "duplicate_title_in_folder": "Another note with the same title exists in this folder."
+      "duplicate_title_in_folder": "Another note with the same title exists in this folder.",
+      "note_id_required": "note_id required",
+      "note_not_found": "Note not found",
+      "invalid_custom_token": "Invalid custom token.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
+      "token_already_in_use": "Token already in use",
+      "no_token_generated": "No token generated",
+      "server_error": "Server error: {{error}}"
     }
   },
   "ui": {
@@ -819,7 +825,10 @@
       "create_url": "Create url",
       "no_link_yet": "No public link yet",
       "custom_token": "Custom token (optional)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "error_prefix": "Error: ",
+      "unknown_error": "Unknown error creating public share",
+      "error_creating": "Error creating public share: "
     },
     "note": {
       "new_note": "New note",

@@ -753,7 +753,13 @@
       "method_not_allowed": "Método não permitido",
       "invalid_action": "Ação inválida",
       "internal_server_error": "Erro interno do servidor",
-      "duplicate_title_in_folder": "Já existe outra nota com o mesmo título nesta pasta."
+      "duplicate_title_in_folder": "Já existe outra nota com o mesmo título nesta pasta.",
+      "note_id_required": "note_id obrigatório",
+      "note_not_found": "Nota não encontrada",
+      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
+      "token_already_in_use": "Token já em uso",
+      "no_token_generated": "Nenhum token gerado",
+      "server_error": "Erro do servidor: {{error}}"
     }
   },
   "ui": {

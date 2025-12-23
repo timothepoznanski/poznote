@@ -45,10 +45,10 @@ if (!$noteId) {
     exit;
 }
 
-if (!in_array($format, ['html', 'markdown'])) {
+if (!in_array($format, ['html', 'markdown', 'json'], true)) {
     header('Content-Type: application/json');
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html" or "markdown"']);
+    echo json_encode(['success' => false, 'error' => 'Invalid format. Use "html", "markdown" or "json"']);
     exit;
 }
 
@@ -99,6 +99,36 @@ try {
     }
 
     $content = file_get_contents($filePath);
+    if ($content === false) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Cannot read note file']);
+        exit;
+    }
+
+    // JSON export: only for tasklist notes (raw stored JSON)
+    if ($format === 'json') {
+        if ($noteType !== 'tasklist') {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'JSON export is only available for tasklist notes']);
+            exit;
+        }
+
+        // Remove UTF-8 BOM if present
+        $raw = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+        // Validate that stored content is valid JSON
+        json_decode($raw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Tasklist content is not valid JSON']);
+            exit;
+        }
+
+        exportAsJson($raw, $note['heading']);
+    }
 
     // Check format and export accordingly
     if ($format === 'markdown') {
@@ -108,6 +138,30 @@ try {
         // For markdown notes, convert markdown to HTML first
         if ($noteType === 'markdown') {
             $content = parseMarkdownToHtml($content);
+        }
+
+        // For tasklist notes, convert stored JSON to HTML before styling
+        if ($noteType === 'tasklist') {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded)) {
+                $tasksContent = '<div class="task-list-container">' . "\n";
+                $tasksContent .= '<div class="tasks-list">' . "\n";
+                foreach ($decoded as $task) {
+                    $text = isset($task['text']) ? htmlspecialchars((string)$task['text'], ENT_QUOTES) : '';
+                    $completed = !empty($task['completed']) ? ' completed' : '';
+                    $checked = !empty($task['completed']) ? ' checked' : '';
+                    $important = !empty($task['important']) ? ' important' : '';
+                    $tasksContent .= '<div class="task-item' . $completed . $important . '">';
+                    $tasksContent .= '<input type="checkbox" disabled' . $checked . ' /> ';
+                    $tasksContent .= '<span class="task-text">' . $text . '</span>';
+                    $tasksContent .= '</div>' . "\n";
+                }
+                $tasksContent .= '</div>' . "\n";
+                $tasksContent .= '</div>' . "\n";
+                $content = $tasksContent;
+            } else {
+                $content = '<pre>' . htmlspecialchars($content, ENT_QUOTES) . '</pre>';
+            }
         }
         
         // Generate styled HTML
@@ -638,6 +692,62 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
         .task-list-item input[type="checkbox"] {
             margin-right: 8px;
         }
+
+        /* Tasklist notes (JSON-based tasklists) */
+        .task-list-container {
+            padding: 10px 0;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: default;
+            vertical-align: middle;
+        }
+
+        .task-item .task-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .task-item.completed {
+            background: #f0f8f0;
+            border-color: #c8e6c9;
+            opacity: 0.8;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .task-item.important {
+            border-color: #ffcccc;
+            background: #fff6f6;
+        }
+
+        .task-item.important .task-text {
+            color: #c62828;
+            font-weight: 600;
+        }
         
         @media print {
             body {
@@ -759,5 +869,20 @@ function exportAsMarkdown($content, $title, $tags) {
     header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
     
     echo $markdownContent;
+    exit;
+}
+
+/**
+ * Export as JSON file (raw tasklist JSON)
+ */
+function exportAsJson($rawJson, $title) {
+    $filename = sanitizeFilename($title) . '.json';
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Expires: 0');
+
+    echo $rawJson;
     exit;
 }

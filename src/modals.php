@@ -338,6 +338,16 @@
                         <p><?php echo t_h('modals.export.html.description', [], 'Download as HTML file with all formatting preserved'); ?></p>
                     </div>
                 </div>
+
+                <!-- JSON export option (shown only for tasklist notes) -->
+                <div class="export-option export-option-json" onclick="selectExportType('json')" style="display:none;">
+                    <i class="fal fa-file-code"></i>
+                    <div>
+                        <span><?php echo t_h('modals.export.json.title', [], 'Download as JSON'); ?></span>
+                        <p><?php echo t_h('modals.export.json.description', [], 'Download the raw tasklist data as a JSON file'); ?></p>
+                    </div>
+                </div>
+
                 <div class="export-option" onclick="selectExportType('print')">
                     <i class="fal fa-print"></i>
                     <div>

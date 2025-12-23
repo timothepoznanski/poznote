@@ -103,7 +103,8 @@ if (isset($note['type']) && $note['type'] === 'tasklist') {
             $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
-            $tasksHtml .= '<div class="task-item'.$completed.'">';
+            $important = !empty($task['important']) ? ' important' : '';
+            $tasksHtml .= '<div class="task-item'.$completed.$important.'">';
             $tasksHtml .= '<input type="checkbox" disabled'.$checked.' /> ';
             $tasksHtml .= '<span class="task-text">'.$text.'</span>';
             $tasksHtml .= '</div>';

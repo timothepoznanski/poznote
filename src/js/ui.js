@@ -34,6 +34,8 @@ function showNotificationPopup(message, type) {
         return;
     }
     
+    // Allow displayed newlines (\n) in messages to render as line breaks
+    popup.style.whiteSpace = 'pre-wrap';
     popup.innerText = message;
     
     // Remove existing classes
