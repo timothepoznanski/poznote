@@ -754,7 +754,8 @@
       "method_not_allowed": "Methode nicht erlaubt",
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
-      "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner."
+      "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
+      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
     }
   },
   "ui": {
@@ -819,7 +820,10 @@
       "create_url": "URL erstellen",
       "no_link_yet": "Noch kein öffentlicher Link",
       "custom_token": "Benutzerdefiniertes Token (optional)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "error_prefix": "Fehler: ",
+      "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
+      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
     },
     "note": {
       "new_note": "Neue Notiz",

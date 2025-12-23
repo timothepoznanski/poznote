@@ -193,13 +193,13 @@ async function createPublicShare(noteId) {
                 window.prompt('Public URL (read-only):', data.url);
             }
         } else if (data && data.error) {
-            showNotificationPopup && showNotificationPopup('Error: ' + data.error, 'error');
+            showNotificationPopup && showNotificationPopup((window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error, 'error');
         } else {
-            showNotificationPopup && showNotificationPopup('Unknown error creating public share', 'error');
+            showNotificationPopup && showNotificationPopup(window.t ? window.t('index.share_modal.unknown_error', null, 'Unknown error creating public share') : 'Unknown error creating public share', 'error');
         }
     } catch (err) {
         console.error('Error creating public share:', err);
-        showNotificationPopup && showNotificationPopup('Error creating public share: ' + err.message, 'error');
+        showNotificationPopup && showNotificationPopup((window.t ? window.t('index.share_modal.error_creating', null, 'Error creating public share: ') : 'Error creating public share: ') + err.message, 'error');
     }
 }
 

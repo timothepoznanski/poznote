@@ -3,6 +3,7 @@ require 'auth.php';
 requireApiAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'functions.php';
 
 // Only accept JSON POST
 $body = file_get_contents('php://input');
@@ -10,7 +11,7 @@ $data = json_decode($body, true);
 if (!$data || !isset($data['note_id'])) {
     header('Content-Type: application/json');
     http_response_code(400);
-    echo json_encode(['error' => 'note_id required']);
+        echo json_encode(['error' => t('api.errors.note_id_required', [], 'note_id required')]);
     exit;
 }
 
@@ -26,7 +27,7 @@ try {
     if (!$exists) {
         header('Content-Type: application/json');
         http_response_code(404);
-        echo json_encode(['error' => 'Note not found']);
+        echo json_encode(['error' => t('api.errors.note_not_found', [], 'Note not found')]);
         exit;
     }
 
@@ -91,7 +92,7 @@ try {
             if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
                 header('Content-Type: application/json');
                 http_response_code(400);
-                echo json_encode(['error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                echo json_encode(['error' => t('api.errors.invalid_custom_token', [], 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)')]);
                 exit;
             }
             // Ensure uniqueness (except when it's already used by this note)
@@ -101,7 +102,7 @@ try {
             if ($existing && intval($existing) !== $note_id) {
                 header('Content-Type: application/json');
                 http_response_code(409);
-                echo json_encode(['error' => 'Token already in use']);
+                echo json_encode(['error' => t('api.errors.token_already_in_use', [], 'Token already in use')]);
                 exit;
             }
             $token = $custom;
@@ -126,7 +127,7 @@ try {
     // If we reach here and have a token, build the URL
     if (empty($token)) {
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'No token generated']);
+        echo json_encode(['error' => t('api.errors.no_token_generated', [], 'No token generated')]);
         exit;
     }
 
@@ -150,7 +151,7 @@ try {
 } catch (Exception $e) {
     header('Content-Type: application/json');
     http_response_code(500);
-    echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
+    echo json_encode(['error' => t('api.errors.server_error', ['error' => $e->getMessage()], 'Server error: ' . $e->getMessage())]);
     exit;
 }
 ?>

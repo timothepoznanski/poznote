@@ -1547,15 +1547,20 @@ function showExportModal(noteId, filename, title, noteType) {
         // Show/hide options based on note type
         var markdownOption = modal.querySelector('.export-option-markdown');
         var htmlOption = modal.querySelector('.export-option-html');
+        var jsonOption = modal.querySelector('.export-option-json');
         
         if (noteType === 'markdown') {
-            // For markdown notes: show MD and PDF options, hide HTML option
+            // For markdown notes: allow both MD and HTML exports + PDF (print)
             if (markdownOption) markdownOption.style.display = 'flex';
-            if (htmlOption) htmlOption.style.display = 'none';
+            if (htmlOption) htmlOption.style.display = 'flex';
+            if (jsonOption) jsonOption.style.display = 'none';
         } else {
             // For other notes: show HTML and PDF options, hide MD option
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
+
+            // Only tasklist notes support JSON export
+            if (jsonOption) jsonOption.style.display = (noteType === 'tasklist') ? 'flex' : 'none';
         }
         
         modal.style.display = 'flex';
@@ -1570,6 +1575,8 @@ function selectExportType(type) {
         exportNoteAsMarkdown(currentExportNoteId, currentExportFilename, currentExportNoteType);
     } else if (type === 'html') {
         exportNoteAsHTML(currentExportNoteId, null, currentExportFilename, currentExportNoteType);
+    } else if (type === 'json') {
+        exportNoteAsJSON(currentExportNoteId, currentExportNoteType);
     } else if (type === 'print') {
         exportNoteToPrint(currentExportNoteId, currentExportNoteType);
     }
@@ -1600,6 +1607,20 @@ function exportNoteAsMarkdown(noteId, filename, noteType) {
     var link = document.createElement('a');
     link.href = apiUrl;
     link.download = '';  // Let the server set the filename via Content-Disposition
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Export tasklist note as JSON
+function exportNoteAsJSON(noteId, noteType) {
+    var apiUrl = 'api_export_note.php?id=' + encodeURIComponent(noteId) +
+                 '&type=' + encodeURIComponent(noteType) +
+                 '&format=json';
+
+    var link = document.createElement('a');
+    link.href = apiUrl;
+    link.download = '';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

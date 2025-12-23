@@ -754,7 +754,8 @@
       "method_not_allowed": "Método no permitido",
       "invalid_action": "Acción inválida",
       "internal_server_error": "Error interno del servidor",
-      "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta."
+      "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
+      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
     }
   },
   "ui": {
@@ -819,7 +820,10 @@
       "create_url": "Crear url",
       "no_link_yet": "Aún no hay enlace público",
       "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "error_prefix": "Error: ",
+      "unknown_error": "Error desconocido al crear el enlace público",
+      "error_creating": "Error al crear el enlace público: "
     },
     "note": {
       "new_note": "Nueva nota",

@@ -283,9 +283,53 @@ function generateStyledHtml($content, $title, $noteType, $tags = '') {
             padding-left: 0;
         }
         li.task-list-item input[type="checkbox"] {
-            margin-right: 0.5em;
+            margin-right: 0.8em;
             cursor: default;
             vertical-align: middle;
+        }
+        .task-list-container {
+            padding: 10px 0;
+        }
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .task-item input[type="checkbox"] {
+            margin-right: 0.8em;
+            cursor: default;
+            vertical-align: middle;
+        }
+        .task-item .task-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .task-item.completed {
+            background: #f0f8f0;
+            border-color: #c8e6c9;
+            opacity: 0.8;
+        }
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #666;
+        }
+        .task-item.important {
+            border-color: #ffcccc;
+            background: #fff6f6;
+        }
+        .task-item.important .task-text {
+            color: #c62828;
+            font-weight: 600;
         }
         .mermaid {
             margin: 1em 0;
@@ -361,7 +405,8 @@ if ($noteType === 'tasklist') {
             $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES) : '';
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
-            $tasksContent .= '<div class="task-item'.$completed.'">';
+            $important = !empty($task['important']) ? ' important' : '';
+            $tasksContent .= '<div class="task-item'.$completed.$important.'">';
             $tasksContent .= '<input type="checkbox" disabled'.$checked.' /> ';
             $tasksContent .= '<span class="task-text">'.$text.'</span>';
             $tasksContent .= '</div>' . "\n";

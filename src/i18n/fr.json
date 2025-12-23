@@ -754,7 +754,13 @@
       "method_not_allowed": "Méthode non autorisée",
       "invalid_action": "Action invalide",
       "internal_server_error": "Erreur interne du serveur",
-      "duplicate_title_in_folder": "Une autre note avec le même titre existe déjà dans ce dossier."
+      "duplicate_title_in_folder": "Une autre note avec le même titre existe déjà dans ce dossier.",
+      "note_id_required": "Paramètre note_id requis",
+      "note_not_found": "Note introuvable",
+      "invalid_custom_token": "Jeton personnalisé invalide.\n\nCaractères autorisés :\n\nlettres, chiffres, -, _, . (4-128 caractères)",
+      "token_already_in_use": "Jeton déjà utilisé",
+      "no_token_generated": "Aucun jeton généré",
+      "server_error": "Erreur serveur : {{error}}"
     }
   },
   "ui": {
@@ -819,7 +825,10 @@
       "create_url": "Créer l'url",
       "no_link_yet": "Aucun lien public pour le moment",
       "custom_token": "Token personnalisé (optionnel)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "error_prefix": "Erreur : ",
+      "unknown_error": "Erreur inconnue lors de la création du partage public",
+      "error_creating": "Erreur lors de la création du partage public : "
     },
     "note": {
       "new_note": "Nouvelle note",

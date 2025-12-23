@@ -134,6 +134,11 @@
     flex-wrap: wrap;
 }
 
+/* Export modal: add breathing room above buttons */
+#exportModal .modal-buttons {
+    margin-top: 12px;
+}
+
 .modal-buttons button {
     padding: 8px 14px;
     border: none;
