@@ -198,14 +198,29 @@ function addTask(noteId) {
         .then(data => {
             const insertOrder = (data && data.success && data.value) ? data.value : 'bottom';
             
-            if (insertOrder === 'top') {
-                // Insert at the beginning (top)
-                tasks.unshift(newTask);
-            } else {
-                // Insert at the end (bottom) - default behavior
-                tasks.push(newTask);
+            // Build groups to ensure completed tasks always stay at the end
+            const importantIncomplete = [];
+            const normalIncomplete = [];
+            const completedArr = [];
+
+            for (let i = 0; i < tasks.length; i++) {
+                const t = tasks[i];
+                if (t.completed) completedArr.push(t);
+                else if (t.important) importantIncomplete.push(t);
+                else normalIncomplete.push(t);
             }
-            
+
+            if (insertOrder === 'top') {
+                // Insert after important incomplete tasks, i.e. at start of normalIncomplete
+                normalIncomplete.splice(0, 0, newTask);
+            } else {
+                // Insert at end of incomplete group (before completed tasks)
+                normalIncomplete.push(newTask);
+            }
+
+            // Reassemble ensuring completed tasks remain last
+            tasks = [].concat(importantIncomplete, normalIncomplete, completedArr);
+
             noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
             // Re-render tasks
@@ -255,22 +270,60 @@ function toggleTask(taskId, noteId) {
 
     tasks[taskIndex].completed = !tasks[taskIndex].completed;
     
-    // Sort tasks: important (incomplete) first, then normal (incomplete), then completed last
-    tasks.sort((a, b) => {
-        // Completed tasks always go to the bottom
-        if (a.completed && !b.completed) return 1;
-        if (!a.completed && b.completed) return -1;
-        
-        // Among incomplete tasks, important ones go first
-        if (!a.completed && !b.completed) {
-            if ((a.important ? 1 : 0) !== (b.important ? 1 : 0)) {
-                return (b.important ? 1 : 0) - (a.important ? 1 : 0);
-            }
+    // Reorder tasks to maintain grouping:
+    // - important incomplete tasks first
+    // - other incomplete tasks next
+    // - completed tasks last
+    // Additionally:
+    // - when insert order is 'bottom', newly completed tasks should be
+    //   placed at the start of the completed group (so they don't end up
+    //   below existing checked tasks when new tasks are added at bottom)
+    const btn = document.querySelector('.btn-task-order');
+    const insertOrder = (btn && btn.classList.contains('active')) ? 'top' : 'bottom';
+
+    // Build groups preserving original relative order
+    const importantIncomplete = [];
+    const normalIncomplete = [];
+    const completedArr = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        if (t.completed) completedArr.push(t);
+        else if (t.important) importantIncomplete.push(t);
+        else normalIncomplete.push(t);
+    }
+
+    const toggledTask = tasks[taskIndex];
+
+    if (toggledTask.completed) {
+        // Ensure toggled completed task is at the start of completed group when bottom-insert
+        // Remove any existing occurrence (should be one) and then insert appropriately
+        const idx = completedArr.findIndex(t => String(t.id) === String(toggledTask.id));
+        if (idx !== -1) completedArr.splice(idx, 1);
+        if (insertOrder === 'bottom') {
+            completedArr.unshift(toggledTask);
+        } else {
+            // in top-insert mode, keep completed tasks order (append)
+            completedArr.push(toggledTask);
         }
-        
-        // Keep relative order for same priority tasks
-        return 0;
-    });
+    } else {
+        // toggled to incomplete: place at the end of its corresponding incomplete group
+        // Remove any occurrence from completedArr if present
+        const cidx = completedArr.findIndex(t => String(t.id) === String(toggledTask.id));
+        if (cidx !== -1) completedArr.splice(cidx, 1);
+
+        // Remove from incomplete groups if present to avoid duplicates
+        let ii = importantIncomplete.findIndex(t => String(t.id) === String(toggledTask.id));
+        if (ii !== -1) importantIncomplete.splice(ii, 1);
+        ii = normalIncomplete.findIndex(t => String(t.id) === String(toggledTask.id));
+        if (ii !== -1) normalIncomplete.splice(ii, 1);
+
+        if (toggledTask.important) importantIncomplete.push(toggledTask);
+        else normalIncomplete.push(toggledTask);
+    }
+
+    // Reassemble tasks preserving the chosen grouping
+    tasks = [].concat(importantIncomplete, normalIncomplete, completedArr);
     
     noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
