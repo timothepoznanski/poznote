@@ -1371,21 +1371,29 @@
                 }
             }
         } else {
-            const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
-            if (!cmd) return;
+            // First try to find in filtered commands (for flattened results)
+            const filteredCmd = filteredCommands.find(c => c.id === commandId);
+            if (filteredCmd && filteredCmd.action) {
+                actionToExecute = filteredCmd.action;
+                foundCmd = filteredCmd;
+            } else {
+                // Fallback to original commands
+                const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
+                if (!cmd) return;
 
-            // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
-            if (cmd.submenu && cmd.submenu.length > 0) {
-                const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
-                if (item) {
-                    showSubmenu(cmd, item);
+                // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
+                if (cmd.submenu && cmd.submenu.length > 0) {
+                    const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
+                    if (item) {
+                        showSubmenu(cmd, item);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            if (cmd.action) {
-                actionToExecute = cmd.action;
-                foundCmd = cmd;
+                if (cmd.action) {
+                    actionToExecute = cmd.action;
+                    foundCmd = cmd;
+                }
             }
         }
 
