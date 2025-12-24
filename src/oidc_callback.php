@@ -52,6 +52,11 @@ try {
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
     exit;
 } catch (Exception $e) {
-    header('Location: login.php?oidc_error=1');
+    // Check if the error is due to unauthorized user
+    if (strpos($e->getMessage(), 'not authorized') !== false) {
+        header('Location: login.php?oidc_error=unauthorized');
+    } else {
+        header('Location: login.php?oidc_error=1');
+    }
     exit;
 }

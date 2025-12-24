@@ -93,8 +93,12 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
 }
 
 // OIDC error feedback (generic)
-if (isset($_GET['oidc_error']) && $_GET['oidc_error'] === '1') {
-    $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
+if (isset($_GET['oidc_error'])) {
+    if ($_GET['oidc_error'] === 'unauthorized') {
+        $oidcError = t('login.errors.oidc_unauthorized', [], 'You are not authorized to access this application. Please contact your administrator.', $currentLang ?? 'en');
+    } elseif ($_GET['oidc_error'] === '1') {
+        $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang ?? 'en');
+    }
 }
 ?>
 <!DOCTYPE html>

@@ -25,4 +25,8 @@
     define('OIDC_DISABLE_NORMAL_LOGIN', filter_var($_ENV['POZNOTE_OIDC_DISABLE_NORMAL_LOGIN'] ?? false, FILTER_VALIDATE_BOOL));
     // Optional: disable HTTP Basic Auth for API when OIDC is enabled (force OIDC-only authentication)
     define('OIDC_DISABLE_BASIC_AUTH', filter_var($_ENV['POZNOTE_OIDC_DISABLE_BASIC_AUTH'] ?? false, FILTER_VALIDATE_BOOL));
+    // Optional: comma-separated list of allowed users (email addresses or usernames)
+    // If not set, all authenticated users from the identity provider can access the application
+    // Example: 'user1@example.com,user2@example.com' or 'user1,user2'
+    define('OIDC_ALLOWED_USERS', (string)($_ENV['POZNOTE_OIDC_ALLOWED_USERS'] ?? ''));
 ?>

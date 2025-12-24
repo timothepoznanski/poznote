@@ -346,6 +346,11 @@ POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
 
 # Optional: Disable normal login when OIDC is enabled (force SSO-only login)
 # POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
+
+# Optional BUT VERY RECOMMANDED: Restrict access to specific users (comma-separated list of emails or usernames)
+# If not set, all authenticated users from the identity provider can access the application
+# Example: POZNOTE_OIDC_ALLOWED_USERS=user1@example.com,user2@example.com
+# POZNOTE_OIDC_ALLOWED_USERS=
 ```
 
 #### How it works
@@ -366,6 +371,14 @@ If `POZNOTE_OIDC_DISABLE_BASIC_AUTH` is set to `true`, HTTP Basic Auth for API r
 - Uses PKCE (Proof Key for Code Exchange) for enhanced security
 - Supports RP-initiated logout for clean session termination
 - All OIDC communication uses HTTPS
+- **Access Control**: Use `POZNOTE_OIDC_ALLOWED_USERS` to restrict access to specific users. Without this setting, any user authenticated by your identity provider can access the application.
+
+#### Access Control Example
+
+Restrict access to specific users by email address or username:
+```bash
+POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
+```
 
 ## Password Recovery
 

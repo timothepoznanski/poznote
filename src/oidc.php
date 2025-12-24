@@ -485,7 +485,49 @@ function oidc_claims_to_display_user($claims) {
     return 'oidc-user';
 }
 
+function oidc_is_user_allowed($claims) {
+    // Extract potential user identifiers
+    $email = $claims['email'] ?? null;
+    $preferredUsername = $claims['preferred_username'] ?? null;
+    $sub = $claims['sub'] ?? null;
+    
+    // Get configured allowed users
+    $allowedUsers = defined('OIDC_ALLOWED_USERS') ? OIDC_ALLOWED_USERS : '';
+    
+    // If allowlist is not configured, allow all authenticated users
+    if ($allowedUsers === '') {
+        return true;
+    }
+    
+    // Parse the allowed users list
+    $allowedUsersList = array_map('trim', explode(',', $allowedUsers));
+    $allowedUsersList = array_filter($allowedUsersList, function($u) { return $u !== ''; });
+    
+    // Check if email matches
+    if (is_string($email) && in_array(strtolower($email), array_map('strtolower', $allowedUsersList), true)) {
+        return true;
+    }
+    
+    // Check if preferred_username matches
+    if (is_string($preferredUsername) && in_array(strtolower($preferredUsername), array_map('strtolower', $allowedUsersList), true)) {
+        return true;
+    }
+    
+    // Check if sub matches (for providers that use sub as username)
+    if (is_string($sub) && in_array($sub, $allowedUsersList, true)) {
+        return true;
+    }
+    
+    // User is not in allowlist
+    return false;
+}
+
 function oidc_finish_login($claims, $tokens) {
+    // Check if user is allowed to access the application
+    if (!oidc_is_user_allowed($claims)) {
+        throw new Exception('User not authorized to access this application');
+    }
+    
     $_SESSION['authenticated'] = true;
     $_SESSION['auth_method'] = 'oidc';
     $_SESSION['oidc_sub'] = $claims['sub'] ?? null;
