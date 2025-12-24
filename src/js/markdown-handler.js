@@ -805,7 +805,7 @@ function initializeMarkdownNote(noteId) {
     editorDiv.textContent = markdownContent;
     var isMobileViewport = false;
     try {
-        isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+        isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
     } catch (e) {
         isMobileViewport = false;
     }

@@ -150,6 +150,7 @@ $currentLang = getUserLanguage();
 			// Note name (clickable to open note)
 			const noteCell = document.createElement('td');
 			noteCell.className = 'note-cell';
+			noteCell.setAttribute('data-label', '<?php echo t_h('shared.table.note', [], 'Note'); ?>');
 			const noteLink = document.createElement('a');
 			noteLink.href = 'index.php?note=' + note.note_id + (workspace ? '&workspace=' + encodeURIComponent(workspace) : '');
 			noteLink.textContent = note.heading || '<?php echo t_h('common.untitled', [], 'Untitled'); ?>';
@@ -160,18 +161,21 @@ $currentLang = getUserLanguage();
 			// Folder
 			const folderCell = document.createElement('td');
 			folderCell.className = 'folder-cell';
+			folderCell.setAttribute('data-label', '<?php echo t_h('shared.table.folder', [], 'Folder'); ?>');
 			folderCell.textContent = note.folder || '<?php echo t_h('common.uncategorized', [], 'Uncategorized'); ?>';
 			row.appendChild(folderCell);
 			
 			// Shared date
 			const dateCell = document.createElement('td');
 			dateCell.className = 'date-cell';
+			dateCell.setAttribute('data-label', '<?php echo t_h('shared.table.shared_date', [], 'Shared'); ?>');
 			dateCell.textContent = formatDate(note.shared_date);
 			row.appendChild(dateCell);
 			
 			// URL (with copy button)
 			const urlCell = document.createElement('td');
 			urlCell.className = 'url-cell';
+			urlCell.setAttribute('data-label', '<?php echo t_h('shared.table.url', [], 'Public URL'); ?>');
 			const urlWrapper = document.createElement('div');
 			urlWrapper.className = 'url-wrapper';
 			const urlInput = document.createElement('input');
@@ -192,6 +196,7 @@ $currentLang = getUserLanguage();
 			// Actions
 			const actionsCell = document.createElement('td');
 			actionsCell.className = 'actions-cell';
+			actionsCell.setAttribute('data-label', '<?php echo t_h('shared.table.actions', [], 'Actions'); ?>');
 			
 			const openBtn = document.createElement('button');
 			openBtn.className = 'btn btn-sm btn-secondary';

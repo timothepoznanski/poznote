@@ -2095,7 +2095,7 @@ div[contentEditable=true]:empty:before {
         color: #bababa;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     div[contentEditable=true][data-ph-mobile]:empty:before {
         content: attr(data-ph-mobile);
     }
