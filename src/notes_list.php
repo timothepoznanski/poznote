@@ -63,6 +63,33 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'T
 echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
 
+// Render a dedicated "Shared" folder that links to the shared notes page
+// Count shared notes for the current workspace (non-trashed entries)
+$shared_count = 0;
+try {
+    if (isset($con)) {
+        $query = "SELECT COUNT(*) as cnt FROM shared_notes sn INNER JOIN entries e ON sn.note_id = e.id WHERE e.trash = 0";
+        $params = [];
+        if (!empty($workspace_filter)) {
+            $query .= " AND (e.workspace = ? OR (e.workspace IS NULL AND ? = 'Poznote'))";
+            $params[] = $workspace_filter;
+            $params[] = $workspace_filter;
+        }
+        $stmtShared = $con->prepare($query);
+        $stmtShared->execute($params);
+        $shared_count = (int)$stmtShared->fetchColumn();
+    }
+} catch (Exception $e) {
+    $shared_count = 0;
+}
+
+echo "<div class='folder-header' data-folder='Shared'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<i class='fa-share-nodes folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.shared', [], 'Shared') . "</span>";
+echo "<span class='folder-note-count' id='count-shared'>(" . $shared_count . ")</span>";
+echo "</div></div>";
+
 // If there is no Favorites folder in the list, render the separator here so it always appears
 if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
     echo "<div class='favorites-separator' aria-hidden='true'></div>";
@@ -118,7 +145,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Workspace-aware folder handling in UI
         // Disable double-click rename for system folders
-        $systemFolders = ['Favorites', 'Tags', 'Trash'];
+        $systemFolders = ['Favorites', 'Tags', 'Trash', 'Shared'];
         $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         $folderDisplayName = $folderName;
         if ($folderName === 'Favorites') {

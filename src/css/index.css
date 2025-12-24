@@ -2532,9 +2532,10 @@ hr {
     align-content: center;
 }
 
-/* Réduire les icônes dans les dossiers (Trash, Tags, Favorites) */
+/* Réduire les icônes dans les dossiers (Trash, Tags, Shared, Favorites) */
 .fa-trash.folder-icon,
 .fa-tags.folder-icon,
+.fa-share-nodes.folder-icon,
 .fa-star-light.folder-icon {
     font-size: 0.8em !important;
 }
