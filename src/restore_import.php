@@ -3,6 +3,7 @@ require_once 'auth.php';
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
+require_once 'csp_helper.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -742,7 +743,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 <head>
     <title><?php echo t_h('restore_import.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+    <script <?php echo nonceAttr(); ?>>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
@@ -1152,7 +1153,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
     
     <script src="js/restore-import.js"></script>
     <script src="js/chunked-uploader.js"></script>
-    <script>
+    <script <?php echo nonceAttr(); ?>>
         (function () {
             const trLocal = (key, fallback, vars) => {
                 if (typeof window.t === 'function') {
@@ -1275,7 +1276,7 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
 </body>
 </html>
 
-<script>
+<script <?php echo nonceAttr(); ?>>
 // Ensure Back to Notes opens the stored workspace if present
 (function(){ try {
     var stored = localStorage.getItem('poznote_selected_workspace');

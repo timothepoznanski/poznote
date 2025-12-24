@@ -11,6 +11,7 @@ requireAuth();
 ob_start();
 require_once 'config.php';
 include 'functions.php';
+require_once 'csp_helper.php';
 
 include 'db_connect.php';
 
@@ -47,7 +48,8 @@ if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
         exit;
     } else {
         // Use localStorage (either because default is __last_opened__ or no default is set)
-        echo '<!DOCTYPE html><html><head><script>
+        echo '<!DOCTYPE html><html><head><script nonce="' . htmlspecialchars(getCSPNonce(), ENT_QUOTES) . '">';
+        echo '
         (function(){
             try {
                 var workspace = localStorage.getItem("poznote_selected_workspace");
@@ -113,7 +115,7 @@ $using_unified_search = handleUnifiedSearch();
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title>Poznote</title>
     <?php $v = '20251020.6'; // Cache version to force reload ?>
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     (function(){
         try {
             var theme = localStorage.getItem('poznote-theme');
@@ -151,6 +153,8 @@ $using_unified_search = handleUnifiedSearch();
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/page-config.js?v=<?php echo $v; ?>"></script>
+    <script src="js/index-page.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -205,7 +209,7 @@ $body_classes = trim($extra_body_classes);
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
     <!-- Debug console info removed in production -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     // Global error handler to catch all JavaScript errors
     window.addEventListener('error', function(event) {
         console.error('JavaScript Error caught:', {
@@ -276,26 +280,10 @@ $body_classes = trim($extra_body_classes);
     };
     </script>
 
-    <script>
-    // Restore folder states from localStorage
+    <!-- Page initialization is now in index-page.js -->
+    
+    <script <?php echo nonceAttr(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
-
-        try {
-            var folderContents = document.querySelectorAll('.folder-content');
-            for (var i = 0; i < folderContents.length; i++) {
-                var content = folderContents[i];
-                var folderId = content.id;
-                var savedState = localStorage.getItem('folder_' + folderId);
-
-                if (savedState === 'closed') {
-                    // add a closed class so CSS can hide it; existing code expects this state
-                    content.classList.add('closed');
-                }
-            }
-        } catch (e) {
-            // ignore errors during initial folder state restoration
-        }
-
         window.workspaceDisplayMap = <?php
             $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
             $json_output = json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
@@ -380,10 +368,11 @@ $body_classes = trim($extra_body_classes);
         </div>
     </div>
         
-    <script>
-    // Set configuration variables for the main page
-    window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
-    window.currentNoteFolder = <?php 
+    <script <?php echo nonceAttr(); ?>>
+    // Initialize page configuration
+    window.setPageConfig({
+        isSearchMode: <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>,
+        currentNoteFolder: <?php 
         if ($note != '' && empty($search) && empty($tags_search)) {
             $folder_value = $current_note_folder ?? '';
             echo json_encode($folder_value);
@@ -392,8 +381,9 @@ $body_classes = trim($extra_body_classes);
         } else {
             echo 'null';
         }
-    ?>;
-    window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>;
+    ?>,
+        selectedWorkspace: <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>
+    });
     </script>
                     
     <?php
@@ -448,7 +438,7 @@ $body_classes = trim($extra_body_classes);
     ?>
 
     </div>
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     // Create menu functionality - now opens unified modal
     function toggleCreateMenu() {
         // Show the unified create modal instead of dropdown menu
@@ -974,7 +964,7 @@ $body_classes = trim($extra_body_classes);
     
     <?php if (!empty($tasklist_ids)): ?>
     <!-- Initialize all tasklists -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof initializeTaskList === 'function') {
             <?php foreach ($tasklist_ids as $tasklist_id): ?>
@@ -987,7 +977,7 @@ $body_classes = trim($extra_body_classes);
     
     <?php if (!empty($markdown_ids)): ?>
     <!-- Initialize all markdown notes -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof initializeMarkdownNote === 'function') {
             <?php foreach ($markdown_ids as $markdown_id): ?>
@@ -999,7 +989,7 @@ $body_classes = trim($extra_body_classes);
     <?php endif; ?>
     
     <!-- Track opened note and process note references -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     document.addEventListener('DOMContentLoaded', function() {
         // Track the currently opened note for recent notes list
         var noteEntry = document.querySelector('.noteentry[data-note-id]');
@@ -1023,7 +1013,7 @@ $body_classes = trim($extra_body_classes);
     </script>
         
     </div>  <!-- Close main-container -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
         function startEditSubheading(noteId) {
             var disp = document.getElementById('subheading-display-' + noteId);
             var input = document.getElementById('subheading-input-' + noteId);
@@ -1090,7 +1080,7 @@ $body_classes = trim($extra_body_classes);
     </script>
     
 </body>
-<script>
+<script <?php echo nonceAttr(); ?>>
     function openNoteInfoEdit(noteId) {
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
         if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
@@ -1149,7 +1139,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 
-<script>
+<script <?php echo nonceAttr(); ?>>
 // Mobile navigation functionality
 function scrollToRightColumn() {
     const rightCol = document.getElementById('right_col');

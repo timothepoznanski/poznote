@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'page_init.php';
+require_once 'csp_helper.php';
 
 // Get parameters
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -114,7 +115,7 @@ if ($note_id > 0) {
     <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
     <!-- Theme -->
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     (function(){
         try {
             var theme = localStorage.getItem('poznote-theme') || 'light';

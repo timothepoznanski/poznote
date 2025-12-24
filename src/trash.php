@@ -6,6 +6,7 @@ requireAuth();
 include 'functions.php';
 require_once 'config.php';
 include 'db_connect.php';
+require_once 'csp_helper.php';
 
 // Helper: convert plain-text URLs into safe HTML anchors
 function linkify_html($text) {
@@ -35,7 +36,7 @@ $currentLang = getUserLanguage();
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 	<title><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?> - <?php echo t_h('app.name'); ?></title>
-	<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+	<script <?php echo nonceAttr(); ?>>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
 	<meta name="color-scheme" content="dark light">
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
@@ -236,7 +237,7 @@ $currentLang = getUserLanguage();
 	<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
 	<script src="js/main.js"></script>
 	<script src="js/trash.js"></script>
-	<script>
+	<script <?php echo nonceAttr(); ?>>
 		var pageWorkspace = <?php echo $pageWorkspace ? json_encode($pageWorkspace) : 'undefined'; ?>;
 		
 		function goBackToNotes() {

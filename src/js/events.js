@@ -1175,11 +1175,162 @@ function setupNoteDragDropEvents() {
                         sessionStorage.setItem('shouldScrollToNote', 'true');
                     }
 
-                    var func = new Function('event', dataOnclick);
-                    func.call(link, evt);
+                    // CSP-safe: Execute onclick without eval/new Function
+                    // Support common patterns used in Poznote
+                    
+                    // Remove 'return' statement and trailing semicolon if present
+                    var code = dataOnclick.trim();
+                    var hasReturn = code.match(/^return\s+/);
+                    if (hasReturn) {
+                        code = code.replace(/^return\s+/, '');
+                    }
+                    // Remove trailing semicolon
+                    code = code.replace(/;$/, '');
+                    
+                    // Try to parse as a function call: functionName(args...)
+                    var funcMatch = code.match(/^(\w+)\((.*)\)$/);
+                    
+                    if (funcMatch && typeof window[funcMatch[1]] === 'function') {
+                        var funcName = funcMatch[1];
+                        var argsString = funcMatch[2];
+                        
+                        // Parse arguments - handle strings, numbers, 'this', 'event', etc.
+                        var args = [];
+                        if (argsString.trim()) {
+                            // Split by comma but respect quoted strings
+                            var argParts = parseArguments(argsString);
+                            
+                            for (var i = 0; i < argParts.length; i++) {
+                                args.push(evaluateArgument(argParts[i], link, evt));
+                            }
+                        }
+                        
+                        // Call the function with parsed arguments
+                        var result = window[funcName].apply(link, args);
+                        
+                        // If original had return, return the result
+                        if (hasReturn) {
+                            return result;
+                        }
+                    } else {
+                        // Fallback: try direct execution for very simple cases
+                        // This is safer than eval but still limited
+                        console.warn('CSP: Could not parse onclick expression:', dataOnclick);
+                        console.info('Attempting fallback execution...');
+                        
+                        // For backwards compatibility, try one more approach
+                        // Check if it's a known function pattern
+                        if (code.indexOf('loadNoteDirectly') === 0 && typeof window.loadNoteDirectly === 'function') {
+                            // Special case for loadNoteDirectly which is used frequently
+                            var loadMatch = code.match(/loadNoteDirectly\(([^)]+)\)/);
+                            if (loadMatch) {
+                                var loadArgs = parseArguments(loadMatch[1]);
+                                var evaledArgs = loadArgs.map(function(arg) {
+                                    return evaluateArgument(arg, link, evt);
+                                });
+                                return window.loadNoteDirectly.apply(link, evaledArgs);
+                            }
+                        }
+                    }
                 } catch (err) {
-                    console.error('Error executing click handler:', err);
+                    console.error('Error executing click handler:', err, 'for:', dataOnclick);
                 }
+            }
+            
+            // Helper function to parse function arguments respecting quotes
+            function parseArguments(argsString) {
+                var args = [];
+                var current = '';
+                var inQuotes = false;
+                var quoteChar = null;
+                var parenDepth = 0;
+                
+                for (var i = 0; i < argsString.length; i++) {
+                    var char = argsString[i];
+                    
+                    if (!inQuotes && (char === '"' || char === "'")) {
+                        inQuotes = true;
+                        quoteChar = char;
+                        current += char;
+                    } else if (inQuotes && char === quoteChar && argsString[i-1] !== '\\') {
+                        inQuotes = false;
+                        quoteChar = null;
+                        current += char;
+                    } else if (!inQuotes && char === '(') {
+                        parenDepth++;
+                        current += char;
+                    } else if (!inQuotes && char === ')') {
+                        parenDepth--;
+                        current += char;
+                    } else if (!inQuotes && char === ',' && parenDepth === 0) {
+                        args.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                if (current.trim()) {
+                    args.push(current.trim());
+                }
+                
+                return args;
+            }
+            
+            // Helper function to evaluate a single argument
+            function evaluateArgument(arg, linkElement, event) {
+                arg = arg.trim();
+                
+                // Handle 'this'
+                if (arg === 'this') {
+                    return linkElement;
+                }
+                
+                // Handle 'event'
+                if (arg === 'event') {
+                    return event;
+                }
+                
+                // Handle string literals (single or double quotes)
+                if ((arg[0] === '"' && arg[arg.length - 1] === '"') ||
+                    (arg[0] === "'" && arg[arg.length - 1] === "'")) {
+                    return arg.slice(1, -1);
+                }
+                
+                // Handle numbers
+                if (!isNaN(arg) && arg !== '') {
+                    return parseFloat(arg);
+                }
+                
+                // Handle boolean literals
+                if (arg === 'true') return true;
+                if (arg === 'false') return false;
+                if (arg === 'null') return null;
+                if (arg === 'undefined') return undefined;
+                
+                // Try to evaluate as a global variable or simple expression
+                try {
+                    // Check if it's a simple property access like window.something
+                    if (arg.indexOf('.') > 0) {
+                        var parts = arg.split('.');
+                        var obj = window;
+                        for (var i = 0; i < parts.length; i++) {
+                            obj = obj[parts[i]];
+                            if (obj === undefined) break;
+                        }
+                        return obj;
+                    }
+                    
+                    // Check if it's a global variable
+                    if (typeof window[arg] !== 'undefined') {
+                        return window[arg];
+                    }
+                } catch (e) {
+                    // Ignore evaluation errors
+                }
+                
+                // Return as string if we can't evaluate it
+                return arg;
             }
 
             // Robust mobile tap fallback:

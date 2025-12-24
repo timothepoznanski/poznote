@@ -3,6 +3,7 @@ require_once 'auth.php';
 require_once 'config.php';
 include 'functions.php';
 require_once 'db_connect.php';
+require_once 'csp_helper.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -293,7 +294,7 @@ function createBackup() {
 <head>
     <title><?php echo t_h('backup_export.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
+    <script <?php echo nonceAttr(); ?>>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
@@ -360,7 +361,7 @@ function createBackup() {
     </div>
     
     <script src="js/backup-export.js"></script>
-    <script>
+    <script <?php echo nonceAttr(); ?>>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');
         if (stored) {
