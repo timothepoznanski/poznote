@@ -634,28 +634,22 @@
       "title_in_folder": "Erstellen in {{folder}}",
       "folder_fallback": "Ordner",
       "note": {
-        "title": "Notiz",
-        "description": "Rich-Text mit Formatierung, Bildern, Links und Excalidraw-Diagrammen"
+        "title": "Notiz"
       },
       "markdown": {
-        "title": "Markdown-Notiz",
-        "description": "Leichte Auszeichnungssprache für strukturierten Text"
+        "title": "Markdown-Notiz"
       },
       "task_list": {
-        "title": "Aufgabenliste",
-        "description": "Checkliste mit Kontrollkästchen für Aufgaben und Elemente"
+        "title": "Aufgabenliste"
       },
       "subfolder": {
-        "title": "Unterordner",
-        "description": "Einen Unterordner innerhalb dieses Ordners erstellen"
+        "title": "Unterordner"
       },
       "folder": {
-        "title": "Ordner",
-        "description": "Ihre Notizen in Ordnern organisieren"
+        "title": "Ordner"
       },
       "workspace": {
-        "title": "Arbeitsbereich",
-        "description": "Eine neue Arbeitsbereichsumgebung erstellen"
+        "title": "Arbeitsbereich"
       }
     },
     "export": {

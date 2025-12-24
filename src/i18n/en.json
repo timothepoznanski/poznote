@@ -634,28 +634,22 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "Note",
-        "description": "Rich text with formatting, images, links, and Excalidraw diagrams"
+        "title": "Note"
       },
       "markdown": {
-        "title": "Markdown Note",
-        "description": "Lightweight markup language for structured text"
+        "title": "Markdown Note"
       },
       "task_list": {
-        "title": "Task List",
-        "description": "Checklist with checkboxes for tasks and items"
+        "title": "Task List"
       },
       "subfolder": {
-        "title": "Subfolder",
-        "description": "Create a subfolder within this folder"
+        "title": "Subfolder"
       },
       "folder": {
-        "title": "Folder",
-        "description": "Organize your notes in folders"
+        "title": "Folder"
       },
       "workspace": {
-        "title": "Workspace",
-        "description": "Create a new workspace environment"
+        "title": "Workspace"
       }
     },
     "export": {

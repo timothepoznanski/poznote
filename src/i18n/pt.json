@@ -633,28 +633,22 @@
       "title_in_folder": "Criar em {{folder}}",
       "folder_fallback": "pasta",
       "note": {
-        "title": "Nota",
-        "description": "Texto rico com formatação, imagens, links e diagramas Excalidraw"
+        "title": "Nota"
       },
       "markdown": {
-        "title": "Nota Markdown",
-        "description": "Linguagem de marcação leve para texto estruturado"
+        "title": "Nota Markdown"
       },
       "task_list": {
-        "title": "Lista de Tarefas",
-        "description": "Lista de verificação com caixas de seleção para tarefas e itens"
+        "title": "Lista de Tarefas"
       },
       "subfolder": {
-        "title": "Subpasta",
-        "description": "Criar uma subpasta dentro desta pasta"
+        "title": "Subpasta"
       },
       "folder": {
-        "title": "Pasta",
-        "description": "Organizar suas notas em pastas"
+        "title": "Pasta"
       },
       "workspace": {
-        "title": "Espaço de Trabalho",
-        "description": "Criar um novo ambiente de espaço de trabalho"
+        "title": "Espaço de Trabalho"
       }
     },
     "export": {

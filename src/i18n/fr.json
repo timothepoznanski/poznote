@@ -634,28 +634,22 @@
       "title_in_folder": "Créer dans {{folder}}",
       "folder_fallback": "dossier",
       "note": {
-        "title": "Note",
-        "description": "Texte enrichi avec mise en forme, images, liens et diagrammes Excalidraw"
+        "title": "Note"
       },
       "markdown": {
-        "title": "Note Markdown",
-        "description": "Langage de balisage léger pour structurer le texte"
+        "title": "Note Markdown"
       },
       "task_list": {
-        "title": "Liste de tâches",
-        "description": "Checklist avec cases à cocher pour les tâches et éléments"
+        "title": "Liste de tâches"
       },
       "subfolder": {
-        "title": "Sous-dossier",
-        "description": "Créer un sous-dossier dans ce dossier"
+        "title": "Sous-dossier"
       },
       "folder": {
-        "title": "Dossier",
-        "description": "Organiser vos notes dans des dossiers"
+        "title": "Dossier"
       },
       "workspace": {
-        "title": "Espace de travail",
-        "description": "Créer un nouvel espace de travail"
+        "title": "Espace de travail"
       }
     },
     "export": {

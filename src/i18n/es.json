@@ -634,28 +634,22 @@
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota",
-        "description": "Texto enriquecido con formato, imágenes, enlaces y diagramas Excalidraw"
+        "title": "Nota"
       },
       "markdown": {
-        "title": "Nota Markdown",
-        "description": "Lenguaje de marcado ligero para texto estructurado"
+        "title": "Nota Markdown"
       },
       "task_list": {
-        "title": "Lista de tareas",
-        "description": "Lista de verificación con casillas de verificación para tareas y elementos"
+        "title": "Lista de tareas"
       },
       "subfolder": {
-        "title": "Subcarpeta",
-        "description": "Crear una subcarpeta dentro de esta carpeta"
+        "title": "Subcarpeta"
       },
       "folder": {
-        "title": "Carpeta",
-        "description": "Organizar tus notas en carpetas"
+        "title": "Carpeta"
       },
       "workspace": {
-        "title": "Espacio de trabajo",
-        "description": "Crear un nuevo entorno de espacio de trabajo"
+        "title": "Espacio de trabajo"
       }
     },
     "export": {
