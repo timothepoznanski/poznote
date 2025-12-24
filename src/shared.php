@@ -31,7 +31,7 @@ $currentLang = getUserLanguage();
 		<h2 class="shared-header"><?php echo t_h('shared.page.title', [], 'Shared Notes'); ?></h2>
 		
 		<div class="shared-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="<?php echo t_h('common.back_to_notes'); ?>">
+			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
 		</div>
@@ -50,22 +50,6 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<!-- Confirmation Modal -->
-	<div id="confirmModal" class="modal" style="display: none;">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3><?php echo t_h('shared.confirm.revoke_title', [], 'Revoke Sharing'); ?></h3>
-			</div>
-			<div class="modal-body">
-				<p id="confirmMessage"></p>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-secondary" onclick="closeConfirmModal()"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-				<button class="btn btn-danger" id="confirmBtn"><?php echo t_h('shared.actions.revoke', [], 'Revoke'); ?></button>
-			</div>
-		</div>
-	</div>
-	
 	<script>
 	const workspace = <?php echo json_encode($pageWorkspace); ?>;
 	let sharedNotes = [];
@@ -73,6 +57,9 @@ $currentLang = getUserLanguage();
 	// Load shared notes on page load
 	document.addEventListener('DOMContentLoaded', function() {
 		loadSharedNotes();
+		
+		// Attach event listener to back button
+		document.getElementById('backToNotesBtn').addEventListener('click', goBackToNotes);
 	});
 	
 	function goBackToNotes() {
@@ -99,6 +86,11 @@ $currentLang = getUserLanguage();
 			}
 			
 			const response = await fetch('api_list_shared.php?' + params.toString());
+			
+			if (!response.ok) {
+				throw new Error('HTTP error! status: ' + response.status);
+			}
+			
 			const data = await response.json();
 			
 			if (data.error) {
@@ -124,79 +116,30 @@ $currentLang = getUserLanguage();
 	function renderSharedNotes() {
 		const container = document.getElementById('sharedNotesContainer');
 		
-		const table = document.createElement('table');
-		table.className = 'shared-notes-table';
-		
-		// Table header
-		const thead = document.createElement('thead');
-		thead.innerHTML = `
-			<tr>
-				<th><?php echo t_h('shared.table.note', [], 'Note'); ?></th>
-				<th><?php echo t_h('shared.table.folder', [], 'Folder'); ?></th>
-				<th><?php echo t_h('shared.table.shared_date', [], 'Shared'); ?></th>
-				<th><?php echo t_h('shared.table.url', [], 'Public URL'); ?></th>
-				<th class="actions-column"><?php echo t_h('shared.table.actions', [], 'Actions'); ?></th>
-			</tr>
-		`;
-		table.appendChild(thead);
-		
-		// Table body
-		const tbody = document.createElement('tbody');
+		const list = document.createElement('div');
+		list.className = 'shared-notes-list';
 		
 		sharedNotes.forEach(note => {
-			const row = document.createElement('tr');
-			row.dataset.noteId = note.note_id;
+			const item = document.createElement('div');
+			item.className = 'shared-note-item';
+			item.dataset.noteId = note.note_id;
 			
-			// Note name (clickable to open note)
-			const noteCell = document.createElement('td');
-			noteCell.className = 'note-cell';
-			noteCell.setAttribute('data-label', '<?php echo t_h('shared.table.note', [], 'Note'); ?>');
+			// Note name (clickable)
 			const noteLink = document.createElement('a');
 			noteLink.href = 'index.php?note=' + note.note_id + (workspace ? '&workspace=' + encodeURIComponent(workspace) : '');
 			noteLink.textContent = note.heading || '<?php echo t_h('common.untitled', [], 'Untitled'); ?>';
-			noteLink.className = 'note-link';
-			noteCell.appendChild(noteLink);
-			row.appendChild(noteCell);
+			noteLink.className = 'note-name';
+			item.appendChild(noteLink);
 			
-			// Folder
-			const folderCell = document.createElement('td');
-			folderCell.className = 'folder-cell';
-			folderCell.setAttribute('data-label', '<?php echo t_h('shared.table.folder', [], 'Folder'); ?>');
-			folderCell.textContent = note.folder || '<?php echo t_h('common.uncategorized', [], 'Uncategorized'); ?>';
-			row.appendChild(folderCell);
-			
-			// Shared date
-			const dateCell = document.createElement('td');
-			dateCell.className = 'date-cell';
-			dateCell.setAttribute('data-label', '<?php echo t_h('shared.table.shared_date', [], 'Shared'); ?>');
-			dateCell.textContent = formatDate(note.shared_date);
-			row.appendChild(dateCell);
-			
-			// URL (with copy button)
-			const urlCell = document.createElement('td');
-			urlCell.className = 'url-cell';
-			urlCell.setAttribute('data-label', '<?php echo t_h('shared.table.url', [], 'Public URL'); ?>');
-			const urlWrapper = document.createElement('div');
-			urlWrapper.className = 'url-wrapper';
-			const urlInput = document.createElement('input');
-			urlInput.type = 'text';
-			urlInput.value = note.url;
-			urlInput.className = 'url-input';
-			urlInput.readonly = true;
-			const copyBtn = document.createElement('button');
-			copyBtn.className = 'btn-copy';
-			copyBtn.innerHTML = '<i class="fa-copy"></i>';
-			copyBtn.title = '<?php echo t_h('shared.actions.copy', [], 'Copy URL'); ?>';
-			copyBtn.onclick = () => copyUrl(note.url, copyBtn);
-			urlWrapper.appendChild(urlInput);
-			urlWrapper.appendChild(copyBtn);
-			urlCell.appendChild(urlWrapper);
-			row.appendChild(urlCell);
+			// Token
+			const tokenSpan = document.createElement('span');
+			tokenSpan.className = 'note-token';
+			tokenSpan.textContent = note.token;
+			item.appendChild(tokenSpan);
 			
 			// Actions
-			const actionsCell = document.createElement('td');
-			actionsCell.className = 'actions-cell';
-			actionsCell.setAttribute('data-label', '<?php echo t_h('shared.table.actions', [], 'Actions'); ?>');
+			const actionsDiv = document.createElement('div');
+			actionsDiv.className = 'note-actions';
 			
 			const openBtn = document.createElement('button');
 			openBtn.className = 'btn btn-sm btn-secondary';
@@ -208,17 +151,16 @@ $currentLang = getUserLanguage();
 			revokeBtn.className = 'btn btn-sm btn-danger';
 			revokeBtn.innerHTML = '<i class="fa-ban"></i>';
 			revokeBtn.title = '<?php echo t_h('shared.actions.revoke', [], 'Revoke'); ?>';
-			revokeBtn.onclick = () => confirmRevoke(note.note_id, note.heading);
+			revokeBtn.onclick = () => revokeShare(note.note_id);
 			
-			actionsCell.appendChild(openBtn);
-			actionsCell.appendChild(revokeBtn);
-			row.appendChild(actionsCell);
+			actionsDiv.appendChild(openBtn);
+			actionsDiv.appendChild(revokeBtn);
+			item.appendChild(actionsDiv);
 			
-			tbody.appendChild(row);
+			list.appendChild(item);
 		});
 		
-		table.appendChild(tbody);
-		container.appendChild(table);
+		container.appendChild(list);
 	}
 	
 	function formatDate(dateString) {
@@ -266,22 +208,6 @@ $currentLang = getUserLanguage();
 		}
 	}
 	
-	function confirmRevoke(noteId, noteHeading) {
-		const modal = document.getElementById('confirmModal');
-		const message = document.getElementById('confirmMessage');
-		const confirmBtn = document.getElementById('confirmBtn');
-		
-		message.textContent = '<?php echo t_h('shared.confirm.revoke_message', [], 'Are you sure you want to revoke sharing for'); ?> "' + noteHeading + '"?';
-		
-		confirmBtn.onclick = () => revokeShare(noteId);
-		
-		modal.style.display = 'block';
-	}
-	
-	function closeConfirmModal() {
-		document.getElementById('confirmModal').style.display = 'none';
-	}
-	
 	async function revokeShare(noteId) {
 		try {
 			const response = await fetch('api_share_note.php', {
@@ -302,11 +228,10 @@ $currentLang = getUserLanguage();
 			}
 			
 			if (data.revoked) {
-				closeConfirmModal();
 				// Remove the note from the list
-				const row = document.querySelector(`tr[data-note-id="${noteId}"]`);
-				if (row) {
-					row.remove();
+				const item = document.querySelector(`.shared-note-item[data-note-id="${noteId}"]`);
+				if (item) {
+					item.remove();
 				}
 				
 				// Update sharedNotes array
@@ -322,14 +247,6 @@ $currentLang = getUserLanguage();
 			alert('<?php echo t_h('common.error', [], 'Error'); ?>: ' + error.message);
 		}
 	}
-	
-	// Close modal when clicking outside
-	window.onclick = function(event) {
-		const modal = document.getElementById('confirmModal');
-		if (event.target === modal) {
-			closeConfirmModal();
-		}
-	};
 	</script>
 </body>
 </html>

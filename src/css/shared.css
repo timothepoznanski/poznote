@@ -88,154 +88,54 @@ body.shared-page {
     margin-top: 20px;
 }
 
-.loading-spinner {
-    text-align: center;
-    padding: 40px;
-    color: var(--text-muted, #666666);
+/* Shared Notes List - Simple Design */
+.shared-notes-list {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-.loading-spinner i {
-    font-size: 32px;
-    margin-bottom: 10px;
+.shared-note-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
-.empty-message {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted, #666666);
-}
-
-.empty-message i {
-    font-size: 64px;
-    margin-bottom: 20px;
-    color: var(--text-muted, #cccccc);
-}
-
-.empty-message p {
-    margin: 10px 0;
-    font-size: 18px;
-}
-
-.empty-hint {
-    font-size: 14px !important;
-    color: var(--text-muted, #999999);
-}
-
-.error-message {
-    padding: 20px;
-    background-color: var(--error-bg, #ffe7e7);
-    border-left: 4px solid var(--error-color, #dc3545);
-    border-radius: 4px;
-    color: var(--error-text, #721c24);
-}
-
-/* Shared Notes Table */
-.shared-notes-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--table-bg, #ffffff);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.shared-notes-table thead {
-    background-color: var(--table-header-bg, #f8f9fa);
-}
-
-.shared-notes-table th {
-    padding: 12px 16px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-color, #333333);
-    border-bottom: 2px solid var(--border-color, #dee2e6);
-}
-
-.shared-notes-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #dee2e6);
-}
-
-.shared-notes-table tbody tr:hover {
-    background-color: var(--table-row-hover, #f8f9fa);
-}
-
-.shared-notes-table tbody tr:last-child td {
+.shared-note-item:last-child {
     border-bottom: none;
 }
 
-.note-cell {
+.note-name {
+    flex: 0 0 auto;
+    min-width: 200px;
     max-width: 300px;
-}
-
-.note-link {
+    font-weight: 500;
     color: var(--link-color, #007bff);
     text-decoration: none;
-    font-weight: 500;
-}
-
-.note-link:hover {
-    text-decoration: underline;
-}
-
-.folder-cell {
-    color: var(--text-muted, #666666);
-    font-size: 14px;
-}
-
-.date-cell {
-    color: var(--text-muted, #666666);
-    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.url-cell {
-    max-width: 350px;
+.note-name:hover {
+    text-decoration: underline;
 }
 
-.url-wrapper {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.url-input {
+.note-token {
     flex: 1;
-    padding: 6px 10px;
-    border: 1px solid var(--border-color, #dee2e6);
-    border-radius: 4px;
-    background-color: var(--input-bg, #f8f9fa);
-    color: var(--text-color, #333333);
-    font-size: 13px;
     font-family: monospace;
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.btn-copy {
-    padding: 6px 12px;
-    background-color: var(--btn-secondary-bg, #6c757d);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-copy:hover {
-    background-color: var(--btn-secondary-hover, #5a6268);
-}
-
-.btn-copy.copied {
-    background-color: var(--success-color, #28a745);
-}
-
-.actions-column {
-    width: 120px;
-}
-
-.actions-cell {
+.note-actions {
+    flex: 0 0 auto;
     display: flex;
     gap: 8px;
-    align-items: center;
 }
 
 .btn {
@@ -280,7 +180,6 @@ body.shared-page {
 }
 
 /* Modal */
-.modal {
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -418,91 +317,32 @@ body.shared-page {
         padding: 10px;
     }
     
-    /* Table responsive: cache certaines colonnes sur mobile */
-    .shared-notes-table {
-        font-size: 14px;
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .shared-notes-table thead {
-        display: none;
-    }
-    
-    .shared-notes-table tbody {
-        display: block;
-    }
-    
-    .shared-notes-table tbody tr {
-        display: block;
-        margin-bottom: 20px;
-        border: 1px solid var(--border-color, #dee2e6);
-        border-radius: 8px;
+    /* Simplified mobile layout */
+    .shared-note-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
         padding: 15px;
         background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .shared-notes-table tbody tr:hover {
-        background: white;
-    }
-    
-    .shared-notes-table td {
-        display: block;
-        text-align: left !important;
-        padding: 8px 0 !important;
-        border: none !important;
-    }
-    
-    .shared-notes-table td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        display: block;
-        margin-bottom: 4px;
-        color: var(--text-muted, #666666);
-        font-size: 12px;
-        text-transform: uppercase;
-    }
-    
-    .note-cell {
-        max-width: 100%;
-    }
-    
-    .note-link {
-        font-size: 16px;
-        display: block;
+        border: 1px solid var(--border-color, #e0e0e0);
+        border-radius: 8px;
         margin-bottom: 10px;
     }
     
-    .url-cell {
+    .note-name {
+        min-width: auto;
         max-width: 100%;
+        font-size: 16px;
     }
     
-    .url-wrapper {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .url-input {
+    .note-token {
         width: 100%;
         font-size: 12px;
     }
     
-    .btn-copy {
+    .note-actions {
         width: 100%;
-    }
-    
-    .actions-cell {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    .actions-cell .btn {
-        flex: 1;
+        justify-content: flex-end;
     }
     
     .empty-message {

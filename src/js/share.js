@@ -2,6 +2,19 @@
 let currentShareMenuNoteId = null;
 let isShareMenuOpen = false;
 
+// Update the shared notes count in the sidebar
+function updateSharedCount(delta) {
+    const countEl = document.getElementById('count-shared');
+    if (countEl) {
+        const match = countEl.textContent.match(/\((\d+)\)/);
+        if (match) {
+            const currentCount = parseInt(match[1], 10);
+            const newCount = Math.max(0, currentCount + delta);
+            countEl.textContent = '(' + newCount + ')';
+        }
+    }
+}
+
 function toggleShareMenu(event, noteId, filename, titleJson) {
     if (event) event.stopPropagation();
     currentShareMenuNoteId = noteId;
@@ -182,6 +195,7 @@ async function createPublicShare(noteId) {
         if (data && data.url) {
             // Update toolbar icon to indicate shared state
             markShareIconShared(noteId, true);
+            updateSharedCount(1);
 
             // Use a dedicated share modal (copy + cancel + revoke/renew)
             if (typeof showShareModal === 'function') {
@@ -346,6 +360,7 @@ function showShareModal(url, options) {
                 });
                 if (resp.ok) {
                     markShareIconShared(noteId, false);
+                    updateSharedCount(-1);
                     closeModal('shareModal');
                 } else {
                     const ct = resp.headers.get('content-type') || '';

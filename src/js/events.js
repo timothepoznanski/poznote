@@ -1593,6 +1593,15 @@ function handleFolderDrop(e) {
             return;
         }
         
+        // Special handling for Shared folder
+        if (targetFolder === 'Shared') {
+            // Open the share popup instead of moving the note
+            if (typeof openPublicShareModal === 'function') {
+                openPublicShareModal(data.noteId);
+            }
+            return;
+        }
+        
         // Special handling for Favorites folder
         if (targetFolder === 'Favorites') {
             // Add note to favorites instead of moving it
