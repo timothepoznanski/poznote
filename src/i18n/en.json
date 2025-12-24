@@ -911,7 +911,8 @@
     "documentation": "Poznote documentation",
     "errors": {
       "invalid_credentials": "Incorrect username or password.",
-      "oidc_failed": "SSO login failed. Please try again."
+      "oidc_failed": "SSO login failed. Please try again.",
+      "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
     }
   },
   "restore_import": {

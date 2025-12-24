@@ -907,7 +907,8 @@
     "documentation": "Documentação do Poznote",
     "errors": {
       "invalid_credentials": "Nome de usuário ou senha incorretos.",
-      "oidc_failed": "Falha no login SSO. Por favor, tente novamente."
+      "oidc_failed": "Falha no login SSO. Por favor, tente novamente.",
+      "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador."
     }
   },
   "restore_import": {

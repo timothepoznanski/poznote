@@ -906,7 +906,8 @@
     "documentation": "Poznote-Dokumentation",
     "errors": {
       "invalid_credentials": "Falscher Benutzername oder Passwort.",
-      "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen."
+      "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+      "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator."
     }
   },
   "restore_import": {
