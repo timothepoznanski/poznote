@@ -755,7 +755,7 @@
       "invalid_action": "Acción inválida",
       "internal_server_error": "Error interno del servidor",
       "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
-      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
+      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
     }
   },
   "ui": {

@@ -755,7 +755,7 @@
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
-      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
+      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
     }
   },
   "ui": {
