@@ -856,6 +856,8 @@
     "add_border_no_padding": "Add Border without padding",
     "remove_border_no_padding": "Remove Border without padding",
     "delete_image": "Delete Image",
+    "links": "Links",
+    "open_link": "Open Link",
     "add_link": "Add Link",
     "edit_link": "Edit Link",
     "remove_link": "Remove Link",

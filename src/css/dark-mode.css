@@ -120,6 +120,24 @@ body.dark-mode .image-menu-item i {
     color: #9ca3af;
 }
 
+html[data-theme='dark'] .image-submenu,
+body.dark-mode .image-submenu {
+    background: #1e1e1e;
+    border-color: #444;
+}
+
+html[data-theme='dark'] .image-submenu-item,
+body.dark-mode .image-submenu-item {
+    color: #e0e0e0;
+    border-bottom-color: #333;
+}
+
+html[data-theme='dark'] .image-submenu-item:hover,
+body.dark-mode .image-submenu-item:hover {
+    background-color: #2d2d2d;
+    color: #5cb3e9;
+}
+
 html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i,
 body.dark-mode .image-menu-item[data-action='delete-image'] i {
     color: #dc3545;

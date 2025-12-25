@@ -853,6 +853,8 @@
     "add_border_no_padding": "Ajouter une bordure sans marge",
     "remove_border_no_padding": "Supprimer la bordure sans marge",
     "delete_image": "Supprimer l'image",
+    "links": "Liens",
+    "open_link": "Ouvrir le lien",
     "add_link": "Ajouter un lien",
     "edit_link": "Modifier le lien",
     "remove_link": "Retirer le lien",

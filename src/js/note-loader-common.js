@@ -635,31 +635,50 @@ function reinitializeImageClickHandlers() {
     allImages.forEach((img) => {
         img.style.cursor = 'pointer';
         
+        // Remove existing tooltip event listeners to avoid duplicates
+        const oldListeners = img._tooltipListeners;
+        if (oldListeners) {
+            img.removeEventListener('mouseenter', oldListeners.mouseenter);
+            img.removeEventListener('mousemove', oldListeners.mousemove);
+            img.removeEventListener('mouseleave', oldListeners.mouseleave);
+        }
+        
         // Add hover tooltip for images with links (not on public pages)
         if (!window.isPublicNotePage) {
-            const parentLink = img.closest('a[data-image-link]');
-            if (parentLink && parentLink.href) {
-                let currentToast;
-                
-                img.addEventListener('mouseenter', function(e) {
-                    // Show immediately at mouse position
+            let currentToast;
+            
+            const mouseenterHandler = function(e) {
+                // Check if link still exists at the time of hover
+                const parentLink = img.closest('a[data-image-link]');
+                if (parentLink && parentLink.href) {
                     currentToast = showImageLinkToast(parentLink.href, e.clientX, e.clientY);
-                });
-                
-                img.addEventListener('mousemove', function(e) {
-                    // Update toast position as mouse moves
-                    if (currentToast) {
-                        updateImageLinkToastPosition(currentToast, e.clientX, e.clientY);
-                    }
-                });
-                
-                img.addEventListener('mouseleave', function() {
-                    if (currentToast) {
-                        hideImageLinkToast(currentToast);
-                        currentToast = null;
-                    }
-                });
-            }
+                }
+            };
+            
+            const mousemoveHandler = function(e) {
+                // Update toast position as mouse moves
+                if (currentToast) {
+                    updateImageLinkToastPosition(currentToast, e.clientX, e.clientY);
+                }
+            };
+            
+            const mouseleaveHandler = function() {
+                if (currentToast) {
+                    hideImageLinkToast(currentToast);
+                    currentToast = null;
+                }
+            };
+            
+            img.addEventListener('mouseenter', mouseenterHandler);
+            img.addEventListener('mousemove', mousemoveHandler);
+            img.addEventListener('mouseleave', mouseleaveHandler);
+            
+            // Store listeners for cleanup
+            img._tooltipListeners = {
+                mouseenter: mouseenterHandler,
+                mousemove: mousemoveHandler,
+                mouseleave: mouseleaveHandler
+            };
         }
     });
 }
@@ -758,25 +777,45 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Add link option for all images
+    // Add link option for all images - create submenu
     const existingLink = img.closest('a');
     
-    menuHTML += `
-        <div class="image-menu-item" data-action="add-link">
-            <i class="fas fa-link"></i>
+    // Build link submenu items
+    let linkSubmenuHTML = '';
+    
+    // If link exists, add "Open link" option first
+    if (existingLink) {
+        linkSubmenuHTML += `
+            <div class="image-menu-item image-submenu-item" data-action="open-link" data-url="${existingLink.href}">
+                ${t('image_menu.open_link', null, 'Open Link')}
+            </div>
+        `;
+    }
+    
+    // Add/Edit link option
+    linkSubmenuHTML += `
+        <div class="image-menu-item image-submenu-item" data-action="add-link">
             ${existingLink ? t('image_menu.edit_link', null, 'Modifier le lien') : t('image_menu.add_link', null, 'Ajouter un lien')}
         </div>
     `;
     
     // If the image already has a link, add option to remove it
     if (existingLink) {
-        menuHTML += `
-            <div class="image-menu-item" data-action="remove-link">
-                <i class="fas fa-unlink"></i>
+        linkSubmenuHTML += `
+            <div class="image-menu-item image-submenu-item" data-action="remove-link">
                 ${t('image_menu.remove_link', null, 'Retirer le lien')}
             </div>
         `;
     }
+    
+    // Add link submenu parent
+    menuHTML += `
+        <div class="image-menu-item image-menu-parent" data-action="link-submenu">
+            <i class="fas fa-link"></i>
+            ${t('image_menu.links', null, 'Liens')}
+            <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 10px;"></i>
+        </div>
+    `;
     
     // Add border toggle and delete options only for non-markdown notes
     if (!isMarkdownNote) {
@@ -816,6 +855,112 @@ function handleImageClick(event) {
 
     document.body.appendChild(menu);
 
+    // Create and handle submenu for link menu
+    const linkParent = menu.querySelector('.image-menu-parent[data-action="link-submenu"]');
+    if (linkParent) {
+        // Create submenu element
+        const submenu = document.createElement('div');
+        submenu.className = 'image-submenu';
+        submenu.style.display = 'none';
+        submenu.innerHTML = linkSubmenuHTML;
+        document.body.appendChild(submenu);
+        
+        linkParent.addEventListener('mouseenter', function() {
+            submenu.style.display = 'block';
+            
+            // Position submenu like slash menu does
+            const parentRect = linkParent.getBoundingClientRect();
+            const submenuRect = submenu.getBoundingClientRect();
+            
+            const padding = 8;
+            let x = parentRect.right + 4;
+            let y = parentRect.top;
+            
+            // If overflows right, show on left
+            if (x + submenuRect.width > window.innerWidth - padding) {
+                x = parentRect.left - submenuRect.width - 4;
+            }
+            
+            // If overflows bottom
+            if (y + submenuRect.height > window.innerHeight - padding) {
+                y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
+            }
+            
+            submenu.style.position = 'fixed';
+            submenu.style.left = Math.max(padding, x) + 'px';
+            submenu.style.top = Math.max(padding, y) + 'px';
+            
+            const chevron = linkParent.querySelector('.fa-chevron-right');
+            if (chevron) {
+                chevron.style.transform = 'rotate(90deg)';
+            }
+        });
+        
+        linkParent.addEventListener('mouseleave', function(e) {
+            // Don't hide if moving to submenu
+            const relatedTarget = e.relatedTarget;
+            if (!relatedTarget || (!submenu.contains(relatedTarget) && relatedTarget !== submenu)) {
+                setTimeout(() => {
+                    if (!submenu.matches(':hover')) {
+                        submenu.style.display = 'none';
+                        const chevron = linkParent.querySelector('.fa-chevron-right');
+                        if (chevron) {
+                            chevron.style.transform = '';
+                        }
+                    }
+                }, 100);
+            }
+        });
+        
+        submenu.addEventListener('mouseleave', function(e) {
+            const relatedTarget = e.relatedTarget;
+            if (!relatedTarget || (!linkParent.contains(relatedTarget) && relatedTarget !== linkParent)) {
+                submenu.style.display = 'none';
+                const chevron = linkParent.querySelector('.fa-chevron-right');
+                if (chevron) {
+                    chevron.style.transform = '';
+                }
+            }
+        });
+        
+        // Add click handlers to submenu items
+        submenu.addEventListener('click', function(e) {
+            const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
+            
+            if (action === 'open-link') {
+                const url = e.target.closest('.image-menu-item')?.getAttribute('data-url');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+                // Remove both menus
+                if (document.body.contains(menu)) {
+                    document.body.removeChild(menu);
+                }
+                if (document.body.contains(submenu)) {
+                    document.body.removeChild(submenu);
+                }
+            } else if (action === 'add-link') {
+                addOrEditImageLink(img);
+                // Remove both menus
+                if (document.body.contains(menu)) {
+                    document.body.removeChild(menu);
+                }
+                if (document.body.contains(submenu)) {
+                    document.body.removeChild(submenu);
+                }
+            } else if (action === 'remove-link') {
+                removeImageLink(img);
+                // Remove both menus
+                if (document.body.contains(menu)) {
+                    document.body.removeChild(menu);
+                }
+                if (document.body.contains(submenu)) {
+                    document.body.removeChild(submenu);
+                }
+            }
+        });
+    }
+
     // Adjust position if menu goes off-screen
     const menuRect = menu.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
@@ -842,6 +987,12 @@ function handleImageClick(event) {
     // Handle menu item clicks
     menu.addEventListener('click', function(e) {
         const action = e.target.closest('.image-menu-item')?.getAttribute('data-action');
+
+        // Ignore click on link-submenu parent (handled by hover)
+        if (action === 'link-submenu') {
+            e.stopPropagation();
+            return;
+        }
 
         if (action === 'view-large') {
             viewImageLarge(src);
@@ -893,6 +1044,15 @@ function handleImageClick(event) {
             }
         } else if (action === 'delete-image') {
             deleteImage(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'open-link') {
+            const url = e.target.closest('.image-menu-item')?.getAttribute('data-url');
+            if (url) {
+                window.open(url, '_blank');
+            }
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -1455,6 +1615,11 @@ function removeImageLink(img) {
                     window.saveNoteImmediately();
                 }
             }, 100);
+            
+            // Reinitialize image click handlers to remove old event listeners
+            setTimeout(function() {
+                reinitializeImageClickHandlers();
+            }, 150);
         }
     } catch (error) {
         console.warn('Error removing image link:', error);
