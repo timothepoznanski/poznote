@@ -238,7 +238,6 @@ body::-webkit-scrollbar {
 
 /* Back button in slash submenu (mobile) */
 .slash-command-back {
-    border-bottom: 1px solid #e5e7eb;
     font-weight: 500;
     background-color: #f9fafb !important;
 }

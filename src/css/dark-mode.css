@@ -82,6 +82,17 @@ body.dark-mode .slash-command-separator {
     background: #404040;
 }
 
+/* Back button in slash submenu (dark mode) */
+html[data-theme='dark'] .slash-command-back,
+body.dark-mode .slash-command-back {
+    background-color: transparent !important;
+}
+
+html[data-theme='dark'] .slash-command-back:hover,
+body.dark-mode .slash-command-back:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* ============================================
    Image Context Menu (Dark Mode)
    ============================================ */
