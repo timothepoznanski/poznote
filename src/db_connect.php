@@ -141,6 +141,24 @@ try {
         error_log('Could not add indexable column to shared_notes: ' . $e->getMessage());
     }
 
+    // Add 'password' column to shared_notes if it doesn't exist (optional password protection for shared notes)
+    try {
+        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasPassword = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'password') {
+                $hasPassword = true;
+                break;
+            }
+        }
+        if (!$hasPassword) {
+            $con->exec("ALTER TABLE shared_notes ADD COLUMN password TEXT");
+        }
+    } catch (Exception $e) {
+        // Non-fatal: if this fails, continue without password support
+        error_log('Could not add password column to shared_notes: ' . $e->getMessage());
+    }
+
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");

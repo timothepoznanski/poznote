@@ -1220,6 +1220,12 @@
     "actions": {
       "open": "Ouvrir",
       "revoke": "Révoquer"
-    }
+    },
+    "indexable": "Indexable",
+    "password_protected": "Protégé par mot de passe",
+    "add_password_title": "Ajouter une protection par mot de passe",
+    "change_password_title": "Modifier le mot de passe",
+    "password_remove_hint": "Laissez vide pour supprimer la protection par mot de passe.",
+    "enter_new_password": "Entrez un nouveau mot de passe"
   }
 }

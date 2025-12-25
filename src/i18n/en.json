@@ -825,6 +825,9 @@
       "no_link_yet": "No public link yet",
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Allow search engine indexing",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public share",
       "error_creating": "Error creating public share: "
@@ -1220,6 +1223,12 @@
     "actions": {
       "open": "Open",
       "revoke": "Revoke"
-    }
+    },
+    "indexable": "Indexable",
+    "password_protected": "Password protected",
+    "add_password_title": "Add password protection",
+    "change_password_title": "Change password",
+    "password_remove_hint": "Leave empty to remove password protection.",
+    "enter_new_password": "Enter new password"
   }
 }

@@ -1577,6 +1577,29 @@
     box-sizing: border-box;
 }
 
+#shareModal .share-password-wrap {
+    margin: 15px 0 12px 0;
+}
+
+#shareModal .share-password-label {
+    display: block;
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+#shareModal .share-password-label .optional-text {
+    color: #dc3545;
+}
+
+#shareModal .share-password-input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
 #shareModal .share-indexable-wrap {
     margin: 15px 0 20px 0;
 }

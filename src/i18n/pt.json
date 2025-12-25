@@ -823,7 +823,10 @@
       "create_url": "Criar url",
       "no_link_yet": "Nenhum link público ainda",
       "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Permitir indexação por motores de busca",
+      "password": "Senha (opcional)",
+      "password_placeholder": "Digite uma senha"
     },
     "note": {
       "new_note": "Nova nota",
@@ -1215,7 +1218,13 @@
       "actions": {
         "open": "Abrir",
         "revoke": "Revogar"
-      }
+      },
+      "indexable": "Indexável",
+      "password_protected": "Protegido por senha",
+      "add_password_title": "Adicionar proteção por senha",
+      "change_password_title": "Alterar senha",
+      "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
+      "enter_new_password": "Digite uma nova senha"
     }
   }
 }

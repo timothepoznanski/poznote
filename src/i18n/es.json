@@ -820,6 +820,9 @@
       "no_link_yet": "Aún no hay enlace público",
       "custom_token": "Token personalizado (opcional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Permitir indexación por motores de búsqueda",
+      "password": "Contraseña (opcional)",
+      "password_placeholder": "Ingrese una contraseña",
       "error_prefix": "Error: ",
       "unknown_error": "Error desconocido al crear el enlace público",
       "error_creating": "Error al crear el enlace público: "
@@ -1214,7 +1217,13 @@
       "actions": {
         "open": "Abrir",
         "revoke": "Revocar"
-      }
+      },
+      "indexable": "Indexable",
+      "password_protected": "Protegido con contraseña",
+      "add_password_title": "Agregar protección con contraseña",
+      "change_password_title": "Cambiar contraseña",
+      "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
+      "enter_new_password": "Ingrese una nueva contraseña"
     }
   }
 }

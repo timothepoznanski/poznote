@@ -18,6 +18,7 @@ try {
         sn.token,
         sn.theme,
         sn.indexable,
+        CASE WHEN sn.password IS NOT NULL AND sn.password != '' THEN 1 ELSE 0 END as hasPassword,
         sn.created as shared_date,
         e.heading,
         e.folder,

@@ -820,6 +820,9 @@
       "no_link_yet": "Noch kein öffentlicher Link",
       "custom_token": "Benutzerdefiniertes Token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Suchmaschinenindizierung zulassen",
+      "password": "Passwort (optional)",
+      "password_placeholder": "Geben Sie ein Passwort ein",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
@@ -1214,7 +1217,13 @@
       "actions": {
         "open": "Öffnen",
         "revoke": "Widerrufen"
-      }
+      },
+      "indexable": "Indexierbar",
+      "password_protected": "Passwortgeschützt",
+      "add_password_title": "Passwortschutz hinzufügen",
+      "change_password_title": "Passwort ändern",
+      "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
+      "enter_new_password": "Neues Passwort eingeben"
     }
   }
 }

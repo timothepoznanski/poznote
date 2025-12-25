@@ -57,7 +57,7 @@ if (empty($token)) {
 }
 
 try {
-    $stmt = $con->prepare('SELECT note_id, created, theme, indexable FROM shared_notes WHERE token = ?');
+    $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password FROM shared_notes WHERE token = ?');
     $stmt->execute([$token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -68,6 +68,117 @@ try {
 
     $note_id = $row['note_id'];
     $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
+    $storedPassword = $row['password'];
+
+    // Check if password protection is enabled
+    if (!empty($storedPassword)) {
+        session_start();
+        $sessionKey = 'public_note_auth_' . $token;
+        
+        // Check if password was submitted
+        if (isset($_POST['note_password'])) {
+            $submittedPassword = $_POST['note_password'];
+            if (password_verify($submittedPassword, $storedPassword)) {
+                // Password correct, store in session
+                $_SESSION[$sessionKey] = true;
+            } else {
+                // Password incorrect
+                $passwordError = true;
+            }
+        }
+        
+        // If not authenticated, show password form
+        if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
+            // Show password entry form
+            ?>
+            <!doctype html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="robots" content="noindex, nofollow">
+                <title>Password Protected</title>
+                <style>
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                        margin: 0;
+                        background: #f5f5f5;
+                    }
+                    .password-container {
+                        background: white;
+                        padding: 40px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        max-width: 400px;
+                        width: 90%;
+                    }
+                    h2 {
+                        margin-top: 0;
+                        color: #333;
+                    }
+                    p {
+                        color: #666;
+                        margin-bottom: 20px;
+                    }
+                    input[type="password"] {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        box-sizing: border-box;
+                        font-size: 14px;
+                        margin-bottom: 15px;
+                    }
+                    button {
+                        width: 100%;
+                        padding: 12px;
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        font-weight: 500;
+                    }
+                    button:hover {
+                        background: #0056b3;
+                    }
+                    .error {
+                        color: #dc3545;
+                        margin-bottom: 15px;
+                        font-size: 14px;
+                    }
+                    .lock-icon {
+                        font-size: 48px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                        color: #007bff;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="password-container">
+                    <div class="lock-icon">🔒</div>
+                    <h2>Password Protected</h2>
+                    <p>This note is password protected. Please enter the password to view it.</p>
+                    <?php if (isset($passwordError)): ?>
+                        <div class="error">Incorrect password. Please try again.</div>
+                    <?php endif; ?>
+                    <form method="POST">
+                        <input type="password" name="note_password" placeholder="Enter password" required autofocus>
+                        <button type="submit">Unlock</button>
+                    </form>
+                </div>
+            </body>
+            </html>
+            <?php
+            exit;
+        }
+    }
 
     $stmt = $con->prepare('SELECT heading, entry, created, updated, type FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);

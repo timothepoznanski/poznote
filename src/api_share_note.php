@@ -34,7 +34,7 @@ try {
     // Handle actions
     if ($action === 'get') {
         // Return existing share URL if any
-        $stmt = $con->prepare('SELECT token, indexable FROM shared_notes WHERE note_id = ? LIMIT 1');
+        $stmt = $con->prepare('SELECT token, indexable, password FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -44,6 +44,7 @@ try {
         }
         $token = $row['token'];
         $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
+        $hasPassword = !empty($row['password']);
         
         // Build pretty URLs (same as create/renew)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -59,7 +60,7 @@ try {
         $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
         header('Content-Type: application/json');
-        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable]);
+        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable, 'hasPassword' => $hasPassword]);
         exit;
     } elseif ($action === 'revoke') {
         // Delete any share for this note
@@ -76,6 +77,16 @@ try {
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'indexable' => $indexable]);
         exit;
+    } elseif ($action === 'update_password') {
+        // Update the password for this note's share
+        $password = isset($data['password']) ? trim($data['password']) : '';
+        // Hash the password if not empty, otherwise set to null
+        $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
+        $stmt = $con->prepare('UPDATE shared_notes SET password = ? WHERE note_id = ?');
+        $stmt->execute([$hashedPassword, $note_id]);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'hasPassword' => $password !== '']);
+        exit;
     } elseif ($action === 'renew') {
         // Generate a new token and update existing row (or insert)
         $token = bin2hex(random_bytes(16));
@@ -83,16 +94,19 @@ try {
         $theme = isset($data['theme']) ? trim($data['theme']) : null;
         // Indexable parameter (default: 0 = not indexable)
         $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0;
+        // Password parameter (optional)
+        $password = isset($data['password']) ? trim($data['password']) : '';
+        $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
         // If exists update, else insert
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $theme, $indexable, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, password = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $indexable, $hashedPassword, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$note_id, $token, $theme, $indexable]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable, password) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme, $indexable, $hashedPassword]);
         }
     } else {
         // Default: create (same as renew semantics)
@@ -121,18 +135,20 @@ try {
             $token = bin2hex(random_bytes(16));
         }
 
-        // Insert or update existing token for this note; also store optional theme and indexable
+        // Insert or update existing token for this note; also store optional theme, indexable and password
         $theme = isset($data['theme']) ? trim($data['theme']) : null;
         $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0; // Default: not indexable
+        $password = isset($data['password']) ? trim($data['password']) : '';
+        $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $theme, $indexable, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, password = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $indexable, $hashedPassword, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$note_id, $token, $theme, $indexable]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable, password) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme, $indexable, $hashedPassword]);
         }
     }
 

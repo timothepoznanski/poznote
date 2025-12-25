@@ -165,6 +165,18 @@ $currentLang = getUserLanguage();
 			const actionsDiv = document.createElement('div');
 			actionsDiv.className = 'note-actions';
 			
+			// Password button
+			const passwordBtn = document.createElement('button');
+			passwordBtn.className = 'btn btn-sm btn-password';
+			if (note.hasPassword) {
+				passwordBtn.innerHTML = '<i class="fa-lock"></i>';
+				passwordBtn.title = '<?php echo t_h('shared.password_protected', [], 'Password protected'); ?>';
+			} else {
+				passwordBtn.innerHTML = '<i class="fa-lock-open"></i>';
+				passwordBtn.title = '<?php echo t_h('shared.add_password_title', [], 'Add password protection'); ?>';
+			}
+			passwordBtn.onclick = () => showPasswordModal(note.note_id, note.hasPassword);
+			
 			const openBtn = document.createElement('button');
 			openBtn.className = 'btn btn-sm btn-secondary';
 			openBtn.innerHTML = '<i class="fa-external-link"></i>';
@@ -177,6 +189,7 @@ $currentLang = getUserLanguage();
 			revokeBtn.title = '<?php echo t_h('shared.actions.revoke', [], 'Revoke'); ?>';
 			revokeBtn.onclick = () => revokeShare(note.note_id);
 			
+			actionsDiv.appendChild(passwordBtn);
 			actionsDiv.appendChild(openBtn);
 			actionsDiv.appendChild(revokeBtn);
 			item.appendChild(actionsDiv);
@@ -304,6 +317,117 @@ $currentLang = getUserLanguage();
 			if (checkbox) {
 				checkbox.checked = !isIndexable;
 			}
+		}
+	}
+	
+	function showPasswordModal(noteId, hasPassword) {
+		const modal = document.createElement('div');
+		modal.id = 'passwordModal';
+		modal.className = 'modal';
+		modal.style.display = 'flex';
+		
+		const content = document.createElement('div');
+		content.className = 'modal-content';
+		
+		const header = document.createElement('div');
+		header.className = 'modal-header';
+		const h3 = document.createElement('h3');
+		h3.textContent = hasPassword ? '<?php echo t_h('shared.change_password_title', [], 'Change Password'); ?>' : '<?php echo t_h('shared.add_password_title', [], 'Add Password'); ?>';
+		header.appendChild(h3);
+		content.appendChild(header);
+		
+		const body = document.createElement('div');
+		body.className = 'modal-body';
+		
+		if (hasPassword) {
+			const removeInfo = document.createElement('p');
+			removeInfo.textContent = '<?php echo t_h('shared.password_remove_hint', [], 'Leave empty to remove password protection.'); ?>';
+			removeInfo.style.marginBottom = '15px';
+			removeInfo.style.fontSize = '13px';
+			removeInfo.style.color = '#666';
+			body.appendChild(removeInfo);
+		}
+		
+		const passwordInput = document.createElement('input');
+		passwordInput.type = 'password';
+		passwordInput.id = 'modalPasswordInput';
+		passwordInput.placeholder = '<?php echo t_h('shared.enter_new_password', [], 'Enter new password'); ?>';
+		passwordInput.className = 'modal-password-input';
+		passwordInput.style.width = '100%';
+		passwordInput.style.padding = '8px 10px';
+		passwordInput.style.borderRadius = '6px';
+		passwordInput.style.border = '1px solid #ddd';
+		passwordInput.style.boxSizing = 'border-box';
+		body.appendChild(passwordInput);
+		
+		content.appendChild(body);
+		
+		const footer = document.createElement('div');
+		footer.className = 'modal-footer';
+		
+		const cancelBtn = document.createElement('button');
+		cancelBtn.className = 'btn btn-secondary';
+		cancelBtn.textContent = '<?php echo t_h('common.cancel', [], 'Cancel'); ?>';
+		cancelBtn.onclick = () => {
+			document.body.removeChild(modal);
+		};
+		
+		const saveBtn = document.createElement('button');
+		saveBtn.className = 'btn btn-primary';
+		saveBtn.textContent = '<?php echo t_h('common.save', [], 'Save'); ?>';
+		saveBtn.onclick = async () => {
+			const password = passwordInput.value.trim();
+			await updatePassword(noteId, password);
+			document.body.removeChild(modal);
+		};
+		
+		footer.appendChild(cancelBtn);
+		footer.appendChild(saveBtn);
+		content.appendChild(footer);
+		
+		modal.appendChild(content);
+		document.body.appendChild(modal);
+		
+		// Focus on input
+		passwordInput.focus();
+		
+		// Close on background click
+		modal.onclick = (e) => {
+			if (e.target === modal) {
+				document.body.removeChild(modal);
+			}
+		};
+	}
+	
+	async function updatePassword(noteId, password) {
+		try {
+			const response = await fetch('api_share_note.php', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					note_id: noteId,
+					action: 'update_password',
+					password: password
+				})
+			});
+			
+			const data = await response.json();
+			
+			if (data.error) {
+				throw new Error(data.error);
+			}
+			
+			// Update the local array and UI
+			const note = sharedNotes.find(n => n.note_id === noteId);
+			if (note) {
+				note.hasPassword = data.hasPassword ? 1 : 0;
+				// Re-render the list to update the button
+				loadSharedNotes();
+			}
+		} catch (error) {
+			alert('<?php echo t_h('common.error', [], 'Error'); ?>: ' + error.message);
 		}
 	}
 	</script>
