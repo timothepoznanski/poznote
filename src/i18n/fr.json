@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Échec de la mise à jour du titre : {{error}}",
       "network_error_updating_subheading": "Erreur réseau lors de la mise à jour du titre"
+    },
+    "confirm": {
+      "convert_title": "Convertir en HTML",
+      "convert_to_html": "Convertir cette note markdown en HTML ?"
     }
   },
   "modals": {
@@ -628,34 +632,28 @@
       "delete_title": "Confirmer la suppression de l’espace de travail",
       "delete_description": "Saisissez le nom de l’espace de travail pour confirmer la suppression. Toutes les notes et tous les dossiers seront supprimés définitivement et ne pourront pas être récupérés.",
       "delete_placeholder": "Tapez le nom de l’espace de travail pour confirmer",
-      "delete_button": "Supprimer l’espace de travail"
+      "delete_button": "Supprimer"
     },
     "create": {
       "title_in_folder": "Créer dans {{folder}}",
       "folder_fallback": "dossier",
       "note": {
-        "title": "Note",
-        "description": "Texte enrichi avec mise en forme, images, liens et diagrammes Excalidraw"
+        "title": "Note"
       },
       "markdown": {
-        "title": "Note Markdown",
-        "description": "Langage de balisage léger pour structurer le texte"
+        "title": "Note Markdown"
       },
       "task_list": {
-        "title": "Liste de tâches",
-        "description": "Checklist avec cases à cocher pour les tâches et éléments"
+        "title": "Liste de tâches"
       },
       "subfolder": {
-        "title": "Sous-dossier",
-        "description": "Créer un sous-dossier dans ce dossier"
+        "title": "Sous-dossier"
       },
       "folder": {
-        "title": "Dossier",
-        "description": "Organiser vos notes dans des dossiers"
+        "title": "Dossier"
       },
       "workspace": {
-        "title": "Espace de travail",
-        "description": "Créer un nouvel espace de travail"
+        "title": "Espace de travail"
       }
     },
     "export": {
@@ -698,7 +696,8 @@
     "system_folders": {
       "trash": "Corbeille",
       "tags": "Tags",
-      "favorites": "Favoris"
+      "favorites": "Favoris",
+      "shared": "Partagées"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -813,7 +812,7 @@
       "share_note": "Partager la note",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
-      "convert_to_html": "Convertir le markdown en HTML"
+      "convert_to_html": "Convertir en HTML"
     },
     "share_modal": {
       "title": "URL publique",
@@ -911,7 +910,8 @@
     "documentation": "Documentation Poznote",
     "errors": {
       "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect.",
-      "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer."
+      "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer.",
+      "oidc_unauthorized": "Vous n'êtes pas autorisé à accéder à cette application. Veuillez contacter votre administrateur."
     }
   },
   "restore_import": {
@@ -1205,6 +1205,21 @@
         "edge_yes": "Oui",
         "edge_no": "Non"
       }
+    }
+  },
+  "shared": {
+    "page": {
+      "title": "Notes partagées",
+      "no_shared_notes": "Aucune note partagée pour le moment.",
+      "share_hint": "Partagez une note en cliquant sur le bouton de partage dans la barre d'outils."
+    },
+    "table": {
+      "note": "Note",
+      "url": "URL publique"
+    },
+    "actions": {
+      "open": "Ouvrir",
+      "revoke": "Révoquer"
     }
   }
 }

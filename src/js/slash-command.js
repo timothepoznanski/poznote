@@ -979,7 +979,74 @@
         if (!searchText) return commands;
 
         const search = searchText.toLowerCase();
-        return commands.filter(cmd => cmd.label && cmd.label.toLowerCase().includes(search));
+        const results = [];
+        
+        // Flatten the menu structure when filtering
+        commands.forEach(cmd => {
+            // Check if main command label matches
+            const cmdMatches = cmd.label && cmd.label.toLowerCase().includes(search);
+            
+            if (cmdMatches && (!cmd.submenu || cmd.submenu.length === 0)) {
+                // Command without submenu matches - add it directly
+                results.push(cmd);
+            } else if (cmdMatches && cmd.submenu && cmd.submenu.length > 0) {
+                // Command with submenu matches - add all submenu items directly
+                cmd.submenu.forEach(subItem => {
+                    if (subItem.submenu && subItem.submenu.length > 0) {
+                        // If submenu item has sub-submenu, add all sub-submenu items
+                        subItem.submenu.forEach(subSubItem => {
+                            results.push({
+                                ...subSubItem,
+                                label: cmd.label + ' › ' + subItem.label + ' › ' + subSubItem.label,
+                                _originalLabel: subSubItem.label
+                            });
+                        });
+                    } else {
+                        results.push({
+                            ...subItem,
+                            label: cmd.label + ' › ' + subItem.label,
+                            _originalLabel: subItem.label
+                        });
+                    }
+                });
+            } else if (cmd.submenu && cmd.submenu.length > 0) {
+                // Command doesn't match but might have matching submenu items
+                cmd.submenu.forEach(subItem => {
+                    const subItemMatches = subItem.label && subItem.label.toLowerCase().includes(search);
+                    
+                    if (subItemMatches && (!subItem.submenu || subItem.submenu.length === 0)) {
+                        // Submenu item matches and has no sub-submenu
+                        results.push({
+                            ...subItem,
+                            label: cmd.label + ' › ' + subItem.label,
+                            _originalLabel: subItem.label
+                        });
+                    } else if (subItemMatches && subItem.submenu && subItem.submenu.length > 0) {
+                        // Submenu item matches and has sub-submenu - add all sub-submenu items
+                        subItem.submenu.forEach(subSubItem => {
+                            results.push({
+                                ...subSubItem,
+                                label: cmd.label + ' › ' + subItem.label + ' › ' + subSubItem.label,
+                                _originalLabel: subSubItem.label
+                            });
+                        });
+                    } else if (subItem.submenu && subItem.submenu.length > 0) {
+                        // Submenu item doesn't match but might have matching sub-submenu items
+                        subItem.submenu.forEach(subSubItem => {
+                            if (subSubItem.label && subSubItem.label.toLowerCase().includes(search)) {
+                                results.push({
+                                    ...subSubItem,
+                                    label: cmd.label + ' › ' + subItem.label + ' › ' + subSubItem.label,
+                                    _originalLabel: subSubItem.label
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        
+        return results;
     }
 
     function buildMenuHTML() {
@@ -1304,21 +1371,29 @@
                 }
             }
         } else {
-            const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
-            if (!cmd) return;
+            // First try to find in filtered commands (for flattened results)
+            const filteredCmd = filteredCommands.find(c => c.id === commandId);
+            if (filteredCmd && filteredCmd.action) {
+                actionToExecute = filteredCmd.action;
+                foundCmd = filteredCmd;
+            } else {
+                // Fallback to original commands
+                const cmd = (activeCommands || getSlashCommands()).find(c => c.id === commandId);
+                if (!cmd) return;
 
-            // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
-            if (cmd.submenu && cmd.submenu.length > 0) {
-                const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
-                if (item) {
-                    showSubmenu(cmd, item);
+                // Si la commande a un sous-menu, l'afficher au lieu d'exécuter
+                if (cmd.submenu && cmd.submenu.length > 0) {
+                    const item = slashMenuElement.querySelector('[data-command-id="' + commandId + '"]');
+                    if (item) {
+                        showSubmenu(cmd, item);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            if (cmd.action) {
-                actionToExecute = cmd.action;
-                foundCmd = cmd;
+                if (cmd.action) {
+                    actionToExecute = cmd.action;
+                    foundCmd = cmd;
+                }
             }
         }
 
@@ -1615,10 +1690,16 @@
     function updateFilterFromEditor() {
         if (!slashMenuElement || !slashTextNode || slashOffset < 0) return;
 
-        // Close the menu immediately when user types after / (no filtering)
-        hideSlashMenu();
-        savedNoteEntry = null;
-        return;
+        // Extract text after the slash
+        const textContent = slashTextNode.textContent || '';
+        const textAfterSlash = textContent.substring(slashOffset + 1);
+        
+        // Find the first space or newline after the slash to limit the filter text
+        const spaceIndex = textAfterSlash.search(/[\s\n]/);
+        filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
+
+        // Update the menu with filtered commands
+        updateMenuContent();
     }
 
     function showSlashMenu() {

@@ -1,0 +1,461 @@
+/* Styles for the shared notes page */
+
+/* Override global rules for scrollbars */
+body.shared-page {
+    scrollbar-width: auto !important;
+    -ms-overflow-style: scrollbar !important;
+}
+
+body.shared-page::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    background-color: #f1f1f1 !important;
+}
+
+body.shared-page::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1 !important;
+    border-radius: 8px !important;
+}
+
+body.shared-page::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8 !important;
+}
+
+html {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+body.shared-page html {
+    scrollbar-width: auto !important;
+    -ms-overflow-style: scrollbar !important;
+}
+
+body.shared-page html::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    background-color: #f1f1f1 !important;
+}
+
+body.shared-page html::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1 !important;
+    border-radius: 8px !important;
+}
+
+body.shared-page html::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8 !important;
+}
+
+body.shared-page {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-color, #ffffff);
+    color: var(--text-color, #333333);
+}
+
+.shared-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.shared-header {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color, #333333);
+}
+
+.shared-info {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background-color: var(--info-bg, #e7f3ff);
+    border-left: 4px solid var(--primary-color, #007bff);
+    border-radius: 4px;
+    color: var(--text-color, #333333);
+}
+
+.shared-buttons-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.shared-content {
+    margin-top: 20px;
+}
+
+/* Shared Notes List - Simple Design */
+.shared-notes-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.shared-note-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.shared-note-item:last-child {
+    border-bottom: none;
+}
+
+.note-name {
+    flex: 0 0 auto;
+    min-width: 200px;
+    max-width: 300px;
+    font-weight: 500;
+    color: var(--link-color, #007bff);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-name:hover {
+    text-decoration: underline;
+}
+
+.note-token {
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #e04b4b;
+    color: #fff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c43b3b;
+}
+
+.modal-content {
+    background-color: var(--modal-bg, #ffffff);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color, #333333);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body p {
+    margin: 0;
+    color: var(--text-color, #333333);
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color, #dee2e6);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    /* Reset complet pour le scroll sur mobile */
+    * {
+        box-sizing: border-box;
+    }
+    
+    /* Override des règles globales sur mobile */
+    html {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        height: auto !important;
+        position: static !important;
+        max-height: none !important;
+        -webkit-overflow-scrolling: touch;
+        min-height: 100vh !important;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+    
+    html::-webkit-scrollbar {
+        display: block !important;
+        width: 6px !important;
+        background-color: #f1f1f1 !important;
+    }
+    
+    body {
+        overflow: auto !important;
+        overflow-y: scroll !important;
+        height: auto !important;
+        position: static !important;
+        max-height: none !important;
+        min-height: 100vh !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+    
+    body::-webkit-scrollbar {
+        display: block !important;
+        width: 12px !important;
+        background-color: #f1f1f1 !important;
+    }
+    
+    body.shared-page {
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        position: static !important;
+        padding: 10px;
+        background: #f5f5f5 !important;
+        scrollbar-width: auto !important;
+        -ms-overflow-style: scrollbar !important;
+    }
+    
+    body.shared-page::-webkit-scrollbar {
+        display: block !important;
+        width: 12px !important;
+        background-color: #f1f1f1 !important;
+    }
+    
+    /* Fix pour iOS Safari */
+    .shared-container {
+        position: relative !important;
+        height: auto !important;
+        overflow: visible !important;
+        min-height: calc(100vh - 20px) !important;
+        padding: 10px !important;
+        padding-bottom: 20px !important;
+    }
+    
+    .shared-header {
+        font-size: 1.8em;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .shared-buttons-container {
+        justify-content: center;
+        margin: 15px 10px;
+        gap: 30px;
+    }
+    
+    .shared-content {
+        padding: 10px;
+    }
+    
+    /* Simplified mobile layout */
+    .shared-note-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px;
+        background: white;
+        border: 1px solid var(--border-color, #e0e0e0);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .note-name {
+        min-width: auto;
+        max-width: 100%;
+        font-size: 16px;
+    }
+    
+    .note-token {
+        width: 100%;
+        font-size: 12px;
+    }
+    
+    .note-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .empty-message {
+        padding: 40px 15px;
+    }
+    
+    .empty-message i {
+        font-size: 48px;
+    }
+    
+    .empty-message p {
+        font-size: 16px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] body.shared-page {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+/* Font Awesome icon definitions */
+.fa-share-nodes::before { content: "\f1e0"; }
+.fa-spinner::before { content: "\f110"; }
+.fa-exclamation-triangle::before { content: "\f071"; }
+.fa-copy::before { content: "\f0c5"; }
+.fa-external-link::before { content: "\f08e"; }
+.fa-ban::before { content: "\f05e"; }
+.fa-check::before { content: "\f00c"; }
+.fa-times::before { content: "\f00d"; }
+
+.fa-share-nodes,
+.fa-spinner,
+.fa-exclamation-triangle,
+.fa-copy,
+.fa-external-link,
+.fa-ban,
+.fa-check,
+.fa-times {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
+.fa-spin {
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+[data-theme="dark"] .shared-info {
+    background-color: #1e3a52;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .shared-notes-table {
+    background-color: #2a2a2a;
+}
+
+[data-theme="dark"] .shared-notes-table thead {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .shared-notes-table th {
+    color: #e0e0e0;
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .shared-notes-table td {
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .shared-notes-table tbody tr:hover {
+    background-color: #333333;
+}
+
+[data-theme="dark"] .note-link {
+    color: #4d9eff;
+}
+
+[data-theme="dark"] .url-input {
+    background-color: #333333;
+    border-color: #444444;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #2a2a2a;
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: #444444;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: #444444;
+}
+
+[data-theme="dark"] .error-message {
+    background-color: #3a1f1f;
+    border-left-color: #dc3545;
+    color: #ffcccc;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar {
+    background-color: #2a2a2a !important;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
+    background-color: #555555 !important;
+}
+
+[data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
+    background-color: #666666 !important;
+}

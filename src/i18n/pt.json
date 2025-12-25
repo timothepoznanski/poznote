@@ -550,6 +550,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falha ao atualizar cabeçalho: {{error}}",
       "network_error_updating_subheading": "Erro de rede ao atualizar cabeçalho"
+    },
+    "confirm": {
+      "convert_title": "Converter para HTML",
+      "convert_to_html": "Converter esta nota markdown para HTML?"
     }
   },
   "modals": {
@@ -627,34 +631,28 @@
       "delete_title": "Confirmar exclusão do espaço de trabalho",
       "delete_description": "Insira o nome do espaço de trabalho para confirmar a exclusão. Todas as notas e pastas serão excluídas permanentemente e não podem ser recuperadas.",
       "delete_placeholder": "Digite o nome do espaço de trabalho para confirmar",
-      "delete_button": "Excluir espaço de trabalho"
+      "delete_button": "Excluir"
     },
     "create": {
       "title_in_folder": "Criar em {{folder}}",
       "folder_fallback": "pasta",
       "note": {
-        "title": "Nota",
-        "description": "Texto rico com formatação, imagens, links e diagramas Excalidraw"
+        "title": "Nota"
       },
       "markdown": {
-        "title": "Nota Markdown",
-        "description": "Linguagem de marcação leve para texto estruturado"
+        "title": "Nota Markdown"
       },
       "task_list": {
-        "title": "Lista de Tarefas",
-        "description": "Lista de verificação com caixas de seleção para tarefas e itens"
+        "title": "Lista de Tarefas"
       },
       "subfolder": {
-        "title": "Subpasta",
-        "description": "Criar uma subpasta dentro desta pasta"
+        "title": "Subpasta"
       },
       "folder": {
-        "title": "Pasta",
-        "description": "Organizar suas notas em pastas"
+        "title": "Pasta"
       },
       "workspace": {
-        "title": "Espaço de Trabalho",
-        "description": "Criar um novo ambiente de espaço de trabalho"
+        "title": "Espaço de Trabalho"
       }
     },
     "export": {
@@ -697,7 +695,8 @@
     "system_folders": {
       "trash": "Lixeira",
       "tags": "Etiquetas",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "shared": "Compartilhadas"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -812,7 +811,7 @@
       "share_note": "Compartilhar nota",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
-      "convert_to_html": "Converter markdown para HTML"
+      "convert_to_html": "Converter para HTML"
     },
     "share_modal": {
       "title": "URL Pública",
@@ -907,7 +906,8 @@
     "documentation": "Documentação do Poznote",
     "errors": {
       "invalid_credentials": "Nome de usuário ou senha incorretos.",
-      "oidc_failed": "Falha no login SSO. Por favor, tente novamente."
+      "oidc_failed": "Falha no login SSO. Por favor, tente novamente.",
+      "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador."
     }
   },
   "restore_import": {
@@ -1200,6 +1200,21 @@
         "node_d": "Continuar escrevendo",
         "edge_yes": "Sim",
         "edge_no": "Não"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Notas Compartilhadas Publicamente",
+        "no_shared_notes": "Ainda não há notas compartilhadas.",
+        "share_hint": "Compartilhe uma nota clicando no botão de compartilhar na barra de ferramentas."
+      },
+      "table": {
+        "note": "Nota",
+        "url": "URL Pública"
+      },
+      "actions": {
+        "open": "Abrir",
+        "revoke": "Revogar"
       }
     }
   }

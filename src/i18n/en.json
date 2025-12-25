@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Failed to update heading: {{error}}",
       "network_error_updating_subheading": "Network error while updating heading"
+    },
+    "confirm": {
+      "convert_title": "Convert to HTML",
+      "convert_to_html": "Convert this markdown note to HTML?"
     }
   },
   "modals": {
@@ -634,28 +638,22 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "Note",
-        "description": "Rich text with formatting, images, links, and Excalidraw diagrams"
+        "title": "Note"
       },
       "markdown": {
-        "title": "Markdown Note",
-        "description": "Lightweight markup language for structured text"
+        "title": "Markdown Note"
       },
       "task_list": {
-        "title": "Task List",
-        "description": "Checklist with checkboxes for tasks and items"
+        "title": "Task List"
       },
       "subfolder": {
-        "title": "Subfolder",
-        "description": "Create a subfolder within this folder"
+        "title": "Subfolder"
       },
       "folder": {
-        "title": "Folder",
-        "description": "Organize your notes in folders"
+        "title": "Folder"
       },
       "workspace": {
-        "title": "Workspace",
-        "description": "Create a new workspace environment"
+        "title": "Workspace"
       }
     },
     "export": {
@@ -698,7 +696,8 @@
     "system_folders": {
       "trash": "Trash",
       "tags": "Tags",
-      "favorites": "Favorites"
+      "favorites": "Favorites",
+      "shared": "Shared"
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -813,7 +812,7 @@
       "share_note": "Share note",
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
-      "convert_to_html": "Convert markdown to HTML"
+      "convert_to_html": "Convert to HTML"
     },
     "share_modal": {
       "title": "Public URL",
@@ -911,7 +910,8 @@
     "documentation": "Poznote documentation",
     "errors": {
       "invalid_credentials": "Incorrect username or password.",
-      "oidc_failed": "SSO login failed. Please try again."
+      "oidc_failed": "SSO login failed. Please try again.",
+      "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
     }
   },
   "restore_import": {
@@ -1205,6 +1205,21 @@
         "edge_yes": "Yes",
         "edge_no": "No"
       }
+    }
+  },
+  "shared": {
+    "page": {
+      "title": "Shared Notes",
+      "no_shared_notes": "No shared notes yet.",
+      "share_hint": "Share a note by clicking the share button in the note toolbar."
+    },
+    "table": {
+      "note": "Note",
+      "url": "Public URL"
+    },
+    "actions": {
+      "open": "Open",
+      "revoke": "Revoke"
     }
   }
 }

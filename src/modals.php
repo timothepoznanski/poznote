@@ -265,28 +265,24 @@
                         <i class="fa fa-file-alt"></i>
                         <div>
                             <span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
-                            <p><?php echo t_h('modals.create.note.description', [], 'Rich text with formatting, images, links, and Excalidraw diagrams'); ?></p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
                         <i class="fa fa-markdown"></i>
                         <div>
                             <span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
-                            <p><?php echo t_h('modals.create.markdown.description', [], 'Lightweight markup language for structured text'); ?></p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="list" onclick="selectCreateType('list')">
                         <i class="fa fa-list-ul"></i>
                         <div>
                             <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
-                            <p><?php echo t_h('modals.create.task_list.description', [], 'Checklist with checkboxes for tasks and items'); ?></p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="subfolder" onclick="selectCreateType('subfolder')" id="subfolderOption" style="display: none;">
                         <i class="fal fa-folder-plus"></i>
                         <div>
                             <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
-                            <p><?php echo t_h('modals.create.subfolder.description', [], 'Create a subfolder within this folder'); ?></p>
                         </div>
                     </div>
                 </div>
@@ -297,20 +293,18 @@
                         <i class="fa fa-folder"></i>
                         <div>
                             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
-                            <p><?php echo t_h('modals.create.folder.description', [], 'Organize your notes in folders'); ?></p>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="workspace" onclick="selectCreateType('workspace')" style="margin-top: 14px;">
                         <i class="fa fa-layer-group"></i>
                         <div>
                             <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
-                            <p><?php echo t_h('modals.create.workspace.description', [], 'Create a new workspace environment'); ?></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal-buttons">
+        <div class="modal-buttons" style="margin-top: 16px;">
             <button type="button" class="btn-cancel" onclick="closeModal('createModal')"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>

@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falló al actualizar el encabezado: {{error}}",
       "network_error_updating_subheading": "Error de red al actualizar el encabezado"
+    },
+    "confirm": {
+      "convert_title": "Convertir a HTML",
+      "convert_to_html": "¿Convertir esta nota markdown a HTML?"
     }
   },
   "modals": {
@@ -628,34 +632,28 @@
       "delete_title": "Confirmar eliminación de espacio de trabajo",
       "delete_description": "Ingresa el nombre del espacio de trabajo para confirmar la eliminación. Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
       "delete_placeholder": "Escribe el nombre del espacio de trabajo para confirmar",
-      "delete_button": "Eliminar espacio de trabajo"
+      "delete_button": "Eliminar"
     },
     "create": {
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota",
-        "description": "Texto enriquecido con formato, imágenes, enlaces y diagramas Excalidraw"
+        "title": "Nota"
       },
       "markdown": {
-        "title": "Nota Markdown",
-        "description": "Lenguaje de marcado ligero para texto estructurado"
+        "title": "Nota Markdown"
       },
       "task_list": {
-        "title": "Lista de tareas",
-        "description": "Lista de verificación con casillas de verificación para tareas y elementos"
+        "title": "Lista de tareas"
       },
       "subfolder": {
-        "title": "Subcarpeta",
-        "description": "Crear una subcarpeta dentro de esta carpeta"
+        "title": "Subcarpeta"
       },
       "folder": {
-        "title": "Carpeta",
-        "description": "Organizar tus notas en carpetas"
+        "title": "Carpeta"
       },
       "workspace": {
-        "title": "Espacio de trabajo",
-        "description": "Crear un nuevo entorno de espacio de trabajo"
+        "title": "Espacio de trabajo"
       }
     },
     "export": {
@@ -698,7 +696,8 @@
     "system_folders": {
       "trash": "Papelera",
       "tags": "Etiquetas",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "shared": "Compartidas"
     },
     "drop_zone": {
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
@@ -755,7 +754,7 @@
       "invalid_action": "Acción inválida",
       "internal_server_error": "Error interno del servidor",
       "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
-      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
+      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
     }
   },
   "ui": {
@@ -808,7 +807,7 @@
       "share_note": "Compartir nota",
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú",
-      "convert_to_html": "Convertir markdown a HTML"
+      "convert_to_html": "Convertir a HTML"
     },
     "share_modal": {
       "title": "URL pública",
@@ -906,7 +905,8 @@
     "documentation": "Documentación de Poznote",
     "errors": {
       "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
-      "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo."
+      "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
+      "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador."
     }
   },
   "restore_import": {
@@ -1199,6 +1199,21 @@
         "node_d": "Seguir escribiendo",
         "edge_yes": "Sí",
         "edge_no": "No"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Notas Compartidas Públicamente",
+        "no_shared_notes": "Aún no hay notas compartidas.",
+        "share_hint": "Comparte una nota haciendo clic en el botón de compartir en la barra de herramientas."
+      },
+      "table": {
+        "note": "Nota",
+        "url": "URL Pública"
+      },
+      "actions": {
+        "open": "Abrir",
+        "revoke": "Revocar"
       }
     }
   }

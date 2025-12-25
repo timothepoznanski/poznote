@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Aktualisierung der Überschrift fehlgeschlagen: {{error}}",
       "network_error_updating_subheading": "Netzwerkfehler beim Aktualisieren der Überschrift"
+    },
+    "confirm": {
+      "convert_title": "In HTML konvertieren",
+      "convert_to_html": "Diese Markdown-Notiz in HTML konvertieren?"
     }
   },
   "modals": {
@@ -634,28 +638,22 @@
       "title_in_folder": "Erstellen in {{folder}}",
       "folder_fallback": "Ordner",
       "note": {
-        "title": "Notiz",
-        "description": "Rich-Text mit Formatierung, Bildern, Links und Excalidraw-Diagrammen"
+        "title": "Notiz"
       },
       "markdown": {
-        "title": "Markdown-Notiz",
-        "description": "Leichte Auszeichnungssprache für strukturierten Text"
+        "title": "Markdown-Notiz"
       },
       "task_list": {
-        "title": "Aufgabenliste",
-        "description": "Checkliste mit Kontrollkästchen für Aufgaben und Elemente"
+        "title": "Aufgabenliste"
       },
       "subfolder": {
-        "title": "Unterordner",
-        "description": "Einen Unterordner innerhalb dieses Ordners erstellen"
+        "title": "Unterordner"
       },
       "folder": {
-        "title": "Ordner",
-        "description": "Ihre Notizen in Ordnern organisieren"
+        "title": "Ordner"
       },
       "workspace": {
-        "title": "Arbeitsbereich",
-        "description": "Eine neue Arbeitsbereichsumgebung erstellen"
+        "title": "Arbeitsbereich"
       }
     },
     "export": {
@@ -698,7 +696,8 @@
     "system_folders": {
       "trash": "Papierkorb",
       "tags": "Tags",
-      "favorites": "Favoriten"
+      "favorites": "Favoriten",
+      "shared": "Geteilt"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -755,7 +754,7 @@
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
-      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
+      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
     }
   },
   "ui": {
@@ -808,7 +807,7 @@
       "share_note": "Notiz teilen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
-      "convert_to_html": "Markdown in HTML konvertieren"
+      "convert_to_html": "In HTML konvertieren"
     },
     "share_modal": {
       "title": "Öffentliche URL",
@@ -906,7 +905,8 @@
     "documentation": "Poznote-Dokumentation",
     "errors": {
       "invalid_credentials": "Falscher Benutzername oder Passwort.",
-      "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen."
+      "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+      "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator."
     }
   },
   "restore_import": {
@@ -1199,6 +1199,21 @@
         "node_d": "Weiterschreiben",
         "edge_yes": "Ja",
         "edge_no": "Nein"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Öffentlich Geteilte Notizen",
+        "no_shared_notes": "Noch keine geteilten Notizen.",
+        "share_hint": "Teilen Sie eine Notiz, indem Sie auf die Schaltfläche \"Teilen\" in der Symbolleiste klicken."
+      },
+      "table": {
+        "note": "Notiz",
+        "url": "Öffentliche URL"
+      },
+      "actions": {
+        "open": "Öffnen",
+        "revoke": "Widerrufen"
       }
     }
   }
