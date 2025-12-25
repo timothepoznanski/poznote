@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Failed to update heading: {{error}}",
       "network_error_updating_subheading": "Network error while updating heading"
+    },
+    "confirm": {
+      "convert_title": "Convert to HTML",
+      "convert_to_html": "Convert this markdown note to HTML?"
     }
   },
   "modals": {
@@ -692,7 +696,8 @@
     "system_folders": {
       "trash": "Trash",
       "tags": "Tags",
-      "favorites": "Favorites"
+      "favorites": "Favorites",
+      "shared": "Shared"
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -1200,6 +1205,21 @@
         "edge_yes": "Yes",
         "edge_no": "No"
       }
+    }
+  },
+  "shared": {
+    "page": {
+      "title": "Shared Notes",
+      "no_shared_notes": "No shared notes yet.",
+      "share_hint": "Share a note by clicking the share button in the note toolbar."
+    },
+    "table": {
+      "note": "Note",
+      "url": "Public URL"
+    },
+    "actions": {
+      "open": "Open",
+      "revoke": "Revoke"
     }
   }
 }

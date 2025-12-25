@@ -550,6 +550,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falha ao atualizar cabeçalho: {{error}}",
       "network_error_updating_subheading": "Erro de rede ao atualizar cabeçalho"
+    },
+    "confirm": {
+      "convert_title": "Converter para HTML",
+      "convert_to_html": "Converter esta nota markdown para HTML?"
     }
   },
   "modals": {
@@ -691,7 +695,8 @@
     "system_folders": {
       "trash": "Lixeira",
       "tags": "Etiquetas",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "shared": "Compartilhadas"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -1195,6 +1200,21 @@
         "node_d": "Continuar escrevendo",
         "edge_yes": "Sim",
         "edge_no": "Não"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Notas Compartilhadas Publicamente",
+        "no_shared_notes": "Ainda não há notas compartilhadas.",
+        "share_hint": "Compartilhe uma nota clicando no botão de compartilhar na barra de ferramentas."
+      },
+      "table": {
+        "note": "Nota",
+        "url": "URL Pública"
+      },
+      "actions": {
+        "open": "Abrir",
+        "revoke": "Revogar"
       }
     }
   }

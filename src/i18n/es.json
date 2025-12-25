@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falló al actualizar el encabezado: {{error}}",
       "network_error_updating_subheading": "Error de red al actualizar el encabezado"
+    },
+    "confirm": {
+      "convert_title": "Convertir a HTML",
+      "convert_to_html": "¿Convertir esta nota markdown a HTML?"
     }
   },
   "modals": {
@@ -692,7 +696,8 @@
     "system_folders": {
       "trash": "Papelera",
       "tags": "Etiquetas",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "shared": "Compartidas"
     },
     "drop_zone": {
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
@@ -1194,6 +1199,21 @@
         "node_d": "Seguir escribiendo",
         "edge_yes": "Sí",
         "edge_no": "No"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Notas Compartidas Públicamente",
+        "no_shared_notes": "Aún no hay notas compartidas.",
+        "share_hint": "Comparte una nota haciendo clic en el botón de compartir en la barra de herramientas."
+      },
+      "table": {
+        "note": "Nota",
+        "url": "URL Pública"
+      },
+      "actions": {
+        "open": "Abrir",
+        "revoke": "Revocar"
       }
     }
   }

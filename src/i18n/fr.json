@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Échec de la mise à jour du titre : {{error}}",
       "network_error_updating_subheading": "Erreur réseau lors de la mise à jour du titre"
+    },
+    "confirm": {
+      "convert_title": "Convertir en HTML",
+      "convert_to_html": "Convertir cette note markdown en HTML ?"
     }
   },
   "modals": {
@@ -692,7 +696,8 @@
     "system_folders": {
       "trash": "Corbeille",
       "tags": "Tags",
-      "favorites": "Favoris"
+      "favorites": "Favoris",
+      "shared": "Partagées"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -1200,6 +1205,21 @@
         "edge_yes": "Oui",
         "edge_no": "Non"
       }
+    }
+  },
+  "shared": {
+    "page": {
+      "title": "Notes partagées",
+      "no_shared_notes": "Aucune note partagée pour le moment.",
+      "share_hint": "Partagez une note en cliquant sur le bouton de partage dans la barre d'outils."
+    },
+    "table": {
+      "note": "Note",
+      "url": "URL publique"
+    },
+    "actions": {
+      "open": "Ouvrir",
+      "revoke": "Révoquer"
     }
   }
 }

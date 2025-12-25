@@ -551,6 +551,10 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Aktualisierung der Überschrift fehlgeschlagen: {{error}}",
       "network_error_updating_subheading": "Netzwerkfehler beim Aktualisieren der Überschrift"
+    },
+    "confirm": {
+      "convert_title": "In HTML konvertieren",
+      "convert_to_html": "Diese Markdown-Notiz in HTML konvertieren?"
     }
   },
   "modals": {
@@ -692,7 +696,8 @@
     "system_folders": {
       "trash": "Papierkorb",
       "tags": "Tags",
-      "favorites": "Favoriten"
+      "favorites": "Favoriten",
+      "shared": "Geteilt"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -1194,6 +1199,21 @@
         "node_d": "Weiterschreiben",
         "edge_yes": "Ja",
         "edge_no": "Nein"
+      }
+    },
+    "shared": {
+      "page": {
+        "title": "Öffentlich Geteilte Notizen",
+        "no_shared_notes": "Noch keine geteilten Notizen.",
+        "share_hint": "Teilen Sie eine Notiz, indem Sie auf die Schaltfläche \"Teilen\" in der Symbolleiste klicken."
+      },
+      "table": {
+        "note": "Notiz",
+        "url": "Öffentliche URL"
+      },
+      "actions": {
+        "open": "Öffnen",
+        "revoke": "Widerrufen"
       }
     }
   }
