@@ -109,10 +109,11 @@ try {
                         background: #f5f5f5;
                     }
                     .password-container {
-                        background: white;
+                        /* background: white; */
                         padding: 40px;
                         border-radius: 8px;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        justify-items: center;
+                        /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
                         max-width: 400px;
                         width: 90%;
                     }
@@ -164,7 +165,6 @@ try {
                 <div class="password-container">
                     <div class="lock-icon">🔒</div>
                     <h2>Password Protected</h2>
-                    <p>This note is password protected. Please enter the password to view it.</p>
                     <?php if (isset($passwordError)): ?>
                         <div class="error">Incorrect password. Please try again.</div>
                     <?php endif; ?>

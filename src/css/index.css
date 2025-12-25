@@ -2578,7 +2578,7 @@ hr {
 /* Réduire les icônes dans les dossiers (Trash, Tags, Shared, Favorites) */
 .fa-trash.folder-icon,
 .fa-tags.folder-icon,
-.fa-share-nodes.folder-icon,
+.fa-cloud.folder-icon,
 .fa-star-light.folder-icon {
     font-size: 0.8em !important;
 }
@@ -2965,8 +2965,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 /* Blue color when a note is shared publicly */
-.toolbar-btn.btn-share.is-shared i.fa-share-nodes,
-.toolbar-btn.btn-share.is-shared .fa-share-nodes {
+.toolbar-btn.btn-share.is-shared i.fa-cloud,
+.toolbar-btn.btn-share.is-shared .fa-cloud {
   color: #007DB8 !important;
 }
 
@@ -3000,7 +3000,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Font Awesome icon customizations */
 .fa-caret-down::before { content: "\f0d7"; }
-.fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
 .fa-ellipsis::before { content: "\f141"; }
 .fa-folder::before { content: "\f07b"; }
@@ -3102,7 +3101,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-mobile,
 .fa-border-outer,
 .fa-paint-brush,
-.fa-share-nodes,
 .fa-smile,
 .fa-folder,
 .fa-folder-open,
@@ -3630,7 +3628,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* Exception: Remove filter for favorite/share/attachment (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
-.toolbar-btn.is-shared .fa-share-nodes,
+.toolbar-btn.is-shared .fa-cloud,
 .toolbar-btn.has-attachments .fa-paperclip {
   filter: none !important;
 }

@@ -1893,10 +1893,10 @@ body.dark-mode .toolbar-btn.save-modified .fa-save {
 }
 
 html[data-theme='dark'] .toolbar-btn.is-favorite .fa-star-light,
-html[data-theme='dark'] .toolbar-btn.is-shared .fa-share-nodes,
+html[data-theme='dark'] .toolbar-btn.is-shared .fa-cloud,
 html[data-theme='dark'] .toolbar-btn.has-attachments .fa-paperclip,
 body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
-body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
+body.dark-mode .toolbar-btn.is-shared .fa-cloud,
 body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
     filter: none !important;
