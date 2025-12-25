@@ -509,7 +509,8 @@
       "insert_table": "Tabelle einfügen",
       "insert_checklist": "Checkliste einfügen",
       "add_separator": "Trennlinie hinzufügen",
-      "insert_note_reference": "Notiz-Referenz einfügen"
+      "insert_note_reference": "Notiz-Referenz einfügen",
+      "open_in_new_tab": "In neuem Tab öffnen"
     },
     "link": {
       "add_title": "Link hinzufügen",

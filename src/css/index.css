@@ -3015,6 +3015,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link::before { content: "\f0c1"; }
 .fa-unlink::before { content: "\f127"; }
 .fa-paperclip::before { content: "\f0c6"; }
+.fa-external-link::before { content: "\f08e"; }
 .fa-minus::before { content: "\f068"; }
 .fa-info-circle::before { content: "\f05a"; }
 .fa-question-circle::before { content: "\f059"; }
@@ -3087,6 +3088,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrow-up::before { content: "\f062"; }
 .fa-arrow-down::before { content: "\f063"; }
 
+
 .fa-question-circle,
 .fa-times-circle,
 .fa-question-circle,
@@ -3112,6 +3114,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link,
 .fa-unlink,
 .fa-paperclip,
+.fa-external-link,
 .fa-minus,
 .fa-info-circle,
 .fa-search,

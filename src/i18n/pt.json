@@ -508,7 +508,8 @@
       "insert_table": "Inserir tabela",
       "insert_checklist": "Inserir lista de tarefas",
       "add_separator": "Adicionar separador",
-      "insert_note_reference": "Inserir referência de nota"
+      "insert_note_reference": "Inserir referência de nota",
+      "open_in_new_tab": "Abrir em nova aba"
     },
     "link": {
       "add_title": "Adicionar Link",

@@ -699,6 +699,9 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-share-nodes"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                    
+                    // Open in new tab button
+                    echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" onclick="openNoteInNewTab('.$row['id'].')"><i class="fa-external-link"></i></button>';
 
                     // Mobile overflow menu button (shown only on mobile via CSS)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
@@ -710,6 +713,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     // Convert to HTML button (only for markdown notes)
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert-html\')"><i class="fa-file-code"></i> '.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'</button>';

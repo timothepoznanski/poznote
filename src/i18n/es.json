@@ -509,7 +509,8 @@
       "insert_table": "Insertar tabla",
       "insert_checklist": "Insertar lista de verificación",
       "add_separator": "Agregar separador",
-      "insert_note_reference": "Insertar referencia de nota"
+      "insert_note_reference": "Insertar referencia de nota",
+      "open_in_new_tab": "Abrir en nueva pestaña"
     },
     "link": {
       "add_title": "Agregar enlace",
