@@ -158,9 +158,24 @@ async function createPublicShare(noteId) {
             if (el && el.value) customToken = el.value.trim();
         } catch (e) {}
 
+        // Get indexable checkbox value
+        let indexable = 0;
+        try {
+            const indexableEl = document.getElementById('shareIndexable');
+            if (indexableEl && indexableEl.checked) indexable = 1;
+        } catch (e) {}
+
+        // Get password value
+        let password = '';
+        try {
+            const passwordEl = document.getElementById('sharePassword');
+            if (passwordEl && passwordEl.value) password = passwordEl.value.trim();
+        } catch (e) {}
+
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        const body = { note_id: noteId, theme: theme };
+        const body = { note_id: noteId, theme: theme, indexable: indexable };
         if (customToken) body.custom_token = customToken;
+        if (password) body.password = password;
 
         const resp = await fetch('api_share_note.php', {
             method: 'POST',
@@ -436,6 +451,50 @@ function showShareModal(url, options) {
         inputWrap.appendChild(label);
         inputWrap.appendChild(input);
         content.appendChild(inputWrap);
+
+        // Add password input
+        const passwordWrap = document.createElement('div');
+        passwordWrap.className = 'share-password-wrap';
+        const passwordLabel = document.createElement('label');
+        const passwordLabelText = window.t ? window.t('index.share_modal.password', null, 'Password (optional)') : 'Password (optional)';
+        const passwordLabelParts = passwordLabelText.match(/^(.+?)(\(.*?\))$/);
+        if (passwordLabelParts) {
+            passwordLabel.innerHTML = passwordLabelParts[1] + '<span class="optional-text">' + passwordLabelParts[2] + '</span>';
+        } else {
+            passwordLabel.textContent = passwordLabelText;
+        }
+        passwordLabel.className = 'share-password-label';
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'password';
+        passwordInput.id = 'sharePassword';
+        passwordInput.placeholder = window.t ? window.t('index.share_modal.password_placeholder', null, 'Enter a password') : 'Enter a password';
+        passwordInput.className = 'share-password-input';
+        passwordWrap.appendChild(passwordLabel);
+        passwordWrap.appendChild(passwordInput);
+        content.appendChild(passwordWrap);
+
+        // Add indexable toggle
+        const indexableWrap = document.createElement('div');
+        indexableWrap.className = 'share-indexable-wrap';
+        const indexableLabel = document.createElement('label');
+        indexableLabel.className = 'share-indexable-label';
+        const indexableText = document.createElement('span');
+        indexableText.textContent = window.t ? window.t('index.share_modal.indexable', null, 'Allow search engine indexing') : 'Allow search engine indexing';
+        indexableText.className = 'indexable-label-text';
+        const toggleSwitch = document.createElement('label');
+        toggleSwitch.className = 'toggle-switch';
+        const indexableCheckbox = document.createElement('input');
+        indexableCheckbox.type = 'checkbox';
+        indexableCheckbox.id = 'shareIndexable';
+        indexableCheckbox.className = 'share-indexable-checkbox';
+        const slider = document.createElement('span');
+        slider.className = 'toggle-slider';
+        toggleSwitch.appendChild(indexableCheckbox);
+        toggleSwitch.appendChild(slider);
+        indexableLabel.appendChild(indexableText);
+        indexableLabel.appendChild(toggleSwitch);
+        indexableWrap.appendChild(indexableLabel);
+        content.appendChild(indexableWrap);
 
         const createBtn = document.createElement('button');
         createBtn.type = 'button';

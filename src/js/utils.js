@@ -684,6 +684,11 @@ function showUpdateInstructions(hasUpdate = false) {
             if (backupWarning) {
                 backupWarning.style.display = 'block';
             }
+            // Show release notes link
+            var releaseNotesLink = document.getElementById('releaseNotesLink');
+            if (releaseNotesLink) {
+                releaseNotesLink.style.display = 'block';
+            }
         } else {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, '✅ Poznote is Up to date') : '✅ Poznote is Up to date';
             if (messageEl) messageEl.textContent = '';
@@ -692,6 +697,11 @@ function showUpdateInstructions(hasUpdate = false) {
             }
             if (backupWarning) {
                 backupWarning.style.display = 'none';
+            }
+            // Hide release notes link
+            var releaseNotesLink = document.getElementById('releaseNotesLink');
+            if (releaseNotesLink) {
+                releaseNotesLink.style.display = 'none';
             }
         }
         
@@ -719,6 +729,13 @@ function showUpdateInstructions(hasUpdate = false) {
                     }
                     if (availableVersionEl) {
                         availableVersionEl.textContent = data.remote_version || 'unknown';
+                    }
+                    // Set release notes link if update available
+                    if (hasUpdate && data.remote_version) {
+                        var releaseNotesHref = document.getElementById('releaseNotesHref');
+                        if (releaseNotesHref) {
+                            releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases/tag/' + data.remote_version;
+                        }
                     }
                 } else {
                     // Error

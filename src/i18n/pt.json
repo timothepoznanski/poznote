@@ -276,13 +276,13 @@
       "notes_n": "{{count}} notas"
     },
     "default": {
-      "title": "Espaço de Trabalho Padrão",
+      "title": "Espaço de Trabalho Inicial",
       "description_1": "Escolha qual espaço de trabalho abrir ao iniciar o Poznote.",
       "description_2": "Selecione \"{{last}}\" para sempre abrir o espaço de trabalho que você estava usando anteriormente.",
       "last_opened": "Último espaço de trabalho aberto",
-      "save_button": "Salvar Padrão",
-      "status_set_to": "✓ Espaço de trabalho padrão definido para: {{workspace}}",
-      "error_saving": "Erro ao salvar espaço de trabalho padrão"
+      "save_button": "Salvar",
+      "status_set_to": "✓ Espaço de trabalho inicial definido para: {{workspace}}",
+      "error_saving": "Erro ao salvar espaço de trabalho inicial"
     },
     "validation": {
       "enter_name": "Insira um nome de espaço de trabalho",
@@ -312,9 +312,9 @@
       "name_empty": "O nome do espaço de trabalho não pode estar vazio",
       "invalid_name": "Nome de espaço de trabalho inválido. Use apenas letras, números, traço e sublinhado (sem espaços).",
       "name_required": "Nome do espaço de trabalho obrigatório",
-      "cannot_delete_default": "Não é possível excluir o espaço de trabalho padrão",
+      "cannot_delete_default": "Não é possível excluir o espaço de trabalho inicial",
       "not_found": "Espaço de trabalho não encontrado",
-      "cannot_rename_default": "Não é possível renomear o espaço de trabalho padrão",
+      "cannot_rename_default": "Não é possível renomear o espaço de trabalho inicial",
       "invalid_new_name": "Nome de espaço de trabalho novo inválido. Use apenas letras, números, traço e sublinhado (sem espaços).",
       "name_and_target_required": "Nome do espaço de trabalho e destino obrigatórios",
       "source_target_must_differ": "Os espaços de trabalho de origem e destino devem ser diferentes"
@@ -327,7 +327,7 @@
     },
     "confirm_delete": {
       "title": "Confirmar exclusão do espaço de trabalho",
-      "message": "Excluir espaço de trabalho \"{{workspace}}\"? As notas serão movidas para o espaço de trabalho padrão."
+      "message": "Excluir espaço de trabalho \"{{workspace}}\"? As notas serão movidas para o espaço de trabalho inicial."
     }
   },
   "display": {
@@ -559,10 +559,11 @@
   "modals": {
     "update": {
       "title": "📱 Versão da Aplicação",
-      "backup_warning": "Faça um backup dos seus dados antes de atualizar",
-      "backup_hint": "Você pode criar um backup em <strong>Configurações > Backup</strong>",
+      "backup_warning": "Faça um backup dos seus dados.",
+      "backup_hint": "<strong>Configurações > Backup</strong>",
       "current_version": "Versão atual:",
       "latest_available": "Última disponível:",
+      "view_release_notes": "Ver notas de versão",
       "self_hosted": "Instruções para Auto-hospedagem",
       "cloud": "Instruções para Nuvem"
     },
@@ -710,7 +711,7 @@
   },
   "update": {
     "new_available": "🎉 Nova Atualização Disponível!",
-    "description": "Uma nova versão do Poznote está disponível. Seus dados serão preservados durante a atualização.",
+    "description": "Seus dados serão preservados durante a atualização.",
     "up_to_date": "✅ Poznote está Atualizado",
     "error_loading_version": "Erro ao carregar versão"
   },
@@ -739,7 +740,8 @@
     "table": "Tabela",
     "separator": "Separador",
     "link_to_note": "Link para nota",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "back": "Voltar"
   },
   "api": {
     "settings": {
@@ -823,7 +825,10 @@
       "create_url": "Criar url",
       "no_link_yet": "Nenhum link público ainda",
       "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1"
+      "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Permitir indexação por motores de busca",
+      "password": "Senha (opcional)",
+      "password_placeholder": "Digite uma senha"
     },
     "note": {
       "new_note": "Nova nota",
@@ -847,7 +852,20 @@
     "remove_border": "Remover Borda",
     "add_border_no_padding": "Adicionar Borda sem preenchimento",
     "remove_border_no_padding": "Remover Borda sem preenchimento",
-    "delete_image": "Excluir Imagem"
+    "delete_image": "Excluir Imagem",
+    "links": "Links",
+    "open_link": "Abrir Link",
+    "add_link": "Adicionar Link",
+    "edit_link": "Editar Link",
+    "remove_link": "Remover Link",
+    "link_modal": {
+      "title_add": "Adicionar Link à Imagem",
+      "title_edit": "Editar Link da Imagem",
+      "url_label": "Digite a URL:",
+      "url_placeholder": "https://www.exemplo.com",
+      "cancel": "Cancelar",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {
@@ -1215,7 +1233,13 @@
       "actions": {
         "open": "Abrir",
         "revoke": "Revogar"
-      }
+      },
+      "indexable": "Indexável",
+      "password_protected": "Protegido por senha",
+      "add_password_title": "Adicionar proteção por senha",
+      "change_password_title": "Alterar senha",
+      "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
+      "enter_new_password": "Digite uma nova senha"
     }
   }
 }

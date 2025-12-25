@@ -277,13 +277,13 @@
       "notes_n": "{{count}} notes"
     },
     "default": {
-      "title": "Default Workspace",
+      "title": "Startup Workspace",
       "description_1": "Choose which workspace opens when you start Poznote.",
       "description_2": "Select \"{{last}}\" to always open the workspace you were using previously.",
       "last_opened": "Last workspace opened",
-      "save_button": "Save Default",
-      "status_set_to": "✓ Default workspace set to: {{workspace}}",
-      "error_saving": "Error saving default workspace"
+      "save_button": "Save",
+      "status_set_to": "✓ Startup workspace set to: {{workspace}}",
+      "error_saving": "Error saving startup workspace"
     },
     "validation": {
       "enter_name": "Enter a workspace name",
@@ -313,9 +313,9 @@
       "name_empty": "Workspace name cannot be empty",
       "invalid_name": "Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_required": "Workspace name required",
-      "cannot_delete_default": "Cannot delete the default workspace",
+      "cannot_delete_default": "Cannot delete the startup workspace",
       "not_found": "Workspace not found",
-      "cannot_rename_default": "Cannot rename the default workspace",
+      "cannot_rename_default": "Cannot rename the startup workspace",
       "invalid_new_name": "Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_and_target_required": "Workspace name and target required",
       "source_target_must_differ": "Source and target workspaces must differ"
@@ -328,7 +328,7 @@
     },
     "confirm_delete": {
       "title": "Confirm delete workspace",
-      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the default workspace."
+      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the startup workspace."
     }
   },
   "display": {
@@ -560,10 +560,11 @@
   "modals": {
     "update": {
       "title": "📱 Application Version",
-      "backup_warning": "Make a backup of your data before updating",
-      "backup_hint": "You can create a backup in <strong>Settings > Backup</strong>",
+      "backup_warning": "Make a backup of your data.",
+      "backup_hint": "<strong>Settings > Backup</strong>",
       "current_version": "Current version:",
       "latest_available": "Latest available:",
+      "view_release_notes": "View release notes",
       "self_hosted": "Self-Hosted Instructions",
       "cloud": "Cloud Instructions"
     },
@@ -711,7 +712,7 @@
   },
   "update": {
     "new_available": "🎉 New Update Available!",
-    "description": "A new version of Poznote is available. Your data will be preserved during the update.",
+    "description": "Your data will be preserved during the update.",
     "up_to_date": "✅ Poznote is Up to date",
     "error_loading_version": "Error loading version"
   },
@@ -740,7 +741,8 @@
     "table": "Table",
     "separator": "Separator",
     "link_to_note": "Link to note",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "back": "Back"
   },
   "api": {
     "settings": {
@@ -825,6 +827,9 @@
       "no_link_yet": "No public link yet",
       "custom_token": "Custom token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Allow search engine indexing",
+      "password": "Password (optional)",
+      "password_placeholder": "Enter a password",
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public share",
       "error_creating": "Error creating public share: "
@@ -851,7 +856,20 @@
     "remove_border": "Remove Border",
     "add_border_no_padding": "Add Border without padding",
     "remove_border_no_padding": "Remove Border without padding",
-    "delete_image": "Delete Image"
+    "delete_image": "Delete Image",
+    "links": "Links",
+    "open_link": "Open Link",
+    "add_link": "Add Link",
+    "edit_link": "Edit Link",
+    "remove_link": "Remove Link",
+    "link_modal": {
+      "title_add": "Add Link to Image",
+      "title_edit": "Edit Image Link",
+      "url_label": "Enter the URL:",
+      "url_placeholder": "https://www.example.com",
+      "cancel": "Cancel",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {
@@ -1220,6 +1238,12 @@
     "actions": {
       "open": "Open",
       "revoke": "Revoke"
-    }
+    },
+    "indexable": "Indexable",
+    "password_protected": "Password protected",
+    "add_password_title": "Add password protection",
+    "change_password_title": "Change password",
+    "password_remove_hint": "Leave empty to remove password protection.",
+    "enter_new_password": "Enter new password"
   }
 }

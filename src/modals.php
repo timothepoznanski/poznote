@@ -14,6 +14,7 @@
         <div class="version-info">
             <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
+            <p id="releaseNotesLink" style="display: none;"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
         <div class="update-buttons-container">
             <div class="update-instructions-buttons">
@@ -210,7 +211,7 @@
 <!-- Move notes modal (for workspaces.php) -->
 <div id="moveNotesModal" class="modal" style="display:none;">
     <div class="modal-content">
-        <h3><?php echo t_h('modals.workspaces.move_notes_title', [], 'Move notes from'); ?> <span id="moveSourceName"></span></h3>
+        <h3><?php echo t_h('modals.workspaces.move_notes_title', [], 'Move notes from'); ?> "<span id="moveSourceName"></span>"</h3>
         <div class="form-group">
             <label for="moveTargetSelect"><?php echo t_h('modals.workspaces.select_target_workspace', [], 'Select target workspace'); ?></label>
             <select id="moveTargetSelect">
@@ -241,7 +242,7 @@
 <!-- Delete confirmation modal (for workspaces.php) -->
 <div id="deleteModal" class="modal" style="display:none;">
     <div class="modal-content">
-        <h3><?php echo t_h('modals.workspaces.delete_title', [], 'Confirm delete workspace'); ?> <span id="deleteWorkspaceName"></span></h3>
+        <h3><?php echo t_h('modals.workspaces.delete_title', [], 'Confirm delete workspace'); ?> "<span id="deleteWorkspaceName"></span>"</h3>
         <p><?php echo t_h('modals.workspaces.delete_description', [], 'Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.'); ?></p>
         <div class="form-group">
             <input id="confirmDeleteInput" type="text" placeholder="<?php echo t_h('modals.workspaces.delete_placeholder', [], 'Type workspace name to confirm'); ?>" />

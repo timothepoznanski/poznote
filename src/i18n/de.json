@@ -277,13 +277,13 @@
       "notes_n": "{{count}} Notizen"
     },
     "default": {
-      "title": "Standard-Arbeitsbereich",
+      "title": "Startup-Arbeitsbereich",
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
       "last_opened": "Zuletzt geöffneter Arbeitsbereich",
-      "save_button": "Standard speichern",
-      "status_set_to": "✓ Standard-Arbeitsbereich gesetzt auf: {{workspace}}",
-      "error_saving": "Fehler beim Speichern des Standard-Arbeitsbereichs"
+      "save_button": "Speichern",
+      "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
+      "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"
     },
     "validation": {
       "enter_name": "Arbeitsbereichsnamen eingeben",
@@ -313,9 +313,9 @@
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
       "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
-      "cannot_delete_default": "Standard-Arbeitsbereich kann nicht gelöscht werden",
+      "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
-      "cannot_rename_default": "Standard-Arbeitsbereich kann nicht umbenannt werden",
+      "cannot_rename_default": "Startup-Arbeitsbereich kann nicht umbenannt werden",
       "invalid_new_name": "Ungültiger neuer Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_and_target_required": "Arbeitsbereichsname und Ziel erforderlich",
       "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
@@ -328,7 +328,7 @@
     },
     "confirm_delete": {
       "title": "Arbeitsbereich löschen bestätigen",
-      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Standard-Arbeitsbereich verschoben."
+      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Startup-Arbeitsbereich verschoben."
     }
   },
   "display": {
@@ -560,10 +560,11 @@
   "modals": {
     "update": {
       "title": "📱 Anwendungsversion",
-      "backup_warning": "Erstellen Sie ein Backup Ihrer Daten, bevor Sie aktualisieren",
-      "backup_hint": "Sie können ein Backup in <strong>Einstellungen > Backup</strong> erstellen",
+      "backup_warning": "Erstellen Sie ein Backup Ihrer Daten.",
+      "backup_hint": "<strong>Einstellungen > Backup</strong>",
       "current_version": "Aktuelle Version:",
       "latest_available": "Neueste verfügbare:",
+      "view_release_notes": "Versionshinweise anzeigen",
       "self_hosted": "Selbst-gehostete Anweisungen",
       "cloud": "Cloud-Anweisungen"
     },
@@ -711,7 +712,7 @@
   },
   "update": {
     "new_available": "🎉 Neues Update verfügbar!",
-    "description": "Eine neue Version von Poznote ist verfügbar. Ihre Daten werden während des Updates erhalten bleiben.",
+    "description": "Ihre Daten werden während des Updates erhalten bleiben.",
     "up_to_date": "✅ Poznote ist auf dem neuesten Stand",
     "error_loading_version": "Fehler beim Laden der Version"
   },
@@ -740,7 +741,8 @@
     "table": "Tabelle",
     "separator": "Trennlinie",
     "link_to_note": "Link zur Notiz",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "back": "Zurück"
   },
   "api": {
     "settings": {
@@ -820,6 +822,9 @@
       "no_link_yet": "Noch kein öffentlicher Link",
       "custom_token": "Benutzerdefiniertes Token (optional)",
       "custom_token_placeholder": "my_custom_token-1",
+      "indexable": "Suchmaschinenindizierung zulassen",
+      "password": "Passwort (optional)",
+      "password_placeholder": "Geben Sie ein Passwort ein",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
@@ -846,7 +851,20 @@
     "remove_border": "Rand entfernen",
     "add_border_no_padding": "Rand ohne Innenabstand hinzufügen",
     "remove_border_no_padding": "Rand ohne Innenabstand entfernen",
-    "delete_image": "Bild löschen"
+    "delete_image": "Bild löschen",
+    "links": "Links",
+    "open_link": "Link öffnen",
+    "add_link": "Link hinzufügen",
+    "edit_link": "Link bearbeiten",
+    "remove_link": "Link entfernen",
+    "link_modal": {
+      "title_add": "Link zum Bild hinzufügen",
+      "title_edit": "Bildlink bearbeiten",
+      "url_label": "URL eingeben:",
+      "url_placeholder": "https://www.beispiel.de",
+      "cancel": "Abbrechen",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {
@@ -1214,7 +1232,13 @@
       "actions": {
         "open": "Öffnen",
         "revoke": "Widerrufen"
-      }
+      },
+      "indexable": "Indexierbar",
+      "password_protected": "Passwortgeschützt",
+      "add_password_title": "Passwortschutz hinzufügen",
+      "change_password_title": "Passwort ändern",
+      "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
+      "enter_new_password": "Neues Passwort eingeben"
     }
   }
 }

@@ -82,6 +82,17 @@ body.dark-mode .slash-command-separator {
     background: #404040;
 }
 
+/* Back button in slash submenu (dark mode) */
+html[data-theme='dark'] .slash-command-back,
+body.dark-mode .slash-command-back {
+    background-color: transparent !important;
+}
+
+html[data-theme='dark'] .slash-command-back:hover,
+body.dark-mode .slash-command-back:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* ============================================
    Image Context Menu (Dark Mode)
    ============================================ */
@@ -107,6 +118,24 @@ body.dark-mode .image-menu-item:hover {
 html[data-theme='dark'] .image-menu-item i,
 body.dark-mode .image-menu-item i {
     color: #9ca3af;
+}
+
+html[data-theme='dark'] .image-submenu,
+body.dark-mode .image-submenu {
+    background: #1e1e1e;
+    border-color: #444;
+}
+
+html[data-theme='dark'] .image-submenu-item,
+body.dark-mode .image-submenu-item {
+    color: #e0e0e0;
+    border-bottom-color: #333;
+}
+
+html[data-theme='dark'] .image-submenu-item:hover,
+body.dark-mode .image-submenu-item:hover {
+    background-color: #2d2d2d;
+    color: #5cb3e9;
 }
 
 html[data-theme='dark'] .image-menu-item[data-action='delete-image'] i,
@@ -534,6 +563,99 @@ body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary {
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary:hover,
 body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary:hover {
     background-color: #2a4a7f;
+}
+
+/* Move Notes Modal (workspaces) - Dark Mode */
+html[data-theme='dark'] #moveNotesModal .modal-content,
+body.dark-mode #moveNotesModal .modal-content {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #moveNotesModal .modal-content h3,
+body.dark-mode #moveNotesModal .modal-content h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #moveNotesModal .modal-content label,
+body.dark-mode #moveNotesModal .modal-content label {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #moveNotesModal select,
+body.dark-mode #moveNotesModal select {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #moveNotesModal select:focus,
+body.dark-mode #moveNotesModal select:focus {
+    outline: none;
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* Rename Modal - Dark Mode */
+html[data-theme='dark'] #renameModal .modal-content,
+body.dark-mode #renameModal .modal-content {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #renameModal .modal-content h3,
+body.dark-mode #renameModal .modal-content h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #renameModal .modal-content label,
+body.dark-mode #renameModal .modal-content label {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #renameModal input,
+body.dark-mode #renameModal input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #renameModal input:focus,
+body.dark-mode #renameModal input:focus {
+    outline: none;
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+}
+
+/* Delete Modal - Dark Mode */
+html[data-theme='dark'] #deleteModal .modal-content,
+body.dark-mode #deleteModal .modal-content {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #deleteModal .modal-content h3,
+body.dark-mode #deleteModal .modal-content h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #deleteModal .modal-content p,
+body.dark-mode #deleteModal .modal-content p {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #deleteModal input,
+body.dark-mode #deleteModal input {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] #deleteModal input:focus,
+body.dark-mode #deleteModal input:focus {
+    outline: none;
+    border-color: #4a9eff;
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
 }
 
 /* Error message block */

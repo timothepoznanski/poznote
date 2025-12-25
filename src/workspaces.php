@@ -494,30 +494,26 @@ try {
                                         </div>
                                     </div>
                                 </div>
+                                <?php if ($ws !== 'Poznote'): ?>
                                 <div class="ws-col ws-col-action">
-                                    <?php if ($ws !== 'Poznote'): ?>
-                                        <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
-                                    <?php else: ?>
-                                        <button class="btn btn-rename action-btn" disabled><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
-                                    <?php endif; ?>
+                                    <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                 </div>
+                                <?php endif; ?>
                                 <div class="ws-col ws-col-select">
                                     <?php if ($ws !== ''): ?>
                                         <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button></div>
+                                <?php if ($ws !== 'Poznote'): ?>
                                 <div class="ws-col ws-col-delete">
-                                    <?php if ($ws !== 'Poznote'): ?>
-                                        <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                        </form>
-                                    <?php else: ?>
-                                        <button class="btn btn-danger action-btn" disabled><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                    <?php endif; ?>
+                                    <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
+                                    </form>
                                 </div>
+                                <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
