@@ -241,12 +241,12 @@ jobs:
           VERSION="${{ steps.check_version.outputs.version_clean }}"
           TAGS="ghcr.io/${{ github.repository_owner }}/poznote:$VERSION"
           
-          # Only add 'latest' tag for stable versions (not test versions)
-          if [[ "$VERSION" != *"-test"* ]]; then
+          # Only add 'latest' tag for stable versions (not test or beta versions)
+          if [[ "$VERSION" != *"-test"* ]] && [[ "$VERSION" != *"-beta"* ]]; then
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest"
             echo "📦 Stable version detected - will tag as 'latest'"
           else
-            echo "🧪 Test version detected - will NOT tag as 'latest'"
+            echo "🧪 Pre-release version detected (test/beta) - will NOT tag as 'latest'"
           fi
           
           echo "tags<<EOF" >> $GITHUB_OUTPUT
