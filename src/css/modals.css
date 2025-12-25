@@ -844,7 +844,6 @@
     border-radius: 8px;
     padding: 15px 20px;
     margin: 20px 0;
-    border-left: 4px solid #007DB8;
 }
 
 #updateModal .version-info p {
@@ -862,7 +861,6 @@
 #updateModal .backup-warning {
     background-color: #fff3cd;
     border: 1px solid #ffeaa7;
-    border-left: 4px solid #dc3545;
     border-radius: 8px;
     padding: 15px 20px;
     margin: 15px 0;

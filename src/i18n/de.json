@@ -560,10 +560,11 @@
   "modals": {
     "update": {
       "title": "📱 Anwendungsversion",
-      "backup_warning": "Erstellen Sie ein Backup Ihrer Daten, bevor Sie aktualisieren",
-      "backup_hint": "Sie können ein Backup in <strong>Einstellungen > Backup</strong> erstellen",
+      "backup_warning": "Erstellen Sie ein Backup Ihrer Daten.",
+      "backup_hint": "<strong>Einstellungen > Backup</strong>",
       "current_version": "Aktuelle Version:",
       "latest_available": "Neueste verfügbare:",
+      "view_release_notes": "Versionshinweise anzeigen",
       "self_hosted": "Selbst-gehostete Anweisungen",
       "cloud": "Cloud-Anweisungen"
     },
@@ -711,7 +712,7 @@
   },
   "update": {
     "new_available": "🎉 Neues Update verfügbar!",
-    "description": "Eine neue Version von Poznote ist verfügbar. Ihre Daten werden während des Updates erhalten bleiben.",
+    "description": "Ihre Daten werden während des Updates erhalten bleiben.",
     "up_to_date": "✅ Poznote ist auf dem neuesten Stand",
     "error_loading_version": "Fehler beim Laden der Version"
   },
