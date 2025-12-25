@@ -69,11 +69,18 @@ jobs:
             echo "📦 Creating stable release: $VERSION"
           fi
           
-          # Try to extract PR number from the last merge commit
-          COMMIT_MESSAGE=$(git log -1 --pretty=%s)
-          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=#)\d+(?=\))' || echo "")
-          
           RELEASE_NOTES=""
+          
+          # Method 1: Try to find PR number in recent commit messages (last 10 commits)
+          echo "🔍 Searching for PR in recent commits..."
+          PR_NUMBER=$(git log -10 --pretty=%s | grep -oP '(?<=#)\d+(?=\))' | head -1 || echo "")
+          
+          # Method 2: If no PR found, try to find PR associated with current commit via GitHub API
+          if [ -z "$PR_NUMBER" ]; then
+            echo "🔍 Searching for PR via GitHub API..."
+            COMMIT_SHA=$(git rev-parse HEAD)
+            PR_NUMBER=$(gh pr list --search "$COMMIT_SHA" --state merged --json number --jq '.[0].number' 2>/dev/null || echo "")
+          fi
           
           # If we found a PR number, get the PR description
           if [ -n "$PR_NUMBER" ]; then
@@ -87,10 +94,10 @@ jobs:
               echo "⚠️ Could not fetch PR description"
             fi
           else
-            echo "⚠️ No PR number found in commit message"
+            echo "⚠️ No PR found in recent history or via API"
           fi
           
-          # Fallback to default message if no PR description found
+          # Fallback: Default message if no PR description found
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="Automatic release for version $VERSION
 
