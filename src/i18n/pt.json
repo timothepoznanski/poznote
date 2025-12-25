@@ -811,7 +811,7 @@
       "share_note": "Compartilhar nota",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
-      "convert_to_html": "Converter markdown para HTML"
+      "convert_to_html": "Converter para HTML"
     },
     "share_modal": {
       "title": "URL Pública",

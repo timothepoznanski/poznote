@@ -812,7 +812,7 @@
       "share_note": "Share note",
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
-      "convert_to_html": "Convert markdown to HTML"
+      "convert_to_html": "Convert to HTML"
     },
     "share_modal": {
       "title": "Public URL",

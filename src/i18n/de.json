@@ -807,7 +807,7 @@
       "share_note": "Notiz teilen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
-      "convert_to_html": "Markdown in HTML konvertieren"
+      "convert_to_html": "In HTML konvertieren"
     },
     "share_modal": {
       "title": "Öffentliche URL",
