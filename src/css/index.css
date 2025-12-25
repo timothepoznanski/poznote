@@ -3015,6 +3015,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link::before { content: "\f0c1"; }
 .fa-unlink::before { content: "\f127"; }
 .fa-paperclip::before { content: "\f0c6"; }
+.fa-cloud::before { content: "\f0c2"; }
 .fa-external-link::before { content: "\f08e"; }
 .fa-minus::before { content: "\f068"; }
 .fa-info-circle::before { content: "\f05a"; }
@@ -3095,6 +3096,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-times-circle,
 .fa-eye,
 .fa-clock,
+.fa-cloud,
 .fa-caret-down,
 .fa-ellipsis,
 .fa-mobile,
@@ -3144,6 +3146,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-tags,
 .fa-sign-out-alt,
 .fa-sync-alt,
+.fa-globe,
 .fa-upload,
 .fa-arrow-left,
 .fa-arrow-up,

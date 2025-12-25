@@ -85,7 +85,7 @@ try {
 
 echo "<div class='folder-header' data-folder='Shared'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fa-share-nodes folder-icon'></i>";
+echo "<i class='fa-cloud folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.shared', [], 'Shared') . "</span>";
 echo "<span class='folder-note-count' id='count-shared'>(" . $shared_count . ")</span>";
 echo "</div></div>";

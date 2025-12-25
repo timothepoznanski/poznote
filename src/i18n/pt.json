@@ -698,7 +698,7 @@
       "trash": "Lixeira",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "shared": "Compartilhadas"
+      "shared": "Públicas"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -811,7 +811,7 @@
     "toolbar": {
       "favorite_add": "Adicionar aos favoritos",
       "favorite_remove": "Remover dos favoritos",
-      "share_note": "Compartilhar nota",
+      "share_note": "Tornar nota pública",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
       "convert_to_html": "Converter para HTML"
@@ -1225,7 +1225,7 @@
       "page": {
         "title": "Notas Compartilhadas Publicamente",
         "no_shared_notes": "Ainda não há notas compartilhadas.",
-        "share_hint": "Compartilhe uma nota clicando no botão de compartilhar na barra de ferramentas."
+        "share_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
       },
       "table": {
         "note": "Nota",

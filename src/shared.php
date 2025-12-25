@@ -43,7 +43,7 @@ $currentLang = getUserLanguage();
 			</div>
 			<div id="sharedNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message" style="display: none;">
-				<i class="fa-share-nodes"></i>
+			<i class="fa-cloud"></i>
 				<p><?php echo t_h('shared.page.no_shared_notes', [], 'No shared notes yet.'); ?></p>
 				<p class="empty-hint"><?php echo t_h('shared.page.share_hint', [], 'Share a note by clicking the share button in the note toolbar.'); ?></p>
 			</div>

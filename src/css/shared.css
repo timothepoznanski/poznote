@@ -416,6 +416,7 @@ body.shared-page {
 .fa-times::before { content: "\f00d"; }
 .fa-lock::before { content: "\f023"; }
 .fa-lock-open::before { content: "\f3c1"; }
+.fa-cloud::before { content: "\f0c2"; }
 
 .fa-share-nodes,
 .fa-spinner,
@@ -426,6 +427,7 @@ body.shared-page {
 .fa-check,
 .fa-times,
 .fa-lock,
+.fa-cloud,
 .fa-lock-open {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;

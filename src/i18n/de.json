@@ -699,7 +699,7 @@
       "trash": "Papierkorb",
       "tags": "Tags",
       "favorites": "Favoriten",
-      "shared": "Geteilt"
+      "shared": "Öffentliche"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -807,7 +807,7 @@
     "toolbar": {
       "favorite_add": "Zu Favoriten hinzufügen",
       "favorite_remove": "Aus Favoriten entfernen",
-      "share_note": "Notiz teilen",
+      "share_note": "Notiz öffentlich machen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
       "convert_to_html": "In HTML konvertieren"
@@ -1222,9 +1222,9 @@
     },
     "shared": {
       "page": {
-        "title": "Öffentlich Geteilte Notizen",
-        "no_shared_notes": "Noch keine geteilten Notizen.",
-        "share_hint": "Teilen Sie eine Notiz, indem Sie auf die Schaltfläche \"Teilen\" in der Symbolleiste klicken."
+        "title": "Öffentliche Notizen",
+        "no_shared_notes": "Noch keine öffentlichen Notizen.",
+        "share_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
       },
       "table": {
         "note": "Notiz",
