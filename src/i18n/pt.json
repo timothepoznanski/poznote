@@ -739,7 +739,8 @@
     "table": "Tabela",
     "separator": "Separador",
     "link_to_note": "Link para nota",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "back": "Voltar"
   },
   "api": {
     "settings": {

@@ -740,7 +740,8 @@
     "table": "Tabelle",
     "separator": "Trennlinie",
     "link_to_note": "Link zur Notiz",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "back": "Zurück"
   },
   "api": {
     "settings": {

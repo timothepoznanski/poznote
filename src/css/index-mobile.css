@@ -236,6 +236,17 @@ body::-webkit-scrollbar {
     margin: 6px 0;
 }
 
+/* Back button in slash submenu (mobile) */
+.slash-command-back {
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 500;
+    background-color: #f9fafb !important;
+}
+
+.slash-command-back:hover {
+    background-color: #f3f4f6 !important;
+}
+
 /* Responsive tables in note view (mobile)
    - Prevent tables from forcing a wider-than-screen layout
    - Keep native table layout (do NOT use display:block on <table>)

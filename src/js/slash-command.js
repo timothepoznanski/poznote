@@ -1071,7 +1071,20 @@
     }
 
     function buildSubmenuHTML(items) {
-        return items
+        const isMobile = window.innerWidth < 768;
+        const t = window.t || ((key, params, fallback) => fallback);
+        
+        let html = '';
+        
+        // Add back button on mobile
+        if (isMobile) {
+            html += '<div class="slash-command-item slash-command-back" data-action="back">' +
+                    '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                    '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
+                    '</div>';
+        }
+        
+        html += items
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubmenuIndex ? ' selected' : '';
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
@@ -1086,10 +1099,25 @@
                 );
             })
             .join('');
+            
+        return html;
     }
 
     function buildSubSubmenuHTML(items) {
-        return items
+        const isMobile = window.innerWidth < 768;
+        const t = window.t || ((key, params, fallback) => fallback);
+        
+        let html = '';
+        
+        // Add back button on mobile
+        if (isMobile) {
+            html += '<div class="slash-command-item slash-command-back" data-action="back-sub">' +
+                    '<i class="fa fa-arrow-left" style="margin-right: 8px; width: 16px; display: inline-block; text-align: center;"></i>' +
+                    '<span class="slash-command-label">' + escapeHtml(t('slash_menu.back', null, 'Back')) + '</span>' +
+                    '</div>';
+        }
+        
+        html += items
             .map((item, idx) => {
                 const selectedClass = idx === selectedSubSubmenuIndex ? ' selected' : '';
                 const iconStyle = item.iconColor ? ' style="margin-right: 8px; color: ' + item.iconColor + ';"' : ' style="margin-right: 8px;"';
@@ -1102,6 +1130,8 @@
                 );
             })
             .join('');
+            
+        return html;
     }
 
     function escapeHtml(text) {
@@ -1448,6 +1478,13 @@
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
 
+        // Check if it's the back button
+        const action = item.getAttribute('data-action');
+        if (action === 'back') {
+            hideSubmenu();
+            return;
+        }
+
         const submenuId = item.getAttribute('data-submenu-id');
         if (submenuId) executeCommand(submenuId, true, false);
     }
@@ -1455,6 +1492,13 @@
     function handleSubSubmenuClick(e) {
         const item = e.target.closest && e.target.closest('.slash-command-item');
         if (!item) return;
+
+        // Check if it's the back button
+        const action = item.getAttribute('data-action');
+        if (action === 'back-sub') {
+            hideSubSubmenu();
+            return;
+        }
 
         const subSubmenuId = item.getAttribute('data-sub-submenu-id');
         if (subSubmenuId) executeCommand(subSubmenuId, false, true);
