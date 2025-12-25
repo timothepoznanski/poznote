@@ -277,13 +277,13 @@
       "notes_n": "{{count}} Notizen"
     },
     "default": {
-      "title": "Standard-Arbeitsbereich",
+      "title": "Startup-Arbeitsbereich",
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
       "last_opened": "Zuletzt geöffneter Arbeitsbereich",
-      "save_button": "Standard speichern",
-      "status_set_to": "✓ Standard-Arbeitsbereich gesetzt auf: {{workspace}}",
-      "error_saving": "Fehler beim Speichern des Standard-Arbeitsbereichs"
+      "save_button": "Speichern",
+      "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
+      "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"
     },
     "validation": {
       "enter_name": "Arbeitsbereichsnamen eingeben",
@@ -313,9 +313,9 @@
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
       "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
-      "cannot_delete_default": "Standard-Arbeitsbereich kann nicht gelöscht werden",
+      "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
-      "cannot_rename_default": "Standard-Arbeitsbereich kann nicht umbenannt werden",
+      "cannot_rename_default": "Startup-Arbeitsbereich kann nicht umbenannt werden",
       "invalid_new_name": "Ungültiger neuer Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_and_target_required": "Arbeitsbereichsname und Ziel erforderlich",
       "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
@@ -328,7 +328,7 @@
     },
     "confirm_delete": {
       "title": "Arbeitsbereich löschen bestätigen",
-      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Standard-Arbeitsbereich verschoben."
+      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Startup-Arbeitsbereich verschoben."
     }
   },
   "display": {

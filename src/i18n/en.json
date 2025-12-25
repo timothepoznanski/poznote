@@ -277,13 +277,13 @@
       "notes_n": "{{count}} notes"
     },
     "default": {
-      "title": "Default Workspace",
+      "title": "Startup Workspace",
       "description_1": "Choose which workspace opens when you start Poznote.",
       "description_2": "Select \"{{last}}\" to always open the workspace you were using previously.",
       "last_opened": "Last workspace opened",
-      "save_button": "Save Default",
-      "status_set_to": "✓ Default workspace set to: {{workspace}}",
-      "error_saving": "Error saving default workspace"
+      "save_button": "Save",
+      "status_set_to": "✓ Startup workspace set to: {{workspace}}",
+      "error_saving": "Error saving startup workspace"
     },
     "validation": {
       "enter_name": "Enter a workspace name",
@@ -313,9 +313,9 @@
       "name_empty": "Workspace name cannot be empty",
       "invalid_name": "Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_required": "Workspace name required",
-      "cannot_delete_default": "Cannot delete the default workspace",
+      "cannot_delete_default": "Cannot delete the startup workspace",
       "not_found": "Workspace not found",
-      "cannot_rename_default": "Cannot rename the default workspace",
+      "cannot_rename_default": "Cannot rename the startup workspace",
       "invalid_new_name": "Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_and_target_required": "Workspace name and target required",
       "source_target_must_differ": "Source and target workspaces must differ"
@@ -328,7 +328,7 @@
     },
     "confirm_delete": {
       "title": "Confirm delete workspace",
-      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the default workspace."
+      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the startup workspace."
     }
   },
   "display": {

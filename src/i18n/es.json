@@ -277,13 +277,13 @@
       "notes_n": "{{count}} notas"
     },
     "default": {
-      "title": "Espacio de trabajo predeterminado",
+      "title": "Espacio de trabajo de inicio",
       "description_1": "Elige qué espacio de trabajo se abre al iniciar Poznote.",
       "description_2": "Selecciona \"{{last}}\" para siempre abrir el espacio de trabajo que estabas usando anteriormente.",
       "last_opened": "Último espacio de trabajo abierto",
-      "save_button": "Guardar predeterminado",
-      "status_set_to": "✓ Espacio de trabajo predeterminado establecido en: {{workspace}}",
-      "error_saving": "Error al guardar el espacio de trabajo predeterminado"
+      "save_button": "Guardar",
+      "status_set_to": "✓ Espacio de trabajo de inicio establecido en: {{workspace}}",
+      "error_saving": "Error al guardar el espacio de trabajo de inicio"
     },
     "validation": {
       "enter_name": "Ingresa un nombre de espacio de trabajo",
@@ -313,9 +313,9 @@
       "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
       "invalid_name": "Nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
       "name_required": "Nombre de espacio de trabajo requerido",
-      "cannot_delete_default": "No se puede eliminar el espacio de trabajo predeterminado",
+      "cannot_delete_default": "No se puede eliminar el espacio de trabajo de inicio",
       "not_found": "Espacio de trabajo no encontrado",
-      "cannot_rename_default": "No se puede renombrar el espacio de trabajo predeterminado",
+      "cannot_rename_default": "No se puede renombrar el espacio de trabajo de inicio",
       "invalid_new_name": "Nuevo nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
       "name_and_target_required": "Nombre de espacio de trabajo y destino requeridos",
       "source_target_must_differ": "Los espacios de trabajo de origen y destino deben ser diferentes"
@@ -328,7 +328,7 @@
     },
     "confirm_delete": {
       "title": "Confirmar eliminación de espacio de trabajo",
-      "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo predeterminado."
+      "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo de inicio."
     }
   },
   "display": {
