@@ -68,11 +68,11 @@ function checkForUpdates() {
         
         $result['remote_version'] = $remote_version;
         
-        // Check if remote version is a test version (contains -test)
-        $is_test_version = (strpos($remote_version, '-test') !== false);
+        // Check if remote version is a test or beta version (contains -test or -beta)
+        $is_prerelease_version = (strpos($remote_version, '-test') !== false || strpos($remote_version, '-beta') !== false);
         
-        // Don't show test versions as available updates
-        if ($is_test_version) {
+        // Don't show test/beta versions as available updates
+        if ($is_prerelease_version) {
             $result['has_updates'] = false;
             $result['remote_version'] = $remote_version;
             return $result;

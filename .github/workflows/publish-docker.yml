@@ -60,20 +60,47 @@ jobs:
         run: |
           VERSION="${{ steps.check_version.outputs.version }}"
           
-          # Check if this is a test version
-          if [[ "$VERSION" == *"-test"* ]]; then
+          # Check if this is a test or beta version
+          if [[ "$VERSION" == *"-test"* ]] || [[ "$VERSION" == *"-beta"* ]]; then
             PRERELEASE_FLAG="--prerelease"
-            echo "📋 Creating pre-release for test version: $VERSION"
+            echo "📋 Creating pre-release for test/beta version: $VERSION"
           else
             PRERELEASE_FLAG=""
             echo "📦 Creating stable release: $VERSION"
           fi
           
-          gh release create $VERSION $PRERELEASE_FLAG \
-            --title "Release $VERSION" \
-            --notes "Automatic release for version $VERSION
+          # Try to extract PR number from the last merge commit
+          COMMIT_MESSAGE=$(git log -1 --pretty=%s)
+          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=#)\d+(?=\))' || echo "")
+          
+          RELEASE_NOTES=""
+          
+          # If we found a PR number, get the PR description
+          if [ -n "$PR_NUMBER" ]; then
+            echo "📝 Found PR #$PR_NUMBER, fetching description..."
+            PR_BODY=$(gh pr view $PR_NUMBER --json body --jq '.body' 2>/dev/null || echo "")
+            
+            if [ -n "$PR_BODY" ]; then
+              RELEASE_NOTES="$PR_BODY"
+              echo "✅ Using PR #$PR_NUMBER description as release notes"
+            else
+              echo "⚠️ Could not fetch PR description"
+            fi
+          else
+            echo "⚠️ No PR number found in commit message"
+          fi
+          
+          # Fallback to default message if no PR description found
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Automatic release for version $VERSION
 
           This release was automatically created when a new version was detected in the repository."
+            echo "📋 Using default release notes"
+          fi
+          
+          gh release create $VERSION $PRERELEASE_FLAG \
+            --title "Release $VERSION" \
+            --notes "$RELEASE_NOTES"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
