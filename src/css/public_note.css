@@ -408,3 +408,64 @@ html[data-theme='dark'] .public-note .content .task-item.important .task-text {
     font-weight: 600;
 }
 
+/* Dark mode styles for tables */
+html[data-theme='dark'] * table td,
+html[data-theme='dark'] * table th {
+    border-color: #404040 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] * table th {
+    background-color: #2a2a2a !important;
+}
+
+html[data-theme='dark'] table td,
+html[data-theme='dark'] table th {
+    border-color: #404040 !important;
+}
+
+html[data-theme='dark'] table th {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] table td {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] .public-note table td,
+html[data-theme='dark'] .public-note table th,
+html[data-theme='dark'] .public-note table.inserted-table td,
+html[data-theme='dark'] .public-note table.inserted-table th {
+    border-color: #404040 !important;
+}
+
+html[data-theme='dark'] .public-note table th,
+html[data-theme='dark'] .public-note table.inserted-table th {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] .public-note table td,
+html[data-theme='dark'] .public-note table.inserted-table td {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] .public-note .content table td,
+html[data-theme='dark'] .public-note .content table th {
+    border-color: #404040 !important;
+}
+
+html[data-theme='dark'] .public-note .content table th {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+html[data-theme='dark'] .public-note .content table td {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
