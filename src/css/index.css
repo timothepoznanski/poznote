@@ -471,19 +471,16 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
-.sidebar-tips { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 
 /* Hover and focus states for sidebar buttons */
 .sidebar-display:hover,
 .sidebar-settings:hover,
-.sidebar-tips:hover,
 .sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
 
 .sidebar-display:focus,
 .sidebar-settings:focus,
-.sidebar-tips:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
@@ -491,8 +488,6 @@ body {
 .sidebar-title-actions [class*="fa-"],
 .sidebar-display i,
 .sidebar-display [class*="fa-"],
-.sidebar-tips i,
-.sidebar-tips [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;

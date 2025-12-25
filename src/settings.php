@@ -94,16 +94,6 @@ $currentLang = getUserLanguage();
                 </div>
             </div>
 
-            <!-- Tips -->
-            <div class="settings-card" onclick="window.open('https://poznote.com/tips.html', '_blank');">
-                <div class="settings-card-icon">
-                    <i class="fa-lightbulb"></i>
-                </div>
-                <div class="settings-card-content">
-                    <h3><?php echo t_h('settings.cards.tips'); ?></h3>
-                </div>
-            </div>
-
             <!-- API Documentation -->
             <div class="settings-card" onclick="window.open('api-docs/', '_blank');">
                 <div class="settings-card-icon">
