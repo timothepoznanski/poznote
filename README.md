@@ -404,11 +404,6 @@ Stop the running container before updating:
 docker compose down
 ```
 
-Remove the current image to force download of latest version:
-```bash
-docker rmi ghcr.io/timothepoznanski/poznote:latest
-```
-
 Download the latest Poznote image:
 ```bash
 docker compose pull
@@ -420,6 +415,29 @@ docker compose up -d
 ```
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
+
+### Beta Versions
+
+Occasionally, beta versions will be published as **pre-releases** on GitHub. These versions include more features and fixes than the stable production version, but may not be fully validated yet.
+
+**How to install a beta version:**
+
+You can install beta versions by modifying your `docker-compose.yml` to use a specific version tag instead of `latest`:
+
+1. Edit your `docker-compose.yml` file and change the image line to:
+   ```yaml
+   image: ghcr.io/timothepoznanski/poznote:X.X.X-beta
+   ```
+   Replace `X.X.X-beta` with the specific beta version from the [GitHub Releases](https://github.com/timothepoznanski/poznote/releases) page.
+
+2. Update and restart:
+   ```bash
+   docker compose down
+   docker compose pull
+   docker compose up -d
+   ```
+
+> **Note:** Beta versions are marked as "Pre-release" on GitHub and are not automatically suggested for updates in the application.
 
 ## Backup / Export and Restore / Import
 
