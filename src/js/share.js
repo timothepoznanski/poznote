@@ -158,8 +158,15 @@ async function createPublicShare(noteId) {
             if (el && el.value) customToken = el.value.trim();
         } catch (e) {}
 
+        // Get indexable checkbox value
+        let indexable = 0;
+        try {
+            const indexableEl = document.getElementById('shareIndexable');
+            if (indexableEl && indexableEl.checked) indexable = 1;
+        } catch (e) {}
+
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        const body = { note_id: noteId, theme: theme };
+        const body = { note_id: noteId, theme: theme, indexable: indexable };
         if (customToken) body.custom_token = customToken;
 
         const resp = await fetch('api_share_note.php', {
@@ -436,6 +443,29 @@ function showShareModal(url, options) {
         inputWrap.appendChild(label);
         inputWrap.appendChild(input);
         content.appendChild(inputWrap);
+
+        // Add indexable toggle
+        const indexableWrap = document.createElement('div');
+        indexableWrap.className = 'share-indexable-wrap';
+        const indexableLabel = document.createElement('label');
+        indexableLabel.className = 'share-indexable-label';
+        const indexableText = document.createElement('span');
+        indexableText.textContent = window.t ? window.t('index.share_modal.indexable', null, 'Allow search engine indexing') : 'Allow search engine indexing';
+        indexableText.className = 'indexable-label-text';
+        const toggleSwitch = document.createElement('label');
+        toggleSwitch.className = 'toggle-switch';
+        const indexableCheckbox = document.createElement('input');
+        indexableCheckbox.type = 'checkbox';
+        indexableCheckbox.id = 'shareIndexable';
+        indexableCheckbox.className = 'share-indexable-checkbox';
+        const slider = document.createElement('span');
+        slider.className = 'toggle-slider';
+        toggleSwitch.appendChild(indexableCheckbox);
+        toggleSwitch.appendChild(slider);
+        indexableLabel.appendChild(indexableText);
+        indexableLabel.appendChild(toggleSwitch);
+        indexableWrap.appendChild(indexableLabel);
+        content.appendChild(indexableWrap);
 
         const createBtn = document.createElement('button');
         createBtn.type = 'button';

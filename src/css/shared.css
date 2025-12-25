@@ -132,6 +132,29 @@ body.shared-page {
     white-space: nowrap;
 }
 
+.note-indexable {
+    flex: 0 0 auto;
+    margin-right: 10px;
+}
+
+.indexable-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-color, #333333);
+    cursor: pointer;
+    user-select: none;
+}
+
+.indexable-label-text {
+    white-space: nowrap;
+}
+
+.indexable-checkbox {
+    display: none;
+}
+
 .note-actions {
     flex: 0 0 auto;
     display: flex;
@@ -458,4 +481,12 @@ body.shared-page {
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
     background-color: #666666 !important;
+}
+[data-theme="dark"] .indexable-toggle-label {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .shared-note-item {
+    background-color: #2a2a2a;
+    border-color: #444444;
 }

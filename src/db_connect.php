@@ -123,6 +123,24 @@ try {
         error_log('Could not add theme column to shared_notes: ' . $e->getMessage());
     }
 
+    // Add 'indexable' column to shared_notes if it doesn't exist (controls whether the page can be indexed by search engines)
+    try {
+        $cols = $con->query("PRAGMA table_info(shared_notes)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasIndexable = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'indexable') {
+                $hasIndexable = true;
+                break;
+            }
+        }
+        if (!$hasIndexable) {
+            $con->exec("ALTER TABLE shared_notes ADD COLUMN indexable INTEGER DEFAULT 0");
+        }
+    } catch (Exception $e) {
+        // Non-fatal: if this fails, continue without indexable support
+        error_log('Could not add indexable column to shared_notes: ' . $e->getMessage());
+    }
+
     // Set default settings
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
     $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");

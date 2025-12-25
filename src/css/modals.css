@@ -1577,6 +1577,84 @@
     box-sizing: border-box;
 }
 
+#shareModal .share-indexable-wrap {
+    margin: 15px 0 20px 0;
+}
+
+#shareModal .share-indexable-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    gap: 15px;
+}
+
+#shareModal .indexable-label-text {
+    flex: 1;
+}
+
+/* Toggle Switch Styles */
+#shareModal .toggle-switch,
+.toggle-switch {
+    position: relative;
+    display: inline-block !important;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+#shareModal .toggle-switch input,
+.toggle-switch input {
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute;
+}
+
+#shareModal .toggle-slider,
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: all 0.3s ease;
+    border-radius: 24px;
+}
+
+#shareModal .toggle-slider:before,
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+#shareModal input:checked + .toggle-slider,
+input:checked + .toggle-slider {
+    background-color: #28a745 !important;
+}
+
+#shareModal input:focus + .toggle-slider,
+input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #28a745;
+}
+
+#shareModal input:checked + .toggle-slider:before,
+input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
 /* Button color variations specific to the share modal */
 #shareModal .btn-cancel {
     background: #dc3545;
@@ -1647,6 +1725,20 @@ html[data-theme='dark'] #shareModal .share-custom-input {
 
 html[data-theme='dark'] #shareModal .share-custom-input::placeholder {
     color: #666;
+}
+
+html[data-theme='dark'] #shareModal .share-indexable-label {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] #shareModal .toggle-slider,
+html[data-theme='dark'] .toggle-slider {
+    background-color: #555;
+}
+
+html[data-theme='dark'] #shareModal input:checked + .toggle-slider,
+html[data-theme='dark'] input:checked + .toggle-slider {
+    background-color: #28a745 !important;
 }
 
 /* ===========================================

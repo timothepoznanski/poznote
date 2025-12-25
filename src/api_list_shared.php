@@ -17,6 +17,7 @@ try {
         sn.note_id,
         sn.token,
         sn.theme,
+        sn.indexable,
         sn.created as shared_date,
         e.heading,
         e.folder,

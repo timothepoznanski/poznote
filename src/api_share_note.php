@@ -16,7 +16,7 @@ if (!$data || !isset($data['note_id'])) {
 }
 
 $note_id = intval($data['note_id']);
-// action: create (default), get, revoke, renew
+// action: create (default), get, revoke, renew, update_indexable
 $action = isset($data['action']) ? strtolower(trim($data['action'])) : 'create';
 
 // Verify that the user has access to this note (owner or can view in workspace)
@@ -34,7 +34,7 @@ try {
     // Handle actions
     if ($action === 'get') {
         // Return existing share URL if any
-        $stmt = $con->prepare('SELECT token FROM shared_notes WHERE note_id = ? LIMIT 1');
+        $stmt = $con->prepare('SELECT token, indexable FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -43,6 +43,7 @@ try {
             exit;
         }
         $token = $row['token'];
+        $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
         
         // Build pretty URLs (same as create/renew)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -58,7 +59,7 @@ try {
         $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
         header('Content-Type: application/json');
-        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace]);
+        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable]);
         exit;
     } elseif ($action === 'revoke') {
         // Delete any share for this note
@@ -67,21 +68,31 @@ try {
         header('Content-Type: application/json');
         echo json_encode(['revoked' => true]);
         exit;
+    } elseif ($action === 'update_indexable') {
+        // Update the indexable status for this note's share
+        $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0;
+        $stmt = $con->prepare('UPDATE shared_notes SET indexable = ? WHERE note_id = ?');
+        $stmt->execute([$indexable, $note_id]);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'indexable' => $indexable]);
+        exit;
     } elseif ($action === 'renew') {
         // Generate a new token and update existing row (or insert)
         $token = bin2hex(random_bytes(16));
         // Theme passed optionally — store with the token (do not expose in URL)
         $theme = isset($data['theme']) ? trim($data['theme']) : null;
+        // Indexable parameter (default: 0 = not indexable)
+        $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0;
         // If exists update, else insert
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $theme, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $indexable, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
-            $stmt->execute([$note_id, $token, $theme]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme, $indexable]);
         }
     } else {
         // Default: create (same as renew semantics)
@@ -110,17 +121,18 @@ try {
             $token = bin2hex(random_bytes(16));
         }
 
-        // Insert or update existing token for this note; also store optional theme
+        // Insert or update existing token for this note; also store optional theme and indexable
         $theme = isset($data['theme']) ? trim($data['theme']) : null;
+        $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0; // Default: not indexable
         $stmt = $con->prepare('SELECT id FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $existsRow = $stmt->fetchColumn();
         if ($existsRow) {
-            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
-            $stmt->execute([$token, $theme, $note_id]);
+            $stmt = $con->prepare('UPDATE shared_notes SET token = ?, theme = ?, indexable = ?, created = CURRENT_TIMESTAMP WHERE note_id = ?');
+            $stmt->execute([$token, $theme, $indexable, $note_id]);
         } else {
-            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme) VALUES (?, ?, ?)');
-            $stmt->execute([$note_id, $token, $theme]);
+            $stmt = $con->prepare('INSERT INTO shared_notes (note_id, token, theme, indexable) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$note_id, $token, $theme, $indexable]);
         }
     }
 

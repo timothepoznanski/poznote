@@ -137,6 +137,30 @@ $currentLang = getUserLanguage();
 			tokenSpan.textContent = note.token;
 			item.appendChild(tokenSpan);
 			
+			// Indexable toggle
+			const indexableDiv = document.createElement('div');
+			indexableDiv.className = 'note-indexable';
+			const indexableLabel = document.createElement('label');
+			indexableLabel.className = 'indexable-toggle-label';
+			const indexableText = document.createElement('span');
+			indexableText.textContent = '<?php echo t_h('shared.indexable', [], 'Indexable'); ?>';
+			indexableText.className = 'indexable-label-text';
+			const toggleSwitch = document.createElement('label');
+			toggleSwitch.className = 'toggle-switch';
+			const indexableCheckbox = document.createElement('input');
+			indexableCheckbox.type = 'checkbox';
+			indexableCheckbox.checked = note.indexable ? true : false;
+			indexableCheckbox.className = 'indexable-checkbox';
+			indexableCheckbox.onchange = () => toggleIndexable(note.note_id, indexableCheckbox.checked);
+			const slider = document.createElement('span');
+			slider.className = 'toggle-slider';
+			toggleSwitch.appendChild(indexableCheckbox);
+			toggleSwitch.appendChild(slider);
+			indexableLabel.appendChild(indexableText);
+			indexableLabel.appendChild(toggleSwitch);
+			indexableDiv.appendChild(indexableLabel);
+			item.appendChild(indexableDiv);
+			
 			// Actions
 			const actionsDiv = document.createElement('div');
 			actionsDiv.className = 'note-actions';
@@ -245,6 +269,41 @@ $currentLang = getUserLanguage();
 			}
 		} catch (error) {
 			alert('<?php echo t_h('common.error', [], 'Error'); ?>: ' + error.message);
+		}
+	}
+	
+	async function toggleIndexable(noteId, isIndexable) {
+		try {
+			const response = await fetch('api_share_note.php', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					note_id: noteId,
+					action: 'update_indexable',
+					indexable: isIndexable ? 1 : 0
+				})
+			});
+			
+			const data = await response.json();
+			
+			if (data.error) {
+				throw new Error(data.error);
+			}
+			
+			// Update the local array
+			const note = sharedNotes.find(n => n.note_id === noteId);
+			if (note) {
+				note.indexable = isIndexable ? 1 : 0;
+			}
+		} catch (error) {
+			alert('<?php echo t_h('common.error', [], 'Error'); ?>: ' + error.message);
+			// Revert checkbox on error
+			const checkbox = document.querySelector(`.shared-note-item[data-note-id="${noteId}"] .indexable-checkbox`);
+			if (checkbox) {
+				checkbox.checked = !isIndexable;
+			}
 		}
 	}
 	</script>

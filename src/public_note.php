@@ -57,7 +57,7 @@ if (empty($token)) {
 }
 
 try {
-    $stmt = $con->prepare('SELECT note_id, created, theme FROM shared_notes WHERE token = ?');
+    $stmt = $con->prepare('SELECT note_id, created, theme, indexable FROM shared_notes WHERE token = ?');
     $stmt->execute([$token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
@@ -67,6 +67,7 @@ try {
     }
 
     $note_id = $row['note_id'];
+    $indexable = isset($row['indexable']) ? (int)$row['indexable'] : 0;
 
     $stmt = $con->prepare('SELECT heading, entry, created, updated, type FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
