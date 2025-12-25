@@ -114,21 +114,48 @@
 }
 
 /* Dark mode support */
+html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
     background: var(--bg-color-dark, #2d3748);
     color: var(--text-color-dark, #e2e8f0);
 }
 
+html[data-theme='dark'] .alert-modal-header,
 .dark-mode .alert-modal-header {
     border-color: var(--border-color-dark, #4a5568);
 }
 
+html[data-theme='dark'] .alert-modal-title,
 .dark-mode .alert-modal-title {
     color: var(--text-color-dark, #e2e8f0);
 }
 
+html[data-theme='dark'] .alert-modal-body,
 .dark-mode .alert-modal-body {
     color: var(--text-color-dark, #cbd5e0);
+}
+
+html[data-theme='dark'] .alert-modal-button,
+.dark-mode .alert-modal-button {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .alert-modal-button:hover,
+.dark-mode .alert-modal-button:hover {
+    background-color: #333;
+}
+
+html[data-theme='dark'] .alert-modal-button.primary,
+.dark-mode .alert-modal-button.primary {
+    background-color: #1e3a5f;
+    color: white;
+}
+
+html[data-theme='dark'] .alert-modal-button.primary:hover,
+.dark-mode .alert-modal-button.primary:hover {
+    background-color: #2a4a7f;
 }
 
 /* Responsive */
@@ -177,6 +204,7 @@
 }
 
 /* Dark mode spinner */
+html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
     border-color: var(--border-color-dark, #4a5568);
     border-top-color: var(--primary-color, #007bff);
