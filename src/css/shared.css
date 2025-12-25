@@ -406,7 +406,6 @@ body.shared-page {
 }
 
 /* Font Awesome icon definitions */
-.fa-share-nodes::before { content: "\f1e0"; }
 .fa-spinner::before { content: "\f110"; }
 .fa-exclamation-triangle::before { content: "\f071"; }
 .fa-copy::before { content: "\f0c5"; }
@@ -416,8 +415,8 @@ body.shared-page {
 .fa-times::before { content: "\f00d"; }
 .fa-lock::before { content: "\f023"; }
 .fa-lock-open::before { content: "\f3c1"; }
+.fa-cloud::before { content: "\f0c2"; }
 
-.fa-share-nodes,
 .fa-spinner,
 .fa-exclamation-triangle,
 .fa-copy,
@@ -426,6 +425,7 @@ body.shared-page {
 .fa-check,
 .fa-times,
 .fa-lock,
+.fa-cloud,
 .fa-lock-open {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;

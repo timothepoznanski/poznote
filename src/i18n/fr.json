@@ -244,7 +244,6 @@
       "backup_export": "Sauvegarde / Export",
       "restore_import": "Restauration / Import",
       "check_updates": "Vérifier les mises à jour",
-      "tips": "Astuces",
       "api_docs": "API REST",
       "documentation": "Documentation",
       "news": "Actualités Poznote",
@@ -509,7 +508,8 @@
       "insert_table": "Insérer un tableau",
       "insert_checklist": "Insérer une checklist",
       "add_separator": "Ajouter un séparateur",
-      "insert_note_reference": "Insérer une référence de note"
+      "insert_note_reference": "Insérer une référence de note",
+      "open_in_new_tab": "Ouvrir dans un nouvel onglet"
     },
     "link": {
       "add_title": "Ajouter un lien",
@@ -698,7 +698,7 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "shared": "Partagées"
+      "shared": "Publiques"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -811,7 +811,7 @@
     "toolbar": {
       "favorite_add": "Ajouter aux favoris",
       "favorite_remove": "Retirer des favoris",
-      "share_note": "Partager la note",
+      "share_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
       "convert_to_html": "Convertir en HTML"
@@ -1224,9 +1224,9 @@
   },
   "shared": {
     "page": {
-      "title": "Notes partagées",
-      "no_shared_notes": "Aucune note partagée pour le moment.",
-      "share_hint": "Partagez une note en cliquant sur le bouton de partage dans la barre d'outils."
+      "title": "Notes publiques",
+      "no_shared_notes": "Aucune note publique pour le moment.",
+      "share_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
     },
     "table": {
       "note": "Note",

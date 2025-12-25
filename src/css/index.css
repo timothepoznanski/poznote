@@ -471,19 +471,16 @@ body {
 .sidebar-title-actions { display: flex; align-items: center; gap: 6px; position: relative; }
 .sidebar-gear { display: none; }
 .sidebar-display { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
-.sidebar-tips { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 .sidebar-settings { background: transparent; border: none; color: #007DB8; font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; position: relative; }
 .sidebar-plus { background: transparent; border: none; color: #6c757d !important; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 6px; }
 
 /* Hover and focus states for sidebar buttons */
 .sidebar-display:hover,
 .sidebar-settings:hover,
-.sidebar-tips:hover,
 .sidebar-plus:hover { background: rgba(0, 125, 184, 0.1); }
 
 .sidebar-display:focus,
 .sidebar-settings:focus,
-.sidebar-tips:focus,
 .sidebar-plus:focus { outline: 2px solid #007DB8; outline-offset: 2px; }
 
 /* Réduire la taille des icônes Font Awesome dans la sidebar */
@@ -491,8 +488,6 @@ body {
 .sidebar-title-actions [class*="fa-"],
 .sidebar-display i,
 .sidebar-display [class*="fa-"],
-.sidebar-tips i,
-.sidebar-tips [class*="fa-"],
 .sidebar-settings i,
 .sidebar-settings [class*="fa-"] {
     font-size: 0.7em !important;
@@ -2578,7 +2573,7 @@ hr {
 /* Réduire les icônes dans les dossiers (Trash, Tags, Shared, Favorites) */
 .fa-trash.folder-icon,
 .fa-tags.folder-icon,
-.fa-share-nodes.folder-icon,
+.fa-cloud.folder-icon,
 .fa-star-light.folder-icon {
     font-size: 0.8em !important;
 }
@@ -2965,8 +2960,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 /* Blue color when a note is shared publicly */
-.toolbar-btn.btn-share.is-shared i.fa-share-nodes,
-.toolbar-btn.btn-share.is-shared .fa-share-nodes {
+.toolbar-btn.btn-share.is-shared i.fa-cloud,
+.toolbar-btn.btn-share.is-shared .fa-cloud {
   color: #007DB8 !important;
 }
 
@@ -3000,7 +2995,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Font Awesome icon customizations */
 .fa-caret-down::before { content: "\f0d7"; }
-.fa-share-nodes::before { content: "\f1e0"; }
 .fa-smile::before { content: "\f118"; }
 .fa-ellipsis::before { content: "\f141"; }
 .fa-folder::before { content: "\f07b"; }
@@ -3015,6 +3009,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link::before { content: "\f0c1"; }
 .fa-unlink::before { content: "\f127"; }
 .fa-paperclip::before { content: "\f0c6"; }
+.fa-cloud::before { content: "\f0c2"; }
+.fa-external-link::before { content: "\f08e"; }
 .fa-minus::before { content: "\f068"; }
 .fa-info-circle::before { content: "\f05a"; }
 .fa-question-circle::before { content: "\f059"; }
@@ -3087,18 +3083,19 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-arrow-up::before { content: "\f062"; }
 .fa-arrow-down::before { content: "\f063"; }
 
+
 .fa-question-circle,
 .fa-times-circle,
 .fa-question-circle,
 .fa-times-circle,
 .fa-eye,
 .fa-clock,
+.fa-cloud,
 .fa-caret-down,
 .fa-ellipsis,
 .fa-mobile,
 .fa-border-outer,
 .fa-paint-brush,
-.fa-share-nodes,
 .fa-smile,
 .fa-folder,
 .fa-folder-open,
@@ -3112,6 +3109,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link,
 .fa-unlink,
 .fa-paperclip,
+.fa-external-link,
 .fa-minus,
 .fa-info-circle,
 .fa-search,
@@ -3141,6 +3139,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-tags,
 .fa-sign-out-alt,
 .fa-sync-alt,
+.fa-globe,
 .fa-upload,
 .fa-arrow-left,
 .fa-arrow-up,
@@ -3624,7 +3623,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 /* Exception: Remove filter for favorite/share/attachment (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
-.toolbar-btn.is-shared .fa-share-nodes,
+.toolbar-btn.is-shared .fa-cloud,
 .toolbar-btn.has-attachments .fa-paperclip {
   filter: none !important;
 }

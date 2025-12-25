@@ -472,6 +472,22 @@ function updateTitleInElement(linkElement, newTitle) {
     }
 }
 
+// Open note in new tab
+function openNoteInNewTab(noteId) {
+    if (!noteId) {
+        console.error('No note ID provided');
+        return;
+    }
+    
+    // Build URL with note ID and current workspace
+    var workspace = selectedWorkspace || 'Poznote';
+    var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(noteId);
+    
+    // Open in new tab
+    window.open(url, '_blank');
+}
+
 // Expose functions globally
 window.saveNoteToServer = saveNoteToServer;
 window.deleteNote = deleteNote;
+window.openNoteInNewTab = openNoteInNewTab;

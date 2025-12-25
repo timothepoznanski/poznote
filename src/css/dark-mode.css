@@ -1872,18 +1872,6 @@ body.dark-mode .sidebar-plus {
     filter: brightness(0) saturate(0%) invert(80%) !important;
 }
 
-/* Tips button keeps its orange color in dark mode */
-html[data-theme='dark'] .sidebar-tips,
-body.dark-mode .sidebar-tips {
-    color: #f39c12 !important;
-}
-
-
-html[data-theme='dark'] .sidebar-tips:hover,
-body.dark-mode .sidebar-tips:hover {
-    background: rgba(0, 125, 184, 0.2) !important;
-}
-
 /* Sidebar plus button styles */
 
 /* Keep some specific icons with their original colors when active/selected */
@@ -1893,10 +1881,10 @@ body.dark-mode .toolbar-btn.save-modified .fa-save {
 }
 
 html[data-theme='dark'] .toolbar-btn.is-favorite .fa-star-light,
-html[data-theme='dark'] .toolbar-btn.is-shared .fa-share-nodes,
+html[data-theme='dark'] .toolbar-btn.is-shared .fa-cloud,
 html[data-theme='dark'] .toolbar-btn.has-attachments .fa-paperclip,
 body.dark-mode .toolbar-btn.is-favorite .fa-star-light,
-body.dark-mode .toolbar-btn.is-shared .fa-share-nodes,
+body.dark-mode .toolbar-btn.is-shared .fa-cloud,
 body.dark-mode .toolbar-btn.has-attachments .fa-paperclip {
     filter: none !important;
     filter: none !important;

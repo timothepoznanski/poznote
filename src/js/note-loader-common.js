@@ -965,21 +965,25 @@ function handleImageClick(event) {
     const menuRect = menu.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const padding = 8;
 
     // If menu goes off the right edge, move it left
-    if (menuRect.right > viewportWidth) {
+    if (menuRect.right > viewportWidth - padding) {
         menu.style.left = (clickX - (menuRect.width / 2)) + 'px';
         menu.style.transform = 'translate(0, -120%)';
     }
 
     // If menu goes off the left edge, move it right
-    if (menuRect.left < 0) {
-        menu.style.left = clickX + 'px';
+    // Recalculate after potential right edge adjustment
+    const updatedMenuRect = menu.getBoundingClientRect();
+    if (updatedMenuRect.left < padding) {
+        // Position menu with padding from left edge
+        menu.style.left = (padding + menuRect.width / 2) + 'px';
         menu.style.transform = 'translate(-50%, -120%)';
     }
 
     // If menu goes off the top edge, move it below the cursor
-    if (menuRect.top < 0) {
+    if (menuRect.top < padding) {
         menu.style.top = clickY + 'px';
         menu.style.transform = 'translate(-50%, 20%)';
     }

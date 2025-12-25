@@ -168,6 +168,11 @@ body::-webkit-scrollbar {
     display: none !important;
 }
 
+/* Hide open in new tab button on mobile (it's in the overflow menu) */
+.btn-open-new-tab {
+    display: none !important;
+}
+
 /* Mobile note toolbar: keep only primary icons + overflow menu */
 .note-edit-toolbar .toolbar-btn {
     display: none !important;
