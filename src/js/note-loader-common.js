@@ -1521,7 +1521,6 @@ function showImageLinkModal(defaultUrl, callback, mode) {
                         <h3 id="imageLinkModalTitle">${t('image_menu.link_modal.title_add', null, 'Add Link to Image')}</h3>
                     </div>
                     <div class="modal-body">
-                        <label for="imageLinkModalInput" style="display:block; margin-bottom:8px; font-weight:600;">${t('image_menu.link_modal.url_label', null, 'Enter the URL:')}</label>
                         <input type="text" id="imageLinkModalInput" placeholder="${t('image_menu.link_modal.url_placeholder', null, 'https://www.example.com')}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                     </div>
                     <div class="modal-buttons">
