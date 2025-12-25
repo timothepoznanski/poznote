@@ -851,7 +851,18 @@
     "remove_border": "Remover Borda",
     "add_border_no_padding": "Adicionar Borda sem preenchimento",
     "remove_border_no_padding": "Remover Borda sem preenchimento",
-    "delete_image": "Excluir Imagem"
+    "delete_image": "Excluir Imagem",
+    "add_link": "Adicionar Link",
+    "edit_link": "Editar Link",
+    "remove_link": "Remover Link",
+    "link_modal": {
+      "title_add": "Adicionar Link à Imagem",
+      "title_edit": "Editar Link da Imagem",
+      "url_label": "Digite a URL:",
+      "url_placeholder": "https://www.exemplo.com",
+      "cancel": "Cancelar",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {

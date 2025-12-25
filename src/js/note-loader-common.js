@@ -634,6 +634,33 @@ function reinitializeImageClickHandlers() {
     // Ensure all images are clickable
     allImages.forEach((img) => {
         img.style.cursor = 'pointer';
+        
+        // Add hover tooltip for images with links (not on public pages)
+        if (!window.isPublicNotePage) {
+            const parentLink = img.closest('a[data-image-link]');
+            if (parentLink && parentLink.href) {
+                let currentToast;
+                
+                img.addEventListener('mouseenter', function(e) {
+                    // Show immediately at mouse position
+                    currentToast = showImageLinkToast(parentLink.href, e.clientX, e.clientY);
+                });
+                
+                img.addEventListener('mousemove', function(e) {
+                    // Update toast position as mouse moves
+                    if (currentToast) {
+                        updateImageLinkToastPosition(currentToast, e.clientX, e.clientY);
+                    }
+                });
+                
+                img.addEventListener('mouseleave', function() {
+                    if (currentToast) {
+                        hideImageLinkToast(currentToast);
+                        currentToast = null;
+                    }
+                });
+            }
+        }
     });
 }
 
@@ -648,6 +675,12 @@ function handleImageClick(event) {
         return;
     }
 
+    // On public pages, if image is in a link, let the link work
+    if (window.isPublicNotePage && img.closest('a')) {
+        return;
+    }
+
+    // Always show the custom menu on left-click, even if image is in a link
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
@@ -723,6 +756,26 @@ function handleImageClick(event) {
                 ${t('image_menu.edit', null, 'Edit')}
             </div>
         ` + menuHTML;
+    }
+    
+    // Add link option for all images
+    const existingLink = img.closest('a');
+    
+    menuHTML += `
+        <div class="image-menu-item" data-action="add-link">
+            <i class="fas fa-link"></i>
+            ${existingLink ? t('image_menu.edit_link', null, 'Modifier le lien') : t('image_menu.add_link', null, 'Ajouter un lien')}
+        </div>
+    `;
+    
+    // If the image already has a link, add option to remove it
+    if (existingLink) {
+        menuHTML += `
+            <div class="image-menu-item" data-action="remove-link">
+                <i class="fas fa-unlink"></i>
+                ${t('image_menu.remove_link', null, 'Retirer le lien')}
+            </div>
+        `;
     }
     
     // Add border toggle and delete options only for non-markdown notes
@@ -840,6 +893,18 @@ function handleImageClick(event) {
             }
         } else if (action === 'delete-image') {
             deleteImage(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'add-link') {
+            addOrEditImageLink(img);
+            // Remove menu safely
+            if (document.body.contains(menu)) {
+                document.body.removeChild(menu);
+            }
+        } else if (action === 'remove-link') {
+            removeImageLink(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
                 document.body.removeChild(menu);
@@ -1214,6 +1279,189 @@ function toggleImageBorderNoPadding(img) {
 }
 
 /**
+ * Add or edit a link on an image
+ */
+function addOrEditImageLink(img) {
+    if (!img) return;
+    
+    try {
+        // Check if the image is already wrapped in a link
+        const existingLink = img.closest('a');
+        const currentUrl = existingLink ? existingLink.href : '';
+        
+        // Show modal instead of prompt
+        showImageLinkModal(currentUrl, function(url) {
+            // If user cancelled or provided empty string
+            if (url === null || url === undefined) return;
+            
+            // If empty string, remove link if it exists
+            if (url.trim() === '') {
+                if (existingLink) {
+                    removeImageLink(img);
+                }
+                return;
+            }
+            
+            // Validate and sanitize URL
+            let finalUrl = url.trim();
+            if (!finalUrl.match(/^https?:\/\//i)) {
+                // Add https:// if no protocol specified
+                finalUrl = 'https://' + finalUrl;
+            }
+            
+            if (existingLink) {
+                // Update existing link
+                existingLink.href = finalUrl;
+                existingLink.setAttribute('target', '_blank');
+                existingLink.setAttribute('rel', 'noopener noreferrer');
+            } else {
+                // Create new link wrapper
+                const link = document.createElement('a');
+                link.href = finalUrl;
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener noreferrer');
+                link.setAttribute('data-image-link', 'true'); // Mark this as an image link
+                
+                // Wrap the image in the link
+                img.parentNode.insertBefore(link, img);
+                link.appendChild(img);
+            }
+            
+            // Mark note as modified and save
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+            
+            setTimeout(function() {
+                if (typeof window.saveNoteImmediately === 'function') {
+                    window.saveNoteImmediately();
+                }
+            }, 100);
+        }, existingLink ? 'edit' : 'add');
+        
+    } catch (error) {
+        console.warn('Error adding/editing image link:', error);
+    }
+}
+
+/**
+ * Show modal for adding/editing image link
+ */
+function showImageLinkModal(defaultUrl, callback, mode) {
+    const t = window.t || ((key, params, fallback) => fallback);
+    const isEdit = mode === 'edit';
+    
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('imageLinkModal');
+    if (!modal) {
+        const modalHtml = `
+            <div id="imageLinkModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="imageLinkModalTitle">${t('image_menu.link_modal.title_add', null, 'Add Link to Image')}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label for="imageLinkModalInput" style="display:block; margin-bottom:8px; font-weight:600;">${t('image_menu.link_modal.url_label', null, 'Enter the URL:')}</label>
+                        <input type="text" id="imageLinkModalInput" placeholder="${t('image_menu.link_modal.url_placeholder', null, 'https://www.example.com')}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel" onclick="closeImageLinkModal()">${t('image_menu.link_modal.cancel', null, 'Cancel')}</button>
+                        <button type="button" id="imageLinkModalConfirmBtn" class="btn-primary">${t('image_menu.link_modal.ok', null, 'OK')}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('imageLinkModal');
+        
+        // Add event listeners
+        const input = document.getElementById('imageLinkModalInput');
+        const confirmBtn = document.getElementById('imageLinkModalConfirmBtn');
+        
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmImageLinkModal();
+            }
+        });
+        
+        confirmBtn.addEventListener('click', confirmImageLinkModal);
+    }
+    
+    // Update modal content
+    const titleEl = document.getElementById('imageLinkModalTitle');
+    const inputEl = document.getElementById('imageLinkModalInput');
+    
+    titleEl.textContent = isEdit 
+        ? t('image_menu.link_modal.title_edit', null, 'Edit Image Link')
+        : t('image_menu.link_modal.title_add', null, 'Add Link to Image');
+    
+    inputEl.value = defaultUrl || '';
+    
+    // Store callback
+    window.imageLinkModalCallback = callback;
+    
+    // Show modal
+    modal.style.display = 'flex';
+    
+    // Focus input
+    setTimeout(() => inputEl.focus(), 100);
+}
+
+/**
+ * Close image link modal
+ */
+function closeImageLinkModal() {
+    const modal = document.getElementById('imageLinkModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    window.imageLinkModalCallback = null;
+}
+
+/**
+ * Confirm image link modal
+ */
+function confirmImageLinkModal() {
+    const inputValue = document.getElementById('imageLinkModalInput').value;
+    const callback = window.imageLinkModalCallback;
+    
+    closeImageLinkModal();
+    
+    if (callback) {
+        callback(inputValue);
+    }
+}
+
+/**
+ * Remove link from an image
+ */
+function removeImageLink(img) {
+    if (!img) return;
+    
+    try {
+        const link = img.closest('a');
+        if (link) {
+            // Replace the link with just the image
+            link.parentNode.insertBefore(img, link);
+            link.remove();
+            
+            // Mark note as modified and save
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+            
+            setTimeout(function() {
+                if (typeof window.saveNoteImmediately === 'function') {
+                    window.saveNoteImmediately();
+                }
+            }, 100);
+        }
+    } catch (error) {
+        console.warn('Error removing image link:', error);
+    }
+}
+
+/**
  * Enable resize mode for an image with a handle in the bottom-right corner
  */
 function enableImageResize(img) {
@@ -1323,6 +1571,67 @@ function enableImageResize(img) {
             }
         });
     }, 10);
+}
+
+/**
+ * Show toast with image link URL
+ */
+function showImageLinkToast(url, mouseX, mouseY) {
+    // Remove any existing toast first to avoid duplication
+    const existingToast = document.querySelector('.image-link-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast
+    const toast = document.createElement('div');
+    toast.className = 'image-link-toast';
+    toast.style.position = 'fixed';
+    toast.style.background = '#2d3748';
+    toast.style.color = '#e2e8f0';
+    toast.style.padding = '8px 12px';
+    toast.style.borderRadius = '6px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    toast.style.fontSize = '12px';
+    toast.style.maxWidth = '400px';
+    toast.style.wordBreak = 'break-all';
+    toast.style.border = '1px solid rgba(255,255,255,0.1)';
+    toast.style.zIndex = '10000';
+    toast.style.pointerEvents = 'none';
+    toast.style.whiteSpace = 'nowrap';
+    toast.style.overflow = 'hidden';
+    toast.style.textOverflow = 'ellipsis';
+    
+    // Position near mouse cursor (offset slightly to not block the image)
+    toast.style.left = (mouseX + 15) + 'px';
+    toast.style.top = (mouseY + 15) + 'px';
+    
+    // Add icon and URL
+    toast.innerHTML = `<i class="fas fa-link" style="margin-right: 6px;"></i><span>${url}</span>`;
+    
+    document.body.appendChild(toast);
+    
+    return toast;
+}
+
+/**
+ * Update toast position
+ */
+function updateImageLinkToastPosition(toast, mouseX, mouseY) {
+    if (!toast) return;
+    toast.style.left = (mouseX + 15) + 'px';
+    toast.style.top = (mouseY + 15) + 'px';
+}
+
+/**
+ * Hide image link toast
+ */
+function hideImageLinkToast(toast) {
+    if (!toast) return;
+    
+    if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+    }
 }
 
 // Initialize image click handlers when this script loads

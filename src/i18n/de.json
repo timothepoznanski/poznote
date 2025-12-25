@@ -850,7 +850,18 @@
     "remove_border": "Rand entfernen",
     "add_border_no_padding": "Rand ohne Innenabstand hinzufügen",
     "remove_border_no_padding": "Rand ohne Innenabstand entfernen",
-    "delete_image": "Bild löschen"
+    "delete_image": "Bild löschen",
+    "add_link": "Link hinzufügen",
+    "edit_link": "Link bearbeiten",
+    "remove_link": "Link entfernen",
+    "link_modal": {
+      "title_add": "Link zum Bild hinzufügen",
+      "title_edit": "Bildlink bearbeiten",
+      "url_label": "URL eingeben:",
+      "url_placeholder": "https://www.beispiel.de",
+      "cancel": "Abbrechen",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {

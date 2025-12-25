@@ -855,7 +855,18 @@
     "remove_border": "Remove Border",
     "add_border_no_padding": "Add Border without padding",
     "remove_border_no_padding": "Remove Border without padding",
-    "delete_image": "Delete Image"
+    "delete_image": "Delete Image",
+    "add_link": "Add Link",
+    "edit_link": "Edit Link",
+    "remove_link": "Remove Link",
+    "link_modal": {
+      "title_add": "Add Link to Image",
+      "title_edit": "Edit Image Link",
+      "url_label": "Enter the URL:",
+      "url_placeholder": "https://www.example.com",
+      "cancel": "Cancel",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {

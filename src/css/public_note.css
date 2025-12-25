@@ -297,6 +297,12 @@ pre:hover .code-block-copy-btn {
     text-decoration: underline;
 }
 
+/* Remove underline for image links */
+.public-note .content a[data-image-link],
+.public-note .content a[data-image-link]:hover {
+    text-decoration: none;
+}
+
 /* Headings in content */
 .public-note .content h1 {
     font-size: 2em;

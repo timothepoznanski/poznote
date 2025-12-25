@@ -852,7 +852,18 @@
     "remove_border": "Supprimer la bordure",
     "add_border_no_padding": "Ajouter une bordure sans marge",
     "remove_border_no_padding": "Supprimer la bordure sans marge",
-    "delete_image": "Supprimer l'image"
+    "delete_image": "Supprimer l'image",
+    "add_link": "Ajouter un lien",
+    "edit_link": "Modifier le lien",
+    "remove_link": "Retirer le lien",
+    "link_modal": {
+      "title_add": "Ajouter un lien à l'image",
+      "title_edit": "Modifier le lien de l'image",
+      "url_label": "Entrez l'URL du lien :",
+      "url_placeholder": "https://www.exemple.com",
+      "cancel": "Annuler",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {

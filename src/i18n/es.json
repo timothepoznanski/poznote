@@ -850,7 +850,18 @@
     "remove_border": "Eliminar borde",
     "add_border_no_padding": "Agregar borde sin relleno",
     "remove_border_no_padding": "Eliminar borde sin relleno",
-    "delete_image": "Eliminar imagen"
+    "delete_image": "Eliminar imagen",
+    "add_link": "Añadir enlace",
+    "edit_link": "Editar enlace",
+    "remove_link": "Eliminar enlace",
+    "link_modal": {
+      "title_add": "Añadir enlace a la imagen",
+      "title_edit": "Editar enlace de la imagen",
+      "url_label": "Introduce la URL:",
+      "url_placeholder": "https://www.ejemplo.com",
+      "cancel": "Cancelar",
+      "ok": "OK"
+    }
   },
   "backup_export": {
     "page": {

@@ -312,6 +312,9 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
 </body>
 <script src="js/copy-code-on-focus.js"></script>
 <script>
+    // Mark this as a public note page for JS behavior
+    window.isPublicNotePage = true;
+    
     // Theme toggle functionality
     (function() {
         var themeToggle = document.getElementById('themeToggle');
