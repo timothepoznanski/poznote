@@ -860,6 +860,7 @@
     "link_modal": {
       "title_add": "Link zum Bild hinzufügen",
       "title_edit": "Bildlink bearbeiten",
+      "description": "Dieser Link macht das Bild anklickbar, wenn die Notiz als öffentlich festgelegt wird.",
       "url_label": "URL eingeben:",
       "url_placeholder": "https://www.beispiel.de",
       "cancel": "Abbrechen",
