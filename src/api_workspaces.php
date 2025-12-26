@@ -22,9 +22,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 try {
     if ($action === 'list') {
-        $stmt = $con->query("SELECT name, created FROM workspaces ORDER BY name");
+        $stmt = $con->query("SELECT name, display_name, created FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'workspaces' => $rows]);
+        exit;
+    } else if ($action === 'update_display_name') {
+        // Update display name for a workspace (especially for Poznote which cannot be renamed)
+        if (!isset($input)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'JSON body required for this action']);
+            exit;
+        }
+        $name = trim($input['name'] ?? '');
+        $displayName = trim($input['display_name'] ?? '');
+        if ($name === '') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'name is required']);
+            exit;
+        }
+        // Ensure workspace exists
+        $check = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+        $check->execute([$name]);
+        if ((int)$check->fetchColumn() === 0) {
+            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
+            exit;
+        }
+        // Update display_name (empty string means use the name as display)
+        $stmt = $con->prepare("UPDATE workspaces SET display_name = ? WHERE name = ?");
+        if ($stmt->execute([$displayName === '' ? null : $displayName, $name])) {
+            echo json_encode(['success' => true, 'name' => $name, 'display_name' => $displayName]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error updating display name']);
+        }
         exit;
     } else if ($action === 'create') {
         if (!isset($input)) {

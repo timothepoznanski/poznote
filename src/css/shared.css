@@ -103,10 +103,6 @@ body.shared-page {
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
-.shared-note-item:last-child {
-    border-bottom: none;
-}
-
 .note-name {
     flex: 0 0 auto;
     min-width: 200px;
@@ -317,7 +313,7 @@ body.shared-page {
         min-height: 100vh !important;
         position: static !important;
         padding: 10px;
-        background: #f5f5f5 !important;
+        /* background: #f5f5f5 !important; */
         scrollbar-width: auto !important;
         -ms-overflow-style: scrollbar !important;
     }

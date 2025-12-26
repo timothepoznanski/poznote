@@ -163,17 +163,18 @@ body {
     align-items: flex-start;
     justify-content: center;
     padding: 40px 16px 16px 16px;
+    box-sizing: border-box;
 }
 
 .import-confirm-modal-content {
     background-color: #fefefe;
     /* remove large top margin so the flex centering can work properly */
-    margin: 0 auto;
+    margin: 0;
     padding: 20px;
     border: none;
     border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 400px;
     max-height: 90vh;
     overflow: auto;
     font-family: 'Inter', sans-serif;

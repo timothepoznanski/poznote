@@ -312,9 +312,9 @@
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
       "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
-      "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
+      "cannot_delete_default": "Hauptarbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
-      "cannot_rename_default": "Startup-Arbeitsbereich kann nicht umbenannt werden",
+      "cannot_rename_default": "Hauptarbeitsbereich kann nicht umbenannt werden",
       "invalid_new_name": "Ungültiger neuer Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_and_target_required": "Arbeitsbereichsname und Ziel erforderlich",
       "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
@@ -327,8 +327,9 @@
     },
     "confirm_delete": {
       "title": "Arbeitsbereich löschen bestätigen",
-      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Startup-Arbeitsbereich verschoben."
-    }
+      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Hauptarbeitsbereich verschoben."
+    },
+    "default_workspace_locked": "Hauptarbeitsbereich (kann nicht gelöscht werden)"
   },
   "display": {
     "title": "Anzeige",
@@ -698,7 +699,7 @@
       "trash": "Papierkorb",
       "tags": "Tags",
       "favorites": "Favoriten",
-      "shared": "Öffentliche"
+      "public": "Öffentliche"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -806,12 +807,12 @@
     "toolbar": {
       "favorite_add": "Zu Favoriten hinzufügen",
       "favorite_remove": "Aus Favoriten entfernen",
-      "share_note": "Notiz öffentlich machen",
+      "public_note": "Notiz öffentlich machen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
       "convert_to_html": "In HTML konvertieren"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "Öffentliche URL",
       "close": "Schließen",
       "open": "Öffnen",
@@ -860,6 +861,7 @@
     "link_modal": {
       "title_add": "Link zum Bild hinzufügen",
       "title_edit": "Bildlink bearbeiten",
+      "description": "Dieser Link macht das Bild anklickbar, wenn die Notiz als öffentlich festgelegt wird.",
       "url_label": "URL eingeben:",
       "url_placeholder": "https://www.beispiel.de",
       "cancel": "Abbrechen",
@@ -1218,27 +1220,27 @@
         "edge_yes": "Ja",
         "edge_no": "Nein"
       }
-    },
-    "shared": {
-      "page": {
-        "title": "Öffentliche Notizen",
-        "no_shared_notes": "Noch keine öffentlichen Notizen.",
-        "share_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
-      },
-      "table": {
-        "note": "Notiz",
-        "url": "Öffentliche URL"
-      },
-      "actions": {
-        "open": "Öffnen",
-        "revoke": "Widerrufen"
-      },
-      "indexable": "Indexierbar",
-      "password_protected": "Passwortgeschützt",
-      "add_password_title": "Passwortschutz hinzufügen",
-      "change_password_title": "Passwort ändern",
-      "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
-      "enter_new_password": "Neues Passwort eingeben"
     }
+  },
+  "public": {
+    "page": {
+      "title": "Öffentliche Notizen",
+      "no_public_notes": "Noch keine öffentlichen Notizen.",
+      "public_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
+    },
+    "table": {
+      "note": "Notiz",
+      "url": "Öffentliche URL"
+    },
+    "actions": {
+      "open": "Öffnen",
+      "revoke": "Widerrufen"
+    },
+    "indexable": "Indexierbar",
+    "password_protected": "Passwortgeschützt",
+    "add_password_title": "Passwortschutz hinzufügen",
+    "change_password_title": "Passwort ändern",
+    "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
+    "enter_new_password": "Neues Passwort eingeben"
   }
 }

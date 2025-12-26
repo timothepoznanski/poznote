@@ -140,7 +140,8 @@ body {
     border-color: #adb5bd;
 }
 
-.btn-rename {
+.btn-rename,
+.btn-rename-display {
     background-color: #ffc107;
     color: white;
     border-color: #ffc107;
@@ -149,7 +150,8 @@ body {
     justify-content: center;
 }
 
-.btn-rename:hover {
+.btn-rename:hover,
+.btn-rename-display:hover {
     background-color: #e0a800;
     border-color: #d39e00;
 }
@@ -163,6 +165,19 @@ body {
 .btn-delete-ws:hover {
     background-color: #c82333;
     border-color: #bd2130;
+}
+
+.btn-delete-disabled {
+    background-color: #6c757d;
+    color: rgba(255, 255, 255, 0.5);
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.btn-delete-disabled:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
 }
 
 
@@ -423,6 +438,20 @@ body {
         width: 100% !important;
         padding: 14px !important;
         font-size: 16px !important;
+    }
+
+    /* Default workspace selector: stack + add spacing above Save button */
+    #defaultWorkspaceSelect {
+        width: 100% !important;
+        margin-right: 0 !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
+    #saveDefaultWorkspaceBtn {
+        width: 100% !important;
+        display: block !important;
+        margin-top: 10px !important;
     }
     
     /* Back button mobile styling */

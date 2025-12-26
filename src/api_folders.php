@@ -93,7 +93,7 @@ switch($action) {
         }
         
         // Prevent creating folders with reserved system names
-        $reserved_names = ['Favorites', 'Tags', 'Trash', 'Shared'];
+        $reserved_names = ['Favorites', 'Tags', 'Trash', 'Public'];
         if (in_array($folderName, $reserved_names)) {
             echo json_encode(['success' => false, 'error' => 'Cannot create folder with reserved name: ' . $folderName]);
             exit;
@@ -158,13 +158,13 @@ switch($action) {
         }
         
         // Do not allow renaming special system folders
-        if (in_array($oldName, ['Favorites', 'Tags', 'Trash', 'Shared'])) {
+        if (in_array($oldName, ['Favorites', 'Tags', 'Trash', 'Public'])) {
             echo json_encode(['success' => false, 'error' => 'Renaming system folders is not allowed']);
             exit;
         }
         
         // Don't allow renaming TO reserved system folder names
-        if (in_array($newName, ['Favorites', 'Tags', 'Trash', 'Shared'])) {
+        if (in_array($newName, ['Favorites', 'Tags', 'Trash', 'Public'])) {
             echo json_encode(['success' => false, 'error' => 'Cannot rename to reserved system folder name']);
             exit;
         }

@@ -777,45 +777,51 @@ function handleImageClick(event) {
         ` + menuHTML;
     }
     
-    // Add link option for all images - create submenu
+    // Add link option for all images
     const existingLink = img.closest('a');
     
-    // Build link submenu items
-    let linkSubmenuHTML = '';
-    
-    // If link exists, add "Open link" option first
-    if (existingLink) {
+    // If no existing link, show direct "Add Link" button
+    if (!existingLink) {
+        menuHTML += `
+            <div class="image-menu-item" data-action="add-link">
+                <i class="fas fa-link"></i>
+                ${t('image_menu.add_link', null, 'Ajouter un lien')}
+            </div>
+        `;
+    } else {
+        // If link exists, create submenu with multiple options
+        let linkSubmenuHTML = '';
+        
+        // Add "Open link" option first
         linkSubmenuHTML += `
             <div class="image-menu-item image-submenu-item" data-action="open-link" data-url="${existingLink.href}">
                 ${t('image_menu.open_link', null, 'Open Link')}
             </div>
         `;
-    }
-    
-    // Add/Edit link option
-    linkSubmenuHTML += `
-        <div class="image-menu-item image-submenu-item" data-action="add-link">
-            ${existingLink ? t('image_menu.edit_link', null, 'Modifier le lien') : t('image_menu.add_link', null, 'Ajouter un lien')}
-        </div>
-    `;
-    
-    // If the image already has a link, add option to remove it
-    if (existingLink) {
+        
+        // Add edit link option
+        linkSubmenuHTML += `
+            <div class="image-menu-item image-submenu-item" data-action="add-link">
+                ${t('image_menu.edit_link', null, 'Modifier le lien')}
+            </div>
+        `;
+        
+        // Add remove link option
         linkSubmenuHTML += `
             <div class="image-menu-item image-submenu-item" data-action="remove-link">
                 ${t('image_menu.remove_link', null, 'Retirer le lien')}
             </div>
         `;
+        
+        // Add link submenu parent
+        menuHTML += `
+            <div class="image-menu-item image-menu-parent" data-action="link-submenu" data-submenu-html="${encodeURIComponent(linkSubmenuHTML)}">
+                <i class="fas fa-link"></i>
+                ${t('image_menu.links', null, 'Liens')}
+                <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 10px;"></i>
+            </div>
+        `;
     }
-    
-    // Add link submenu parent
-    menuHTML += `
-        <div class="image-menu-item image-menu-parent" data-action="link-submenu">
-            <i class="fas fa-link"></i>
-            ${t('image_menu.links', null, 'Liens')}
-            <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 10px;"></i>
-        </div>
-    `;
     
     // Add border toggle and delete options only for non-markdown notes
     if (!isMarkdownNote) {
@@ -855,9 +861,12 @@ function handleImageClick(event) {
 
     document.body.appendChild(menu);
 
-    // Create and handle submenu for link menu
+    // Create and handle submenu for link menu (only if link exists)
     const linkParent = menu.querySelector('.image-menu-parent[data-action="link-submenu"]');
     if (linkParent) {
+        // Get submenu HTML from data attribute
+        const linkSubmenuHTML = decodeURIComponent(linkParent.getAttribute('data-submenu-html'));
+        
         // Create submenu element
         const submenu = document.createElement('div');
         submenu.className = 'image-submenu';
@@ -1525,6 +1534,9 @@ function showImageLinkModal(defaultUrl, callback, mode) {
                         <h3 id="imageLinkModalTitle">${t('image_menu.link_modal.title_add', null, 'Add Link to Image')}</h3>
                     </div>
                     <div class="modal-body">
+                        <p style="margin: 0 0 12px 0; color: #666; font-size: 13px; line-height: 1.5;">
+                            ${t('image_menu.link_modal.description', null, 'Ce lien rendra l\'image clickable lorsque la note sera définie comme publique.')}
+                        </p>
                         <input type="text" id="imageLinkModalInput" placeholder="${t('image_menu.link_modal.url_placeholder', null, 'https://www.example.com')}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                     </div>
                     <div class="modal-buttons">
@@ -1774,8 +1786,8 @@ function showImageLinkToast(url, mouseX, mouseY) {
     toast.style.left = (mouseX + 15) + 'px';
     toast.style.top = (mouseY + 15) + 'px';
     
-    // Add icon and URL
-    toast.innerHTML = `<i class="fas fa-link" style="margin-right: 6px;"></i><span>${url}</span>`;
+    // Add URL (no icon)
+    toast.innerHTML = `<span>${url}</span>`;
     
     document.body.appendChild(toast);
     
