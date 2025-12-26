@@ -1295,7 +1295,8 @@ function loadWorkspacesForMoveModal(callback) {
             data.workspaces.forEach(function(workspace) {
                 var option = document.createElement('option');
                 option.value = workspace.name;
-                option.textContent = workspace.name;
+                // Use display_name if available, otherwise use name
+                option.textContent = workspace.display_name || workspace.name;
                 if (workspace.name === currentWorkspace) {
                     option.selected = true;
                 }

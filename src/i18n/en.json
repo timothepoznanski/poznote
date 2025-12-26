@@ -268,8 +268,10 @@
     },
     "actions": {
       "select": "Select",
-      "move_notes": "Move notes"
+      "move_notes": "Move notes",
+      "edit_display_name": "Edit name"
     },
+    "default_workspace_locked": "Main workspace (cannot be deleted)",
     "count": {
       "notes_0": "0 notes",
       "notes_1": "1 note",
@@ -296,7 +298,9 @@
       "renamed_success": "Workspace renamed successfully",
       "deleted_success": "Workspace deleted successfully",
       "rename_error": "Error renaming workspace",
-      "delete_error": "Error deleting workspace"
+      "delete_error": "Error deleting workspace",
+      "display_name_updated": "Display name updated successfully",
+      "display_name_error": "Error updating display name"
     },
     "move": {
       "choose_target": "Choose a target",
@@ -312,9 +316,9 @@
       "name_empty": "Workspace name cannot be empty",
       "invalid_name": "Invalid workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_required": "Workspace name required",
-      "cannot_delete_default": "Cannot delete the startup workspace",
+      "cannot_delete_default": "Cannot delete the main workspace",
       "not_found": "Workspace not found",
-      "cannot_rename_default": "Cannot rename the startup workspace",
+      "cannot_rename_default": "Cannot rename the main workspace",
       "invalid_new_name": "Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).",
       "name_and_target_required": "Workspace name and target required",
       "source_target_must_differ": "Source and target workspaces must differ"
@@ -327,7 +331,7 @@
     },
     "confirm_delete": {
       "title": "Confirm delete workspace",
-      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the startup workspace."
+      "message": "Delete workspace \"{{workspace}}\"? Notes will be moved to the main workspace."
     }
   },
   "display": {
@@ -633,7 +637,11 @@
       "delete_title": "Confirm delete workspace",
       "delete_description": "Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.",
       "delete_placeholder": "Type workspace name to confirm",
-      "delete_button": "Delete workspace"
+      "delete_button": "Delete workspace",
+      "edit_display_name_title": "Edit display name",
+      "edit_display_name_description": "Change the display name of this workspace. Leave empty to use the default name.",
+      "display_name_label": "Display name",
+      "display_name_placeholder": "Enter display name"
     },
     "create": {
       "title_in_folder": "Create in {{folder}}",

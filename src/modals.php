@@ -229,12 +229,28 @@
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.rename_title', [], 'Rename workspace'); ?> <span id="renameSource"></span></h3>
         <div class="form-group">
-            <label for="renameNewName"><?php echo t_h('modals.workspaces.new_name', [], 'New name'); ?></label>
             <input id="renameNewName" type="text" />
         </div>
         <div style="margin-top:12px;">
             <button id="confirmRenameBtn" class="btn btn-primary"><?php echo t_h('common.rename', [], 'Rename'); ?></button>
             <button onclick="closeRenameModal()" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit display name modal (for workspaces.php, especially for Poznote) -->
+<div id="editDisplayNameModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.workspaces.edit_display_name_title', [], 'Edit display name'); ?></h3>
+        <p><?php echo t_h('modals.workspaces.edit_display_name_description', [], 'Change the display name of this workspace. Leave empty to use the default name.'); ?></p>
+        <input type="hidden" id="editDisplayNameSource" value="" />
+        <div class="form-group">
+            <label for="editDisplayNameInput"><?php echo t_h('modals.workspaces.display_name_label', [], 'Display name'); ?></label>
+            <input id="editDisplayNameInput" type="text" placeholder="<?php echo t_h('modals.workspaces.display_name_placeholder', [], 'Enter display name'); ?>" />
+        </div>
+        <div style="margin-top:12px;">
+            <button id="confirmEditDisplayNameBtn" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
+            <button onclick="closeEditDisplayNameModal()" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>

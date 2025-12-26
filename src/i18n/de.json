@@ -312,9 +312,9 @@
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
       "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
-      "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
+      "cannot_delete_default": "Hauptarbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
-      "cannot_rename_default": "Startup-Arbeitsbereich kann nicht umbenannt werden",
+      "cannot_rename_default": "Hauptarbeitsbereich kann nicht umbenannt werden",
       "invalid_new_name": "Ungültiger neuer Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_and_target_required": "Arbeitsbereichsname und Ziel erforderlich",
       "source_target_must_differ": "Quell- und Ziel-Arbeitsbereiche müssen sich unterscheiden"
@@ -327,8 +327,9 @@
     },
     "confirm_delete": {
       "title": "Arbeitsbereich löschen bestätigen",
-      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Startup-Arbeitsbereich verschoben."
-    }
+      "message": "Arbeitsbereich \"{{workspace}}\" löschen? Notizen werden in den Hauptarbeitsbereich verschoben."
+    },
+    "default_workspace_locked": "Hauptarbeitsbereich (kann nicht gelöscht werden)"
   },
   "display": {
     "title": "Anzeige",

@@ -83,8 +83,26 @@ try {
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE NOT NULL,
+        display_name TEXT,
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )');
+
+    // Add display_name column if it doesn't exist (migration for existing databases)
+    try {
+        $cols = $con->query("PRAGMA table_info(workspaces)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasDisplayName = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'display_name') {
+                $hasDisplayName = true;
+                break;
+            }
+        }
+        if (!$hasDisplayName) {
+            $con->exec("ALTER TABLE workspaces ADD COLUMN display_name TEXT");
+        }
+    } catch (Exception $e) {
+        // Ignore migration errors
+    }
 
     // Insert default workspace
     $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");

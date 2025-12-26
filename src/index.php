@@ -86,7 +86,8 @@ if ($workspace_filter === '__last_opened__') {
     // Default to Poznote but will be updated by JavaScript from localStorage
     $displayWorkspace = 'Poznote';
 } else {
-    $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
+    // Get the display name for the workspace (may be customized)
+    $displayWorkspace = getWorkspaceDisplayName($workspace_filter);
 }
 
 // Load note-related data (res_right, default/current note folders)

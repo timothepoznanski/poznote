@@ -312,9 +312,9 @@
       "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
       "invalid_name": "Nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
       "name_required": "Nombre de espacio de trabajo requerido",
-      "cannot_delete_default": "No se puede eliminar el espacio de trabajo de inicio",
+      "cannot_delete_default": "No se puede eliminar el espacio de trabajo principal",
       "not_found": "Espacio de trabajo no encontrado",
-      "cannot_rename_default": "No se puede renombrar el espacio de trabajo de inicio",
+      "cannot_rename_default": "No se puede renombrar el espacio de trabajo principal",
       "invalid_new_name": "Nuevo nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
       "name_and_target_required": "Nombre de espacio de trabajo y destino requeridos",
       "source_target_must_differ": "Los espacios de trabajo de origen y destino deben ser diferentes"
@@ -327,8 +327,9 @@
     },
     "confirm_delete": {
       "title": "Confirmar eliminación de espacio de trabajo",
-      "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo de inicio."
-    }
+      "message": "Eliminar espacio de trabajo \"{{workspace}}\"? Las notas serán movidas al espacio de trabajo principal."
+    },
+    "default_workspace_locked": "Espacio de trabajo principal (no se puede eliminar)"
   },
   "display": {
     "title": "Pantalla",
