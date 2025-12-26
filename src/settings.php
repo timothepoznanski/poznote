@@ -144,6 +144,11 @@ $currentLang = getUserLanguage();
                 </div>
             </div>
         </div>
+        
+        <!-- Version Display -->
+        <div style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small>
+        </div>
     </div>
     
     <!-- For Update modal -->
