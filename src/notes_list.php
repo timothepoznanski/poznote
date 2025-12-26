@@ -63,8 +63,8 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'T
 echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
 echo "</div></div>";
 
-// Render a dedicated "Shared" folder that links to the shared notes page
-// Count shared notes for the current workspace (non-trashed entries)
+// Render a dedicated "Public" folder that links to the public notes page
+// Count public notes for the current workspace (non-trashed entries)
 $shared_count = 0;
 try {
     if (isset($con)) {
@@ -83,10 +83,10 @@ try {
     $shared_count = 0;
 }
 
-echo "<div class='folder-header' data-folder='Shared'>";
+echo "<div class='folder-header' data-folder='Public'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-cloud folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.shared', [], 'Shared') . "</span>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
 echo "<span class='folder-note-count' id='count-shared'>(" . $shared_count . ")</span>";
 echo "</div></div>";
 
@@ -145,7 +145,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         
         // Workspace-aware folder handling in UI
         // Disable double-click rename for system folders
-        $systemFolders = ['Favorites', 'Tags', 'Trash', 'Shared'];
+        $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
         $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
         $folderDisplayName = $folderName;
         if ($folderName === 'Favorites') {

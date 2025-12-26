@@ -698,7 +698,7 @@
       "trash": "Papelera",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "shared": "Públicas"
+      "public": "Públicas"
     },
     "drop_zone": {
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
@@ -806,7 +806,7 @@
     "toolbar": {
       "favorite_add": "Agregar a favoritos",
       "favorite_remove": "Eliminar de favoritos",
-      "share_note": "Hacer nota pública",
+      "public_note": "Hacer nota pública",
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú",
       "convert_to_html": "Convertir a HTML"
@@ -1218,27 +1218,27 @@
         "edge_yes": "Sí",
         "edge_no": "No"
       }
-    },
-    "shared": {
-      "page": {
-        "title": "Notas Compartidas Públicamente",
-        "no_shared_notes": "Aún no hay notas compartidas.",
-        "share_hint": "Haga pública una nota haciendo clic en el botón de nube en la barra de herramientas."
-      },
-      "table": {
-        "note": "Nota",
-        "url": "URL Pública"
-      },
-      "actions": {
-        "open": "Abrir",
-        "revoke": "Revocar"
-      },
-      "indexable": "Indexable",
-      "password_protected": "Protegido con contraseña",
-      "add_password_title": "Agregar protección con contraseña",
-      "change_password_title": "Cambiar contraseña",
-      "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
-      "enter_new_password": "Ingrese una nueva contraseña"
     }
+  },
+  "public": {
+    "page": {
+      "title": "Notas Compartidas Públicamente",
+      "no_public_notes": "Aún no hay notas compartidas.",
+      "public_hint": "Haga pública una nota haciendo clic en el botón de nube en la barra de herramientas."
+    },
+    "table": {
+      "note": "Nota",
+      "url": "URL Pública"
+    },
+    "actions": {
+      "open": "Abrir",
+      "revoke": "Revocar"
+    },
+    "indexable": "Indexable",
+    "password_protected": "Protegido con contraseña",
+    "add_password_title": "Agregar protección con contraseña",
+    "change_password_title": "Cambiar contraseña",
+    "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
+    "enter_new_password": "Ingrese una nueva contraseña"
   }
 }
