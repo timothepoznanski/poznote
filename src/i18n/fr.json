@@ -862,6 +862,7 @@
     "link_modal": {
       "title_add": "Ajouter un lien à l'image",
       "title_edit": "Modifier le lien de l'image",
+      "description": "Ce lien rendra l'image clickable lorsque la note sera définie comme publique.",
       "url_label": "Entrez l'URL du lien :",
       "url_placeholder": "https://www.exemple.com",
       "cancel": "Annuler",
