@@ -166,8 +166,8 @@ function emptyTrash() {
     .then(response => response.json())
     .then(data => {
         if (data.success === true) {
-            // Success - redirect to trash.php to refresh page
-            window.location.href = 'trash.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
+            // Success - redirect to home page
+            window.location.href = 'index.php' + (typeof pageWorkspace !== 'undefined' && pageWorkspace ? '?workspace=' + encodeURIComponent(pageWorkspace) : '');
         } else {
             const title = (window.t ? window.t('trash.alerts.empty_error_title', {}, 'Empty Trash Error') : 'Empty Trash Error');
             const unknown = (window.t ? window.t('common.unknown_error', {}, 'Unknown error') : 'Unknown error');
