@@ -424,6 +424,20 @@ body {
         padding: 14px !important;
         font-size: 16px !important;
     }
+
+    /* Default workspace selector: stack + add spacing above Save button */
+    #defaultWorkspaceSelect {
+        width: 100% !important;
+        margin-right: 0 !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
+    #saveDefaultWorkspaceBtn {
+        width: 100% !important;
+        display: block !important;
+        margin-top: 10px !important;
+    }
     
     /* Back button mobile styling */
     .btn-secondary {
