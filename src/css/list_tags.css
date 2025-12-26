@@ -30,7 +30,7 @@ html.tags-page {
 /* Button styles reused from trash.css to match appearance */
 .tags-buttons-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     gap: 20px;
     margin: 20px 30px;
@@ -39,10 +39,12 @@ html.tags-page {
 
 .tags-header {
     display: block;
-    margin: 0;
+    margin: 0 auto;
     font-size: 1.8em;
     color: #333;
     font-weight: 500;
+    text-align: center;
+    flex: 1;
 }
 
 /* Button styles matching trash.css */
@@ -59,8 +61,6 @@ html.tags-page {
     transition: all 0.2s ease;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
-    position: absolute;
-    left: 0;
 }
 
 .btn-secondary {
@@ -156,13 +156,35 @@ html.tags-page {
 
 /* Mobile styles */
 @media (max-width: 800px) {
-    /* Hide the "Back to notes" button on mobile */
-    .tags-buttons-container .btn[title="Back to notes"] {
-        display: none !important;
+    /* Adjust search input width for mobile */
+    .tags-search-input {
+        width: 90%;
     }
     
-    /* Center the header when button is hidden */
+    /* Adjust container padding for mobile */
+    .tags-container {
+        padding: 15px;
+    }
+    
+    /* Adjust button container margins for mobile */
     .tags-buttons-container {
-        justify-content: center !important;
+        margin: 15px 10px;
+        gap: 10px;
+    }
+    
+    /* Adjust header font size for mobile */
+    .tags-header {
+        font-size: 1.5em;
+    }
+    
+    /* Adjust grid for mobile */
+    .tags-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    /* Make button text smaller on mobile */
+    .btn {
+        font-size: 13px;
+        padding: 8px 15px;
     }
 }
