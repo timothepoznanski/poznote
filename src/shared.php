@@ -16,7 +16,7 @@ $currentLang = getUserLanguage();
 	<meta charset="utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-	<title><?php echo t_h('shared.page.title', [], 'Shared Notes'); ?> - <?php echo t_h('app.name'); ?></title>
+	<title><?php echo t_h('public.page.title', [], 'Public Notes'); ?> - <?php echo t_h('app.name'); ?></title>
 	<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
 	<meta name="color-scheme" content="dark light">
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
@@ -28,7 +28,7 @@ $currentLang = getUserLanguage();
 </head>
 <body class="shared-page">
 	<div class="shared-container">
-		<h2 class="shared-header"><?php echo t_h('shared.page.title', [], 'Shared Notes'); ?></h2>
+		<h2 class="shared-header"><?php echo t_h('public.page.title', [], 'Public Notes'); ?></h2>
 		
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
@@ -44,8 +44,8 @@ $currentLang = getUserLanguage();
 			<div id="sharedNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message" style="display: none;">
 			<i class="fa-cloud"></i>
-				<p><?php echo t_h('shared.page.no_shared_notes', [], 'No shared notes yet.'); ?></p>
-				<p class="empty-hint"><?php echo t_h('shared.page.share_hint', [], 'Share a note by clicking the share button in the note toolbar.'); ?></p>
+			<p><?php echo t_h('public.page.no_public_notes', [], 'No public notes yet.'); ?></p>
+				<p class="empty-hint"><?php echo t_h('public.page.public_hint', [], 'Make a note public by clicking the cloud button in the note toolbar.'); ?></p>
 			</div>
 		</div>
 	</div>
@@ -143,7 +143,7 @@ $currentLang = getUserLanguage();
 			const indexableLabel = document.createElement('label');
 			indexableLabel.className = 'indexable-toggle-label';
 			const indexableText = document.createElement('span');
-			indexableText.textContent = '<?php echo t_h('shared.indexable', [], 'Indexable'); ?>';
+			indexableText.textContent = '<?php echo t_h('public.indexable', [], 'Indexable'); ?>';
 			indexableText.className = 'indexable-label-text';
 			const toggleSwitch = document.createElement('label');
 			toggleSwitch.className = 'toggle-switch';
@@ -170,23 +170,23 @@ $currentLang = getUserLanguage();
 			passwordBtn.className = 'btn btn-sm btn-password';
 			if (note.hasPassword) {
 				passwordBtn.innerHTML = '<i class="fa-lock"></i>';
-				passwordBtn.title = '<?php echo t_h('shared.password_protected', [], 'Password protected'); ?>';
+				passwordBtn.title = '<?php echo t_h('public.password_protected', [], 'Password protected'); ?>';
 			} else {
 				passwordBtn.innerHTML = '<i class="fa-lock-open"></i>';
-				passwordBtn.title = '<?php echo t_h('shared.add_password_title', [], 'Add password protection'); ?>';
+				passwordBtn.title = '<?php echo t_h('public.add_password_title', [], 'Add password protection'); ?>';
 			}
 			passwordBtn.onclick = () => showPasswordModal(note.note_id, note.hasPassword);
 			
 			const openBtn = document.createElement('button');
 			openBtn.className = 'btn btn-sm btn-secondary';
 			openBtn.innerHTML = '<i class="fa-external-link"></i>';
-			openBtn.title = '<?php echo t_h('shared.actions.open', [], 'Open public view'); ?>';
+			openBtn.title = '<?php echo t_h('public.actions.open', [], 'Open public view'); ?>';
 			openBtn.onclick = () => window.open(note.url, '_blank');
 			
 			const revokeBtn = document.createElement('button');
 			revokeBtn.className = 'btn btn-sm btn-danger';
 			revokeBtn.innerHTML = '<i class="fa-ban"></i>';
-			revokeBtn.title = '<?php echo t_h('shared.actions.revoke', [], 'Revoke'); ?>';
+			revokeBtn.title = '<?php echo t_h('public.actions.revoke', [], 'Revoke'); ?>';
 			revokeBtn.onclick = () => revokeShare(note.note_id);
 			
 			actionsDiv.appendChild(passwordBtn);
@@ -332,7 +332,7 @@ $currentLang = getUserLanguage();
 		const header = document.createElement('div');
 		header.className = 'modal-header';
 		const h3 = document.createElement('h3');
-		h3.textContent = hasPassword ? '<?php echo t_h('shared.change_password_title', [], 'Change Password'); ?>' : '<?php echo t_h('shared.add_password_title', [], 'Add Password'); ?>';
+		h3.textContent = hasPassword ? '<?php echo t_h('public.change_password_title', [], 'Change Password'); ?>' : '<?php echo t_h('public.add_password_title', [], 'Add Password'); ?>';
 		header.appendChild(h3);
 		content.appendChild(header);
 		
@@ -341,7 +341,7 @@ $currentLang = getUserLanguage();
 		
 		if (hasPassword) {
 			const removeInfo = document.createElement('p');
-			removeInfo.textContent = '<?php echo t_h('shared.password_remove_hint', [], 'Leave empty to remove password protection.'); ?>';
+			removeInfo.textContent = '<?php echo t_h('public.password_remove_hint', [], 'Leave empty to remove password protection.'); ?>';
 			removeInfo.style.marginBottom = '15px';
 			removeInfo.style.fontSize = '13px';
 			removeInfo.style.color = '#666';
@@ -351,7 +351,7 @@ $currentLang = getUserLanguage();
 		const passwordInput = document.createElement('input');
 		passwordInput.type = 'password';
 		passwordInput.id = 'modalPasswordInput';
-		passwordInput.placeholder = '<?php echo t_h('shared.enter_new_password', [], 'Enter new password'); ?>';
+		passwordInput.placeholder = '<?php echo t_h('public.enter_new_password', [], 'Enter new password'); ?>';
 		passwordInput.className = 'modal-password-input';
 		passwordInput.style.width = '100%';
 		passwordInput.style.padding = '8px 10px';

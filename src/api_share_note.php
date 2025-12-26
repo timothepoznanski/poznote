@@ -33,13 +33,13 @@ try {
 
     // Handle actions
     if ($action === 'get') {
-        // Return existing share URL if any
+        // Return existing public note URL if any
         $stmt = $con->prepare('SELECT token, indexable, password FROM shared_notes WHERE note_id = ? LIMIT 1');
         $stmt->execute([$note_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
             header('Content-Type: application/json');
-            echo json_encode(['shared' => false]);
+            echo json_encode(['public' => false]);
             exit;
         }
         $token = $row['token'];
@@ -60,17 +60,17 @@ try {
         $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
         header('Content-Type: application/json');
-        echo json_encode(['shared' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable, 'hasPassword' => $hasPassword]);
+        echo json_encode(['public' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable, 'hasPassword' => $hasPassword]);
         exit;
     } elseif ($action === 'revoke') {
-        // Delete any share for this note
+        // Delete any public note for this note
         $stmt = $con->prepare('DELETE FROM shared_notes WHERE note_id = ?');
         $stmt->execute([$note_id]);
         header('Content-Type: application/json');
         echo json_encode(['revoked' => true]);
         exit;
     } elseif ($action === 'update_indexable') {
-        // Update the indexable status for this note's share
+        // Update the indexable status for this note's public version
         $indexable = isset($data['indexable']) ? (int)$data['indexable'] : 0;
         $stmt = $con->prepare('UPDATE shared_notes SET indexable = ? WHERE note_id = ?');
         $stmt->execute([$indexable, $note_id]);
@@ -78,7 +78,7 @@ try {
         echo json_encode(['success' => true, 'indexable' => $indexable]);
         exit;
     } elseif ($action === 'update_password') {
-        // Update the password for this note's share
+        // Update the password for this note's public version
         $password = isset($data['password']) ? trim($data['password']) : '';
         // Hash the password if not empty, otherwise set to null
         $hashedPassword = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
@@ -174,7 +174,7 @@ try {
     $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
     header('Content-Type: application/json');
-    echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'shared' => true]);
+    echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'public' => true]);
     exit;
 } catch (Exception $e) {
     header('Content-Type: application/json');

@@ -698,7 +698,7 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "shared": "Publiques"
+      "public": "Publiques"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -811,12 +811,12 @@
     "toolbar": {
       "favorite_add": "Ajouter aux favoris",
       "favorite_remove": "Retirer des favoris",
-      "share_note": "Rendre la note publique",
+      "public_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
       "convert_to_html": "Convertir en HTML"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "URL publique",
       "close": "Fermer",
       "open": "Ouvrir",
@@ -1222,11 +1222,11 @@
       }
     }
   },
-  "shared": {
+  "public": {
     "page": {
       "title": "Notes publiques",
-      "no_shared_notes": "Aucune note publique pour le moment.",
-      "share_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
+      "no_public_notes": "Aucune note publique pour le moment.",
+      "public_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
     },
     "table": {
       "note": "Note",

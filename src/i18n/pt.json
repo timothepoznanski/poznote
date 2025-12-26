@@ -697,7 +697,7 @@
       "trash": "Lixeira",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "shared": "Públicas"
+      "public": "Públicas"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -810,12 +810,12 @@
     "toolbar": {
       "favorite_add": "Adicionar aos favoritos",
       "favorite_remove": "Remover dos favoritos",
-      "share_note": "Tornar nota pública",
+      "public_note": "Tornar nota pública",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
       "convert_to_html": "Converter para HTML"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "URL Pública",
       "close": "Fechar",
       "open": "Abrir",
@@ -1219,27 +1219,27 @@
         "edge_yes": "Sim",
         "edge_no": "Não"
       }
-    },
-    "shared": {
-      "page": {
-        "title": "Notas Compartilhadas Publicamente",
-        "no_shared_notes": "Ainda não há notas compartilhadas.",
-        "share_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
-      },
-      "table": {
-        "note": "Nota",
-        "url": "URL Pública"
-      },
-      "actions": {
-        "open": "Abrir",
-        "revoke": "Revogar"
-      },
-      "indexable": "Indexável",
-      "password_protected": "Protegido por senha",
-      "add_password_title": "Adicionar proteção por senha",
-      "change_password_title": "Alterar senha",
-      "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
-      "enter_new_password": "Digite uma nova senha"
     }
+  },
+  "public": {
+    "page": {
+      "title": "Notas Compartilhadas Publicamente",
+      "no_public_notes": "Ainda não há notas compartilhadas.",
+      "public_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
+    },
+    "table": {
+      "note": "Nota",
+      "url": "URL Pública"
+    },
+    "actions": {
+      "open": "Abrir",
+      "revoke": "Revogar"
+    },
+    "indexable": "Indexável",
+    "password_protected": "Protegido por senha",
+    "add_password_title": "Adicionar proteção por senha",
+    "change_password_title": "Alterar senha",
+    "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
+    "enter_new_password": "Digite uma nova senha"
   }
 }

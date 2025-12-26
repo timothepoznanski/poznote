@@ -698,7 +698,7 @@
       "trash": "Trash",
       "tags": "Tags",
       "favorites": "Favorites",
-      "shared": "Shared"
+      "public": "Public"
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -811,12 +811,12 @@
     "toolbar": {
       "favorite_add": "Add to favorites",
       "favorite_remove": "Remove from favorites",
-      "share_note": "Make note public",
+      "public_note": "Make note public",
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
       "convert_to_html": "Convert to HTML"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "Public URL",
       "close": "Close",
       "open": "Open",
@@ -1225,11 +1225,11 @@
       }
     }
   },
-  "shared": {
+  "public": {
     "page": {
       "title": "Public Notes",
-      "no_shared_notes": "No public notes yet.",
-      "share_hint": "Make a note public by clicking the cloud button in the note toolbar."
+      "no_public_notes": "No public notes yet.",
+      "public_hint": "Make a note public by clicking the cloud button in the note toolbar."
     },
     "table": {
       "note": "Note",

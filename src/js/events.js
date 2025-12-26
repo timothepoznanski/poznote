@@ -1593,8 +1593,8 @@ function handleFolderDrop(e) {
             return;
         }
         
-        // Special handling for Shared folder
-        if (targetFolder === 'Shared') {
+        // Special handling for Public folder
+        if (targetFolder === 'Public') {
             // Open the share popup instead of moving the note
             if (typeof openPublicShareModal === 'function') {
                 openPublicShareModal(data.noteId);

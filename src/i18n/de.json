@@ -698,7 +698,7 @@
       "trash": "Papierkorb",
       "tags": "Tags",
       "favorites": "Favoriten",
-      "shared": "Öffentliche"
+      "public": "Öffentliche"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -806,12 +806,12 @@
     "toolbar": {
       "favorite_add": "Zu Favoriten hinzufügen",
       "favorite_remove": "Aus Favoriten entfernen",
-      "share_note": "Notiz öffentlich machen",
+      "public_note": "Notiz öffentlich machen",
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
       "convert_to_html": "In HTML konvertieren"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "Öffentliche URL",
       "close": "Schließen",
       "open": "Öffnen",
@@ -1218,27 +1218,27 @@
         "edge_yes": "Ja",
         "edge_no": "Nein"
       }
-    },
-    "shared": {
-      "page": {
-        "title": "Öffentliche Notizen",
-        "no_shared_notes": "Noch keine öffentlichen Notizen.",
-        "share_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
-      },
-      "table": {
-        "note": "Notiz",
-        "url": "Öffentliche URL"
-      },
-      "actions": {
-        "open": "Öffnen",
-        "revoke": "Widerrufen"
-      },
-      "indexable": "Indexierbar",
-      "password_protected": "Passwortgeschützt",
-      "add_password_title": "Passwortschutz hinzufügen",
-      "change_password_title": "Passwort ändern",
-      "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
-      "enter_new_password": "Neues Passwort eingeben"
     }
+  },
+  "public": {
+    "page": {
+      "title": "Öffentliche Notizen",
+      "no_public_notes": "Noch keine öffentlichen Notizen.",
+      "public_hint": "Machen Sie eine Notiz öffentlich, indem Sie auf die Wolken-Schaltfläche in der Symbolleiste klicken."
+    },
+    "table": {
+      "note": "Notiz",
+      "url": "Öffentliche URL"
+    },
+    "actions": {
+      "open": "Öffnen",
+      "revoke": "Widerrufen"
+    },
+    "indexable": "Indexierbar",
+    "password_protected": "Passwortgeschützt",
+    "add_password_title": "Passwortschutz hinzufügen",
+    "change_password_title": "Passwort ändern",
+    "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
+    "enter_new_password": "Neues Passwort eingeben"
   }
 }
