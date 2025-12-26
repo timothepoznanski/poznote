@@ -717,6 +717,8 @@ try {
 
         // Default Workspace Management
         (function(){
+            var lastOpenedLabel = <?php echo json_encode(t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
+
             window.loadDefaultWorkspaceSetting = function loadDefaultWorkspaceSetting() {
                 var select = document.getElementById('defaultWorkspaceSelect');
                 if (!select) return;
@@ -727,7 +729,7 @@ try {
                 // Add special option for last workspace opened
                 var optLast = document.createElement('option');
                 optLast.value = '__last_opened__';
-                optLast.textContent = tr('workspaces.default.last_opened', {}, 'Last workspace opened');
+                optLast.textContent = lastOpenedLabel;
                 select.appendChild(optLast);
                 
                 <?php foreach ($workspaces as $w): ?>
@@ -774,7 +776,7 @@ try {
                         if (result && result.success) {
                             if (status) {
                                 var displayText = selectedWorkspace === '__last_opened__' 
-                                    ? tr('workspaces.default.last_opened', {}, 'Last workspace opened') 
+                                    ? lastOpenedLabel
                                     : selectedWorkspace;
                                 status.textContent = tr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                                 status.style.display = 'block';

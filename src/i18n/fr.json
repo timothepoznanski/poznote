@@ -276,13 +276,13 @@
       "notes_n": "{{count}} notes"
     },
     "default": {
-      "title": "Workspace de démarrage",
+      "title": "Espace de travail de démarrage",
       "description_1": "Choisissez l’espace de travail qui s’ouvre au démarrage de Poznote.",
       "description_2": "Sélectionnez \"{{last}}\" pour toujours ouvrir l’espace de travail que vous utilisiez précédemment.",
       "last_opened": "Dernier espace de travail ouvert",
       "save_button": "Enregistrer",
-      "status_set_to": "✓ Workspace de démarrage défini sur : {{workspace}}",
-      "error_saving": "Erreur lors de l'enregistrement du workspace de démarrage"
+      "status_set_to": "✓ Espace de travail de démarrage défini sur : {{workspace}}",
+      "error_saving": "Erreur lors de l'enregistrement de l'espace de travail de démarrage"
     },
     "validation": {
       "enter_name": "Saisissez un nom d’espace de travail",
