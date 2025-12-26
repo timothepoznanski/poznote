@@ -525,8 +525,7 @@ try {
         <div class="settings-section">
             <h3><?php echo t_h('workspaces.default.title', [], 'Default Workspace', $currentLang); ?></h3>
             <p>
-                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?><br>
-                <?php echo t_h('workspaces.default.description_2', ['last' => t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang)], 'Select "{{last}}" to always open the workspace you were using previously.', $currentLang); ?>
+                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
             </p>
             <div class="form-group">
                 <select id="defaultWorkspaceSelect" style="width: 300px; padding: 8px; font-size: 14px; margin-right: 10px;">
