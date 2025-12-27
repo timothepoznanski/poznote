@@ -2577,7 +2577,7 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 40px;
+    gap: 35px;
     margin: 0px 0px 15px 0px;
     /* padding: 5px 0; */
     border: 1px solid #d3d6db;
@@ -2587,6 +2587,11 @@ hr {
     overflow: hidden;
     height: 40px;
     box-sizing: border-box;
+}
+
+/* Réduire l'écart entre la loupe et la corbeille */
+.system-folders-container > .folder-header:first-child {
+    margin-right: -10px;
 }
 
 /* Dossiers système: affichage en icônes uniquement */
