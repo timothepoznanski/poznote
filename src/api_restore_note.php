@@ -33,8 +33,7 @@ try {
     $checkParams = [$id];
     
     if ($workspace) {
-        $checkSql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $checkParams[] = $workspace;
+        $checkSql .= " AND workspace = ?";
         $checkParams[] = $workspace;
     }
     
@@ -65,8 +64,7 @@ try {
     $updateParams = [$id];
     
     if ($workspace) {
-        $updateSql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $updateParams[] = $workspace;
+        $updateSql .= " AND workspace = ?";
         $updateParams[] = $workspace;
     }
     

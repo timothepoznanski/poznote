@@ -4,6 +4,7 @@ requireApiAuth();
 
 header('Content-Type: application/json');
 require_once 'config.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -62,7 +63,7 @@ try {
         }
     } elseif ($folderPath !== null && $folderPath !== '') {
         if ($workspace === null || $workspace === '') {
-            $workspace = 'Poznote';
+            $workspace = getFirstWorkspaceName();
         }
         $resolvedId = resolvePathToId($con, $workspace, $folderPath);
         if ($resolvedId === null) {
@@ -82,7 +83,7 @@ try {
 
     // Validate workspace exists
     if ($workspace === null || $workspace === '') {
-        $workspace = 'Poznote';
+        $workspace = getFirstWorkspaceName();
     }
     $wsStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
     $wsStmt->execute([$workspace]);

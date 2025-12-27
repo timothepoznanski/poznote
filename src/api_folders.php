@@ -109,8 +109,8 @@ switch($action) {
             
             // Verify parent folder exists
             if ($workspace !== null) {
-                $checkParent = $con->prepare("SELECT id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $checkParent->execute([$parentId, $workspace, $workspace]);
+                $checkParent = $con->prepare("SELECT id FROM folders WHERE id = ? AND workspace = ?");
+                $checkParent->execute([$parentId, $workspace]);
             } else {
                 $checkParent = $con->prepare("SELECT id FROM folders WHERE id = ?");
                 $checkParent->execute([$parentId]);
@@ -124,8 +124,8 @@ switch($action) {
         
         // Check if folder with same name exists in same parent
         if ($workspace !== null) {
-            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND parent_id IS NOT DISTINCT FROM ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $check2->execute([$folderName, $parentId, $workspace, $workspace]);
+            $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND parent_id IS NOT DISTINCT FROM ? AND workspace = ?");
+            $check2->execute([$folderName, $parentId, $workspace]);
         } else {
             $check2 = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND parent_id IS NOT DISTINCT FROM ?");
             $check2->execute([$folderName, $parentId]);
@@ -138,7 +138,7 @@ switch($action) {
             // Create folder (store workspace and parent_id)
             $query = "INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)";
             $stmt = $con->prepare($query);
-            $wsValue = $workspace ?? 'Poznote';
+            $wsValue = $workspace;
             if ($stmt->execute([$folderName, $wsValue, $parentId])) {
                 $folder_id = $con->lastInsertId();
                 echo json_encode(['success' => true, 'folder_id' => (int)$folder_id, 'folder_name' => $folderName, 'parent_id' => $parentId]);
@@ -171,8 +171,8 @@ switch($action) {
 
         // Ensure target name does not already exist in the same workspace (but allow same name in other workspaces)
         if ($workspace !== null) {
-            $check = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $check->execute([$newName, $workspace, $workspace]);
+            $check = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ? AND workspace = ?");
+            $check->execute([$newName, $workspace]);
         } else {
             $check = $con->prepare("SELECT COUNT(*) as count FROM folders WHERE name = ?");
             $check->execute([$newName]);
@@ -185,12 +185,12 @@ switch($action) {
         
         // Update entries and folders table (workspace-scoped)
             if ($workspace !== null) {
-                $query1 = "UPDATE entries SET folder = ? WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-                $query2 = "UPDATE folders SET name = ? WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query1 = "UPDATE entries SET folder = ? WHERE folder = ? AND workspace = ?";
+                $query2 = "UPDATE folders SET name = ? WHERE name = ? AND workspace = ?";
                 $stmt1 = $con->prepare($query1);
                 $stmt2 = $con->prepare($query2);
-                $exec1 = $stmt1->execute([$newName, $oldName, $workspace, $workspace]);
-                $exec2 = $stmt2->execute([$newName, $oldName, $workspace, $workspace]);
+                $exec1 = $stmt1->execute([$newName, $oldName, $workspace]);
+                $exec2 = $stmt2->execute([$newName, $oldName, $workspace]);
             } else {
                 $query1 = "UPDATE entries SET folder = ? WHERE folder = ?";
                 $query2 = "UPDATE folders SET name = ? WHERE name = ?";
@@ -215,8 +215,8 @@ switch($action) {
         // If folder_id is provided, use it to find the folder
         if ($folderId !== null && $folderId > 0) {
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folderId, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+                $stmt->execute([$folderId, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
                 $stmt->execute([$folderId]);
@@ -230,8 +230,8 @@ switch($action) {
         } elseif (!empty($folderName)) {
             // If folder_name is provided instead, verify it exists and get its ID
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folderName, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$folderName, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                 $stmt->execute([$folderName]);
@@ -254,9 +254,9 @@ switch($action) {
             
             // Get all subfolders
             if ($workspace !== null) {
-                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderId, $workspace, $workspace]);
+                $stmt->execute([$folderId, $workspace]);
             } else {
                 $query = "SELECT id FROM folders WHERE parent_id = ?";
                 $stmt = $con->prepare($query);
@@ -279,9 +279,9 @@ switch($action) {
             $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
             
             if ($workspace !== null) {
-                $query1 = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders) AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query1 = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders) AND workspace = ?";
                 $stmt1 = $con->prepare($query1);
-                $params = array_merge($allFolderIds, [$workspace, $workspace]);
+                $params = array_merge($allFolderIds, [$workspace]);
                 $exec1 = $stmt1->execute($params);
             } else {
                 $query1 = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders)";
@@ -294,9 +294,9 @@ switch($action) {
         
         // Delete the folder (CASCADE will automatically delete all subfolders)
         if ($workspace !== null) {
-            $query2 = "DELETE FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $query2 = "DELETE FROM folders WHERE id = ? AND workspace = ?";
             $stmt2 = $con->prepare($query2);
-            $exec2 = $stmt2->execute([$folderId, $workspace, $workspace]);
+            $exec2 = $stmt2->execute([$folderId, $workspace]);
         } else {
             $query2 = "DELETE FROM folders WHERE id = ?";
             $stmt2 = $con->prepare($query2);
@@ -329,8 +329,8 @@ switch($action) {
             // If folder_id is provided and > 0, fetch the folder name
             elseif ($targetFolderId > 0) {
                 if ($workspace) {
-                    $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                    $stmt->execute([$targetFolderId, $workspace, $workspace]);
+                    $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+                    $stmt->execute([$targetFolderId, $workspace]);
                 } else {
                     $stmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
                     $stmt->execute([$targetFolderId]);
@@ -344,8 +344,8 @@ switch($action) {
             } elseif ($targetFolder !== null) {
                 // If folder name is provided, get folder_id
                 if ($workspace) {
-                    $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                    $stmt->execute([$targetFolder, $workspace, $workspace]);
+                    $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                    $stmt->execute([$targetFolder, $workspace]);
                 } else {
                     $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                     $stmt->execute([$targetFolder]);
@@ -356,7 +356,7 @@ switch($action) {
                 } else {
                     // Folder doesn't exist, create it
                     $createStmt = $con->prepare("INSERT INTO folders (name, workspace) VALUES (?, ?)");
-                    $createStmt->execute([$targetFolder, $workspace ?? 'Poznote']);
+                    $createStmt->execute([$targetFolder, $workspace]);
                     $targetFolderId = (int)$con->lastInsertId();
                 }
             }
@@ -386,8 +386,7 @@ switch($action) {
             
             // Add workspace constraint
             if ($targetWorkspace !== null) {
-                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-                $duplicateCheckParams[] = $targetWorkspace;
+                $duplicateCheckQuery .= " AND workspace = ?";
                 $duplicateCheckParams[] = $targetWorkspace;
             }
             
@@ -440,8 +439,8 @@ switch($action) {
         $query = "SELECT id, name, parent_id FROM folders";
         $params = [];
         if ($workspace !== null) {
-            $query .= " WHERE (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params = [$workspace, $workspace];
+            $query .= " WHERE workspace = ?";
+            $params = [$workspace];
         }
         $query .= " ORDER BY name";
 
@@ -482,7 +481,7 @@ switch($action) {
                         LEFT JOIN folders f ON e.folder_id = f.id 
                         WHERE e.folder_id IS NOT NULL AND e.trash = 0";
         if ($workspace !== null) {
-            $recentQuery .= " AND (e.workspace = '" . addslashes($workspace) . "' OR (e.workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            $recentQuery .= " AND e.workspace = '" . addslashes($workspace) . "'";
         }
         $recentQuery .= " GROUP BY e.folder_id ORDER BY last_used DESC LIMIT 5";
         $recentResult = $con->query($recentQuery);
@@ -505,7 +504,7 @@ switch($action) {
                             LEFT JOIN folders f ON e.folder_id = f.id 
                             WHERE e.folder_id IS NOT NULL AND e.trash = 0";
             if ($workspace !== null) {
-                $popularQuery .= " AND (e.workspace = '" . addslashes($workspace) . "' OR (e.workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+                $popularQuery .= " AND e.workspace = '" . addslashes($workspace) . "'";
             }
             $popularQuery .= " GROUP BY e.folder_id ORDER BY count DESC LIMIT 5";
             $popularResult = $con->query($popularQuery);
@@ -539,7 +538,7 @@ switch($action) {
         // Get note counts for each folder (using folder_id)
         $query = "SELECT folder_id, COUNT(*) as count FROM entries WHERE trash = 0 AND folder_id IS NOT NULL";
         if ($workspace !== null) {
-            $query .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            $query .= " AND workspace = '" . addslashes($workspace) . "'";
         }
         $query .= " GROUP BY folder_id";
         $result = $con->query($query);
@@ -553,7 +552,7 @@ switch($action) {
         // Get uncategorized notes count (notes with no folder)
         $uncategorizedQuery = "SELECT COUNT(*) as count FROM entries WHERE trash = 0 AND folder_id IS NULL";
         if ($workspace !== null) {
-            $uncategorizedQuery .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            $uncategorizedQuery .= " AND workspace = '" . addslashes($workspace) . "'";
         }
         $uncategorizedResult = $con->query($uncategorizedQuery);
         $uncategorizedRow = $uncategorizedResult->fetch(PDO::FETCH_ASSOC);
@@ -562,7 +561,7 @@ switch($action) {
         // Get favorite count
         $favoriteQuery = "SELECT COUNT(*) as count FROM entries WHERE trash = 0 AND favorite = 1";
         if ($workspace !== null) {
-            $favoriteQuery .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+            $favoriteQuery .= " AND workspace = '" . addslashes($workspace) . "'";
         }
         $favoriteResult = $con->query($favoriteQuery);
         if ($favoriteResult) {
@@ -587,9 +586,9 @@ switch($action) {
         if ($folderId !== null && $folderId > 0) {
             // Move all notes from this folder to trash (workspace-scoped)
             if ($workspace !== null) {
-                $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0 AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $successExec = $stmt->execute([$folderId, $workspace, $workspace]);
+                $successExec = $stmt->execute([$folderId, $workspace]);
             } else {
                 $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0";
                 $stmt = $con->prepare($query);
@@ -598,9 +597,9 @@ switch($action) {
         } else {
             // Fallback to folder_name
             if ($workspace !== null) {
-                $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0 AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $successExec = $stmt->execute([$folderName, $workspace, $workspace]);
+                $successExec = $stmt->execute([$folderName, $workspace]);
             } else {
                 $query = "UPDATE entries SET trash = 1 WHERE folder = ? AND trash = 0";
                 $stmt = $con->prepare($query);
@@ -629,8 +628,8 @@ switch($action) {
         // Get folder ID from name if needed
         if ($folderId === null && !empty($folderName)) {
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folderName, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$folderName, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                 $stmt->execute([$folderName]);
@@ -647,9 +646,9 @@ switch($action) {
             
             // Count notes directly in this folder
             if ($workspace !== null) {
-                $query = "SELECT COUNT(*) as count FROM entries WHERE folder_id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "SELECT COUNT(*) as count FROM entries WHERE folder_id = ? AND trash = 0 AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderId, $workspace, $workspace]);
+                $stmt->execute([$folderId, $workspace]);
             } else {
                 $query = "SELECT COUNT(*) as count FROM entries WHERE folder_id = ? AND trash = 0";
                 $stmt = $con->prepare($query);
@@ -660,9 +659,9 @@ switch($action) {
             
             // Get all subfolders
             if ($workspace !== null) {
-                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderId, $workspace, $workspace]);
+                $stmt->execute([$folderId, $workspace]);
             } else {
                 $query = "SELECT id FROM folders WHERE parent_id = ?";
                 $stmt = $con->prepare($query);
@@ -683,9 +682,9 @@ switch($action) {
             
             // Get all direct subfolders
             if ($workspace !== null) {
-                $query = "SELECT id FROM folders WHERE parent_id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $query = "SELECT id FROM folders WHERE parent_id = ? AND workspace = ?";
                 $stmt = $con->prepare($query);
-                $stmt->execute([$folderId, $workspace, $workspace]);
+                $stmt->execute([$folderId, $workspace]);
             } else {
                 $query = "SELECT id FROM folders WHERE parent_id = ?";
                 $stmt = $con->prepare($query);
@@ -726,8 +725,8 @@ switch($action) {
         // Get folder by name if needed
         if ($folderId === null && !empty($folderName)) {
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folderName, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$folderName, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                 $stmt->execute([$folderName]);
@@ -750,8 +749,8 @@ switch($action) {
         
         while ($currentId !== null && $depth < 10) { // Limit depth to prevent infinite loops
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$currentId, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ? AND workspace = ?");
+                $stmt->execute([$currentId, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT name, parent_id FROM folders WHERE id = ?");
                 $stmt->execute([$currentId]);
@@ -787,8 +786,8 @@ switch($action) {
         // Get folder ID from name if needed
         if ($folderId === null && !empty($folderName)) {
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folderName, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$folderName, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                 $stmt->execute([$folderName]);
@@ -802,8 +801,8 @@ switch($action) {
         // Get new parent ID from name if provided
         if ($newParentId === null && !empty($newParent)) {
             if ($workspace !== null) {
-                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$newParent, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $stmt->execute([$newParent, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
                 $stmt->execute([$newParent]);
@@ -825,8 +824,8 @@ switch($action) {
                 }
                 
                 if ($workspace !== null) {
-                    $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                    $stmt->execute([$checkId, $workspace, $workspace]);
+                    $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ? AND workspace = ?");
+                    $stmt->execute([$checkId, $workspace]);
                 } else {
                     $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ?");
                     $stmt->execute([$checkId]);
@@ -840,8 +839,8 @@ switch($action) {
         
         // Update folder's parent_id
         if ($workspace !== null) {
-            $stmt = $con->prepare("UPDATE folders SET parent_id = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $success = $stmt->execute([$newParentId, $folderId, $workspace, $workspace]);
+            $stmt = $con->prepare("UPDATE folders SET parent_id = ? WHERE id = ? AND workspace = ?");
+            $success = $stmt->execute([$newParentId, $folderId, $workspace]);
         } else {
             $stmt = $con->prepare("UPDATE folders SET parent_id = ? WHERE id = ?");
             $success = $stmt->execute([$newParentId, $folderId]);
@@ -879,11 +878,11 @@ switch($action) {
             
             // Add workspace constraint
             if ($workspace !== null) {
-                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $duplicateCheckQuery .= " AND workspace = ?";
                 $duplicateCheckParams[] = $workspace;
                 $duplicateCheckParams[] = $workspace;
             } elseif ($currentNote['workspace'] !== null) {
-                $duplicateCheckQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $duplicateCheckQuery .= " AND workspace = ?";
                 $duplicateCheckParams[] = $currentNote['workspace'];
                 $duplicateCheckParams[] = $currentNote['workspace'];
             }

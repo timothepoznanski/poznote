@@ -13,8 +13,8 @@
 
 	// First check the heading to see if it's protected
 	if ($workspace) {
-		$checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-		$checkStmt->execute([$id, $workspace, $workspace]);
+		$checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND workspace = ?");
+		$checkStmt->execute([$id, $workspace]);
 	} else {
 		$checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
 		$checkStmt->execute([$id]);
@@ -24,8 +24,8 @@
 	// Get note data before deletion to access attachments and type
 
 	if ($workspace) {
-		$stmt = $con->prepare("SELECT attachments, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-		$stmt->execute([$id, $workspace, $workspace]);
+		$stmt = $con->prepare("SELECT attachments, type FROM entries WHERE id = ? AND workspace = ?");
+		$stmt->execute([$id, $workspace]);
 	} else {
 		$stmt = $con->prepare("SELECT attachments, type FROM entries WHERE id = ?");
 		$stmt->execute([$id]);
@@ -55,8 +55,8 @@
 	
 	// Delete database entry (respect workspace if provided)
 	if ($workspace) {
-		$stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-		echo $stmt->execute([$id, $workspace, $workspace]) ? 1 : 'Database error occurred';
+		$stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
+		echo $stmt->execute([$id, $workspace]) ? 1 : 'Database error occurred';
 	} else {
 		$stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
 		echo $stmt->execute([$id]) ? 1 : 'Database error occurred';

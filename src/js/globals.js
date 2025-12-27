@@ -2,8 +2,8 @@
 var noteid = -1;
 var selectedFolderId = null; // ID du dossier sélectionné
 var selectedFolder = null; // Nom du dossier (pour affichage uniquement)
-// Initialize from window.selectedWorkspace if available (set by PHP), otherwise default to Poznote
-var selectedWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : 'Poznote';
+// Initialize from window.selectedWorkspace if available (set by PHP), otherwise empty string
+var selectedWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : '';
 var currentNoteFolder = null;
 var currentNoteFolderId = null; // ID du dossier de la note actuelle
 var currentNoteIdForAttachments = null;
@@ -37,7 +37,7 @@ function getSelectedWorkspace() {
         var stored = localStorage.getItem('poznote_selected_workspace');
         if (stored) return stored;
     } catch(e) {}
-    return selectedWorkspace || 'Poznote';
+    return selectedWorkspace || '';
 }
 
 // Apply global preferences on load

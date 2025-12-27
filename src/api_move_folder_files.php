@@ -19,7 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $source_folder_id = isset($_POST['source_folder_id']) ? intval($_POST['source_folder_id']) : null;
 $target_folder_id = isset($_POST['target_folder_id']) ? intval($_POST['target_folder_id']) : null;
-$workspace = $_POST['workspace'] ?? 'Poznote';
+$workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : '';
+
+if (empty($workspace)) {
+    // Fetch the first available workspace from database
+    $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+    $wsRow = $wsStmt->fetch(PDO::FETCH_ASSOC);
+    $workspace = $wsRow ? $wsRow['name'] : '';
+}
 
 if ($source_folder_id === null) {
     ob_clean();
@@ -80,8 +87,8 @@ try {
         }
         
         // Verify workspace match
-        $targetWorkspace = $targetFolderData['workspace'] ?: 'Poznote';
-        if ($targetWorkspace !== $workspace && !($targetWorkspace === null && $workspace === 'Poznote')) {
+        $targetWorkspace = $targetFolderData['workspace'] ?? '';
+        if ($targetWorkspace !== $workspace) {
             $con->rollBack();
             ob_clean();
             error_log("Target folder ID $target_folder_id belongs to workspace '$targetWorkspace', not '$workspace'");
@@ -98,8 +105,7 @@ try {
     
     // Apply workspace filter
     if (!empty($workspace)) {
-        $sql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace;
+        $sql .= " AND workspace = ?";
         $params[] = $workspace;
     }
     

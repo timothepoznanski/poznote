@@ -50,8 +50,8 @@ function isNoteFavorite($con, $note, $workspace_filter) {
         return false;
     }
     
-    $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-    $stmt_check_favorite->execute([$note, $workspace_filter, $workspace_filter]);
+    $stmt_check_favorite = $con->prepare("SELECT favorite FROM entries WHERE trash = 0 AND heading = ? AND workspace = ?");
+    $stmt_check_favorite->execute([$note, $workspace_filter]);
     $favorite_data = $stmt_check_favorite->fetch(PDO::FETCH_ASSOC);
     
     return $favorite_data && $favorite_data['favorite'] == 1;

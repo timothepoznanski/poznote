@@ -4,6 +4,7 @@ requireApiAuth();
 
 header('Content-Type: application/json');
 require_once 'config.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 
 /**
@@ -77,7 +78,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 
 // Inputs
-$workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : 'Poznote';
+$workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : getFirstWorkspaceName();
 $folder_path = isset($data['folder_path']) ? trim((string)$data['folder_path']) : null;
 $create_parents = isset($data['create_parents']) ? (bool)$data['create_parents'] : false;
 

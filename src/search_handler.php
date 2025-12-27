@@ -99,9 +99,7 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
 
     // Apply workspace filter
     if (!empty($workspace_filter)) {
-        $where_conditions[] = "(workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        // We push workspace twice to match the two placeholders
-        $search_params[] = $workspace_filter;
+        $where_conditions[] = "workspace = ?";
         $search_params[] = $workspace_filter;
     }
     

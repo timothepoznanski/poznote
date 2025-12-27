@@ -29,9 +29,9 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             // First time seeing this folder_id - get the canonical name from folders table
             $canonicalQuery = "SELECT name FROM folders WHERE id = ?";
             if ($workspace_filter) {
-                $canonicalQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $canonicalQuery .= " AND workspace = ?";
                 $canonicalStmt = $con->prepare($canonicalQuery);
-                $canonicalStmt->execute([$folderId, $workspace_filter, $workspace_filter]);
+                $canonicalStmt->execute([$folderId, $workspace_filter]);
             } else {
                 $canonicalStmt = $con->prepare($canonicalQuery);
                 $canonicalStmt->execute([$folderId]);
@@ -66,7 +66,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
 function addEmptyFolders($con, $folders, $workspace_filter) {
     $folders_sql = "SELECT id, name FROM folders";
     if (!empty($workspace_filter)) {
-        $folders_sql .= " WHERE (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
+        $folders_sql .= " WHERE workspace = '" . addslashes($workspace_filter) . "'";
     }
     $folders_sql .= " ORDER BY name";
     
@@ -212,8 +212,8 @@ function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filt
  */
 function getTotalNotesCount($con, $workspace_filter) {
     $total_notes_query = "SELECT COUNT(*) as total FROM entries WHERE trash = 0";
-    if (isset($workspace_filter)) {
-        $total_notes_query .= " AND (workspace = '" . addslashes($workspace_filter) . "' OR (workspace IS NULL AND '" . addslashes($workspace_filter) . "' = 'Poznote'))";
+    if (isset($workspace_filter) && $workspace_filter !== '') {
+        $total_notes_query .= " AND workspace = '" . addslashes($workspace_filter) . "'";
     }
     $total_notes_result = $con->query($total_notes_query);
     return $total_notes_result->fetch(PDO::FETCH_ASSOC)['total'];
@@ -257,8 +257,7 @@ function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
         $query = "SELECT parent_id FROM folders WHERE id = ?";
         $params = [$folderId];
         if ($workspace_filter) {
-            $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace_filter;
+            $query .= " AND workspace = ?";
             $params[] = $workspace_filter;
         }
         

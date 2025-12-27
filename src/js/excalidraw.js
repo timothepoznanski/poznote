@@ -34,9 +34,11 @@ function openExcalidrawNote(noteId) {
     }
     
     var params = new URLSearchParams({
-        note_id: noteId,
-        workspace: selectedWorkspace || 'Poznote'
+        note_id: noteId
     });
+    if (selectedWorkspace) {
+        params.append('workspace', selectedWorkspace);
+    }
     
     // Redirect to Excalidraw editor
     window.location.href = 'excalidraw_editor.php?' + params.toString();
@@ -314,9 +316,11 @@ function openExcalidrawEditor(diagramId) {
     // Redirect to Excalidraw editor with diagram context
     const params = new URLSearchParams({
         diagram_id: diagramId,
-        note_id: currentNoteId,
-        workspace: selectedWorkspace || 'Poznote'
+        note_id: currentNoteId
     });
+    if (selectedWorkspace) {
+        params.append('workspace', selectedWorkspace);
+    }
     
     window.location.href = 'excalidraw_editor.php?' + params.toString();
 }

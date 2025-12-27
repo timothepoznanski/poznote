@@ -55,8 +55,8 @@ try {
 
     if ($noteId !== null) {
         if ($useWorkspaceFilter) {
-            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt->execute([$noteId, $workspace, $workspace]);
+            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+            $stmt->execute([$noteId, $workspace]);
         } else {
             $stmt = $con->prepare('SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0');
             $stmt->execute([$noteId]);
@@ -74,12 +74,12 @@ try {
 
         if (is_numeric($reference)) {
             $refId = (int)$reference;
-            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt->execute([$refId, $workspace, $workspace]);
+            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+            $stmt->execute([$refId, $workspace]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
         } else {
-            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE trash = 0 AND heading LIKE ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-            $stmt->execute(['%' . $reference . '%', $workspace, $workspace]);
+            $stmt = $con->prepare("SELECT id, heading, type, workspace FROM entries WHERE trash = 0 AND heading LIKE ? AND workspace = ? ORDER BY updated DESC LIMIT 1");
+            $stmt->execute(['%' . $reference . '%', $workspace]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
         }
     }

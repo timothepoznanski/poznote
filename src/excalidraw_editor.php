@@ -3,13 +3,14 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'page_init.php';
 
 // Get parameters
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
 $diagram_id = isset($_GET['diagram_id']) ? $_GET['diagram_id'] : null;
-$workspace = isset($_GET['workspace']) ? $_GET['workspace'] : 'Poznote';
+$workspace = isset($_GET['workspace']) ? $_GET['workspace'] : getFirstWorkspaceName();
 
 // Determine if we're in embedded diagram mode
 $is_embedded_diagram = !empty($diagram_id);

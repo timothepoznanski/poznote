@@ -21,9 +21,9 @@ if (!$note_id) {
 // Get note details
 $query = "SELECT heading FROM entries WHERE id = ?";
 if ($workspace) {
-    $query = "SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+    $query = "SELECT heading FROM entries WHERE id = ? AND workspace = ?";
     $stmt = $con->prepare($query);
-    $stmt->execute([$note_id, $workspace, $workspace]);
+    $stmt->execute([$note_id, $workspace]);
 } else {
     $stmt = $con->prepare($query);
     $stmt->execute([$note_id]);
@@ -613,7 +613,7 @@ if (!$note) {
         // Ensure Back to Notes preserves selected workspace if stored in localStorage
         try {
             var stored = localStorage.getItem('poznote_selected_workspace');
-            if (stored && stored !== 'Poznote') {
+            if (stored) {
                 var a = document.getElementById('backToNotesLink');
                 if (a) {
                     var params = [];

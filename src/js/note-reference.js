@@ -144,7 +144,7 @@
         
         try {
             // Get current workspace
-            const workspace = localStorage.getItem('poznote_selected_workspace') || 'Poznote';
+            const workspace = localStorage.getItem('poznote_selected_workspace') || '';
             
             // Fetch notes from API
             const response = await fetch(`api_list_notes.php?workspace=${encodeURIComponent(workspace)}`);
@@ -311,7 +311,7 @@
      * Navigate to a referenced note
      */
     window.navigateToNote = function(noteId) {
-        const workspace = localStorage.getItem('poznote_selected_workspace') || 'Poznote';
+        const workspace = localStorage.getItem('poznote_selected_workspace') || '';
         const isMobile = window.innerWidth <= 800;
         
         // Add scroll parameter for mobile to trigger auto-scroll to note content
@@ -367,7 +367,7 @@
     window.processNoteReferences = async function(container, workspace) {
         if (!container) return;
         
-        workspace = workspace || localStorage.getItem('poznote_selected_workspace') || 'Poznote';
+        workspace = workspace || localStorage.getItem('poznote_selected_workspace') || '';
         
         // Find all text nodes containing [[...]]
         const walker = document.createTreeWalker(

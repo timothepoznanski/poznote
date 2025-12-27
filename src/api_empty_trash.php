@@ -12,8 +12,8 @@
 
     // Delete all files and attachments from trash entries (scoped by workspace when provided)
     if ($workspace) {
-        $res_stmt = $con->prepare('SELECT id, attachments, type FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = \'Poznote\'))');
-        $res_stmt->execute([$workspace, $workspace]);
+        $res_stmt = $con->prepare('SELECT id, attachments, type FROM entries WHERE trash = 1 AND workspace = ?');
+        $res_stmt->execute([$workspace]);
         $rows = $res_stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
         $res = $con->query('SELECT id, attachments, type FROM entries WHERE trash = 1');
@@ -40,8 +40,8 @@
     
     // Delete all trash entries from database (scoped by workspace when provided)
     if ($workspace) {
-        $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $ok = $del_stmt->execute([$workspace, $workspace]);
+        $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1 AND workspace = ?");
+        $ok = $del_stmt->execute([$workspace]);
     } else {
         $del_stmt = $con->prepare("DELETE FROM entries WHERE trash = 1");
         $ok = $del_stmt->execute();

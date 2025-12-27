@@ -161,7 +161,7 @@ function createAPIBackup() {
     $currentFolder = '';
     if ($result) {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $workspace = htmlspecialchars($row['workspace'] ?: 'Poznote');
+            $workspace = htmlspecialchars($row['workspace'] ?: 'Default');
             $folder = htmlspecialchars($row['folder'] ?: 'Default');
             if ($currentWorkspace !== $workspace) {
                 if ($currentWorkspace !== '') {

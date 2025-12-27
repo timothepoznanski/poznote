@@ -11,23 +11,17 @@ $where_conditions = ["trash = 0"];
 $search_params = [];
 
 // Respect optional workspace parameter to scope tags
-$workspace = $_GET['workspace'] ?? $_POST['workspace'] ?? 'Poznote';
+$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
 
 $where_clause = implode(" AND ", $where_conditions);
 
 // Execute query with proper parameters
 $select_query = "SELECT tags FROM entries WHERE $where_clause";
 
-// If workspace is provided and not the default, add workspace condition to where clause and params
-if ($workspace !== null && $workspace !== 'Poznote') {
-	// Append workspace condition to where clause and parameters
-	// We add it now because $where_clause was already built without workspace
-	$select_query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+// Add workspace condition if provided
+if (!empty($workspace)) {
+	$select_query .= " AND workspace = ?";
 	$search_params[] = $workspace;
-	$search_params[] = $workspace;
-} else {
-	// For Poznote workspace, include entries with no workspace or explicit Poznote workspace
-	$select_query .= " AND (workspace IS NULL OR workspace = 'Poznote')";
 }
 
 $stmt = $con->prepare($select_query);

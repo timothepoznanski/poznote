@@ -4,6 +4,7 @@ requireApiAuth();
 
 header('Content-Type: application/json');
 require_once 'config.php';
+require_once 'functions.php';
 require_once 'db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -12,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-$workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : 'Poznote';
+$workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : getFirstWorkspaceName();
 $includeHierarchy = isset($_GET['include_hierarchy']) && (string)$_GET['include_hierarchy'] !== ''
     ? filter_var($_GET['include_hierarchy'], FILTER_VALIDATE_BOOLEAN)
     : false;
