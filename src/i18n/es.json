@@ -62,7 +62,8 @@
       "delete_prefix": "Error al eliminar carpeta: {{error}}",
       "rename_prefix": "Error al renombrar carpeta: {{error}}",
       "load_prefix": "Error al cargar carpetas: {{error}}",
-      "empty_folder_prefix": "Error al vaciar carpeta: {{error}}"
+      "empty_folder_prefix": "Error al vaciar carpeta: {{error}}",
+      "move_folder_prefix": "Error al mover la carpeta: {{error}}"
     },
     "validation": {
       "enter_folder_name": "Por favor ingresa un nombre de carpeta"
@@ -86,6 +87,10 @@
     "subfolder": {
       "modal_title": "Nueva subcarpeta",
       "modal_message": "Ingresa el nombre de la subcarpeta (dentro de {{parent}})"
+    },
+    "move": {
+      "moving": "Moviendo...",
+      "success": "Carpeta \"{{folder}}\" movida exitosamente"
     }
   },
   "modal_alerts": {
@@ -691,6 +696,15 @@
         "pacific": "Pacífico",
         "africa": "África"
       }
+    },
+    "move_folder": {
+      "title": "Mover carpeta",
+      "prompt_prefix": "Mover carpeta",
+      "prompt_suffix": "a:",
+      "select_target": "Seleccionar carpeta padre...",
+      "root": "Raíz (Nivel superior)",
+      "hint": "Esto moverá la carpeta y todas sus notas como subcarpeta. Seleccione \"Raíz\" para moverla al nivel superior.",
+      "move": "Mover carpeta"
     }
   },
   "notes_list": {
@@ -707,7 +721,8 @@
       "create": "Crear",
       "move_all_files": "Mover todos los archivos a otra carpeta",
       "rename_folder": "Renombrar carpeta",
-      "delete_folder": "Eliminar carpeta"
+      "delete_folder": "Eliminar carpeta",
+      "move_folder": "Mover carpeta a subcarpeta"
     }
   },
   "update": {
@@ -1209,6 +1224,18 @@
         "title": "Tablas",
         "col_name": "Nombre",
         "col_value": "Valor"
+      },
+      "math": {
+        "title": "Ecuaciones Matemáticas",
+        "inline": {
+          "title": "Ecuaciones en Línea"
+        },
+        "block": {
+          "title": "Ecuaciones en Bloque"
+        },
+        "examples": {
+          "title": "Más Ejemplos"
+        }
       },
       "mermaid": {
         "title": "Diagramas Mermaid",

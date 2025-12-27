@@ -7,7 +7,17 @@
 
 <!-- Notes list display -->
 <?php
-// Render a dedicated "Trash" folder above Favorites
+// Container pour les 4 dossiers système (Trash, Tags, Public, Favorites) en mode icônes centrées
+echo "<div class='system-folders-container'>";
+
+// Icône toggle pour la barre de recherche
+echo "<div class='folder-header system-folder' onclick='toggleSearchBar()' title='Recherche'>";
+echo "<div class='folder-toggle'>";
+echo "<i class='fa-search folder-icon'></i>";
+echo "<span class='folder-name'>Recherche</span>";
+echo "</div></div>";
+
+// Render a dedicated "Trash" folder
 try {
     $trash_count = 0;
     if (isset($con)) {
@@ -19,11 +29,11 @@ try {
     $trash_count = 0;
 }
 
-echo "<div class='folder-header' data-folder='Trash'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<div class='folder-header system-folder' data-folder='Trash'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.trash', [], 'Trash') . "'>";
 echo "<i class='fa-trash folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
-echo "<span class='folder-note-count' id='count-Trash'>(" . $trash_count . ")</span>";
+echo "<span class='folder-note-count' id='count-Trash'>" . $trash_count . "</span>";
 echo "</div></div>";
 
 // Render a dedicated "Tags" folder that links to the tag listing page
@@ -55,11 +65,11 @@ try {
     $tag_count = 0;
 }
 
-echo "<div class='folder-header' data-folder='Tags'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<div class='folder-header system-folder' data-folder='Tags'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.tags', [], 'Tags') . "'>";
 echo "<i class='fa-tags folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'Tags') . "</span>";
-echo "<span class='folder-note-count' id='count-tags'>(" . $tag_count . ")</span>";
+echo "<span class='folder-note-count' id='count-tags'>" . $tag_count . "</span>";
 echo "</div></div>";
 
 // Render a dedicated "Public" folder that links to the public notes page
@@ -81,18 +91,65 @@ try {
     $shared_count = 0;
 }
 
-echo "<div class='folder-header' data-folder='Public'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<div class='folder-header system-folder' data-folder='Public'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
 echo "<i class='fa-cloud folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
-echo "<span class='folder-note-count' id='count-shared'>(" . $shared_count . ")</span>";
+echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div></div>";
 
-// If there is no Favorites folder in the list, render the separator here so it always appears
-if (!is_array($folders) || !array_key_exists('Favorites', $folders)) {
-    echo "<div class='favorites-separator' aria-hidden='true'></div>";
+// Add Favorites as a system folder icon (will be rendered later in detail)
+// Count favorites for the current workspace
+$favorites_count = 0;
+try {
+    if (isset($con)) {
+        $query = "SELECT COUNT(*) as cnt FROM entries WHERE trash = 0 AND favorite = 1";
+        $params = [];
+        if (!empty($workspace_filter)) {
+            $query .= " AND workspace = ?";
+            $params[] = $workspace_filter;
+        }
+        $stmtFavorites = $con->prepare($query);
+        $stmtFavorites->execute($params);
+        $favorites_count = (int)$stmtFavorites->fetchColumn();
+    }
+} catch (Exception $e) {
+    $favorites_count = 0;
 }
 
+echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"folder-favorites\")' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
+echo "<i class='fa-star-light folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "</span>";
+echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
+echo "</div></div>";
+
+echo "</div>"; // Fin du container system-folders
+?>
+
+<!-- Search bar container - appears below the system icons when toggled -->
+<div class="contains_forms_search" id="search-bar-container">
+    <form id="unified-search-form" action="index.php" method="POST">
+        <div class="unified-search-container">
+            <div class="searchbar-row searchbar-icon-row">
+                <div class="searchbar-input-wrapper">
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <span class="searchbar-icon"><span class="fa-search"></span></span>
+                    <?php if (!empty($search) || !empty($tags_search)): ?>
+                        <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
+            <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
+            <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+            <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
+            <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
+        </div>
+    </form>
+</div>
+
+<?php
 /**
  * Recursive function to display folders and their subfolders
  */
@@ -206,10 +263,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     if (empty($folder_filter)) {
         echo "</div>"; // Close folder-content
         echo "</div>"; // Close folder-header
-        // Add a thin separator after Favorites to visually separate the top sections
-        if ($folderName === 'Favorites') {
-            echo "<div class='favorites-separator' aria-hidden='true'></div>";
-        }
     }
 }
 

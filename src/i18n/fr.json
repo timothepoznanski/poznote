@@ -52,9 +52,14 @@
       "empty_folder": "Ce dossier est vide",
       "unable_to_count_files": "Impossible de compter les fichiers"
     },
+    "move": {
+      "moving": "Déplacement...",
+      "success": "Dossier \"{{folder}}\" déplacé avec succès"
+    },
     "errors": {
       "check_content_prefix": "Erreur lors de la vérification du contenu du dossier : {{error}}",
       "move_files_prefix": "Erreur lors du déplacement des fichiers : {{error}}",
+      "move_folder_prefix": "Erreur lors du déplacement du dossier : {{error}}",
       "cannot_rename_system_folders": "Impossible de renommer les dossiers système",
       "generic_prefix": "Erreur : {{error}}",
       "create_title": "Erreur lors de la création du dossier",
@@ -691,6 +696,15 @@
         "pacific": "Pacifique",
         "africa": "Afrique"
       }
+    },
+    "move_folder": {
+      "title": "Déplacer le dossier",
+      "prompt_prefix": "Déplacer le dossier",
+      "prompt_suffix": "dans :",
+      "select_target": "Sélectionner le dossier parent...",
+      "root": "Racine (Niveau supérieur)",
+      "hint": "Ceci déplacera le dossier et toutes ses notes en tant que sous-dossier. Sélectionnez \"Racine\" pour le déplacer au niveau supérieur.",
+      "move": "Déplacer le dossier"
     }
   },
   "notes_list": {
@@ -706,6 +720,7 @@
     "folder_actions": {
       "create": "Créer",
       "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
+      "move_folder": "Déplacer le dossier en sous-dossier",
       "rename_folder": "Renommer le dossier",
       "delete_folder": "Supprimer le dossier"
     }
@@ -1211,6 +1226,18 @@
         "title": "Tableaux",
         "col_name": "Nom",
         "col_value": "Valeur"
+      },
+      "math": {
+        "title": "Équations mathématiques",
+        "inline": {
+          "title": "Équations en ligne"
+        },
+        "block": {
+          "title": "Équations en bloc"
+        },
+        "examples": {
+          "title": "Plus d'exemples"
+        }
       },
       "mermaid": {
         "title": "Diagrammes Mermaid",

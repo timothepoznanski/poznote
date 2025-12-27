@@ -1299,7 +1299,8 @@ a.links_arbo_left.selected-note {
 .contains_forms_search
 {
     width: 100%;
-    margin: 12px 0 15px 0;
+    margin: 5px 0 15px 0;
+    padding: 0;
     text-align: center;
     box-sizing: border-box;
     /* display: flex; */
@@ -2570,12 +2571,142 @@ hr {
     align-content: center;
 }
 
-/* Réduire les icônes dans les dossiers (Trash, Tags, Shared, Favorites) */
-.fa-trash.folder-icon,
-.fa-tags.folder-icon,
-.fa-cloud.folder-icon,
-.fa-star-light.folder-icon {
+/* Container pour les dossiers système (Trash, Tags, Public, Favorites) */
+.system-folders-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 0px 0px 15px 0px;
+    /* padding: 5px 0; */
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px 4px;
+    overflow: hidden;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+/* Dossiers système: affichage en icônes uniquement */
+.system-folder .folder-toggle {
+    padding: 3px;
+    justify-content: center;
+    width: auto;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+/* Cacher le nom des dossiers système */
+.system-folder .folder-name {
+    display: none !important;
+}
+
+/* Icônes des dossiers système */
+.system-folder .fa-trash.folder-icon,
+.system-folder .fa-tags.folder-icon,
+.system-folder .fa-cloud.folder-icon,
+.system-folder .fa-star-light.folder-icon,
+.system-folder .fa-eye.folder-icon,
+.system-folder .fa-cog.folder-icon,
+.system-folder .fa-search.folder-icon {
+    font-size: clamp(11px, 2vw, 14px) !important;
+    margin-right: 0 !important;
+    color: #007DB8;
+}
+
+/* Afficher le compteur en bas à droite de l'icône - toujours visible */
+.system-folder .folder-note-count {
+    display: inline-block !important;
+    opacity: 1 !important;
+    transform: none !important;
+    position: absolute;
+    bottom: 0px;
+    right: -14px;
+    color: #5b9bd5;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 600;
+    min-width: 14px;
+    text-align: center;
+    line-height: 1.2;
+    margin-left: 0;
+    pointer-events: auto;
+}
+
+.system-folder .folder-toggle {
+    position: relative;
+}
+
+/* Effet hover sur les icônes système */
+.system-folder .folder-toggle:hover {
+    background-color: transparent;
+}
+
+.system-folder .folder-toggle:hover .folder-icon {
+    color: #005a8a;
+    transform: scale(1.15);
+}
+
+/* Réduire les icônes dans les autres dossiers (non-système) */
+.folder-icon:not(.system-folder .folder-icon) {
     font-size: 0.8em !important;
+}
+
+/* Agrandir les icônes système en vue mobile */
+@media (max-width: 800px) {
+    .system-folder .fa-trash.folder-icon,
+    .system-folder .fa-tags.folder-icon,
+    .system-folder .fa-cloud.folder-icon,
+    .system-folder .fa-star-light.folder-icon,
+    .system-folder .fa-eye.folder-icon,
+    .system-folder .fa-cog.folder-icon,
+    .system-folder .fa-search.folder-icon {
+        font-size: 14px !important;
+    }
+}
+
+/* Cacher uniquement l'en-tête du dossier Favorites qui apparaît normalement dans la liste */
+/* On garde le contenu (folder-content) visible pour que les notes s'affichent */
+.folder-header[data-folder="Favorites"]:not(.system-folder) > .folder-toggle {
+    display: none !important;
+}
+
+/* S'assurer que le contenu des favoris reste visible et aligné à gauche */
+/* Retirer !important pour permettre au toggle JavaScript de fonctionner */
+#folder-favorites {
+    margin-left: 0 !important;
+}
+
+/* Ajouter une bordure de séparation en bas quand les favoris sont affichés */
+#folder-favorites[style*="display: block"],
+#folder-favorites:not([style*="display: none"]) {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+/* Aligner les notes favorites à gauche sans indentation */
+#folder-favorites .note-in-folder {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+#folder-favorites .links_arbo_left {
+    padding-left: 0 !important;
+}
+
+/* Ajouter une petite icône étoile à gauche des notes favorites */
+#folder-favorites .note-title::before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    margin-right: 8px;
+    margin-left: 6px;
+    color: #1f2937;
+    font-size: 1em;
+    transition: transform 0.2s;
+    align-content: center;
 }
 
 .folder-name {
@@ -2681,7 +2812,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding-left: 6px !important; /* Réduction du padding pour récupérer l'espace */
+    padding-left: 0px !important; /* Réduction du padding pour récupérer l'espace */
     transition: padding-left 0.2s;
 }
 

@@ -297,7 +297,10 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/tasks.css">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
+    <link rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.css'); ?>">
     <script src="js/mermaid/mermaid.min.js?v=<?php echo filemtime(__DIR__ . '/js/mermaid/mermaid.min.js'); ?>"></script>
+    <script src="js/katex/katex.min.js?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.js'); ?>"></script>
+    <script src="js/katex/auto-render.min.js?v=<?php echo filemtime(__DIR__ . '/js/katex/auto-render.min.js'); ?>"></script>
 </head>
 <body>
     <div class="public-note">
@@ -311,6 +314,7 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     </div>
 </body>
 <script src="js/copy-code-on-focus.js"></script>
+<script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
 <script>
     // Mark this as a public note page for JS behavior
     window.isPublicNotePage = true;

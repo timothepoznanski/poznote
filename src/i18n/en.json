@@ -52,9 +52,14 @@
       "empty_folder": "This folder is empty",
       "unable_to_count_files": "Unable to count files"
     },
+    "move": {
+      "moving": "Moving...",
+      "success": "Folder \"{{folder}}\" moved successfully"
+    },
     "errors": {
       "check_content_prefix": "Error checking folder content: {{error}}",
       "move_files_prefix": "Error moving files: {{error}}",
+      "move_folder_prefix": "Error moving folder: {{error}}",
       "cannot_rename_system_folders": "Cannot rename system folders",
       "generic_prefix": "Error: {{error}}",
       "create_title": "Error Creating Folder",
@@ -625,6 +630,15 @@
       "hint_move_all": "To move all notes from one workspace to another, go to Settings → Workspaces",
       "move_all": "Move All Files"
     },
+    "move_folder": {
+      "title": "Move Folder",
+      "prompt_prefix": "Move folder",
+      "prompt_suffix": "into:",
+      "select_target": "Select parent folder...",
+      "root": "Root (Top Level)",
+      "hint": "This will move the folder and all its notes as a subfolder. Select \"Root\" to move it to the top level.",
+      "move": "Move Folder"
+    },
     "workspaces": {
       "move_notes_title": "Move notes from",
       "select_target_workspace": "Select target workspace",
@@ -706,6 +720,7 @@
     "folder_actions": {
       "create": "Create",
       "move_all_files": "Move all files to another folder",
+      "move_folder": "Move folder to subfolder",
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder"
     }
@@ -1214,6 +1229,18 @@
         "title": "Tables",
         "col_name": "Name",
         "col_value": "Value"
+      },
+      "math": {
+        "title": "Mathematical Equations",
+        "inline": {
+          "title": "Inline Equations"
+        },
+        "block": {
+          "title": "Display Equations"
+        },
+        "examples": {
+          "title": "More Examples"
+        }
       },
       "mermaid": {
         "title": "Mermaid Diagrams",

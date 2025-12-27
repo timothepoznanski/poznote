@@ -35,6 +35,32 @@ function parseMarkdown($text) {
         return "\n" . $placeholder . "\n";
     }, $text);
     
+    // Extract and protect math equations (display mode: $$...$$)
+    $protectedMathBlocks = [];
+    $mathBlockIndex = 0;
+    
+    $text = preg_replace_callback('/\$\$(.+?)\$\$/s', function($matches) use (&$protectedMathBlocks, &$mathBlockIndex) {
+        $math = trim($matches[1]);
+        $placeholder = "\x00MATHBLOCK" . $mathBlockIndex . "\x00";
+        // Store the raw math content to be processed after HTML escaping
+        $protectedMathBlocks[$mathBlockIndex] = $math;
+        $mathBlockIndex++;
+        return "\n" . $placeholder . "\n";
+    }, $text);
+    
+    // Extract and protect inline math equations ($...$)
+    $protectedMathInline = [];
+    $mathInlineIndex = 0;
+    
+    $text = preg_replace_callback('/(?<!\$)\$(?!\$)(.+?)\$/', function($matches) use (&$protectedMathInline, &$mathInlineIndex) {
+        $math = trim($matches[1]);
+        $placeholder = "\x00MATHINLINE" . $mathInlineIndex . "\x00";
+        // Store the raw math content to be processed after HTML escaping
+        $protectedMathInline[$mathInlineIndex] = $math;
+        $mathInlineIndex++;
+        return $placeholder;
+    }, $text);
+    
     // Extract and protect images and links from HTML escaping
     $protectedElements = [];
     $protectedIndex = 0;
@@ -75,7 +101,7 @@ function parseMarkdown($text) {
     $html = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
     
     // Helper function to apply inline styles (bold, italic, code, etc.)
-    $applyInlineStyles = function($text) use (&$protectedElements) {
+    $applyInlineStyles = function($text) use (&$protectedElements, &$protectedMathInline) {
         // First, protect inline code content from other replacements
         $protectedCode = [];
         $codeIndex = 0;
@@ -104,6 +130,16 @@ function parseMarkdown($text) {
         $text = preg_replace_callback('/\x00CODE(\d+)\x00/', function($matches) use ($protectedCode) {
             $index = (int)$matches[1];
             return isset($protectedCode[$index]) ? $protectedCode[$index] : $matches[0];
+        }, $text);
+        
+        // Restore protected inline math elements
+        $text = preg_replace_callback('/\x00MATHINLINE(\d+)\x00/', function($matches) use ($protectedMathInline) {
+            $index = (int)$matches[1];
+            if (isset($protectedMathInline[$index])) {
+                $mathContent = $protectedMathInline[$index];
+                return '<span class="math-inline" data-math="' . htmlspecialchars($mathContent, ENT_QUOTES, 'UTF-8') . '"></span>';
+            }
+            return $matches[0];
         }, $text);
         
         // Restore protected elements (images and links)
@@ -148,6 +184,22 @@ function parseMarkdown($text) {
     
     for ($i = 0; $i < count($lines); $i++) {
         $line = $lines[$i];
+        
+        // Check if this line contains a protected math block placeholder
+        if (preg_match('/\x00MATHBLOCK\d+\x00/', $line)) {
+            $flushParagraph();
+            // Restore the math block directly as HTML element
+            $line = preg_replace_callback('/\x00MATHBLOCK(\d+)\x00/', function($matches) use ($protectedMathBlocks) {
+                $index = (int)$matches[1];
+                if (isset($protectedMathBlocks[$index])) {
+                    $mathContent = $protectedMathBlocks[$index];
+                    return '<span class="math-block" data-math="' . htmlspecialchars($mathContent, ENT_QUOTES, 'UTF-8') . '"></span>';
+                }
+                return $matches[0];
+            }, $line);
+            $result[] = $line;
+            continue;
+        }
         
         // Check if this line contains a protected code block placeholder
         if (preg_match('/\x00CODEBLOCK\d+\x00/', $line)) {

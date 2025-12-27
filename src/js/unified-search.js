@@ -71,6 +71,17 @@ class SearchManager {
         // Clear any previous search-only hiding so folders are visible by default
         this.clearSearchHiddenMarkers();
 
+        // Check if there's an active search
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasActiveSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
+        
+        // Show or hide system folders container based on search state
+        if (hasActiveSearch) {
+            this.hideSystemFoldersContainer();
+        } else {
+            this.showSystemFoldersContainer();
+        }
+
         // Restore state from URL parameters or defaults
         if (!this.suppressURLRestore) {
             this.restoreSearchStateFromURL(isMobile);
@@ -240,6 +251,34 @@ class SearchManager {
                     }
                 });
             });
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    /**
+     * Hide system folders container when executing search
+     */
+    hideSystemFoldersContainer() {
+        try {
+            const container = document.querySelector('.system-folders-container');
+            if (container) {
+                container.style.display = 'none';
+            }
+        } catch (err) {
+            // ignore
+        }
+    }
+
+    /**
+     * Show system folders container when clearing search
+     */
+    showSystemFoldersContainer() {
+        try {
+            const container = document.querySelector('.system-folders-container');
+            if (container) {
+                container.style.display = 'flex';
+            }
         } catch (err) {
             // ignore
         }
@@ -592,6 +631,9 @@ class SearchManager {
         if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
             return;
         }
+
+        // Hide system folders container when executing search
+        this.hideSystemFoldersContainer();
 
         // Update hidden inputs and hide special folders immediately so UI reflects search
     // debug info removed
@@ -1010,6 +1052,9 @@ class SearchManager {
         if (typeof clearSearchHighlights === 'function') {
             clearSearchHighlights();
         }
+
+        // Show system folders container when clearing search
+        this.showSystemFoldersContainer();
 
         // Build URL preserving workspace, folder, and search type
         const urlParams = new URLSearchParams(window.location.search);

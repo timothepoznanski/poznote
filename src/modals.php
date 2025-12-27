@@ -208,6 +208,22 @@
     </div>
 </div>
 
+<!-- Move Folder to Subfolder Modal -->
+<div id="moveFolderModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.move_folder.title', [], 'Move Folder'); ?></h3>
+        <p><?php echo t_h('modals.move_folder.prompt_prefix', [], 'Move folder'); ?> "<span id="moveFolderSourceName"></span>" <?php echo t_h('modals.move_folder.prompt_suffix', [], 'into:'); ?></p>
+        <select id="moveFolderTargetSelect">
+            <option value=""><?php echo t_h('modals.move_folder.select_target', [], 'Select parent folder...'); ?></option>
+        </select>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('moveFolderModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" onclick="executeMoveFolderToSubfolder()"><?php echo t_h('modals.move_folder.move', [], 'Move Folder'); ?></button>
+        </div>
+        <div id="moveFolderErrorMessage" class="modal-error-message"></div>
+    </div>
+</div>
+
 <!-- Move notes modal (for workspaces.php) -->
 <div id="moveNotesModal" class="modal" style="display:none;">
     <div class="modal-content">

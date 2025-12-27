@@ -293,3 +293,38 @@
     background-color: #2d2d2d;
 }
 
+/* Math equations styling */
+.math-block {
+    display: block;
+    margin: 1em 0;
+    padding: 0.5em 0;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.math-inline {
+    display: inline;
+    margin: 0 0.2em;
+}
+
+/* KaTeX font adjustments for better readability */
+.katex {
+    font-size: 1.1em;
+}
+
+.math-block .katex {
+    font-size: 1.21em;
+}
+
+/* Math error styling */
+.math-block span[style*="color: #cc0000"],
+.math-inline span[style*="color: #cc0000"] {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+/* Dark mode adjustments for math */
+[data-theme='dark'] .katex {
+    color: #e0e0e0;
+}

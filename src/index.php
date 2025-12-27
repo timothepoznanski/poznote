@@ -159,6 +159,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -167,6 +168,8 @@ $using_unified_search = handleUnifiedSearch();
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -363,37 +366,54 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="<?php echo t_h('sidebar.display'); ?>"><i class="fa-eye"></i></button>
-                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings'); ?>">
-                    <i class="fa-cog"></i>
-                    <span class="update-badge" style="display: none;"></span>
-                </button>
+                <button class="sidebar-display" onclick="navigateToDisplayOrSettings('display.php');" title="<?php echo t_h('sidebar.display', [], 'Display'); ?>"><i class="fa-eye"></i></button>
+                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i></button>
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
         </div>
 
-        <div class="contains_forms_search">
-            <form id="unified-search-form" action="index.php" method="POST">
-                <div class="unified-search-container">
-                    <div class="searchbar-row searchbar-icon-row">
-                        <div class="searchbar-input-wrapper">
-                            <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                            <span class="searchbar-icon"><span class="fa-search"></span></span>
-                            <?php if (!empty($search) || !empty($tags_search)): ?>
-                                <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
-                    <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
-                    <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
-                    <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
-                </div>
-            </form>
-        </div>
+    <script>
+    function toggleSearchBar() {
+        const searchContainer = document.getElementById('search-bar-container');
+        const searchInput = document.getElementById('unified-search');
+        const currentDisplay = window.getComputedStyle(searchContainer).display;
+        
+        if (currentDisplay === 'none') {
+            // Ouvrir la barre de recherche
+            searchContainer.style.display = 'block';
+            localStorage.setItem('searchBarVisible', 'true');
+            
+            // Positionner le curseur dans le champ de recherche
+            if (searchInput) {
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            }
+        } else {
+            // Fermer la barre de recherche
+            searchContainer.style.display = 'none';
+            localStorage.setItem('searchBarVisible', 'false');
+            
+            // Effacer la recherche en cours seulement s'il y a une recherche active
+            if (window.isSearchMode && typeof clearUnifiedSearch === 'function') {
+                clearUnifiedSearch();
+            }
+        }
+    }
+    
+    // Restaurer l'état au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchContainer = document.getElementById('search-bar-container');
+        const isVisible = localStorage.getItem('searchBarVisible');
+        
+        // Par défaut, la barre est visible
+        if (isVisible === 'false') {
+            searchContainer.style.display = 'none';
+        }
+    });
+    </script>
     </div>
         
     <script>
@@ -727,7 +747,6 @@ $body_classes = trim($extra_body_classes);
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     // Convert to HTML button (only for markdown notes)
@@ -794,7 +813,6 @@ $body_classes = trim($extra_body_classes);
                     
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fa-copy"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="'.t_h('common.move', [], 'Move').'"><i class="fa-folder-open"></i></button>';
                     
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" onclick="showExportModal(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
@@ -1163,6 +1181,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
+<script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>

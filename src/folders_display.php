@@ -184,6 +184,8 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         if ($noteCount > 0) {
             $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files to another folder') . "'></i>";
         }
+        // Move folder to subfolder action
+        $actions .= "<i class='fa-share folder-move-btn' onclick='event.stopPropagation(); showMoveEntireFolderDialog($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.move_folder', [], 'Move folder to subfolder') . "'></i>";
         $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename folder') . "'></i>";
         $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete folder') . "'></i>";
     }
