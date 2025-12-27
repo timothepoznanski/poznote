@@ -631,7 +631,7 @@
       "rename_title": "Arbeitsbereich umbenennen",
       "new_name": "Neuer Name",
       "delete_title": "Arbeitsbereich löschen bestätigen",
-      "delete_description": "Geben Sie den Arbeitsbereichsnamen ein, um die Löschung zu bestätigen. Alle Notizen und Ordner werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
+      "delete_description": "Alle Notizen und Ordner werden dauerhaft gelöscht und können nicht wiederhergestellt werden.",
       "delete_placeholder": "Arbeitsbereichsnamen eingeben, um zu bestätigen",
       "delete_button": "Arbeitsbereich löschen"
     },

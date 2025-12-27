@@ -631,7 +631,7 @@
       "rename_title": "Renombrar espacio de trabajo",
       "new_name": "Nuevo nombre",
       "delete_title": "Confirmar eliminación de espacio de trabajo",
-      "delete_description": "Ingresa el nombre del espacio de trabajo para confirmar la eliminación. Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
+      "delete_description": "Todas las notas y carpetas serán eliminadas permanentemente y no se pueden recuperar.",
       "delete_placeholder": "Escribe el nombre del espacio de trabajo para confirmar",
       "delete_button": "Eliminar"
     },

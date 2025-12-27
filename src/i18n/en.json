@@ -631,7 +631,7 @@
       "rename_title": "Rename workspace",
       "new_name": "New name",
       "delete_title": "Confirm delete workspace",
-      "delete_description": "Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.",
+      "delete_description": "All notes and folders will be permanently deleted and cannot be recovered.",
       "delete_placeholder": "Type workspace name to confirm",
       "delete_button": "Delete workspace"
     },

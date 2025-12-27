@@ -630,7 +630,7 @@
       "rename_title": "Renomear espaço de trabalho",
       "new_name": "Novo nome",
       "delete_title": "Confirmar exclusão do espaço de trabalho",
-      "delete_description": "Insira o nome do espaço de trabalho para confirmar a exclusão. Todas as notas e pastas serão excluídas permanentemente e não podem ser recuperadas.",
+      "delete_description": "Todas as notas e pastas serão excluídas permanentemente e não podem ser recuperadas.",
       "delete_placeholder": "Digite o nome do espaço de trabalho para confirmar",
       "delete_button": "Excluir"
     },

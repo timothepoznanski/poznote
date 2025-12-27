@@ -631,7 +631,7 @@
       "rename_title": "Renommer l’espace de travail",
       "new_name": "Nouveau nom",
       "delete_title": "Confirmer la suppression de l’espace de travail",
-      "delete_description": "Saisissez le nom de l’espace de travail pour confirmer la suppression. Toutes les notes et tous les dossiers seront supprimés définitivement et ne pourront pas être récupérés.",
+      "delete_description": "Toutes les notes et tous les dossiers seront supprimés définitivement et ne pourront pas être récupérés.",
       "delete_placeholder": "Tapez le nom de l’espace de travail pour confirmer",
       "delete_button": "Supprimer"
     },
