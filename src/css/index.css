@@ -520,6 +520,7 @@ body {
     animation: pulse 2s infinite;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     font-family: system-ui, -apple-system, sans-serif;
+    z-index: 10;
 }
 /* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
 
@@ -2576,7 +2577,7 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 25px;
+    gap: 40px;
     margin: 0px 0px 15px 0px;
     /* padding: 5px 0; */
     border: 1px solid #d3d6db;
@@ -2615,14 +2616,14 @@ hr {
     color: #007DB8;
 }
 
-/* Afficher le compteur en bas à droite de l'icône - toujours visible */
+/* Afficher le compteur à droite de l'icône - toujours visible */
 .system-folder .folder-note-count {
     display: inline-block !important;
     opacity: 1 !important;
-    transform: none !important;
     position: absolute;
-    bottom: 0px;
-    right: -14px;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
     color: #5b9bd5;
     padding: 1px 4px;
     font-size: 9px;
@@ -2630,12 +2631,14 @@ hr {
     min-width: 14px;
     text-align: center;
     line-height: 1.2;
-    margin-left: 0;
+    margin-left: -2px;
     pointer-events: auto;
+    z-index: 1;
 }
 
 .system-folder .folder-toggle {
     position: relative;
+    z-index: 2;
 }
 
 /* Effet hover sur les icônes système */

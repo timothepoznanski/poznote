@@ -97,6 +97,7 @@ body {
     justify-content: center;
     line-height: 1;
     animation: pulse 2s infinite;
+    z-index: 10;
 }
 
 @keyframes pulse {
