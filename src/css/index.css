@@ -1299,7 +1299,8 @@ a.links_arbo_left.selected-note {
 .contains_forms_search
 {
     width: 100%;
-    margin: 7px 0 15px 0;
+    margin: 5px 0 15px 0;
+    padding: 0;
     text-align: center;
     box-sizing: border-box;
     /* display: flex; */
@@ -2576,20 +2577,20 @@ hr {
     justify-content: center;
     align-items: center;
     gap: 0px;
-    margin: 0px 0px 20px 0px;
+    margin: 0px 0px 15px 0px;
     /* padding: 5px 0; */
     border: 1px solid #d3d6db;
     border-radius: 8px;
     background: #ffffff;
-    padding: 8px 0;
+    padding: 10px 4px;
 }
 
 /* Dossiers système: affichage en icônes uniquement */
 .system-folder .folder-toggle {
-    padding: 4px;
+    padding: 3px;
     justify-content: center;
     width: auto;
-    min-width: 48px;
+    min-width: 40px;
 }
 
 /* Cacher le nom des dossiers système */
@@ -2601,7 +2602,9 @@ hr {
 .system-folder .fa-trash.folder-icon,
 .system-folder .fa-tags.folder-icon,
 .system-folder .fa-cloud.folder-icon,
-.system-folder .fa-star-light.folder-icon {
+.system-folder .fa-star-light.folder-icon,
+.system-folder .fa-eye.folder-icon,
+.system-folder .fa-cog.folder-icon {
     font-size: 0.9em !important;
     margin-right: 0 !important;
     color: #007DB8;

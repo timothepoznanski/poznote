@@ -124,8 +124,46 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [
 echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
 echo "</div></div>";
 
-echo "</div>"; // Fin du container system-folders
+// Display icon
+echo "<div class='folder-header system-folder' data-folder='Display'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); navigateToDisplayOrSettings(\"display.php\");' title='" . t_h('sidebar.display', [], 'Display') . "'>";
+echo "<i class='fa-eye folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('sidebar.display', [], 'Display') . "</span>";
+echo "</div></div>";
 
+// Settings icon
+echo "<div class='folder-header system-folder' data-folder='Settings'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); navigateToDisplayOrSettings(\"settings.php\");' title='" . t_h('sidebar.settings', [], 'Settings') . "'>";
+echo "<i class='fa-cog folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('sidebar.settings', [], 'Settings') . "</span>";
+echo "</div></div>";
+
+echo "</div>"; // Fin du container system-folders
+?>
+
+<!-- Search bar container - appears below the system icons when toggled -->
+<div class="contains_forms_search" id="search-bar-container">
+    <form id="unified-search-form" action="index.php" method="POST">
+        <div class="unified-search-container">
+            <div class="searchbar-row searchbar-icon-row">
+                <div class="searchbar-input-wrapper">
+                    <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
+                    <span class="searchbar-icon"><span class="fa-search"></span></span>
+                    <?php if (!empty($search) || !empty($tags_search)): ?>
+                        <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
+            <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">
+            <input type="hidden" name="workspace" value="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+            <input type="hidden" id="search-in-notes" name="search_in_notes" value="<?php echo ($using_unified_search && !empty($_POST['search_in_notes']) && $_POST['search_in_notes'] === '1') || (!$using_unified_search && (!empty($search) || $preserve_notes)) ? '1' : ((!$using_unified_search && empty($search) && empty($tags_search) && !$preserve_tags) ? '1' : ''); ?>">
+            <input type="hidden" id="search-in-tags" name="search_in_tags" value="<?php echo ($using_unified_search && !empty($_POST['search_in_tags']) && $_POST['search_in_tags'] === '1') || (!$using_unified_search && (!empty($tags_search) || $preserve_tags)) ? '1' : ''; ?>">
+        </div>
+    </form>
+</div>
+
+<?php
 /**
  * Recursive function to display folders and their subfolders
  */
