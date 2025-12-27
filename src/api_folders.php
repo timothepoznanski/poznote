@@ -880,10 +880,8 @@ switch($action) {
             if ($workspace !== null) {
                 $duplicateCheckQuery .= " AND workspace = ?";
                 $duplicateCheckParams[] = $workspace;
-                $duplicateCheckParams[] = $workspace;
             } elseif ($currentNote['workspace'] !== null) {
                 $duplicateCheckQuery .= " AND workspace = ?";
-                $duplicateCheckParams[] = $currentNote['workspace'];
                 $duplicateCheckParams[] = $currentNote['workspace'];
             }
             
