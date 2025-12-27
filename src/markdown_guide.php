@@ -241,9 +241,25 @@ $currentLang = getUserLanguage();
         .mermaid {
             margin: 10px 0 20px 0;
         }
+        
+        .math-block {
+            display: block;
+            margin: 1em 0;
+            padding: 0.5em 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        
+        .math-inline {
+            display: inline;
+            margin: 0 0.2em;
+        }
     </style>
 
+    <link rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo urlencode($v); ?>">
     <script src="js/mermaid/mermaid.min.js?v=<?php echo urlencode($v); ?>"></script>
+    <script src="js/katex/katex.min.js?v=<?php echo urlencode($v); ?>"></script>
+    <script src="js/katex/auto-render.min.js?v=<?php echo urlencode($v); ?>"></script>
     <script>
         if (window.mermaid) {
             window.mermaid.initialize({
@@ -251,6 +267,33 @@ $currentLang = getUserLanguage();
                 securityLevel: 'strict'
             });
         }
+        
+        // Render math equations
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof katex !== 'undefined') {
+                var mathBlocks = document.querySelectorAll('.math-block');
+                mathBlocks.forEach(function(block) {
+                    var mathContent = block.getAttribute('data-math');
+                    if (mathContent) {
+                        katex.render(mathContent, block, {
+                            displayMode: true,
+                            throwOnError: false
+                        });
+                    }
+                });
+                
+                var mathInline = document.querySelectorAll('.math-inline');
+                mathInline.forEach(function(inline) {
+                    var mathContent = inline.getAttribute('data-math');
+                    if (mathContent) {
+                        katex.render(mathContent, inline, {
+                            displayMode: false,
+                            throwOnError: false
+                        });
+                    }
+                });
+            }
+        });
     </script>
 </head>
 <body>
@@ -273,6 +316,7 @@ $currentLang = getUserLanguage();
             <li><a href="#line-breaks"><?php echo t_h('markdown_guide.sections.line_breaks.title'); ?></a></li>
             <li><a href="#horizontal-rule"><?php echo t_h('markdown_guide.sections.horizontal_rule.title'); ?></a></li>
             <li><a href="#tables"><?php echo t_h('markdown_guide.sections.tables.title'); ?></a></li>
+            <li><a href="#math"><?php echo t_h('markdown_guide.sections.math.title'); ?></a></li>
             <li><a href="#mermaid"><?php echo t_h('markdown_guide.sections.mermaid.title'); ?></a></li>
         </ul>
     </nav>
@@ -524,6 +568,61 @@ function hello(name) {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="math" class="section">
+        <h2><?php echo t_h('markdown_guide.sections.math.title'); ?></h2>
+        
+        <h3><?php echo t_h('markdown_guide.sections.math.inline.title'); ?></h3>
+        <div class="example">
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>Einstein's famous equation is $E = mc^2$ which relates energy and mass.</pre>
+            </div>
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
+                <div class="result">
+                    <p>Einstein's famous equation is <span class="math-inline" data-math="E = mc^2"></span> which relates energy and mass.</p>
+                </div>
+            </div>
+        </div>
+        
+        <h3><?php echo t_h('markdown_guide.sections.math.block.title'); ?></h3>
+        <div class="example">
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>$$
+E = mc^2
+$$</pre>
+            </div>
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
+                <div class="result">
+                    <span class="math-block" data-math="E = mc^2"></span>
+                </div>
+            </div>
+        </div>
+        
+        <h3><?php echo t_h('markdown_guide.sections.math.examples.title'); ?></h3>
+        <div class="example">
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.syntax'); ?></h3>
+                <pre>$$
+\int_{0}^{1} x^2 dx = \frac{1}{3}
+$$
+
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$$</pre>
+            </div>
+            <div>
+                <h3><?php echo t_h('markdown_guide.common.result'); ?></h3>
+                <div class="result">
+                    <span class="math-block" data-math="\int_{0}^{1} x^2 dx = \frac{1}{3}"></span>
+                    <span class="math-block" data-math="\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}"></span>
                 </div>
             </div>
         </div>

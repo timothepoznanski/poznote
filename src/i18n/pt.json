@@ -1226,6 +1226,18 @@
         "col_name": "Nome",
         "col_value": "Valor"
       },
+      "math": {
+        "title": "Equações Matemáticas",
+        "inline": {
+          "title": "Equações em Linha"
+        },
+        "block": {
+          "title": "Equações em Bloco"
+        },
+        "examples": {
+          "title": "Mais Exemplos"
+        }
+      },
       "mermaid": {
         "title": "Diagramas Mermaid",
         "node_a": "Escrever Markdown",

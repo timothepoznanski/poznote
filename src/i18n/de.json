@@ -1225,6 +1225,18 @@
         "col_name": "Name",
         "col_value": "Wert"
       },
+      "math": {
+        "title": "Mathematische Gleichungen",
+        "inline": {
+          "title": "Inline-Gleichungen"
+        },
+        "block": {
+          "title": "Block-Gleichungen"
+        },
+        "examples": {
+          "title": "Weitere Beispiele"
+        }
+      },
       "mermaid": {
         "title": "Mermaid-Diagramme",
         "node_a": "Markdown schreiben",

@@ -159,6 +159,7 @@ $using_unified_search = handleUnifiedSearch();
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -167,6 +168,8 @@ $using_unified_search = handleUnifiedSearch();
     <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
+    <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
 
 </head>
 
@@ -1178,6 +1181,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/share.js"></script>
 <script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
+<script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js"></script>
 <script src="js/resize-column.js"></script>
 <script src="js/unified-search.js"></script>

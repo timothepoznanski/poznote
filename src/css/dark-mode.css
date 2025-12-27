@@ -223,6 +223,12 @@ body.dark-mode .folder-note-count {
     color: #999;
 }
 
+/* System folder note count (trash, tags, public, favorites) - blue like in light mode */
+html[data-theme='dark'] .system-folder .folder-note-count,
+body.dark-mode .system-folder .folder-note-count {
+    color: #5b9bd5;
+}
+
 /* Toolbar icons */
 
 /* Notes list */

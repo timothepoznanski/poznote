@@ -261,6 +261,15 @@ function initMermaid(retryCount) {
                 console.error('Mermaid initialization failed', e2);
             }
         }
+        
+        // Render math equations with KaTeX
+        if (typeof renderMathInElement === 'function') {
+            try {
+                renderMathInElement(document.body);
+            } catch (mathError) {
+                console.error('Math rendering failed', mathError);
+            }
+        }
 }
 
 function parseMarkdown(text) {
@@ -279,7 +288,30 @@ function parseMarkdown(text) {
         return id ? parseInt(id, 10) : null;
     }
     
-    // First, extract and protect images and links from HTML escaping
+    // Extract and protect math equations first (before HTML escaping)
+    let protectedMathBlocks = [];
+    let mathBlockIndex = 0;
+    
+    // Protect display math $$...$$
+    text = text.replace(/\$\$(.+?)\$\$/gs, function(match, math) {
+        let placeholder = '\x00MATHBLOCK' + mathBlockIndex + '\x00';
+        protectedMathBlocks[mathBlockIndex] = math.trim();
+        mathBlockIndex++;
+        return '\n' + placeholder + '\n';
+    });
+    
+    // Protect inline math $...$
+    let protectedMathInline = [];
+    let mathInlineIndex = 0;
+    
+    text = text.replace(/(?<!\$)\$(?!\$)(.+?)\$/g, function(match, math) {
+        let placeholder = '\x00MATHINLINE' + mathInlineIndex + '\x00';
+        protectedMathInline[mathInlineIndex] = math.trim();
+        mathInlineIndex++;
+        return placeholder;
+    });
+    
+    // Extract and protect images and links from HTML escaping
     // We'll use placeholders and restore them later
     let protectedElements = [];
     let protectedIndex = 0;
@@ -364,6 +396,15 @@ function parseMarkdown(text) {
             return protectedElements[parseInt(index)] || match;
         });
         
+        // Restore protected inline math
+        text = text.replace(/\x00MATHINLINE(\d+)\x00/g, function(match, index) {
+            var mathContent = protectedMathInline[parseInt(index)];
+            if (mathContent) {
+                return '<span class="math-inline" data-math="' + escapeHtml(mathContent) + '"></span>';
+            }
+            return match;
+        });
+        
         return text;
     }
     
@@ -437,6 +478,20 @@ function parseMarkdown(text) {
         
         if (inCodeBlock) {
             codeBlockContent.push(line);
+            continue;
+        }
+        
+        // Check for math block placeholders
+        if (line.match(/\x00MATHBLOCK\d+\x00/)) {
+            flushParagraph();
+            line = line.replace(/\x00MATHBLOCK(\d+)\x00/g, function(match, index) {
+                var mathContent = protectedMathBlocks[parseInt(index)];
+                if (mathContent) {
+                    return '<span class="math-block" data-math="' + escapeHtml(mathContent) + '"></span>';
+                }
+                return match;
+            });
+            result.push(line);
             continue;
         }
         
@@ -842,9 +897,14 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
     
-    // Initialize Mermaid diagrams if in preview mode
+    // Initialize Mermaid diagrams and Math equations if in preview mode
     if (!startInEditMode && !isEmpty) {
-        setTimeout(initMermaid, 100);
+        setTimeout(function() {
+            initMermaid();
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(previewDiv);
+            }
+        }, 100);
     }
     
     var toolbar = document.querySelector('#note' + noteId + ' .note-edit-toolbar');
@@ -1012,7 +1072,12 @@ function switchToPreviewMode(noteId) {
     } else {
         previewDiv.innerHTML = parseMarkdown(markdownContent);
         previewDiv.classList.remove('empty');
-        setTimeout(initMermaid, 100);
+        setTimeout(function() {
+            initMermaid();
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(previewDiv);
+            }
+        }, 100);
     }
     
     noteEntry.setAttribute('data-markdown-content', markdownContent);
