@@ -2624,8 +2624,9 @@ hr {
 .system-folder .folder-toggle:hover .folder-note-count {
     display: inline-block;
     position: absolute;
-    top: 3px;
+    top: 50%;
     right: 3px;
+    transform: translateY(-50%);
     background: #007DB8;
     color: white;
     border-radius: 10px;
