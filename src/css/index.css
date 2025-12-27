@@ -2615,26 +2615,23 @@ hr {
     color: #007DB8;
 }
 
-/* Cacher le compteur par défaut pour les dossiers système */
+/* Afficher le compteur en bas à droite de l'icône - toujours visible */
 .system-folder .folder-note-count {
-    display: none;
-}
-
-/* Afficher le compteur au survol en tant que badge */
-.system-folder .folder-toggle:hover .folder-note-count {
-    display: inline-block;
+    display: inline-block !important;
+    opacity: 1 !important;
+    transform: none !important;
     position: absolute;
-    top: 50%;
-    right: 3px;
-    transform: translateY(-50%);
-    background: #007DB8;
-    color: white;
-    border-radius: 10px;
-    padding: 2px 6px;
-    font-size: 10px;
+    bottom: 0px;
+    right: -14px;
+    color: #5b9bd5;
+    padding: 1px 4px;
+    font-size: 9px;
     font-weight: 600;
-    min-width: 18px;
+    min-width: 14px;
     text-align: center;
+    line-height: 1.2;
+    margin-left: 0;
+    pointer-events: auto;
 }
 
 .system-folder .folder-toggle {
