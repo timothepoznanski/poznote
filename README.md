@@ -17,6 +17,10 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 </h3>
 
 <p align="center">
+  <img src="github.png" alt="Poznote" width="100%">
+</p>
+
+<p align="center">
   <img src="screen.png" alt="Poznote" width="100%">
 </p>
 
