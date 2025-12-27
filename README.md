@@ -585,6 +585,8 @@ docker compose up -d
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is an daily update check.
+
 <details>
 <summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
 
@@ -596,8 +598,13 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **HTML5** - Markup and structure
 - **CSS3** - Styling and responsive design
 - **JavaScript (Vanilla)** - Interactive features and dynamic content
-- **React + Vite** - Excalidraw drawing component (bundled as IIFE)
+- **React + Vite** - Build toolchain for Excalidraw component (bundled as IIFE)
 - **AJAX** - Asynchronous data loading
+
+### Libraries
+- **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
+- **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
+- **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
 
 ### Storage
 - **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
