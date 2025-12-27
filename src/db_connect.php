@@ -86,8 +86,11 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )');
 
-    // Insert default workspace
-    $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
+    // Insert default workspace only if no workspaces exist
+    $wsCount = $con->query("SELECT COUNT(*) FROM workspaces")->fetchColumn();
+    if ((int)$wsCount === 0) {
+        $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
+    }
 
     // Create settings table for configuration
     $con->exec('CREATE TABLE IF NOT EXISTS settings (

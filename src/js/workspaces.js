@@ -453,6 +453,15 @@ function handleRenameButtonClick(e) {
                     showAjaxAlert(tr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
                     // Close modal
                     try { closeRenameModal(); } catch(e) {}
+                    
+                    // Update localStorage if the renamed workspace was selected
+                    try {
+                        var stored = localStorage.getItem('poznote_selected_workspace');
+                        if (stored === currentName) {
+                            localStorage.setItem('poznote_selected_workspace', newName);
+                        }
+                    } catch(e) {}
+                    
                     // Reload page to show updated workspace name
                     setTimeout(function() {
                         window.location.reload();
@@ -534,11 +543,23 @@ function handleDeleteButtonClick(e) {
                     showAjaxAlert(tr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
                     // Close modal
                     try { closeDeleteModal(); } catch(e) {}
-                    // If the deleted workspace was the one stored in localStorage, clear it so other pages don't link to a removed workspace
+                    // If the deleted workspace was the one stored in localStorage, find another workspace
                     try {
                         var stored = localStorage.getItem('poznote_selected_workspace');
                         if (stored && stored === workspaceName) {
-                            localStorage.setItem('poznote_selected_workspace', 'Poznote');
+                            // Find another workspace from the page
+                            var newWorkspace = null;
+                            var items = document.querySelectorAll('.workspace-name-item');
+                            for (var i = 0; i < items.length; i++) {
+                                var wsName = items[i].textContent.trim();
+                                if (wsName !== workspaceName) {
+                                    newWorkspace = wsName;
+                                    break;
+                                }
+                            }
+                            if (newWorkspace) {
+                                localStorage.setItem('poznote_selected_workspace', newWorkspace);
+                            }
                         }
                     } catch (e) {}
                     // Additionally clean any folder-related localStorage keys left by this workspace
