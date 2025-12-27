@@ -311,9 +311,9 @@
       "name_empty": "O nome do espaço de trabalho não pode estar vazio",
       "invalid_name": "Nome de espaço de trabalho inválido. Use apenas letras, números, traço e sublinhado (sem espaços).",
       "name_required": "Nome do espaço de trabalho obrigatório",
-      "cannot_delete_default": "Não é possível excluir o espaço de trabalho principal",
+      "cannot_delete_default": "Não é possível excluir o espaço de trabalho inicial",
       "not_found": "Espaço de trabalho não encontrado",
-      "cannot_rename_default": "Não é possível renomear o espaço de trabalho principal",
+      "cannot_rename_default": "Não é possível renomear o espaço de trabalho inicial",
       "invalid_new_name": "Nome de espaço de trabalho novo inválido. Use apenas letras, números, traço e sublinhado (sem espaços).",
       "name_and_target_required": "Nome do espaço de trabalho e destino obrigatórios",
       "source_target_must_differ": "Os espaços de trabalho de origem e destino devem ser diferentes"
@@ -326,9 +326,8 @@
     },
     "confirm_delete": {
       "title": "Confirmar exclusão do espaço de trabalho",
-      "message": "Excluir espaço de trabalho \"{{workspace}}\"? As notas serão movidas para o espaço de trabalho principal."
-    },
-    "default_workspace_locked": "Espaço de trabalho principal (não pode ser excluído)"
+      "message": "Excluir espaço de trabalho \"{{workspace}}\"? As notas serão movidas para o espaço de trabalho inicial."
+    }
   },
   "display": {
     "title": "Exibição",
@@ -698,7 +697,7 @@
       "trash": "Lixeira",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "public": "Públicas"
+      "shared": "Públicas"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -811,12 +810,12 @@
     "toolbar": {
       "favorite_add": "Adicionar aos favoritos",
       "favorite_remove": "Remover dos favoritos",
-      "public_note": "Tornar nota pública",
+      "share_note": "Tornar nota pública",
       "attachments_with_count": "Anexos ({{count}})",
       "menu_actions": "Ações do menu",
       "convert_to_html": "Converter para HTML"
     },
-    "public_modal": {
+    "share_modal": {
       "title": "URL Pública",
       "close": "Fechar",
       "open": "Abrir",
@@ -862,7 +861,6 @@
     "link_modal": {
       "title_add": "Adicionar Link à Imagem",
       "title_edit": "Editar Link da Imagem",
-      "description": "Este link tornará a imagem clicável quando a nota for definida como pública.",
       "url_label": "Digite a URL:",
       "url_placeholder": "https://www.exemplo.com",
       "cancel": "Cancelar",
@@ -1221,27 +1219,27 @@
         "edge_yes": "Sim",
         "edge_no": "Não"
       }
+    },
+    "shared": {
+      "page": {
+        "title": "Notas Compartilhadas Publicamente",
+        "no_shared_notes": "Ainda não há notas compartilhadas.",
+        "share_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
+      },
+      "table": {
+        "note": "Nota",
+        "url": "URL Pública"
+      },
+      "actions": {
+        "open": "Abrir",
+        "revoke": "Revogar"
+      },
+      "indexable": "Indexável",
+      "password_protected": "Protegido por senha",
+      "add_password_title": "Adicionar proteção por senha",
+      "change_password_title": "Alterar senha",
+      "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
+      "enter_new_password": "Digite uma nova senha"
     }
-  },
-  "public": {
-    "page": {
-      "title": "Notas Compartilhadas Publicamente",
-      "no_public_notes": "Ainda não há notas compartilhadas.",
-      "public_hint": "Torne uma nota pública clicando no botão de nuvem na barra de ferramentas."
-    },
-    "table": {
-      "note": "Nota",
-      "url": "URL Pública"
-    },
-    "actions": {
-      "open": "Abrir",
-      "revoke": "Revogar"
-    },
-    "indexable": "Indexável",
-    "password_protected": "Protegido por senha",
-    "add_password_title": "Adicionar proteção por senha",
-    "change_password_title": "Alterar senha",
-    "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
-    "enter_new_password": "Digite uma nova senha"
   }
 }

@@ -160,7 +160,7 @@ function displayWorkspaceMenu(menu, workspaces) {
     }
     
     if (!workspaceExists && currentWorkspace === 'Poznote') {
-        workspaces.unshift({ name: 'Poznote', display_name: null, created: null });
+        workspaces.unshift({ name: 'Poznote', created: null });
     }
     
     // Sort workspaces: Poznote first, then alphabetically
@@ -176,14 +176,10 @@ function displayWorkspaceMenu(menu, workspaces) {
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'fa-check-light-full' : 'fa-layer-group';
-        // Use display_name if available, otherwise fall back to name
-        var displayName = workspace.display_name || workspace.name;
-        // Escape quotes for safe embedding in onclick
-        var escapedDisplayName = displayName.replace(/'/g, "\\'").replace(/"/g, '\\"');
         
-        menuHtml += '<div class="workspace-menu-item' + currentClass + '" onclick="switchToWorkspace(\'' + workspace.name + '\', \'' + escapedDisplayName + '\')">';
+        menuHtml += '<div class="workspace-menu-item' + currentClass + '" onclick="switchToWorkspace(\'' + workspace.name + '\')">';
         menuHtml += '<i class="' + icon + '"></i>';
-        menuHtml += '<span>' + displayName + '</span>';
+        menuHtml += '<span>' + workspace.name + '</span>';
         menuHtml += '</div>';
     }
     
@@ -202,14 +198,14 @@ function displayWorkspaceMenu(menu, workspaces) {
     menu.innerHTML = menuHtml;
 }
 
-function switchToWorkspace(workspaceName, displayName) {
+function switchToWorkspace(workspaceName) {
     if (workspaceName === selectedWorkspace) {
         closeWorkspaceMenus();
         return;
     }
     
     closeWorkspaceMenus();
-    updateWorkspaceNameInHeaders(workspaceName, displayName);
+    updateWorkspaceNameInHeaders(workspaceName);
     selectedWorkspace = workspaceName;
     
     try { 
@@ -263,22 +259,15 @@ function closeWorkspaceMenus() {
     if (menu2) menu2.style.display = 'none';
 }
 
-function updateWorkspaceNameInHeaders(workspaceName, displayName) {
+function updateWorkspaceNameInHeaders(workspaceName) {
     var desktopElement = document.getElementById('workspaceNameDesktop');
     var mobileElement = document.getElementById('workspaceNameMobile');
-    var titleElement = document.querySelector('.workspace-title-text');
-    
-    // Use displayName if provided, otherwise fall back to workspaceName
-    var nameToShow = displayName || workspaceName;
     
     if (desktopElement) {
-        desktopElement.textContent = nameToShow;
+        desktopElement.textContent = workspaceName;
     }
     if (mobileElement) {
-        mobileElement.textContent = nameToShow;
-    }
-    if (titleElement) {
-        titleElement.textContent = nameToShow;
+        mobileElement.textContent = workspaceName;
     }
 }
 
@@ -363,11 +352,6 @@ function closeDeleteModal() {
     document.getElementById('confirmDeleteBtn').disabled = true;
 }
 
-function closeEditDisplayNameModal() {
-    var modal = document.getElementById('editDisplayNameModal');
-    if (modal) modal.style.display = 'none';
-}
-
 function showAjaxAlert(msg, type) {
     // Prefer topAlert if available so messages appear in the same place as server messages
     if (typeof showTopAlert === 'function') {
@@ -418,14 +402,10 @@ function handleRenameButtonClick(e) {
     if (e.target && e.target.classList && e.target.classList.contains('btn-rename')) {
         var currentName = e.target.getAttribute('data-ws');
         if (!currentName || e.target.disabled) return;
-        
-        // Check if this is the Poznote workspace (uses display name instead of rename)
-        var isMainWorkspace = (currentName === 'Poznote');
-        var currentDisplayName = e.target.getAttribute('data-display-name') || '';
 
         // Populate modal with current name
         document.getElementById('renameSource').textContent = currentName;
-        document.getElementById('renameNewName').value = isMainWorkspace ? currentDisplayName : currentName;
+        document.getElementById('renameNewName').value = currentName;
 
         // Show modal
         document.getElementById('renameModal').style.display = 'flex';
@@ -433,100 +413,58 @@ function handleRenameButtonClick(e) {
         // Set up confirm button handler
         document.getElementById('confirmRenameBtn').onclick = function() {
             var newName = document.getElementById('renameNewName').value.trim();
-            
-            // For main workspace, allow empty (will use default name)
-            if (!isMainWorkspace) {
-                if (!newName) {
-                    showTopAlert(tr('workspaces.validation.enter_new_name', {}, 'Please enter a new name'), 'danger');
-                    return;
-                }
-                if (!isValidWorkspaceName(newName)) {
-                    showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
-                    return;
-                }
-                if (newName === currentName) {
-                    showTopAlert(tr('workspaces.validation.new_name_must_differ', {}, 'New name must be different from current name'), 'danger');
-                    return;
-                }
+            if (!newName) {
+                showTopAlert(tr('workspaces.validation.enter_new_name', {}, 'Please enter a new name'), 'danger');
+                return;
+            }
+            if (!isValidWorkspaceName(newName)) {
+                showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+                return;
+            }
+            if (newName === currentName) {
+                showTopAlert(tr('workspaces.validation.new_name_must_differ', {}, 'New name must be different from current name'), 'danger');
+                return;
             }
 
             // Disable button to prevent double clicks
             try { document.getElementById('confirmRenameBtn').disabled = true; } catch(e) {}
 
-            // Use different API endpoint for main workspace (update display_name only)
-            if (isMainWorkspace) {
-                fetch('api_workspaces.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'update_display_name',
-                        name: currentName,
-                        display_name: newName
-                    })
-                })
-                .then(function(resp) { return resp.json(); })
-                .then(function(json) {
-                    // Re-enable button
-                    try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
+            var params = new URLSearchParams({
+                action: 'rename',
+                name: currentName,
+                new_name: newName
+            });
 
-                    if (json && json.success) {
-                        showAjaxAlert(tr('workspaces.alerts.display_name_updated', {}, 'Display name updated successfully'), 'success');
-                        // Close modal
-                        try { closeRenameModal(); } catch(e) {}
-                        // Reload page to show updated workspace name
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.message || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
-                    }
-                })
-                .catch(function() {
-                    try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
-                    showAjaxAlert(tr('workspaces.alerts.display_name_error', {}, 'Error updating display name'), 'danger');
-                });
-            } else {
-                // Regular workspace rename
-                var params = new URLSearchParams({
-                    action: 'rename',
-                    name: currentName,
-                    new_name: newName
-                });
+            fetch('workspaces.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params.toString()
+            })
+            .then(function(resp) { return resp.json(); })
+            .then(function(json) {
+                // Re-enable button
+                try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
 
-                fetch('workspaces.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: params.toString()
-                })
-                .then(function(resp) { return resp.json(); })
-                .then(function(json) {
-                    // Re-enable button
-                    try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
-
-                    if (json && json.success) {
-                        showAjaxAlert(tr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
-                        // Close modal
-                        try { closeRenameModal(); } catch(e) {}
-                        // Reload page to show updated workspace name
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
-                    }
-                })
-                .catch(function() {
-                    try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
-                    showAjaxAlert(tr('workspaces.alerts.rename_error', {}, 'Error renaming workspace'), 'danger');
-                });
-            }
+                if (json && json.success) {
+                    showAjaxAlert(tr('workspaces.alerts.renamed_success', {}, 'Workspace renamed successfully'), 'success');
+                    // Close modal
+                    try { closeRenameModal(); } catch(e) {}
+                    // Reload page to show updated workspace name
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                }
+            })
+            .catch(function() {
+                try { document.getElementById('confirmRenameBtn').disabled = false; } catch(e) {}
+                showAjaxAlert(tr('workspaces.alerts.rename_error', {}, 'Error renaming workspace'), 'danger');
+            });
         };
     }
 }
@@ -646,79 +584,3 @@ function handleDeleteButtonClick(e) {
         };
     }
 }
-
-// Handle edit display name button clicks (for Poznote and other workspaces that need display name editing)
-function handleEditDisplayNameButtonClick(e) {
-    if (e.target && e.target.classList && e.target.classList.contains('btn-rename-display')) {
-        var workspaceName = e.target.getAttribute('data-ws');
-        var currentDisplayName = e.target.getAttribute('data-display-name') || '';
-        if (!workspaceName || e.target.disabled) return;
-
-        // Populate modal
-        document.getElementById('editDisplayNameSource').value = workspaceName;
-        document.getElementById('editDisplayNameInput').value = currentDisplayName;
-
-        // Show modal
-        document.getElementById('editDisplayNameModal').style.display = 'flex';
-
-        // Set up confirm button handler
-        document.getElementById('confirmEditDisplayNameBtn').onclick = function() {
-            var newDisplayName = document.getElementById('editDisplayNameInput').value.trim();
-
-            // Disable button to prevent double clicks
-            try { document.getElementById('confirmEditDisplayNameBtn').disabled = true; } catch(e) {}
-
-            fetch('api_workspaces.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'update_display_name',
-                    name: workspaceName,
-                    display_name: newDisplayName
-                })
-            })
-            .then(function(resp) { return resp.json(); })
-            .then(function(json) {
-                // Re-enable button
-                try { document.getElementById('confirmEditDisplayNameBtn').disabled = false; } catch(e) {}
-
-                if (json && json.success) {
-                    showAjaxAlert(tr('workspaces.alerts.display_name_updated', {}, 'Display name updated successfully'), 'success');
-                    // Close modal
-                    try { closeEditDisplayNameModal(); } catch(e) {}
-                    // Reload page to show updated workspace name
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.message || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
-                }
-            })
-            .catch(function() {
-                try { document.getElementById('confirmEditDisplayNameBtn').disabled = false; } catch(e) {}
-                showAjaxAlert(tr('workspaces.alerts.display_name_error', {}, 'Error updating display name'), 'danger');
-            });
-        };
-    }
-}
-
-// Initialize edit display name button listener
-document.addEventListener('click', handleEditDisplayNameButtonClick);
-
-// Handle clicks on disabled delete button for Poznote workspace
-document.addEventListener('click', function(e) {
-    if (e.target && e.target.classList && e.target.classList.contains('btn-delete-disabled')) {
-        e.preventDefault();
-        e.stopPropagation();
-        var msg = tr('workspaces.errors.cannot_delete_default', {}, 'Cannot delete the default workspace');
-        if (typeof showTopAlert === 'function') {
-            showTopAlert(msg, 'danger');
-        } else {
-            alert(msg);
-        }
-        return false;
-    }
-});

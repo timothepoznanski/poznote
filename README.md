@@ -741,9 +741,9 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api_move_note.php
 ```
 
-**Public Note**
+**Share Note**
 
-Create or enable public access for a note (generates public link):
+Create or enable public sharing for a note (generates public link):
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
@@ -759,7 +759,7 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api_share_note.php
 ```
 
-Get existing public note URL:
+Get existing share URL:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \

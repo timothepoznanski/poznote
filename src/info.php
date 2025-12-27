@@ -5,7 +5,6 @@ requireAuth();
 require_once 'config.php';
 include 'db_connect.php';
 require_once 'functions.php';
-require_once 'page_init.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -127,10 +126,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
 
             <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.workspace', [], 'Workspace:'); ?></div>
-                <div class="info-value"><?php 
-                    $workspaceName = $note['workspace'] ?? ($workspace ?: 'Poznote');
-                    echo htmlspecialchars(getWorkspaceDisplayName($workspaceName, $con)); 
-                ?></div>
+                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
             </div>
 
             <div class="info-row">

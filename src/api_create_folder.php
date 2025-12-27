@@ -46,7 +46,7 @@ function validateFolderSegment(string $segment): ?string {
     }
 
     // Prevent creating folders with reserved system names
-    $reserved = ['Favorites', 'Tags', 'Trash', 'Public'];
+    $reserved = ['Favorites', 'Tags', 'Trash', 'Shared'];
     if (in_array($segment, $reserved, true)) {
         return 'Cannot create folder with reserved name: ' . $segment;
     }

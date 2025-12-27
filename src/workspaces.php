@@ -370,13 +370,11 @@ if ($_POST) {
     }
 }
 
-// Read existing workspaces with display names
+// Read existing workspaces
 $workspaces = [];
-$workspace_display_names = [];
-$stmt = $con->query("SELECT name, display_name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+$stmt = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaces[] = $row['name'];
-    $workspace_display_names[$row['name']] = $row['display_name'] ?? null;
 }
 
 // Count notes per workspace, excluding trashed notes. Map NULL workspace to 'Poznote'.
@@ -475,16 +473,13 @@ try {
                     <ul>
                         <?php foreach ($workspaces as $ws): ?>
                                 <?php
-                                // Use display_name if set, otherwise use the workspace name
-                                $display_name = $workspace_display_names[$ws] ?? null;
-                                $ws_display = htmlspecialchars($display_name && $display_name !== '' ? $display_name : $ws);
-                                $ws_is_poznote = ($ws === 'Poznote');
+                                $ws_display = htmlspecialchars($ws);
                             ?>
                             <li>
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
-                                            <span class="workspace-name-item" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo $ws_display; ?></span>
+                                            <span class="workspace-name-item"><?php echo $ws_display; ?></span>
                                             <?php
                                                 $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                                 if ($cnt === 0) {
@@ -499,12 +494,7 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                                <?php if ($ws_is_poznote): ?>
-                                <!-- For Poznote: only allow changing display name, not the internal name -->
-                                <div class="ws-col ws-col-action">
-                                    <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-display-name="<?php echo htmlspecialchars($display_name ?? '', ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
-                                </div>
-                                <?php else: ?>
+                                <?php if ($ws !== 'Poznote'): ?>
                                 <div class="ws-col ws-col-action">
                                     <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                 </div>
@@ -515,17 +505,15 @@ try {
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button></div>
+                                <?php if ($ws !== 'Poznote'): ?>
                                 <div class="ws-col ws-col-delete">
-                                    <?php if ($ws === 'Poznote'): ?>
-                                        <button type="button" class="btn action-btn btn-delete-disabled" data-disabled="true" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.cannot_delete_default', [], 'Cannot delete the default workspace', $currentLang); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                    <?php else: ?>
-                                        <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                        </form>
-                                    <?php endif; ?>
+                                    <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
+                                    </form>
                                 </div>
+                                <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -537,7 +525,8 @@ try {
         <div class="settings-section">
             <h3><?php echo t_h('workspaces.default.title', [], 'Default Workspace', $currentLang); ?></h3>
             <p>
-                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
+                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?><br>
+                <?php echo t_h('workspaces.default.description_2', ['last' => t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang)], 'Select "{{last}}" to always open the workspace you were using previously.', $currentLang); ?>
             </p>
             <div class="form-group">
                 <select id="defaultWorkspaceSelect" style="width: 300px; padding: 8px; font-size: 14px; margin-right: 10px;">
@@ -627,12 +616,7 @@ try {
                 sel.innerHTML = '';
                 <?php foreach ($workspaces as $w): ?>
                     if ('<?php echo addslashes($w); ?>' !== source) {
-                        <?php
-                        // Use display_name if set, otherwise use the workspace name
-                        $display_name = $workspace_display_names[$w] ?? null;
-                        $display_text = $display_name && $display_name !== '' ? $display_name : $w;
-                        ?>
-                        var opt = document.createElement('option'); opt.value = '<?php echo addslashes($w); ?>'; opt.text = <?php echo json_encode($display_text); ?>; sel.appendChild(opt);
+                        var opt = document.createElement('option'); opt.value = '<?php echo addslashes($w); ?>'; opt.text = '<?php echo addslashes($w); ?>'; sel.appendChild(opt);
                     }
                 <?php endforeach; ?>
                 document.getElementById('moveNotesModal').style.display = 'flex';
@@ -734,8 +718,6 @@ try {
 
         // Default Workspace Management
         (function(){
-            var lastOpenedLabel = <?php echo json_encode(t('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
-
             window.loadDefaultWorkspaceSetting = function loadDefaultWorkspaceSetting() {
                 var select = document.getElementById('defaultWorkspaceSelect');
                 if (!select) return;
@@ -746,18 +728,13 @@ try {
                 // Add special option for last workspace opened
                 var optLast = document.createElement('option');
                 optLast.value = '__last_opened__';
-                optLast.textContent = lastOpenedLabel;
+                optLast.textContent = tr('workspaces.default.last_opened', {}, 'Last workspace opened');
                 select.appendChild(optLast);
                 
                 <?php foreach ($workspaces as $w): ?>
                     var opt = document.createElement('option');
                     opt.value = <?php echo json_encode($w); ?>;
-                    <?php
-                    // Use display_name if set, otherwise use the workspace name
-                    $display_name = $workspace_display_names[$w] ?? null;
-                    $display_text = $display_name && $display_name !== '' ? $display_name : $w;
-                    ?>
-                    opt.textContent = <?php echo json_encode($display_text); ?>;
+                    opt.textContent = <?php echo json_encode($w); ?>;
                     select.appendChild(opt);
                 <?php endforeach; ?>
                 
@@ -798,8 +775,8 @@ try {
                         if (result && result.success) {
                             if (status) {
                                 var displayText = selectedWorkspace === '__last_opened__' 
-                                    ? lastOpenedLabel
-                                    : (select.options[select.selectedIndex] ? select.options[select.selectedIndex].textContent : selectedWorkspace);
+                                    ? tr('workspaces.default.last_opened', {}, 'Last workspace opened') 
+                                    : selectedWorkspace;
                                 status.textContent = tr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                                 status.style.display = 'block';
                                 setTimeout(function() {

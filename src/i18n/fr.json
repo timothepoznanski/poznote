@@ -268,23 +268,21 @@
     },
     "actions": {
       "select": "Sélectionner",
-      "move_notes": "Déplacer les notes",
-      "edit_display_name": "Modifier le nom"
+      "move_notes": "Déplacer les notes"
     },
-    "default_workspace_locked": "Workspace principal (ne peut pas être supprimé)",
     "count": {
       "notes_0": "0 notes",
       "notes_1": "1 note",
       "notes_n": "{{count}} notes"
     },
     "default": {
-      "title": "Espace de travail de démarrage",
+      "title": "Workspace de démarrage",
       "description_1": "Choisissez l’espace de travail qui s’ouvre au démarrage de Poznote.",
       "description_2": "Sélectionnez \"{{last}}\" pour toujours ouvrir l’espace de travail que vous utilisiez précédemment.",
       "last_opened": "Dernier espace de travail ouvert",
       "save_button": "Enregistrer",
-      "status_set_to": "✓ Espace de travail de démarrage défini sur : {{workspace}}",
-      "error_saving": "Erreur lors de l'enregistrement de l'espace de travail de démarrage"
+      "status_set_to": "✓ Workspace de démarrage défini sur : {{workspace}}",
+      "error_saving": "Erreur lors de l'enregistrement du workspace de démarrage"
     },
     "validation": {
       "enter_name": "Saisissez un nom d’espace de travail",
@@ -298,9 +296,7 @@
       "renamed_success": "Espace de travail renommé avec succès",
       "deleted_success": "Espace de travail supprimé avec succès",
       "rename_error": "Erreur lors du renommage de l’espace de travail",
-      "delete_error": "Erreur lors de la suppression de l’espace de travail",
-      "display_name_updated": "Nom d'affichage mis à jour avec succès",
-      "display_name_error": "Erreur lors de la mise à jour du nom d'affichage"
+      "delete_error": "Erreur lors de la suppression de l’espace de travail"
     },
     "move": {
       "choose_target": "Choisissez une destination",
@@ -316,9 +312,9 @@
       "name_empty": "Le nom de l’espace de travail ne peut pas être vide",
       "invalid_name": "Nom d’espace de travail invalide. Utilisez uniquement des lettres, chiffres, tirets et underscores (sans espaces).",
       "name_required": "Nom de l’espace de travail requis",
-      "cannot_delete_default": "Impossible de supprimer le workspace principal",
+      "cannot_delete_default": "Impossible de supprimer le workspace de démarrage",
       "not_found": "Espace de travail introuvable",
-      "cannot_rename_default": "Impossible de renommer le workspace principal",
+      "cannot_rename_default": "Impossible de renommer le workspace de démarrage",
       "invalid_new_name": "Nouveau nom d’espace de travail invalide. Utilisez uniquement des lettres, chiffres, tirets et underscores (sans espaces).",
       "name_and_target_required": "Nom de l’espace de travail et destination requis",
       "source_target_must_differ": "Les espaces de travail source et destination doivent être différents"
@@ -331,7 +327,7 @@
     },
     "confirm_delete": {
       "title": "Confirmer la suppression de l’espace de travail",
-      "message": "Supprimer l'espace de travail \"{{workspace}}\" ? Les notes seront déplacées vers le workspace principal."
+      "message": "Supprimer l'espace de travail \"{{workspace}}\" ? Les notes seront déplacées vers le workspace de démarrage."
     }
   },
   "display": {
@@ -637,11 +633,7 @@
       "delete_title": "Confirmer la suppression de l’espace de travail",
       "delete_description": "Saisissez le nom de l’espace de travail pour confirmer la suppression. Toutes les notes et tous les dossiers seront supprimés définitivement et ne pourront pas être récupérés.",
       "delete_placeholder": "Tapez le nom de l’espace de travail pour confirmer",
-      "delete_button": "Supprimer",
-      "edit_display_name_title": "Modifier le nom d'affichage",
-      "edit_display_name_description": "Changez le nom d'affichage de cet espace de travail. Laissez vide pour utiliser le nom par défaut.",
-      "display_name_label": "Nom d'affichage",
-      "display_name_placeholder": "Entrez le nom d'affichage"
+      "delete_button": "Supprimer"
     },
     "create": {
       "title_in_folder": "Créer dans {{folder}}",
@@ -706,7 +698,7 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "public": "Publiques"
+      "shared": "Publiques"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -819,12 +811,12 @@
     "toolbar": {
       "favorite_add": "Ajouter aux favoris",
       "favorite_remove": "Retirer des favoris",
-      "public_note": "Rendre la note publique",
+      "share_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
       "menu_actions": "Actions du menu",
       "convert_to_html": "Convertir en HTML"
     },
-    "public_modal": {
+    "share_modal": {
       "title": "URL publique",
       "close": "Fermer",
       "open": "Ouvrir",
@@ -870,7 +862,6 @@
     "link_modal": {
       "title_add": "Ajouter un lien à l'image",
       "title_edit": "Modifier le lien de l'image",
-      "description": "Ce lien rendra l'image clickable lorsque la note sera définie comme publique.",
       "url_label": "Entrez l'URL du lien :",
       "url_placeholder": "https://www.exemple.com",
       "cancel": "Annuler",
@@ -1231,11 +1222,11 @@
       }
     }
   },
-  "public": {
+  "shared": {
     "page": {
       "title": "Notes publiques",
-      "no_public_notes": "Aucune note publique pour le moment.",
-      "public_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
+      "no_shared_notes": "Aucune note publique pour le moment.",
+      "share_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
     },
     "table": {
       "note": "Note",
