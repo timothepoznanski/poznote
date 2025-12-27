@@ -2576,13 +2576,16 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0px;
+    gap: 25px;
     margin: 0px 0px 15px 0px;
     /* padding: 5px 0; */
     border: 1px solid #d3d6db;
     border-radius: 8px;
     background: #ffffff;
     padding: 10px 4px;
+    overflow: hidden;
+    height: 40px;
+    box-sizing: border-box;
 }
 
 /* Dossiers système: affichage en icônes uniquement */
@@ -2590,7 +2593,8 @@ hr {
     padding: 3px;
     justify-content: center;
     width: auto;
-    min-width: 40px;
+    flex: 0 1 auto;
+    min-width: 0;
 }
 
 /* Cacher le nom des dossiers système */
@@ -2604,8 +2608,9 @@ hr {
 .system-folder .fa-cloud.folder-icon,
 .system-folder .fa-star-light.folder-icon,
 .system-folder .fa-eye.folder-icon,
-.system-folder .fa-cog.folder-icon {
-    font-size: 0.9em !important;
+.system-folder .fa-cog.folder-icon,
+.system-folder .fa-search.folder-icon {
+    font-size: clamp(11px, 2vw, 14px) !important;
     margin-right: 0 !important;
     color: #007DB8;
 }
@@ -2648,6 +2653,19 @@ hr {
 /* Réduire les icônes dans les autres dossiers (non-système) */
 .folder-icon:not(.system-folder .folder-icon) {
     font-size: 0.8em !important;
+}
+
+/* Agrandir les icônes système en vue mobile */
+@media (max-width: 800px) {
+    .system-folder .fa-trash.folder-icon,
+    .system-folder .fa-tags.folder-icon,
+    .system-folder .fa-cloud.folder-icon,
+    .system-folder .fa-star-light.folder-icon,
+    .system-folder .fa-eye.folder-icon,
+    .system-folder .fa-cog.folder-icon,
+    .system-folder .fa-search.folder-icon {
+        font-size: 14px !important;
+    }
 }
 
 /* Cacher uniquement l'en-tête du dossier Favorites qui apparaît normalement dans la liste */

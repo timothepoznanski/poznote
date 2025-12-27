@@ -124,20 +124,6 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [
 echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
 echo "</div></div>";
 
-// Display icon
-echo "<div class='folder-header system-folder' data-folder='Display'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); navigateToDisplayOrSettings(\"display.php\");' title='" . t_h('sidebar.display', [], 'Display') . "'>";
-echo "<i class='fa-eye folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('sidebar.display', [], 'Display') . "</span>";
-echo "</div></div>";
-
-// Settings icon
-echo "<div class='folder-header system-folder' data-folder='Settings'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); navigateToDisplayOrSettings(\"settings.php\");' title='" . t_h('sidebar.settings', [], 'Settings') . "'>";
-echo "<i class='fa-cog folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('sidebar.settings', [], 'Settings') . "</span>";
-echo "</div></div>";
-
 echo "</div>"; // Fin du container system-folders
 ?>
 
