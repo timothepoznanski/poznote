@@ -61,7 +61,8 @@
       "delete_prefix": "Erro ao excluir pasta: {{error}}",
       "rename_prefix": "Erro ao renomear pasta: {{error}}",
       "load_prefix": "Erro ao carregar pastas: {{error}}",
-      "empty_folder_prefix": "Erro ao esvaziar pasta: {{error}}"
+      "empty_folder_prefix": "Erro ao esvaziar pasta: {{error}}",
+      "move_folder_prefix": "Erro ao mover a pasta: {{error}}"
     },
     "validation": {
       "enter_folder_name": "Por favor, insira um nome de pasta"
@@ -85,6 +86,10 @@
     "subfolder": {
       "modal_title": "Nova Subpasta",
       "modal_message": "Insira o nome da subpasta (dentro de {{parent}})"
+    },
+    "move": {
+      "moving": "Movendo...",
+      "success": "Pasta \"{{folder}}\" movida com sucesso"
     }
   },
   "modal_alerts": {
@@ -690,6 +695,15 @@
         "pacific": "Pacífico",
         "africa": "África"
       }
+    },
+    "move_folder": {
+      "title": "Mover pasta",
+      "prompt_prefix": "Mover pasta",
+      "prompt_suffix": "para:",
+      "select_target": "Selecionar pasta pai...",
+      "root": "Raiz (Nível superior)",
+      "hint": "Isso moverá a pasta e todas as suas notas como subpasta. Selecione \"Raiz\" para movê-la para o nível superior.",
+      "move": "Mover pasta"
     }
   },
   "notes_list": {
@@ -706,7 +720,8 @@
       "create": "Criar",
       "move_all_files": "Mover todos os arquivos para outra pasta",
       "rename_folder": "Renomear pasta",
-      "delete_folder": "Excluir pasta"
+      "delete_folder": "Excluir pasta",
+      "move_folder": "Mover pasta para subpasta"
     }
   },
   "update": {

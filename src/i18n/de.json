@@ -62,7 +62,8 @@
       "delete_prefix": "Fehler beim Löschen des Ordners: {{error}}",
       "rename_prefix": "Fehler beim Umbenennen des Ordners: {{error}}",
       "load_prefix": "Fehler beim Laden der Ordner: {{error}}",
-      "empty_folder_prefix": "Fehler beim Leeren des Ordners: {{error}}"
+      "empty_folder_prefix": "Fehler beim Leeren des Ordners: {{error}}",
+      "move_folder_prefix": "Fehler beim Verschieben des Ordners: {{error}}"
     },
     "validation": {
       "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
@@ -86,6 +87,10 @@
     "subfolder": {
       "modal_title": "Neuer Unterordner",
       "modal_message": "Unterordnername eingeben (innerhalb von {{parent}})"
+    },
+    "move": {
+      "moving": "Verschieben...",
+      "success": "Ordner \"{{folder}}\" erfolgreich verschoben"
     }
   },
   "modal_alerts": {
@@ -691,6 +696,15 @@
         "pacific": "Pazifik",
         "africa": "Afrika"
       }
+    },
+    "move_folder": {
+      "title": "Ordner verschieben",
+      "prompt_prefix": "Ordner verschieben",
+      "prompt_suffix": "nach:",
+      "select_target": "Übergeordneten Ordner auswählen...",
+      "root": "Wurzel (Oberste Ebene)",
+      "hint": "Dies verschiebt den Ordner und alle seine Notizen als Unterordner. Wählen Sie \"Wurzel\", um ihn auf die oberste Ebene zu verschieben.",
+      "move": "Ordner verschieben"
     }
   },
   "notes_list": {
@@ -707,7 +721,8 @@
       "create": "Erstellen",
       "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
       "rename_folder": "Ordner umbenennen",
-      "delete_folder": "Ordner löschen"
+      "delete_folder": "Ordner löschen",
+      "move_folder": "Ordner in Unterordner verschieben"
     }
   },
   "update": {

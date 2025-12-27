@@ -1048,6 +1048,131 @@ function executeMoveAllFiles() {
     });
 }
 
+function showMoveEntireFolderDialog(folderId, folderName) {
+    // Show modal first
+    document.getElementById('moveFolderModal').style.display = 'block';
+    
+    // Then populate elements
+    document.getElementById('moveFolderSourceName').textContent = folderName;
+    document.getElementById('moveFolderSourceName').dataset.folderId = folderId;
+    
+    // Populate target folder dropdown
+    var select = document.getElementById('moveFolderTargetSelect');
+    if (!select) {
+        console.error('moveFolderTargetSelect element not found');
+        return;
+    }
+    
+    select.innerHTML = '';
+    
+    // Add "Root" option
+    var rootOption = document.createElement('option');
+    rootOption.value = '';
+    rootOption.textContent = window.t ? window.t('modals.move_folder.root', null, 'Root (Top Level)') : 'Root (Top Level)';
+    select.appendChild(rootOption);
+    
+    // Get all folders
+    fetch('api_list_notes.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace)
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success && data.folders) {
+            for (var targetFolderId in data.folders) {
+                if (!data.folders.hasOwnProperty(targetFolderId)) continue;
+                var folderData = data.folders[targetFolderId];
+                
+                // Don't include the source folder itself or Favorites
+                if (targetFolderId != folderId && targetFolderId !== 'favorites') {
+                    var option = document.createElement('option');
+                    option.value = targetFolderId;
+                    // Use full path if available, fallback to name
+                    option.textContent = folderData.path || folderData.name;
+                    select.appendChild(option);
+                }
+            }
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error)),
+            'error'
+        );
+    });
+}
+
+function executeMoveFolderToSubfolder() {
+    var sourceFolderElement = document.getElementById('moveFolderSourceName');
+    var sourceFolderId = sourceFolderElement.dataset.folderId;
+    var sourceFolderName = sourceFolderElement.textContent;
+    var targetFolderId = document.getElementById('moveFolderTargetSelect').value;
+    
+    // Empty value means move to root
+    var targetParentId = targetFolderId === '' ? null : parseInt(targetFolderId);
+    
+    // Disable the move button during operation
+    var moveButton = document.querySelector('#moveFolderModal .btn-primary');
+    var originalText = moveButton.textContent;
+    moveButton.disabled = true;
+    moveButton.textContent = window.t ? window.t('folders.move.moving', null, 'Moving...') : 'Moving...';
+    
+    // Prepare the request data
+    var requestData = {
+        folder_id: parseInt(sourceFolderId),
+        workspace: selectedWorkspace
+    };
+    
+    // Only add new_parent_folder_id if not moving to root
+    if (targetParentId !== null) {
+        requestData.new_parent_folder_id = targetParentId;
+    } else {
+        requestData.new_parent_folder_id = null;
+    }
+    
+    fetch('api_move_folder.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            return response.json().then(function(data) {
+                throw new Error(data.error || 'HTTP error! status: ' + response.status);
+            });
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Successfully moved folder
+            showNotificationPopup(
+                (window.t ? window.t('folders.move.success', { folder: sourceFolderName }, 'Folder "{{folder}}" moved successfully') : ('Folder "' + sourceFolderName + '" moved successfully')),
+                'success'
+            );
+            closeModal('moveFolderModal');
+            // Refresh the page to reflect changes
+            location.reload();
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+    })
+    .catch(function(error) {
+        showNotificationPopup(
+            (window.t ? window.t('folders.errors.move_folder_prefix', { error: error.message }, 'Error moving folder: {{error}}') : ('Error moving folder: ' + error.message)),
+            'error'
+        );
+        // Re-enable button on error
+        moveButton.disabled = false;
+        moveButton.textContent = originalText;
+    });
+}
+
 function editFolderName(folderId, oldName) {
     // Prevent renaming system folders
     if (oldName === 'Favorites' || oldName === 'Tags' || oldName === 'Trash') {
