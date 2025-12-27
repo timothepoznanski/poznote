@@ -374,7 +374,7 @@ $body_classes = trim($extra_body_classes);
             <div class="workspace-menu" id="workspaceMenu"></div>
         </div>
 
-        <div class="contains_forms_search">
+        <div class="contains_forms_search" id="search-bar-container">
             <form id="unified-search-form" action="index.php" method="POST">
                 <div class="unified-search-container">
                     <div class="searchbar-row searchbar-icon-row">
@@ -394,6 +394,32 @@ $body_classes = trim($extra_body_classes);
                 </div>
             </form>
         </div>
+        
+    <script>
+    function toggleSearchBar() {
+        const searchContainer = document.getElementById('search-bar-container');
+        const currentDisplay = window.getComputedStyle(searchContainer).display;
+        
+        if (currentDisplay === 'none') {
+            searchContainer.style.display = 'block';
+            localStorage.setItem('searchBarVisible', 'true');
+        } else {
+            searchContainer.style.display = 'none';
+            localStorage.setItem('searchBarVisible', 'false');
+        }
+    }
+    
+    // Restaurer l'état au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchContainer = document.getElementById('search-bar-container');
+        const isVisible = localStorage.getItem('searchBarVisible');
+        
+        // Par défaut, la barre est visible
+        if (isVisible === 'false') {
+            searchContainer.style.display = 'none';
+        }
+    });
+    </script>
     </div>
         
     <script>

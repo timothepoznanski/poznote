@@ -25,7 +25,6 @@ body.dark-mode #right_col {
 html[data-theme='dark'] .sidebar-header,
 body.dark-mode .sidebar-header {
     /* background-color: #242424; */
-    border-bottom: 1px solid #333;
 }
 
 html[data-theme='dark'] .sidebar-title,
@@ -161,10 +160,31 @@ body.dark-mode .searchbar-icon {
     color: #e0e0e0;
 }
 
+/* System folders container - same background as search bar */
+html[data-theme='dark'] .system-folders-container,
+body.dark-mode .system-folders-container {
+    background-color: #2a2a2a;
+    border-color: #404040;
+}
+
 /* Favorites separator */
 html[data-theme='dark'] .favorites-separator,
 body.dark-mode .favorites-separator {
     border-bottom-color: #404040;
+}
+
+/* Separator after favorites when displayed */
+html[data-theme='dark'] #folder-favorites[style*="display: block"],
+html[data-theme='dark'] #folder-favorites:not([style*="display: none"]),
+body.dark-mode #folder-favorites[style*="display: block"],
+body.dark-mode #folder-favorites:not([style*="display: none"]) {
+    border-bottom-color: #404040;
+}
+
+/* Favorite star icons in dark mode */
+html[data-theme='dark'] #folder-favorites .note-title::before,
+body.dark-mode #folder-favorites .note-title::before {
+    color: #e0e0e0;
 }
 
 /* Folder headers */

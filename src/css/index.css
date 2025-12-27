@@ -1299,7 +1299,7 @@ a.links_arbo_left.selected-note {
 .contains_forms_search
 {
     width: 100%;
-    margin: 12px 0 15px 0;
+    margin: 7px 0 15px 0;
     text-align: center;
     box-sizing: border-box;
     /* display: flex; */
@@ -2570,12 +2570,124 @@ hr {
     align-content: center;
 }
 
-/* Réduire les icônes dans les dossiers (Trash, Tags, Shared, Favorites) */
-.fa-trash.folder-icon,
-.fa-tags.folder-icon,
-.fa-cloud.folder-icon,
-.fa-star-light.folder-icon {
+/* Container pour les dossiers système (Trash, Tags, Public, Favorites) */
+.system-folders-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0px;
+    margin: 0px 0px 20px 0px;
+    /* padding: 5px 0; */
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 8px 0;
+}
+
+/* Dossiers système: affichage en icônes uniquement */
+.system-folder .folder-toggle {
+    padding: 4px;
+    justify-content: center;
+    width: auto;
+    min-width: 48px;
+}
+
+/* Cacher le nom des dossiers système */
+.system-folder .folder-name {
+    display: none !important;
+}
+
+/* Icônes des dossiers système */
+.system-folder .fa-trash.folder-icon,
+.system-folder .fa-tags.folder-icon,
+.system-folder .fa-cloud.folder-icon,
+.system-folder .fa-star-light.folder-icon {
+    font-size: 0.9em !important;
+    margin-right: 0 !important;
+    color: #007DB8;
+}
+
+/* Cacher le compteur par défaut pour les dossiers système */
+.system-folder .folder-note-count {
+    display: none;
+}
+
+/* Afficher le compteur au survol en tant que badge */
+.system-folder .folder-toggle:hover .folder-note-count {
+    display: inline-block;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: #007DB8;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+}
+
+.system-folder .folder-toggle {
+    position: relative;
+}
+
+/* Effet hover sur les icônes système */
+.system-folder .folder-toggle:hover {
+    background-color: transparent;
+}
+
+.system-folder .folder-toggle:hover .folder-icon {
+    color: #005a8a;
+    transform: scale(1.15);
+}
+
+/* Réduire les icônes dans les autres dossiers (non-système) */
+.folder-icon:not(.system-folder .folder-icon) {
     font-size: 0.8em !important;
+}
+
+/* Cacher uniquement l'en-tête du dossier Favorites qui apparaît normalement dans la liste */
+/* On garde le contenu (folder-content) visible pour que les notes s'affichent */
+.folder-header[data-folder="Favorites"]:not(.system-folder) > .folder-toggle {
+    display: none !important;
+}
+
+/* S'assurer que le contenu des favoris reste visible et aligné à gauche */
+/* Retirer !important pour permettre au toggle JavaScript de fonctionner */
+#folder-favorites {
+    margin-left: 0 !important;
+}
+
+/* Ajouter une bordure de séparation en bas quand les favoris sont affichés */
+#folder-favorites[style*="display: block"],
+#folder-favorites:not([style*="display: none"]) {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+/* Aligner les notes favorites à gauche sans indentation */
+#folder-favorites .note-in-folder {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+#folder-favorites .links_arbo_left {
+    padding-left: 0 !important;
+}
+
+/* Ajouter une petite icône étoile à gauche des notes favorites */
+#folder-favorites .note-title::before {
+    content: "\f005";
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+    margin-right: 8px;
+    margin-left: 6px;
+    color: #1f2937;
+    font-size: 1em;
+    transition: transform 0.2s;
+    align-content: center;
 }
 
 .folder-name {
@@ -2681,7 +2793,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding-left: 6px !important; /* Réduction du padding pour récupérer l'espace */
+    padding-left: 0px !important; /* Réduction du padding pour récupérer l'espace */
     transition: padding-left 0.2s;
 }
 
