@@ -740,10 +740,19 @@ function redirectToTag(tag) {
         }
     }
     
-    // 4. Fallback to default
+    // 4. Fallback: try to get from workspaceSelector or localStorage
     if (!currentWorkspace || currentWorkspace === '' || currentWorkspace === 'undefined') {
-        currentWorkspace = 'Poznote';
-        workspaceSource = 'default';
+        var wsSelector = document.getElementById('workspaceSelector');
+        if (wsSelector && wsSelector.value) {
+            currentWorkspace = wsSelector.value;
+            workspaceSource = 'workspaceSelector';
+        } else {
+            var storedWs = localStorage.getItem('poznote_selected_workspace');
+            if (storedWs) {
+                currentWorkspace = storedWs;
+                workspaceSource = 'localStorage';
+            }
+        }
     }
     
     // Get current search parameters

@@ -117,8 +117,8 @@ if (!empty($workspace)) {
 // If folder_id is provided, verify it exists and fetch the folder name
 if ($folder_id !== null && $folder_id > 0) {
     if ($workspace) {
-        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $fStmt->execute([$folder_id, $workspace, $workspace]);
+        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+        $fStmt->execute([$folder_id, $workspace]);
     } else {
         $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
         $fStmt->execute([$folder_id]);
@@ -134,8 +134,8 @@ if ($folder_id !== null && $folder_id > 0) {
 } elseif ($folder !== null && $folder !== '') {
     // If folder name is provided, get folder_id
     if ($workspace) {
-        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $fStmt->execute([$folder, $workspace, $workspace]);
+        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+        $fStmt->execute([$folder, $workspace]);
     } else {
         $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
         $fStmt->execute([$folder]);
@@ -184,8 +184,7 @@ if ($folder_id !== null) {
 }
 
 if ($workspace !== null) {
-    $checkQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-    $params[] = $workspace;
+    $checkQuery .= " AND workspace = ?";
     $params[] = $workspace;
 }
 $checkQuery .= " AND id != ?";

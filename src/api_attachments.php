@@ -170,9 +170,9 @@ function handleUpload() {
         
         // Get current attachments (restrict by workspace if provided)
         if ($workspace) {
-            $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
             $stmt = $con->prepare($query);
-            $stmt->execute([$note_id, $workspace, $workspace]);
+            $stmt->execute([$note_id, $workspace]);
         } else {
             $query = "SELECT attachments FROM entries WHERE id = ?";
             $stmt = $con->prepare($query);
@@ -198,9 +198,9 @@ function handleUpload() {
             // Update database
             $attachments_json = json_encode($current_attachments);
             if ($workspace) {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
                 $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace, $workspace]);
+                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace]);
             } else {
                 $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
                 $update_stmt = $con->prepare($update_query);
@@ -249,9 +249,9 @@ function handleList() {
     }
     
     if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
         $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $query = "SELECT attachments FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);
@@ -281,9 +281,9 @@ function handleDelete() {
     
     // Get current attachments
     if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
         $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $query = "SELECT attachments FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);
@@ -315,9 +315,9 @@ function handleDelete() {
             // Update database
             $attachments_json = json_encode($updated_attachments);
             if ($workspace) {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
                 $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace, $workspace]);
+                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace]);
             } else {
                 $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
                 $update_stmt = $con->prepare($update_query);
@@ -351,9 +351,9 @@ function handleDownload() {
     
     // Get attachment info
     if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
         $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $query = "SELECT attachments FROM entries WHERE id = ?";
         $stmt = $con->prepare($query);

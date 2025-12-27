@@ -16,7 +16,7 @@ function showNoteInfo(noteId, created, updated, folder, favorite, tags, attachme
         const currentWorkspace = urlParams.get('workspace') ||
                                 (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
                                 (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                                'Poznote';
+                                '';
         
         var wsParam = currentWorkspace ? ('&workspace=' + encodeURIComponent(currentWorkspace)) : '';
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + wsParam;
@@ -39,7 +39,7 @@ function performFavoriteToggle(noteId) {
         body: JSON.stringify({
             action: 'toggle_favorite',
             note_id: noteId,
-            workspace: selectedWorkspace || 'Poznote'
+            workspace: selectedWorkspace || getSelectedWorkspace()
         })
     })
     .then(function(response) {
@@ -157,7 +157,7 @@ function newFolder() {
         
         var data = {
             folder_name: folderName,
-            workspace: selectedWorkspace || 'Poznote'
+            workspace: selectedWorkspace || getSelectedWorkspace()
         };
         
         fetch('api_create_folder.php', {
@@ -465,8 +465,8 @@ function deleteCurrentWorkspace() {
     if (!sel) return;
     
     var name = sel.value;
-    if (!name || name === 'Poznote') { 
-        showNotificationPopup(window.t ? window.t('workspaces.errors.cannot_delete_default', {}, 'Cannot delete the default workspace') : 'Cannot delete the default workspace', 'error'); 
+    if (!name) { 
+        showNotificationPopup(window.t ? window.t('workspaces.errors.no_workspace_selected', {}, 'No workspace selected') : 'No workspace selected', 'error'); 
         return; 
     }
     
@@ -486,9 +486,11 @@ function deleteCurrentWorkspace() {
         .then(function(response) { return response.json(); })
         .then(function(res) {
             if (res.success) {
-                selectedWorkspace = 'Poznote';
+                // Get the first remaining workspace from the selector
+                var firstWorkspace = sel.options.length > 0 ? sel.options[0].value : '';
+                selectedWorkspace = firstWorkspace;
                 try { 
-                    localStorage.setItem('poznote_selected_workspace', 'Poznote'); 
+                    localStorage.setItem('poznote_selected_workspace', firstWorkspace); 
                 } catch(e) {}
                 
                 // Clean up localStorage entries related to folders that belonged to the deleted workspace
@@ -521,7 +523,9 @@ function deleteCurrentWorkspace() {
                         break;
                     }
                 }
-                sel.value = 'Poznote';
+                // Select the first remaining workspace
+                var newFirstWorkspace = sel.options.length > 0 ? sel.options[0].value : '';
+                sel.value = newFirstWorkspace;
                 
                 // Aggressive cleanup: remove any localStorage keys related to folders
                 try {
@@ -545,7 +549,7 @@ function deleteCurrentWorkspace() {
                 } catch(e) {}
 
                 var url = new URL(window.location.href);
-                url.searchParams.set('workspace', 'Poznote');
+                url.searchParams.set('workspace', newFirstWorkspace || sel.value);
                 window.location.href = url.toString();
             } else {
                 showNotificationPopup('Error deleting workspace: ' + (res.message || 'unknown'), 'error');
@@ -1302,17 +1306,6 @@ function loadWorkspacesForMoveModal(callback) {
                 workspaceSelect.appendChild(option);
             });
             
-            // Add default workspace if not in list
-            if (!data.workspaces.find(function(w) { return w.name === 'Poznote'; })) {
-                var defaultOption = document.createElement('option');
-                defaultOption.value = 'Poznote';
-                defaultOption.textContent = 'Poznote';
-                if ('Poznote' === currentWorkspace) {
-                    defaultOption.selected = true;
-                }
-                workspaceSelect.appendChild(defaultOption);
-            }
-            
             if (callback) callback();
         }
     })
@@ -1492,7 +1485,7 @@ function moveNoteToFolder() {
     
     // Get the selected workspace
     var workspaceSelect = document.getElementById('workspaceSelect');
-    var targetWorkspace = workspaceSelect ? workspaceSelect.value : (selectedWorkspace || 'Poznote');
+    var targetWorkspace = workspaceSelect ? workspaceSelect.value : (selectedWorkspace || getSelectedWorkspace());
 
     var params = new URLSearchParams({
         action: 'move_to',

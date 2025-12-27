@@ -130,7 +130,7 @@ function createCompleteBackup() {
     $currentFolder = '';
     if ($result) {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $workspace = htmlspecialchars($row['workspace'] ?: 'Poznote');
+            $workspace = htmlspecialchars($row['workspace'] ?: 'Default');
             
             // Get the complete folder path including parents
             $folder_id = $row['folder_id'] ?? null;

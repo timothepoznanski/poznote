@@ -40,9 +40,14 @@ function initializeWorkspaces() {
         }
         
         if (!existsInSelect) {
-            selectedWorkspace = 'Poznote';
+            // Workspace not found, select the first available one
+            if (wsSelector.options.length > 0) {
+                selectedWorkspace = wsSelector.options[0].value;
+            } else {
+                selectedWorkspace = '';
+            }
             try { 
-                localStorage.setItem('poznote_selected_workspace', 'Poznote'); 
+                localStorage.setItem('poznote_selected_workspace', selectedWorkspace); 
             } catch(e) {}
         }
         
@@ -147,10 +152,10 @@ function loadAndShowWorkspaceMenu(menu) {
 
 function displayWorkspaceMenu(menu, workspaces) {
     // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
-    var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || 'Poznote');
+    var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
     var menuHtml = '';
     
-    // Add default workspace if it's not in the list
+    // Check if current workspace exists in the list
     var workspaceExists = false;
     for (var i = 0; i < workspaces.length; i++) {
         if (workspaces[i].name === currentWorkspace) {
@@ -159,14 +164,13 @@ function displayWorkspaceMenu(menu, workspaces) {
         }
     }
     
-    if (!workspaceExists && currentWorkspace === 'Poznote') {
-        workspaces.unshift({ name: 'Poznote', created: null });
+    // If current workspace doesn't exist, select first one
+    if (!workspaceExists && workspaces.length > 0) {
+        currentWorkspace = workspaces[0].name;
     }
     
-    // Sort workspaces: Poznote first, then alphabetically
+    // Sort workspaces alphabetically
     workspaces.sort(function(a, b) {
-        if (a.name === 'Poznote') return -1;
-        if (b.name === 'Poznote') return 1;
         return a.name.localeCompare(b.name);
     });
     

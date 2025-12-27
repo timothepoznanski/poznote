@@ -11,8 +11,8 @@
 try {
     $trash_count = 0;
     if (isset($con)) {
-        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmtTrash->execute([ $workspace_filter, $workspace_filter ]);
+        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND workspace = ?");
+        $stmtTrash->execute([ $workspace_filter ]);
         $trash_count = (int)$stmtTrash->fetchColumn();
     }
 } catch (Exception $e) {
@@ -35,8 +35,7 @@ try {
         $query = "SELECT tags FROM entries WHERE trash = 0";
         $params = [];
         if (!empty($workspace_filter)) {
-            $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace_filter;
+            $query .= " AND workspace = ?";
             $params[] = $workspace_filter;
         }
         $stmtTags = $con->prepare($query);
@@ -71,8 +70,7 @@ try {
         $query = "SELECT COUNT(*) as cnt FROM shared_notes sn INNER JOIN entries e ON sn.note_id = e.id WHERE e.trash = 0";
         $params = [];
         if (!empty($workspace_filter)) {
-            $query .= " AND (e.workspace = ? OR (e.workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace_filter;
+            $query .= " AND e.workspace = ?";
             $params[] = $workspace_filter;
         }
         $stmtShared = $con->prepare($query);

@@ -1018,7 +1018,7 @@ class SearchManager {
         const currentWorkspace = urlParams.get('workspace') ||
                                 (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : null) ||
                                 (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : null) ||
-                                'Poznote';
+                                '';
         
         // Always preserve workspace parameter if it exists, regardless of its name
         if (currentWorkspace) {

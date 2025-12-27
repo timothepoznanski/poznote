@@ -40,8 +40,8 @@ $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 // If folder_id is provided, fetch the folder name
 if ($folder_id !== null && $folder_id > 0) {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+        $stmt->execute([$folder_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
         $stmt->execute([$folder_id]);
@@ -56,8 +56,8 @@ if ($folder_id !== null && $folder_id > 0) {
 } elseif ($folder_name !== null && $folder_name !== '') {
     // If folder_name is provided, get folder_id
     if ($workspace) {
-        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+        $stmt->execute([$folder_name, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
         $stmt->execute([$folder_name]);
@@ -79,8 +79,8 @@ if ($folder_id !== null && $folder_id > 0) {
 try {
     // Verify that note exists (respect workspace if provided)
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, workspace, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT heading, folder, workspace, type FROM entries WHERE id = ? AND workspace = ?");
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT heading, folder, workspace, type FROM entries WHERE id = ?");
         $stmt->execute([$note_id]);
@@ -100,8 +100,8 @@ try {
     if ($folder_name !== null && $folder_name !== '') {
         // Check folders table respecting workspace
         if ($workspace) {
-            $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $stmt->execute([$folder_name, $workspace, $workspace]);
+            $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ?");
+            $stmt->execute([$folder_name, $workspace]);
         } else {
             $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE name = ?");
             $stmt->execute([$folder_name]);
@@ -111,8 +111,8 @@ try {
         if (!$folder_exists) {
             // Check if folder already exists in entries
             if ($workspace) {
-                $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folder_name, $workspace, $workspace]);
+                $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ? AND workspace = ?");
+                $stmt->execute([$folder_name, $workspace]);
             } else {
                 $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder = ?");
                 $stmt->execute([$folder_name]);
@@ -182,8 +182,7 @@ try {
     
     // Add workspace constraint
     if ($target_workspace !== null) {
-        $checkQuery .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $checkParams[] = $target_workspace;
+        $checkQuery .= " AND workspace = ?";
         $checkParams[] = $target_workspace;
     }
     
@@ -223,8 +222,8 @@ try {
         $target_folder_id = null;
         
         // Find or create the folder in the target workspace
-        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+        $stmt->execute([$folder_name, $workspace]);
         $targetFolderData = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($targetFolderData) {

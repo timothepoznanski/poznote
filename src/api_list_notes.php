@@ -37,8 +37,7 @@ try {
         $params = [];
         
         if ($workspace) {
-            $sql .= " WHERE (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-            $params[] = $workspace;
+            $sql .= " WHERE workspace = ?";
             $params[] = $workspace;
         }
         
@@ -88,8 +87,7 @@ try {
     $params = [];
     
     if ($workspace) {
-        $sql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace;
+        $sql .= " AND workspace = ?";
         $params[] = $workspace;
     }
     

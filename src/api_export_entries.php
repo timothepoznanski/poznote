@@ -38,7 +38,7 @@ $workspace = $_GET['workspace'] ?? null;
 
 $query_right = 'SELECT * FROM entries WHERE trash = 0';
 if ($workspace !== null) {
-    $query_right .= " AND (workspace = '" . addslashes($workspace) . "' OR (workspace IS NULL AND '" . addslashes($workspace) . "' = 'Poznote'))";
+    $query_right .= " AND workspace = '" . addslashes($workspace) . "'";
 }
 $query_right .= ' ORDER BY updated DESC';
 $res_right = $con->query($query_right);

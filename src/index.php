@@ -47,30 +47,39 @@ if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
         exit;
     } else {
         // Use localStorage (either because default is __last_opened__ or no default is set)
+        // Get first workspace from database to use as fallback
+        $defaultWorkspace = '';
+        try {
+            $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+            $wsRow = $wsStmt->fetch(PDO::FETCH_ASSOC);
+            $defaultWorkspace = $wsRow ? $wsRow['name'] : '';
+        } catch (Exception $e) {}
+        
         echo '<!DOCTYPE html><html><head><script>
         (function(){
+            var defaultWs = ' . json_encode($defaultWorkspace) . ';
             try {
                 var workspace = localStorage.getItem("poznote_selected_workspace");
-                // Always redirect to include workspace parameter, even for Poznote
+                // Always redirect to include workspace parameter
                 if (workspace && workspace !== "") {
                     var params = new URLSearchParams(window.location.search);
                     params.set("workspace", workspace);
                     window.location.href = "index.php?" + params.toString();
                 } else {
-                    // No workspace in localStorage, redirect with default Poznote
+                    // No workspace in localStorage, redirect with first available workspace
                     var params = new URLSearchParams(window.location.search);
-                    params.set("workspace", "Poznote");
+                    params.set("workspace", defaultWs);
                     window.location.href = "index.php?" + params.toString();
                 }
             } catch(e) {
-                // If localStorage fails, redirect with default Poznote workspace
+                // If localStorage fails, redirect with first available workspace
                 var params = new URLSearchParams(window.location.search);
-                params.set("workspace", "Poznote");
+                params.set("workspace", defaultWs);
                 window.location.href = "index.php?" + params.toString();
             }
         })();
         </script></head><body></body></html>';
-        // Don't exit here - let the page continue loading with Poznote as default
+        // Don't exit here - let the page continue loading with first workspace as default
     }
 }
 
@@ -83,8 +92,15 @@ extract($search_params); // Extracts variables: $search, $tags_search, $note, et
 
 // Display workspace name (for __last_opened__, get the actual workspace from localStorage via JavaScript)
 if ($workspace_filter === '__last_opened__') {
-    // Default to Poznote but will be updated by JavaScript from localStorage
-    $displayWorkspace = 'Poznote';
+    // Get first available workspace from database
+    $displayWorkspace = '';
+    try {
+        $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+        $wsRow = $wsStmt->fetch(PDO::FETCH_ASSOC);
+        $displayWorkspace = $wsRow ? htmlspecialchars($wsRow['name'], ENT_QUOTES) : '';
+    } catch (Exception $e) {
+        $displayWorkspace = '';
+    }
 } else {
     $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 }
@@ -393,7 +409,7 @@ $body_classes = trim($extra_body_classes);
             echo 'null';
         }
     ?>;
-    window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? 'Poznote'); ?>;
+    window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? ''); ?>;
     </script>
                     
     <?php
@@ -477,7 +493,7 @@ $body_classes = trim($extra_body_classes);
         var params = new URLSearchParams({
             now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
             folder: selectedFolder,
-            workspace: selectedWorkspace || 'Poznote',
+            workspace: selectedWorkspace || getSelectedWorkspace(),
             type: 'tasklist'
         });
         
@@ -492,7 +508,7 @@ $body_classes = trim($extra_body_classes);
                 var res = JSON.parse(data);
                 if(res.status === 1) {
                     window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                    var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
                     window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
                     showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
@@ -514,7 +530,7 @@ $body_classes = trim($extra_body_classes);
         var params = new URLSearchParams({
             now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
             folder: selectedFolder,
-            workspace: selectedWorkspace || 'Poznote',
+            workspace: selectedWorkspace || getSelectedWorkspace(),
             type: 'markdown'
         });
         
@@ -529,7 +545,7 @@ $body_classes = trim($extra_body_classes);
                 var res = JSON.parse(data);
                 if(res.status === 1) {
                     window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                    var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
                     window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
                 } else {
                     showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
@@ -1090,7 +1106,7 @@ $body_classes = trim($extra_body_classes);
         
         function openNoteInfoEdit(noteId) {
             var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
-            if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+            if (window.selectedWorkspace && window.selectedWorkspace) {
                 url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
             }
             window.location.href = url;
@@ -1101,7 +1117,7 @@ $body_classes = trim($extra_body_classes);
 <script>
     function openNoteInfoEdit(noteId) {
         var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
-        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+        if (window.selectedWorkspace && window.selectedWorkspace) {
             url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
         }
         window.location.href = url;
@@ -1113,7 +1129,7 @@ $body_classes = trim($extra_body_classes);
         var params = [];
         
         // Add workspace parameter if selected
-        if (window.selectedWorkspace && window.selectedWorkspace !== 'Poznote') {
+        if (window.selectedWorkspace && window.selectedWorkspace) {
             params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
         }
         

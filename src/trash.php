@@ -99,14 +99,14 @@ $currentLang = getUserLanguage();
 			$search_condition = " AND (" . implode(" AND ", $parts) . ")";
 		}
 	}
-	$workspace_condition = $pageWorkspace ? " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))" : '';
+	$workspace_condition = $pageWorkspace ? " AND workspace = ?" : '';
 	$sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY updated DESC LIMIT 50";
 
 	// Execute with appropriate parameters order (search params first, then workspace if any)
 	if (!empty($search_params)) {
 		if ($pageWorkspace) {
 			$stmt = $con->prepare($sql);
-			$execute_params = array_merge($search_params, [$pageWorkspace, $pageWorkspace]);
+			$execute_params = array_merge($search_params, [$pageWorkspace]);
 			$stmt->execute($execute_params);
 		} else {
 			$stmt = $con->prepare($sql);
@@ -115,7 +115,7 @@ $currentLang = getUserLanguage();
 	} else {
 		if ($pageWorkspace) {
 			$stmt = $con->prepare($sql);
-			$stmt->execute([$pageWorkspace, $pageWorkspace]);
+			$stmt->execute([$pageWorkspace]);
 		} else {
 			$stmt = $con->query($sql);
 		}
