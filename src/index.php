@@ -393,8 +393,8 @@ $body_classes = trim($extra_body_classes);
             searchContainer.style.display = 'none';
             localStorage.setItem('searchBarVisible', 'false');
             
-            // Effacer la recherche en cours comme si on cliquait sur le bouton clear
-            if (typeof clearUnifiedSearch === 'function') {
+            // Effacer la recherche en cours seulement s'il y a une recherche active
+            if (window.isSearchMode && typeof clearUnifiedSearch === 'function') {
                 clearUnifiedSearch();
             }
         }
