@@ -277,9 +277,9 @@ if ($_POST) {
             $entriesToMove = $sel->fetchAll(PDO::FETCH_ASSOC);
 
             // Prepare statements used in loop
-            $checkStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $updHeading = $con->prepare("UPDATE entries SET heading = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $updWorkspace = $con->prepare("UPDATE entries SET workspace = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
+            $checkStmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND workspace = ?");
+            $updHeading = $con->prepare("UPDATE entries SET heading = ? WHERE id = ? AND workspace = ?");
+            $updWorkspace = $con->prepare("UPDATE entries SET workspace = ? WHERE id = ? AND workspace = ?");
 
             $con->beginTransaction();
             try {
@@ -288,23 +288,23 @@ if ($_POST) {
                     $heading = $entry['heading'] ?? '';
 
                     // If a heading conflict exists in destination, find a unique candidate and update heading
-                    $checkStmt->execute([$heading, $target, $target]);
+                    $checkStmt->execute([$heading, $target]);
                     if ($checkStmt->fetchColumn() > 0) {
                         $base = $heading;
                         $i = 1;
                         do {
                             $candidate = $base . ' (' . $i . ')';
-                            $checkStmt->execute([$candidate, $target, $target]);
+                            $checkStmt->execute([$candidate, $target]);
                             $exists = $checkStmt->fetchColumn() > 0;
                             $i++;
                         } while ($exists);
 
                         // Update heading in the source workspace for this note
-                        $updHeading->execute([$candidate, $id, $name, $name]);
+                        $updHeading->execute([$candidate, $id, $name]);
                     }
 
                     // Now update the workspace for this entry
-                    $updWorkspace->execute([$target, $id, $name, $name]);
+                    $updWorkspace->execute([$target, $id, $name]);
                     if ($updWorkspace->rowCount() > 0) {
                         $moved++;
                     }
@@ -395,15 +395,15 @@ if ($_POST) {
 
 // Read existing workspaces
 $workspaces = [];
-$stmt = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+$stmt = $con->query("SELECT name FROM workspaces ORDER BY name");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaces[] = $row['name'];
 }
 
-// Count notes per workspace, excluding trashed notes. Map NULL workspace to 'Poznote'.
+// Count notes per workspace, excluding trashed notes.
 $workspace_counts = [];
 try {
-    $countSql = "SELECT COALESCE(workspace, 'Poznote') as workspace, COUNT(*) as cnt FROM entries WHERE trash = 0 GROUP BY COALESCE(workspace, 'Poznote')";
+    $countSql = "SELECT workspace, COUNT(*) as cnt FROM entries WHERE trash = 0 AND workspace IS NOT NULL GROUP BY workspace";
     $countStmt = $con->query($countSql);
     while ($r = $countStmt->fetch(PDO::FETCH_ASSOC)) {
         $workspace_counts[$r['workspace']] = (int)$r['cnt'];
@@ -564,7 +564,7 @@ try {
     <?php if (!empty($clearSelectedWorkspace) && !$isAjax): ?>
     <?php
         // Get first available workspace to redirect to
-        $firstWs = 'Poznote';
+        $firstWs = '';
         try {
             $stmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -629,9 +629,11 @@ try {
                     if (exists) {
                         a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
                     } else {
-                        // Clean up stale selection and default to Poznote
-                        try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
-                        a.setAttribute('href', 'index.php?workspace=Poznote');
+                        // Clean up stale selection and use first available workspace
+                        var firstWsName = document.querySelector('.workspace-name-item');
+                        var fallbackWs = firstWsName ? firstWsName.textContent.trim() : '';
+                        try { localStorage.setItem('poznote_selected_workspace', fallbackWs); } catch(e) {}
+                        a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(fallbackWs));
                     }
                 }
             } catch(e) {}

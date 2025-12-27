@@ -21,8 +21,8 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, location, subheading, type FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
@@ -126,7 +126,7 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
 
             <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.workspace', [], 'Workspace:'); ?></div>
-                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? ($workspace ?: 'Poznote')); ?></div>
+                <div class="info-value"><?php echo htmlspecialchars($note['workspace'] ?? $workspace); ?></div>
             </div>
 
             <div class="info-row">

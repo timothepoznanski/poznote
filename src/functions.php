@@ -170,7 +170,7 @@ function getEntryFilename($id, $type) {
  * Get the first available workspace name from the database
  * Used as fallback when no specific workspace is selected
  * 
- * @return string The first workspace name, or 'Poznote' if none exists
+ * @return string The first workspace name, or empty string if none exists
  */
 function getFirstWorkspaceName() {
     global $con;
@@ -185,7 +185,7 @@ function getFirstWorkspaceName() {
             // Continue to default
         }
     }
-    return 'Poznote';
+    return '';
 }
 
 /**
@@ -257,8 +257,7 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
 
     // If workspace specified, restrict uniqueness to that workspace
     if ($workspace !== null) {
-        $query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace;
+        $query .= " AND workspace = ?";
         $params[] = $workspace;
     }
     
@@ -298,13 +297,17 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
  * Create a new note with both database entry and HTML file
  * This is the standard way to create notes used throughout the application
  */
-function createNote($con, $heading, $content, $folder = 'Default', $workspace = 'Poznote', $favorite = 0, $tags = '', $type = 'note') {
+function createNote($con, $heading, $content, $folder = 'Default', $workspace = null, $favorite = 0, $tags = '', $type = 'note') {
+    // If no workspace provided, get first available
+    if ($workspace === null || $workspace === '') {
+        $workspace = getFirstWorkspaceName();
+    }
     try {
         // Get folder_id from folder name
         $folder_id = null;
         if ($folder !== null) {
-            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $fStmt->execute([$folder, $workspace, $workspace]);
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+            $fStmt->execute([$folder, $workspace]);
             $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
             if ($folderData) {
                 $folder_id = (int)$folderData['id'];

@@ -32,8 +32,7 @@ try {
     
     // Apply workspace filter if specified
     if ($workspace) {
-        $query .= " AND (e.workspace = ? OR (e.workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace;
+        $query .= " AND e.workspace = ?";
         $params[] = $workspace;
     }
     

@@ -20,8 +20,7 @@ try {
     
     // Add workspace filter
     if ($workspace) {
-        $sql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $params[] = $workspace;
+        $sql .= " AND workspace = ?";
         $params[] = $workspace;
     }
     
@@ -47,8 +46,7 @@ try {
     $countParams = [];
     
     if ($workspace) {
-        $countSql .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-        $countParams[] = $workspace;
+        $countSql .= " AND workspace = ?";
         $countParams[] = $workspace;
     }
     

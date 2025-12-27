@@ -16,7 +16,7 @@ function initializeWorkspacesAndLabels($con) {
         $workspaces = [];
         try {
             // Try to read workspaces from the DB if the table exists
-            $stmt_ws = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+            $stmt_ws = $con->query("SELECT name FROM workspaces ORDER BY name");
             while ($r = $stmt_ws->fetch(PDO::FETCH_ASSOC)) {
                 $workspaces[] = $r['name'];
             }
@@ -64,7 +64,7 @@ function generateWorkspaceDisplayMap($workspaces, $labels) {
         if (isset($labels[$w]) && $labels[$w] !== '') {
             $display_map[$w] = $labels[$w];
         } else {
-            $display_map[$w] = ($w === 'Poznote') ? 'Poznote' : $w;
+            $display_map[$w] = $w;
         }
     }
     return $display_map;

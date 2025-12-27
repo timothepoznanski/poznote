@@ -36,8 +36,8 @@ $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 // If folder_id is provided, get folder_name
 if ($folder_id !== null) {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+        $stmt->execute([$folder_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
         $stmt->execute([$folder_id]);
@@ -53,8 +53,8 @@ if ($folder_id !== null) {
 } elseif ($folder_name !== null) {
     // If folder_name is provided, get folder_id
     if ($workspace) {
-        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_name, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+        $stmt->execute([$folder_name, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
         $stmt->execute([$folder_name]);
@@ -70,8 +70,8 @@ if ($folder_id !== null) {
 try {
     // Check if folder exists (workspace-scoped)
     if ($workspace) {
-        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE id = ? AND workspace = ?");
+        $stmt->execute([$folder_id, $workspace]);
         $folder_exists_in_table = $stmt->fetchColumn() > 0;
     } else {
         $stmt = $con->prepare("SELECT COUNT(*) FROM folders WHERE id = ?");
@@ -81,12 +81,12 @@ try {
     
     // Check if folder contains notes (workspace-scoped)
     if ($workspace) {
-        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0 AND workspace = ?");
+        $stmt->execute([$folder_id, $workspace]);
         $notes_count = $stmt->fetchColumn();
 
-        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 1 AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$folder_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 1 AND workspace = ?");
+        $stmt->execute([$folder_id, $workspace]);
         $trash_notes_count = $stmt->fetchColumn();
     } else {
         $stmt = $con->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0");
@@ -121,8 +121,8 @@ try {
         // Delete folder from folders table (workspace-scoped)
         if ($folder_exists_in_table) {
             if ($workspace) {
-                $stmt = $con->prepare("DELETE FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $stmt->execute([$folder_id, $workspace, $workspace]);
+                $stmt = $con->prepare("DELETE FROM folders WHERE id = ? AND workspace = ?");
+                $stmt->execute([$folder_id, $workspace]);
             } else {
                 $stmt = $con->prepare("DELETE FROM folders WHERE id = ?");
                 $stmt->execute([$folder_id]);

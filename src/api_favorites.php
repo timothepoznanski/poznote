@@ -37,9 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Get current favorite status limited to workspace if provided
         if ($workspace) {
-            $query = "SELECT favorite FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $query = "SELECT favorite FROM entries WHERE id = ? AND workspace = ?";
             $stmt = $con->prepare($query);
-            $stmt->execute([$noteId, $workspace, $workspace]);
+            $stmt->execute([$noteId, $workspace]);
         } else {
             $query = "SELECT favorite FROM entries WHERE id = ?";
             $stmt = $con->prepare($query);
@@ -59,9 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Update database (respect workspace if provided)
         if ($workspace) {
-            $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
+            $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ? AND workspace = ?";
             $updateStmt = $con->prepare($updateQuery);
-            $success = $updateStmt->execute([$newFavorite, $noteId, $workspace, $workspace]);
+            $success = $updateStmt->execute([$newFavorite, $noteId, $workspace]);
         } else {
             $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
             $updateStmt = $con->prepare($updateQuery);

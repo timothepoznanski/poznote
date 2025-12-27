@@ -30,8 +30,8 @@ $tags = $input['tags'];
 try {
     // Verify note exists
     if ($workspace) {
-        $stmt = $con->prepare("SELECT id FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT id FROM entries WHERE id = ? AND workspace = ?");
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT id FROM entries WHERE id = ?");
         $stmt->execute([$note_id]);
@@ -62,8 +62,8 @@ try {
     
     // Update the tags in the database (respect workspace if provided)
     if ($workspace) {
-        $stmt = $con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$tags_string, $note_id, $workspace, $workspace]);
+        $stmt = $con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ? AND workspace = ?");
+        $stmt->execute([$tags_string, $note_id, $workspace]);
     } else {
         $stmt = $con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
         $stmt->execute([$tags_string, $note_id]);

@@ -18,12 +18,22 @@ try {
     // Check if reference is a numeric ID
     if (is_numeric($reference)) {
         $note_id = intval($reference);
-        $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        if ($workspace) {
+            $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");
+            $stmt->execute([$note_id, $workspace]);
+        } else {
+            $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ?");
+            $stmt->execute([$note_id]);
+        }
     } else {
         // Search by heading (title)
-        $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote')) ORDER BY updated DESC LIMIT 1");
-        $stmt->execute(['%' . $reference . '%', $workspace, $workspace]);
+        if ($workspace) {
+            $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? AND workspace = ? ORDER BY updated DESC LIMIT 1");
+            $stmt->execute(['%' . $reference . '%', $workspace]);
+        } else {
+            $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND heading LIKE ? ORDER BY updated DESC LIMIT 1");
+            $stmt->execute(['%' . $reference . '%']);
+        }
     }
     
     $note = $stmt->fetch(PDO::FETCH_ASSOC);

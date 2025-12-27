@@ -26,7 +26,7 @@ if ($action === 'save_embedded_diagram') {
 
 // Continue with regular full note save
 $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
-$workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
+$workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : getFirstWorkspaceName();
 $heading = isset($_POST['heading']) ? trim($_POST['heading']) : 'New note';
 $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
 $preview_image = isset($_FILES['preview_image']) ? $_FILES['preview_image'] : null;
@@ -63,8 +63,8 @@ if ($note_id === 0) {
     
     // If folder_id is provided, get folder name
     if ($folder_id !== null && $folder === null) {
-        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $fStmt->execute([$folder_id, $workspace, $workspace]);
+        $fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+        $fStmt->execute([$folder_id, $workspace]);
         $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
         if ($folderData) {
             $folder = $folderData['name'];
@@ -74,8 +74,8 @@ if ($note_id === 0) {
         }
     } elseif ($folder !== null && $folder_id === null) {
         // If folder name is provided, get folder_id
-        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $fStmt->execute([$folder, $workspace, $workspace]);
+        $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+        $fStmt->execute([$folder, $workspace]);
         $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
         if ($folderData) {
             $folder_id = (int)$folderData['id'];
@@ -212,7 +212,7 @@ function saveEmbeddedDiagram() {
     
     $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
     $diagram_id = isset($_POST['diagram_id']) ? trim($_POST['diagram_id']) : '';
-    $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : 'Poznote';
+    $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : getFirstWorkspaceName();
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;

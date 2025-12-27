@@ -34,7 +34,7 @@ function isCursorInEditableNote() {
 }
 
 function showAttachmentDialog(noteId) {
-    var ws = selectedWorkspace || 'Poznote';
+    var ws = selectedWorkspace || getSelectedWorkspace() || '';
     var wsParam = ws ? '&workspace=' + encodeURIComponent(ws) : '';
     window.location.href = 'attachments.php?note_id=' + noteId + wsParam;
 }
@@ -370,8 +370,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     formData.append('action', 'upload');
     formData.append('note_id', noteId);
     formData.append('file', file);
-    if (typeof selectedWorkspace !== 'undefined') {
-        formData.append('workspace', selectedWorkspace || 'Poznote');
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+        formData.append('workspace', selectedWorkspace);
     }
     
     fetch('api_attachments.php', {

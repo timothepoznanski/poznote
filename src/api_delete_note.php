@@ -39,8 +39,8 @@ try {
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 
     if ($workspace) {
-        $checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $checkStmt->execute([$note_id, $workspace, $workspace]);
+        $checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ? AND workspace = ?");
+        $checkStmt->execute([$note_id, $workspace]);
     } else {
         $checkStmt = $con->prepare("SELECT heading FROM entries WHERE id = ?");
         $checkStmt->execute([$note_id]);
@@ -51,8 +51,8 @@ try {
     $workspace = isset($data['workspace']) ? trim($data['workspace']) : null;
 
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, trash, attachments, folder, type FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-        $stmt->execute([$note_id, $workspace, $workspace]);
+        $stmt = $con->prepare("SELECT heading, trash, attachments, folder, type FROM entries WHERE id = ? AND workspace = ?");
+        $stmt->execute([$note_id, $workspace]);
     } else {
         $stmt = $con->prepare("SELECT heading, trash, attachments, folder, type FROM entries WHERE id = ?");
         $stmt->execute([$note_id]);
@@ -113,8 +113,8 @@ try {
         
         // Delete database entry (respect workspace if provided)
         if ($workspace) {
-            $stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $success = $stmt->execute([$note_id, $workspace, $workspace]);
+            $stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
+            $success = $stmt->execute([$note_id, $workspace]);
         } else {
             $stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
             $success = $stmt->execute([$note_id]);
@@ -148,8 +148,8 @@ try {
         }
         
         if ($workspace) {
-            $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-            $success = $stmt->execute([$note_id, $workspace, $workspace]);
+            $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
+            $success = $stmt->execute([$note_id, $workspace]);
         } else {
             $stmt = $con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
             $success = $stmt->execute([$note_id]);

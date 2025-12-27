@@ -15,7 +15,7 @@ function createNewNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
         folder_id: selectedFolderId,
-        workspace: selectedWorkspace || 'Poznote'
+        workspace: selectedWorkspace || getSelectedWorkspace()
     });
     
     fetch("api_insert_new.php", {
@@ -29,7 +29,7 @@ function createNewNote() {
             var res = JSON.parse(data);
             if(res.status === 1) {
                 window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
                 window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
             } else {
                 showNotificationPopup(res.error || 'Error creating note', 'error');
@@ -47,7 +47,7 @@ function createTaskListNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
         folder_id: selectedFolderId,
-        workspace: selectedWorkspace || 'Poznote',
+        workspace: selectedWorkspace || getSelectedWorkspace(),
         type: 'tasklist'
     });
     
@@ -62,7 +62,7 @@ function createTaskListNote() {
             var res = JSON.parse(data);
             if(res.status === 1) {
                 window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
                 window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
             } else {
                 showNotificationPopup(res.error || 'Error creating tasklist', 'error');
@@ -80,7 +80,7 @@ function createMarkdownNote() {
     var params = new URLSearchParams({
         now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
         folder_id: selectedFolderId,
-        workspace: selectedWorkspace || 'Poznote',
+        workspace: selectedWorkspace || getSelectedWorkspace(),
         type: 'markdown'
     });
     
@@ -95,7 +95,7 @@ function createMarkdownNote() {
             var res = JSON.parse(data);
             if(res.status === 1) {
                 window.scrollTo(0, 0);
-                var ws = encodeURIComponent(selectedWorkspace || 'Poznote');
+                var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
                 window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
             } else {
                 showNotificationPopup(res.error || 'Error creating markdown note', 'error');
@@ -204,7 +204,7 @@ function saveNoteToServer() {
         entry: ent,
         tags: tags,
         folder_id: folderId,
-        workspace: selectedWorkspace || 'Poznote'
+        workspace: selectedWorkspace || getSelectedWorkspace()
     };
     
     fetch("api_update_note.php", {
@@ -355,7 +355,7 @@ function deleteNote(noteId) {
 }
 
 function redirectToWorkspace() {
-    var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || 'Poznote');
+    var wsRedirect = 'index.php?workspace=' + encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
     // Ensure we don't scroll to note after delete on mobile
     if (typeof sessionStorage !== 'undefined') {
         sessionStorage.removeItem('shouldScrollToNote');
@@ -480,7 +480,7 @@ function openNoteInNewTab(noteId) {
     }
     
     // Build URL with note ID and current workspace
-    var workspace = selectedWorkspace || 'Poznote';
+    var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + encodeURIComponent(noteId);
     
     // Open in new tab

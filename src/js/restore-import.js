@@ -520,15 +520,17 @@ function loadWorkspacesForImport() {
             if (data.success && data.workspaces) {
                 workspaceSelect.innerHTML = '';
                 
-                // Add workspaces to select
+                // Add workspaces to select, select first one by default
+                let isFirst = true;
                 data.workspaces.forEach(workspace => {
                     const option = document.createElement('option');
                     option.value = workspace.name;
                     option.textContent = workspace.name;
                     
-                    // Select 'Poznote' by default if it exists
-                    if (workspace.name === 'Poznote') {
+                    // Select first workspace by default
+                    if (isFirst) {
                         option.selected = true;
+                        isFirst = false;
                     }
                     
                     workspaceSelect.appendChild(option);
@@ -541,18 +543,17 @@ function loadWorkspacesForImport() {
                 }
             } else {
                 console.error('Failed to load workspaces:', data);
-                workspaceSelect.innerHTML = '<option value="Poznote">Poznote</option>';
+                workspaceSelect.innerHTML = '<option value="">No workspace</option>';
             }
         })
         .catch(error => {
             console.error('Error loading workspaces:', error);
-            workspaceSelect.innerHTML = '<option value="Poznote">Poznote</option>';
+            workspaceSelect.innerHTML = '<option value="">No workspace</option>';
         });
 }
 
 // Load folders for selected workspace
 function loadFoldersForImport(workspace) {
-    console.log('loadFoldersForImport called with:', workspace);
     
     const folderSelect = document.getElementById('target_folder_select');
     if (!folderSelect) {
@@ -570,8 +571,6 @@ function loadFoldersForImport(workspace) {
         return;
     }
     
-    console.log('Loading folders for workspace:', workspace);
-    
     // Fetch folders for the selected workspace
     fetch('api_folders.php', {
         method: 'POST',
@@ -586,7 +585,6 @@ function loadFoldersForImport(workspace) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Folders response:', data);
             
             if (data.success && data.folders) {
                 // Flatten the hierarchical structure for simple display
@@ -604,7 +602,6 @@ function loadFoldersForImport(workspace) {
                 };
                 
                 const flatFolders = flattenFolders(data.folders);
-                console.log('Flattened folders:', flatFolders);
                 
                 flatFolders.forEach(folder => {
                     const option = document.createElement('option');

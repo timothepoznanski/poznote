@@ -84,7 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         case 'import_individual_notes':
             if (isset($_FILES['individual_notes_files']) && !empty($_FILES['individual_notes_files']['name'][0])) {
-                $workspace = $_POST['target_workspace'] ?? 'Poznote';
+                $workspace = $_POST['target_workspace'] ?? null;
+                // If no workspace provided, get the first available workspace
+                if (empty($workspace)) {
+                    $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+                    $workspace = $wsStmt->fetchColumn();
+                }
                 $folder = $_POST['target_folder'] ?? null;
                 
                 // Check if a single ZIP file was uploaded
@@ -333,9 +338,11 @@ function importNotesZip($uploadedFile) {
                 $updatedCount++;
             } else {
                 // Insert new entry with specific ID
-                // No folder (uncategorized)
-                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, NULL, NULL, 'Poznote', ?, datetime('now'), datetime('now'), 0, 0)");
-                $insertStmt->execute([$noteId, $title, $content, $noteType]);
+                // No folder (uncategorized) - use the first available workspace
+                $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+                $defaultWs = $wsStmt->fetchColumn() ?: 'Default';
+                $insertStmt = $con->prepare("INSERT INTO entries (id, heading, entry, folder, folder_id, workspace, type, created, updated, trash, favorite) VALUES (?, ?, ?, NULL, NULL, ?, ?, datetime('now'), datetime('now'), 0, 0)");
+                $insertStmt->execute([$noteId, $title, $content, $defaultWs, $noteType]);
                 $importedCount++;
             }
         } catch (Exception $e) {
@@ -425,8 +432,17 @@ function importAttachmentsZip($uploadedFile) {
     return ['success' => true, 'message' => t('restore_import.import_attachments.summary', ['count' => $importedCount])];
 }
 
-function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder = null) {
+function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null) {
     global $con;
+    
+    // If no workspace provided, get the first available workspace
+    if (empty($workspace)) {
+        $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+        $workspace = $wsStmt->fetchColumn();
+        if (!$workspace) {
+            return ['success' => false, 'error' => t('restore_import.individual_notes.errors.no_workspace_available', [], 'No workspace available')];
+        }
+    }
     
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
@@ -541,8 +557,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
             // Get folder_id if folder is provided
             $folder_id = null;
             if ($folder !== null && $folder !== '') {
-                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $fStmt->execute([$folder, $workspace, $workspace]);
+                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $fStmt->execute([$folder, $workspace]);
                 $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
                 if ($folderData) {
                     $folder_id = (int)$folderData['id'];
@@ -600,8 +616,17 @@ function importIndividualNotesZip($uploadedFile, $workspace = 'Poznote', $folder
     return ['success' => true, 'message' => $message];
 }
 
-function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder = null) {
+function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null) {
     global $con;
+    
+    // If no workspace provided, get the first available workspace
+    if (empty($workspace)) {
+        $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+        $workspace = $wsStmt->fetchColumn();
+        if (!$workspace) {
+            return ['success' => false, 'error' => t('restore_import.individual_notes.errors.no_workspace_available', [], 'No workspace available')];
+        }
+    }
     
     // Check file count limit
     $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
@@ -676,8 +701,8 @@ function importIndividualNotes($uploadedFiles, $workspace = 'Poznote', $folder =
             // Get folder_id if folder is provided
             $folder_id = null;
             if ($folder !== null && $folder !== '') {
-                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-                $fStmt->execute([$folder, $workspace, $workspace]);
+                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+                $fStmt->execute([$folder, $workspace]);
                 $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
                 if ($folderData) {
                     $folder_id = (int)$folderData['id'];

@@ -16,9 +16,8 @@ $params = [];
 $select_query = "SELECT tags FROM entries WHERE " . implode(' AND ', $where_conditions);
 
 if ($workspace !== null) {
-    // Scope to workspace or entries with NULL workspace if default 'Poznote'
-    $select_query .= " AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))";
-    $params[] = $workspace;
+    // Scope to workspace
+    $select_query .= " AND workspace = ?";
     $params[] = $workspace;
 }
 

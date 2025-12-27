@@ -14,7 +14,19 @@
 	
 	try {
 		$now = $_POST['now'];
-		$workspace = $_POST['workspace'] ?? 'Poznote';
+		$workspace = $_POST['workspace'] ?? null;
+		
+		// If no workspace provided, get the first available workspace
+		if (empty($workspace)) {
+			$wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+			$workspace = $wsStmt->fetchColumn();
+			if (!$workspace) {
+				header('Content-Type: application/json; charset=utf-8');
+				echo json_encode(['status' => 0, 'error' => t('api.errors.no_workspace_available', [], 'No workspace available')]);
+				exit;
+			}
+		}
+		
 		$folder_id = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
 		// If folder_id is 0, treat it as null
 		if ($folder_id === 0) {
@@ -41,8 +53,8 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 	// If folder_id is provided, verify it exists and fetch the folder name
 	if ($folder_id !== null && $folder_id > 0) {
 		if ($workspace) {
-			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-			$fStmt->execute([$folder_id, $workspace, $workspace]);
+			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+			$fStmt->execute([$folder_id, $workspace]);
 		} else {
 			$fStmt = $con->prepare("SELECT name FROM folders WHERE id = ?");
 			$fStmt->execute([$folder_id]);
@@ -58,8 +70,8 @@ $created_date = gmdate("Y-m-d H:i:s", $now);	// Validate workspace exists
 	} elseif ($folder !== null && $folder !== '') {
 		// If folder name is provided, get folder_id
 		if ($workspace) {
-			$fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND (workspace = ? OR (workspace IS NULL AND ? = 'Poznote'))");
-			$fStmt->execute([$folder, $workspace, $workspace]);
+			$fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+			$fStmt->execute([$folder, $workspace]);
 		} else {
 			$fStmt = $con->prepare("SELECT id FROM folders WHERE name = ?");
 			$fStmt->execute([$folder]);

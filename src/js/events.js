@@ -1650,7 +1650,7 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         action: 'move_to',
         note_id: noteId,
         folder_id: targetFolderId || '',
-        workspace: selectedWorkspace || 'Poznote'
+        workspace: selectedWorkspace || getSelectedWorkspace()
     });
     
     fetch("api_folders.php", {
@@ -1736,7 +1736,7 @@ function moveNoteToRoot(noteId) {
     var params = new URLSearchParams({
         action: 'remove_from_folder',
         note_id: noteId,
-        workspace: selectedWorkspace || 'Poznote'
+        workspace: selectedWorkspace || getSelectedWorkspace()
     });
     
     fetch("api_folders.php", {
@@ -1792,7 +1792,7 @@ function setupLinkEvents() {
             if (noteMatch && noteMatch[1]) {
                 // This is a note-to-note link - open it within the app
                 var targetNoteId = noteMatch[1];
-                var targetWorkspace = workspaceMatch ? decodeURIComponent(workspaceMatch[1]) : (selectedWorkspace || 'Poznote');
+                var targetWorkspace = workspaceMatch ? decodeURIComponent(workspaceMatch[1]) : (selectedWorkspace || getSelectedWorkspace());
                 
                 // If workspace is different, reload page with new workspace and note
                 if (targetWorkspace !== selectedWorkspace) {
@@ -2243,7 +2243,7 @@ function initTextSelectionHandlers() {
 
 // Helper function to load a note by ID
 function loadNoteById(noteId) {
-    var workspace = selectedWorkspace || 'Poznote';
+    var workspace = selectedWorkspace || getSelectedWorkspace();
     var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
     
     // Use the existing loadNoteDirectly function if available
@@ -2406,7 +2406,7 @@ function emergencySave(noteId) {
         tags: tags,
         folder: folder,
         folder_id: folder_id,
-        workspace: (window.selectedWorkspace || 'Poznote')
+        workspace: (window.selectedWorkspace || getSelectedWorkspace())
     };
     
     // Strategy 1: Try fetch with keepalive (most reliable)
@@ -2431,7 +2431,7 @@ function emergencySave(noteId) {
             formData.append('action', 'beacon_save'); // Use beacon_save action for API compatibility
             formData.append('note_id', noteId);
             formData.append('content', ent);
-            formData.append('workspace', window.selectedWorkspace || 'Poznote');
+            formData.append('workspace', window.selectedWorkspace || getSelectedWorkspace());
             
             if (navigator.sendBeacon('api_update_note.php', formData)) {
             } else {
