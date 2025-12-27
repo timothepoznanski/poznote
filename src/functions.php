@@ -167,13 +167,35 @@ function getEntryFilename($id, $type) {
 }
 
 /**
+ * Get the first available workspace name from the database
+ * Used as fallback when no specific workspace is selected
+ * 
+ * @return string The first workspace name, or 'Poznote' if none exists
+ */
+function getFirstWorkspaceName() {
+    global $con;
+    if (isset($con)) {
+        try {
+            $stmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row && !empty($row['name'])) {
+                return $row['name'];
+            }
+        } catch (Exception $e) {
+            // Continue to default
+        }
+    }
+    return 'Poznote';
+}
+
+/**
  * Get the current workspace filter from GET/POST parameters
  * Priority order:
  * 1. GET/POST parameter (highest priority)
  * 2. Database setting 'default_workspace' (if set to a specific workspace name)
  *    Special value '__last_opened__' means use localStorage
  * 3. localStorage 'poznote_selected_workspace' (handled by index.php redirect)
- * 4. Fallback to 'Poznote' (default)
+ * 4. Fallback to first available workspace
  * 
  * @return string The workspace name
  */
@@ -201,9 +223,9 @@ function getWorkspaceFilter() {
         }
     }
     
-    // Final fallback
+    // Final fallback: get first available workspace
     // Note: localStorage is checked by index.php before this function is called
-    return 'Poznote';
+    return getFirstWorkspaceName();
 }
 
 /**

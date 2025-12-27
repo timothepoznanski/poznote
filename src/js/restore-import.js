@@ -524,8 +524,7 @@ function loadWorkspacesForImport() {
                 data.workspaces.forEach(workspace => {
                     const option = document.createElement('option');
                     option.value = workspace.name;
-                    // Use display_name if available, otherwise use name
-                    option.textContent = workspace.display_name || workspace.name;
+                    option.textContent = workspace.name;
                     
                     // Select 'Poznote' by default if it exists
                     if (workspace.name === 'Poznote') {

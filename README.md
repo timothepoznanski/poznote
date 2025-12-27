@@ -404,6 +404,23 @@ Stop the running container before updating:
 docker compose down
 ```
 
+Download the latest Docker Compose configuration:
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
+```
+
+Check if new environment variables were added:
+```bash
+curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
+```
+
+Review `.env.example` and add any new variables to your `.env` file if needed.
+
+> **Tip for Linux users:** Use `sdiff` command to compare your current `.env` file with the latest example side-by-side and easily spot any new variables.
+> ```bash
+> sdiff .env .env.example
+> ```
+
 Download the latest Poznote image:
 ```bash
 docker compose pull

@@ -37,7 +37,12 @@ if ($_POST) {
         } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
-            if ($name === 'Poznote') throw new Exception(t('workspaces.errors.cannot_delete_default', [], 'Cannot delete the default workspace', $currentLang));
+
+            // Cannot delete the last workspace
+            $countAll = $con->query('SELECT COUNT(*) FROM workspaces')->fetchColumn();
+            if ((int)$countAll <= 1) {
+                throw new Exception(t('workspaces.errors.cannot_delete_last', [], 'Cannot delete the last workspace', $currentLang));
+            }
 
             // Ensure workspace exists before deletion
             $check = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
@@ -197,8 +202,6 @@ if ($_POST) {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
             if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
-            // Do not allow renaming the reserved default workspace
-            if ($name === 'Poznote') throw new Exception(t('workspaces.errors.cannot_rename_default', [], 'Cannot rename the default workspace', $currentLang));
 
             // validate new name characters
             if ($new_name !== '' && !preg_match('/^[A-Za-z0-9_-]+$/', $new_name)) throw new Exception(t('workspaces.errors.invalid_new_name', [], 'Invalid new workspace name. Use only letters, numbers, dash and underscore (no spaces).', $currentLang));
@@ -207,17 +210,37 @@ if ($_POST) {
             if ($new_name !== '' && $new_name !== $name) {
                 $con->beginTransaction();
                 try {
-                    // Insert new workspace entry (ignore if exists)
-                    $ins = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
-                    $ins->execute([$new_name]);
+                    // Check if new name already exists
+                    $checkNew = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+                    $checkNew->execute([$new_name]);
+                    if ((int)$checkNew->fetchColumn() > 0) {
+                        throw new Exception(t('workspaces.errors.name_exists', [], 'A workspace with this name already exists', $currentLang));
+                    }
+
+                    // Update the workspace name directly
+                    $upd = $con->prepare('UPDATE workspaces SET name = ? WHERE name = ?');
+                    $upd->execute([$new_name, $name]);
 
                     // Move entries to new workspace name
                     $upd = $con->prepare('UPDATE entries SET workspace = ? WHERE workspace = ?');
                     $upd->execute([$new_name, $name]);
 
-                    // Remove old workspace record
-                    $del = $con->prepare('DELETE FROM workspaces WHERE name = ?');
-                    $del->execute([$name]);
+                    // Move folders to new workspace name
+                    $upd = $con->prepare('UPDATE folders SET workspace = ? WHERE workspace = ?');
+                    $upd->execute([$new_name, $name]);
+
+                    // Update default_workspace setting if it references the old name
+                    try {
+                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                        $stmt->execute(['default_workspace']);
+                        $currentDefault = $stmt->fetchColumn();
+                        if ($currentDefault === $name) {
+                            $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
+                            $stmt->execute([$new_name, 'default_workspace']);
+                        }
+                    } catch (Exception $e) {
+                        // Non-fatal
+                    }
 
                     $con->commit();
                     $message = t('workspaces.messages.renamed', [], 'Workspace renamed across notes and labels', $currentLang);
@@ -370,13 +393,11 @@ if ($_POST) {
     }
 }
 
-// Read existing workspaces with display names
+// Read existing workspaces
 $workspaces = [];
-$workspace_display_names = [];
-$stmt = $con->query("SELECT name, display_name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+$stmt = $con->query("SELECT name FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaces[] = $row['name'];
-    $workspace_display_names[$row['name']] = $row['display_name'] ?? null;
 }
 
 // Count notes per workspace, excluding trashed notes. Map NULL workspace to 'Poznote'.
@@ -475,16 +496,13 @@ try {
                     <ul>
                         <?php foreach ($workspaces as $ws): ?>
                                 <?php
-                                // Use display_name if set, otherwise use the workspace name
-                                $display_name = $workspace_display_names[$ws] ?? null;
-                                $ws_display = htmlspecialchars($display_name && $display_name !== '' ? $display_name : $ws);
-                                $ws_is_poznote = ($ws === 'Poznote');
+                                $ws_display = htmlspecialchars($ws);
                             ?>
                             <li>
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
-                                            <span class="workspace-name-item" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo $ws_display; ?></span>
+                                            <span class="workspace-name-item"><?php echo $ws_display; ?></span>
                                             <?php
                                                 $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
                                                 if ($cnt === 0) {
@@ -499,33 +517,24 @@ try {
                                         </div>
                                     </div>
                                 </div>
-                                <?php if ($ws_is_poznote): ?>
-                                <!-- For Poznote: only allow changing display name, not the internal name -->
-                                <div class="ws-col ws-col-action">
-                                    <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-display-name="<?php echo htmlspecialchars($display_name ?? '', ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
-                                </div>
-                                <?php else: ?>
                                 <div class="ws-col ws-col-action">
                                     <button class="btn btn-rename action-btn" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.rename', [], 'Rename', $currentLang); ?></button>
                                 </div>
-                                <?php endif; ?>
                                 <div class="ws-col ws-col-select">
                                     <?php if ($ws !== ''): ?>
                                         <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button></div>
+                                <?php if (count($workspaces) > 1): ?>
                                 <div class="ws-col ws-col-delete">
-                                    <?php if ($ws === 'Poznote'): ?>
-                                        <button type="button" class="btn action-btn btn-delete-disabled" data-disabled="true" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.cannot_delete_default', [], 'Cannot delete the default workspace', $currentLang); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                    <?php else: ?>
-                                        <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
-                                        </form>
-                                    <?php endif; ?>
+                                    <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="name" value="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
+                                        <button type="button" class="btn btn-danger action-btn btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('common.delete', [], 'Delete', $currentLang); ?></button>
+                                    </form>
                                 </div>
+                                <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -553,9 +562,20 @@ try {
     </div>
 
     <?php if (!empty($clearSelectedWorkspace) && !$isAjax): ?>
+    <?php
+        // Get first available workspace to redirect to
+        $firstWs = 'Poznote';
+        try {
+            $stmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row && !empty($row['name'])) {
+                $firstWs = $row['name'];
+            }
+        } catch (Exception $e) {}
+    ?>
     <script>
-        try { localStorage.setItem('poznote_selected_workspace', 'Poznote'); } catch(e) {}
-        try { window.location = 'index.php?workspace=Poznote'; } catch(e) {}
+        try { localStorage.setItem('poznote_selected_workspace', <?php echo json_encode($firstWs); ?>); } catch(e) {}
+        try { window.location = 'index.php?workspace=' + encodeURIComponent(<?php echo json_encode($firstWs); ?>); } catch(e) {}
     </script>
     <?php endif; ?>
 
@@ -627,12 +647,7 @@ try {
                 sel.innerHTML = '';
                 <?php foreach ($workspaces as $w): ?>
                     if ('<?php echo addslashes($w); ?>' !== source) {
-                        <?php
-                        // Use display_name if set, otherwise use the workspace name
-                        $display_name = $workspace_display_names[$w] ?? null;
-                        $display_text = $display_name && $display_name !== '' ? $display_name : $w;
-                        ?>
-                        var opt = document.createElement('option'); opt.value = '<?php echo addslashes($w); ?>'; opt.text = <?php echo json_encode($display_text); ?>; sel.appendChild(opt);
+                        var opt = document.createElement('option'); opt.value = '<?php echo addslashes($w); ?>'; opt.text = '<?php echo addslashes($w); ?>'; sel.appendChild(opt);
                     }
                 <?php endforeach; ?>
                 document.getElementById('moveNotesModal').style.display = 'flex';
@@ -752,12 +767,7 @@ try {
                 <?php foreach ($workspaces as $w): ?>
                     var opt = document.createElement('option');
                     opt.value = <?php echo json_encode($w); ?>;
-                    <?php
-                    // Use display_name if set, otherwise use the workspace name
-                    $display_name = $workspace_display_names[$w] ?? null;
-                    $display_text = $display_name && $display_name !== '' ? $display_name : $w;
-                    ?>
-                    opt.textContent = <?php echo json_encode($display_text); ?>;
+                    opt.textContent = <?php echo json_encode($w); ?>;
                     select.appendChild(opt);
                 <?php endforeach; ?>
                 
@@ -799,7 +809,7 @@ try {
                             if (status) {
                                 var displayText = selectedWorkspace === '__last_opened__' 
                                     ? lastOpenedLabel
-                                    : (select.options[select.selectedIndex] ? select.options[select.selectedIndex].textContent : selectedWorkspace);
+                                    : selectedWorkspace;
                                 status.textContent = tr('workspaces.default.status_set_to', { workspace: displayText }, '✓ Default workspace set to: {{workspace}}');
                                 status.style.display = 'block';
                                 setTimeout(function() {

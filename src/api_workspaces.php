@@ -22,38 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 try {
     if ($action === 'list') {
-        $stmt = $con->query("SELECT name, display_name, created FROM workspaces ORDER BY CASE WHEN name = 'Poznote' THEN 0 ELSE 1 END, name");
+        $stmt = $con->query("SELECT name, created FROM workspaces ORDER BY name");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode(['success' => true, 'workspaces' => $rows]);
-        exit;
-    } else if ($action === 'update_display_name') {
-        // Update display name for a workspace (especially for Poznote which cannot be renamed)
-        if (!isset($input)) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'JSON body required for this action']);
-            exit;
-        }
-        $name = trim($input['name'] ?? '');
-        $displayName = trim($input['display_name'] ?? '');
-        if ($name === '') {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'name is required']);
-            exit;
-        }
-        // Ensure workspace exists
-        $check = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
-        $check->execute([$name]);
-        if ((int)$check->fetchColumn() === 0) {
-            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
-            exit;
-        }
-        // Update display_name (empty string means use the name as display)
-        $stmt = $con->prepare("UPDATE workspaces SET display_name = ? WHERE name = ?");
-        if ($stmt->execute([$displayName === '' ? null : $displayName, $name])) {
-            echo json_encode(['success' => true, 'name' => $name, 'display_name' => $displayName]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error updating display name']);
-        }
         exit;
     } else if ($action === 'create') {
         if (!isset($input)) {
@@ -85,7 +56,7 @@ try {
             exit;
         }
         $name = trim($input['name'] ?? '');
-        if ($name === '' || $name === 'Poznote') {
+        if ($name === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid workspace']);
             exit;
@@ -95,6 +66,13 @@ try {
         $check->execute([$name]);
         if ((int)$check->fetchColumn() === 0) {
             echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
+            exit;
+        }
+        
+        // Cannot delete the last workspace
+        $countAll = $con->query("SELECT COUNT(*) FROM workspaces")->fetchColumn();
+        if ((int)$countAll <= 1) {
+            echo json_encode(['success' => false, 'message' => t('api.errors.cannot_delete_last_workspace', [], 'Cannot delete the last workspace')]);
             exit;
         }
         
@@ -108,9 +86,14 @@ try {
             // Settings table may not exist - ignore
         }
         
-        // Move notes from this workspace to default before deleting
-        $stmt = $con->prepare("UPDATE entries SET workspace = 'Poznote' WHERE workspace = ?");
-        $stmt->execute([$name]);
+        // Find another workspace to move notes to
+        $otherWs = $con->prepare("SELECT name FROM workspaces WHERE name != ? ORDER BY name LIMIT 1");
+        $otherWs->execute([$name]);
+        $targetWorkspace = $otherWs->fetchColumn();
+        
+        // Move notes from this workspace to another before deleting
+        $stmt = $con->prepare("UPDATE entries SET workspace = ? WHERE workspace = ?");
+        $stmt->execute([$targetWorkspace, $name]);
 
         // If the deleted workspace was the default workspace, reset to "last opened"
         if ($currentDefaultWorkspace === $name) {
@@ -156,7 +139,7 @@ try {
         }
         $old = trim($input['old_name'] ?? '');
         $new = trim($input['new_name'] ?? '');
-        if ($old === '' || $new === '' || $old === 'Poznote' || $new === 'Poznote') {
+        if ($old === '' || $new === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Invalid names']);
             exit;
@@ -179,12 +162,28 @@ try {
             echo json_encode(['success' => false, 'message' => 'Target workspace name already exists']);
             exit;
         }
-        // Update entries workspace and workspaces table
+        // Update entries, folders and workspaces table
         $stmt = $con->prepare("UPDATE entries SET workspace = ? WHERE workspace = ?");
         $stmt->execute([$new, $old]);
+        $stmt = $con->prepare("UPDATE folders SET workspace = ? WHERE workspace = ?");
+        $stmt->execute([$new, $old]);
+        
+        // Update default_workspace setting if it references the old name
+        try {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['default_workspace']);
+            $currentDefault = $stmt->fetchColumn();
+            if ($currentDefault === $old) {
+                $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
+                $stmt->execute([$new, 'default_workspace']);
+            }
+        } catch (Exception $e) {
+            // Non-fatal
+        }
+        
         $stmt = $con->prepare("UPDATE workspaces SET name = ? WHERE name = ?");
         if ($stmt->execute([$new, $old])) {
-            echo json_encode(['success' => true]);
+            echo json_encode(['success' => true, 'old_name' => $old, 'new_name' => $new]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Error renaming workspace']);
         }
