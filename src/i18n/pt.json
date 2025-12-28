@@ -1059,11 +1059,12 @@
         "optional": "opcional",
         "no_folder": "Sem pasta (nível raiz)",
         "select_files": "Selecionar arquivos",
-        "files_info": "Vários arquivos (máx 50) ou arquivo ZIP único (máx 300 arquivos)",
-        "supported_formats": "Suportados: .html, .md, .markdown, .zip",
-        "title": "Quer importar arquivos HTML ou Markdown?",
-        "description_html": "Importe arquivos HTML ou Markdown individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
-        "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown"
+        "files_info": "Vários arquivos (máx {{maxIndividualFiles}}) ou arquivo ZIP único (máx {{maxZipFiles}} arquivos). Esses limites podem ser alterados,",
+        "files_info_link": "consulte a documentação",
+        "supported_formats": "Suportados: .html, .md, .markdown, .txt, .zip",
+        "title": "Quer importar arquivos HTML, Markdown ou de texto?",
+        "description_html": "Importe arquivos HTML, Markdown ou de texto individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
+        "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt"
       }
     },
     "buttons": {

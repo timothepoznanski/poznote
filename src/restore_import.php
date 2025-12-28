@@ -495,8 +495,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Get file extension
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         
-        // Only count HTML, MD, and Markdown files
-        if (in_array($fileExtension, ['html', 'md', 'markdown'])) {
+        // Only count HTML, MD, Markdown and TXT files
+        if (in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
             $validFileCount++;
         }
     }
@@ -528,8 +528,8 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Get file extension
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         
-        // Only process HTML, MD, and Markdown files
-        if (!in_array($fileExtension, ['html', 'md', 'markdown'])) {
+        // Only process HTML, MD, Markdown and TXT files
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
             continue;
         }
         
@@ -671,9 +671,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         
         // Validate file type
-        if (!in_array($fileExtension, ['html', 'md', 'markdown'])) {
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
             $errorCount++;
-            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown']);
+            $errors[] = $fileName . ': ' . t('restore_import.individual_notes.errors.invalid_file_type', ['allowed' => '.html, .md, .markdown, .txt']);
             continue;
         }
         
@@ -1016,16 +1016,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <label for="individual_notes_files" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
                         <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
                     </label>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.zip" multiple required style="padding: 0.5rem;">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required style="padding: 0.5rem;">
                     <small class="form-text text-muted" style="display: block; margin-top: 0.5rem; line-height: 1.5;">
                         <span style="color: #dc3545; font-weight: 600;">
                         <?php 
                         $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
                         $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
-                        echo 'Multiple files (max ' . $maxIndividualFiles . ') or single ZIP archive (max ' . $maxZipFiles . ' files)'; 
+                        echo t_h('restore_import.sections.individual_notes.files_info', ['maxIndividualFiles' => $maxIndividualFiles, 'maxZipFiles' => $maxZipFiles], 'Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,');
+                        echo ' <a href="https://github.com/timothepoznanski/poznote#import-individual-notes" target="_blank" rel="noopener">';
+                        echo t_h('restore_import.sections.individual_notes.files_info_link', 'see documentation');
+                        echo '</a>.';
                         ?>
                         </span><br>
-                        <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .zip'); ?>
+                        <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
                 </div>
                 
