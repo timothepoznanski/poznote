@@ -34,6 +34,13 @@ if ($_POST) {
             $stmt->execute([$name]);
             
             $message = t('workspaces.messages.created', [], 'Workspace created', $currentLang);
+            
+            // If this was an AJAX create, return JSON response immediately
+            if (!empty($isAjax)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $message, 'name' => $name]);
+                exit;
+            }
         } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
@@ -478,12 +485,11 @@ try {
 
         <div class="settings-section">
             <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace', $currentLang); ?></h3>
-            <form id="create-workspace-form" method="POST" onsubmit="return validateCreateWorkspaceForm();">
-                <input type="hidden" name="action" value="create">
+            <form id="create-workspace-form" onsubmit="return handleCreateWorkspace(event);">
                 <div class="form-group">
                     <input id="workspace-name" name="name" type="text" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name', $currentLang); ?>" />
                 </div>
-                <button type="submit" class="btn btn-primary"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
+                <button type="submit" class="btn btn-primary" id="createWorkspaceBtn"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
             </form>
         </div>
 
@@ -600,6 +606,70 @@ try {
             if (num === 0) return tr('workspaces.count.notes_0', {}, '0 notes');
             if (num === 1) return tr('workspaces.count.notes_1', {}, '1 note');
             return tr('workspaces.count.notes_n', { count: num }, '{{count}} notes');
+        }
+
+        // Handle workspace creation with AJAX
+        function handleCreateWorkspace(event) {
+            event.preventDefault();
+            
+            var nameInput = document.getElementById('workspace-name');
+            var name = nameInput.value.trim();
+            
+            // Validate
+            if (name === '') {
+                showTopAlert(tr('workspaces.validation.enter_name', {}, 'Enter a workspace name'), 'danger');
+                scrollToTopAlert();
+                return false;
+            }
+            if (!isValidWorkspaceName(name)) {
+                showTopAlert(tr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, dash or underscore only'), 'danger');
+                scrollToTopAlert();
+                return false;
+            }
+            
+            // Disable button to prevent double clicks
+            var createBtn = document.getElementById('createWorkspaceBtn');
+            if (createBtn) createBtn.disabled = true;
+            
+            var params = new URLSearchParams({
+                action: 'create',
+                name: name
+            });
+            
+            fetch('workspaces.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params.toString()
+            })
+            .then(function(resp) { return resp.json(); })
+            .then(function(json) {
+                // Re-enable button
+                if (createBtn) createBtn.disabled = false;
+                
+                if (json && json.success) {
+                    showAjaxAlert(tr('workspaces.messages.created', {}, 'Workspace created'), 'success');
+                    
+                    // Clear input
+                    nameInput.value = '';
+                    
+                    // Reload page to show the new workspace in the list
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAjaxAlert(tr('workspaces.alerts.error_prefix', { error: (json.error || tr('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}'), 'danger');
+                }
+            })
+            .catch(function() {
+                if (createBtn) createBtn.disabled = false;
+                showAjaxAlert(tr('workspaces.alerts.create_error', {}, 'Error creating workspace'), 'danger');
+            });
+            
+            return false;
         }
 
         // Initialize workspace page when DOM is loaded
