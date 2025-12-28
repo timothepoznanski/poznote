@@ -6,12 +6,10 @@ let isShareMenuOpen = false;
 function updateSharedCount(delta) {
     const countEl = document.getElementById('count-shared');
     if (countEl) {
-        const match = countEl.textContent.match(/\((\d+)\)/);
-        if (match) {
-            const currentCount = parseInt(match[1], 10);
-            const newCount = Math.max(0, currentCount + delta);
-            countEl.textContent = '(' + newCount + ')';
-        }
+        // System folders display count without parentheses, e.g. "5" not "(5)"
+        const currentCount = parseInt(countEl.textContent.trim(), 10) || 0;
+        const newCount = Math.max(0, currentCount + delta);
+        countEl.textContent = newCount.toString();
     }
 }
 
