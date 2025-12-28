@@ -31,22 +31,19 @@ function refreshTagsCount() {
     
     const url = 'api_list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
     
-    // Add a small delay to allow auto-save to complete before fetching the updated count
-    setTimeout(() => {
-        fetch(url, { credentials: 'same-origin' })
-            .then(r => r.json())
-            .then(data => {
-                if (data && data.success && Array.isArray(data.tags)) {
-                    const countEl = document.getElementById('count-tags');
-                    if (countEl) {
-                        countEl.textContent = data.tags.length.toString();
-                    }
+    fetch(url, { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success && Array.isArray(data.tags)) {
+                const countEl = document.getElementById('count-tags');
+                if (countEl) {
+                    countEl.textContent = data.tags.length.toString();
                 }
-            })
-            .catch(err => {
-                console.error('Error refreshing tags count:', err);
-            });
-    }, 300); // Wait 300ms for auto-save to complete
+            }
+        })
+        .catch(err => {
+            console.error('Error refreshing tags count:', err);
+        });
 }
 
 /**
@@ -586,9 +583,6 @@ function updateTagsInput(noteId, container) {
     // Trigger auto-save for this specific note (without changing global noteid)
     triggerAutoSaveForNote(noteId);
     
-    // Refresh the tags count in the sidebar to reflect any new or removed tags
-    refreshTagsCount();
-    
     // Trigger the input change event to notify any other listeners
     const changeEvent = new Event('input', { bubbles: true });
     tagsInput.dispatchEvent(changeEvent);
@@ -844,6 +838,7 @@ function redirectToTag(tag) {
 // Make functions available globally for use by other scripts
 window.initializeClickableTags = initializeClickableTags;
 window.reinitializeClickableTagsAfterAjax = reinitializeClickableTagsAfterAjax;
+window.refreshTagsCount = refreshTagsCount;
 
 // Listen for i18n loaded event to update tag input placeholders
 document.addEventListener('poznote:i18n:loaded', function() {
