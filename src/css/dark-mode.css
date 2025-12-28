@@ -1998,3 +1998,39 @@ html[data-theme='dark'] .image-resize-handle:hover,
 body.dark-mode .image-resize-handle:hover {
     background: #0099e6;
 }
+
+/* Shared page filter bar styles in dark mode */
+html[data-theme='dark'] .filter-input,
+body.dark-mode .filter-input {
+    background-color: #2a2a2a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .filter-input:focus,
+body.dark-mode .filter-input:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .filter-input::placeholder,
+body.dark-mode .filter-input::placeholder {
+    color: #777777;
+}
+
+html[data-theme='dark'] .clear-filter-btn,
+body.dark-mode .clear-filter-btn {
+    color: #777777;
+}
+
+html[data-theme='dark'] .clear-filter-btn:hover,
+body.dark-mode .clear-filter-btn:hover {
+    background-color: #333333;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .filter-stats,
+body.dark-mode .filter-stats {
+    background-color: rgba(0, 125, 184, 0.2);
+    color: #a0c4e0;
+}
