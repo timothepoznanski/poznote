@@ -117,12 +117,14 @@ try {
     $favorites_count = 0;
 }
 
-echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"folder-favorites\")' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
-echo "<i class='fa-star-light folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "</span>";
-echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
-echo "</div></div>";
+if ($favorites_count > 0) {
+    echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
+    echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"folder-favorites\")' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
+    echo "<i class='fa-star-light folder-icon'></i>";
+    echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "</span>";
+    echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
+    echo "</div></div>";
+}
 
 echo "</div>"; // Fin du container system-folders
 ?>
@@ -289,7 +291,7 @@ foreach($hierarchicalFolders as $folderId => $folderData) {
 }
 
 // Display Favorites folder first
-if ($favoritesFolder) {
+if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags);
     }
