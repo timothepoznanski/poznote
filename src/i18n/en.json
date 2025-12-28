@@ -1259,6 +1259,8 @@
       "no_public_notes": "No public notes yet.",
       "public_hint": "Make a note public by clicking the cloud button in the note toolbar."
     },
+    "filter_placeholder": "Filter by title or token...",
+    "no_filter_results": "No notes match your search.",
     "table": {
       "note": "Note",
       "url": "Public URL"

@@ -1256,6 +1256,8 @@
       "no_public_notes": "Aucune note publique pour le moment.",
       "public_hint": "Rendez une note publique en cliquant sur le bouton de nuage dans la barre d'outils."
     },
+    "filter_placeholder": "Filtrer par titre ou token...",
+    "no_filter_results": "Aucune note ne correspond à votre recherche.",
     "table": {
       "note": "Note",
       "url": "URL publique"

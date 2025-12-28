@@ -1254,6 +1254,8 @@
       "no_public_notes": "Aún no hay notas compartidas.",
       "public_hint": "Haga pública una nota haciendo clic en el botón de nube en la barra de herramientas."
     },
+    "filter_placeholder": "Filtrar por título o token...",
+    "no_filter_results": "Ninguna nota coincide con su búsqueda.",
     "table": {
       "note": "Nota",
       "url": "URL Pública"
