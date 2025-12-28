@@ -1034,7 +1034,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "¿Quieres restaurar desde un archivo de copia de seguridad?"
+        "title": "¿Quieres restaurar desde un archivo de copia de seguridad de Poznote?"
       },
       "standard_restore": {
         "title": "¿Tu archivo de copia de seguridad es menor a 500MB?",

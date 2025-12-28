@@ -157,6 +157,74 @@ function extractTaskListFromHTML($htmlContent) {
     return json_encode($tasks);
 }
 
+/**
+ * Parse YAML front matter from Markdown content
+ * Returns array with 'metadata' and 'content' keys
+ */
+function parseFrontMatter($content) {
+    $metadata = [];
+    $bodyContent = $content;
+    
+    // Check if content starts with YAML front matter (---)
+    if (preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $content, $matches)) {
+        $yamlContent = $matches[1];
+        $bodyContent = $matches[2];
+        
+        // Parse YAML manually (simple key-value parser)
+        $lines = explode("\n", $yamlContent);
+        $currentKey = null;
+        $currentArray = null;
+        
+        foreach ($lines as $line) {
+            $trimmedLine = trim($line);
+            
+            // Skip empty lines
+            if (empty($trimmedLine)) continue;
+            
+            // Check for array item (starts with -)
+            if (preg_match('/^-\s+(.+)$/', $trimmedLine, $arrayMatch)) {
+                if ($currentArray !== null) {
+                    // Remove quotes from value if present
+                    $value = trim($arrayMatch[1]);
+                    $value = trim($value, '"\'');
+                    $metadata[$currentArray][] = $value;
+                }
+                continue;
+            }
+            
+            // Check for key-value pair
+            if (preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)$/', $trimmedLine, $kvMatch)) {
+                $key = $kvMatch[1];
+                $value = trim($kvMatch[2]);
+                
+                // Check if value is empty (indicates array follows)
+                if (empty($value)) {
+                    $currentArray = $key;
+                    $metadata[$key] = [];
+                } else {
+                    $currentArray = null;
+                    // Remove quotes from value if present
+                    $value = trim($value, '"\'');
+                    
+                    // Convert boolean strings to actual booleans
+                    if ($value === 'true') {
+                        $value = true;
+                    } elseif ($value === 'false') {
+                        $value = false;
+                    }
+                    
+                    $metadata[$key] = $value;
+                }
+            }
+        }
+    }
+    
+    return [
+        'metadata' => $metadata,
+        'content' => $bodyContent
+    ];
+}
+
 function importNotesZip($uploadedFile) {
     global $con;
     
@@ -688,8 +756,47 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
-        // Extract title from filename (without extension)
-        $title = pathinfo($fileName, PATHINFO_FILENAME);
+        // Parse front matter if it's a markdown file
+        $frontMatterData = null;
+        if ($noteType === 'markdown') {
+            $parsed = parseFrontMatter($content);
+            $frontMatterData = $parsed['metadata'];
+            $content = $parsed['content']; // Remove front matter from content
+        }
+        
+        // Extract title - prioritize front matter, then filename
+        if ($frontMatterData && isset($frontMatterData['title'])) {
+            $title = $frontMatterData['title'];
+        } else {
+            $title = pathinfo($fileName, PATHINFO_FILENAME);
+        }
+        
+        // Extract tags from front matter
+        $tags = '';
+        if ($frontMatterData && isset($frontMatterData['tags']) && is_array($frontMatterData['tags'])) {
+            $tags = implode(', ', $frontMatterData['tags']);
+        }
+        
+        // Extract favorite status from front matter
+        $favorite = 0;
+        if ($frontMatterData && isset($frontMatterData['favorite'])) {
+            $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
+        }
+        
+        // Extract folder from front matter (override if present)
+        if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
+            $folder = $frontMatterData['folder'];
+        }
+        
+        // Extract dates from front matter
+        $created = null;
+        $updated = null;
+        if ($frontMatterData && isset($frontMatterData['created'])) {
+            $created = $frontMatterData['created'];
+        }
+        if ($frontMatterData && isset($frontMatterData['updated'])) {
+            $updated = $frontMatterData['updated'];
+        }
         
         // Sanitize title
         $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
@@ -709,9 +816,20 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 }
             }
             
-            // Insert note into database
-            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, '', ?, ?, ?, ?, datetime('now'), datetime('now'))");
-            $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType]);
+            // Insert note into database with metadata from front matter
+            if ($created && $updated) {
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
+                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+            } elseif ($created) {
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
+                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
+            } elseif ($updated) {
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
+                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
+            } else {
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
+                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
+            }
             $noteId = $con->lastInsertId();
             
             // Save content to file with correct extension

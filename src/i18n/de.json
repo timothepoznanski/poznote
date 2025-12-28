@@ -1034,7 +1034,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Möchten Sie von einer Sicherungsdatei wiederherstellen?"
+        "title": "Möchten Sie von einer Poznote-Sicherungsdatei wiederherstellen?"
       },
       "standard_restore": {
         "title": "Ist Ihre Sicherungsdatei kleiner als 500MB?",

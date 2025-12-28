@@ -1036,7 +1036,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Vous voulez restaurer depuis un fichier de sauvegarde ?"
+        "title": "Vous voulez restaurer depuis un fichier de sauvegarde Poznote ?"
       },
       "standard_restore": {
         "title": "Votre fichier de sauvegarde fait-il moins de 500 Mo ?",

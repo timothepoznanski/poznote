@@ -1035,7 +1035,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Quer restaurar de um arquivo de backup?"
+        "title": "Quer restaurar de um arquivo de backup do Poznote?"
       },
       "standard_restore": {
         "title": "Seu arquivo de backup tem menos de 500MB?",
