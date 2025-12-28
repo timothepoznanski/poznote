@@ -43,7 +43,7 @@ try {
     $shared_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Build URLs for each shared note
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $protocol = get_protocol();
     $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
     $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
     if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
