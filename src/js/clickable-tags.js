@@ -7,6 +7,49 @@
 let notesWithClickableTags = new Set();
 
 /**
+ * Update the tags count in the sidebar
+ * @param {number} delta - The amount to change the count by (can be positive or negative)
+ */
+function updateTagsCount(delta) {
+    const countEl = document.getElementById('count-tags');
+    if (countEl) {
+        // System folders display count without parentheses, e.g. "5" not "(5)"
+        const currentCount = parseInt(countEl.textContent.trim(), 10) || 0;
+        const newCount = Math.max(0, currentCount + delta);
+        countEl.textContent = newCount.toString();
+    }
+}
+
+/**
+ * Refresh the tags count from the server
+ * Fetches the actual count of unique tags and updates the sidebar badge
+ */
+function refreshTagsCount() {
+    // Get current workspace from URL or default
+    const urlParams = new URLSearchParams(window.location.search);
+    const workspace = urlParams.get('workspace') || '';
+    
+    const url = 'api_list_tags.php' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+    
+    // Add a small delay to allow auto-save to complete before fetching the updated count
+    setTimeout(() => {
+        fetch(url, { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success && Array.isArray(data.tags)) {
+                    const countEl = document.getElementById('count-tags');
+                    if (countEl) {
+                        countEl.textContent = data.tags.length.toString();
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Error refreshing tags count:', err);
+            });
+    }, 300); // Wait 300ms for auto-save to complete
+}
+
+/**
  * Initialize clickable tags system
  */
 function initializeClickableTags() {
@@ -542,6 +585,9 @@ function updateTagsInput(noteId, container) {
     
     // Trigger auto-save for this specific note (without changing global noteid)
     triggerAutoSaveForNote(noteId);
+    
+    // Refresh the tags count in the sidebar to reflect any new or removed tags
+    refreshTagsCount();
     
     // Trigger the input change event to notify any other listeners
     const changeEvent = new Event('input', { bubbles: true });
