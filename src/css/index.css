@@ -1981,10 +1981,6 @@ a[data-image-link] {
     color: #dc3545;
 }
 
-.search:focus{
-    border-bottom: 1px solid #32a1ce;
-}
-
 /* TRASH ICONS for main interface */
 
 /* Share / Export dropdown styles */
