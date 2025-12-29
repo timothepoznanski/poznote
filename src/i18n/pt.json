@@ -1035,7 +1035,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Quer restaurar de um arquivo de backup do Poznote?"
+        "title": "Quer restaurar de um arquivo de backup ZIP do Poznote?"
       },
       "standard_restore": {
         "title": "Seu arquivo de backup tem menos de 500MB?",
@@ -1057,13 +1057,14 @@
         "loading": "Carregando...",
         "folder": "Pasta destino",
         "optional": "opcional",
+        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho",
         "no_folder": "Sem pasta (nível raiz)",
         "select_files": "Selecionar arquivos",
         "files_info": "Vários arquivos (máx {{maxIndividualFiles}}) ou arquivo ZIP único (máx {{maxZipFiles}} arquivos). Esses limites podem ser alterados,",
         "files_info_link": "consulte a documentação",
         "supported_formats": "Suportados: .html, .md, .markdown, .txt, .zip",
-        "title": "Quer importar arquivos HTML, Markdown ou de texto?",
-        "description_html": "Importe arquivos HTML, Markdown ou de texto individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão).",
+        "title": "Quer importar arquivos HTML, Markdown, de texto ou arquivos ZIP?",
+        "description_html": "Importe arquivos HTML, Markdown ou de texto individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão), a menos que uma chave title seja definida em um front matter para arquivos MD.",
         "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt"
       }
     },

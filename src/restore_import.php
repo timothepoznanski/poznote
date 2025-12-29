@@ -1032,13 +1032,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </div>
         <?php endif; ?>
         
-        <div>
-            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
-            <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
-                <?php echo t_h('restore_import.page.more_info_link'); ?>
-            </a>.
-        <br><br>
-        
         <!-- Parent Restore Section -->
         <div class="backup-section parent-section">
             <h3 class="accordion-header" onclick="toggleAccordion('restoreBackup')">
@@ -1046,6 +1039,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
             </h3>
             <div id="restoreBackup" class="accordion-content" style="display: none;">
+            
+            <div>
+            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
+            <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                <?php echo t_h('restore_import.page.more_info_link'); ?>
+            </a>.
+        </div>
+        <br>
             
         <!-- Standard Complete Restore Section -->
         <div class="backup-section child-section">
@@ -1182,14 +1183,13 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
             </h3>
             <div id="individualNotes" class="accordion-content" style="display: none;">
-            <p><?php echo t('restore_import.sections.individual_notes.description_html'); ?></p>
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
                 
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <label for="target_workspace_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
-                        <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
+                        1. <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
                     </label>
                     <select id="target_workspace_select" name="target_workspace" class="form-control" required onchange="loadFoldersForImport(this.value)" style="font-size: 15px; padding: 0.5rem;">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
@@ -1198,9 +1198,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <label for="target_folder_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
-                        <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
-                        <span style="font-weight: 400; color: #666; font-size: 0.9em;">(<?php echo t_h('restore_import.sections.individual_notes.optional', 'optional'); ?>)</span>
+                        2. <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
                     </label>
+                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #dc3545; font-size: 0.875rem;">
+                        <?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', 'Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà'); ?>
+                    </small>
                     <select id="target_folder_select" name="target_folder" class="form-control" style="font-size: 15px; padding: 0.5rem;">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>
                     </select>
@@ -1208,11 +1210,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 
                 <div class="form-group" style="margin-bottom: 1.25rem;">
                     <label for="individual_notes_files" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
-                        <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
+                        3. <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
                     </label>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required style="padding: 0.5rem;">
-                    <small class="form-text text-muted" style="display: block; margin-top: 0.5rem; line-height: 1.5;">
-                        <span style="color: #dc3545; font-weight: 600;">
+                    <small class="form-text text-muted" style="display: block; margin-bottom: 0.5rem; line-height: 1.5;">
+                        <span style="color: #dc3545;">
                         <?php 
                         $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
                         $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
@@ -1224,6 +1225,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required style="padding: 0.5rem;">
                 </div>
                 
                 <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()" style="margin-top: 1rem;" id="individualNotesImportBtn">

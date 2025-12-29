@@ -1034,7 +1034,7 @@
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Möchten Sie von einer Poznote-Sicherungsdatei wiederherstellen?"
+        "title": "Möchten Sie von einer Poznote-ZIP-Sicherungsdatei wiederherstellen?"
       },
       "standard_restore": {
         "title": "Ist Ihre Sicherungsdatei kleiner als 500MB?",
@@ -1056,13 +1056,14 @@
         "loading": "Laden...",
         "folder": "Zielordner",
         "optional": "optional",
+        "frontmatter_warning": "Wenn eine MD-Notiz einen Ordnerschlüssel in einem Front-Matter enthält, überschreibt dieser Wert den unten ausgewählten. Sie müssen daher zunächst sicherstellen, dass der Ordner bereits existiert, andernfalls wird die Notiz im Wurzelverzeichnis des Arbeitsbereichs erstellt",
         "no_folder": "Kein Ordner (Root-Ebene)",
         "select_files": "Dateien auswählen",
         "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
         "files_info_link": "siehe Dokumentation",
         "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .zip",
-        "title": "Möchten Sie HTML-, Markdown- oder Textdateien importieren?",
-        "description_html": "Importieren Sie einzelne HTML-, Markdown- oder Textdateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung).",
+        "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
+        "description_html": "Importieren Sie einzelne HTML-, Markdown- oder Textdateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.",
         "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt"
       }
     },
