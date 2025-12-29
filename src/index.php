@@ -408,8 +408,8 @@ $body_classes = trim($extra_body_classes);
         const searchContainer = document.getElementById('search-bar-container');
         const isVisible = localStorage.getItem('searchBarVisible');
         
-        // Par défaut, la barre est visible
-        if (isVisible === 'false') {
+        // Par défaut, la barre est cachée
+        if (isVisible !== 'true') {
             searchContainer.style.display = 'none';
         }
     });
