@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php';
 
 function oidc_is_enabled() {
     return defined('OIDC_ENABLED') && OIDC_ENABLED === true && (OIDC_ISSUER !== '' || OIDC_DISCOVERY_URL !== '') && OIDC_CLIENT_ID !== '';

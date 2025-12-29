@@ -118,6 +118,17 @@ $using_unified_search = handleUnifiedSearch();
 
 // Workspace filter already initialized above
 
+// Load login display name for page title
+$login_display_name = '';
+try {
+    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+    $stmt->execute(['login_display_name']);
+    $login_display_name = $stmt->fetchColumn();
+    if ($login_display_name === false) $login_display_name = '';
+} catch (Exception $e) {
+    $login_display_name = '';
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -127,7 +138,7 @@ $using_unified_search = handleUnifiedSearch();
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title>Poznote</title>
+    <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></title>
     <?php $v = '20251020.6'; // Cache version to force reload ?>
     <script>
     (function(){
@@ -408,8 +419,8 @@ $body_classes = trim($extra_body_classes);
         const searchContainer = document.getElementById('search-bar-container');
         const isVisible = localStorage.getItem('searchBarVisible');
         
-        // Par défaut, la barre est visible
-        if (isVisible === 'false') {
+        // Par défaut, la barre est cachée
+        if (isVisible !== 'true') {
             searchContainer.style.display = 'none';
         }
     });

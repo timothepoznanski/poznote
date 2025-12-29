@@ -200,7 +200,7 @@ $currentLang = getUserLanguage();
 				// No results for filter
 				const noResultsDiv = document.createElement('div');
 				noResultsDiv.className = 'empty-message';
-				noResultsDiv.innerHTML = '<i class="fa-search"></i><p><?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?></p>';
+				noResultsDiv.innerHTML = '<p><?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?></p>';
 				container.appendChild(noResultsDiv);
 			} else {
 				emptyMessage.style.display = 'block';
