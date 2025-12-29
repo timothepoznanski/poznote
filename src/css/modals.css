@@ -1523,7 +1523,7 @@
 
 /* Share modal - wider to fit all buttons on one line */
 #shareModal .modal-content {
-    max-width: 600px;
+    max-width: 790px;
 }
 
 #shareModal .share-url {
@@ -1549,7 +1549,13 @@
     gap: 12px;
     margin-top: 0; /* spacing handled by .share-url margin-bottom */
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: center;
+}
+
+#shareModal .share-modal-buttons button {
+    white-space: nowrap;
+    padding: 8px 16px;
+    min-width: fit-content;
 }
 
 #shareModal .share-custom-wrap {

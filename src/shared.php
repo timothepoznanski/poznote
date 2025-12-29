@@ -73,14 +73,21 @@ $currentLang = getUserLanguage();
 	
 	// Load shared notes on page load
 	document.addEventListener('DOMContentLoaded', function() {
-		loadSharedNotes();
-		
 		// Attach event listener to back button
 		document.getElementById('backToNotesBtn').addEventListener('click', goBackToNotes);
 		
 		// Attach filter event listeners
 		const filterInput = document.getElementById('filterInput');
 		const clearFilterBtn = document.getElementById('clearFilterBtn');
+		
+		// Check for initial filter from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const initialFilter = urlParams.get('filter');
+		if (initialFilter) {
+			filterInput.value = initialFilter;
+			filterText = initialFilter.trim().toLowerCase();
+			updateClearButton();
+		}
 		
 		filterInput.addEventListener('input', function() {
 			filterText = this.value.trim().toLowerCase();
@@ -105,6 +112,9 @@ $currentLang = getUserLanguage();
 				updateClearButton();
 			}
 		});
+		
+		// Load shared notes after setting up event listeners
+		loadSharedNotes();
 	});
 	
 	function updateClearButton() {
@@ -225,10 +235,74 @@ $currentLang = getUserLanguage();
 			noteLink.className = 'note-name';
 			item.appendChild(noteLink);
 			
-			// Token
+			// Token (editable)
 			const tokenSpan = document.createElement('span');
 			tokenSpan.className = 'note-token';
+			tokenSpan.contentEditable = 'true';
 			tokenSpan.textContent = note.token;
+			tokenSpan.title = '<?php echo t_h('public.edit_token', [], 'Click to edit token'); ?>';
+			tokenSpan.dataset.originalToken = note.token;
+			tokenSpan.dataset.noteId = note.note_id;
+			
+			// Handle token editing
+			tokenSpan.addEventListener('blur', async function() {
+				const newToken = this.textContent.trim();
+				const originalToken = this.dataset.originalToken;
+				const noteId = this.dataset.noteId;
+				
+				if (newToken === originalToken || newToken === '') {
+					this.textContent = originalToken;
+					return;
+				}
+				
+				// Save new token via API
+				try {
+					const resp = await fetch('api_share_note.php', {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ 
+							note_id: noteId, 
+							action: 'renew',
+							custom_token: newToken
+						})
+					});
+					
+					if (resp.ok) {
+						const data = await resp.json();
+						if (data.url) {
+							// Update token and URL in the note object
+							const noteIndex = sharedNotes.findIndex(n => n.note_id == noteId);
+							if (noteIndex !== -1) {
+								sharedNotes[noteIndex].token = newToken;
+								sharedNotes[noteIndex].url = data.url;
+							}
+							this.dataset.originalToken = newToken;
+							// Reload to update URLs
+							loadSharedNotes();
+						} else {
+							this.textContent = originalToken;
+							alert('<?php echo t_h('public.token_update_failed', [], 'Failed to update token'); ?>');
+						}
+					} else {
+						const errorData = await resp.json();
+						this.textContent = originalToken;
+						alert(errorData.error || '<?php echo t_h('public.token_update_failed', [], 'Failed to update token'); ?>');
+					}
+				} catch (err) {
+					this.textContent = originalToken;
+					alert('<?php echo t_h('common.network_error', [], 'Network error'); ?>');
+				}
+			});
+			
+			// Prevent line breaks when editing
+			tokenSpan.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					this.blur();
+				}
+			});
+			
 			item.appendChild(tokenSpan);
 			
 			// Indexable toggle

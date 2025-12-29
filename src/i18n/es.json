@@ -827,13 +827,14 @@
       "menu_actions": "Acciones del menú",
       "convert_to_html": "Convertir a HTML"
     },
-    "share_modal": {
+    "public_modal": {
       "title": "URL pública",
       "close": "Cerrar",
       "open": "Abrir",
       "copy": "Copiar",
       "revoke": "Revocar",
       "renew": "Renovar",
+      "manage": "Editar",
       "create_url": "Crear url",
       "no_link_yet": "Aún no hay enlace público",
       "custom_token": "Token personalizado (opcional)",

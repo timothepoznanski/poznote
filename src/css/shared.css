@@ -195,6 +195,20 @@ body.shared-page {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: text;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.note-token:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.note-token:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    background-color: rgba(0, 123, 255, 0.05);
 }
 
 .note-indexable {
