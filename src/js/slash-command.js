@@ -1303,6 +1303,7 @@
         try {
             subSubmenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             subSubmenuElement.removeEventListener('click', handleSubSubmenuClick);
+            subSubmenuElement.removeEventListener('touchend', handleSubSubmenuTouchEnd);
         } catch (e) {}
 
         try {
@@ -1324,6 +1325,7 @@
         try {
             submenuElement.removeEventListener('mousedown', handleMenuMouseDown);
             submenuElement.removeEventListener('click', handleSubmenuClick);
+            submenuElement.removeEventListener('touchend', handleSubmenuTouchEnd);
             submenuElement.removeEventListener('mouseover', handleSubmenuMouseOver);
         } catch (e) {}
 
@@ -1416,6 +1418,7 @@
 
         submenuElement.addEventListener('mousedown', handleMenuMouseDown);
         submenuElement.addEventListener('click', handleSubmenuClick);
+        submenuElement.addEventListener('touchend', handleSubmenuTouchEnd);
         submenuElement.addEventListener('mouseover', handleSubmenuMouseOver);
     }
 
@@ -1460,6 +1463,7 @@
 
         subSubmenuElement.addEventListener('mousedown', handleMenuMouseDown);
         subSubmenuElement.addEventListener('click', handleSubSubmenuClick);
+        subSubmenuElement.addEventListener('touchend', handleSubSubmenuTouchEnd);
     }
 
     function deleteSlashText() {
@@ -1606,6 +1610,8 @@
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back') {
+            e.preventDefault();
+            e.stopPropagation();
             hideSubmenu();
             return;
         }
@@ -1621,12 +1627,55 @@
         // Check if it's the back button
         const action = item.getAttribute('data-action');
         if (action === 'back-sub') {
+            e.preventDefault();
+            e.stopPropagation();
             hideSubSubmenu();
             return;
         }
 
         const subSubmenuId = item.getAttribute('data-sub-submenu-id');
         if (subSubmenuId) executeCommand(subSubmenuId, false, true);
+    }
+
+    // Touch handlers for Firefox mobile compatibility
+    function handleSubmenuTouchEnd(e) {
+        const item = e.target.closest && e.target.closest('.slash-command-item');
+        if (!item) return;
+
+        // Check if it's the back button
+        const action = item.getAttribute('data-action');
+        if (action === 'back') {
+            e.preventDefault();
+            e.stopPropagation();
+            hideSubmenu();
+            return;
+        }
+
+        const submenuId = item.getAttribute('data-submenu-id');
+        if (submenuId) {
+            e.preventDefault();
+            executeCommand(submenuId, true, false);
+        }
+    }
+
+    function handleSubSubmenuTouchEnd(e) {
+        const item = e.target.closest && e.target.closest('.slash-command-item');
+        if (!item) return;
+
+        // Check if it's the back button
+        const action = item.getAttribute('data-action');
+        if (action === 'back-sub') {
+            e.preventDefault();
+            e.stopPropagation();
+            hideSubSubmenu();
+            return;
+        }
+
+        const subSubmenuId = item.getAttribute('data-sub-submenu-id');
+        if (subSubmenuId) {
+            e.preventDefault();
+            executeCommand(subSubmenuId, false, true);
+        }
     }
 
     function handleSubmenuMouseOver(e) {
