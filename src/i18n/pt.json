@@ -232,6 +232,12 @@
   },
   "settings": {
     "title": "Configurações",
+    "sections": {
+      "account_display": "Conta e Exibição",
+      "notes_folders": "Notas e Pastas",
+      "backup_restore": "Backup, Restauração e Atualizações",
+      "advanced": "Avançado"
+    },
     "language": {
       "label": "Idioma",
       "english": "Inglês",

@@ -233,6 +233,12 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "sections": {
+      "account_display": "Konto & Anzeige",
+      "notes_folders": "Notizen & Ordner",
+      "backup_restore": "Sicherung, Wiederherstellung & Updates",
+      "advanced": "Erweitert"
+    },
     "language": {
       "label": "Sprache",
       "english": "Englisch",

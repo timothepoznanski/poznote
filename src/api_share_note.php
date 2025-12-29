@@ -21,15 +21,16 @@ $action = isset($data['action']) ? strtolower(trim($data['action'])) : 'create';
 
 // Verify that the user has access to this note (owner or can view in workspace)
 try {
-    $stmt = $con->prepare('SELECT id FROM entries WHERE id = ?');
+    $stmt = $con->prepare('SELECT id, workspace FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
-    $exists = $stmt->fetchColumn();
-    if (!$exists) {
+    $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$noteRow) {
         header('Content-Type: application/json');
         http_response_code(404);
         echo json_encode(['error' => t('api.errors.note_not_found', [], 'Note not found')]);
         exit;
     }
+    $noteWorkspace = $noteRow['workspace'] ?? '';
 
     // Handle actions
     if ($action === 'get') {
@@ -60,7 +61,7 @@ try {
         $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
         header('Content-Type: application/json');
-        echo json_encode(['public' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable, 'hasPassword' => $hasPassword]);
+        echo json_encode(['public' => true, 'url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'indexable' => $indexable, 'hasPassword' => $hasPassword, 'workspace' => $noteWorkspace]);
         exit;
     } elseif ($action === 'revoke') {
         // Delete any public note for this note
@@ -197,7 +198,7 @@ try {
     $url_workspace = $base . '/workspace/' . rawurlencode($token);
 
     header('Content-Type: application/json');
-    echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'public' => true]);
+    echo json_encode(['url' => $url_path, 'url_query' => $url_query, 'url_workspace' => $url_workspace, 'public' => true, 'workspace' => $noteWorkspace]);
     exit;
 } catch (Exception $e) {
     header('Content-Type: application/json');
