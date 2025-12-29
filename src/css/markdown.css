@@ -328,3 +328,109 @@
 [data-theme='dark'] .katex {
     color: #e0e0e0;
 }
+
+/* Split view mode styles */
+.noteentry.markdown-split-mode {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+    height: auto !important;
+}
+
+/* Hide overflow on parent containers when in split mode */
+.innernote:has(.noteentry.markdown-split-mode) {
+    overflow: hidden !important;
+}
+
+#right_col:has(.noteentry.markdown-split-mode) {
+    overflow: hidden !important;
+}
+
+.noteentry.markdown-split-mode .markdown-editor-container,
+.noteentry.markdown-split-mode .markdown-editor {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    min-width: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    border-right: 1px solid #e0e0e0 !important;
+    box-sizing: border-box !important;
+    max-height: calc(100vh - 200px) !important;
+}
+
+.noteentry.markdown-split-mode .markdown-preview {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    min-width: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px 10px 10px 20px !important;
+    box-sizing: border-box !important;
+    max-height: calc(100vh - 200px) !important;
+}
+
+/* Dark mode border for split view */
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
+    border-right-color: #404040 !important;
+}
+
+/* Scrollbar styling for split view columns */
+.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
+.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
+.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
+    width: 0;
+    display: none;
+}
+
+.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
+.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+    display: none;
+}
+
+.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
+.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
+.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
+.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
+.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
+    display: none;
+}
+
+/* Dark mode scrollbar for split view */
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+    display: none;
+}
+
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
+    display: none;
+}
+
+/* Firefox scrollbar styling for split view */
+.noteentry.markdown-split-mode .markdown-editor-container,
+.noteentry.markdown-split-mode .markdown-editor,
+.noteentry.markdown-split-mode .markdown-preview {
+    scrollbar-width: none;
+}
+
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
+[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
+    scrollbar-width: none;
+}
