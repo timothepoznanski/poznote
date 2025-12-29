@@ -518,7 +518,7 @@ Upload the complete backup ZIP to restore everything:
 
 For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
 
-**Script location:** `backup-poznote.sh` (in the Poznote installation directory)
+**Script location:** `backup-poznote.sh` in the folder tools in the Poznote repository
 
 **Usage:**
 ```bash
