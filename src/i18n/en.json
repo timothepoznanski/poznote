@@ -756,6 +756,7 @@
     "table": "Table",
     "separator": "Separator",
     "link_to_note": "Link to note",
+    "link": "Link",
     "cancel": "Cancel",
     "back": "Back"
   },

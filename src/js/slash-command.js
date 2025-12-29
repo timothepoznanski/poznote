@@ -801,6 +801,92 @@
                 }
             },
             {
+                id: 'link',
+                icon: 'fa-link',
+                label: t('slash_menu.link', null, 'Link'),
+                action: function () {
+                    if (typeof window.showLinkModal === 'function') {
+                        // Save the note entry and editable element before they get cleared
+                        const noteEntry = savedNoteEntry;
+                        const editableElement = savedEditableElement;
+                        
+                        // Get current selection if any
+                        const sel = window.getSelection();
+                        const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
+                        const selectedText = hasSelection ? sel.toString() : '';
+                        
+                        // Save the current range/position
+                        let savedRange = null;
+                        if (sel && sel.rangeCount > 0) {
+                            savedRange = sel.getRangeAt(0).cloneRange();
+                        }
+                        
+                        window.showLinkModal('https://', selectedText, function(url, text) {
+                            if (!url) return;
+                            
+                            // Create a new link element
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.textContent = text || url;
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            
+                            // Focus the editable element first
+                            if (editableElement) {
+                                editableElement.focus();
+                            }
+                            
+                            // Restore selection and insert link
+                            try {
+                                const sel = window.getSelection();
+                                if (savedRange) {
+                                    sel.removeAllRanges();
+                                    sel.addRange(savedRange);
+                                    
+                                    // Replace the selected text with the link
+                                    savedRange.deleteContents();
+                                    savedRange.insertNode(a);
+                                    
+                                    // Position cursor after the link
+                                    const newRange = document.createRange();
+                                    newRange.setStartAfter(a);
+                                    newRange.setEndAfter(a);
+                                    sel.removeAllRanges();
+                                    sel.addRange(newRange);
+                                } else if (sel && sel.rangeCount > 0) {
+                                    // Fallback: insert at current position
+                                    const range = sel.getRangeAt(0);
+                                    range.insertNode(a);
+                                    range.setStartAfter(a);
+                                    range.setEndAfter(a);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                } else if (editableElement) {
+                                    // Last resort: append to editable element
+                                    editableElement.appendChild(a);
+                                }
+                            } catch (e) {
+                                console.error('Error inserting link:', e);
+                                // Absolute fallback
+                                if (editableElement) {
+                                    editableElement.appendChild(a);
+                                }
+                            }
+                            
+                            // Trigger input event for autosave
+                            if (noteEntry) {
+                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                            
+                            // Save the note
+                            if (typeof window.saveNoteImmediately === 'function') {
+                                window.saveNoteImmediately();
+                            }
+                        });
+                    }
+                }
+            },
+            {
                 id: 'open-keyboard',
                 icon: 'fa-times-circle',
                 label: t('slash_menu.cancel', null, 'Cancel'),
@@ -900,6 +986,45 @@
                 action: function () {
                     if (typeof window.openNoteReferenceModal === 'function') {
                         window.openNoteReferenceModal();
+                    }
+                }
+            },
+            {
+                id: 'link',
+                icon: 'fa-link',
+                label: t('slash_menu.link', null, 'Link'),
+                action: function () {
+                    if (typeof window.showLinkModal === 'function') {
+                        const editor = getCurrentMarkdownEditorFromSelection();
+                        if (!editor) return;
+                        
+                        const offsets = getSelectionOffsetsWithin(editor);
+                        if (!offsets) return;
+                        
+                        const text = getMarkdownEditorText(editor);
+                        const selectedText = text.substring(offsets.start, offsets.end);
+                        
+                        window.showLinkModal('https://', selectedText, function(url, linkText) {
+                            if (!url) return;
+                            
+                            const linkMarkdown = '[' + (linkText || 'link') + '](' + url + ')';
+                            const before = text.substring(0, offsets.start);
+                            const after = text.substring(offsets.end);
+                            const newText = before + linkMarkdown + after;
+                            
+                            editor.textContent = '';
+                            editor.appendChild(document.createTextNode(newText));
+                            
+                            // Position cursor after the inserted link
+                            const newOffset = offsets.start + linkMarkdown.length;
+                            setSelectionByOffsets(editor, newOffset, newOffset);
+                            
+                            // Trigger input event for autosave
+                            const noteEntry = editor.closest('.noteentry');
+                            if (noteEntry) {
+                                noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                        });
                     }
                 }
             },
