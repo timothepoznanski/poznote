@@ -212,7 +212,7 @@ async function createPublicShare(noteId) {
 
             // Use a dedicated share modal (copy + cancel + revoke/renew)
             if (typeof showShareModal === 'function') {
-                showShareModal(data.url, { noteId: noteId, shared: true });
+                showShareModal(data.url, { noteId: noteId, shared: true, workspace: data.workspace || '' });
             } else if (typeof showLinkModal === 'function') {
                 showLinkModal(data.url, data.url, function(){});
             } else {
@@ -246,7 +246,7 @@ document.addEventListener('click', function(e) {
 
 // Show a simple modal with the public URL and Copy / Cancel buttons (English)
 // showShareModal can accept either just url or (url, options)
-// options: { noteId: string, shared: boolean }
+// options: { noteId: string, shared: boolean, workspace: string }
 function showShareModal(url, options) {
     // Remove existing if any
     const existing = document.getElementById('shareModal');
@@ -284,6 +284,7 @@ function showShareModal(url, options) {
     // Get options
     const noteId = options && options.noteId ? options.noteId : null;
     const isShared = options && options.shared ? true : false;
+    const noteWorkspace = options && options.workspace ? options.workspace : '';
 
     // Conditionally add buttons based on share status
     if (isShared) {
@@ -354,9 +355,13 @@ function showShareModal(url, options) {
             manageBtn.onclick = function(ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
                 // Extract token from URL (last part after /)
-                const token = url.split('/').pop();
+                const token = decodeURIComponent(url.split('/').pop());
                 if (token) {
-                    window.open('shared.php?filter=' + encodeURIComponent(token), '_blank');
+                    let sharedUrl = 'shared.php?filter=' + encodeURIComponent(token);
+                    if (noteWorkspace) {
+                        sharedUrl += '&workspace=' + encodeURIComponent(noteWorkspace);
+                    }
+                    window.open(sharedUrl, '_blank');
                 }
             };
             buttonsDiv.appendChild(manageBtn);
@@ -385,9 +390,15 @@ function showShareModal(url, options) {
                         if (ct.indexOf('application/json') !== -1) {
                             const j = await resp.json();
                             if (j && j.url) {
-                                // Update displayed URL but keep modal open
+                                // Update displayed URL and workspace
                                 const urlDivEl = document.getElementById('shareModalUrl');
                                 if (urlDivEl) urlDivEl.textContent = j.url;
+                                // Update the workspace variable in modal closure
+                                if (j.workspace !== undefined) {
+                                    // We need to recreate the modal with updated workspace
+                                    closeModal('shareModal');
+                                    showShareModal(j.url, { noteId: noteId, shared: true, workspace: j.workspace });
+                                }
                                 markShareIconShared(noteId, true);
                             }
                         }
@@ -544,7 +555,7 @@ window.toggleShareMenu = toggleShareMenu;
 window.closeShareMenu = closeShareMenu;
 window.createPublicShare = createPublicShare;
 
-// Get existing public share for a note (returns {shared: bool, url?: string})
+// Get existing public share for a note (returns {shared: bool, url?: string, workspace?: string})
 async function getPublicShare(noteId) {
     if (!noteId) return { shared: false };
     try {
@@ -558,7 +569,7 @@ async function getPublicShare(noteId) {
         const ct = resp.headers.get('content-type') || '';
         if (ct.indexOf('application/json') === -1) return { shared: false };
         const j = await resp.json();
-        if (j && j.url) return { shared: true, url: j.url };
+        if (j && j.url) return { shared: true, url: j.url, workspace: j.workspace || '' };
         return { shared: false };
     } catch (e) {
         return { shared: false };
@@ -573,7 +584,7 @@ async function openPublicShareModal(noteId) {
     const info = await getPublicShare(noteId);
     if (info.shared && info.url) {
         markShareIconShared(noteId, true);
-        showShareModal(info.url, { noteId: noteId, shared: true });
+        showShareModal(info.url, { noteId: noteId, shared: true, workspace: info.workspace });
     } else {
         // Show modal with no url and a Create button
         showShareModal('', { noteId: noteId, shared: false });
