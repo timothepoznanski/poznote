@@ -89,7 +89,30 @@ try {
         exit;
     } elseif ($action === 'renew') {
         // Generate a new token and update existing row (or insert)
-        $token = bin2hex(random_bytes(16));
+        // Allow an optional custom token (slug) provided by the client
+        $custom = isset($data['custom_token']) ? trim($data['custom_token']) : '';
+        if ($custom !== '') {
+            // Validate custom token: allow letters, numbers, dash, underscore and dots; length 4-128
+            if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
+                header('Content-Type: application/json');
+                http_response_code(400);
+                echo json_encode(['error' => t('api.errors.invalid_custom_token', [], 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)')]);
+                exit;
+            }
+            // Ensure uniqueness (except when it's already used by this note)
+            $stmt = $con->prepare('SELECT note_id FROM shared_notes WHERE token = ? LIMIT 1');
+            $stmt->execute([$custom]);
+            $existing = $stmt->fetchColumn();
+            if ($existing && intval($existing) !== $note_id) {
+                header('Content-Type: application/json');
+                http_response_code(409);
+                echo json_encode(['error' => t('api.errors.token_already_in_use', [], 'Token already in use')]);
+                exit;
+            }
+            $token = $custom;
+        } else {
+            $token = bin2hex(random_bytes(16));
+        }
         // Theme passed optionally — store with the token (do not expose in URL)
         $theme = isset($data['theme']) ? trim($data['theme']) : null;
         // Indexable parameter (default: 0 = not indexable)
