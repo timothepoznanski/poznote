@@ -1080,7 +1080,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar Restauração",
-      "start_import_individual_notes": "Iniciar Importação de Notas Individuais"
+      "start_import_individual_notes": "Iniciar Importação"
     },
     "drag_drop": {
       "individual_notes": "Soltar arquivos aqui",
