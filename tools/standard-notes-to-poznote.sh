@@ -49,6 +49,21 @@ jq -c '.items[] | select(.content_type=="Note")' "$SN_JSON" | while read -r note
   # Get tags for the note
   mapfile -t tags_array < <(jq -r --arg uuid "$note_uuid" '.items[] | select(.content_type=="Tag") | select(.content.references[]?.uuid == $uuid) | .content.title' "$SN_JSON")
 
+  # Clean the note title for use as filename
+  # If title is empty or contains only whitespace, use UUID
+  if [ -z "$note_title" ] || [ -z "$(echo "$note_title" | tr -d '[:space:]')" ]; then
+    note_title="note_$note_uuid"
+  fi
+  
+  # Replace problematic characters in filename
+  # Replace / with - and remove other problematic characters
+  safe_filename=$(echo "$note_title" | sed 's/\//-/g' | sed 's/[<>:"|?*]/-/g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  
+  # Ensure filename is not empty after cleaning
+  if [ -z "$safe_filename" ]; then
+    safe_filename="note_$note_uuid"
+  fi
+
   # Create Markdown file with front matter
   {
     echo "---"
@@ -60,7 +75,7 @@ jq -c '.items[] | select(.content_type=="Note")' "$SN_JSON" | while read -r note
     echo "---"
     echo ""
     echo "$note_content"
-  } > "$OUTPUT_DIR/$note_title.md"
+  } > "$OUTPUT_DIR/$safe_filename.md"
 done
 
 # --- Create the final zip compatible with Poznote ---
