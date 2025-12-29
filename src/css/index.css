@@ -3142,6 +3142,23 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   transform: scale(1.18);
 }
 
+/* Add slash through icon when in split mode (active state) */
+.toolbar-btn.markdown-split-btn.active {
+  position: relative;
+}
+
+.toolbar-btn.markdown-split-btn.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 2px;
+  background-color: #007DB8;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  pointer-events: none;
+}
+
 /* Font Awesome icon customizations */
 .fa-caret-down::before { content: "\f0d7"; }
 .fa-smile::before { content: "\f118"; }

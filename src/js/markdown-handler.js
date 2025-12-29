@@ -991,10 +991,17 @@ function initializeMarkdownNote(noteId) {
                 var noteEntry = document.getElementById('entry' + noteId);
                 if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
                     exitSplitMode(noteId);
+                    splitBtn.classList.remove('active');
                 } else {
                     switchToSplitMode(noteId);
+                    splitBtn.classList.add('active');
                 }
             };
+            
+            // Set initial state based on split mode
+            if (startInSplitMode) {
+                splitBtn.classList.add('active');
+            }
             
             // Insert split button before help button
             toolbar.insertBefore(splitBtn, helpBtn);

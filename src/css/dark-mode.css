@@ -1988,6 +1988,12 @@ body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
     transform: scale(1.18);
 }
 
+/* Slash through icon when active (in split mode) in dark mode */
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn.active::after,
+body.dark-mode .toolbar-btn.markdown-split-btn.active::after {
+    background-color: #007DB8;
+}
+
 /* Image resize handle in dark mode */
 html[data-theme='dark'] .image-resize-handle,
 body.dark-mode .image-resize-handle {
