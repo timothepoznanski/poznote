@@ -106,7 +106,7 @@ if (isset($_GET['oidc_error'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo t_h('login.page.title', [], 'Login', $currentLang ?? 'en'); ?> - <?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?></title>
+    <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : t_h('app.name', [], 'Poznote', $currentLang ?? 'en')); ?></title>
     <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="css/fontawesome.min.css">
