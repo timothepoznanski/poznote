@@ -468,6 +468,15 @@ Import one or more HTML, Markdown or text notes directly, or upload a ZIP archiv
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
 
+**📁 Folder Structure in ZIP Archives**
+
+When importing a ZIP archive, Poznote automatically detects and recreates the folder structure:
+
+  - **Folders in ZIP become Folders in Poznote**: If your ZIP contains directories, they will be automatically created as folders, preserving the full hierarchy including subfolders
+  - **Example**: A ZIP with `Projects/2024/Notes/note.md` will create the folders `Projects` → `2024` → `Notes` and place the note in `Notes`
+  - **Compatible with any note-taking app**: Export from any app that supports folder structures
+  - **Multiple root folders**: If your ZIP has `folder1/note.md` and `folder2/note.md`, both `folder1` and `folder2` will be created
+
 **Markdown Front Matter Support**
 
 Markdown files can include YAML front matter to specify note metadata. The following keys are supported:

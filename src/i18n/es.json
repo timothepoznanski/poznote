@@ -1065,6 +1065,8 @@
         "folder": "Carpeta destino",
         "optional": "opcional",
         "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo",
+        "zip_folders_info": "ZIP con estructura de carpetas:",
+        "zip_folders_description": "Si su ZIP contiene carpetas, se crearán automáticamente como carpetas en Poznote, preservando su jerarquía (subcarpetas incluidas).",
         "no_folder": "Sin carpeta (nivel raíz)",
         "select_files": "Seleccionar archivos",
         "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
@@ -1077,7 +1079,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar restauración",
-      "start_import_individual_notes": "Iniciar importación de notas individuales"
+      "start_import_individual_notes": "Iniciar importación"
     },
     "drag_drop": {
       "individual_notes": "Soltar archivos aquí",

@@ -1066,6 +1066,8 @@
         "folder": "Pasta destino",
         "optional": "opcional",
         "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho",
+        "zip_folders_info": "ZIP com estrutura de pastas:",
+        "zip_folders_description": "Se o seu ZIP contiver pastas, elas serão criadas automaticamente como pastas no Poznote, preservando sua hierarquia (subpastas incluídas).",
         "no_folder": "Sem pasta (nível raiz)",
         "select_files": "Selecionar arquivos",
         "files_info": "Vários arquivos (máx {{maxIndividualFiles}}) ou arquivo ZIP único (máx {{maxZipFiles}} arquivos). Esses limites podem ser alterados,",
@@ -1078,7 +1080,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar Restauração",
-      "start_import_individual_notes": "Iniciar Importação de Notas Individuais"
+      "start_import_individual_notes": "Iniciar Importação"
     },
     "drag_drop": {
       "individual_notes": "Soltar arquivos aqui",
