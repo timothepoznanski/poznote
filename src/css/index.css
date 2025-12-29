@@ -3128,6 +3128,20 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   transform: scale(1.18);
 }
 
+/* Blue color for markdown split view button */
+.toolbar-btn.markdown-split-btn i,
+.toolbar-btn.markdown-split-btn [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+}
+
+.toolbar-btn.markdown-split-btn:hover i,
+.toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
+  color: #007DB8 !important;
+  filter: none !important;
+  transform: scale(1.18);
+}
+
 /* Font Awesome icon customizations */
 .fa-caret-down::before { content: "\f0d7"; }
 .fa-smile::before { content: "\f118"; }

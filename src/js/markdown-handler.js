@@ -827,10 +827,14 @@ function initializeMarkdownNote(noteId) {
     // Determine initial mode: edit or preview
     var isEmpty = markdownContent.trim() === '';
     var startInEditMode;
+    var startInSplitMode = false;
     
     // Always start in edit mode for empty notes (new notes)
     if (isEmpty) {
         startInEditMode = true;
+    } else if (savedMode && savedMode === 'split') {
+        startInSplitMode = true;
+        startInEditMode = false;
     } else if (savedMode && (savedMode === 'edit' || savedMode === 'preview')) {
         startInEditMode = (savedMode === 'edit');
     } else {
@@ -881,7 +885,12 @@ function initializeMarkdownNote(noteId) {
     editorDiv.style.whiteSpace = 'pre-wrap';
     
     // Set initial display states using setProperty to override any CSS !important rules
-    if (startInEditMode) {
+    if (startInSplitMode) {
+        // Split mode: show both editor and preview side by side
+        noteEntry.classList.add('markdown-split-mode');
+        editorContainer.style.setProperty('display', 'flex', 'important');
+        previewDiv.style.setProperty('display', 'block', 'important');
+    } else if (startInEditMode) {
         // Edit mode: show editor, hide preview
         editorContainer.style.setProperty('display', 'flex', 'important');
         previewDiv.style.setProperty('display', 'none', 'important');
@@ -897,8 +906,8 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
     
-    // Initialize Mermaid diagrams and Math equations if in preview mode
-    if (!startInEditMode && !isEmpty) {
+    // Initialize Mermaid diagrams and Math equations if in preview mode or split mode
+    if ((!startInEditMode || startInSplitMode) && !isEmpty) {
         setTimeout(function() {
             initMermaid();
             if (typeof renderMathInElement === 'function') {
@@ -925,7 +934,12 @@ function initializeMarkdownNote(noteId) {
             
             // Determine current view mode and set icon/title
             var currentMode;
-            if (startInEditMode) {
+            if (startInSplitMode) {
+                currentMode = 'split';
+                viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                viewModeBtn.title = 'Switch to preview mode';
+                viewModeBtn.style.display = 'none'; // Hide in split mode
+            } else if (startInEditMode) {
                 currentMode = 'edit';
                 viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
                 viewModeBtn.title = 'Switch to preview mode';
@@ -957,28 +971,62 @@ function initializeMarkdownNote(noteId) {
                 window.open('markdown_guide.php', '_blank');
             };
             
-            // Insert help button right after the view mode button
+            // Insert help button after view mode button
             if (viewModeBtn.nextSibling) {
                 toolbar.insertBefore(helpBtn, viewModeBtn.nextSibling);
             } else {
                 toolbar.appendChild(helpBtn);
             }
+            
+            // Create split view button
+            var splitBtn = document.createElement('button');
+            splitBtn.type = 'button';
+            splitBtn.className = 'toolbar-btn markdown-split-btn note-action-btn';
+            splitBtn.innerHTML = '<i class="fa-columns"></i>';
+            splitBtn.title = 'Toggle split view';
+            splitBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                var noteEntry = document.getElementById('entry' + noteId);
+                if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+                    exitSplitMode(noteId);
+                } else {
+                    switchToSplitMode(noteId);
+                }
+            };
+            
+            // Insert split button before help button
+            toolbar.insertBefore(splitBtn, helpBtn);
         } else {
             // Update existing button based on current state
             var currentMode;
-            if (startInEditMode) {
+            if (startInSplitMode) {
+                currentMode = 'split';
+                existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
+                existingViewModeBtn.title = 'Switch to preview mode';
+                existingViewModeBtn.classList.remove('active');
+                existingViewModeBtn.style.display = 'none'; // Hide in split mode
+            } else if (startInEditMode) {
                 currentMode = 'edit';
                 existingViewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
                 existingViewModeBtn.title = 'Switch to preview mode';
                 existingViewModeBtn.classList.remove('active');
+                existingViewModeBtn.style.display = '';
             } else {
                 currentMode = 'preview';
                 existingViewModeBtn.innerHTML = '<i class="fa-edit"></i>';
                 existingViewModeBtn.title = 'Switch to edit mode';
                 existingViewModeBtn.classList.remove('active');
+                existingViewModeBtn.style.display = '';
             }
             existingViewModeBtn.setAttribute('data-current-mode', currentMode);
         }
+    }
+    
+    // Setup live preview update if starting in split mode
+    if (startInSplitMode) {
+        setupSplitModePreviewUpdate(noteId);
     }
     
     // Setup event listeners for the editor
@@ -1262,20 +1310,172 @@ function updateViewModeButton(noteId, mode) {
         viewModeBtn.innerHTML = '<i class="fa-markdown"></i>';
         viewModeBtn.title = 'Switch to preview mode';
         viewModeBtn.classList.remove('active');
+        viewModeBtn.style.display = '';
     } else if (mode === 'preview') {
         viewModeBtn.innerHTML = '<i class="fa-edit"></i>';
         viewModeBtn.title = 'Switch to edit mode';
         viewModeBtn.classList.remove('active');
+        viewModeBtn.style.display = '';
+    } else if (mode === 'split') {
+        // Hide the view mode button in split mode
+        viewModeBtn.style.display = 'none';
+    }
+}
+
+// Switch to split view mode (editor on left, preview on right)
+function switchToSplitMode(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+    
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var editorContainer = noteEntry.querySelector('.markdown-editor-container');
+    
+    if (!previewDiv || !editorDiv) return;
+    
+    // Update preview content before showing
+    var markdownContent = normalizeContentEditableText(editorDiv);
+    var isEmpty = markdownContent.trim() === '';
+    
+    if (isEmpty) {
+        previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here as you type...</div>';
+        previewDiv.classList.add('empty');
+    } else {
+        previewDiv.innerHTML = parseMarkdown(markdownContent);
+        previewDiv.classList.remove('empty');
+        setTimeout(function() {
+            initMermaid();
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(previewDiv);
+            }
+        }, 100);
+    }
+    
+    noteEntry.setAttribute('data-markdown-content', markdownContent);
+    
+    // Add split mode class to note entry
+    noteEntry.classList.add('markdown-split-mode');
+    
+    // Show both editor and preview
+    if (editorContainer) {
+        editorContainer.style.setProperty('display', 'flex', 'important');
+    } else {
+        editorDiv.style.setProperty('display', 'block', 'important');
+    }
+    previewDiv.style.setProperty('display', 'block', 'important');
+    
+    // Update view mode button
+    updateViewModeButton(noteId, 'split');
+    
+    // Save mode to localStorage
+    try {
+        localStorage.setItem('poznote-markdown-view-mode', 'split');
+    } catch (e) {
+        console.warn('Could not save view mode to localStorage:', e);
+    }
+    
+    // Setup live preview update on input
+    setupSplitModePreviewUpdate(noteId);
+}
+
+// Exit split view mode (return to edit mode)
+function exitSplitMode(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+    
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+    
+    // Remove split mode class
+    noteEntry.classList.remove('markdown-split-mode');
+    
+    // Remove split mode input listener
+    if (editorDiv && editorDiv._splitModeInputListener) {
+        editorDiv.removeEventListener('input', editorDiv._splitModeInputListener);
+        editorDiv._splitModeInputListener = null;
+    }
+    
+    // Hide preview
+    if (previewDiv) {
+        previewDiv.style.setProperty('display', 'none', 'important');
+    }
+    
+    // Switch to edit mode
+    switchToEditMode(noteId);
+}
+
+// Setup live preview update in split mode
+function setupSplitModePreviewUpdate(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+    
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var previewDiv = noteEntry.querySelector('.markdown-preview');
+    
+    if (!editorDiv || !previewDiv) return;
+    
+    // Remove existing listener if any
+    if (editorDiv._splitModeInputListener) {
+        editorDiv.removeEventListener('input', editorDiv._splitModeInputListener);
+    }
+    
+    // Create debounced update function
+    var updateTimeout;
+    editorDiv._splitModeInputListener = function() {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(function() {
+            var content = normalizeContentEditableText(editorDiv);
+            var isEmpty = content.trim() === '';
+            
+            if (isEmpty) {
+                previewDiv.innerHTML = '<div class="markdown-preview-placeholder">Preview will appear here as you type...</div>';
+                previewDiv.classList.add('empty');
+            } else {
+                previewDiv.innerHTML = parseMarkdown(content);
+                previewDiv.classList.remove('empty');
+                
+                // Re-initialize Mermaid and Math
+                setTimeout(function() {
+                    initMermaid();
+                    if (typeof renderMathInElement === 'function') {
+                        renderMathInElement(previewDiv);
+                    }
+                }, 50);
+            }
+        }, 300); // 300ms debounce
+    };
+    
+    editorDiv.addEventListener('input', editorDiv._splitModeInputListener);
+}
+
+// Update toggle function to handle split mode
+function toggleMarkdownModeSplit(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+    
+    var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+    if (!viewModeBtn) return;
+    
+    var currentMode = viewModeBtn.getAttribute('data-current-mode');
+    
+    // Cycle through: edit -> preview -> edit
+    if (currentMode === 'edit') {
+        switchToPreviewMode(noteId);
+    } else {
+        switchToEditMode(noteId);
     }
 }
 
 // Make functions globally available
 window.initializeMarkdownNote = initializeMarkdownNote;
-window.toggleMarkdownMode = toggleMarkdownMode;
+window.toggleMarkdownMode = toggleMarkdownModeSplit;
 window.switchToEditMode = switchToEditMode;
 window.switchToPreviewMode = switchToPreviewMode;
+window.switchToSplitMode = switchToSplitMode;
+window.exitSplitMode = exitSplitMode;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.parseMarkdown = parseMarkdown;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;
+window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;

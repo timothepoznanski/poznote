@@ -270,7 +270,7 @@ body.dark-mode .innernote {
 html[data-theme='dark'] .note-header,
 body.dark-mode .note-header {
     background-color: #1a1a1a;
-    border-bottom: 1px solid #333;
+    /* border-bottom: 1px solid #333; */
 }
 
 html[data-theme='dark'] .note-edit-toolbar,
@@ -1947,6 +1947,42 @@ html[data-theme='dark'] .markdown-edit-btn:hover .fa-markdown,
 html[data-theme='dark'] .markdown-preview-btn:hover .fa-eye,
 body.dark-mode .markdown-edit-btn:hover .fa-markdown,
 body.dark-mode .markdown-preview-btn:hover .fa-eye {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Make markdown help button blue in dark mode */
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn i,
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-help-btn i,
+body.dark-mode .toolbar-btn.markdown-help-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-help-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+    transform: scale(1.18);
+}
+
+/* Make markdown split view button blue in dark mode */
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn i,
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-split-btn i,
+body.dark-mode .toolbar-btn.markdown-split-btn [class*="fa-"] {
+    color: #007DB8 !important;
+    filter: none !important;
+}
+
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover i,
+html[data-theme='dark'] .toolbar-btn.markdown-split-btn:hover [class*="fa-"],
+body.dark-mode .toolbar-btn.markdown-split-btn:hover i,
+body.dark-mode .toolbar-btn.markdown-split-btn:hover [class*="fa-"] {
     color: #007DB8 !important;
     filter: none !important;
     transform: scale(1.18);
