@@ -534,6 +534,356 @@ function importAttachmentsZip($uploadedFile) {
     return ['success' => true, 'message' => t('restore_import.import_attachments.summary', ['count' => $importedCount])];
 }
 
+/**
+ * Import a ZIP file with folder structure containing notes
+ * 
+ * @param array $uploadedFile The uploaded file from $_FILES
+ * @param string $workspace The workspace to import into
+ * @return array Result array with success status and message
+ */
+function importZipWithFolders($uploadedFile, $workspace) {
+    global $con;
+    
+    // Check file type
+    if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
+        return ['success' => false, 'message' => t('restore_import.errors.file_type_zip_only', [], 'Only ZIP files are allowed')];
+    }
+    
+    $tempFile = '/tmp/poznote_zip_folders_import_' . uniqid() . '.zip';
+    
+    // Move uploaded file
+    if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
+        return ['success' => false, 'message' => t('restore_import.errors.error_uploading_file', [], 'Error uploading file')];
+    }
+    
+    $entriesPath = getEntriesPath();
+    if (!$entriesPath || !is_dir($entriesPath)) {
+        unlink($tempFile);
+        return ['success' => false, 'message' => t('restore_import.individual_notes.errors.entries_dir_not_found', [], 'Entries directory not found')];
+    }
+    
+    // Open ZIP file
+    $zip = new ZipArchive;
+    $res = $zip->open($tempFile);
+    
+    if ($res !== TRUE) {
+        unlink($tempFile);
+        return ['success' => false, 'message' => t('restore_import.errors.cannot_open_zip', [], 'Cannot open ZIP file')];
+    }
+    
+    $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
+    
+    // Map to store folder paths to folder IDs
+    $folderMap = [];
+    
+    // Stats
+    $importedNotes = 0;
+    $createdFolders = 0;
+    $errors = [];
+    
+    // First pass: collect all files and folders
+    $files = [];
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+        
+        // Skip hidden files and directories
+        if (basename($fileName)[0] === '.' || basename(dirname($fileName))[0] === '.') {
+            continue;
+        }
+        
+        // Skip the root folder if the ZIP contains a single root folder
+        if (substr($fileName, -1) === '/') {
+            continue; // Skip directory entries
+        }
+        
+        // Get file extension
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Only process Markdown files
+        if ($fileExtension === 'md' || $fileExtension === 'markdown') {
+            $files[] = $fileName;
+        }
+    }
+    
+    // Check file count limit
+    if (count($files) > $maxFiles) {
+        $zip->close();
+        unlink($tempFile);
+        return [
+            'success' => false,
+            'message' => t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => count($files)], 
+                "Too many files in ZIP ({count}). Maximum is {max}.")
+        ];
+    }
+    
+    // Sort files to process folders in order
+    sort($files);
+    
+    // Helper function to create folder hierarchy
+    $createFolderHierarchy = function($folderPath) use ($con, $workspace, &$folderMap, &$createdFolders) {
+        // Normalize path (remove leading/trailing slashes)
+        $folderPath = trim($folderPath, '/');
+        
+        if (empty($folderPath)) {
+            return null; // No folder
+        }
+        
+        // Check if we already created this folder
+        if (isset($folderMap[$folderPath])) {
+            return $folderMap[$folderPath];
+        }
+        
+        // Split path into segments
+        $segments = explode('/', $folderPath);
+        $parentId = null;
+        $currentPath = '';
+        
+        foreach ($segments as $segment) {
+            // Build current path
+            if ($currentPath === '') {
+                $currentPath = $segment;
+            } else {
+                $currentPath .= '/' . $segment;
+            }
+            
+            // Check if this segment already exists in our map
+            if (isset($folderMap[$currentPath])) {
+                $parentId = $folderMap[$currentPath];
+                continue;
+            }
+            
+            // Check if folder exists in database
+            if ($parentId === null) {
+                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
+                $checkStmt->execute([$segment, $workspace]);
+            } else {
+                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?");
+                $checkStmt->execute([$segment, $workspace, $parentId]);
+            }
+            
+            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existing) {
+                // Folder already exists
+                $folderId = (int)$existing['id'];
+                $folderMap[$currentPath] = $folderId;
+                $parentId = $folderId;
+            } else {
+                // Create new folder
+                try {
+                    $insertStmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)");
+                    $insertStmt->execute([$segment, $workspace, $parentId]);
+                    $folderId = (int)$con->lastInsertId();
+                    $folderMap[$currentPath] = $folderId;
+                    $parentId = $folderId;
+                    $createdFolders++;
+                } catch (PDOException $e) {
+                    error_log("Error creating folder '$segment': " . $e->getMessage());
+                    return null;
+                }
+            }
+        }
+        
+        return $parentId;
+    };
+    
+    // Process each file
+    foreach ($files as $fileName) {
+        try {
+            // Extract file content
+            $content = $zip->getFromName($fileName);
+            if ($content === false) {
+                $errors[] = basename($fileName) . ': Cannot read file';
+                continue;
+            }
+            
+            // Determine folder structure from path
+            $dirPath = dirname($fileName);
+            
+            // Remove leading folder if all files are in one root folder
+            // (detect if all files start with the same root folder)
+            if (strpos($dirPath, '/') !== false) {
+                $parts = explode('/', $dirPath);
+                // Keep the directory structure after the first segment if it appears to be a vault name
+                if (count($parts) > 1) {
+                    array_shift($parts); // Remove first segment (vault name)
+                    $dirPath = implode('/', $parts);
+                }
+            } else if ($dirPath === '.') {
+                $dirPath = '';
+            }
+            
+            // Create folder hierarchy
+            $folderId = null;
+            $folderName = null;
+            if (!empty($dirPath) && $dirPath !== '.') {
+                $folderId = $createFolderHierarchy($dirPath);
+                // Get the folder name for legacy support
+                $segments = explode('/', $dirPath);
+                $folderName = end($segments);
+            }
+            
+            // Parse front matter if present
+            $frontMatterData = null;
+            $tags = '';
+            $favorite = 0;
+            $created = null;
+            $updated = null;
+            
+            $parsed = parseFrontMatter($content);
+            $frontMatterData = $parsed['metadata'];
+            $noteContent = $parsed['content'];
+            
+            // Extract title - prioritize front matter, then filename
+            if ($frontMatterData && isset($frontMatterData['title'])) {
+                $title = $frontMatterData['title'];
+            } else {
+                $title = pathinfo($fileName, PATHINFO_FILENAME);
+            }
+            
+            // Extract tags from front matter
+            if ($frontMatterData && isset($frontMatterData['tags'])) {
+                if (is_array($frontMatterData['tags'])) {
+                    $tags = implode(', ', $frontMatterData['tags']);
+                } else {
+                    $tags = (string)$frontMatterData['tags'];
+                }
+            }
+            
+            // Extract favorite status from front matter
+            if ($frontMatterData && isset($frontMatterData['favorite'])) {
+                $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
+            }
+            
+            // Extract dates from front matter
+            if ($frontMatterData && isset($frontMatterData['created'])) {
+                $created = $frontMatterData['created'];
+            }
+            if ($frontMatterData && isset($frontMatterData['updated'])) {
+                $updated = $frontMatterData['updated'];
+            }
+            
+            // Sanitize title
+            $title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+            if (empty($title)) {
+                $title = 'Imported Note ' . date('Y-m-d H:i:s');
+            }
+            
+            // Check if title already exists and make it unique
+            $uniqueTitle = generateUniqueTitle($title, null, $workspace, $folderId);
+            
+            // Prepare dates
+            $now = time();
+            $now_utc = gmdate('Y-m-d H:i:s', $now);
+            
+            // Convert created/updated dates if provided
+            if ($created) {
+                try {
+                    $createdTime = strtotime($created);
+                    if ($createdTime !== false) {
+                        $created = gmdate('Y-m-d H:i:s', $createdTime);
+                    } else {
+                        $created = $now_utc;
+                    }
+                } catch (Exception $e) {
+                    $created = $now_utc;
+                }
+            } else {
+                $created = $now_utc;
+            }
+            
+            if ($updated) {
+                try {
+                    $updatedTime = strtotime($updated);
+                    if ($updatedTime !== false) {
+                        $updated = gmdate('Y-m-d H:i:s', $updatedTime);
+                    } else {
+                        $updated = $now_utc;
+                    }
+                } catch (Exception $e) {
+                    $updated = $now_utc;
+                }
+            } else {
+                $updated = $now_utc;
+            }
+            
+            // Insert note into database
+            $insertStmt = $con->prepare(
+                "INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, favorite, created, updated) 
+                 VALUES (?, ?, ?, ?, ?, ?, 'markdown', ?, ?, ?)"
+            );
+            
+            // For entry field, store a text version of the content (first 500 chars)
+            $entryText = strip_tags($noteContent);
+            $entryText = substr($entryText, 0, 500);
+            
+            $insertStmt->execute([
+                $uniqueTitle,
+                $entryText,
+                $tags,
+                $folderName,
+                $folderId,
+                $workspace,
+                $favorite,
+                $created,
+                $updated
+            ]);
+            
+            $noteId = (int)$con->lastInsertId();
+            
+            // Write content to file
+            $noteFilename = getEntryFilename($noteId, 'markdown');
+            
+            // Ensure the entries directory exists
+            $noteDir = dirname($noteFilename);
+            if (!is_dir($noteDir)) {
+                mkdir($noteDir, 0755, true);
+            }
+            
+            // Write markdown content to file
+            if (file_put_contents($noteFilename, $noteContent) === false) {
+                error_log("Failed to write file for note ID $noteId: $noteFilename");
+                $errors[] = basename($fileName) . ': Failed to write file';
+                
+                // Delete the database entry since we couldn't write the file
+                $deleteStmt = $con->prepare("DELETE FROM entries WHERE id = ?");
+                $deleteStmt->execute([$noteId]);
+                continue;
+            }
+            
+            $importedNotes++;
+            
+        } catch (Exception $e) {
+            error_log("Error importing file '$fileName': " . $e->getMessage());
+            $errors[] = basename($fileName) . ': ' . $e->getMessage();
+        }
+    }
+    
+    $zip->close();
+    unlink($tempFile);
+    
+    // Build result message
+    $message = sprintf(
+        t('restore_import.zip_folders.import_success', [], 
+          'Successfully imported %d notes and created %d folders'),
+        $importedNotes,
+        $createdFolders
+    );
+    
+    if (!empty($errors)) {
+        $message .= '. ' . count($errors) . ' errors occurred.';
+    }
+    
+    return [
+        'success' => true,
+        'message' => $message,
+        'imported_notes' => $importedNotes,
+        'created_folders' => $createdFolders,
+        'errors' => $errors
+    ];
+}
+
 function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null) {
     global $con;
     
@@ -583,6 +933,61 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     
     $maxFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
     
+    // Detect if ZIP contains folder structure and find common root
+    $hasSubfolders = false;
+    $rootFolderName = null;
+    $allFilesShareSameRoot = true;
+    $filesAnalyzed = [];
+    
+    // Analyze ZIP structure - collect all file paths
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+        
+        // Skip directories themselves and hidden files
+        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
+            continue;
+        }
+        
+        // Get file extension
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Only consider valid note files
+        if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
+            continue;
+        }
+        
+        $filesAnalyzed[] = $fileName;
+        
+        // Check if file is in a subdirectory
+        $dirPath = dirname($fileName);
+        if ($dirPath !== '.' && $dirPath !== '') {
+            $hasSubfolders = true;
+            
+            // Extract root folder name
+            $parts = explode('/', $fileName);
+            if (count($parts) > 1) {
+                $firstSegment = $parts[0];
+                
+                if ($rootFolderName === null) {
+                    $rootFolderName = $firstSegment;
+                } else if ($rootFolderName !== $firstSegment) {
+                    // Found a file with a different root folder
+                    $allFilesShareSameRoot = false;
+                }
+            }
+        }
+    }
+    
+    // Only use rootFolderName if ALL files share the same root
+    if (!$allFilesShareSameRoot || $rootFolderName === null) {
+        $rootFolderName = null;
+    }
+    
+    // Map to store folder paths to folder IDs
+    $folderMap = [];
+    $createdFolders = 0;
+    
     // First pass: count valid files in the ZIP to enforce limit BEFORE importing anything
     $validFileCount = 0;
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -617,6 +1022,74 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $errorCount = 0;
     $errors = [];
     
+    // Helper function to create folder hierarchy
+    $createFolderHierarchy = function($folderPath) use ($con, $workspace, &$folderMap, &$createdFolders) {
+        // Normalize path (remove leading/trailing slashes)
+        $folderPath = trim($folderPath, '/');
+        
+        if (empty($folderPath)) {
+            return null; // No folder
+        }
+        
+        // Check if we already created this folder
+        if (isset($folderMap[$folderPath])) {
+            return $folderMap[$folderPath];
+        }
+        
+        // Split path into segments
+        $segments = explode('/', $folderPath);
+        $parentId = null;
+        $currentPath = '';
+        
+        foreach ($segments as $segment) {
+            // Build current path
+            if ($currentPath === '') {
+                $currentPath = $segment;
+            } else {
+                $currentPath .= '/' . $segment;
+            }
+            
+            // Check if this segment already exists in our map
+            if (isset($folderMap[$currentPath])) {
+                $parentId = $folderMap[$currentPath];
+                continue;
+            }
+            
+            // Check if folder exists in database
+            if ($parentId === null) {
+                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
+                $checkStmt->execute([$segment, $workspace]);
+            } else {
+                $checkStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?");
+                $checkStmt->execute([$segment, $workspace, $parentId]);
+            }
+            
+            $existing = $checkStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existing) {
+                // Folder already exists
+                $folderId = (int)$existing['id'];
+                $folderMap[$currentPath] = $folderId;
+                $parentId = $folderId;
+            } else {
+                // Create new folder
+                try {
+                    $insertStmt = $con->prepare("INSERT INTO folders (name, workspace, parent_id) VALUES (?, ?, ?)");
+                    $insertStmt->execute([$segment, $workspace, $parentId]);
+                    $folderId = (int)$con->lastInsertId();
+                    $folderMap[$currentPath] = $folderId;
+                    $parentId = $folderId;
+                    $createdFolders++;
+                } catch (PDOException $e) {
+                    error_log("Error creating folder '$segment': " . $e->getMessage());
+                    return null;
+                }
+            }
+        }
+        
+        return $parentId;
+    };
+    
     // Second pass: actually import the files
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
@@ -646,6 +1119,38 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Determine folder from ZIP structure (if hasSubfolders is true)
+        $targetFolderId = null;
+        $targetFolderName = $folder; // Use provided folder as default
+        
+        if ($hasSubfolders) {
+            // Extract directory path from file path
+            $dirPath = dirname($fileName);
+            
+            // Remove root folder if all files are in a single root folder
+            if ($rootFolderName && strpos($dirPath, $rootFolderName) === 0) {
+                $dirPath = substr($dirPath, strlen($rootFolderName));
+                $dirPath = trim($dirPath, '/');
+            }
+            
+            // Create folder hierarchy if path is not empty
+            if (!empty($dirPath) && $dirPath !== '.') {
+                $targetFolderId = $createFolderHierarchy($dirPath);
+                // Get the leaf folder name for legacy support
+                $segments = explode('/', $dirPath);
+                $targetFolderName = end($segments);
+            }
+        } else if ($folder !== null && $folder !== '') {
+            // Use the provided folder parameter if no subfolders in ZIP
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+            $fStmt->execute([$folder, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $targetFolderId = (int)$folderData['id'];
+                $targetFolderName = $folder;
+            }
+        }
+        
         // Parse front matter if it's a markdown file
         $frontMatterData = null;
         $tags = '';
@@ -667,8 +1172,12 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         }
         
         // Extract tags from front matter
-        if ($frontMatterData && isset($frontMatterData['tags']) && is_array($frontMatterData['tags'])) {
-            $tags = implode(', ', $frontMatterData['tags']);
+        if ($frontMatterData && isset($frontMatterData['tags'])) {
+            if (is_array($frontMatterData['tags'])) {
+                $tags = implode(', ', $frontMatterData['tags']);
+            } else if (is_string($frontMatterData['tags'])) {
+                $tags = $frontMatterData['tags'];
+            }
         }
         
         // Extract favorite status from front matter
@@ -676,9 +1185,16 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
         }
         
-        // Extract folder from front matter (override if present)
+        // Extract folder from front matter (can override ZIP structure)
         if ($frontMatterData && isset($frontMatterData['folder']) && !empty($frontMatterData['folder'])) {
-            $folder = $frontMatterData['folder'];
+            $targetFolderName = $frontMatterData['folder'];
+            // Try to find this folder
+            $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
+            $fStmt->execute([$targetFolderName, $workspace]);
+            $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($folderData) {
+                $targetFolderId = (int)$folderData['id'];
+            }
         }
         
         // Extract dates from front matter
@@ -696,30 +1212,19 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         }
         
         try {
-            // Get folder_id if folder is provided
-            $folder_id = null;
-            if ($folder !== null && $folder !== '') {
-                $fStmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ?");
-                $fStmt->execute([$folder, $workspace]);
-                $folderData = $fStmt->fetch(PDO::FETCH_ASSOC);
-                if ($folderData) {
-                    $folder_id = (int)$folderData['id'];
-                }
-            }
-            
             // Insert note into database with metadata from front matter
             if ($created && $updated) {
                 $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created, $updated]);
+                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created, $updated]);
             } elseif ($created) {
                 $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $created]);
+                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $created]);
             } elseif ($updated) {
                 $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), ?, 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite, $updated]);
+                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite, $updated]);
             } else {
                 $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, tags, favorite, created, updated, trash) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0)");
-                $stmt->execute([$title, $folder, $folder_id, $workspace, $noteType, $tags, $favorite]);
+                $stmt->execute([$title, $targetFolderName, $targetFolderId, $workspace, $noteType, $tags, $favorite]);
             }
             $noteId = $con->lastInsertId();
             
@@ -760,8 +1265,14 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $zip->close();
     unlink($tempFile);
     
-    $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
-    $message = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
+    // Build result message
+    if ($hasSubfolders && $createdFolders > 0) {
+        $message = t('restore_import.messages.notes_imported_with_folders', ['count' => $importedCount, 'folders' => $createdFolders, 'workspace' => $workspace], 'Imported {{count}} note(s) and created {{folders}} folder(s) in workspace "{{workspace}}".');
+    } else {
+        $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
+        $message = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
+    }
+    
     if ($errorCount > 0) {
         $message .= " {$errorCount} error(s): " . implode('; ', array_slice($errors, 0, 5));
     }
@@ -1211,6 +1722,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     </label>
                     <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #dc3545; font-size: 0.875rem;">
                         <?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', 'Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà'); ?>
+                    </small>
+                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #17a2b8; font-size: 0.875rem;">
+                        <strong><?php echo t_h('restore_import.sections.individual_notes.zip_folders_info', 'ZIP avec structure de dossiers :'); ?></strong> <?php echo t_h('restore_import.sections.individual_notes.zip_folders_description', 'Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).'); ?>
                     </small>
                     <select id="target_folder_select" name="target_folder" class="form-control" style="font-size: 15px; padding: 0.5rem;">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>

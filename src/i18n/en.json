@@ -1070,6 +1070,8 @@
         "folder": "Target Folder",
         "optional": "optional",
         "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore first ensure that the folder already exists, otherwise the note will be created at the workspace root",
+        "zip_folders_info": "ZIP with folder structure:",
+        "zip_folders_description": "If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).",
         "no_folder": "No folder (root level)",
         "select_files": "Select Files",
         "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,",

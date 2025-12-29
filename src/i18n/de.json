@@ -1065,6 +1065,8 @@
         "folder": "Zielordner",
         "optional": "optional",
         "frontmatter_warning": "Wenn eine MD-Notiz einen Ordnerschlüssel in einem Front-Matter enthält, überschreibt dieser Wert den unten ausgewählten. Sie müssen daher zunächst sicherstellen, dass der Ordner bereits existiert, andernfalls wird die Notiz im Wurzelverzeichnis des Arbeitsbereichs erstellt",
+        "zip_folders_info": "ZIP mit Ordnerstruktur:",
+        "zip_folders_description": "Wenn Ihre ZIP-Datei Ordner enthält, werden diese automatisch als Ordner in Poznote erstellt und ihre Hierarchie (einschließlich Unterordner) beibehalten.",
         "no_folder": "Kein Ordner (Root-Ebene)",
         "select_files": "Dateien auswählen",
         "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
