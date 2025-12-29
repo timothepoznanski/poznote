@@ -756,6 +756,7 @@
     "table": "Tabla",
     "separator": "Separador",
     "link_to_note": "Enlace a nota",
+    "link": "Enlace",
     "cancel": "Cancelar",
     "back": "Volver"
   },
@@ -1030,11 +1031,11 @@
         "cannot_read_file": "No se puede leer archivo"
       },
       "summary_with_location": "Esto importará {{fileText}} en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
-      "summary_zip_with_location": "Esto extraerá e importará todos los archivos HTML y Markdown del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
+      "summary_zip_with_location": "Esto extraerá e importará todos los archivos del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
-        "title": "¿Quieres restaurar desde un archivo de copia de seguridad?"
+        "title": "¿Quieres restaurar desde un archivo de copia de seguridad ZIP de Poznote?"
       },
       "standard_restore": {
         "title": "¿Tu archivo de copia de seguridad es menor a 500MB?",
@@ -1056,13 +1057,15 @@
         "loading": "Cargando...",
         "folder": "Carpeta destino",
         "optional": "opcional",
+        "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo",
         "no_folder": "Sin carpeta (nivel raíz)",
         "select_files": "Seleccionar archivos",
-        "files_info": "Varios archivos (máx 50) o archivo ZIP único (máx 300 archivos)",
-        "supported_formats": "Soportados: .html, .md, .markdown, .zip",
-        "title": "¿Quieres importar archivos HTML o Markdown?",
-        "description_html": "Importe archivos HTML o Markdown individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión).",
-        "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown"
+        "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
+        "files_info_link": "consulte la documentación",
+        "supported_formats": "Soportados: .html, .md, .markdown, .txt, .zip",
+        "title": "¿Quieres importar archivos HTML, Markdown, de texto o archivos ZIP?",
+        "description_html": "Importe archivos HTML, Markdown o de texto individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión), a menos que se defina una clave title en un front matter para archivos MD.",
+        "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt"
       }
     },
     "buttons": {
@@ -1254,6 +1257,8 @@
       "no_public_notes": "Aún no hay notas compartidas.",
       "public_hint": "Haga pública una nota haciendo clic en el botón de nube en la barra de herramientas."
     },
+    "filter_placeholder": "Filtrar por título o token...",
+    "no_filter_results": "Ninguna nota coincide con su búsqueda.",
     "table": {
       "note": "Nota",
       "url": "URL Pública"

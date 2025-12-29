@@ -756,6 +756,7 @@
     "table": "Table",
     "separator": "Separator",
     "link_to_note": "Link to note",
+    "link": "Link",
     "cancel": "Cancel",
     "back": "Back"
   },
@@ -1035,11 +1036,11 @@
         "cannot_read_file": "Cannot read file"
       },
       "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
-      "summary_zip_with_location": "This will extract and import all HTML and Markdown files from the ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
+      "summary_zip_with_location": "This will extract and import all files from the ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
-        "title": "Want to restore from a backup file?"
+        "title": "Want to restore from a Poznote ZIP backup file?"
       },
       "standard_restore": {
         "title": "Is your backup file less than 500MB?",
@@ -1061,13 +1062,15 @@
         "loading": "Loading...",
         "folder": "Target Folder",
         "optional": "optional",
+        "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore first ensure that the folder already exists, otherwise the note will be created at the workspace root",
         "no_folder": "No folder (root level)",
         "select_files": "Select Files",
-        "files_info": "Multiple files (max 50) or single ZIP archive (max 300 files)",
-        "supported_formats": "Supported: .html, .md, .markdown, .zip",
-        "title": "Want to import HTML or Markdown files?",
-        "description_html": "Import individual HTML or Markdown files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension).",
-        "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown"
+        "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,",
+        "files_info_link": "see documentation",
+        "supported_formats": "Supported: .html, .md, .markdown, .txt, .zip",
+        "title": "Want to import HTML, Markdown, text files or ZIP archives?",
+        "description_html": "Import individual HTML, Markdown or text files, or a ZIP archive containing multiple files.<br><br>The title will be automatically created from the file name (without the extension), unless a title key is defined in a front matter for MD files.",
+        "helper": "You can select multiple files at once (maximum 50 files). Supported formats: .html, .md, .markdown, .txt"
       }
     },
     "buttons": {
@@ -1259,6 +1262,8 @@
       "no_public_notes": "No public notes yet.",
       "public_hint": "Make a note public by clicking the cloud button in the note toolbar."
     },
+    "filter_placeholder": "Filter by title or token...",
+    "no_filter_results": "No notes match your search.",
     "table": {
       "note": "Note",
       "url": "Public URL"

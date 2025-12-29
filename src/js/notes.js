@@ -219,6 +219,11 @@ function saveNoteToServer() {
     .then(function(data) {
         if (data.success) {
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
+            
+            // Refresh tags count in sidebar after successful save
+            if (typeof window.refreshTagsCount === 'function') {
+                window.refreshTagsCount();
+            }
         } else {
             // Show user-visible error notification
             if (typeof showNotificationPopup === 'function') {
@@ -277,6 +282,11 @@ function handleSaveResponse(data) {
             // Clear draft from localStorage after successful save
             if (typeof window.clearDraft === 'function') {
                 window.clearDraft(noteid);
+            }
+            
+            // Refresh tags count in sidebar after successful save
+            if (typeof window.refreshTagsCount === 'function') {
+                window.refreshTagsCount();
             }
             
             return;

@@ -20,13 +20,7 @@ function oidc_base64url_decode($data) {
 }
 
 function oidc_get_base_url() {
-    $proto = 'http';
-    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-        $proto = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]));
-    } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-        $proto = 'https';
-    }
-
+    $proto = get_protocol();
     $host = $_SERVER['HTTP_HOST'] ?? (defined('SERVER_NAME') ? SERVER_NAME : 'localhost');
     return $proto . '://' . $host;
 }

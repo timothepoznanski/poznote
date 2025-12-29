@@ -60,8 +60,8 @@ if (!in_array($disposition, ['attachment', 'inline'], true)) {
 }
 
 try {
-    // Fetch note from database
-    $stmt = $con->prepare('SELECT id, heading, type, tags FROM entries WHERE id = ? AND trash = 0');
+    // Fetch note from database with all metadata for front matter
+    $stmt = $con->prepare('SELECT id, heading, type, tags, favorite, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$noteId]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -132,8 +132,8 @@ try {
 
     // Check format and export accordingly
     if ($format === 'markdown') {
-        // Export as Markdown with title and tags in markdown format
-        exportAsMarkdown($content, $note['heading'], $note['tags']);
+        // Export as Markdown with front matter YAML
+        exportAsMarkdown($content, $note, $con);
     } else {
         // For markdown notes, convert markdown to HTML first
         if ($noteType === 'markdown') {
@@ -832,30 +832,54 @@ function sanitizeFilename($filename) {
 }
 
 /**
- * Export as Markdown file with title and tags in markdown format
+ * Export as Markdown file with YAML front matter
  */
-function exportAsMarkdown($content, $title, $tags) {
+function exportAsMarkdown($content, $note, $con) {
+    $title = $note['heading'] ?? 'New note';
+    $tags = $note['tags'] ?? '';
+    $favorite = !empty($note['favorite']) ? 'true' : 'false';
+    $created = $note['created'] ?? '';
+    $updated = $note['updated'] ?? '';
+    $folder_id = $note['folder_id'] ?? null;
+    
     // Parse tags (stored as comma-separated string)
     $tagsList = [];
     if (!empty($tags)) {
         $tagsList = array_filter(array_map('trim', explode(',', $tags)));
     }
     
-    // Build markdown content with title and tags
-    $markdownContent = '';
-    
-    // Add title as H1
-    $markdownContent .= '# ' . $title . "\n\n";
-    
-    // Add tags in markdown format
-    if (!empty($tagsList)) {
-        $markdownContent .= '**Tags:** ';
-        $tagsFormatted = array_map(function($tag) {
-            return '`' . $tag . '`';
-        }, $tagsList);
-        $markdownContent .= implode(', ', $tagsFormatted);
-        $markdownContent .= "\n\n---\n\n";
+    // Get folder path if exists
+    $folderPath = '';
+    if ($folder_id && function_exists('getFolderPath')) {
+        $folderPath = getFolderPath($folder_id, $con);
     }
+    
+    // Build markdown content with YAML front matter
+    $markdownContent = "---\n";
+    $markdownContent .= "title: " . json_encode($title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    
+    if (!empty($tagsList)) {
+        $markdownContent .= "tags:\n";
+        foreach ($tagsList as $tag) {
+            $markdownContent .= "  - " . json_encode($tag, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        }
+    }
+    
+    if (!empty($folderPath)) {
+        $markdownContent .= "folder: " . json_encode($folderPath, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    }
+    
+    $markdownContent .= "favorite: " . $favorite . "\n";
+    
+    if (!empty($created)) {
+        $markdownContent .= "created: " . json_encode($created, JSON_UNESCAPED_UNICODE) . "\n";
+    }
+    
+    if (!empty($updated)) {
+        $markdownContent .= "updated: " . json_encode($updated, JSON_UNESCAPED_UNICODE) . "\n";
+    }
+    
+    $markdownContent .= "---\n\n";
     
     // Add the actual note content
     $markdownContent .= $content;

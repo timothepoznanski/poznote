@@ -234,7 +234,8 @@ if (isset($note['type']) && $note['type'] === 'markdown') {
     // The content is raw markdown, we need to convert it to HTML
     $content = parseMarkdown($content);
 }
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+$protocol = get_protocol();
+$baseUrl = $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 // If the app is in a subdirectory, ensure the base includes the script dir
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 if ($scriptDir && $scriptDir !== '/') {

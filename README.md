@@ -459,14 +459,51 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 <a id="import-individual-notes"></a>
 **📥 Import Individual Notes**
 
-Import one or more HTML or Markdown notes directly, or upload a ZIP archive containing multiple notes:
+Import one or more HTML, Markdown or text notes directly, or upload a ZIP archive containing multiple notes:
 
-  - Support `.html`, `.md`, `.markdown`, or `.zip` files types
+  - Support `.html`, `.md`, `.markdown`, `.txt`, or `.zip` file types
   - ZIP archives can contain up to 300 files — configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env` (default: 300)
   - Up to 50 files can be selected at once — configurable via `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` in your `.env` (default: 50)
   - Choose the target workspace for imported notes
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
+
+**Markdown Front Matter Support**
+
+Markdown files can include YAML front matter to specify note metadata. The following keys are supported:
+
+  - `title` — Override the note title (default: filename without extension)
+  - `folder` — Override the target folder selection (folder must exist in the workspace)
+  - `tags` — Array of tags to apply to the note. Supports both inline `[tag1, tag2]` and multi-line syntax
+  - `favorite` — Mark note as favorite (`true`/`false` or `1`/`0`)
+  - `created` — Set custom creation date (format: `YYYY-MM-DD HH:MM:SS`)
+  - `updated` — Set custom update date (format: `YYYY-MM-DD HH:MM:SS`)
+
+Example with inline array syntax:
+```yaml
+---
+title: My Important Note
+folder: Projects
+tags: [important, work]
+favorite: true
+created: 2024-01-15 10:30:00
+updated: 2024-01-20 15:45:00
+---
+```
+
+Example with multi-line syntax:
+```yaml
+---
+title: My Important Note
+folder: Projects
+tags:
+  - important
+  - work
+favorite: true
+created: 2024-01-15 10:30:00
+updated: 2024-01-20 15:45:00
+---
+```
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 
@@ -481,7 +518,7 @@ Upload the complete backup ZIP to restore everything:
 
 For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
 
-**Script location:** `backup-poznote.sh` (in the Poznote installation directory)
+**Script location:** `backup-poznote.sh` in the folder tools in the Poznote repository
 
 **Usage:**
 ```bash
@@ -585,6 +622,8 @@ docker compose up -d
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is an daily update check.
+
 <details>
 <summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
 
@@ -596,8 +635,13 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **HTML5** - Markup and structure
 - **CSS3** - Styling and responsive design
 - **JavaScript (Vanilla)** - Interactive features and dynamic content
-- **React + Vite** - Excalidraw drawing component (bundled as IIFE)
+- **React + Vite** - Build toolchain for Excalidraw component (bundled as IIFE)
 - **AJAX** - Asynchronous data loading
+
+### Libraries
+- **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
+- **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
+- **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
 
 ### Storage
 - **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem

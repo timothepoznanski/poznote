@@ -71,6 +71,7 @@ $indexContent .= '</body></html>';
 $zip->addFromString('index.html', $indexContent);
 
 // Add all note files (HTML and Markdown) from entries directory
+// For Markdown files, add front matter with metadata
 $files = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($rootPath), 
     RecursiveIteratorIterator::LEAVES_ONLY
@@ -85,11 +86,86 @@ foreach ($files as $name => $file) {
         // Include both HTML and Markdown files, skip index.php and other non-note files
         if ($extension === 'html' || $extension === 'md') {
             if (file_exists($filePath) && is_readable($filePath)) {
-                $zip->addFile($filePath, $relativePath);
-                $fileCount++;
+                // For Markdown files, add front matter with metadata
+                if ($extension === 'md') {
+                    $noteId = intval(pathinfo($relativePath, PATHINFO_FILENAME));
+                    
+                    // Get metadata from database
+                    $metaStmt = $con->prepare('SELECT heading, tags, favorite, folder_id, created, updated FROM entries WHERE id = ? AND trash = 0');
+                    $metaStmt->execute([$noteId]);
+                    $metadata = $metaStmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($metadata) {
+                        $content = file_get_contents($filePath);
+                        $frontMatterContent = addFrontMatterToMarkdown($content, $metadata, $con);
+                        $zip->addFromString($relativePath, $frontMatterContent);
+                        $fileCount++;
+                    } else {
+                        // No metadata found, add file as-is
+                        $zip->addFile($filePath, $relativePath);
+                        $fileCount++;
+                    }
+                } else {
+                    // For HTML files, add as-is
+                    $zip->addFile($filePath, $relativePath);
+                    $fileCount++;
+                }
             }
         }
     }
+}
+
+/**
+ * Add YAML front matter to Markdown content
+ */
+function addFrontMatterToMarkdown($content, $metadata, $con) {
+    $title = $metadata['heading'] ?? 'New note';
+    $tags = $metadata['tags'] ?? '';
+    $favorite = !empty($metadata['favorite']) ? 'true' : 'false';
+    $created = $metadata['created'] ?? '';
+    $updated = $metadata['updated'] ?? '';
+    $folder_id = $metadata['folder_id'] ?? null;
+    
+    // Parse tags (stored as comma-separated string)
+    $tagsList = [];
+    if (!empty($tags)) {
+        $tagsList = array_filter(array_map('trim', explode(',', $tags)));
+    }
+    
+    // Get folder path if exists
+    $folderPath = '';
+    if ($folder_id && function_exists('getFolderPath')) {
+        $folderPath = getFolderPath($folder_id, $con);
+    }
+    
+    // Build YAML front matter
+    $frontMatter = "---\n";
+    $frontMatter .= "title: " . json_encode($title, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    
+    if (!empty($tagsList)) {
+        $frontMatter .= "tags:\n";
+        foreach ($tagsList as $tag) {
+            $frontMatter .= "  - " . json_encode($tag, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+        }
+    }
+    
+    if (!empty($folderPath)) {
+        $frontMatter .= "folder: " . json_encode($folderPath, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    }
+    
+    $frontMatter .= "favorite: " . $favorite . "\n";
+    
+    if (!empty($created)) {
+        $frontMatter .= "created: " . json_encode($created, JSON_UNESCAPED_UNICODE) . "\n";
+    }
+    
+    if (!empty($updated)) {
+        $frontMatter .= "updated: " . json_encode($updated, JSON_UNESCAPED_UNICODE) . "\n";
+    }
+    
+    $frontMatter .= "---\n\n";
+    
+    return $frontMatter . $content;
 }
 
 $zip->close();

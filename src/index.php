@@ -747,6 +747,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     // Convert to HTML button (only for markdown notes)
@@ -813,6 +814,7 @@ $body_classes = trim($extra_body_classes);
                     
                     // Individual action buttons
                     echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fa-copy"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="'.t_h('common.move', [], 'Move').'"><i class="fa-folder-open"></i></button>';
                     
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" onclick="showExportModal(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';

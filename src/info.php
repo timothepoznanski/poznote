@@ -53,7 +53,7 @@ function formatDateString($dateStr) {
         $timezone = getUserTimezone();
         $date = new DateTime($dateStr, new DateTimeZone('UTC'));
         $date->setTimezone(new DateTimeZone($timezone));
-        return $date->format('d/m/Y H:i');
+        return $date->format('Y-m-d H:i');
     } catch (Exception $e) {
         return t('common.not_available', [], 'Not available');
     }

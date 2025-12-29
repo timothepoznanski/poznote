@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script pour rebuilder le bundle Excalidraw
+# Script to rebuild the Excalidraw bundle
 # Usage: ./rebuild-excalidraw.sh
 
 echo "Rebuilding Excalidraw bundle..."

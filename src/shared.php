@@ -36,6 +36,21 @@ $currentLang = getUserLanguage();
 			</button>
 		</div>
 		
+		<div class="shared-filter-bar">
+			<div class="filter-input-wrapper">
+				<input 
+					type="text" 
+					id="filterInput" 
+					class="filter-input" 
+					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or token...'); ?>"
+				/>
+				<button id="clearFilterBtn" class="clear-filter-btn" style="display: none;">
+					<i class="fa-times"></i>
+				</button>
+			</div>
+			<div id="filterStats" class="filter-stats"></div>
+		</div>
+		
 		<div class="shared-content">
 			<div id="loadingSpinner" class="loading-spinner">
 				<i class="fa-spinner fa-spin"></i>
@@ -53,6 +68,8 @@ $currentLang = getUserLanguage();
 	<script>
 	const workspace = <?php echo json_encode($pageWorkspace); ?>;
 	let sharedNotes = [];
+	let filteredNotes = [];
+	let filterText = '';
 	
 	// Load shared notes on page load
 	document.addEventListener('DOMContentLoaded', function() {
@@ -60,7 +77,64 @@ $currentLang = getUserLanguage();
 		
 		// Attach event listener to back button
 		document.getElementById('backToNotesBtn').addEventListener('click', goBackToNotes);
+		
+		// Attach filter event listeners
+		const filterInput = document.getElementById('filterInput');
+		const clearFilterBtn = document.getElementById('clearFilterBtn');
+		
+		filterInput.addEventListener('input', function() {
+			filterText = this.value.trim().toLowerCase();
+			applyFilter();
+			updateClearButton();
+		});
+		
+		clearFilterBtn.addEventListener('click', function() {
+			filterInput.value = '';
+			filterText = '';
+			applyFilter();
+			updateClearButton();
+			filterInput.focus();
+		});
+		
+		// Clear filter on Escape key
+		filterInput.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				filterInput.value = '';
+				filterText = '';
+				applyFilter();
+				updateClearButton();
+			}
+		});
 	});
+	
+	function updateClearButton() {
+		const clearBtn = document.getElementById('clearFilterBtn');
+		clearBtn.style.display = filterText ? 'flex' : 'none';
+	}
+	
+	function applyFilter() {
+		if (!filterText) {
+			filteredNotes = [...sharedNotes];
+		} else {
+			filteredNotes = sharedNotes.filter(note => {
+				const heading = (note.heading || '').toLowerCase();
+				const token = (note.token || '').toLowerCase();
+				return heading.includes(filterText) || token.includes(filterText);
+			});
+		}
+		renderSharedNotes();
+		updateFilterStats();
+	}
+	
+	function updateFilterStats() {
+		const statsDiv = document.getElementById('filterStats');
+		if (filterText && filteredNotes.length < sharedNotes.length) {
+			statsDiv.textContent = `${filteredNotes.length} / ${sharedNotes.length}`;
+			statsDiv.style.display = 'block';
+		} else {
+			statsDiv.style.display = 'none';
+		}
+	}
 	
 	function goBackToNotes() {
 		const params = new URLSearchParams();
@@ -106,7 +180,8 @@ $currentLang = getUserLanguage();
 				return;
 			}
 			
-			renderSharedNotes();
+			// Apply current filter
+			applyFilter();
 		} catch (error) {
 			spinner.style.display = 'none';
 			container.innerHTML = '<div class="error-message"><i class="fa-exclamation-triangle"></i> <?php echo t_h('common.error', [], 'Error'); ?>: ' + error.message + '</div>';
@@ -115,11 +190,30 @@ $currentLang = getUserLanguage();
 	
 	function renderSharedNotes() {
 		const container = document.getElementById('sharedNotesContainer');
+		const emptyMessage = document.getElementById('emptyMessage');
+		
+		container.innerHTML = '';
+		
+		// Show empty message if no notes match the filter
+		if (filteredNotes.length === 0) {
+			if (filterText) {
+				// No results for filter
+				const noResultsDiv = document.createElement('div');
+				noResultsDiv.className = 'empty-message';
+				noResultsDiv.innerHTML = '<i class="fa-search"></i><p><?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?></p>';
+				container.appendChild(noResultsDiv);
+			} else {
+				emptyMessage.style.display = 'block';
+			}
+			return;
+		}
+		
+		emptyMessage.style.display = 'none';
 		
 		const list = document.createElement('div');
 		list.className = 'shared-notes-list';
 		
-		sharedNotes.forEach(note => {
+		filteredNotes.forEach(note => {
 			const item = document.createElement('div');
 			item.className = 'shared-note-item';
 			item.dataset.noteId = note.note_id;
@@ -273,6 +367,9 @@ $currentLang = getUserLanguage();
 				
 				// Update sharedNotes array
 				sharedNotes = sharedNotes.filter(note => note.note_id !== noteId);
+				
+				// Reapply filter
+				applyFilter();
 				
 				// Show empty message if no more shared notes
 				if (sharedNotes.length === 0) {

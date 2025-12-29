@@ -85,6 +85,74 @@ body.shared-page {
     margin-bottom: 30px;
 }
 
+/* Filter Bar */
+.shared-filter-bar {
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color, #333333);
+    background-color: var(--input-bg, #ffffff);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary-color, #007bff);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.filter-input::placeholder {
+    color: var(--text-muted, #999999);
+}
+
+.clear-filter-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: var(--text-muted, #666666);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+    background-color: var(--hover-bg, #f0f0f0);
+    color: var(--text-color, #333333);
+}
+
+.filter-stats {
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    white-space: nowrap;
+    padding: 6px 12px;
+    background-color: var(--info-bg-light, #f0f7ff);
+    border-radius: 6px;
+    font-weight: 500;
+}
+
 .shared-content {
     margin-top: 20px;
 }
