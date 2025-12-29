@@ -461,12 +461,49 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
 
 Import one or more HTML, Markdown or text notes directly, or upload a ZIP archive containing multiple notes:
 
-  - Support `.html`, `.md`, `.markdown`, `.txt`, or `.zip` files types
+  - Support `.html`, `.md`, `.markdown`, `.txt`, or `.zip` file types
   - ZIP archives can contain up to 300 files — configurable via `POZNOTE_IMPORT_MAX_ZIP_FILES` in your `.env` (default: 300)
   - Up to 50 files can be selected at once — configurable via `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` in your `.env` (default: 50)
   - Choose the target workspace for imported notes
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
+
+**Markdown Front Matter Support**
+
+Markdown files can include YAML front matter to specify note metadata. The following keys are supported:
+
+  - `title` — Override the note title (default: filename without extension)
+  - `folder` — Override the target folder selection (folder must exist in the workspace)
+  - `tags` — Array of tags to apply to the note. Supports both inline `[tag1, tag2]` and multi-line syntax
+  - `favorite` — Mark note as favorite (`true`/`false` or `1`/`0`)
+  - `created` — Set custom creation date (format: `YYYY-MM-DD HH:MM:SS`)
+  - `updated` — Set custom update date (format: `YYYY-MM-DD HH:MM:SS`)
+
+Example with inline array syntax:
+```yaml
+---
+title: My Important Note
+folder: Projects
+tags: [important, work]
+favorite: true
+created: 2024-01-15 10:30:00
+updated: 2024-01-20 15:45:00
+---
+```
+
+Example with multi-line syntax:
+```yaml
+---
+title: My Important Note
+folder: Projects
+tags:
+  - important
+  - work
+favorite: true
+created: 2024-01-15 10:30:00
+updated: 2024-01-20 15:45:00
+---
+```
 
 <a id="complete-restore"></a>
 **🔄 Complete Restore** 

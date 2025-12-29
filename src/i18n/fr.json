@@ -1032,7 +1032,7 @@
         "cannot_read_file": "Impossible de lire le fichier"
       },
       "summary_with_location": "Cela importera {{fileText}} dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
-      "summary_zip_with_location": "Cela extraira et importera tous les fichiers HTML et Markdown depuis l'archive ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
+      "summary_zip_with_location": "Cela extraira et importera tous les fichiers depuis l'archive ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {

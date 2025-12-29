@@ -1030,7 +1030,7 @@
         "cannot_read_file": "No se puede leer archivo"
       },
       "summary_with_location": "Esto importará {{fileText}} en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
-      "summary_zip_with_location": "Esto extraerá e importará todos los archivos HTML y Markdown del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
+      "summary_zip_with_location": "Esto extraerá e importará todos los archivos del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {

@@ -229,16 +229,25 @@ function parseFrontMatter($content) {
                 } else {
                     // Scalar value
                     $currentArray = null;
-                    $value = trim($value, '"\'');
                     
-                    // Convert boolean strings to actual booleans
-                    if ($value === 'true') {
-                        $value = true;
-                    } elseif ($value === 'false') {
-                        $value = false;
+                    // Check if value is an inline array: [item1, item2, item3]
+                    if (preg_match('/^\[(.*)\]$/', $value, $arrayMatch)) {
+                        $items = explode(',', $arrayMatch[1]);
+                        $metadata[$key] = array_map(function($item) {
+                            return trim(trim($item), '"\'');
+                        }, $items);
+                    } else {
+                        $value = trim($value, '"\'');
+                        
+                        // Convert boolean strings to actual booleans
+                        if ($value === 'true') {
+                            $value = true;
+                        } elseif ($value === 'false') {
+                            $value = false;
+                        }
+                        
+                        $metadata[$key] = $value;
                     }
-                    
-                    $metadata[$key] = $value;
                 }
             }
         }

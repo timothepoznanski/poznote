@@ -1035,7 +1035,7 @@
         "cannot_read_file": "Cannot read file"
       },
       "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
-      "summary_zip_with_location": "This will extract and import all HTML and Markdown files from the ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
+      "summary_zip_with_location": "This will extract and import all files from the ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
     },
     "sections": {
       "restore_from_backup": {
