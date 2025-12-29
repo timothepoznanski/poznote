@@ -233,6 +233,12 @@
   },
   "settings": {
     "title": "Paramètres",
+    "sections": {
+      "account_display": "Compte & Affichage",
+      "notes_folders": "Notes & Dossiers",
+      "backup_restore": "Sauvegarde, Restauration & Mises à jour",
+      "advanced": "Avancé"
+    },
     "language": {
       "label": "Langue",
       "english": "Anglais",

@@ -14,7 +14,10 @@ body {
     margin: 10px auto;
     padding: 8px 12px;
     display: block;
+    text-align: center;
+    position: relative;
 }
+
 .settings-header {
     padding: 12px 8px;
     margin-bottom: 8px;
@@ -33,6 +36,36 @@ body {
     margin: 0;
     padding: 0;
 }
+
+/* Two columns layout for desktop */
+.settings-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.settings-column {
+    display: block;
+}
+
+.settings-column-left {
+    /* Actions without badges */
+}
+
+.settings-column-right {
+    /* Settings with badges */
+}
+
+/* Mobile: stack columns */
+@media (max-width: 768px) {
+    .settings-two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 .settings-sep {
     height: 1px;
     background: #afb3b6ff;
@@ -147,6 +180,21 @@ body {
     color: #991b1b;
 }
 
+.heart-blink {
+    color: #ef4444;
+    font-size: 0.85em;
+    margin-left: 6px;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0% { opacity: 1; transform: scale(1); }
+    25% { opacity: 0.6; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1); }
+    75% { opacity: 0.6; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
 .fa-arrow-left::before { content: "\f060"; }
 .fa-layer-group::before { content: "\f5fd"; }
 .fa-upload::before { content: "\f093"; }
@@ -160,6 +208,22 @@ body {
 .fa-code::before { content: "\f121"; }
 .fa-coffee::before { content: "\f0f4"; }
 .fa-lightbulb::before { content: "\f0eb"; }
+.fa-user::before { content: "\f007"; }
+.fa-folder::before { content: "\f07b"; }
+.fa-database::before { content: "\f1c0"; }
+.fa-cog::before { content: "\f013"; }
+.fa-flag::before { content: "\f024"; }
+.fa-sun::before { content: "\f185"; }
+.fa-text-height::before { content: "\f034"; }
+.fa-clock::before { content: "\f017"; }
+.fa-list-ol::before { content: "\f0cb"; }
+.fa-calendar-alt::before { content: "\f073"; }
+.fa-map-marker-alt::before { content: "\f3c5"; }
+.fa-hashtag::before { content: "\f292"; }
+.fa-folder-open::before { content: "\f07c"; }
+.fa-chevron-down::before { content: "\f078"; }
+.fa-eye::before { content: "\f06e"; }
+.fa-heart::before { content: "\f004"; }
 
 .fa-arrow-left,
 .fa-layer-group,
@@ -173,7 +237,23 @@ body {
 .fa-code-branch,
 .fa-code,
 .fa-coffee,
-.fa-lightbulb {
+.fa-lightbulb,
+.fa-user,
+.fa-folder,
+.fa-database,
+.fa-cog,
+.fa-flag,
+.fa-sun,
+.fa-text-height,
+.fa-clock,
+.fa-list-ol,
+.fa-calendar-alt,
+.fa-map-marker-alt,
+.fa-hashtag,
+.fa-folder-open,
+.fa-chevron-down,
+.fa-eye,
+.fa-heart {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;
     font-style: normal;

@@ -233,6 +233,12 @@
   },
   "settings": {
     "title": "Configuración",
+    "sections": {
+      "account_display": "Cuenta y Visualización",
+      "notes_folders": "Notas y Carpetas",
+      "backup_restore": "Copia de seguridad, Restauración y Actualizaciones",
+      "advanced": "Avanzado"
+    },
     "language": {
       "label": "Idioma",
       "english": "Inglés",

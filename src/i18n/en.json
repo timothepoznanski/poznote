@@ -233,6 +233,12 @@
   },
   "settings": {
     "title": "Settings",
+    "sections": {
+      "account_display": "Account & Display",
+      "notes_folders": "Notes & Folders",
+      "backup_restore": "Backup, Restore & Updates",
+      "advanced": "Advanced"
+    },
     "language": {
       "label": "Language",
       "english": "English",
