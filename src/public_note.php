@@ -280,6 +280,9 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php if ($indexable == 0): ?>
+    <meta name="robots" content="noindex, nofollow">
+    <?php endif; ?>
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
     <script>
         // Apply theme immediately to prevent flash
