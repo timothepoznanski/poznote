@@ -1552,6 +1552,12 @@
     justify-content: flex-end;
 }
 
+#shareModal .share-modal-buttons button {
+    white-space: nowrap;
+    padding: 8px 16px;
+    min-width: fit-content;
+}
+
 #shareModal .share-custom-wrap {
     margin: 0 0 12px 0;
 }

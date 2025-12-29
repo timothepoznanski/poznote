@@ -838,6 +838,7 @@
       "copy": "Copiar",
       "revoke": "Revogar",
       "renew": "Renovar",
+      "manage": "Editar",
       "create_url": "Criar url",
       "no_link_yet": "Nenhum link público ainda",
       "custom_token": "Token personalizado (opcional)",

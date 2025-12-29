@@ -73,14 +73,21 @@ $currentLang = getUserLanguage();
 	
 	// Load shared notes on page load
 	document.addEventListener('DOMContentLoaded', function() {
-		loadSharedNotes();
-		
 		// Attach event listener to back button
 		document.getElementById('backToNotesBtn').addEventListener('click', goBackToNotes);
 		
 		// Attach filter event listeners
 		const filterInput = document.getElementById('filterInput');
 		const clearFilterBtn = document.getElementById('clearFilterBtn');
+		
+		// Check for initial filter from URL
+		const urlParams = new URLSearchParams(window.location.search);
+		const initialFilter = urlParams.get('filter');
+		if (initialFilter) {
+			filterInput.value = initialFilter;
+			filterText = initialFilter.trim().toLowerCase();
+			updateClearButton();
+		}
 		
 		filterInput.addEventListener('input', function() {
 			filterText = this.value.trim().toLowerCase();
@@ -105,6 +112,9 @@ $currentLang = getUserLanguage();
 				updateClearButton();
 			}
 		});
+		
+		// Load shared notes after setting up event listeners
+		loadSharedNotes();
 	});
 	
 	function updateClearButton() {

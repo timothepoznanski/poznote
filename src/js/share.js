@@ -285,15 +285,6 @@ function showShareModal(url, options) {
     const noteId = options && options.noteId ? options.noteId : null;
     const isShared = options && options.shared ? true : false;
 
-    // Create Cancel button. Always present.
-    const cancelBtn = document.createElement('button');
-    cancelBtn.type = 'button';
-    cancelBtn.className = 'btn-cancel';
-    cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
-    // styling handled by CSS classes
-    cancelBtn.onclick = function() { closeModal('shareModal'); };
-    buttonsDiv.appendChild(cancelBtn);
-
     // Conditionally add buttons based on share status
     if (isShared) {
         // If shared, show Open, Copy, Revoke, Renew
@@ -301,7 +292,7 @@ function showShareModal(url, options) {
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
         openBtn.className = 'btn-open';
-        openBtn.textContent = window.t ? window.t('index.share_modal.open', null, 'Open') : 'Open';
+        openBtn.textContent = window.t ? window.t('index.public_modal.open', null, 'Open') : 'Open';
         // styling handled by CSS classes
         openBtn.onclick = function(ev) {
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
@@ -322,7 +313,7 @@ function showShareModal(url, options) {
         const copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn-primary';
-        copyBtn.textContent = window.t ? window.t('index.share_modal.copy', null, 'Copy') : 'Copy';
+        copyBtn.textContent = window.t ? window.t('index.public_modal.copy', null, 'Copy') : 'Copy';
         copyBtn.onclick = async function(ev) {
             // Prevent clicks from bubbling to global handlers
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
@@ -354,46 +345,29 @@ function showShareModal(url, options) {
         };
         buttonsDiv.appendChild(copyBtn);
 
+        // Add Edit button to open shared.php filtered by this token
+        if (noteId) {
+            const manageBtn = document.createElement('button');
+            manageBtn.type = 'button';
+            manageBtn.className = 'btn-primary';
+            manageBtn.textContent = window.t ? window.t('index.public_modal.manage', null, 'Edit') : 'Edit';
+            manageBtn.onclick = function(ev) {
+                try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+                // Extract token from URL (last part after /)
+                const token = url.split('/').pop();
+                if (token) {
+                    window.open('shared.php?filter=' + encodeURIComponent(token), '_blank');
+                }
+            };
+            buttonsDiv.appendChild(manageBtn);
+        }
+
         // Add Revoke and Renew buttons when options.noteId provided and shared
         if (noteId) {
-            const revokeBtn = document.createElement('button');
-            revokeBtn.type = 'button';
-            revokeBtn.className = 'btn-revoke';
-            revokeBtn.textContent = window.t ? window.t('index.share_modal.revoke', null, 'Revoke') : 'Revoke';
-            // styling handled by CSS classes
-            revokeBtn.onclick = async function(ev) {
-            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
-            // Call API to revoke
-            try {
-                const resp = await fetch('api_share_note.php', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ note_id: noteId, action: 'revoke' })
-                });
-                if (resp.ok) {
-                    markShareIconShared(noteId, false);
-                    updateSharedCount(-1);
-                    closeModal('shareModal');
-                } else {
-                    const ct = resp.headers.get('content-type') || '';
-                    let err = 'Failed to revoke';
-                    if (ct.indexOf('application/json') !== -1) {
-                        const j = await resp.json();
-                        err = j.error || err;
-                    }
-                    showNotificationPopup && showNotificationPopup(err, 'error');
-                }
-            } catch (e) {
-                showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
-            }
-        };
-            buttonsDiv.appendChild(revokeBtn);
-
             const renewBtn = document.createElement('button');
             renewBtn.type = 'button';
             renewBtn.className = 'btn-renew';
-            renewBtn.textContent = window.t ? window.t('index.share_modal.renew', null, 'Renew') : 'Renew';
+            renewBtn.textContent = window.t ? window.t('index.public_modal.renew', null, 'Renew') : 'Renew';
             // styling handled by CSS classes
             renewBtn.onclick = async function(ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
@@ -425,6 +399,48 @@ function showShareModal(url, options) {
                 }
             };
             buttonsDiv.appendChild(renewBtn);
+
+            const revokeBtn = document.createElement('button');
+            revokeBtn.type = 'button';
+            revokeBtn.className = 'btn-cancel';
+            revokeBtn.textContent = window.t ? window.t('index.public_modal.revoke', null, 'Revoke') : 'Revoke';
+            // styling handled by CSS classes
+            revokeBtn.onclick = async function(ev) {
+            try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
+            // Call API to revoke
+            try {
+                const resp = await fetch('api_share_note.php', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note_id: noteId, action: 'revoke' })
+                });
+                if (resp.ok) {
+                    markShareIconShared(noteId, false);
+                    updateSharedCount(-1);
+                    closeModal('shareModal');
+                } else {
+                    const ct = resp.headers.get('content-type') || '';
+                    let err = 'Failed to revoke';
+                    if (ct.indexOf('application/json') !== -1) {
+                        const j = await resp.json();
+                        err = j.error || err;
+                    }
+                    showNotificationPopup && showNotificationPopup(err, 'error');
+                }
+            } catch (e) {
+                showNotificationPopup && showNotificationPopup('Network error: ' + e.message, 'error');
+            }
+        };
+            buttonsDiv.appendChild(revokeBtn);
+
+            // Create Close button for shared notes
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'btn-cancel';
+            cancelBtn.textContent = window.t ? window.t('index.public_modal.close', null, 'Close') : 'Close';
+            cancelBtn.onclick = function() { closeModal('shareModal'); };
+            buttonsDiv.appendChild(cancelBtn);
         }
     } else {
         // If not shared, show Create button
@@ -501,6 +517,14 @@ function showShareModal(url, options) {
         // create button styled via CSS class
         createBtn.onclick = function() { createPublicShare(noteId); };
         buttonsDiv.appendChild(createBtn);
+
+        // Create Close button for non-shared notes
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'btn-cancel';
+        cancelBtn.textContent = window.t ? window.t('index.share_modal.close', null, 'Close') : 'Close';
+        cancelBtn.onclick = function() { closeModal('shareModal'); };
+        buttonsDiv.appendChild(cancelBtn);
     }
 
     // If there's no URL provided, show placeholder text
