@@ -84,7 +84,7 @@ $currentLang = getUserLanguage();
 		
 		<div class="shared-filter-bar">
 			<div class="filter-input-wrapper">
-				<input type="text" id="filterInput" class="filter-input" placeholder="<?php echo t_h('attachments.list.filter_placeholder', [], 'Filter...'); ?>"/>
+				<input type="text" id="filterInput" class="filter-input" placeholder="<?php echo t_h('attachments.list.filter_placeholder'); ?>"/>
 				<button id="clearFilterBtn" class="clear-filter-btn" style="display: none;">
 					<i class="fa-times"></i>
 				</button>

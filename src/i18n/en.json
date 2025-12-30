@@ -234,7 +234,7 @@
       "title": "Notes with Attachments",
       "no_attachments": "No notes with attachments yet.",
       "hint": "Add attachments to your notes using the paperclip button in the note toolbar.",
-      "filter_placeholder": "Filter by note title...",
+      "filter_placeholder": "Filter by note title or attachment name...",
       "no_filter_results": "No notes match your search.",
       "download": "Download"
     }

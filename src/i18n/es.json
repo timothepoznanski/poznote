@@ -232,7 +232,7 @@
       "title": "Notas con archivos adjuntos",
       "no_attachments": "Aún no hay notas con archivos adjuntos.",
       "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
-      "filter_placeholder": "Filtrar por título de nota...",
+      "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
       "no_filter_results": "Ninguna nota coincide con su búsqueda.",
       "download": "Descargar"
     }

@@ -234,7 +234,7 @@
       "title": "Notes avec pièces jointes",
       "no_attachments": "Aucune note avec pièces jointes pour le moment.",
       "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
-      "filter_placeholder": "Filtrer par titre de note...",
+      "filter_placeholder": "Filtrer par titre de note ou nom de pièce jointe...",
       "no_filter_results": "Aucune note ne correspond à votre recherche.",
       "download": "Télécharger"
     }

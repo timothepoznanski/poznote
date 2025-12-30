@@ -232,7 +232,7 @@
       "title": "Notizen mit Anhängen",
       "no_attachments": "Noch keine Notizen mit Anhängen.",
       "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
-      "filter_placeholder": "Nach Notizentitel filtern...",
+      "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
       "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
       "download": "Herunterladen"
     }
