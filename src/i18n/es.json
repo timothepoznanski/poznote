@@ -1093,7 +1093,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar restauración",
-      "start_import_individual_notes": "Iniciar importación"
+      "start_import": "Iniciar importación"
     },
     "drag_drop": {
       "individual_notes": "Soltar archivos aquí",

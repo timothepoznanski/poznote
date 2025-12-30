@@ -1093,7 +1093,7 @@
     },
     "buttons": {
       "start_restore": "Wiederherstellung starten",
-      "start_import_individual_notes": "Import starten"
+      "start_import": "Import starten"
     },
     "drag_drop": {
       "individual_notes": "Dateien hier ablegen",

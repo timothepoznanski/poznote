@@ -1113,7 +1113,7 @@
     },
     "buttons": {
       "start_restore": "Start Restore",
-      "start_import_individual_notes": "Start Import"
+      "start_import": "Start Import"
     },
     "drag_drop": {
       "individual_notes": "Drop files here",

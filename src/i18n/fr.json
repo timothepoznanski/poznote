@@ -1110,7 +1110,7 @@
     },
     "buttons": {
       "start_restore": "Démarrer la restauration",
-      "start_import_individual_notes": "Démarrer l’import des notes individuelles"
+      "start_import": "Démarrer l’import"
     },
     "modals": {
       "import_confirm": {

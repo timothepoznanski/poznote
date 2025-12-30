@@ -1752,7 +1752,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 </div>
                 
                 <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()" style="margin-top: 1rem;" id="individualNotesImportBtn">
-                    <?php echo t_h('restore_import.buttons.start_import_individual_notes', 'Start Import'); ?>
+                    <?php echo t_h('restore_import.buttons.start_import', 'Start Import'); ?>
                 </button>
                 
                 <!-- Spinner shown while processing import -->
