@@ -4184,10 +4184,10 @@ body.dark-mode .checklist-checkbox:checked + .checklist-text {
     padding-left: 24px;
 }
 
-/* Add spacing to bullet list items as well */
-.noteentry ul > li {
-    margin-top: 6px;
-    margin-bottom: 6px;
+/* Add spacing to bullet list items as well (exclude checklists) */
+.noteentry ul:not(.checklist):not(.task-list) > li:not(.checklist-item):not(.task-list-item) {
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 /* Root Drop Zone Styles */
