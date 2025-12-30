@@ -2057,7 +2057,31 @@ function toggleFolderActionsMenu(folderId) {
     // Toggle the current menu
     var menu = document.getElementById('folder-actions-menu-' + folderId);
     if (menu) {
-        menu.classList.toggle('show');
+        var isShowing = menu.classList.toggle('show');
+        
+        // If showing, check if menu would overflow viewport and adjust position
+        if (isShowing) {
+            adjustMenuPosition(menu);
+        }
+    }
+}
+
+function adjustMenuPosition(menu) {
+    // Reset any previous adjustments
+    menu.style.bottom = '';
+    menu.style.top = '';
+    
+    // Get menu position and dimensions
+    var rect = menu.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    
+    // Check if menu overflows bottom of viewport
+    if (rect.bottom > viewportHeight) {
+        // Position menu above the toggle button instead
+        menu.style.top = 'auto';
+        menu.style.bottom = '100%';
+        menu.style.marginTop = '0';
+        menu.style.marginBottom = '4px';
     }
 }
 
