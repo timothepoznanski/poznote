@@ -4121,6 +4121,22 @@ body.dark-mode .checklist-checkbox:checked + .checklist-text {
 .checklist-item .checklist {
     margin-top: 4px;
     margin-bottom: 4px;
+    padding-left: 24px !important;
+}
+
+/* Support multiple levels of nesting */
+.checklist-item .checklist .checklist-item .checklist {
+    padding-left: 24px !important;
+}
+
+/* Ensure checklist-item can contain nested lists properly */
+.checklist-item {
+    flex-wrap: wrap;
+}
+
+.checklist-item > .checklist {
+    flex-basis: 100%;
+    margin-left: 0;
 }
 
 /* Root Drop Zone Styles */

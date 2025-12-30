@@ -523,11 +523,13 @@
   }
 
   /**
-   * Indent a checklist item
+   * Indent a checklist item (TAB key)
+   * Moves the current item as a child of the previous sibling item
    */
   function indentItem(item) {
     const prevItem = item.previousElementSibling;
     if (!prevItem || !prevItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
+      // Cannot indent first item or if previous is not a checklist item
       return;
     }
     
@@ -536,12 +538,14 @@
     
     if (!nestedList) {
       nestedList = createChecklist();
-      nestedList.style.paddingLeft = '24px';
+      // CSS handles the indentation via .checklist-item .checklist rule
       prevItem.appendChild(nestedList);
     }
     
+    // Move item to nested list
     nestedList.appendChild(item);
     
+    // Restore cursor position in text
     const textSpan = item.querySelector('.' + TEXT_CLASS);
     if (textSpan) {
       setCursorInElement(textSpan, true);
@@ -554,7 +558,8 @@
   }
 
   /**
-   * Outdent a checklist item
+   * Outdent a checklist item (SHIFT+TAB key)
+   * Moves the current item from a nested list back to the parent level
    */
   function outdentItem(item) {
     const parentList = item.parentElement;
@@ -563,14 +568,16 @@
     }
     
     const parentItem = parentList.parentElement;
+    // Check if we're in a nested list (parent is a checklist-item)
     if (!parentItem || !parentItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
+      // Already at root level, cannot outdent
       return;
     }
     
     const grandparentList = parentItem.parentElement;
     if (!grandparentList) return;
     
-    // Move item after parent item
+    // Move item after parent item in the grandparent list
     if (parentItem.nextSibling) {
       grandparentList.insertBefore(item, parentItem.nextSibling);
     } else {
@@ -582,6 +589,7 @@
       parentList.remove();
     }
     
+    // Restore cursor position in text
     const textSpan = item.querySelector('.' + TEXT_CLASS);
     if (textSpan) {
       setCursorInElement(textSpan, true);
