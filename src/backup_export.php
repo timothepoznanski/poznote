@@ -314,7 +314,14 @@ function createBackup() {
             <?php echo t_h('common.back_to_settings'); ?>
         </a>
 
-    <br><br>
+        <br><br>
+        
+        <!-- Info about individual note export -->
+        <div class="info-box">
+            <p style="margin: 0;">
+                <?php echo t_h('backup_export.info.individual_export'); ?>
+            </p>
+        </div>
         
         <!-- Complete Backup Section -->
         <div class="backup-section">
@@ -355,11 +362,31 @@ function createBackup() {
             </form>
         </div>
         
+        <!-- Structured Export Section -->
+        <div class="backup-section">
+            <h3><?php echo t_h('backup_export.sections.structured_export.title'); ?></h3>
+            <p>
+                <?php echo t_h('backup_export.sections.structured_export.description'); ?>
+                <br><br>
+                <strong><?php echo t_h('backup_export.sections.structured_export.features'); ?></strong><br>
+            </p>
+            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
+                <li><?php echo t_h('backup_export.sections.structured_export.feature_folders'); ?></li>
+                <li><?php echo t_h('backup_export.sections.structured_export.feature_subfolders'); ?></li>
+                <li><?php echo t_h('backup_export.sections.structured_export.feature_metadata'); ?></li>
+                <li><?php echo t_h('backup_export.sections.structured_export.feature_formats'); ?></li>
+            </ul>
+            
+            <button id="structuredExportBtn" type="button" class="btn btn-primary" onclick="startStructuredExport();">
+                <span><?php echo t_h('backup_export.buttons.download_structured_export'); ?></span>
+            </button>
+        </div>
+        
         <!-- Bottom padding for better spacing -->
         <div style="padding-bottom: 50px;"></div>
     </div>
     
-    <script src="js/backup-export.js"></script>
+    <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
     <script>
     (function(){ try {
         var stored = localStorage.getItem('poznote_selected_workspace');

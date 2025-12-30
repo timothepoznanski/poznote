@@ -896,6 +896,9 @@
     "page": {
       "title": "Sauvegarde / Export"
     },
+    "info": {
+      "individual_export": "Vous pouvez également exporter des notes individuelles dans différents formats (PDF, HTML, Markdown, Texte) en ouvrant une note et en cliquant sur l'icône de téléchargement dans la barre d'outils."
+    },
     "common": {
       "all_workspaces": "tous les espaces de travail"
     },
@@ -910,10 +913,20 @@
         "use_case_offline_label": "Lecture hors ligne",
         "use_case_offline_text": "Ouvrez le fichier",
         "use_case_offline_text_suffix": "pour parcourir vos notes sans Poznote"
+      },
+      "structured_export": {
+        "title": "Export structuré",
+        "description": "Exportez vos notes organisées dans des dossiers correspondant à votre structure de dossiers Poznote. Chaque note sera enregistrée dans un répertoire qui correspond à son dossier dans Poznote, préservant la hiérarchie complète.",
+        "features": "Fonctionnalités :",
+        "feature_folders": "Structure des dossiers préservée",
+        "feature_subfolders": "Sous-dossiers maintenus",
+        "feature_metadata": "Les fichiers Markdown incluent un front matter YAML avec les métadonnées",
+        "feature_formats": "Formats de fichiers originaux préservés (.html ou .md)"
       }
     },
     "buttons": {
-      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)"
+      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)",
+      "download_structured_export": "Télécharger l'export structuré (ZIP)"
     },
     "spinner": {
       "preparing": "Préparation de la sauvegarde...",
