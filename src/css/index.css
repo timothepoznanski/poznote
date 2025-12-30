@@ -4157,6 +4157,39 @@ body.dark-mode .checklist-checkbox:checked + .checklist-text {
     margin-bottom: 4px;
 }
 
+/* ===== HIERARCHICAL NUMBERED LISTS (1.1, 1.2, 2.1, etc.) ===== */
+/* Reset default list styling for ordered lists in notes */
+.noteentry ol {
+    counter-reset: item;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.noteentry ol > li {
+    counter-increment: item;
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.noteentry ol > li::before {
+    content: counters(item, ".") ". ";
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+/* Ensure nested ol also uses hierarchical numbering */
+.noteentry ol ol {
+    counter-reset: item;
+    padding-left: 24px;
+}
+
+/* Add spacing to bullet list items as well */
+.noteentry ul > li {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
 /* Root Drop Zone Styles */
 .root-drop-zone {
     padding: 15px;
