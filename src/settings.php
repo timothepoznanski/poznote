@@ -234,14 +234,6 @@ $currentLang = getUserLanguage();
                         <h3><?php echo t_h('display.cards.show_folder_counts'); ?> <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
                     </div>
                 </div>
-
-                <!-- Show Folder Actions -->
-                <div class="settings-card" id="folder-actions-card">
-                    <div class="settings-card-icon"><i class="fa-folder-open"></i></div>
-                    <div class="settings-card-content">
-                        <h3><?php echo t_h('display.cards.show_folder_actions'); ?> <span id="folder-actions-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -390,44 +382,6 @@ $currentLang = getUserLanguage();
             }); 
         }
         refreshFolder();
-
-        // Folder actions
-        var cardFolderActions = document.getElementById('folder-actions-card');
-        var statusFolderActions = document.getElementById('folder-actions-status');
-        function refreshFolderActions(){
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','hide_folder_actions');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
-                if(statusFolderActions){ 
-                    statusFolderActions.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
-                    statusFolderActions.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                }
-                if(enabled) document.body.classList.add('folder-actions-always-visible'); 
-                else document.body.classList.remove('folder-actions-always-visible');
-            }).catch(()=>{});
-        }
-        if(cardFolderActions){ 
-            cardFolderActions.addEventListener('click', function(){
-                var form = new FormData(); 
-                form.append('action','get'); 
-                form.append('key','hide_folder_actions');
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                    var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
-                    var toSet = currently ? '0' : '1';
-                    var setForm = new FormData(); 
-                    setForm.append('action','set'); 
-                    setForm.append('key','hide_folder_actions'); 
-                    setForm.append('value', toSet);
-                    return fetch('api_settings.php',{method:'POST',body:setForm});
-                }).then(function(){ 
-                    refreshFolderActions(); 
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
-                }).catch(e=>console.error(e));
-            }); 
-        }
-        refreshFolderActions();
     })();
     </script>
 

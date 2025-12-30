@@ -398,6 +398,27 @@ function selectFolder(folderId, folderName, element) {
     }
 }
 
+function downloadFolder(folderId, folderName) {
+    // Close the folder actions menu
+    closeFolderActionsMenu(folderId);
+    
+    // Create download URL
+    var url = 'api_export_folder.php?folder_id=' + encodeURIComponent(folderId);
+    
+    // Create a temporary link and click it to trigger download
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = '';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    
+    // Remove the link after a short delay
+    setTimeout(function() {
+        document.body.removeChild(link);
+    }, 100);
+}
+
 // Workspace management (creation/deletion)
 function showNewWorkspacePrompt() {
     var name = prompt('Nom du nouveau workspace:');
@@ -2023,3 +2044,36 @@ function createWorkspace() {
 function createNoteInFolder() {
     executeCreateAction();
 }
+
+// Folder actions menu toggle functions
+function toggleFolderActionsMenu(folderId) {
+    // Close all other folder menus first
+    document.querySelectorAll('.folder-actions-menu.show').forEach(function(menu) {
+        if (menu.id !== 'folder-actions-menu-' + folderId) {
+            menu.classList.remove('show');
+        }
+    });
+    
+    // Toggle the current menu
+    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    if (menu) {
+        menu.classList.toggle('show');
+    }
+}
+
+function closeFolderActionsMenu(folderId) {
+    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    if (menu) {
+        menu.classList.remove('show');
+    }
+}
+
+// Close folder menus when clicking outside
+document.addEventListener('click', function(event) {
+    // If click is not inside a folder-actions element, close all menus
+    if (!event.target.closest('.folder-actions')) {
+        document.querySelectorAll('.folder-actions-menu.show').forEach(function(menu) {
+            menu.classList.remove('show');
+        });
+    }
+});

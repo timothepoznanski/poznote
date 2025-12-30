@@ -418,8 +418,13 @@ $body_classes = trim($extra_body_classes);
         const searchContainer = document.getElementById('search-bar-container');
         const isVisible = localStorage.getItem('searchBarVisible');
         
-        // Par défaut, la barre est cachée
-        if (isVisible !== 'true') {
+        // Forcer l'affichage si une recherche est active (search ou tags_search)
+        if (window.isSearchMode) {
+            searchContainer.style.display = 'block';
+            localStorage.setItem('searchBarVisible', 'true');
+        }
+        // Par défaut, la barre est cachée si pas de recherche active
+        else if (isVisible !== 'true') {
             searchContainer.style.display = 'none';
         }
     });

@@ -8,6 +8,7 @@
     "close": "Fermer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
+    "confirm_action": "Confirmer l'action",
     "confirmation": "Confirmation",
     "save": "Enregistrer",
     "download": "Télécharger",
@@ -43,6 +44,10 @@
         "note_singular_html": "<strong>• {{count}}</strong> note sera déplacée dans la corbeille",
         "note_plural_html": "<strong>• {{count}}</strong> notes seront déplacées dans la corbeille"
       }
+    },
+    "download": {
+      "starting": "Préparation du téléchargement du dossier \"{{folder}}\"...",
+      "started": "Téléchargement du dossier \"{{folder}}\" démarré"
     },
     "move_all": {
       "same_source_target": "Les dossiers source et cible ne peuvent pas être identiques",
@@ -208,7 +213,8 @@
       "loading_attachments": "Chargement des pièces jointes...",
       "preview_alt": "Aperçu",
       "uploaded_prefix": "Téléversé : ",
-      "open_in_new_tab": "Ouvrir dans un nouvel onglet"
+      "open_in_new_tab": "Ouvrir dans un nouvel onglet",
+      "pdf_label": "PDF"
     },
     "modals": {
       "delete": {
@@ -223,6 +229,14 @@
         "mb": "Mo",
         "gb": "Go"
       }
+    },
+    "list": {
+      "title": "Notes avec pièces jointes",
+      "no_attachments": "Aucune note avec pièces jointes pour le moment.",
+      "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
+      "filter_placeholder": "Filtrer par titre de note...",
+      "no_filter_results": "Aucune note ne correspond à votre recherche.",
+      "download": "Télécharger"
     }
   },
   "auth": {
@@ -718,7 +732,8 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "public": "Publiques"
+      "public": "Publiques",
+      "attachments": "Pièces jointes"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -728,7 +743,8 @@
       "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
       "move_folder": "Déplacer le dossier en sous-dossier",
       "rename_folder": "Renommer le dossier",
-      "delete_folder": "Supprimer le dossier"
+      "delete_folder": "Supprimer le dossier",
+      "download_folder": "Télécharger le dossier"
     }
   },
   "update": {

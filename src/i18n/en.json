@@ -8,6 +8,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "confirm_action": "Confirm Action",
     "confirmation": "Confirmation",
     "save": "Save",
     "download": "Download",
@@ -43,6 +44,10 @@
         "note_singular_html": "<strong>• {{count}}</strong> note will be moved to trash",
         "note_plural_html": "<strong>• {{count}}</strong> notes will be moved to trash"
       }
+    },
+    "download": {
+      "starting": "Preparing download for folder \"{{folder}}\"...",
+      "started": "Download started for folder \"{{folder}}\""
     },
     "move_all": {
       "same_source_target": "Source and target folders cannot be the same",
@@ -208,7 +213,8 @@
       "loading_attachments": "Loading attachments...",
       "preview_alt": "Preview",
       "uploaded_prefix": "Uploaded: ",
-      "open_in_new_tab": "Open in new tab"
+      "open_in_new_tab": "Open in new tab",
+      "pdf_label": "PDF"
     },
     "modals": {
       "delete": {
@@ -223,6 +229,14 @@
         "mb": "MB",
         "gb": "GB"
       }
+    },
+    "list": {
+      "title": "Notes with Attachments",
+      "no_attachments": "No notes with attachments yet.",
+      "hint": "Add attachments to your notes using the paperclip button in the note toolbar.",
+      "filter_placeholder": "Filter by note title...",
+      "no_filter_results": "No notes match your search.",
+      "download": "Download"
     }
   },
   "auth": {
@@ -718,7 +732,8 @@
       "trash": "Trash",
       "tags": "Tags",
       "favorites": "Favorites",
-      "public": "Public"
+      "public": "Public",
+      "attachments": "Attachments"
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -728,7 +743,8 @@
       "move_all_files": "Move all files to another folder",
       "move_folder": "Move folder to subfolder",
       "rename_folder": "Rename folder",
-      "delete_folder": "Delete folder"
+      "delete_folder": "Delete folder",
+      "download_folder": "Download folder"
     }
   },
   "update": {
