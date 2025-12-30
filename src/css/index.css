@@ -4011,14 +4011,14 @@ body.dark-mode .create-section h4 {
 .checklist {
     list-style: none;
     padding-left: 0;
-    margin: 8px 0;
+    /* margin: 8px 0; */
 }
 
 .checklist-item {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin: 4px 0;
+    /* gap: 8px; */
+    /* margin-left: 8px; */
     line-height: 1.6;
 }
 
@@ -4040,7 +4040,7 @@ body.dark-mode .create-section h4 {
     box-shadow: none !important;
     background-color: transparent !important;
     padding: 0;
-    margin: 0;
+    margin-left: 8px;
     min-height: 1.6em;
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -4137,6 +4137,24 @@ body.dark-mode .checklist-checkbox:checked + .checklist-text {
 .checklist-item > .checklist {
     flex-basis: 100%;
     margin-left: 0;
+}
+
+/* ===== NESTED BULLET/NUMBERED LIST STYLES ===== */
+/* Ensure proper indentation for nested lists created via Tab key */
+.noteentry ul ul,
+.noteentry ul ol,
+.noteentry ol ul,
+.noteentry ol ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 24px;
+}
+
+/* Ensure list items can contain nested lists properly */
+.noteentry li > ul,
+.noteentry li > ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 /* Root Drop Zone Styles */

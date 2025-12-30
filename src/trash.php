@@ -234,6 +234,7 @@ $currentLang = getUserLanguage();
 	<script src="js/search-highlight.js"></script>
 	<script src="js/toolbar.js"></script>
 	<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
+	<script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
 	<script src="js/main.js"></script>
 	<script src="js/trash.js"></script>
 	<script>
