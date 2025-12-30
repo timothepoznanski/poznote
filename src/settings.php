@@ -145,10 +145,10 @@ $currentLang = getUserLanguage();
                 <!-- Support Developer -->
                 <div class="settings-card" onclick="window.open('https://ko-fi.com/timothepoznanski', '_blank');">
                     <div class="settings-card-icon">
-                        <i class="fa-coffee"></i>
+                        <i class="fa-heart heart-blink"></i>
                     </div>
                     <div class="settings-card-content">
-                        <h3><?php echo t_h('settings.cards.support'); ?> <i class="fa-heart heart-blink"></i></h3>
+                        <h3><?php echo t_h('settings.cards.support'); ?></h3>
                     </div>
                 </div>
             </div>

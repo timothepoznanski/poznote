@@ -183,7 +183,6 @@ body {
 .heart-blink {
     color: #ef4444;
     font-size: 0.85em;
-    margin-left: 6px;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
 
