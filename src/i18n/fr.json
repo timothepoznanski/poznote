@@ -8,6 +8,7 @@
     "close": "Fermer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
+    "confirm_action": "Confirmer l'action",
     "confirmation": "Confirmation",
     "save": "Enregistrer",
     "download": "Télécharger",
@@ -43,6 +44,10 @@
         "note_singular_html": "<strong>• {{count}}</strong> note sera déplacée dans la corbeille",
         "note_plural_html": "<strong>• {{count}}</strong> notes seront déplacées dans la corbeille"
       }
+    },
+    "download": {
+      "starting": "Préparation du téléchargement du dossier \"{{folder}}\"...",
+      "started": "Téléchargement du dossier \"{{folder}}\" démarré"
     },
     "move_all": {
       "same_source_target": "Les dossiers source et cible ne peuvent pas être identiques",
@@ -208,7 +213,8 @@
       "loading_attachments": "Chargement des pièces jointes...",
       "preview_alt": "Aperçu",
       "uploaded_prefix": "Téléversé : ",
-      "open_in_new_tab": "Ouvrir dans un nouvel onglet"
+      "open_in_new_tab": "Ouvrir dans un nouvel onglet",
+      "pdf_label": "PDF"
     },
     "modals": {
       "delete": {
@@ -223,6 +229,14 @@
         "mb": "Mo",
         "gb": "Go"
       }
+    },
+    "list": {
+      "title": "Notes avec pièces jointes",
+      "no_attachments": "Aucune note avec pièces jointes pour le moment.",
+      "hint": "Ajoutez des pièces jointes à vos notes en utilisant le bouton trombone dans la barre d'outils.",
+      "filter_placeholder": "Filtrer par titre de note ou nom de pièce jointe...",
+      "no_filter_results": "Aucune note ne correspond à votre recherche.",
+      "download": "Télécharger"
     }
   },
   "auth": {
@@ -718,7 +732,8 @@
       "trash": "Corbeille",
       "tags": "Tags",
       "favorites": "Favoris",
-      "public": "Publiques"
+      "public": "Publiques",
+      "attachments": "Pièces jointes"
     },
     "drop_zone": {
       "remove_from_folder": "Déposez ici pour retirer du dossier"
@@ -728,7 +743,8 @@
       "move_all_files": "Déplacer tous les fichiers vers un autre dossier",
       "move_folder": "Déplacer le dossier en sous-dossier",
       "rename_folder": "Renommer le dossier",
-      "delete_folder": "Supprimer le dossier"
+      "delete_folder": "Supprimer le dossier",
+      "download_folder": "Télécharger le dossier"
     }
   },
   "update": {
@@ -896,6 +912,9 @@
     "page": {
       "title": "Sauvegarde / Export"
     },
+    "info": {
+      "individual_export": "Vous pouvez également exporter des notes individuelles dans différents formats (PDF, HTML, Markdown, Texte) en ouvrant une note et en cliquant sur l'icône de téléchargement dans la barre d'outils."
+    },
     "common": {
       "all_workspaces": "tous les espaces de travail"
     },
@@ -910,10 +929,20 @@
         "use_case_offline_label": "Lecture hors ligne",
         "use_case_offline_text": "Ouvrez le fichier",
         "use_case_offline_text_suffix": "pour parcourir vos notes sans Poznote"
+      },
+      "structured_export": {
+        "title": "Export structuré",
+        "description": "Exportez vos notes organisées dans des dossiers correspondant à votre structure de dossiers Poznote. Chaque note sera enregistrée dans un répertoire qui correspond à son dossier dans Poznote, préservant la hiérarchie complète.",
+        "features": "Fonctionnalités :",
+        "feature_folders": "Structure des dossiers préservée",
+        "feature_subfolders": "Sous-dossiers maintenus",
+        "feature_metadata": "Les fichiers Markdown incluent un front matter YAML avec les métadonnées",
+        "feature_formats": "Formats de fichiers originaux préservés (.html ou .md)"
       }
     },
     "buttons": {
-      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)"
+      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)",
+      "download_structured_export": "Télécharger l'export structuré (ZIP)"
     },
     "spinner": {
       "preparing": "Préparation de la sauvegarde...",
@@ -1081,7 +1110,7 @@
     },
     "buttons": {
       "start_restore": "Démarrer la restauration",
-      "start_import_individual_notes": "Démarrer l’import des notes individuelles"
+      "start_import": "Démarrer l’import"
     },
     "modals": {
       "import_confirm": {

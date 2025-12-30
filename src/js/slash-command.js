@@ -5,6 +5,14 @@
     'use strict';
 
     // ----------------------------
+    // Helper function to remove accents for filtering
+    // ----------------------------
+    function removeAccents(str) {
+        if (!str) return '';
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    // ----------------------------
     // Markdown insertion helpers
     // ----------------------------
     function getCurrentMarkdownEditorFromSelection() {
@@ -1103,13 +1111,13 @@
 
         if (!searchText) return commands;
 
-        const search = searchText.toLowerCase();
+        const search = removeAccents(searchText.toLowerCase());
         const results = [];
         
         // Flatten the menu structure when filtering
         commands.forEach(cmd => {
             // Check if main command label matches
-            const cmdMatches = cmd.label && cmd.label.toLowerCase().includes(search);
+            const cmdMatches = cmd.label && removeAccents(cmd.label.toLowerCase()).includes(search);
             
             if (cmdMatches && (!cmd.submenu || cmd.submenu.length === 0)) {
                 // Command without submenu matches - add it directly
@@ -1137,7 +1145,7 @@
             } else if (cmd.submenu && cmd.submenu.length > 0) {
                 // Command doesn't match but might have matching submenu items
                 cmd.submenu.forEach(subItem => {
-                    const subItemMatches = subItem.label && subItem.label.toLowerCase().includes(search);
+                    const subItemMatches = subItem.label && removeAccents(subItem.label.toLowerCase()).includes(search);
                     
                     if (subItemMatches && (!subItem.submenu || subItem.submenu.length === 0)) {
                         // Submenu item matches and has no sub-submenu
@@ -1158,7 +1166,7 @@
                     } else if (subItem.submenu && subItem.submenu.length > 0) {
                         // Submenu item doesn't match but might have matching sub-submenu items
                         subItem.submenu.forEach(subSubItem => {
-                            if (subSubItem.label && subSubItem.label.toLowerCase().includes(search)) {
+                            if (subSubItem.label && removeAccents(subSubItem.label.toLowerCase()).includes(search)) {
                                 results.push({
                                     ...subSubItem,
                                     label: cmd.label + ' › ' + subItem.label + ' › ' + subSubItem.label,

@@ -8,6 +8,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "confirm": "Confirm",
+    "confirm_action": "Confirm Action",
     "confirmation": "Confirmation",
     "save": "Save",
     "download": "Download",
@@ -43,6 +44,10 @@
         "note_singular_html": "<strong>• {{count}}</strong> note will be moved to trash",
         "note_plural_html": "<strong>• {{count}}</strong> notes will be moved to trash"
       }
+    },
+    "download": {
+      "starting": "Preparing download for folder \"{{folder}}\"...",
+      "started": "Download started for folder \"{{folder}}\""
     },
     "move_all": {
       "same_source_target": "Source and target folders cannot be the same",
@@ -208,7 +213,8 @@
       "loading_attachments": "Loading attachments...",
       "preview_alt": "Preview",
       "uploaded_prefix": "Uploaded: ",
-      "open_in_new_tab": "Open in new tab"
+      "open_in_new_tab": "Open in new tab",
+      "pdf_label": "PDF"
     },
     "modals": {
       "delete": {
@@ -223,6 +229,14 @@
         "mb": "MB",
         "gb": "GB"
       }
+    },
+    "list": {
+      "title": "Notes with Attachments",
+      "no_attachments": "No notes with attachments yet.",
+      "hint": "Add attachments to your notes using the paperclip button in the note toolbar.",
+      "filter_placeholder": "Filter by note title or attachment name...",
+      "no_filter_results": "No notes match your search.",
+      "download": "Download"
     }
   },
   "auth": {
@@ -718,7 +732,8 @@
       "trash": "Trash",
       "tags": "Tags",
       "favorites": "Favorites",
-      "public": "Public"
+      "public": "Public",
+      "attachments": "Attachments"
     },
     "drop_zone": {
       "remove_from_folder": "Drop here to remove from folder"
@@ -728,7 +743,8 @@
       "move_all_files": "Move all files to another folder",
       "move_folder": "Move folder to subfolder",
       "rename_folder": "Rename folder",
-      "delete_folder": "Delete folder"
+      "delete_folder": "Delete folder",
+      "download_folder": "Download folder"
     }
   },
   "update": {
@@ -899,6 +915,9 @@
     "page": {
       "title": "Backup / Export"
     },
+    "info": {
+      "individual_export": "You can also export individual notes in different formats (PDF, HTML, Markdown, Text) by opening a note and clicking the download icon in the toolbar."
+    },
     "common": {
       "all_workspaces": "all workspaces"
     },
@@ -913,10 +932,20 @@
         "use_case_offline_label": "Offline Reading",
         "use_case_offline_text": "Open the included",
         "use_case_offline_text_suffix": "to browse your notes without Poznote"
+      },
+      "structured_export": {
+        "title": "Structured Export",
+        "description": "Export your notes organized in folders matching your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the complete hierarchy.",
+        "features": "Features:",
+        "feature_folders": "Folder structure preserved",
+        "feature_subfolders": "Subfolders maintained",
+        "feature_metadata": "Markdown files include YAML front matter with metadata",
+        "feature_formats": "Original file formats preserved (.html or .md)"
       }
     },
     "buttons": {
-      "download_complete_backup": "Download Complete Backup (ZIP)"
+      "download_complete_backup": "Download Complete Backup (ZIP)",
+      "download_structured_export": "Download Structured Export (ZIP)"
     },
     "spinner": {
       "preparing": "Preparing backup...",
@@ -1084,7 +1113,7 @@
     },
     "buttons": {
       "start_restore": "Start Restore",
-      "start_import_individual_notes": "Start Import"
+      "start_import": "Start Import"
     },
     "drag_drop": {
       "individual_notes": "Drop files here",

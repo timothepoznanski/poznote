@@ -361,6 +361,65 @@ body.dark-mode .note-edit-toolbar .mobile-toolbar-item i {
     color: #4a9eff;
 }
 
+/* Folder actions menu */
+html[data-theme='dark'] .folder-actions-toggle,
+body.dark-mode .folder-actions-toggle {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-actions-toggle:hover,
+body.dark-mode .folder-actions-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-actions-menu,
+body.dark-mode .folder-actions-menu {
+    background: #1a1a1a;
+    border: 1px solid #404040;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item,
+body.dark-mode .folder-actions-menu-item {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item:hover,
+body.dark-mode .folder-actions-menu-item:hover {
+    background-color: #2a2a2a;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item i,
+body.dark-mode .folder-actions-menu-item i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item:hover i,
+body.dark-mode .folder-actions-menu-item:hover i {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger,
+body.dark-mode .folder-actions-menu-item.danger {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger:hover,
+body.dark-mode .folder-actions-menu-item.danger:hover {
+    background-color: rgba(220, 38, 38, 0.15);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item.danger i,
+body.dark-mode .folder-actions-menu-item.danger i {
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .folder-actions-menu-separator,
+body.dark-mode .folder-actions-menu-separator {
+    background: #404040;
+}
+
 /* Tags */
 html[data-theme='dark'] .name_tags,
 body.dark-mode .name_tags {

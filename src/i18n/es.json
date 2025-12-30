@@ -44,6 +44,10 @@
         "note_plural_html": "<strong>• {{count}}</strong> notas serán movidas a la papelera"
       }
     },
+    "download": {
+      "starting": "Preparando descarga de la carpeta \"{{folder}}\"...",
+      "started": "Descarga iniciada para la carpeta \"{{folder}}\""
+    },
     "move_all": {
       "same_source_target": "Las carpetas de origen y destino no pueden ser las mismas",
       "moving": "Moviendo...",
@@ -223,6 +227,14 @@
         "mb": "MB",
         "gb": "GB"
       }
+    },
+    "list": {
+      "title": "Notas con archivos adjuntos",
+      "no_attachments": "Aún no hay notas con archivos adjuntos.",
+      "hint": "Añada archivos adjuntos a sus notas usando el botón del clip en la barra de herramientas.",
+      "filter_placeholder": "Filtrar por título de nota o nombre de archivo adjunto...",
+      "no_filter_results": "Ninguna nota coincide con su búsqueda.",
+      "download": "Descargar"
     }
   },
   "auth": {
@@ -718,7 +730,8 @@
       "trash": "Papelera",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "public": "Públicas"
+      "public": "Públicas",
+      "attachments": "Archivos adjuntos"
     },
     "drop_zone": {
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
@@ -728,7 +741,8 @@
       "move_all_files": "Mover todos los archivos a otra carpeta",
       "rename_folder": "Renombrar carpeta",
       "delete_folder": "Eliminar carpeta",
-      "move_folder": "Mover carpeta a subcarpeta"
+      "move_folder": "Mover carpeta a subcarpeta",
+      "download_folder": "Descargar carpeta"
     }
   },
   "update": {
@@ -1079,7 +1093,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar restauración",
-      "start_import_individual_notes": "Iniciar importación"
+      "start_import": "Iniciar importación"
     },
     "drag_drop": {
       "individual_notes": "Soltar archivos aquí",

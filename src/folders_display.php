@@ -179,15 +179,55 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
     } else {
-        $actions .= "<i class='fa-plus-circle folder-create-note-btn' onclick='showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.create', [], 'Create') . "'></i>";
-        // Only show move button if folder has notes
+        // Create three-dot menu
+        $actions .= "<div class='folder-actions-toggle' onclick='event.stopPropagation(); toggleFolderActionsMenu($folderId)' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
+        $actions .= "<i class='fa-ellipsis-v'></i>";
+        $actions .= "</div>";
+        
+        // Create dropdown menu
+        $actions .= "<div class='folder-actions-menu' id='folder-actions-menu-$folderId'>";
+        
+        // Create note action
+        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<i class='fa-plus-circle'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
+        $actions .= "</div>";
+        
+        // Move all files action (only if folder has notes)
         if ($noteCount > 0) {
-            $actions .= "<i class='fa-folder-open folder-move-files-btn' onclick='event.stopPropagation(); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files to another folder') . "'></i>";
+            $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")'>";
+            $actions .= "<i class='fa-folder-open'></i>";
+            $actions .= "<span>" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files') . "</span>";
+            $actions .= "</div>";
         }
-        // Move folder to subfolder action
-        $actions .= "<i class='fa-share folder-move-btn' onclick='event.stopPropagation(); showMoveEntireFolderDialog($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.move_folder', [], 'Move folder to subfolder') . "'></i>";
-        $actions .= "<i class='fa-edit folder-edit-btn' onclick='event.stopPropagation(); editFolderName($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename folder') . "'></i>";
-        $actions .= "<i class='fa-trash folder-delete-btn' onclick='event.stopPropagation(); deleteFolder($folderId, \"$escapedFolderName\")' title='" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete folder') . "'></i>";
+        
+        // Move folder action
+        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showMoveEntireFolderDialog($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<i class='fa-share'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
+        $actions .= "</div>";
+        
+        // Download folder action (only if folder has notes)
+        if ($noteCount > 0) {
+            $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); downloadFolder($folderId, \"$escapedFolderName\")'>";
+            $actions .= "<i class='fa-download'></i>";
+            $actions .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
+            $actions .= "</div>";
+        }
+        
+        // Rename folder action
+        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); editFolderName($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<i class='fa-edit'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
+        $actions .= "</div>";
+        
+        // Delete folder action
+        $actions .= "<div class='folder-actions-menu-item danger' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); deleteFolder($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<i class='fa-trash'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . "</span>";
+        $actions .= "</div>";
+        
+        $actions .= "</div>"; // Close dropdown menu
     }
     
     return $actions;

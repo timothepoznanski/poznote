@@ -132,6 +132,7 @@ if (!$note) {
         const TXT_DELETE = <?php echo json_encode(t('attachments.actions.delete', [], 'Delete')); ?>;
         const TXT_OPEN_NEW_TAB = <?php echo json_encode(t('attachments.page.open_in_new_tab', [], 'Open in new tab')); ?>;
         const TXT_DOWNLOAD = <?php echo json_encode(t('common.download', [], 'Download')); ?>;
+        const TXT_PDF_LABEL = <?php echo json_encode(t('attachments.page.pdf_label', [], 'PDF')); ?>;
         const TXT_DELETED_SUCCESS = <?php echo json_encode(t('attachments.messages.deleted_success', [], 'Attachment deleted successfully')); ?>;
         const TXT_DELETE_FAILED_PREFIX = <?php echo json_encode(t('attachments.errors.deletion_failed', ['error' => '{{error}}'], 'Deletion failed: {{error}}')); ?>;
         const TXT_DELETE_FAILED_GENERIC = <?php echo json_encode(t('attachments.errors.deletion_failed_generic', [], 'Deletion failed.')); ?>;
@@ -141,6 +142,9 @@ if (!$note) {
             t('attachments.size.units.mb', [], 'MB'),
             t('attachments.size.units.gb', [], 'GB'),
         ]); ?>;
+        const TXT_CONFIRM_ACTION = <?php echo json_encode(t('common.confirm_action', [], 'Confirm Action')); ?>;
+        const TXT_DELETE_BUTTON = <?php echo json_encode(t('common.delete', [], 'Delete')); ?>;
+        const TXT_CANCEL = <?php echo json_encode(t('common.cancel', [], 'Cancel')); ?>;
 
         // Load attachments when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -175,7 +179,7 @@ if (!$note) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         htmlContent += `<div class="image-preview">
-                            <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;">
+                            <img src="${e.target.result}" alt="${TXT_PREVIEW_ALT}" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;">
                         </div>`;
                         fileNameDiv.innerHTML = htmlContent;
                     };
@@ -332,7 +336,7 @@ if (!$note) {
                         <iframe src="${fileUrl}" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>
                         <div class="pdf-overlay">
                             
-                            <span>PDF</span>
+                            <span>${TXT_PDF_LABEL}</span>
                         </div>
                     </div>`;
                 } else {
@@ -536,11 +540,11 @@ if (!$note) {
             const modalHTML = `
                 <div id="confirmationModal" class="modal" style="display: flex;">
                     <div class="modal-content" style="max-width: 400px;">
-                        <h3>Confirm Action</h3>
+                        <h3>${TXT_CONFIRM_ACTION}</h3>
                         <p id="confirmationMessage">${message}</p>
                         <div class="modal-buttons">
-                            <button type="button" id="confirmBtn" class="btn-primary">Delete</button>
-                            <button type="button" id="cancelBtn">Cancel</button>
+                            <button type="button" id="confirmBtn" class="btn-primary">${TXT_DELETE_BUTTON}</button>
+                            <button type="button" id="cancelBtn">${TXT_CANCEL}</button>
                         </div>
                     </div>
                 </div>

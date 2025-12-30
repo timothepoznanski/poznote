@@ -140,3 +140,20 @@ body {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* Info box styles */
+.info-box {
+    background-color: #e7f3ff;
+    border-left: 4px solid #2196F3;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    color: #1976D2;
+}
+
+/* Dark mode support for info box */
+html[data-theme='dark'] .info-box {
+    background-color: #1a3a52;
+    border-left: 4px solid #4a9eff;
+    color: #64b5f6;
+}

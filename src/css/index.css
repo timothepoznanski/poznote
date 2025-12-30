@@ -636,14 +636,102 @@ body {
 }
 .links_arbo_left.selected-note .note-title { color: #0b4da6; font-weight:600; }
 
-/* Folder actions icons keep small size */
-.folder-actions i { margin-left: 12px; color:#6b7280; cursor:pointer; font-size: 1.2em; }
-.folder-actions i:hover { color:#374151; }
+/* Folder actions with three-dot menu */
+.folder-actions {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+}
 
-/* Réduire les icônes Font Awesome dans folder-actions */
-.folder-actions i[class*="fa-"],
-.folder-actions [class*="fa-"] {
+.folder-actions-toggle {
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #6b7280;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-actions-toggle:hover {
+    background: rgba(107, 114, 128, 0.1);
+    color: #374151;
+}
+
+.folder-actions-toggle i {
+    font-size: 1.2em;
+}
+
+/* Réduire les icônes Font Awesome dans folder-actions-toggle */
+.folder-actions-toggle i[class*="fa-"],
+.folder-actions-toggle [class*="fa-"] {
     font-size: 0.85em !important;
+}
+
+/* Dropdown menu for folder actions */
+.folder-actions-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 200px;
+    padding: 4px 0;
+    z-index: 10000;
+    display: none;
+}
+
+.folder-actions-menu.show {
+    display: block;
+}
+
+.folder-actions-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #374151;
+    transition: background-color 0.15s ease;
+    font-size: 0.9em;
+}
+
+.folder-actions-menu-item:hover {
+    background-color: #f3f4f6;
+}
+
+.folder-actions-menu-item i {
+    font-size: 1em;
+    color: #6b7280;
+    width: 16px;
+}
+
+.folder-actions-menu-item:hover i {
+    color: #374151;
+}
+
+.folder-actions-menu-item.danger {
+    color: #dc2626;
+}
+
+.folder-actions-menu-item.danger:hover {
+    background-color: #fee2e2;
+}
+
+.folder-actions-menu-item.danger i {
+    color: #dc2626;
+}
+
+/* Separator in menu */
+.folder-actions-menu-separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 4px 0;
 }
 
 /* Dropdown menu for create button */
@@ -2739,11 +2827,11 @@ hr {
     flex: 0 0 auto;
 }
 
-/* Hide individual action icons by default (show on hover) */
+/* Show folder action icons always visible */
 .folder-actions i {
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.12s ease-in-out, color 0.12s;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 /* Reveal icons on folder hover by default */
@@ -3163,6 +3251,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-caret-down::before { content: "\f0d7"; }
 .fa-smile::before { content: "\f118"; }
 .fa-ellipsis::before { content: "\f141"; }
+.fa-ellipsis-v::before { content: "\f142"; }
 .fa-folder::before { content: "\f07b"; }
 .fa-folder-open::before { content: "\f07c"; }
 .fa-edit::before { content: "\f044"; }
@@ -3259,6 +3348,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-cloud,
 .fa-caret-down,
 .fa-ellipsis,
+.fa-ellipsis-v,
 .fa-mobile,
 .fa-border-outer,
 .fa-paint-brush,
@@ -3921,14 +4011,14 @@ body.dark-mode .create-section h4 {
 .checklist {
     list-style: none;
     padding-left: 0;
-    margin: 8px 0;
+    /* margin: 8px 0; */
 }
 
 .checklist-item {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin: 4px 0;
+    /* gap: 8px; */
+    /* margin-left: 8px; */
     line-height: 1.6;
 }
 
@@ -3950,7 +4040,7 @@ body.dark-mode .create-section h4 {
     box-shadow: none !important;
     background-color: transparent !important;
     padding: 0;
-    margin: 0;
+    margin-left: 8px;
     min-height: 1.6em;
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -4031,6 +4121,73 @@ body.dark-mode .checklist-checkbox:checked + .checklist-text {
 .checklist-item .checklist {
     margin-top: 4px;
     margin-bottom: 4px;
+    padding-left: 24px !important;
+}
+
+/* Support multiple levels of nesting */
+.checklist-item .checklist .checklist-item .checklist {
+    padding-left: 24px !important;
+}
+
+/* Ensure checklist-item can contain nested lists properly */
+.checklist-item {
+    flex-wrap: wrap;
+}
+
+.checklist-item > .checklist {
+    flex-basis: 100%;
+    margin-left: 0;
+}
+
+/* ===== NESTED BULLET/NUMBERED LIST STYLES ===== */
+/* Ensure proper indentation for nested lists created via Tab key */
+.noteentry ul ul,
+.noteentry ul ol,
+.noteentry ol ul,
+.noteentry ol ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-left: 24px;
+}
+
+/* Ensure list items can contain nested lists properly */
+.noteentry li > ul,
+.noteentry li > ol {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+/* ===== HIERARCHICAL NUMBERED LISTS (1.1, 1.2, 2.1, etc.) ===== */
+/* Reset default list styling for ordered lists in notes */
+.noteentry ol {
+    counter-reset: item;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.noteentry ol > li {
+    counter-increment: item;
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.noteentry ol > li::before {
+    content: counters(item, ".") ". ";
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+/* Ensure nested ol also uses hierarchical numbering */
+.noteentry ol ol {
+    counter-reset: item;
+    padding-left: 24px;
+}
+
+/* Add spacing to bullet list items as well (exclude checklists) */
+.noteentry ul:not(.checklist):not(.task-list) > li:not(.checklist-item):not(.task-list-item) {
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 /* Root Drop Zone Styles */

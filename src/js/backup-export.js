@@ -12,6 +12,14 @@ function startDownload() {
 }
 
 /**
+ * Download structured export as ZIP file
+ */
+function startStructuredExport() {
+    // Create a direct link to the structured export script
+    window.location.href = 'api_export_structured.php';
+}
+
+/**
  * Download attachments as ZIP file
  */
 function startAttachmentsDownload() {

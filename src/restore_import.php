@@ -158,6 +158,18 @@ function extractTaskListFromHTML($htmlContent) {
 }
 
 /**
+ * Remove all <style> tags from HTML content
+ * @param string $htmlContent The HTML content to clean
+ * @return string The HTML content without <style> tags
+ */
+function removeStyleTags($htmlContent) {
+    // Remove all <style>...</style> tags and their content
+    // Using case-insensitive pattern to match <style>, <STYLE>, etc.
+    $cleaned = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $htmlContent);
+    return $cleaned !== null ? $cleaned : $htmlContent;
+}
+
+/**
  * Parse YAML front matter from Markdown content
  * Returns array with 'metadata' and 'content' keys
  */
@@ -1119,6 +1131,11 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
         
+        // Remove <style> tags from HTML files
+        if ($noteType === 'note' && $fileExtension === 'html') {
+            $content = removeStyleTags($content);
+        }
+        
         // Determine folder from ZIP structure (if hasSubfolders is true)
         $targetFolderId = null;
         $targetFolderName = $folder; // Use provided folder as default
@@ -1351,6 +1368,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         // Determine note type based on file extension
         $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
+        
+        // Remove <style> tags from HTML files
+        if ($noteType === 'note' && $fileExtension === 'html') {
+            $content = removeStyleTags($content);
+        }
         
         // Parse front matter if it's a markdown file
         $frontMatterData = null;
@@ -1752,7 +1774,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 </div>
                 
                 <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()" style="margin-top: 1rem;" id="individualNotesImportBtn">
-                    <?php echo t_h('restore_import.buttons.start_import_individual_notes', 'Start Import'); ?>
+                    <?php echo t_h('restore_import.buttons.start_import', 'Start Import'); ?>
                 </button>
                 
                 <!-- Spinner shown while processing import -->

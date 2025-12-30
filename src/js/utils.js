@@ -398,6 +398,27 @@ function selectFolder(folderId, folderName, element) {
     }
 }
 
+function downloadFolder(folderId, folderName) {
+    // Close the folder actions menu
+    closeFolderActionsMenu(folderId);
+    
+    // Create download URL
+    var url = 'api_export_folder.php?folder_id=' + encodeURIComponent(folderId);
+    
+    // Create a temporary link and click it to trigger download
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = '';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    
+    // Remove the link after a short delay
+    setTimeout(function() {
+        document.body.removeChild(link);
+    }, 100);
+}
+
 // Workspace management (creation/deletion)
 function showNewWorkspacePrompt() {
     var name = prompt('Nom du nouveau workspace:');
@@ -2023,3 +2044,60 @@ function createWorkspace() {
 function createNoteInFolder() {
     executeCreateAction();
 }
+
+// Folder actions menu toggle functions
+function toggleFolderActionsMenu(folderId) {
+    // Close all other folder menus first
+    document.querySelectorAll('.folder-actions-menu.show').forEach(function(menu) {
+        if (menu.id !== 'folder-actions-menu-' + folderId) {
+            menu.classList.remove('show');
+        }
+    });
+    
+    // Toggle the current menu
+    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    if (menu) {
+        var isShowing = menu.classList.toggle('show');
+        
+        // If showing, check if menu would overflow viewport and adjust position
+        if (isShowing) {
+            adjustMenuPosition(menu);
+        }
+    }
+}
+
+function adjustMenuPosition(menu) {
+    // Reset any previous adjustments
+    menu.style.bottom = '';
+    menu.style.top = '';
+    
+    // Get menu position and dimensions
+    var rect = menu.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    
+    // Check if menu overflows bottom of viewport
+    if (rect.bottom > viewportHeight) {
+        // Position menu above the toggle button instead
+        menu.style.top = 'auto';
+        menu.style.bottom = '100%';
+        menu.style.marginTop = '0';
+        menu.style.marginBottom = '4px';
+    }
+}
+
+function closeFolderActionsMenu(folderId) {
+    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    if (menu) {
+        menu.classList.remove('show');
+    }
+}
+
+// Close folder menus when clicking outside
+document.addEventListener('click', function(event) {
+    // If click is not inside a folder-actions element, close all menus
+    if (!event.target.closest('.folder-actions')) {
+        document.querySelectorAll('.folder-actions-menu.show').forEach(function(menu) {
+            menu.classList.remove('show');
+        });
+    }
+});

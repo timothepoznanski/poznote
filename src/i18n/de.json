@@ -44,6 +44,10 @@
         "note_plural_html": "<strong>• {{count}}</strong> Notizen werden in den Papierkorb verschoben"
       }
     },
+    "download": {
+      "starting": "Download für Ordner \"{{folder}}\" wird vorbereitet...",
+      "started": "Download für Ordner \"{{folder}}\" gestartet"
+    },
     "move_all": {
       "same_source_target": "Quell- und Zielordner können nicht identisch sein",
       "moving": "Verschiebe...",
@@ -223,6 +227,14 @@
         "mb": "MB",
         "gb": "GB"
       }
+    },
+    "list": {
+      "title": "Notizen mit Anhängen",
+      "no_attachments": "Noch keine Notizen mit Anhängen.",
+      "hint": "Fügen Sie Ihren Notizen Anhänge hinzu, indem Sie auf das Büroklammer-Symbol in der Symbolleiste klicken.",
+      "filter_placeholder": "Nach Notizentitel oder Anhangsname filtern...",
+      "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
+      "download": "Herunterladen"
     }
   },
   "auth": {
@@ -718,7 +730,8 @@
       "trash": "Papierkorb",
       "tags": "Tags",
       "favorites": "Favoriten",
-      "public": "Öffentliche"
+      "public": "Öffentliche",
+      "attachments": "Anhänge"
     },
     "drop_zone": {
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
@@ -728,7 +741,8 @@
       "move_all_files": "Alle Dateien in einen anderen Ordner verschieben",
       "rename_folder": "Ordner umbenennen",
       "delete_folder": "Ordner löschen",
-      "move_folder": "Ordner in Unterordner verschieben"
+      "move_folder": "Ordner in Unterordner verschieben",
+      "download_folder": "Ordner herunterladen"
     }
   },
   "update": {
@@ -1079,7 +1093,7 @@
     },
     "buttons": {
       "start_restore": "Wiederherstellung starten",
-      "start_import_individual_notes": "Import starten"
+      "start_import": "Import starten"
     },
     "drag_drop": {
       "individual_notes": "Dateien hier ablegen",

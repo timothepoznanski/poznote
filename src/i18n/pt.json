@@ -43,6 +43,10 @@
         "note_plural_html": "<strong>• {{count}}</strong> notas serão movidas para a lixeira"
       }
     },
+    "download": {
+      "starting": "Preparando download da pasta \"{{folder}}\"...",
+      "started": "Download iniciado para a pasta \"{{folder}}\""
+    },
     "move_all": {
       "same_source_target": "A pasta de origem e destino não podem ser a mesma",
       "moving": "Movendo...",
@@ -222,6 +226,14 @@
         "mb": "MB",
         "gb": "GB"
       }
+    },
+    "list": {
+      "title": "Notas com anexos",
+      "no_attachments": "Ainda não há notas com anexos.",
+      "hint": "Adicione anexos às suas notas usando o botão de clipe na barra de ferramentas.",
+      "filter_placeholder": "Filtrar por título da nota ou nome do anexo...",
+      "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
+      "download": "Baixar"
     }
   },
   "auth": {
@@ -717,7 +729,8 @@
       "trash": "Lixeira",
       "tags": "Etiquetas",
       "favorites": "Favoritos",
-      "public": "Públicas"
+      "public": "Públicas",
+      "attachments": "Anexos"
     },
     "drop_zone": {
       "remove_from_folder": "Solte aqui para remover da pasta"
@@ -727,7 +740,8 @@
       "move_all_files": "Mover todos os arquivos para outra pasta",
       "rename_folder": "Renomear pasta",
       "delete_folder": "Excluir pasta",
-      "move_folder": "Mover pasta para subpasta"
+      "move_folder": "Mover pasta para subpasta",
+      "download_folder": "Baixar pasta"
     }
   },
   "update": {
@@ -1080,7 +1094,7 @@
     },
     "buttons": {
       "start_restore": "Iniciar Restauração",
-      "start_import_individual_notes": "Iniciar Importação"
+      "start_import": "Iniciar Importação"
     },
     "drag_drop": {
       "individual_notes": "Soltar arquivos aqui",

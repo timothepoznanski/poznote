@@ -98,6 +98,32 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 
 echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div></div>";
 
+// Render a dedicated "Attachments" folder that links to notes with attachments
+// Count notes with attachments for the current workspace (non-trashed entries)
+$attachments_count = 0;
+try {
+    if (isset($con)) {
+        $query = "SELECT COUNT(*) as cnt FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $params = [];
+        if (!empty($workspace_filter)) {
+            $query .= " AND workspace = ?";
+            $params[] = $workspace_filter;
+        }
+        $stmtAttachments = $con->prepare($query);
+        $stmtAttachments->execute($params);
+        $attachments_count = (int)$stmtAttachments->fetchColumn();
+    }
+} catch (Exception $e) {
+    $attachments_count = 0;
+}
+
+echo "<div class='folder-header system-folder' data-folder='Attachments'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"attachments_list.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "'>";
+echo "<i class='fa-paperclip folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
+echo "<span class='folder-note-count' id='count-attachments'>" . $attachments_count . "</span>";
+echo "</div></div>";
+
 // Add Favorites as a system folder icon (will be rendered later in detail)
 // Count favorites for the current workspace
 $favorites_count = 0;
