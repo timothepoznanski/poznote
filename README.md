@@ -651,6 +651,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
 - **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
 - **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
+- **Sortable.js** - JavaScript library for drag-and-drop sorting
 
 ### Storage
 - **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
