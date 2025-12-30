@@ -520,23 +520,26 @@ function loadWorkspacesForImport() {
             if (data.success && data.workspaces) {
                 workspaceSelect.innerHTML = '';
                 
-                // Add workspaces to select, select first one by default
-                let isFirst = true;
+                // Get the workspace from localStorage
+                const savedWorkspace = localStorage.getItem('poznote_selected_workspace');
+                
+                // Add workspaces to select
                 data.workspaces.forEach(workspace => {
                     const option = document.createElement('option');
                     option.value = workspace.name;
                     option.textContent = workspace.name;
                     
-                    // Select first workspace by default
-                    if (isFirst) {
+                    // Select workspace from localStorage if it exists, otherwise select first one
+                    if (savedWorkspace && workspace.name === savedWorkspace) {
                         option.selected = true;
-                        isFirst = false;
+                    } else if (!savedWorkspace && workspaceSelect.options.length === 0) {
+                        option.selected = true;
                     }
                     
                     workspaceSelect.appendChild(option);
                 });
                 
-                // Load folders for the default selected workspace
+                // Load folders for the selected workspace
                 const selectedWorkspace = workspaceSelect.value;
                 if (selectedWorkspace) {
                     loadFoldersForImport(selectedWorkspace);
