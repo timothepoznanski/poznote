@@ -2697,6 +2697,7 @@ hr {
 .system-folder .fa-tags.folder-icon,
 .system-folder .fa-cloud.folder-icon,
 .system-folder .fa-star-light.folder-icon,
+.system-folder .fa-paperclip.folder-icon,
 .system-folder .fa-eye.folder-icon,
 .system-folder .fa-cog.folder-icon,
 .system-folder .fa-search.folder-icon {
@@ -2751,6 +2752,7 @@ hr {
     .system-folder .fa-tags.folder-icon,
     .system-folder .fa-cloud.folder-icon,
     .system-folder .fa-star-light.folder-icon,
+    .system-folder .fa-paperclip.folder-icon,
     .system-folder .fa-eye.folder-icon,
     .system-folder .fa-cog.folder-icon,
     .system-folder .fa-search.folder-icon {
