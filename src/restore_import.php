@@ -763,6 +763,19 @@ function importZipWithFolders($uploadedFile, $workspace) {
                 }
             }
             
+            // Validate tags format - replace spaces with underscores
+            if (!empty($tags)) {
+                $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+                $validTags = [];
+                foreach ($tagsArray as $tag) {
+                    if (!empty($tag)) {
+                        $tag = str_replace(' ', '_', $tag);
+                        $validTags[] = $tag;
+                    }
+                }
+                $tags = implode(', ', $validTags);
+            }
+            
             // Extract favorite status from front matter
             if ($frontMatterData && isset($frontMatterData['favorite'])) {
                 $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
@@ -1197,6 +1210,19 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             }
         }
         
+        // Validate tags format - replace spaces with underscores
+        if (!empty($tags)) {
+            $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+            $validTags = [];
+            foreach ($tagsArray as $tag) {
+                if (!empty($tag)) {
+                    $tag = str_replace(' ', '_', $tag);
+                    $validTags[] = $tag;
+                }
+            }
+            $tags = implode(', ', $validTags);
+        }
+        
         // Extract favorite status from front matter
         if ($frontMatterData && isset($frontMatterData['favorite'])) {
             $favorite = ($frontMatterData['favorite'] === true || $frontMatterData['favorite'] === 1) ? 1 : 0;
@@ -1393,6 +1419,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         $tags = '';
         if ($frontMatterData && isset($frontMatterData['tags']) && is_array($frontMatterData['tags'])) {
             $tags = implode(', ', $frontMatterData['tags']);
+        }
+        
+        // Validate tags format - replace spaces with underscores
+        if (!empty($tags)) {
+            $tagsArray = array_map('trim', explode(',', str_replace(' ', ',', $tags)));
+            $validTags = [];
+            foreach ($tagsArray as $tag) {
+                if (!empty($tag)) {
+                    $tag = str_replace(' ', '_', $tag);
+                    $validTags[] = $tag;
+                }
+            }
+            $tags = implode(', ', $validTags);
         }
         
         // Extract favorite status from front matter

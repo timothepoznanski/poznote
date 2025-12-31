@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 
 function checkForUpdates() {
     $result = [
+        'success' => true,
         'has_updates' => false,
         'current_version' => '',
         'remote_version' => '',
@@ -80,9 +81,11 @@ function checkForUpdates() {
         
         // Compare versions using semantic versioning
         $result['has_updates'] = version_compare($remote_version, $current_version_clean, '>');
+        $result['update_available'] = $result['has_updates']; // Alias for compatibility
         
     } catch (Exception $e) {
         $result['error'] = $e->getMessage();
+        $result['success'] = false;
     }
     
     return $result;

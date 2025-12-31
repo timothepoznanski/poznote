@@ -158,7 +158,7 @@ if (!empty($tags)) {
             $validTags[] = $tag;
         }
     }
-    $tags = implode(',', $validTags);
+    $tags = implode(', ', $validTags);
 }
 
 // Get the current note type to determine file extension

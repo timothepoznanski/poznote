@@ -100,10 +100,23 @@ try {
     $sort = $_GET['sort'] ?? $_POST['sort'] ?? null;
     
     // Whitelist allowed values
-    // For updated_desc and created_desc, notes without folder should appear first, then grouped by folder, then sorted by date
+    // Check setting for notes without folders position
+    $notes_without_folders_after = false;
+    try {
+        $stmtSetting = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmtSetting->execute(['notes_without_folders_after_folders']);
+        $settingValue = $stmtSetting->fetchColumn();
+        $notes_without_folders_after = ($settingValue === '1' || $settingValue === 'true');
+    } catch (Exception $e) {
+        // ignore, keep default
+    }
+    
+    $folder_null_case = $notes_without_folders_after ? '1' : '0';
+    $folder_case = $notes_without_folders_after ? '0' : '1';
+    
     $allowed = [
-        'updated_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, updated DESC',
-        'created_desc' => 'CASE WHEN folder_id IS NULL THEN 0 ELSE 1 END, folder, created DESC',
+        'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
+        'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
         'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
     ];
     
