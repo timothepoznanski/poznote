@@ -364,6 +364,7 @@
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
       "show_note_subheading": "Notiz-Untertitel anzeigen",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
+      "notes_without_folders_after": "Notizen ohne Ordner nach Ordnern anzeigen",
       "show_folder_actions": "Ordner-Aktionen anzeigen"
     },
     "badges": {

@@ -205,7 +205,7 @@ $currentLang = getUserLanguage();
 
                 <!-- Note Sort Order -->
                 <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
-                    <div class="settings-card-icon"><i class="fa-list-ol"></i></div>
+                    <div class="settings-card-icon"><i class="fa-sort-amount-down"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.note_sort_order'); ?> <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
                     </div>
@@ -232,6 +232,14 @@ $currentLang = getUserLanguage();
                     <div class="settings-card-icon"><i class="fa-hashtag"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.show_folder_counts'); ?> <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span></h3>
+                    </div>
+                </div>
+
+                <!-- Notes Without Folders Position -->
+                <div class="settings-card" id="notes-without-folders-card">
+                    <div class="settings-card-icon"><i class="fa-folder-tree"></i></div>
+                    <div class="settings-card-content">
+                        <h3><?php echo t_h('display.cards.notes_without_folders_after'); ?> <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span></h3>
                     </div>
                 </div>
             </div>
@@ -382,6 +390,42 @@ $currentLang = getUserLanguage();
             }); 
         }
         refreshFolder();
+
+        // Notes without folders position
+        var cardNotesPos = document.getElementById('notes-without-folders-card');
+        var statusNotesPos = document.getElementById('notes-without-folders-status');
+        function refreshNotesPos(){
+            var form = new FormData(); 
+            form.append('action','get'); 
+            form.append('key','notes_without_folders_after_folders');
+            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                var enabled = j && j.success && (j.value==='1' || j.value==='true');
+                if(statusNotesPos){ 
+                    statusNotesPos.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
+                    statusNotesPos.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
+                }
+            }).catch(()=>{});
+        }
+        if(cardNotesPos){ 
+            cardNotesPos.addEventListener('click', function(){
+                var form = new FormData(); 
+                form.append('action','get'); 
+                form.append('key','notes_without_folders_after_folders');
+                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
+                    var currently = j && j.success && (j.value === '1' || j.value === 'true');
+                    var toSet = currently ? '0' : '1';
+                    var setForm = new FormData(); 
+                    setForm.append('action','set'); 
+                    setForm.append('key','notes_without_folders_after_folders'); 
+                    setForm.append('value', toSet);
+                    return fetch('api_settings.php',{method:'POST',body:setForm});
+                }).then(function(){ 
+                    refreshNotesPos(); 
+                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
+                }).catch(e=>console.error(e));
+            }); 
+        }
+        refreshNotesPos();
     })();
     </script>
 

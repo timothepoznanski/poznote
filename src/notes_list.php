@@ -301,9 +301,23 @@ $folders = enrichFoldersWithParentId($folders, $con, $workspace_filter);
 $hierarchicalFolders = buildFolderHierarchy($folders);
 
 // Determine if we should display uncategorized notes first (after Favorites, before other folders)
-// This happens when sort order is by date (updated_desc or created_desc)
-$displayUncategorizedFirst = isset($note_list_sort_type) && 
-    ($note_list_sort_type === 'updated_desc' || $note_list_sort_type === 'created_desc');
+// Check the user setting
+$displayUncategorizedFirst = true; // default: notes without folders BEFORE folders
+try {
+    $stmtSetting = $con->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmtSetting->execute(['notes_without_folders_after_folders']);
+    $settingValue = $stmtSetting->fetchColumn();
+    if ($settingValue === '1' || $settingValue === 'true') {
+        $displayUncategorizedFirst = false; // notes without folders AFTER folders
+    }
+} catch (Exception $e) {
+    // ignore, keep default
+}
+
+// If sorting alphabetically, always display uncategorized notes at the end
+if (isset($note_list_sort_type) && $note_list_sort_type === 'heading_asc') {
+    $displayUncategorizedFirst = false;
+}
 
 // Separate Favorites folder from other folders
 $favoritesFolder = null;

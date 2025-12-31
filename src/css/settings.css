@@ -153,6 +153,15 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Mobile: allow text wrapping */
+@media (max-width: 768px) {
+    .settings-card h3 {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+}
 .back-link {
     color: #007DB8;
     text-decoration: none;
@@ -223,6 +232,9 @@ body {
 .fa-chevron-down::before { content: "\f078"; }
 .fa-eye::before { content: "\f06e"; }
 .fa-heart::before { content: "\f004"; }
+.fa-sort-amount-down::before { content: "\f161"; }
+.fa-folder-plus::before { content: "\f65e"; }
+.fa-folder-tree::before { content: "\f802"; }
 
 .fa-arrow-left,
 .fa-layer-group,
@@ -252,7 +264,10 @@ body {
 .fa-folder-open,
 .fa-chevron-down,
 .fa-eye,
-.fa-heart {
+.fa-heart,
+.fa-sort-amount-down,
+.fa-folder-plus,
+.fa-folder-tree {
     font-family: "Font Awesome 5 Pro";
     font-weight: 300;
     font-style: normal;
