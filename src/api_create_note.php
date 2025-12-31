@@ -48,7 +48,7 @@ if (!empty($tags)) {
             $validTags[] = $tag;
         }
     }
-    $tags = implode(',', $validTags);
+    $tags = implode(', ', $validTags);
 }
 
 // Get folder_id if needed
