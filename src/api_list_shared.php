@@ -59,8 +59,14 @@ try {
         $note['url_workspace'] = $base . '/workspace/' . rawurlencode($token);
     }
     
-    echo json_encode(['shared_notes' => $shared_notes]);
+    echo json_encode([
+        'success' => true,
+        'shared_notes' => $shared_notes
+    ]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to retrieve shared notes: ' . $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Failed to retrieve shared notes: ' . $e->getMessage()
+    ]);
 }

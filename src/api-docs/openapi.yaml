@@ -8,9 +8,10 @@ info:
     - Use HTTP Basic Auth (`-u username:password`) for scripts and automation
     - Use Session Auth for browser-based access (Swagger UI)
 
-    **OIDC / SSO (optional):** Poznote can be configured to authenticate users via OpenID Connect.
+    **OIDC / SSO (optional):** Poznote can be configured to authenticate users via OpenID Connect for interactive login.
     - Start the flow: `GET /oidc_login.php`
     - Callback: `GET /oidc_callback.php`
+    - Note: OIDC creates user sessions; API authentication for automation still uses HTTP Basic Auth
     
     [View complete curl examples in the README](https://github.com/timothepoznanski/poznote#api-documentation)
   version: 1.0.0
@@ -24,6 +25,8 @@ tags:
   - name: Attachments Management
   - name: Favorites Management
   - name: Backup Management
+  - name: Export Management
+  - name: Public Sharing
   - name: System Information
 
 security:
@@ -269,39 +272,31 @@ paths:
                   type: string
                   description: "Note title (required)"
                   example: "My New Note"
-                subheading:
-                  type: string
-                  description: "Note subtitle (optional)"
-                  example: "Important information"
-                entrycontent:
-                  type: string
-                  description: "Text content (optional)"
-                  example: "This is the content of my note"
                 entry:
                   type: string
-                  description: "HTML content (optional)"
-                  example: "<p>This is <strong>HTML</strong> content</p>"
+                  description: "HTML content for the note file (optional)"
+                  example: "<p>This is the note content</p>"
+                entrycontent:
+                  type: string
+                  description: "Text content for database storage (optional)"
+                  example: "This is the note content"
                 tags:
                   type: string
                   description: "Comma-separated tags (optional)"
-                  example: "work,important,todo"
+                  example: "work,important"
                 folder_name:
                   type: string
-                  description: "Folder name (optional, default: Default)"
-                  example: "Work"
+                  description: "Folder name to place the note in (optional)"
+                  example: "Projects"
                 workspace:
                   type: string
-                  description: "Workspace name (optional, default: Poznote)"
+                  description: "Workspace name (optional, defaults to first available workspace)"
                   example: "Personal"
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
-                  description: "Note type (optional, default: note)"
+                  description: "Note type (optional, defaults to 'note')"
                   example: "note"
-                location:
-                  type: string
-                  description: "Geographic location (optional)"
-                  example: "Paris"
       responses:
         '200':
           description: Note created successfully
@@ -313,13 +308,15 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  message:
-                    type: string
-                    example: "Note created successfully"
                   id:
                     type: integer
-                    description: ID of created note
                     example: 123
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Workspace not found
+        '500':
+          description: Server error
 
   /api_apply_tags.php:
     post:
@@ -602,7 +599,7 @@ paths:
       tags:
         - Notes Management
       summary: Share note
-      description: Manage public sharing for a note (create, get, revoke, or renew share link)
+      description: Manage public sharing for a note (create, get, revoke, renew share link, update settings)
       requestBody:
         required: true
         content:
@@ -618,10 +615,27 @@ paths:
                   example: 123
                 action:
                   type: string
-                  enum: [create, get, revoke, renew]
-                  description: "Action to perform: 'create' (generate new link), 'get' (retrieve existing), 'revoke' (disable sharing), 'renew' (generate new token)"
+                  enum: [create, get, revoke, renew, update_indexable, update_password]
+                  description: "Action to perform (optional, default: create)"
                   example: "create"
                   default: "create"
+                custom_token:
+                  type: string
+                  description: "Custom URL token/slug (4-128 chars, letters/numbers/-_.) for create/renew actions (optional)"
+                  example: "my-custom-note"
+                theme:
+                  type: string
+                  description: "Theme for public display (optional)"
+                  example: "dark"
+                indexable:
+                  type: integer
+                  enum: [0, 1]
+                  description: "Whether the note should be indexable by search engines (optional, default: 0)"
+                  example: 1
+                password:
+                  type: string
+                  description: "Password to protect the shared note (optional)"
+                  example: "secret123"
       responses:
         '200':
           description: Sharing action completed successfully
@@ -632,15 +646,44 @@ paths:
                 properties:
                   success:
                     type: boolean
+                    example: true
+                  public:
+                    type: boolean
+                    description: "Whether the note is publicly shared"
                   url:
                     type: string
-                    description: Public share URL (for create/get/renew actions)
-                  shared:
+                    description: "Public share URL"
+                    example: "https://example.com/abc123def"
+                  url_query:
+                    type: string
+                    description: "Alternative URL with query parameter"
+                    example: "https://example.com/public_note.php?token=abc123def"
+                  url_workspace:
+                    type: string
+                    description: "Workspace-style URL"
+                    example: "https://example.com/workspace/abc123def"
+                  indexable:
+                    type: integer
+                    description: "Indexable status"
+                    example: 1
+                  hasPassword:
                     type: boolean
-                    description: Current sharing status
+                    description: "Whether the shared note is password-protected"
+                    example: false
+                  workspace:
+                    type: string
+                    description: "Note's workspace"
+                    example: "Personal"
                   revoked:
                     type: boolean
-                    description: True if revoke action was successful
+                    description: "True if sharing was revoked"
+                    example: false
+        '400':
+          description: Bad request (invalid parameters)
+        '404':
+          description: Note not found
+        '409':
+          description: Conflict (token already in use)
 
   /api_workspaces.php:
     get:
@@ -1341,6 +1384,466 @@ paths:
                     type: boolean
                     description: Whether an update is available (alias)
                     example: true
+        '401':
+          description: Authentication required
+
+  /api_update_note.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Update note
+      description: Update an existing note with new content, title, tags, or folder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - heading
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID to update (required)"
+                  example: 123
+                heading:
+                  type: string
+                  description: "New note title (required)"
+                  example: "Updated Note Title"
+                entry:
+                  type: string
+                  description: "New text/HTML content (optional)"
+                  example: "<p>Updated HTML content</p>"
+                tags:
+                  type: string
+                  description: "New comma-separated tags (optional)"
+                  example: "work,updated,important"
+                folder:
+                  type: string
+                  description: "New folder name (optional)"
+                  example: "Archive"
+                folder_id:
+                  type: integer
+                  description: "New folder ID (optional, preferred over folder name)"
+                  example: 456
+                workspace:
+                  type: string
+                  description: "New workspace name (optional)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Note updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  id:
+                    type: integer
+                    example: 123
+                  title:
+                    type: string
+                    example: "Updated Note Title"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Note not found
+        '409':
+          description: Conflict (duplicate title in folder)
+        '500':
+          description: Server error
+
+  /api_move_note.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Move note
+      description: Move a note to a different folder or workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - note_id
+              properties:
+                note_id:
+                  type: string
+                  description: "Note ID to move (required)"
+                  example: "123"
+                folder_name:
+                  type: string
+                  description: "Target folder name (optional)"
+                  example: "Archive"
+                folder_id:
+                  type: integer
+                  description: "Target folder ID (optional, preferred over folder_name)"
+                  example: 456
+                workspace:
+                  type: string
+                  description: "Target workspace name (optional)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Note moved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note moved successfully"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Note or target folder not found
+        '500':
+          description: Server error
+
+  /api_list_notes_with_attachments.php:
+    get:
+      tags:
+        - Notes Management
+      summary: List notes with attachments
+      description: Get list of all notes that have file attachments
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Filter by workspace name (optional)"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  notes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 123
+                        heading:
+                          type: string
+                          example: "Note with attachments"
+                        attachments:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              filename:
+                                type: string
+                                example: "document.pdf"
+                              original_name:
+                                type: string
+                                example: "My Document.pdf"
+                              size:
+                                type: integer
+                                example: 1024000
+                        updated:
+                          type: string
+                          format: date-time
+                          example: "2025-01-15 10:30:00"
+        '401':
+          description: Authentication required
+
+  /api_convert_to_html.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Convert markdown note to HTML
+      description: Convert a markdown note to HTML note type
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - note_id
+              properties:
+                note_id:
+                  type: integer
+                  description: "Note ID to convert (required)"
+                  example: 123
+      responses:
+        '200':
+          description: Note converted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note converted to HTML successfully"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Note not found
+        '500':
+          description: Server error
+
+  /api_export_folder.php:
+    get:
+      tags:
+        - Export Management
+      summary: Export folder
+      description: Export a specific folder and all its contents (notes and subfolders) as a ZIP file
+      parameters:
+        - name: folder_id
+          in: query
+          required: true
+          description: "Folder ID to export"
+          schema:
+            type: integer
+            example: 123
+      responses:
+        '200':
+          description: ZIP file download
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Folder not found
+        '500':
+          description: Server error
+
+  /api_export_structured.php:
+    get:
+      tags:
+        - Export Management
+      summary: Export structured notes
+      description: Export all notes and folders in a structured ZIP file preserving folder hierarchy
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Workspace to export (optional, exports all if not specified)"
+          schema:
+            type: string
+            example: "Personal"
+      responses:
+        '200':
+          description: ZIP file download
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error
+
+  /api_export_entries.php:
+    get:
+      tags:
+        - Export Management
+      summary: Export all note files
+      description: Export all note files as a ZIP archive with HTML index
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Workspace to export (optional, exports all if not specified)"
+          schema:
+            type: string
+            example: "Personal"
+      responses:
+        '200':
+          description: ZIP file download
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error
+
+  /api_export_attachments.php:
+    get:
+      tags:
+        - Export Management
+      summary: Export all attachments
+      description: Export all file attachments from all notes as a ZIP archive
+      responses:
+        '200':
+          description: ZIP file download or HTML page if no attachments
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error
+
+  /api_list_shared.php:
+    get:
+      tags:
+        - Public Sharing
+      summary: List shared notes
+      description: Get list of all publicly shared notes
+      parameters:
+        - name: workspace
+          in: query
+          required: false
+          description: "Filter by workspace name (optional)"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  shared_notes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        share_id:
+                          type: integer
+                          example: 456
+                        note_id:
+                          type: integer
+                          example: 123
+                        token:
+                          type: string
+                          example: "abc123def"
+                        theme:
+                          type: string
+                          example: "light"
+                        indexable:
+                          type: boolean
+                          example: true
+                        hasPassword:
+                          type: boolean
+                          example: false
+                        shared_date:
+                          type: string
+                          format: date-time
+                          example: "2025-01-15 10:30:00"
+                        heading:
+                          type: string
+                          example: "Shared Note Title"
+                        folder:
+                          type: string
+                          example: "Projects"
+                        workspace:
+                          type: string
+                          example: "Personal"
+                        updated:
+                          type: string
+                          format: date-time
+                          example: "2025-01-15 09:00:00"
+                        url:
+                          type: string
+                          example: "https://example.com/public.php?token=abc123def"
+        '401':
+          description: Authentication required
+
+  /api_delete_backup.php:
+    post:
+      tags:
+        - Backup Management
+      summary: Delete backup
+      description: Delete a specific backup file from the server
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - filename
+              properties:
+                filename:
+                  type: string
+                  description: "Backup filename to delete (required)"
+                  example: "poznote_backup_2025-01-15_10-30-00.zip"
+      responses:
+        '200':
+          description: Backup deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Backup deleted successfully"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Backup file not found
+        '500':
+          description: Server error
+
+  /api_check_updates.php:
+    get:
+      tags:
+        - System Information
+      summary: Check for updates
+      description: Check if a newer version of Poznote is available
+      responses:
+        '200':
+          description: Update check completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  has_updates:
+                    type: boolean
+                    description: Whether an update is available
+                    example: true
+                  current_version:
+                    type: string
+                    description: Current installed version
+                    example: "1.2.3"
+                  remote_version:
+                    type: string
+                    description: Latest available version
+                    example: "1.3.0"
+                  update_available:
+                    type: boolean
+                    description: Whether an update is available (alias)
+                    example: true
                   error:
                     type: string
                     nullable: true
@@ -1348,3 +1851,225 @@ paths:
                     example: null
         '401':
           description: Authentication required
+
+  /api_i18n.php:
+    get:
+      tags:
+        - System Information
+      summary: Get internationalization strings
+      description: |
+        Get merged translation strings for the user's language.
+        No authentication required - used for loading UI translations.
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          description: "Language override for testing (optional)"
+          schema:
+            type: string
+            example: "fr"
+      responses:
+        '200':
+          description: Translation strings returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  lang:
+                    type: string
+                    description: Language code
+                    example: "en"
+                  strings:
+                    type: object
+                    description: Merged translation dictionary
+                    example:
+                      "app.name": "Poznote"
+                      "common.save": "Save"
+        '500':
+          description: Server error
+
+  /api_insert_new.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Insert new note
+      description: Create a new empty note with basic metadata
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - now
+              properties:
+                now:
+                  type: integer
+                  description: "Current timestamp (required)"
+                  example: 1640995200
+                workspace:
+                  type: string
+                  description: "Workspace name (optional, uses first available if not specified)"
+                  example: "Personal"
+                folder_id:
+                  type: integer
+                  description: "Folder ID (optional)"
+                  example: 123
+                folder:
+                  type: string
+                  description: "Folder name (optional)"
+                  example: "Projects"
+                type:
+                  type: string
+                  enum: [note, markdown, tasklist]
+                  description: "Note type (optional, default: note)"
+                  example: "markdown"
+      responses:
+        '200':
+          description: Note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  id:
+                    type: integer
+                    description: New note ID
+                    example: 456
+                  message:
+                    type: string
+                    example: "Note created successfully"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '500':
+          description: Server error
+
+  /api_folders.php:
+    post:
+      tags:
+        - Folders Management
+      summary: Advanced folder operations
+      description: Handle various folder-related operations (create, move, get defaults, etc.) - This is a legacy endpoint, prefer using specific endpoints like api_create_folder.php, api_move_folder.php, api_list_folders.php
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  description: "Action to perform (required)"
+                  enum: [create, move, delete, get_default_folder_settings, update_default_folder_settings]
+                  example: "create"
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Poznote"
+                folder_name:
+                  type: string
+                  description: "Folder name (required for create action)"
+                  example: "Projects"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: Invalid request
+        '401':
+          description: Authentication required
+        '500':
+          description: Server error
+
+  /api_empty_trash.php:
+    post:
+      tags:
+        - Trash Management
+      summary: Empty trash
+      description: Permanently delete all notes in trash and their attachments
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                workspace:
+                  type: string
+                  description: "Workspace to empty trash for (optional, empties all if not specified)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Trash emptied successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Trash emptied successfully"
+                  deleted_count:
+                    type: integer
+                    example: 5
+
+  /api_permanent_delete.php:
+    post:
+      tags:
+        - Trash Management
+      summary: Permanently delete note
+      description: Permanently delete a specific note and its attachments (bypasses trash)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID to permanently delete (required)"
+                  example: 123
+                workspace:
+                  type: string
+                  description: "Workspace name (optional)"
+                  example: "Personal"
+      responses:
+        '200':
+          description: Note permanently deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note permanently deleted"
+        '400':
+          description: Bad request (missing/invalid parameters)
+        '404':
+          description: Note not found

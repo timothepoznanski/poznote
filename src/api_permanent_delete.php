@@ -1,6 +1,6 @@
 <?php
 	require 'auth.php';
-	requireAuth();
+	requireApiAuth();
 	
 	include 'functions.php';
 	require_once 'config.php';
@@ -56,9 +56,23 @@
 	// Delete database entry (respect workspace if provided)
 	if ($workspace) {
 		$stmt = $con->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");
-		echo $stmt->execute([$id, $workspace]) ? 1 : 'Database error occurred';
+		$success = $stmt->execute([$id, $workspace]);
 	} else {
 		$stmt = $con->prepare("DELETE FROM entries WHERE id = ?");
-		echo $stmt->execute([$id]) ? 1 : 'Database error occurred';
+		$success = $stmt->execute([$id]);
+	}
+	
+	header('Content-Type: application/json');
+	if ($success) {
+		echo json_encode([
+			'success' => true,
+			'message' => 'Note permanently deleted'
+		]);
+	} else {
+		http_response_code(500);
+		echo json_encode([
+			'success' => false,
+			'error' => 'Database error occurred'
+		]);
 	}
 ?>
