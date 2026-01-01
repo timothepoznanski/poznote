@@ -175,6 +175,7 @@ $currentLang = getUserLanguage();
 		container.innerHTML = filteredRows.map(row => {
 			const attachmentsList = row.attachments.map(att => 
 				`<div class="attachment-file-item">
+					<i class="fa-paperclip"></i>
 					<a href="#" class="attachment-file-link" onclick="downloadAttachment('${att.id}', '${row.noteId}'); return false;" title="${escapeHtml(att.filename)}">${escapeHtml(att.filename)}</a>
 				</div>`
 			).join('');
@@ -183,7 +184,7 @@ $currentLang = getUserLanguage();
 				<div class="attachment-row">
 					<a href="index.php?note=${row.noteId}${workspace ? '&workspace=' + encodeURIComponent(workspace) : ''}" class="attachment-note-name" title="${escapeHtml(row.noteName)}">
 						${escapeHtml(row.noteName)}
-						<span class="attachment-count">(${row.attachments.length})</span>
+
 					</a>
 					<div class="attachment-files-list">
 						${attachmentsList}

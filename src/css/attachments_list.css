@@ -547,10 +547,7 @@ body.attachments-page {
 	gap: 8px;
 }
 
-.attachment-file-item:before {
-	content: '\f0c6';
-	font-family: 'Font Awesome 6 Free';
-	font-weight: 900;
+.attachment-file-item .fa-paperclip {
 	font-size: 12px;
 }
 
