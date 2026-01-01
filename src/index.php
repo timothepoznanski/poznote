@@ -1229,24 +1229,48 @@ $body_classes = trim($extra_body_classes);
 <script>
 // Mobile navigation functionality
 function scrollToRightColumn() {
-    const rightCol = document.getElementById('right_col');
-    if (rightCol) {
-        rightCol.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'start'
+    if (window.innerWidth < 800) {
+        // On mobile, columns are in horizontal flex layout
+        // We need to scroll the body horizontally
+        const scrollAmount = window.innerWidth;
+        document.documentElement.scrollLeft = scrollAmount;
+        document.body.scrollLeft = scrollAmount;
+        window.scrollTo({
+            left: scrollAmount,
+            behavior: 'smooth'
         });
+    } else {
+        // On desktop, use classic scrollIntoView
+        const rightCol = document.getElementById('right_col');
+        if (rightCol) {
+            rightCol.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'start'
+            });
+        }
     }
 }
 
 function scrollToLeftColumn() {
-    const leftCol = document.getElementById('left_col');
-    if (leftCol) {
-        leftCol.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'start'
+    if (window.innerWidth < 800) {
+        // On mobile, go back to the left column
+        document.documentElement.scrollLeft = 0;
+        document.body.scrollLeft = 0;
+        window.scrollTo({
+            left: 0,
+            behavior: 'smooth'
         });
+    } else {
+        // On desktop
+        const leftCol = document.getElementById('left_col');
+        if (leftCol) {
+            leftCol.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'start'
+            });
+        }
     }
 }
 
