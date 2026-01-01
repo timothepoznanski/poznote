@@ -229,11 +229,9 @@ After installation, access Poznote in your web browser:
 
 ### Docker volume permission issues
 
-These permission errors occur when the container cannot properly access or modify the mounted volumes.
-
 <details>
-<summary><strong>Case 1: Database errors and mkdir() warnings</strong></summary>
-
+<summary><strong>Case 1: mkdir() warnings (permission denied) or Connection failed</strong></summary>
+ 
 If you encounter errors like:
 - `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
 - `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
@@ -262,8 +260,8 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>Case 2: "This site can't be reached" in browser</strong></summary>
-
+<summary><strong>Case 2: "This site can't be reached"</strong></summary>
+ 
 If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
 
 ```bash
