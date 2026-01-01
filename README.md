@@ -353,48 +353,11 @@ This allows users to log in using external identity providers such as:
 - Keycloak
 - Azure Active Directory
 - Google Identity
-- Okta
 - And any other OIDC-compliant provider
 
 #### Configuration
 
-Add the following variables to your `.env` file and restart the container:
-
-```bash
-# Enable OIDC authentication
-POZNOTE_OIDC_ENABLED=true
-
-# Display name for the OIDC provider (shown on login button)
-POZNOTE_OIDC_PROVIDER_NAME=YourCompany
-
-# OIDC Provider Configuration
-POZNOTE_OIDC_ISSUER=https://your-identity-provider.com
-POZNOTE_OIDC_CLIENT_ID=your_client_id
-POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
-
-# Optional: Custom scopes (default: "openid profile email")
-# POZNOTE_OIDC_SCOPES="openid profile email"
-
-# Optional: Override auto-discovery URL
-# POZNOTE_OIDC_DISCOVERY_URL=https://your-idp.com/.well-known/openid-configuration
-
-# Optional: Custom redirect URI (default: auto-generated)
-# POZNOTE_OIDC_REDIRECT_URI=https://your-domain.com/oidc_callback.php
-
-# Optional: Custom logout endpoint for RP-initiated logout
-# POZNOTE_OIDC_END_SESSION_ENDPOINT=https://your-idp.com/logout
-
-# Optional: Where to redirect after logout (default: login page)
-# POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI=https://your-domain.com/login.php
-
-# Optional: Disable normal login when OIDC is enabled (force SSO-only login)
-# POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
-
-# Optional BUT VERY RECOMMANDED: Restrict access to specific users (comma-separated list of emails or usernames)
-# If not set, all authenticated users from the identity provider can access the application
-# Example: POZNOTE_OIDC_ALLOWED_USERS=user1@example.com,user2@example.com
-# POZNOTE_OIDC_ALLOWED_USERS=
-```
+Add the OIDC variables (see .env.example) to your `.env` file and restart the container.
 
 #### How it works
 
@@ -408,13 +371,8 @@ If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is set to `true`, the normal username/pas
 
 If `POZNOTE_OIDC_DISABLE_BASIC_AUTH` is set to `true`, HTTP Basic Auth for API requests will be disabled, rejecting API calls that use username/password credentials. This can be combined with `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` to fully enforce OIDC-only authentication across both the UI and API.
 
-#### Security Notes
+Note that OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure.
 
-- OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure
-- Uses PKCE (Proof Key for Code Exchange) for enhanced security
-- Supports RP-initiated logout for clean session termination
-- All OIDC communication uses HTTPS
-- **Access Control**: Use `POZNOTE_OIDC_ALLOWED_USERS` to restrict access to specific users. Without this setting, any user authenticated by your identity provider can access the application.
 
 #### Access Control Example
 
@@ -658,7 +616,7 @@ And then you will have two completely isolated instances, for example:
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
-**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is an daily update check.
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is a daily update check.
 
 <details>
 <summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
