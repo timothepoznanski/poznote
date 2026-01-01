@@ -225,8 +225,73 @@ After installation, access Poznote in your web browser:
 
 **Default Credentials:**
 - Username: `admin`
-- Password: `admin123!`
+- Password: `admin`
 - Port: `8040`
+
+## Troubleshooting Installation
+
+### Docker volume permission issues
+
+These permission errors occur when the container cannot properly access or modify the mounted volumes.
+
+<details>
+<summary><strong>Case 1: Database errors and mkdir() warnings</strong></summary>
+
+If you encounter errors like:
+- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
+- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
+- The `database` folder is created with `root:root` instead of `www-data:www-data`
+
+This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
+
+**Solution:** Before starting the container, set the correct permissions on your host machine:
+
+```bash
+# Navigate to your Poznote directory
+cd poznote
+
+# Create the data directory structure with correct permissions
+mkdir -p data/database
+
+# Set ownership to UID 82 (www-data in Alpine Linux)
+sudo chown -R 82:82 data
+
+# Start the container
+docker compose up -d
+```
+
+> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
+
+</details>
+
+<details>
+<summary><strong>Case 2: "This site can't be reached" in browser</strong></summary>
+
+If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
+
+```bash
+docker logs poznote-webserver-1
+# or with podman
+podman logs poznote-webserver-1
+```
+
+You'll likely find:
+- `chown: /var/www/html/data: Permission denied`
+
+This occurs when Docker volumes don't have the correct SELinux context, especially when installing from `/root` directory.
+
+**Solution:** We strongly recommend using the `:Z` suffix for Docker volumes and avoiding the `/root` directory to ensure proper functioning on all distributions.
+
+Edit your `docker-compose.yml` to add `:Z` to volume definitions:
+
+```yaml
+volumes:
+  - ./data:/var/www/html/data:Z
+```
+
+Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
+
+</details>
 
 # Other information
 
@@ -237,7 +302,6 @@ After installation, access Poznote in your web browser:
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
-- [Troubleshooting](#troubleshooting)
 - [Tech Stack](#tech-stack)
 - [API Documentation](#api-documentation)
 - [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
@@ -593,65 +657,6 @@ And then you will have two completely isolated instances, for example:
 - Alice's Poznote: http://localhost:8041
 
 > 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
-
-## Troubleshooting
-
-### Docker volume permission issues
-
-These permission errors occur when the container cannot properly access or modify the mounted volumes.
-
-#### Case 1: Database errors and mkdir() warnings
-
-If you encounter errors like:
-- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
-- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
-- The `database` folder is created with `root:root` instead of `www-data:www-data`
-
-This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
-
-**Solution:** Before starting the container, set the correct permissions on your host machine:
-
-```bash
-# Navigate to your Poznote directory
-cd poznote
-
-# Create the data directory structure with correct permissions
-mkdir -p data/database
-
-# Set ownership to UID 82 (www-data in Alpine Linux)
-sudo chown -R 82:82 data
-
-# Start the container
-docker compose up -d
-```
-
-> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
-
-#### Case 2: "This site can't be reached" in browser
-
-If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
-
-```bash
-docker logs poznote-webserver-1
-# or with podman
-podman logs poznote-webserver-1
-```
-
-You'll likely find:
-- `chown: /var/www/html/data: Permission denied`
-
-This occurs when Docker volumes don't have the correct SELinux context, especially when installing from `/root` directory.
-
-**Solution:** We strongly recommend using the `:Z` suffix for Docker volumes and avoiding the `/root` directory to ensure proper functioning on all distributions.
-
-Edit your `docker-compose.yml` to add `:Z` to volume definitions:
-
-```yaml
-volumes:
-  - ./data:/var/www/html/data:Z
-```
-
-Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
 
 ## Tech Stack
 
