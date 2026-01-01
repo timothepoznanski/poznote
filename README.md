@@ -309,6 +309,7 @@ Poznote configuration is split between two locations:
 
 <details>
 <summary><strong>System Settings (`.env` file)</strong></summary>
+<br>
 
 The following settings are configured in the `.env` file located in your Poznote installation directory:
 
@@ -372,7 +373,7 @@ Additional settings are available through the Poznote web interface and are stor
 - **Backup/Restore** - Create backups, restore from backups
 - **And more** - Various application-level configurations
 
-**How to Access**
+**How to Modify Settings**
 
 1. Log in to Poznote
 2. Click on the **Settings** icon (⚙️) in the navigation bar
