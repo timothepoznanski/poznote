@@ -51,7 +51,7 @@ Password: `poznote`
 - [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
-- [Update to the latest version](#update-to-the-latest-version)
+- [Update application](#update-application)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
