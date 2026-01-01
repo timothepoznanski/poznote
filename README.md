@@ -737,7 +737,7 @@ Poznote provides a REST API for programmatic access to notes, folders, workspace
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
 
-### 📖 Command Line Examples (Curl)
+### Command Line Examples (Curl)
 
 Ready-to-use curl commands for every API operation.
 
