@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="poznote.svg" alt="Poznote Logo" width="80">
+  <img src="images/poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
 <h1 align="center">Poznote</h1>
@@ -17,7 +17,7 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 </h3>
 
 <p align="center">
-  <img src="github.png" alt="Poznote" width="100%">
+  <img src="images/github.png" alt="Poznote" width="100%">
 </p>
 
 ## Features
@@ -1355,7 +1355,7 @@ curl "http://YOUR_SERVER/api_i18n.php?lang=fr"
 ## Use Poznote in the Cloud
 
 <p align="center">
-  <img src="railway-template.png" alt="Railway Template" width="100%">
+  <img src="images/railway-template.png" alt="Railway Template" width="100%">
 </p>
 
 If you:
