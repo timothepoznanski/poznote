@@ -577,10 +577,6 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Failed to update heading: {{error}}",
       "network_error_updating_subheading": "Network error while updating heading"
-    },
-    "confirm": {
-      "convert_title": "Convert to HTML",
-      "convert_to_html": "Convert this markdown note to HTML?"
     }
   },
   "modals": {
@@ -852,8 +848,7 @@
       "favorite_remove": "Remove from favorites",
       "public_note": "Make note public",
       "attachments_with_count": "Attachments ({{count}})",
-      "menu_actions": "Menu actions",
-      "convert_to_html": "Convert to HTML"
+      "menu_actions": "Menu actions"
     },
     "public_modal": {
       "title": "Public URL",

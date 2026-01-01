@@ -575,10 +575,6 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falló al actualizar el encabezado: {{error}}",
       "network_error_updating_subheading": "Error de red al actualizar el encabezado"
-    },
-    "confirm": {
-      "convert_title": "Convertir a HTML",
-      "convert_to_html": "¿Convertir esta nota markdown a HTML?"
     }
   },
   "modals": {
@@ -845,8 +841,7 @@
       "favorite_remove": "Eliminar de favoritos",
       "public_note": "Hacer nota pública",
       "attachments_with_count": "Adjuntos ({{count}})",
-      "menu_actions": "Acciones del menú",
-      "convert_to_html": "Convertir a HTML"
+      "menu_actions": "Acciones del menú"
     },
     "public_modal": {
       "title": "URL pública",

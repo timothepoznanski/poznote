@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="poznote.svg" alt="Poznote Logo" width="80">
+  <img src="images/poznote.svg" alt="Poznote Logo" width="80">
 </p>
 
 <h1 align="center">Poznote</h1>
@@ -17,46 +17,53 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 </h3>
 
 <p align="center">
-  <img src="github.png" alt="Poznote" width="100%">
-</p>
-
-<p align="center">
-  <img src="screen.png" alt="Poznote" width="100%">
+  <img src="images/github.png" alt="Poznote" width="100%">
 </p>
 
 ## Features
 
-- Rich Text Editor
-- Powerful Search
-- Tag System
-- File Attachments
-- Responsive Design
-- Self-Hosted
-- Multi-instance
-- Workspaces
-- Built-in Backup
-- Trash System
-- REST API
-- Public Sharing
-- Tasklist
-- Markdown Notes
-- Dark Mode
-- Excalidraw Integration
-- Mermaid Diagrams
-- Mathematics Support
-- OpenID Connect
+<div align="center">
+
+| 📝 **Editor** | 🔍 **Organization** | 🔧 **Technical** |
+|:---:|:---:|:---:|
+| Rich Text Editor | Powerful Search | Self-Hosted |
+| Markdown Notes | Tag System | REST API |
+| Excalidraw Integration | Workspaces | Multi-instance |
+| Mermaid Diagrams | File Attachments | Built-in Backup |
+| Mathematics Support | Folders | Trash System |
+| Tasklist | Favorites | OpenID Connect |
+| Dark Mode | Public Sharing | Responsive Design |
+
+</div>
 
 ## Try the Poznote demo
-
-A live Poznote demo is available at [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 Username: `poznote`
 <br>
 Password: `poznote`
 
+[poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
+
+## Table of content
+
+- [Install](#install)
+- [Access](#access)
+- [Troubleshooting Installation](#troubleshooting-installation)
+- [Change Settings](#change-settings)
+- [Authentication](#authentication)
+- [Update application](#update-application)
+- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
+- [Offline View](#offline-view)
+- [Multiple Instances](#multiple-instances)
+- [Tech Stack](#tech-stack)
+- [API Documentation](#api-documentation)
+- [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
+- [Star History](#star-history)
+
+
 ## Install
 
-> The official image on GHCR is multi-arch (linux/amd64, linux/arm64) and works on Windows/macOS via Docker Desktop (Linux containers).
+> The official image is multi-arch (linux/amd64, linux/arm64) and supports Windows/macOS via Docker Desktop, as well as ARM64 devices like Raspberry Pi, NAS systems etc.
 
 Choose your preferred installation method below:
 
@@ -70,9 +77,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 
 #### Step 2: Deploy Poznote
 
-Open Powershell and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 
 ```powershell
 mkdir poznote
@@ -83,30 +88,30 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Create the environment file:
 
 ```powershell
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 
 ```powershell
 notepad .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 
 ```powershell
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```powershell
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container:
 ```powershell
 docker compose up -d
 ```
@@ -124,9 +129,7 @@ docker compose up -d
 
 #### Step 2: Install Poznote
 
-Open a Terminal and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 ```bash
 mkdir poznote
 ```
@@ -136,27 +139,27 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Create the environment file:
 ```bash
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 ```bash
-vim .env
+vi .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 ```bash
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```bash
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container:
 ```bash
 docker compose up -d
 ```
@@ -173,9 +176,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 
 #### Step 2: Deploy Poznote
 
-Open Terminal and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 ```bash
 mkdir poznote
 ```
@@ -185,27 +186,27 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Download the environment file:
 ```bash
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 ```bash
-nano .env
+vi .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 ```bash
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```bash
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container:
 ```bash
 docker compose up -d
 ```
@@ -225,31 +226,113 @@ docker compose up -d
 
 After installation, access Poznote in your web browser:
 
-**URL:** [http://localhost:8040](http://localhost:8040)
+[http://localhost:8040](http://localhost:8040)
 
-**Default Credentials:**
+
 - Username: `admin`
-- Password: `admin123!`
+- Password: `admin`
 - Port: `8040`
 
-# Other information
+## Troubleshooting Installation
 
-- [Change Settings](#change-settings)
-- [Authentication](#authentication)
-- [Password Recovery](#password-recovery)
-- [Update to the latest version](#update-to-the-latest-version)
-- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
-- [Offline View](#offline-view)
-- [Multiple Instances](#multiple-instances)
-- [Troubleshooting](#troubleshooting)
-- [Tech Stack](#tech-stack)
-- [API Documentation](#api-documentation)
-- [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
-- [Star History](#star-history)
+<details>
+<summary><strong>mkdir() warnings (permission denied) or Connection failed</strong></summary>
+<br>
+
+If you encounter errors like:
+- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
+- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
+- The `database` folder is created with `root:root` instead of `www-data:www-data`
+
+This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
+
+**Solution:** Before starting the container, set the correct permissions on your host machine:
+
+```bash
+# Navigate to your Poznote directory
+cd poznote
+
+# Create the data directory structure with correct permissions
+mkdir -p data/database
+
+# Set ownership to UID 82 (www-data in Alpine Linux)
+sudo chown -R 82:82 data
+
+# Start the container
+docker compose up -d
+```
+
+> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
+
+</details>
+
+<details>
+<summary><strong>"This site can't be reached"</strong></summary>
+ <br>
+
+If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
+
+```bash
+docker logs poznote-webserver-1
+# or with podman
+podman logs poznote-webserver-1
+```
+
+You'll likely find:
+- `chown: /var/www/html/data: Permission denied`
+
+This occurs when Docker volumes don't have the correct SELinux context, especially when installing from `/root` directory.
+
+**Solution:** We strongly recommend using the `:Z` suffix for Docker volumes and avoiding the `/root` directory to ensure proper functioning on all distributions.
+
+Edit your `docker-compose.yml` to add `:Z` to volume definitions:
+
+```yaml
+volumes:
+  - ./data:/var/www/html/data:Z
+```
+
+Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
+
+</details>
 
 ## Change Settings
 
-To modify your username, password, or port.
+Poznote configuration is split between two locations:
+
+<details>
+<summary><strong>System Settings (`.env` file)</strong></summary>
+<br>
+
+The following settings are configured in the `.env` file located in your Poznote installation directory:
+
+**Basic Authentication**
+- `POZNOTE_USERNAME` - Admin username for login (default: `admin`)
+- `POZNOTE_PASSWORD` - Admin password for login (default: `admin`)
+
+**Web Server**
+- `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
+
+**OIDC / SSO Authentication**
+- `POZNOTE_OIDC_ENABLED` - Enable OpenID Connect authentication (`true`/`false`)
+- `POZNOTE_OIDC_PROVIDER_NAME` - Display name for the OIDC provider
+- `POZNOTE_OIDC_ISSUER` - OIDC provider issuer URL
+- `POZNOTE_OIDC_CLIENT_ID` - Client ID from OIDC provider
+- `POZNOTE_OIDC_CLIENT_SECRET` - Client secret from OIDC provider
+- `POZNOTE_OIDC_SCOPES` - Custom scopes (default: `"openid profile email"`)
+- `POZNOTE_OIDC_DISCOVERY_URL` - Override auto-discovery URL
+- `POZNOTE_OIDC_REDIRECT_URI` - Custom redirect URI
+- `POZNOTE_OIDC_END_SESSION_ENDPOINT` - Custom logout endpoint
+- `POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI` - Redirect URL after logout
+- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` - Hide username/password login form (`true`/`false`)
+- `POZNOTE_OIDC_DISABLE_BASIC_AUTH` - Disable HTTP Basic Auth for API (`true`/`false`)
+- `POZNOTE_OIDC_ALLOWED_USERS` - Comma-separated list of allowed users (emails or usernames)
+
+**Import Limits**
+- `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` - Max number of individual files for import (default: `50`)
+- `POZNOTE_IMPORT_MAX_ZIP_FILES` - Max number of files in ZIP archive for import (default: `300`)
+
+**How to Modify Settings**
 
 Navigate to your Poznote directory:
 ```bash
@@ -261,24 +344,45 @@ Stop the running Poznote container:
 docker compose down
 ```
 
-Edit the `.env` file with your preferred text editor and modify the values:
+Edit and modify the `.env` file with your preferred text editor.
 
-```
-POZNOTE_USERNAME=your_new_username
-POZNOTE_PASSWORD=your_new_password
-HTTP_WEB_PORT=8040
-```
-
-Restart Poznote with new configuration:
+Save the file and restart Poznote to apply changes:
 ```bash
 docker compose up -d
 ```
+
+</details>
+
+<details>
+<summary><strong>Application Settings (Settings Page)</strong></summary>
+<br>
+
+Additional settings are available through the Poznote web interface and are stored in the database:
+
+- **General settings** - Application preferences, default workspace, language
+- **Note editor** - Default note type (HTML/Markdown), editor preferences
+- **Workspaces** - Create, rename, delete workspaces
+- **Folders** - Manage folder structure and organization
+- **Backup/Restore** - Create backups, restore from backups
+- **And more** - Various application-level configurations
+
+**How to Modify Settings**
+
+1. Log in to Poznote
+2. Click on the **Settings** icon (⚙️) in the navigation bar
+3. Modify your preferences directly in the interface
+
+> **Note:** Settings in the web interface are stored in the database and persist across container restarts. Only `.env` file changes require container restart.
+
+</details>
 
 ## Authentication
 
 Poznote supports two authentication methods:
 
-### Traditional Authentication
+<details>
+<summary><strong>Traditional Authentication</strong></summary>
+<br>
 
 By default, Poznote uses traditional username/password authentication. Configure your credentials in the `.env` file:
 
@@ -287,7 +391,11 @@ POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_secure_password
 ```
 
-### OIDC / SSO Authentication (Optional)
+</details>
+
+<details>
+<summary><strong>OIDC / SSO Authentication (Optional)</strong></summary>
+<br>
 
 Poznote can optionally authenticate users via OpenID Connect (authorization code + PKCE) for sign-on integration.
 
@@ -297,48 +405,11 @@ This allows users to log in using external identity providers such as:
 - Keycloak
 - Azure Active Directory
 - Google Identity
-- Okta
 - And any other OIDC-compliant provider
 
 #### Configuration
 
-Add the following variables to your `.env` file and restart the container:
-
-```bash
-# Enable OIDC authentication
-POZNOTE_OIDC_ENABLED=true
-
-# Display name for the OIDC provider (shown on login button)
-POZNOTE_OIDC_PROVIDER_NAME=YourCompany
-
-# OIDC Provider Configuration
-POZNOTE_OIDC_ISSUER=https://your-identity-provider.com
-POZNOTE_OIDC_CLIENT_ID=your_client_id
-POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
-
-# Optional: Custom scopes (default: "openid profile email")
-# POZNOTE_OIDC_SCOPES="openid profile email"
-
-# Optional: Override auto-discovery URL
-# POZNOTE_OIDC_DISCOVERY_URL=https://your-idp.com/.well-known/openid-configuration
-
-# Optional: Custom redirect URI (default: auto-generated)
-# POZNOTE_OIDC_REDIRECT_URI=https://your-domain.com/oidc_callback.php
-
-# Optional: Custom logout endpoint for RP-initiated logout
-# POZNOTE_OIDC_END_SESSION_ENDPOINT=https://your-idp.com/logout
-
-# Optional: Where to redirect after logout (default: login page)
-# POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI=https://your-domain.com/login.php
-
-# Optional: Disable normal login when OIDC is enabled (force SSO-only login)
-# POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
-
-# Optional BUT VERY RECOMMANDED: Restrict access to specific users (comma-separated list of emails or usernames)
-# If not set, all authenticated users from the identity provider can access the application
-# Example: POZNOTE_OIDC_ALLOWED_USERS=user1@example.com,user2@example.com
-# POZNOTE_OIDC_ALLOWED_USERS=
-```
+Add the OIDC variables (see .env.example) to your `.env` file and restart the container.
 
 #### How it works
 
@@ -352,13 +423,8 @@ If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` is set to `true`, the normal username/pas
 
 If `POZNOTE_OIDC_DISABLE_BASIC_AUTH` is set to `true`, HTTP Basic Auth for API requests will be disabled, rejecting API calls that use username/password credentials. This can be combined with `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` to fully enforce OIDC-only authentication across both the UI and API.
 
-#### Security Notes
+Note that OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure.
 
-- OIDC configuration is stored in `.env` file (not in the database) to keep sensitive credentials secure
-- Uses PKCE (Proof Key for Code Exchange) for enhanced security
-- Supports RP-initiated logout for clean session termination
-- All OIDC communication uses HTTPS
-- **Access Control**: Use `POZNOTE_OIDC_ALLOWED_USERS` to restrict access to specific users. Without this setting, any user authenticated by your identity provider can access the application.
 
 #### Access Control Example
 
@@ -367,19 +433,13 @@ Restrict access to specific users by email address or username:
 POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 ```
 
-## Password Recovery
+</details>
 
-Your credentials are stored in the `.env` file in your Poznote directory.
+## Update application
 
-To retrieve your password:
-
-1. Navigate to your Poznote directory
-2. Open the `.env` file
-3. Look for the `POZNOTE_PASSWORD` value
-
-## Update to the latest version
-
-To update Poznote to the latest version.
+<details>
+<summary><strong>Update to the latest version</strong></summary>
+<br>
 
 Navigate to your Poznote directory:
 ```bash
@@ -396,7 +456,7 @@ Download the latest Docker Compose configuration:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Check if new environment variables were added:
+Download the latest .env.example:
 ```bash
 curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
@@ -420,7 +480,11 @@ docker compose up -d
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
 
-### Beta Versions
+</details>
+
+<details>
+<summary><strong>Update to Beta version</strong></summary>
+<br>
 
 Occasionally, beta versions will be published as **pre-releases** on GitHub. These versions include more features and fixes than the stable production version, but may not be fully validated yet.
 
@@ -443,12 +507,16 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
 
 > **Note:** Beta versions are marked as "Pre-release" on GitHub and are not automatically suggested for updates in the application.
 
+</details>
+
 ## Backup / Export and Restore / Import
 
 Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
 <a id="complete-backup"></a>
-**📦 Complete Backup**
+<details>
+<summary><strong>Complete Backup</strong></summary>
+<br>
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
 
@@ -456,8 +524,12 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
+</details>
+
 <a id="import-individual-notes"></a>
-**📥 Import Individual Notes**
+<details>
+<summary><strong>Import Individual Notes</strong></summary>
+<br>
 
 Import one or more HTML, Markdown or text notes directly, or upload a ZIP archive containing multiple notes:
 
@@ -468,7 +540,9 @@ Import one or more HTML, Markdown or text notes directly, or upload a ZIP archiv
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
 
-**📁 Folder Structure in ZIP Archives**
+<details>
+<summary><strong>Folder Structure in ZIP Archives</strong></summary>
+<br>
 
 When importing a ZIP archive, Poznote automatically detects and recreates the folder structure:
 
@@ -476,6 +550,8 @@ When importing a ZIP archive, Poznote automatically detects and recreates the fo
   - **Example**: A ZIP with `Projects/2024/Notes/note.md` will create the folders `Projects` → `2024` → `Notes` and place the note in `Notes`
   - **Compatible with any note-taking app**: Export from any app that supports folder structures
   - **Multiple root folders**: If your ZIP has `folder1/note.md` and `folder2/note.md`, both `folder1` and `folder2` will be created
+
+</details>
 
 **Markdown Front Matter Support**
 
@@ -514,16 +590,24 @@ updated: 2024-01-20 15:45:00
 ---
 ```
 
+</details>
+
 <a id="complete-restore"></a>
-**🔄 Complete Restore** 
+<details>
+<summary><strong>Complete Restore</strong></summary>
+<br>
 
 Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+</details>
+
 <a id="automated-backups-with-bash-script"></a>
-**🤖 Automated Backups with Bash Script**
+<details>
+<summary><strong>Automated Backups with Bash Script</strong></summary>
+<br>
 
 For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
 
@@ -555,6 +639,8 @@ To schedule automatic backups twice daily (at midnight and noon), add this line 
 2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
 3. The script downloads this backup locally to: `/root/poznote/backups-poznote/`
 4. Old backups are automatically deleted from both locations to keep only the most recent ones based on retention count
+
+</details>
 
 ## Offline View
 
@@ -598,40 +684,11 @@ And then you will have two completely isolated instances, for example:
 
 > 💡 **Tip:** Make sure each instance uses a different port number to avoid conflicts!
 
-## Troubleshooting
-
-### Permission denied when using Docker
-
-If you encounter errors like:
-- `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
-- `Connection failed: SQLSTATE[HY000] [14] unable to open database file`
-- The `database` folder is created with `root:root` instead of `www-data:www-data`
-
-This is a known issue with Docker volume mounts in certain environments (Komodo, Portainer, etc.). The container cannot change permissions on mounted volumes in some configurations.
-
-**Solution:** Before starting the container, set the correct permissions on your host machine:
-
-```bash
-# Navigate to your Poznote directory
-cd poznote
-
-# Create the data directory structure with correct permissions
-mkdir -p data/database
-
-# Set ownership to UID 82 (www-data in Alpine Linux)
-sudo chown -R 82:82 data
-
-# Start the container
-docker compose up -d
-```
-
-> 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
-
 ## Tech Stack
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
-**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is an daily update check.
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. The only outbound connection is a daily update check.
 
 <details>
 <summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>
@@ -672,7 +729,7 @@ Poznote provides a REST API for programmatic access to notes, folders, workspace
 
 Access the **Swagger UI** directly from Poznote from `Settings > API Documentation` and browse all endpoints, view request/response schemas, and test API calls interactively.
 
-### 📖 Command Line Examples (Curl)
+### Command Line Examples (Curl)
 
 Ready-to-use curl commands for every API operation.
 
@@ -1298,7 +1355,7 @@ curl "http://YOUR_SERVER/api_i18n.php?lang=fr"
 ## Use Poznote in the Cloud
 
 <p align="center">
-  <img src="railway-template.png" alt="Railway Template" width="100%">
+  <img src="images/railway-template.png" alt="Railway Template" width="100%">
 </p>
 
 If you:

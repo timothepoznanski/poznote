@@ -22,55 +22,9 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared.css"/>
+	<link type="text/css" rel="stylesheet" href="css/attachments_list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
 	<script src="js/theme-manager.js"></script>
-	<style>
-		.attachment-row {
-			display: flex;
-			align-items: center;
-			padding: 12px 0;
-			border-bottom: 1px solid var(--border-color, #e0e0e0);
-			gap: 20px;
-		}
-		.attachment-row:last-child {
-			border-bottom: none;
-		}
-		.attachment-note-name {
-			flex: 0 0 250px;
-			font-weight: 500;
-			color: var(--link-color, #007bff);
-			text-decoration: none;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.attachment-note-name:hover {
-			text-decoration: underline;
-		}
-		.attachment-file-name {
-			flex: 1;
-			color: var(--text-muted, #666);
-			font-size: 14px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.attachments-list-container {
-			max-width: 900px;
-			margin: 0 auto;
-		}
-		@media (max-width: 600px) {
-			.attachment-row {
-				flex-direction: column;
-				align-items: flex-start;
-				gap: 5px;
-			}
-			.attachment-note-name {
-				flex: none;
-				width: 100%;
-			}
-		}
-	</style>
 </head>
 <body class="shared-page">
 	<div class="shared-container">
@@ -162,17 +116,15 @@ $currentLang = getUserLanguage();
 			
 			spinner.style.display = 'none';
 			
-			// Flatten: one row per attachment
-			allRows = [];
-			(data.notes || []).forEach(note => {
-				(note.attachments || []).forEach(att => {
-					allRows.push({
-						noteId: note.id,
-						noteName: note.heading || '<?php echo t_h('common.untitled', [], 'Untitled'); ?>',
-						fileName: att.original_filename || att.filename
-					});
-				});
-			});
+			// Group: one row per note with all its attachments
+			allRows = (data.notes || []).map(note => ({
+				noteId: note.id,
+				noteName: note.heading || '<?php echo t_h('common.untitled', [], 'Untitled'); ?>',
+				attachments: (note.attachments || []).map(att => ({
+					id: att.id,
+					filename: att.original_filename || att.filename
+				}))
+			}));
 			
 			if (allRows.length === 0) {
 				emptyMessage.style.display = 'block';
@@ -188,7 +140,11 @@ $currentLang = getUserLanguage();
 	
 	function applyFilter() {
 		filteredRows = filterText 
-			? allRows.filter(r => r.noteName.toLowerCase().includes(filterText) || r.fileName.toLowerCase().includes(filterText))
+			? allRows.filter(r => {
+					const nameMatch = r.noteName.toLowerCase().includes(filterText);
+					const fileMatch = r.attachments.some(att => att.filename.toLowerCase().includes(filterText));
+					return nameMatch || fileMatch;
+				})
 			: [...allRows];
 		
 		renderRows();
@@ -216,18 +172,40 @@ $currentLang = getUserLanguage();
 		
 		emptyMessage.style.display = 'none';
 		
-		container.innerHTML = filteredRows.map(row => `
-			<div class="attachment-row">
-				<a href="index.php?note=${row.noteId}${workspace ? '&workspace=' + encodeURIComponent(workspace) : ''}" class="attachment-note-name" title="${escapeHtml(row.noteName)}">${escapeHtml(row.noteName)}</a>
-				<span class="attachment-file-name" title="${escapeHtml(row.fileName)}">${escapeHtml(row.fileName)}</span>
-			</div>
-		`).join('');
+		container.innerHTML = filteredRows.map(row => {
+			const attachmentsList = row.attachments.map(att => 
+				`<div class="attachment-file-item">
+					<i class="fa-paperclip"></i>
+					<a href="#" class="attachment-file-link" onclick="downloadAttachment('${att.id}', '${row.noteId}'); return false;" title="${escapeHtml(att.filename)}">${escapeHtml(att.filename)}</a>
+				</div>`
+			).join('');
+			
+			return `
+				<div class="attachment-row">
+					<a href="index.php?note=${row.noteId}${workspace ? '&workspace=' + encodeURIComponent(workspace) : ''}" class="attachment-note-name" title="${escapeHtml(row.noteName)}">
+						${escapeHtml(row.noteName)}
+
+					</a>
+					<div class="attachment-files-list">
+						${attachmentsList}
+					</div>
+				</div>
+			`;
+		}).join('');
 	}
 	
 	function escapeHtml(text) {
 		const div = document.createElement('div');
 		div.textContent = text;
 		return div.innerHTML;
+	}
+	
+	function downloadAttachment(attachmentId, noteId) {
+		if (!noteId || !attachmentId) {
+			console.error('Missing noteId or attachmentId');
+			return;
+		}
+		window.open('api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachmentId, '_blank');
 	}
 	</script>
 </body>

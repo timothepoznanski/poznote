@@ -575,10 +575,6 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Aktualisierung der Überschrift fehlgeschlagen: {{error}}",
       "network_error_updating_subheading": "Netzwerkfehler beim Aktualisieren der Überschrift"
-    },
-    "confirm": {
-      "convert_title": "In HTML konvertieren",
-      "convert_to_html": "Diese Markdown-Notiz in HTML konvertieren?"
     }
   },
   "modals": {
@@ -845,8 +841,7 @@
       "favorite_remove": "Aus Favoriten entfernen",
       "public_note": "Notiz öffentlich machen",
       "attachments_with_count": "Anhänge ({{count}})",
-      "menu_actions": "Menüaktionen",
-      "convert_to_html": "In HTML konvertieren"
+      "menu_actions": "Menüaktionen"
     },
     "public_modal": {
       "title": "Öffentliche URL",

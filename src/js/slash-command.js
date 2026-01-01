@@ -401,6 +401,37 @@
         }
     }
 
+    function insertCodeBlock() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create code block (pre > code structure)
+        const pre = document.createElement('pre');
+        const code = document.createElement('code');
+        const textNode = document.createTextNode('\u200B');
+        code.appendChild(textNode);
+        pre.appendChild(code);
+        
+        // Insert at cursor position
+        range.deleteContents();
+        range.insertNode(pre);
+        
+        // Place cursor inside code element
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        // Trigger input event for autosave
+        const noteEntry = pre.closest('.noteentry');
+        if (noteEntry) {
+            noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
     function insertNormalText() {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -725,8 +756,16 @@
                     { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => insertBold() },
                     { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => insertItalic() },
                     { id: 'highlight', icon: 'fa-fill-drip', label: t('slash_menu.highlight', null, 'Highlight'), action: () => insertHighlight() },
-                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() },
-                    { id: 'code', icon: 'fa-code', label: t('slash_menu.code', null, 'Code'), action: () => insertCode() }
+                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => insertStrikethrough() }
+                ]
+            },
+            {
+                id: 'code',
+                icon: 'fa-code',
+                label: t('slash_menu.code', null, 'Code'),
+                submenu: [
+                    { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
+                    { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertCodeBlock() }
                 ]
             },
             {
@@ -937,7 +976,14 @@
                 submenu: [
                     { id: 'bold', icon: 'fa-bold', label: t('slash_menu.bold', null, 'Bold'), action: () => wrapMarkdownSelection('**', '**', 2) },
                     { id: 'italic', icon: 'fa-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => wrapMarkdownSelection('*', '*', 1) },
-                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) },
+                    { id: 'strikethrough', icon: 'fa-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => wrapMarkdownSelection('~~', '~~', 2) }
+                ]
+            },
+            {
+                id: 'code',
+                icon: 'fa-code',
+                label: t('slash_menu.code', null, 'Code'),
+                submenu: [
                     { id: 'inline-code', icon: 'fa-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
                     { id: 'code-block', icon: 'fa-code', label: t('slash_menu.code_block', null, 'Code block'), action: () => insertMarkdownAtCursor('```\n\n```\n', -5) }
                 ]

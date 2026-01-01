@@ -154,7 +154,7 @@ body.shared-page {
 }
 
 .shared-content {
-    margin-top: 20px;
+    margin-top: -20px;
 }
 
 /* Shared Notes List - Simple Design */
