@@ -387,7 +387,9 @@ Additional settings are available through the Poznote web interface and are stor
 
 Poznote supports two authentication methods:
 
-### Traditional Authentication
+<details>
+<summary><strong>Traditional Authentication</strong></summary>
+<br>
 
 By default, Poznote uses traditional username/password authentication. Configure your credentials in the `.env` file:
 
@@ -396,7 +398,11 @@ POZNOTE_USERNAME=your_username
 POZNOTE_PASSWORD=your_secure_password
 ```
 
-### OIDC / SSO Authentication (Optional)
+</details>
+
+<details>
+<summary><strong>OIDC / SSO Authentication (Optional)</strong></summary>
+<br>
 
 Poznote can optionally authenticate users via OpenID Connect (authorization code + PKCE) for sign-on integration.
 
@@ -433,6 +439,8 @@ Restrict access to specific users by email address or username:
 ```bash
 POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 ```
+
+</details>
 
 ## Password Recovery
 
