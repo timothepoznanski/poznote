@@ -441,7 +441,11 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 </details>
 
-## Update to the latest version
+## Update application
+
+<details>
+<summary><strong>Update to the latest version</strong></summary>
+<br>
 
 To update Poznote to the latest version.
 
@@ -484,7 +488,11 @@ docker compose up -d
 
 Your data is preserved in the `./data` directory and will not be affected by the update.
 
-### Beta Versions
+</details>
+
+<details>
+<summary><strong>Update to Beta version</strong></summary>
+<br>
 
 Occasionally, beta versions will be published as **pre-releases** on GitHub. These versions include more features and fixes than the stable production version, but may not be fully validated yet.
 
@@ -506,6 +514,8 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
    ```
 
 > **Note:** Beta versions are marked as "Pre-release" on GitHub and are not automatically suggested for updates in the application.
+
+</details>
 
 ## Backup / Export and Restore / Import
 
