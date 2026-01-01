@@ -366,7 +366,7 @@
       "show_note_created": "Afficher la date de création",
       "show_note_subheading": "Afficher le sous-titre",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
-      "notes_without_folders_after": "Afficher les notes sans dossier après les dossiers",
+      "notes_without_folders_after": "Afficher les notes après les dossiers",
       "show_folder_actions": "Afficher les actions de dossier"
     },
     "badges": {
