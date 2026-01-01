@@ -509,3 +509,76 @@ body.attachments-page {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Attachment list grouping styles */
+.attachment-row {
+	padding: 16px 0;
+	border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.attachment-row:last-child {
+	border-bottom: none;
+}
+
+.attachment-note-name {
+	display: block;
+	font-weight: 500;
+	color: var(--link-color, #007bff);
+	text-decoration: none;
+	margin-bottom: 8px;
+}
+
+.attachment-note-name:hover {
+	text-decoration: underline;
+}
+
+.attachment-files-list {
+	margin-left: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.attachment-file-item {
+	color: var(--text-muted, #666);
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.attachment-file-item:before {
+	content: '\f0c6';
+	font-family: 'Font Awesome 6 Free';
+	font-weight: 900;
+	font-size: 12px;
+}
+
+.attachment-file-link {
+	color: var(--text-muted, #666);
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.attachment-file-link:hover {
+	color: var(--link-color, #007bff);
+	text-decoration: underline;
+}
+
+.attachment-count {
+	color: var(--text-muted, #666);
+	font-size: 13px;
+	margin-left: 8px;
+	font-weight: normal;
+}
+
+.attachments-list-container {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+	.attachment-files-list {
+		margin-left: 10px;
+	}
+}
