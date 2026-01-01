@@ -859,6 +859,11 @@ $body_classes = trim($extra_body_classes);
                         echo '<button type="button" class="toolbar-btn btn-convert-html note-action-btn" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'" onclick="convertMarkdownToHTML(\''.$row['id'].'\')"><i class="fa-file-code"></i></button>';
                     }
                     
+                    // Convert to Markdown button (only for HTML notes)
+                    if ($note_type === 'note') {
+                        echo '<button type="button" class="toolbar-btn btn-convert-markdown note-action-btn" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'" onclick="convertHTMLToMarkdown(\''.$row['id'].'\')"><i class="fa-file-code"></i></button>';
+                    }
+                    
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="'.t_h('common.delete', [], 'Delete').'"><i class="fa-trash"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';

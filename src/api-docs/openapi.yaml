@@ -1605,6 +1605,46 @@ paths:
         '500':
           description: Server error
 
+  /api_convert_to_markdown.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Convert HTML note to Markdown
+      description: Convert an HTML note to Markdown note type
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - note_id
+              properties:
+                note_id:
+                  type: integer
+                  description: "Note ID to convert (required)"
+                  example: 123
+      responses:
+        '200':
+          description: Note converted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note successfully converted to Markdown"
+        '400':
+          description: Bad request (missing/invalid parameters or note is not HTML)
+        '404':
+          description: Note not found
+        '500':
+          description: Server error
+
   /api_export_folder.php:
     get:
       tags:
