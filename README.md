@@ -623,6 +623,32 @@ docker compose up -d
 
 > 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
 
+### SELinux permission issues
+
+If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
+
+```bash
+docker logs poznote-webserver-1
+# or with podman
+podman logs poznote-webserver-1
+```
+
+You'll likely find:
+- `chown: /var/www/html/data: Permission denied`
+
+This occurs when Docker volumes don't have the correct SELinux context, especially when installing from `/root` directory.
+
+**Solution:** We strongly recommend using the `:Z` suffix for Docker volumes and avoiding the `/root` directory to ensure proper functioning on all distributions.
+
+Edit your `docker-compose.yml` to add `:Z` to volume definitions:
+
+```yaml
+volumes:
+  - ./data:/var/www/html/data:Z
+```
+
+Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
+
 ## Tech Stack
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
