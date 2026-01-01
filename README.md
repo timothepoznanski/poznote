@@ -77,9 +77,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 
 #### Step 2: Deploy Poznote
 
-Open Powershell and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 
 ```powershell
 mkdir poznote
@@ -113,7 +111,7 @@ Download the latest Docker image:
 docker compose pull
 ```
 
-Start Poznote container in detached mode:
+Start Poznote container:
 ```powershell
 docker compose up -d
 ```
@@ -131,9 +129,7 @@ docker compose up -d
 
 #### Step 2: Install Poznote
 
-Open a Terminal and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 ```bash
 mkdir poznote
 ```
@@ -163,7 +159,7 @@ Download the latest Docker image:
 docker compose pull
 ```
 
-Start Poznote container in detached mode:
+Start Poznote container:
 ```bash
 docker compose up -d
 ```
@@ -180,9 +176,7 @@ Install and start [Docker Desktop](https://docs.docker.com/desktop/setup/install
 
 #### Step 2: Deploy Poznote
 
-Open Terminal and run the following commands.
-
-Create a new directory for Poznote:
+Create a new directory:
 ```bash
 mkdir poznote
 ```
@@ -212,7 +206,7 @@ Download the latest Docker image:
 docker compose pull
 ```
 
-Start Poznote container in detached mode:
+Start Poznote container:
 ```bash
 docker compose up -d
 ```
