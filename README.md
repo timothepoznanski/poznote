@@ -305,7 +305,42 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 
 ## Change Settings
 
-To modify your username, password, or port.
+Poznote configuration is split between two locations:
+
+- **`.env` file** - System-level settings (authentication, port, OIDC, import limits)
+- **Settings page** - Application settings accessible from the UI (stored in database)
+
+### System Settings (`.env` file)
+
+The following settings are configured in the `.env` file located in your Poznote installation directory:
+
+**Basic Authentication**
+- `POZNOTE_USERNAME` - Admin username for login (default: `admin`)
+- `POZNOTE_PASSWORD` - Admin password for login (default: `admin`)
+
+**Web Server**
+- `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
+
+**OIDC / SSO Authentication** (Optional)
+- `POZNOTE_OIDC_ENABLED` - Enable OpenID Connect authentication (`true`/`false`)
+- `POZNOTE_OIDC_PROVIDER_NAME` - Display name for the OIDC provider
+- `POZNOTE_OIDC_ISSUER` - OIDC provider issuer URL
+- `POZNOTE_OIDC_CLIENT_ID` - Client ID from OIDC provider
+- `POZNOTE_OIDC_CLIENT_SECRET` - Client secret from OIDC provider
+- `POZNOTE_OIDC_SCOPES` - Custom scopes (default: `"openid profile email"`)
+- `POZNOTE_OIDC_DISCOVERY_URL` - Override auto-discovery URL
+- `POZNOTE_OIDC_REDIRECT_URI` - Custom redirect URI
+- `POZNOTE_OIDC_END_SESSION_ENDPOINT` - Custom logout endpoint
+- `POZNOTE_OIDC_POST_LOGOUT_REDIRECT_URI` - Redirect URL after logout
+- `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` - Hide username/password login form (`true`/`false`)
+- `POZNOTE_OIDC_DISABLE_BASIC_AUTH` - Disable HTTP Basic Auth for API (`true`/`false`)
+- `POZNOTE_OIDC_ALLOWED_USERS` - Comma-separated list of allowed users (emails or usernames)
+
+**Import Limits**
+- `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` - Max number of individual files for import (default: `50`)
+- `POZNOTE_IMPORT_MAX_ZIP_FILES` - Max number of files in ZIP archive for import (default: `300`)
+
+### How to Modify Settings
 
 Navigate to your Poznote directory:
 ```bash
@@ -317,18 +352,49 @@ Stop the running Poznote container:
 docker compose down
 ```
 
-Edit the `.env` file with your preferred text editor and modify the values:
+Edit the `.env` file with your preferred text editor:
 
-```
-POZNOTE_USERNAME=your_new_username
-POZNOTE_PASSWORD=your_new_password
-HTTP_WEB_PORT=8040
+**Linux/macOS:**
+```bash
+nano .env
+# or
+vim .env
 ```
 
-Restart Poznote with new configuration:
+**Windows (PowerShell):**
+```powershell
+notepad .env
+```
+
+Modify the values as needed. For example:
+```env
+POZNOTE_USERNAME=myusername
+POZNOTE_PASSWORD=mysecurepassword
+HTTP_WEB_PORT=9000
+```
+
+Save the file and restart Poznote to apply changes:
 ```bash
 docker compose up -d
 ```
+
+### Application Settings (Settings Page)
+
+Additional settings are available through the Poznote web interface and are stored in the database:
+
+- **General settings** - Application preferences, default workspace, language
+- **Note editor** - Default note type (HTML/Markdown), editor preferences
+- **Workspaces** - Create, rename, delete workspaces
+- **Folders** - Manage folder structure and organization
+- **Backup/Restore** - Create backups, restore from backups
+- **And more** - Various application-level configurations
+
+To access these settings:
+1. Log in to Poznote
+2. Click on the **Settings** icon (⚙️) in the navigation bar
+3. Modify your preferences directly in the interface
+
+> **Note:** Settings in the web interface are stored in the database and persist across container restarts. Only `.env` file changes require container restart.
 
 ## Authentication
 
