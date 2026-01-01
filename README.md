@@ -596,7 +596,11 @@ And then you will have two completely isolated instances, for example:
 
 ## Troubleshooting
 
-### Permission denied when using Docker
+### Docker volume permission issues
+
+These permission errors occur when the container cannot properly access or modify the mounted volumes.
+
+#### Case 1: Database errors and mkdir() warnings
 
 If you encounter errors like:
 - `Warning: mkdir(): Permission denied in /var/www/html/db_connect.php`
@@ -623,7 +627,7 @@ docker compose up -d
 
 > 💡 **Note:** UID 82 corresponds to the `www-data` user in Alpine Linux, which is used by the Poznote Docker image.
 
-### SELinux permission issues
+#### Case 2: "This site can't be reached" in browser
 
 If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
 
