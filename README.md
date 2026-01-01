@@ -51,7 +51,6 @@ Password: `poznote`
 - [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
-- [Password Recovery](#password-recovery)
 - [Update to the latest version](#update-to-the-latest-version)
 - [Backup / Export and Restore / Import](#backup--export-and-restore--import)
 - [Offline View](#offline-view)
@@ -442,16 +441,6 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 
 </details>
 
-## Password Recovery
-
-Your credentials are stored in the `.env` file in your Poznote directory.
-
-To retrieve your password:
-
-1. Navigate to your Poznote directory
-2. Open the `.env` file
-3. Look for the `POZNOTE_PASSWORD` value
-
 ## Update to the latest version
 
 To update Poznote to the latest version.
@@ -523,7 +512,9 @@ You can install beta versions by modifying your `docker-compose.yml` to use a sp
 Poznote includes built-in Backup / Export and Restoration / Import functionality accessible through Settings.
 
 <a id="complete-backup"></a>
-**📦 Complete Backup**
+<details>
+<summary><strong>Complete Backup</strong></summary>
+<br>
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
 
@@ -531,8 +522,12 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
+</details>
+
 <a id="import-individual-notes"></a>
-**📥 Import Individual Notes**
+<details>
+<summary><strong>Import Individual Notes</strong></summary>
+<br>
 
 Import one or more HTML, Markdown or text notes directly, or upload a ZIP archive containing multiple notes:
 
@@ -543,7 +538,9 @@ Import one or more HTML, Markdown or text notes directly, or upload a ZIP archiv
   - Optionally select a specific folder within the workspace
   - Simply drag files or ZIP archives onto the upload area
 
-**📁 Folder Structure in ZIP Archives**
+<details>
+<summary><strong>Folder Structure in ZIP Archives</strong></summary>
+<br>
 
 When importing a ZIP archive, Poznote automatically detects and recreates the folder structure:
 
@@ -551,6 +548,8 @@ When importing a ZIP archive, Poznote automatically detects and recreates the fo
   - **Example**: A ZIP with `Projects/2024/Notes/note.md` will create the folders `Projects` → `2024` → `Notes` and place the note in `Notes`
   - **Compatible with any note-taking app**: Export from any app that supports folder structures
   - **Multiple root folders**: If your ZIP has `folder1/note.md` and `folder2/note.md`, both `folder1` and `folder2` will be created
+
+</details>
 
 **Markdown Front Matter Support**
 
@@ -589,16 +588,24 @@ updated: 2024-01-20 15:45:00
 ---
 ```
 
+</details>
+
 <a id="complete-restore"></a>
-**🔄 Complete Restore** 
+<details>
+<summary><strong>Complete Restore</strong></summary>
+<br>
 
 Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+</details>
+
 <a id="automated-backups-with-bash-script"></a>
-**🤖 Automated Backups with Bash Script**
+<details>
+<summary><strong>Automated Backups with Bash Script</strong></summary>
+<br>
 
 For automated scheduled backups, you can use the included `backup-poznote.sh` script. This script creates complete backups via the Poznote API and automatically manages retention.
 
@@ -630,6 +637,8 @@ To schedule automatic backups twice daily (at midnight and noon), add this line 
 2. The API generates a backup ZIP in the Poznote container: `/var/www/html/data/backups/`
 3. The script downloads this backup locally to: `/root/poznote/backups-poznote/`
 4. Old backups are automatically deleted from both locations to keep only the most recent ones based on retention count
+
+</details>
 
 ## Offline View
 
