@@ -307,11 +307,8 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 
 Poznote configuration is split between two locations:
 
-- **`.env` file** - System-level settings (authentication, port, OIDC, import limits)
-- **Settings page** - Application settings accessible from the UI (stored in database)
-
 <details>
-<summary><strong>⚙️ System Settings (`.env` file)</strong></summary>
+<summary><strong>System Settings (`.env` file)</strong></summary>
 
 The following settings are configured in the `.env` file located in your Poznote installation directory:
 
@@ -363,7 +360,7 @@ docker compose up -d
 </details>
 
 <details>
-<summary><strong>🖥️ Application Settings (Settings Page)</strong></summary>
+<summary><strong>Application Settings (Settings Page)</strong></summary>
 <br>
 
 Additional settings are available through the Poznote web interface and are stored in the database:
