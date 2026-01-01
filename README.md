@@ -218,9 +218,9 @@ docker compose up -d
 
 After installation, access Poznote in your web browser:
 
-**URL:** [http://localhost:8040](http://localhost:8040)
+[http://localhost:8040](http://localhost:8040)
 
-**Default Credentials:**
+
 - Username: `admin`
 - Password: `admin`
 - Port: `8040`
