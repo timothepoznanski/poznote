@@ -890,22 +890,6 @@ curl -X POST -u 'username:password' \
   http://YOUR_SERVER/api_share_note.php
 ```
 
-**Convert Note Format**
-
-Convert a Markdown note to HTML format:
-```bash
-curl -X POST -u 'username:password' \
-  -d 'note_id=123' \
-  http://YOUR_SERVER/api_convert_to_html.php
-```
-
-Convert an HTML note to Markdown format:
-```bash
-curl -X POST -u 'username:password' \
-  -d 'note_id=123' \
-  http://YOUR_SERVER/api_convert_to_markdown.php
-```
-
 </details>
 
 <details>

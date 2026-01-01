@@ -577,10 +577,6 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Échec de la mise à jour du titre : {{error}}",
       "network_error_updating_subheading": "Erreur réseau lors de la mise à jour du titre"
-    },
-    "confirm": {
-      "convert_title": "Convertir en HTML",
-      "convert_to_html": "Convertir cette note markdown en HTML ?"
     }
   },
   "modals": {
@@ -852,8 +848,7 @@
       "favorite_remove": "Retirer des favoris",
       "public_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
-      "menu_actions": "Actions du menu",
-      "convert_to_html": "Convertir en HTML"
+      "menu_actions": "Actions du menu"
     },
     "public_modal": {
       "title": "URL publique",

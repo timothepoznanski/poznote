@@ -574,10 +574,6 @@
     "errors": {
       "failed_to_update_subheading_prefix": "Falha ao atualizar cabeçalho: {{error}}",
       "network_error_updating_subheading": "Erro de rede ao atualizar cabeçalho"
-    },
-    "confirm": {
-      "convert_title": "Converter para HTML",
-      "convert_to_html": "Converter esta nota markdown para HTML?"
     }
   },
   "modals": {
@@ -849,8 +845,7 @@
       "favorite_remove": "Remover dos favoritos",
       "public_note": "Tornar nota pública",
       "attachments_with_count": "Anexos ({{count}})",
-      "menu_actions": "Ações do menu",
-      "convert_to_html": "Converter para HTML"
+      "menu_actions": "Ações do menu"
     },
     "public_modal": {
       "title": "URL Pública",
