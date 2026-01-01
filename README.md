@@ -310,7 +310,8 @@ Poznote configuration is split between two locations:
 - **`.env` file** - System-level settings (authentication, port, OIDC, import limits)
 - **Settings page** - Application settings accessible from the UI (stored in database)
 
-### System Settings (`.env` file)
+<details>
+<summary><strong>⚙️ System Settings (`.env` file)</strong></summary>
 
 The following settings are configured in the `.env` file located in your Poznote installation directory:
 
@@ -321,7 +322,7 @@ The following settings are configured in the `.env` file located in your Poznote
 **Web Server**
 - `HTTP_WEB_PORT` - Port on which Poznote will be accessible (default: `8040`)
 
-**OIDC / SSO Authentication** (Optional)
+**OIDC / SSO Authentication**
 - `POZNOTE_OIDC_ENABLED` - Enable OpenID Connect authentication (`true`/`false`)
 - `POZNOTE_OIDC_PROVIDER_NAME` - Display name for the OIDC provider
 - `POZNOTE_OIDC_ISSUER` - OIDC provider issuer URL
@@ -340,7 +341,7 @@ The following settings are configured in the `.env` file located in your Poznote
 - `POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES` - Max number of individual files for import (default: `50`)
 - `POZNOTE_IMPORT_MAX_ZIP_FILES` - Max number of files in ZIP archive for import (default: `300`)
 
-### How to Modify Settings
+**How to Modify Settings**
 
 Navigate to your Poznote directory:
 ```bash
@@ -352,33 +353,18 @@ Stop the running Poznote container:
 docker compose down
 ```
 
-Edit the `.env` file with your preferred text editor:
-
-**Linux/macOS:**
-```bash
-nano .env
-# or
-vim .env
-```
-
-**Windows (PowerShell):**
-```powershell
-notepad .env
-```
-
-Modify the values as needed. For example:
-```env
-POZNOTE_USERNAME=myusername
-POZNOTE_PASSWORD=mysecurepassword
-HTTP_WEB_PORT=9000
-```
+Edit and modify the `.env` file with your preferred text editor.
 
 Save the file and restart Poznote to apply changes:
 ```bash
 docker compose up -d
 ```
 
-### Application Settings (Settings Page)
+</details>
+
+<details>
+<summary><strong>🖥️ Application Settings (Settings Page)</strong></summary>
+<br>
 
 Additional settings are available through the Poznote web interface and are stored in the database:
 
@@ -389,12 +375,15 @@ Additional settings are available through the Poznote web interface and are stor
 - **Backup/Restore** - Create backups, restore from backups
 - **And more** - Various application-level configurations
 
-To access these settings:
+**How to Access**
+
 1. Log in to Poznote
 2. Click on the **Settings** icon (⚙️) in the navigation bar
 3. Modify your preferences directly in the interface
 
 > **Note:** Settings in the web interface are stored in the database and persist across container restarts. Only `.env` file changes require container restart.
+
+</details>
 
 ## Authentication
 
