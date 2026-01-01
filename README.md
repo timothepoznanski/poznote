@@ -52,7 +52,7 @@ Password: `poznote`
 
 ## Install
 
-> The official image on GHCR is multi-arch (linux/amd64, linux/arm64) and works on Windows/macOS via Docker Desktop (Linux containers).
+> The official image is multi-arch (linux/amd64, linux/arm64) and supports Windows/macOS via Docker Desktop, as well as ARM64 devices like Raspberry Pi, NAS systems etc.
 
 Choose your preferred installation method below:
 
