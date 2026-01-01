@@ -38,15 +38,13 @@ Poznote is a lightweight, open-source personal note-taking and documentation pla
 
 ## Try the Poznote demo
 
-A live Poznote demo is available with: 
-
 Username: `poznote`
 <br>
 Password: `poznote`
 
-at:
-
 [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
+
+
 
 
 ## Install
