@@ -44,7 +44,11 @@ Password: `poznote`
 
 [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
+## Table of content
 
+- [Install](#install)
+- [Access](#access)
+- [Troubleshooting Installation](#troubleshooting-installation)
 - [Change Settings](#change-settings)
 - [Authentication](#authentication)
 - [Password Recovery](#password-recovery)
