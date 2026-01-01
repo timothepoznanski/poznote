@@ -45,6 +45,17 @@ Password: `poznote`
 [poznote-demo.up.railway.app](https://poznote-demo.up.railway.app)
 
 
+- [Change Settings](#change-settings)
+- [Authentication](#authentication)
+- [Password Recovery](#password-recovery)
+- [Update to the latest version](#update-to-the-latest-version)
+- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
+- [Offline View](#offline-view)
+- [Multiple Instances](#multiple-instances)
+- [Tech Stack](#tech-stack)
+- [API Documentation](#api-documentation)
+- [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
+- [Star History](#star-history)
 
 
 ## Install
@@ -261,7 +272,7 @@ docker compose up -d
 <details>
 <summary><strong>"This site can't be reached"</strong></summary>
  <br>
- 
+
 If you see "This site can't be reached" in your browser, you may have SELinux enabled. In this case, check the container logs:
 
 ```bash
@@ -287,20 +298,6 @@ volumes:
 Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/poznote` or `~/poznote`.
 
 </details>
-
-# Other information
-
-- [Change Settings](#change-settings)
-- [Authentication](#authentication)
-- [Password Recovery](#password-recovery)
-- [Update to the latest version](#update-to-the-latest-version)
-- [Backup / Export and Restore / Import](#backup--export-and-restore--import)
-- [Offline View](#offline-view)
-- [Multiple Instances](#multiple-instances)
-- [Tech Stack](#tech-stack)
-- [API Documentation](#api-documentation)
-- [Use Poznote in the Cloud](#use-poznote-in-the-cloud)
-- [Star History](#star-history)
 
 ## Change Settings
 
