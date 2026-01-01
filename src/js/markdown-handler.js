@@ -12,7 +12,10 @@ function normalizeContentEditableText(element) {
         for (var i = 0; i < element.childNodes.length; i++) {
             var node = element.childNodes[i];
             if (node.nodeType === Node.TEXT_NODE) {
-                parts.push(node.textContent);
+                // Preserve newlines that are already in the text node
+                // This is important for pasted content on macOS which may contain literal \n characters
+                var textContent = node.textContent || node.nodeValue || '';
+                parts.push(textContent);
             } else if (node.nodeType === Node.ELEMENT_NODE) {
                 if (node.tagName === 'DIV') {
                     // DIV usually represents a line
@@ -32,7 +35,21 @@ function normalizeContentEditableText(element) {
                 }
             }
         }
-        content = parts.join('\n');
+        
+        // Join parts, but be careful about newlines
+        // If a text node already contains \n, we shouldn't add another one
+        content = '';
+        for (var j = 0; j < parts.length; j++) {
+            var part = parts[j];
+            if (j > 0) {
+                // Only add a newline separator if the previous part doesn't already end with one
+                var prevPart = parts[j - 1];
+                if (!prevPart.endsWith('\n') && part !== '') {
+                    content += '\n';
+                }
+            }
+            content += part;
+        }
     } else {
         // Fallback to innerText/textContent
         content = element.innerText || element.textContent || '';

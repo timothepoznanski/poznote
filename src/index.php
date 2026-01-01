@@ -11,6 +11,7 @@ requireAuth();
 ob_start();
 require_once 'config.php';
 include 'functions.php';
+require_once 'version_helper.php';
 
 include 'db_connect.php';
 
@@ -139,7 +140,10 @@ try {
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></title>
-    <?php $v = '20251020.6'; // Cache version to force reload ?>
+    <?php 
+    // Cache version based on app version to force reload on updates
+    $v = getAppVersion();
+    ?>
     <script>
     (function(){
         try {
@@ -1229,24 +1233,48 @@ $body_classes = trim($extra_body_classes);
 <script>
 // Mobile navigation functionality
 function scrollToRightColumn() {
-    const rightCol = document.getElementById('right_col');
-    if (rightCol) {
-        rightCol.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'start'
+    if (window.innerWidth < 800) {
+        // On mobile, columns are in horizontal flex layout
+        // We need to scroll the body horizontally
+        const scrollAmount = window.innerWidth;
+        document.documentElement.scrollLeft = scrollAmount;
+        document.body.scrollLeft = scrollAmount;
+        window.scrollTo({
+            left: scrollAmount,
+            behavior: 'smooth'
         });
+    } else {
+        // On desktop, use classic scrollIntoView
+        const rightCol = document.getElementById('right_col');
+        if (rightCol) {
+            rightCol.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'start'
+            });
+        }
     }
 }
 
 function scrollToLeftColumn() {
-    const leftCol = document.getElementById('left_col');
-    if (leftCol) {
-        leftCol.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'start'
+    if (window.innerWidth < 800) {
+        // On mobile, go back to the left column
+        document.documentElement.scrollLeft = 0;
+        document.body.scrollLeft = 0;
+        window.scrollTo({
+            left: 0,
+            behavior: 'smooth'
         });
+    } else {
+        // On desktop
+        const leftCol = document.getElementById('left_col');
+        if (leftCol) {
+            leftCol.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'start'
+            });
+        }
     }
 }
 

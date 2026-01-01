@@ -364,7 +364,7 @@
       "show_note_created": "Mostrar fecha de creación de la nota",
       "show_note_subheading": "Mostrar subtítulo de la nota",
       "show_folder_counts": "Mostrar conteo de notas de carpetas",
-      "notes_without_folders_after": "Mostrar notas sin carpetas después de las carpetas",
+      "notes_without_folders_after": "Mostrar notas después de las carpetas",
       "show_folder_actions": "Mostrar acciones de carpeta"
     },
     "badges": {

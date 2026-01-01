@@ -363,7 +363,7 @@
       "show_note_created": "Mostrar Data de Criação da Nota",
       "show_note_subheading": "Mostrar Subtítulo da Nota",
       "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
-      "notes_without_folders_after": "Mostrar notas sem pastas após as pastas",
+      "notes_without_folders_after": "Mostrar notas após as pastas",
       "show_folder_actions": "Mostrar Ações da Pasta"
     },
     "badges": {

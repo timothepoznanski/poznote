@@ -366,7 +366,7 @@
       "show_note_created": "Show Note Creation Date",
       "show_note_subheading": "Show Note Subheading",
       "show_folder_counts": "Show Folders Notes Counts",
-      "notes_without_folders_after": "Display notes without folders after folders",
+      "notes_without_folders_after": "Display notes after folders",
       "show_folder_actions": "Show Folder Actions"
     },
     "badges": {
