@@ -108,7 +108,7 @@ ghcr.io/timothepoznanski/poznote:latest
 ```bash
 SQLITE_DATABASE=/var/www/html/data/database/poznote.db
 POZNOTE_USERNAME=admin
-POZNOTE_PASSWORD=admin123!
+POZNOTE_PASSWORD=admin
 HTTP_WEB_PORT=8040
 ```
 
@@ -119,7 +119,7 @@ docker run -d \
   --restart always \
   -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
   -e POZNOTE_USERNAME=admin \
-  -e POZNOTE_PASSWORD=admin123! \
+  -e POZNOTE_PASSWORD=admin \
   -e HTTP_WEB_PORT=8040 \
   -p 8040:80 \
   -v ./data:/var/www/html/data \
