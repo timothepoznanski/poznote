@@ -8,12 +8,20 @@
  * 4. Default version
  */
 function getAppVersion() {
+    // Cache the version in a static variable to avoid reading files multiple times per request
+    static $cached_version = null;
+    
+    if ($cached_version !== null) {
+        return $cached_version;
+    }
+    
     // Primary source: version.txt file
     $version_file = __DIR__ . '/../version.txt';
     if (file_exists($version_file)) {
         $version = trim(file_get_contents($version_file));
         if (!empty($version)) {
-            return $version;
+            $cached_version = $version;
+            return $cached_version;
         }
     }
 
@@ -22,7 +30,8 @@ function getAppVersion() {
     if (file_exists($build_version_file)) {
         include_once $build_version_file;
         if (defined('APP_VERSION') && APP_VERSION !== 'unknown') {
-            return APP_VERSION;
+            $cached_version = APP_VERSION;
+            return $cached_version;
         }
     }
 
@@ -30,14 +39,16 @@ function getAppVersion() {
     try {
         $gitVersion = shell_exec('git describe --tags --abbrev=0 2>/dev/null');
         if ($gitVersion && !empty(trim($gitVersion))) {
-            return ltrim(trim($gitVersion), 'v');
+            $cached_version = ltrim(trim($gitVersion), 'v');
+            return $cached_version;
         }
     } catch (Exception $e) {
         // Git not available or no tags
     }
 
     // Ultimate fallback
-    return 'X.X.X';
+    $cached_version = 'X.X.X';
+    return $cached_version;
 }
 
 /**

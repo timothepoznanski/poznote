@@ -11,6 +11,7 @@ requireAuth();
 ob_start();
 require_once 'config.php';
 include 'functions.php';
+require_once 'version_helper.php';
 
 include 'db_connect.php';
 
@@ -139,7 +140,10 @@ try {
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></title>
-    <?php $v = '20251020.6'; // Cache version to force reload ?>
+    <?php 
+    // Cache version based on app version to force reload on updates
+    $v = getAppVersion();
+    ?>
     <script>
     (function(){
         try {
