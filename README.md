@@ -90,30 +90,30 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Create the environment file:
 
 ```powershell
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 
 ```powershell
 notepad .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 
 ```powershell
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```powershell
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container in detached mode:
 ```powershell
 docker compose up -d
 ```
@@ -143,27 +143,27 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Create the environment file:
 ```bash
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 ```bash
-vim .env
+vi .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 ```bash
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```bash
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container in detached mode:
 ```bash
 docker compose up -d
 ```
@@ -192,27 +192,27 @@ Navigate to the Poznote directory:
 cd poznote
 ```
 
-Download the environment file with default credentials and port configuration:
+Download the environment file:
 ```bash
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
 
-Edit the `.env` file so that it fits your needs:
+Edit the `.env` file:
 ```bash
-nano .env
+vi .env
 ```
 
-Download the Docker Compose configuration file for Poznote service:
+Download the Docker Compose configuration file:
 ```bash
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Download the latest Poznote Docker image:
+Download the latest Docker image:
 ```bash
 docker compose pull
 ```
 
-Start Poznote container in detached mode (runs in background):
+Start Poznote container in detached mode:
 ```bash
 docker compose up -d
 ```
@@ -447,8 +447,6 @@ POZNOTE_OIDC_ALLOWED_USERS=alice@example.com,bob@example.com,charlie@company.org
 <summary><strong>Update to the latest version</strong></summary>
 <br>
 
-To update Poznote to the latest version.
-
 Navigate to your Poznote directory:
 ```bash
 cd poznote
@@ -464,7 +462,7 @@ Download the latest Docker Compose configuration:
 curl -o docker-compose.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.yml
 ```
 
-Check if new environment variables were added:
+Download the latest .env.example:
 ```bash
 curl -o .env.example https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.example
 ```
