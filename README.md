@@ -709,6 +709,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
 - **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
 - **Sortable.js** - JavaScript library for drag-and-drop sorting
+- **Swagger UI** - Interactive API documentation and testing interface
 
 ### Storage
 - **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
