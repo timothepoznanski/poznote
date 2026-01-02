@@ -1224,6 +1224,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
+<script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
 
 <script>
 // Mobile navigation functionality
