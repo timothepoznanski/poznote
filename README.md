@@ -1366,7 +1366,7 @@ If you:
 - Prefer one-click updates or automatic updates
 - Are okay with approximately $5/month (Cloud provider fees)
 
-**👉 [View Poznote Cloud Install and Manage Guide](POZNOTE-CLOUD.md)**
+**👉 [View Poznote Cloud Install and Manage Guide](Docs/POZNOTE-CLOUD.md)**
 
 ## Star History
 

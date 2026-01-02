@@ -1623,7 +1623,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             
             <div>
             <?php echo t_h('restore_import.page.more_info_prefix'); ?>
-            <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+            <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
                 <?php echo t_h('restore_import.page.more_info_link'); ?>
             </a>.
         </div>
@@ -1695,7 +1695,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <div id="directCopyRestore" class="accordion-content" style="display: none;">
             <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
-                <a href="https://github.com/timothepoznanski/poznote/blob/main/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
                     <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
                 </a>.
             </p>
