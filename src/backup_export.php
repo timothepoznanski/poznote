@@ -313,16 +313,7 @@ function createBackup() {
         <a href="settings.php" class="btn btn-secondary">
             <?php echo t_h('common.back_to_settings'); ?>
         </a>
-
         <br><br>
-        
-        <!-- Info about individual note export -->
-        <div class="info-box">
-            <p style="margin: 0;">
-                <?php echo t_h('backup_export.info.individual_export'); ?>
-            </p>
-        </div>
-        
         <!-- Complete Backup Section -->
         <div class="backup-section">
             <h3><?php echo t_h('backup_export.sections.complete_backup.title'); ?></h3>
