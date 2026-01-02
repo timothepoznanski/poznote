@@ -266,11 +266,12 @@
       "backup_export": "Backup / Exportar",
       "restore_import": "Restaurar / Importar",
       "check_updates": "Verificar atualizações",
-      "api_docs": "API REST",
-      "documentation": "Documentação",
+      "api_docs": "Documentação da API",
+      "documentation": "Repositório Github",
       "news": "Notícias do Poznote",
       "website": "Site do Poznote",
-      "support": "Apoiar o desenvolvedor"
+      "support": "Apoiar o desenvolvedor",
+      "release_notes": "Notas de versão"
     }
   },
   "workspaces": {
@@ -355,8 +356,8 @@
   "display": {
     "title": "Exibição",
     "cards": {
-      "theme_mode": "Modo do Tema",
-      "login_display": "Exibição de Login",
+      "theme_mode": "Tema",
+      "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte do Conteúdo da Nota",
       "note_sort_order": "Ordem de classificação das notas",
       "timezone": "Fuso Horário",
@@ -680,7 +681,7 @@
       "title": "Exportar nota",
       "markdown": {
         "title": "Exportar como Markdown",
-        "description": "Baixar como arquivo MD com título e tags em formato markdown"
+        "description": "Baixar como arquivo MD com metadados (título, tags, pasta) em frontmatter YAML"
       },
       "html": {
         "title": "Exportar como HTML",

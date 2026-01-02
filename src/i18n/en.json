@@ -269,11 +269,12 @@
       "backup_export": "Backup / Export",
       "restore_import": "Restore / Import",
       "check_updates": "Check for Updates",
-      "api_docs": "Rest API",
-      "documentation": "Documentation",
+      "api_docs": "API Documentation",
+      "documentation": "Github Repository",
       "news": "Poznote News",
       "website": "Poznote Website",
-      "support": "Support Developer"
+      "support": "Support Developer",
+      "release_notes": "Release Notes"
     }
   },
   "workspaces": {
@@ -358,8 +359,8 @@
   "display": {
     "title": "Display",
     "cards": {
-      "theme_mode": "Theme Mode",
-      "login_display": "Login Display",
+      "theme_mode": "Theme",
+      "login_display": "Login Page Title",
       "note_font_size": "Note Content Font Size",
       "note_sort_order": "Note sort order",
       "timezone": "Timezone",
@@ -692,7 +693,7 @@
       "title": "Export Note",
       "markdown": {
         "title": "Export as Markdown",
-        "description": "Download as MD file with title and tags in markdown format"
+        "description": "Download as MD file with metadata (title, tags, folder) in YAML frontmatter"
       },
       "html": {
         "title": "Export as HTML",

@@ -7,7 +7,7 @@
 
 <!-- Notes list display -->
 <?php
-// Container pour les 4 dossiers système (Trash, Tags, Public, Favorites) en mode icônes centrées
+// Container pour les icônes système en mode icônes centrées
 echo "<div class='system-folders-container'>";
 
 // Icône toggle pour la barre de recherche
@@ -17,27 +17,7 @@ echo "<i class='fa-search folder-icon'></i>";
 echo "<span class='folder-name'>Recherche</span>";
 echo "</div></div>";
 
-// Render a dedicated "Trash" folder
-try {
-    $trash_count = 0;
-    if (isset($con)) {
-        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND workspace = ?");
-        $stmtTrash->execute([ $workspace_filter ]);
-        $trash_count = (int)$stmtTrash->fetchColumn();
-    }
-} catch (Exception $e) {
-    $trash_count = 0;
-}
-
-echo "<div class='folder-header system-folder' data-folder='Trash'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.trash', [], 'Trash') . "'>";
-echo "<i class='fa-trash folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
-echo "<span class='folder-note-count' id='count-Trash'>" . $trash_count . "</span>";
-echo "</div></div>";
-
-// Render a dedicated "Tags" folder that links to the tag listing page
-// Count unique tags for the current workspace (non-trashed entries)
+// Count for Tags folder
 $tag_count = 0;
 $unique_tags = [];
 try {
@@ -65,6 +45,7 @@ try {
     $tag_count = 0;
 }
 
+// Render a dedicated "Tags" folder
 echo "<div class='folder-header system-folder' data-folder='Tags'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.tags', [], 'Tags') . "'>";
 echo "<i class='fa-tags folder-icon'></i>";
@@ -72,8 +53,19 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'T
 echo "<span class='folder-note-count' id='count-tags'>" . $tag_count . "</span>";
 echo "</div></div>";
 
-// Render a dedicated "Public" folder that links to the public notes page
-// Count public notes for the current workspace (non-trashed entries)
+// Count for Trash
+try {
+    $trash_count = 0;
+    if (isset($con)) {
+        $stmtTrash = $con->prepare("SELECT COUNT(*) as cnt FROM entries WHERE trash = 1 AND workspace = ?");
+        $stmtTrash->execute([ $workspace_filter ]);
+        $trash_count = (int)$stmtTrash->fetchColumn();
+    }
+} catch (Exception $e) {
+    $trash_count = 0;
+}
+
+// Count for Public/Shared notes
 $shared_count = 0;
 try {
     if (isset($con)) {
@@ -91,15 +83,7 @@ try {
     $shared_count = 0;
 }
 
-echo "<div class='folder-header system-folder' data-folder='Public'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
-echo "<i class='fa-cloud folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
-echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
-echo "</div></div>";
-
-// Render a dedicated "Attachments" folder that links to notes with attachments
-// Count notes with attachments for the current workspace (non-trashed entries)
+// Count for Attachments
 $attachments_count = 0;
 try {
     if (isset($con)) {
@@ -117,14 +101,6 @@ try {
     $attachments_count = 0;
 }
 
-echo "<div class='folder-header system-folder' data-folder='Attachments'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"attachments_list.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "'>";
-echo "<i class='fa-paperclip folder-icon'></i>";
-echo "<span class='folder-name'>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
-echo "<span class='folder-note-count' id='count-attachments'>" . $attachments_count . "</span>";
-echo "</div></div>";
-
-// Add Favorites as a system folder icon (will be rendered later in detail)
 // Count favorites for the current workspace
 $favorites_count = 0;
 try {
@@ -143,6 +119,7 @@ try {
     $favorites_count = 0;
 }
 
+// Add Favorites icon BEFORE the menu (only if there are favorites)
 if ($favorites_count > 0) {
     echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
     echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"folder-favorites\")' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
@@ -151,6 +128,41 @@ if ($favorites_count > 0) {
     echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
     echo "</div></div>";
 }
+
+// Public/Shared notes icon in the bar
+echo "<div class='folder-header system-folder' data-folder='Shared'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
+echo "<i class='fa-cloud folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
+echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
+echo "</div></div>";
+
+// Menu trois points verticaux (DERNIER élément - tout à droite)
+echo "<div class='folder-header system-folder system-menu-container' data-folder='SystemMenu'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleSystemMenu()' title='Menu'>";
+echo "<i class='fa-ellipsis-v folder-icon'></i>";
+echo "<span class='folder-name'>Menu</span>";
+echo "</div>";
+
+// Menu déroulant
+echo "<div class='system-menu-dropdown' id='system-menu-dropdown' style='display: none;'>";
+
+// Trash
+echo "<div class='system-menu-item' onclick='window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<i class='fa-trash'></i>";
+echo "<span>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
+echo "<span class='menu-item-count' id='count-trash'>" . $trash_count . "</span>";
+echo "</div>";
+
+// Attachments
+echo "<div class='system-menu-item' onclick='window.location = \"attachments_list.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<i class='fa-paperclip'></i>";
+echo "<span>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
+echo "<span class='menu-item-count' id='count-attachments'>" . $attachments_count . "</span>";
+echo "</div>";
+
+echo "</div>"; // Fin du menu dropdown
+echo "</div>"; // Fin du container menu
 
 echo "</div>"; // Fin du container system-folders
 ?>

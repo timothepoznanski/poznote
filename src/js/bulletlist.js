@@ -119,6 +119,7 @@
   /**
    * Indent a list item (TAB key)
    * Moves the current item as a child of the previous sibling item
+   * Limited to one level of indentation only
    */
   function indentListItem(item) {
     const prevItem = item.previousElementSibling;
@@ -133,6 +134,14 @@
     }
 
     const parentList = findParentList(item);
+    
+    // Check if we are already at level 1 (inside a nested list)
+    // If parentList has a parent that is a LI, we're already nested
+    const parentListParent = parentList.parentElement;
+    if (parentListParent && parentListParent.tagName === 'LI') {
+      // Already indented once, cannot indent further
+      return false;
+    }
     
     // Find or create nested list in previous item
     let nestedList = null;

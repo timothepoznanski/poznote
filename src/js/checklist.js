@@ -525,11 +525,25 @@
   /**
    * Indent a checklist item (TAB key)
    * Moves the current item as a child of the previous sibling item
+   * Limited to one level of indentation only
    */
   function indentItem(item) {
     const prevItem = item.previousElementSibling;
     if (!prevItem || !prevItem.classList.contains(CHECKLIST_ITEM_CLASS)) {
       // Cannot indent first item or if previous is not a checklist item
+      return;
+    }
+    
+    const parentList = item.parentElement;
+    if (!parentList || !parentList.classList.contains(CHECKLIST_CLASS)) {
+      return;
+    }
+    
+    // Check if we are already at level 1 (inside a nested list)
+    // If parentList has a parent that is a checklist-item, we're already nested
+    const parentListParent = parentList.parentElement;
+    if (parentListParent && parentListParent.classList.contains(CHECKLIST_ITEM_CLASS)) {
+      // Already indented once, cannot indent further
       return;
     }
     
@@ -604,6 +618,44 @@
   // ===== MAIN KEYBOARD HANDLER =====
 
   /**
+   * Handle CTRL + Enter to toggle checkbox
+   */
+  function handleCtrlEnter(event, textSpan) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    
+    const item = findChecklistItem(textSpan);
+    if (!item) return;
+    
+    const checkbox = item.querySelector('.' + CHECKBOX_CLASS);
+    if (!checkbox) return;
+    
+    // Toggle checkbox
+    checkbox.checked = !checkbox.checked;
+    
+    const isChecked = checkbox.checked;
+    
+    // Update data attribute
+    checkbox.setAttribute('data-checked', isChecked ? '1' : '0');
+    
+    // Update checked attribute and item class
+    if (isChecked) {
+      checkbox.setAttribute('checked', 'checked');
+      item.classList.add(CHECKED_ITEM_CLASS);
+    } else {
+      checkbox.removeAttribute('checked');
+      item.classList.remove(CHECKED_ITEM_CLASS);
+    }
+    
+    // Mark as modified
+    const noteentry = getNoteEntry(checkbox);
+    if (noteentry) {
+      markAsModified(noteentry);
+    }
+  }
+
+  /**
    * Handle keyboard events for checklist
    */
   function handleKeyDown(event) {
@@ -619,7 +671,12 @@
     
     switch (event.key) {
       case 'Enter':
-        handleEnterKey(event);
+        // Handle CTRL + ENTER to toggle checkbox
+        if (event.ctrlKey || event.metaKey) {
+          handleCtrlEnter(event, textSpan);
+        } else {
+          handleEnterKey(event);
+        }
         break;
       case 'Backspace':
         handleBackspaceKey(event);

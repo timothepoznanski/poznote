@@ -7,10 +7,11 @@
  * - id: Note ID (required)
  * - type: Note type (required)
  * - format: Export format - 'html' or 'markdown' (default: 'html')
+ *   Note: HTML export is only available for 'note' and 'tasklist' types, not for 'markdown' notes
  * - disposition: 'attachment' (download, default) or 'inline' (render in browser)
  * 
  * Returns:
- * - HTML: Styled HTML document for download
+ * - HTML: Styled HTML document for download (note and tasklist types only)
  * - Markdown: MD file with title and tags in markdown format
  * - PDF: Not supported
  */
@@ -130,16 +131,19 @@ try {
         exportAsJson($raw, $note['heading']);
     }
 
+    // HTML export is not available for markdown notes
+    if ($format === 'html' && $noteType === 'markdown') {
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'HTML export is not available for markdown notes. Use "markdown" format instead.']);
+        exit;
+    }
+
     // Check format and export accordingly
     if ($format === 'markdown') {
         // Export as Markdown with front matter YAML
         exportAsMarkdown($content, $note, $con);
     } else {
-        // For markdown notes, convert markdown to HTML first
-        if ($noteType === 'markdown') {
-            $content = parseMarkdownToHtml($content);
-        }
-
         // For tasklist notes, convert stored JSON to HTML before styling
         if ($noteType === 'tasklist') {
             $decoded = json_decode($content, true);

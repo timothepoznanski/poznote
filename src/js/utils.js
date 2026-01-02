@@ -55,11 +55,11 @@ function performFavoriteToggle(noteId) {
                 window.location.reload();
             }, 50);
         } else {
-            showNotificationPopup('Error: ' + (data.message || 'Unknown error'));
+            showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error updating favorites');
+        showNotificationPopup('Error updating favorites', 'error');
         console.error('Favorite toggle error:', error);
     });
 }
@@ -736,7 +736,7 @@ function goToSelfHostedUpdateInstructions() {
 }
 
 function goToCloudUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote/blob/main/POZNOTE-CLOUD.md', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote/blob/main/Docs/POZNOTE-CLOUD.md', '_blank');
 }
 
 function showUpdateCheckModal() {
@@ -1651,16 +1651,19 @@ function showExportModal(noteId, filename, title, noteType) {
         var markdownOption = modal.querySelector('.export-option-markdown');
         var htmlOption = modal.querySelector('.export-option-html');
         var jsonOption = modal.querySelector('.export-option-json');
+        var printOption = modal.querySelector('.export-option-print');
         
         if (noteType === 'markdown') {
-            // For markdown notes: allow both MD and HTML exports + PDF (print)
+            // For markdown notes: only allow MD export, no HTML or print
             if (markdownOption) markdownOption.style.display = 'flex';
-            if (htmlOption) htmlOption.style.display = 'flex';
+            if (htmlOption) htmlOption.style.display = 'none';
             if (jsonOption) jsonOption.style.display = 'none';
+            if (printOption) printOption.style.display = 'none';
         } else {
-            // For other notes: show HTML and PDF options, hide MD option
+            // For other notes: show HTML, print and PDF options, hide MD option
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
+            if (printOption) printOption.style.display = 'flex';
 
             // Only tasklist notes support JSON export
             if (jsonOption) jsonOption.style.display = (noteType === 'tasklist') ? 'flex' : 'none';

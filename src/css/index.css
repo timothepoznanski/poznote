@@ -2668,7 +2668,7 @@ hr {
     border-radius: 8px;
     background: #ffffff;
     padding: 10px 4px;
-    overflow: hidden;
+    overflow: visible;
     height: 40px;
     box-sizing: border-box;
 }
@@ -2676,6 +2676,67 @@ hr {
 /* Réduire l'écart entre la loupe et la corbeille */
 .system-folders-container > .folder-header:first-child {
     margin-right: -10px;
+}
+
+/* Conteneur du menu système avec menu déroulant */
+.system-menu-container {
+    position: relative;
+}
+
+/* Menu déroulant du système */
+.system-menu-dropdown {
+    position: fixed;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 10000;
+    overflow: visible;
+}
+
+/* Items du menu déroulant */
+.system-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    gap: 12px;
+}
+
+.system-menu-item:hover {
+    background-color: #f5f7fa;
+}
+
+.system-menu-item i {
+    font-size: 14px;
+    color: #007DB8;
+    width: 20px;
+    text-align: center;
+}
+
+.system-menu-item span:not(.menu-item-count) {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.system-menu-item .menu-item-count {
+    font-size: 12px;
+    color: #5b9bd5;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: right;
+}
+
+/* Icône ellipsis-v */
+.system-folder .fa-ellipsis-v.folder-icon {
+    font-size: clamp(11px, 2vw, 14px) !important;
+    margin-right: 0 !important;
+    color: #007DB8;
 }
 
 /* Dossiers système: affichage en icônes uniquement */
@@ -3266,6 +3327,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link::before { content: "\f0c1"; }
 .fa-unlink::before { content: "\f127"; }
 .fa-paperclip::before { content: "\f0c6"; }
+.fa-plane::before { content: "\f072"; }
 .fa-cloud::before { content: "\f0c2"; }
 .fa-external-link::before { content: "\f08e"; }
 .fa-minus::before { content: "\f068"; }
@@ -3367,6 +3429,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link,
 .fa-unlink,
 .fa-paperclip,
+.fa-plane,
 .fa-external-link,
 .fa-minus,
 .fa-info-circle,

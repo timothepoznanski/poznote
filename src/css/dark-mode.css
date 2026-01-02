@@ -167,6 +167,29 @@ body.dark-mode .system-folders-container {
     border-color: #404040;
 }
 
+/* Menu déroulant du système en mode sombre */
+html[data-theme='dark'] .system-menu-dropdown,
+body.dark-mode .system-menu-dropdown {
+    background: #2a2a2a;
+    border-color: #404040;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .system-menu-item,
+body.dark-mode .system-menu-item {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .system-menu-item:hover,
+body.dark-mode .system-menu-item:hover {
+    background-color: #333333;
+}
+
+html[data-theme='dark'] .system-menu-item span:not(.menu-item-count),
+body.dark-mode .system-menu-item span:not(.menu-item-count) {
+    color: #e0e0e0;
+}
+
 /* Favorites separator */
 html[data-theme='dark'] .favorites-separator,
 body.dark-mode .favorites-separator {
