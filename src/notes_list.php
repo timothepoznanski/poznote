@@ -129,6 +129,14 @@ if ($favorites_count > 0) {
     echo "</div></div>";
 }
 
+// Public/Shared notes icon in the bar
+echo "<div class='folder-header system-folder' data-folder='Shared'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
+echo "<i class='fa-cloud folder-icon'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
+echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
+echo "</div></div>";
+
 // Menu trois points verticaux (DERNIER élément - tout à droite)
 echo "<div class='folder-header system-folder system-menu-container' data-folder='SystemMenu'>";
 echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleSystemMenu()' title='Menu'>";
@@ -144,13 +152,6 @@ echo "<div class='system-menu-item' onclick='window.location = \"trash.php?works
 echo "<i class='fa-trash'></i>";
 echo "<span>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
 echo "<span class='menu-item-count' id='count-trash'>" . $trash_count . "</span>";
-echo "</div>";
-
-// Public (cloud)
-echo "<div class='system-menu-item' onclick='window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
-echo "<i class='fa-cloud'></i>";
-echo "<span>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
-echo "<span class='menu-item-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div>";
 
 // Attachments
