@@ -247,7 +247,8 @@ $currentLang = getUserLanguage();
 
         <!-- Version Display -->
         <div style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
-            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small>
+            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
+            <small><a href="https://poznote.com/releases.html" target="_blank" style="color: var(--link-color); text-decoration: underline; opacity: 1;"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
         </div>
     </div>
 

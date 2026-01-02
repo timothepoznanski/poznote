@@ -269,11 +269,12 @@
       "backup_export": "Sauvegarde / Export",
       "restore_import": "Restauration / Import",
       "check_updates": "Vérifier les mises à jour",
-      "api_docs": "API REST",
-      "documentation": "Documentation",
-      "news": "Actualités Poznote",
+      "api_docs": "Documentation API",
+      "documentation": "Repository Github",
+      "news": "Blog Poznote",
       "website": "Site Poznote",
-      "support": "Soutenir le développeur"
+      "support": "Soutenir le développeur",
+      "release_notes": "Notes de version"
     }
   },
   "workspaces": {
@@ -358,8 +359,8 @@
   "display": {
     "title": "Affichage",
     "cards": {
-      "theme_mode": "Mode de thème",
-      "login_display": "Nom à la connexion",
+      "theme_mode": "Thème",
+      "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police du contenu",
       "note_sort_order": "Tri des notes",
       "timezone": "Fuseau horaire",

@@ -267,11 +267,12 @@
       "backup_export": "Sicherung / Export",
       "restore_import": "Wiederherstellen / Importieren",
       "check_updates": "Nach Updates suchen",
-      "api_docs": "REST-API",
-      "documentation": "Dokumentation",
+      "api_docs": "API-Dokumentation",
+      "documentation": "Github Repository",
       "news": "Poznote-News",
       "website": "Poznote-Website",
-      "support": "Entwickler unterstützen"
+      "support": "Entwickler unterstützen",
+      "release_notes": "Versionshinweise"
     }
   },
   "workspaces": {
@@ -356,8 +357,8 @@
   "display": {
     "title": "Anzeige",
     "cards": {
-      "theme_mode": "Thema-Modus",
-      "login_display": "Login-Anzeige",
+      "theme_mode": "Thema",
+      "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße des Notizinhalts",
       "note_sort_order": "Notizen-Sortierreihenfolge",
       "timezone": "Zeitzone",
