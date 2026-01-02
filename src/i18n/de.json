@@ -534,7 +534,9 @@
       "insert_checklist": "Checkliste einfügen",
       "add_separator": "Trennlinie hinzufügen",
       "insert_note_reference": "Notiz-Referenz einfügen",
-      "open_in_new_tab": "In neuem Tab öffnen"
+      "open_in_new_tab": "In neuem Tab öffnen",
+      "make_offline": "Offline verfügbar machen",
+      "remove_offline": "Vom Offline-Modus entfernen"
     },
     "link": {
       "add_title": "Link hinzufügen",
@@ -729,6 +731,7 @@
       "tags": "Tags",
       "favorites": "Favoriten",
       "public": "Öffentliche",
+      "offline": "Offline",
       "attachments": "Anhänge"
     },
     "drop_zone": {
@@ -1293,5 +1296,28 @@
     "change_password_title": "Passwort ändern",
     "password_remove_hint": "Leer lassen, um den Passwortschutz zu entfernen.",
     "enter_new_password": "Neues Passwort eingeben"
+  },
+  "offline": {
+    "note_saved": "Notiz offline verfügbar",
+    "note_removed": "Notiz aus dem Offline-Modus entfernt",
+    "error": "Fehler beim Speichern der Notiz offline",
+    "no_notes": "Keine Notizen offline verfügbar",
+    "notes_list": "Offline verfügbare Notizen",
+    "page": {
+      "title": "Offline-Notizen",
+      "no_offline_notes": "Noch keine Offline-Notizen.",
+      "offline_hint": "Machen Sie eine Notiz offline verfügbar, indem Sie auf die Download-Schaltfläche in der Notiz-Symbolleiste klicken.",
+      "filter_placeholder": "Nach Titel filtern...",
+      "refresh": "Aktualisieren",
+      "view_content": "Inhalt anzeigen",
+      "open_note": "Notiz öffnen",
+      "remove_offline": "Vom Offline-Modus entfernen",
+      "confirm_remove": "Diese Notiz aus dem Offline-Speicher entfernen?",
+      "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
+      "no_content": "Kein Inhalt",
+      "just_now": "Gerade eben",
+      "minutes_ago": "min",
+      "hours_ago": "h"
+    }
   }
 }

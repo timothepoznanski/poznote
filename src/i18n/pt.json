@@ -533,7 +533,9 @@
       "insert_checklist": "Inserir lista de tarefas",
       "add_separator": "Adicionar separador",
       "insert_note_reference": "Inserir referência de nota",
-      "open_in_new_tab": "Abrir em nova aba"
+      "open_in_new_tab": "Abrir em nova aba",
+      "make_offline": "Tornar disponível offline",
+      "remove_offline": "Remover do modo offline"
     },
     "link": {
       "add_title": "Adicionar Link",
@@ -728,6 +730,7 @@
       "tags": "Etiquetas",
       "favorites": "Favoritos",
       "public": "Públicas",
+      "offline": "Offline",
       "attachments": "Anexos"
     },
     "drop_zone": {
@@ -1294,5 +1297,28 @@
     "change_password_title": "Alterar senha",
     "password_remove_hint": "Deixe vazio para remover a proteção por senha.",
     "enter_new_password": "Digite uma nova senha"
+  },
+  "offline": {
+    "note_saved": "Nota disponível offline",
+    "note_removed": "Nota removida do modo offline",
+    "error": "Erro ao salvar nota offline",
+    "no_notes": "Nenhuma nota disponível offline",
+    "notes_list": "Notas disponíveis offline",
+    "page": {
+      "title": "Notas offline",
+      "no_offline_notes": "Ainda não há notas offline.",
+      "offline_hint": "Torne uma nota disponível offline clicando no botão de download na barra de ferramentas da nota.",
+      "filter_placeholder": "Filtrar por título...",
+      "refresh": "Atualizar",
+      "view_content": "Ver conteúdo",
+      "open_note": "Abrir nota",
+      "remove_offline": "Remover do modo offline",
+      "confirm_remove": "Remover esta nota do armazenamento offline?",
+      "no_filter_results": "Nenhuma nota corresponde à sua pesquisa.",
+      "no_content": "Sem conteúdo",
+      "just_now": "Agora mesmo",
+      "minutes_ago": "min",
+      "hours_ago": "h"
+    }
   }
 }

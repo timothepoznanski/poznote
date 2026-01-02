@@ -182,6 +182,7 @@ body::-webkit-scrollbar {
 .note-edit-toolbar .btn-task-order:not(.hide-on-selection),
 .note-edit-toolbar .btn-favorite:not(.hide-on-selection),
 .note-edit-toolbar .btn-share:not(.hide-on-selection),
+.note-edit-toolbar .btn-offline:not(.hide-on-selection),
 .note-edit-toolbar .btn-attachment:not(.hide-on-selection),
 .note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
 .note-edit-toolbar .markdown-help-btn:not(.hide-on-selection),

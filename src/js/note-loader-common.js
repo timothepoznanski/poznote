@@ -1303,6 +1303,15 @@ function reinitializeNoteContent() {
     // Force interface refresh to sync with loaded content - but don't trigger auto-save
     // since content was just loaded from server and is already saved
 
+    // Update offline button status for the loaded note
+    if (typeof window.updateOfflineButtonStatus === 'function' && window.noteid) {
+        try {
+            window.updateOfflineButtonStatus(window.noteid);
+        } catch (e) {
+            console.error('Error updating offline button status:', e);
+        }
+    }
+
     // Mark that note loading is complete
     window.isLoadingNote = false;
 }

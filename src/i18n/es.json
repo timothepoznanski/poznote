@@ -534,7 +534,9 @@
       "insert_checklist": "Insertar lista de verificación",
       "add_separator": "Agregar separador",
       "insert_note_reference": "Insertar referencia de nota",
-      "open_in_new_tab": "Abrir en nueva pestaña"
+      "open_in_new_tab": "Abrir en nueva pestaña",
+      "make_offline": "Hacer disponible sin conexión",
+      "remove_offline": "Quitar del modo sin conexión"
     },
     "link": {
       "add_title": "Agregar enlace",
@@ -729,6 +731,7 @@
       "tags": "Etiquetas",
       "favorites": "Favoritos",
       "public": "Públicas",
+      "offline": "Sin conexión",
       "attachments": "Archivos adjuntos"
     },
     "drop_zone": {
@@ -1293,5 +1296,28 @@
     "change_password_title": "Cambiar contraseña",
     "password_remove_hint": "Dejar vacío para eliminar la protección con contraseña.",
     "enter_new_password": "Ingrese una nueva contraseña"
+  },
+  "offline": {
+    "note_saved": "Nota disponible sin conexión",
+    "note_removed": "Nota eliminada del modo sin conexión",
+    "error": "Error al guardar la nota sin conexión",
+    "no_notes": "No hay notas disponibles sin conexión",
+    "notes_list": "Notas disponibles sin conexión",
+    "page": {
+      "title": "Notas sin conexión",
+      "no_offline_notes": "Aún no hay notas sin conexión.",
+      "offline_hint": "Haga que una nota esté disponible sin conexión haciendo clic en el botón de descarga en la barra de herramientas de la nota.",
+      "filter_placeholder": "Filtrar por título...",
+      "refresh": "Actualizar",
+      "view_content": "Ver contenido",
+      "open_note": "Abrir nota",
+      "remove_offline": "Quitar del modo sin conexión",
+      "confirm_remove": "¿Quitar esta nota del almacenamiento sin conexión?",
+      "no_filter_results": "Ninguna nota coincide con tu búsqueda.",
+      "no_content": "Sin contenido",
+      "just_now": "Ahora mismo",
+      "minutes_ago": "min",
+      "hours_ago": "h"
+    }
   }
 }

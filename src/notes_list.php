@@ -98,6 +98,14 @@ echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 
 echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div></div>";
 
+// Render a dedicated "Offline" folder that links to offline notes page
+echo "<div class='folder-header system-folder' data-folder='Offline'>";
+echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"offline.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.offline', [], 'Offline') . "'>";
+echo "<i class='fa-plane folder-icon' style='color: #007DB8;'></i>";
+echo "<span class='folder-name'>" . t_h('notes_list.system_folders.offline', [], 'Offline') . "</span>";
+echo "<span class='folder-note-count' id='count-offline'>0</span>";
+echo "</div></div>";
+
 // Render a dedicated "Attachments" folder that links to notes with attachments
 // Count notes with attachments for the current workspace (non-trashed entries)
 $attachments_count = 0;

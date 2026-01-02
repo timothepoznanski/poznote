@@ -3190,6 +3190,12 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
   color: #007DB8 !important;
 }
 
+/* Blue color when a note is saved offline */
+.toolbar-btn.btn-offline.active i.fa-plane,
+.toolbar-btn.btn-offline.active .fa-plane {
+  color: #007DB8 !important;
+}
+
 /* Blue color for markdown view mode toggle button */
 .toolbar-btn.markdown-view-mode-btn i,
 .toolbar-btn.markdown-view-mode-btn [class*="fa-"] {
@@ -3266,6 +3272,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link::before { content: "\f0c1"; }
 .fa-unlink::before { content: "\f127"; }
 .fa-paperclip::before { content: "\f0c6"; }
+.fa-plane::before { content: "\f072"; }
 .fa-cloud::before { content: "\f0c2"; }
 .fa-external-link::before { content: "\f08e"; }
 .fa-minus::before { content: "\f068"; }
@@ -3367,6 +3374,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-link,
 .fa-unlink,
 .fa-paperclip,
+.fa-plane,
 .fa-external-link,
 .fa-minus,
 .fa-info-circle,
@@ -3879,10 +3887,11 @@ input[type="search"]::-webkit-search-results-decoration {
   filter: none !important;
 }
 
-/* Exception: Remove filter for favorite/share/attachment (to show blue color) */
+/* Exception: Remove filter for favorite/share/attachment/offline (to show blue color) */
 .toolbar-btn.is-favorite .fa-star-light,
 .toolbar-btn.is-shared .fa-cloud,
-.toolbar-btn.has-attachments .fa-paperclip {
+.toolbar-btn.has-attachments .fa-paperclip,
+.toolbar-btn.btn-offline.active .fa-plane {
   filter: none !important;
 }
 
