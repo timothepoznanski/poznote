@@ -70,20 +70,23 @@
                 return;
             }
 
+            // Convertir en nombre pour uniformiser
+            const numericNoteId = parseInt(noteId, 10);
+
             // Récupérer les informations de la note depuis le DOM
-            const noteCard = document.getElementById('note' + noteId);
+            const noteCard = document.getElementById('note' + numericNoteId);
             if (!noteCard) {
                 reject(new Error('Note non trouvée'));
                 return;
             }
 
-            const titleElement = document.getElementById('inp' + noteId);
-            const entryElement = document.getElementById('entry' + noteId);
-            const tagsElement = document.getElementById('tags' + noteId);
-            const folderElement = document.getElementById('folder' + noteId);
+            const titleElement = document.getElementById('inp' + numericNoteId);
+            const entryElement = document.getElementById('entry' + numericNoteId);
+            const tagsElement = document.getElementById('tags' + numericNoteId);
+            const folderElement = document.getElementById('folder' + numericNoteId);
             
             const noteData = {
-                id: noteId,
+                id: numericNoteId,
                 title: titleElement ? titleElement.value : '',
                 content: entryElement ? entryElement.innerHTML : '',
                 tags: tagsElement ? tagsElement.value : '',
@@ -121,9 +124,12 @@
                 return;
             }
 
+            // Convertir en nombre pour uniformiser
+            const numericNoteId = parseInt(noteId, 10);
+
             const transaction = db.transaction([STORE_NAME], 'readwrite');
             const objectStore = transaction.objectStore(STORE_NAME);
-            const request = objectStore.delete(noteId);
+            const request = objectStore.delete(numericNoteId);
 
             request.onsuccess = () => {
                 resolve();

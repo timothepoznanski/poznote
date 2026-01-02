@@ -405,10 +405,6 @@ $currentLang = getUserLanguage();
 	}
 	
 	async function removeFromOffline(noteId) {
-		if (!confirm('<?php echo t_h('offline.page.confirm_remove', [], 'Remove this note from offline storage?'); ?>')) {
-			return;
-		}
-		
 		try {
 			if (window.OfflineNotesManager) {
 				await window.OfflineNotesManager.removeNoteOffline(noteId);
