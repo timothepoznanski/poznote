@@ -260,6 +260,14 @@ $currentLang = getUserLanguage();
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
+    <script>
+    // Restore update badge if update is available
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof restoreUpdateBadge === 'function') {
+            restoreUpdateBadge();
+        }
+    });
+    </script>
 
     <script>
     // Update Back to Notes link with workspace from localStorage

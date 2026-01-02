@@ -397,7 +397,7 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i></button>
+                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge" style="display: none;"></span></button>
                 <button class="sidebar-plus" onclick="toggleCreateMenu();" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
 

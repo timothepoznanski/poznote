@@ -542,6 +542,11 @@ function checkForUpdates() {
     // Remove update badge since user is checking manually
     hideUpdateBadge();
     
+    // User has manually checked, so clear the update available flag and reset the check time
+    // This prevents the badge from reappearing until the next automatic check (24h later)
+    localStorage.removeItem('poznote_update_available');
+    localStorage.setItem('poznote_last_update_check', Date.now().toString());
+    
     // Show checking modal
     showUpdateCheckModal();
     
@@ -561,8 +566,7 @@ function checkForUpdates() {
                 closeUpdateCheckModal();
                 showUpdateInstructions(true);
             } else {
-                // No updates available, but still show version info in update modal
-                localStorage.removeItem('poznote_update_available');
+                // No updates available
                 closeUpdateCheckModal();
                 showUpdateInstructions(false);
             }
