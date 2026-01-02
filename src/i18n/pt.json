@@ -681,7 +681,7 @@
       "title": "Exportar nota",
       "markdown": {
         "title": "Exportar como Markdown",
-        "description": "Baixar como arquivo MD com título e tags em formato markdown"
+        "description": "Baixar como arquivo MD com metadados (título, tags, pasta) em frontmatter YAML"
       },
       "html": {
         "title": "Exportar como HTML",

@@ -338,7 +338,7 @@
                     <i class="fal fa-file-alt"></i>
                     <div>
                         <span><?php echo t_h('modals.export.markdown.title', [], 'Export as Markdown'); ?></span>
-                        <p><?php echo t_h('modals.export.markdown.description', [], 'Download as MD file with title and tags in markdown format'); ?></p>
+                        <p><?php echo t_h('modals.export.markdown.description', [], 'Download as MD file with metadata (title, tags, folder) in YAML frontmatter'); ?></p>
                     </div>
                 </div>
                 <!-- HTML export option (shown only for non-markdown notes) -->
@@ -359,7 +359,7 @@
                     </div>
                 </div>
 
-                <div class="export-option" onclick="selectExportType('print')">
+                <div class="export-option export-option-print" onclick="selectExportType('print')">
                     <i class="fal fa-print"></i>
                     <div>
                         <span><?php echo t_h('modals.export.print.title', [], 'Print to PDF (Browser)'); ?></span>

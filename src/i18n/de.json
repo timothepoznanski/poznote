@@ -682,7 +682,7 @@
       "title": "Notiz exportieren",
       "markdown": {
         "title": "Als Markdown exportieren",
-        "description": "Als MD-Datei mit Titel und Tags im Markdown-Format herunterladen"
+        "description": "Als MD-Datei mit Metadaten (Titel, Tags, Ordner) in YAML-Frontmatter herunterladen"
       },
       "html": {
         "title": "Als HTML exportieren",

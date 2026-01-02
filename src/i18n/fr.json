@@ -684,7 +684,7 @@
       "title": "Exporter la note",
       "markdown": {
         "title": "Exporter en Markdown",
-        "description": "Télécharger en fichier MD avec titre et tags au format markdown"
+        "description": "Télécharger en fichier MD avec métadonnées (titre, tags, dossier) en frontmatter YAML"
       },
       "html": {
         "title": "Exporter en HTML",
