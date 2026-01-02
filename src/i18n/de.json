@@ -679,6 +679,20 @@
         "title": "Arbeitsbereich"
       }
     },
+    "convert": {
+      "title": "Notiz konvertieren",
+      "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
+      "to_html_title": "In HTML konvertieren",
+      "to_html_message": "Dies wird Ihre Markdown-Notiz in das HTML-Format konvertieren.",
+      "to_html_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
+      "to_markdown_title": "In Markdown konvertieren",
+      "to_markdown_message": "Dies wird Ihre HTML-Notiz in das Markdown-Format konvertieren. Eingebettete Bilder werden als Anhänge gespeichert.",
+      "to_markdown_warning": "Einige komplexe HTML-Formatierungen werden möglicherweise nicht perfekt in Markdown konvertiert.",
+      "converting": "Notiz wird konvertiert...",
+      "success": "Notiz erfolgreich konvertiert!",
+      "error": "Fehler beim Konvertieren der Notiz",
+      "duplicate_button": "Duplizieren"
+    },
     "export": {
       "title": "Notiz exportieren",
       "markdown": {

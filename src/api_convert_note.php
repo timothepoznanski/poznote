@@ -98,9 +98,10 @@ try {
         $newAttachments = removeEmbeddedImagesFromAttachments($content, $note['attachments'], $con);
     } else {
         // HTML to Markdown
-        $newContent = convertHtmlToMarkdown($content, $noteId, $note['attachments'], $con);
+        $conversionResult = convertHtmlToMarkdown($content, $noteId, $note['attachments'], $con);
+        $newContent = $conversionResult['markdown'];
+        $newAttachments = $conversionResult['attachments']; // Get updated attachments
         $newType = 'markdown';
-        $newAttachments = $note['attachments']; // Keep attachments for HTML to MD
     }
     
     // Determine new file path
@@ -200,11 +201,20 @@ function removeEmbeddedImagesFromAttachments($markdownContent, $attachmentsJson,
         }
     }
     
-    // Remove attachments with matching IDs
+    // Remove attachments with matching IDs and delete physical files
+    $attachmentsPath = getAttachmentsPath();
     $newAttachments = [];
     foreach ($attachments as $attachment) {
         if (!isset($attachment['id']) || !in_array((string)$attachment['id'], $idsToRemove, true)) {
             $newAttachments[] = $attachment;
+        } else {
+            // Delete physical file
+            if (isset($attachment['filename'])) {
+                $filePath = $attachmentsPath . '/' . $attachment['filename'];
+                if (file_exists($filePath)) {
+                    @unlink($filePath);
+                }
+            }
         }
     }
     
@@ -517,7 +527,9 @@ function parseMarkdownToHtmlForConversion($text, $embedImages = false, $con = nu
 
 /**
  * Convert HTML content to Markdown
- * Also handles embedded base64 images by saving them as attachments
+ * Extracts base64 images, saves them as attachments, and generates markdown
+ * 
+ * @return array Array with 'markdown' and 'attachments' keys
  */
 function convertHtmlToMarkdown($html, $noteId, $existingAttachmentsJson, $con) {
     $markdown = $html;
@@ -532,11 +544,17 @@ function convertHtmlToMarkdown($html, $noteId, $existingAttachmentsJson, $con) {
     
     // Convert embedded base64 images to attachments
     $markdown = preg_replace_callback(
-        '/<img[^>]+src=["\']data:image\/([^;]+);base64,([^"\']+)["\'][^>]*(?:alt=["\']([^"\']*)["\'])?[^>]*>/i',
+        '/<img[^>]*src=["\']data:image\/([^;]+);base64,([^"\']+)["\'][^>]*>/i',
         function($matches) use ($noteId, &$attachments, $attachmentsPath, $con) {
             $imageType = $matches[1];
             $base64Data = $matches[2];
-            $alt = isset($matches[3]) ? $matches[3] : 'image';
+            
+            // Extract alt attribute separately (can be before or after src)
+            $fullTag = $matches[0];
+            $alt = 'image';
+            if (preg_match('/alt=["\']([^"\']*)["\']/', $fullTag, $altMatch)) {
+                $alt = $altMatch[1];
+            }
             
             // Generate unique filename
             $extension = $imageType === 'jpeg' ? 'jpg' : $imageType;
@@ -658,12 +676,9 @@ function convertHtmlToMarkdown($html, $noteId, $existingAttachmentsJson, $con) {
     $markdown = preg_replace('/\n{3,}/', "\n\n", $markdown);
     $markdown = trim($markdown);
     
-    // Update attachments in database if new ones were added
-    if (!empty($attachments)) {
-        $attachmentsJson = json_encode($attachments);
-        $stmt = $con->prepare('UPDATE entries SET attachments = ? WHERE id = ?');
-        $stmt->execute([$attachmentsJson, $noteId]);
-    }
-    
-    return $markdown;
+    // Return both markdown and updated attachments
+    return [
+        'markdown' => $markdown,
+        'attachments' => json_encode($attachments)
+    ];
 }

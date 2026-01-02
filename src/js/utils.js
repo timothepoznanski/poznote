@@ -2077,34 +2077,50 @@ function showConvertNoteModal(noteId, target) {
     var messageEl = document.getElementById('convertNoteMessage');
     var warningEl = document.getElementById('convertNoteWarning');
     var confirmBtn = document.getElementById('confirmConvertBtn');
+    var duplicateBtn = document.getElementById('duplicateBeforeConvertBtn');
     
     if (!modal) return;
     
     if (target === 'html') {
-        titleEl.textContent = window.i18n && window.i18n['modals.convert.to_html_title'] 
-            ? window.i18n['modals.convert.to_html_title'] 
-            : 'Convert to HTML';
-        messageEl.textContent = window.i18n && window.i18n['modals.convert.to_html_message'] 
-            ? window.i18n['modals.convert.to_html_message'] 
-            : 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.';
-        warningEl.textContent = window.i18n && window.i18n['modals.convert.to_html_warning'] 
-            ? window.i18n['modals.convert.to_html_warning'] 
-            : 'This action cannot be easily undone. Make sure to backup your note first.';
+        titleEl.textContent = window.t ? window.t('modals.convert.to_html_title', null, 'Convert to HTML') : 'Convert to HTML';
+        messageEl.textContent = window.t ? window.t('modals.convert.to_html_message', null, 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.') : 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.';
+        warningEl.textContent = window.t ? window.t('modals.convert.to_html_warning', null, 'Make sure to backup your note first. You can also duplicate the note beforehand to keep a copy in case the conversion doesn\'t meet your expectations.') : 'Make sure to backup your note first. You can also duplicate the note beforehand to keep a copy in case the conversion doesn\'t meet your expectations.';
     } else {
-        titleEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_title'] 
-            ? window.i18n['modals.convert.to_markdown_title'] 
-            : 'Convert to Markdown';
-        messageEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_message'] 
-            ? window.i18n['modals.convert.to_markdown_message'] 
-            : 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.';
-        warningEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_warning'] 
-            ? window.i18n['modals.convert.to_markdown_warning'] 
-            : 'Some complex HTML formatting may not convert perfectly to Markdown.';
+        titleEl.textContent = window.t ? window.t('modals.convert.to_markdown_title', null, 'Convert to Markdown') : 'Convert to Markdown';
+        messageEl.textContent = window.t ? window.t('modals.convert.to_markdown_message', null, 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.') : 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.';
+        warningEl.textContent = window.t ? window.t('modals.convert.to_markdown_warning', null, 'Some complex HTML formatting may not convert perfectly to Markdown.') : 'Some complex HTML formatting may not convert perfectly to Markdown.';
     }
     
     confirmBtn.onclick = function() {
         executeNoteConversion();
     };
+    
+    if (duplicateBtn) {
+        duplicateBtn.onclick = function() {
+            // Duplicate the note without reloading the page
+            fetch('api_duplicate_note.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ note_id: noteId })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    // Hide the warning message and disable the duplicate button
+                    if (warningEl) warningEl.style.display = 'none';
+                    duplicateBtn.disabled = true;
+                    duplicateBtn.style.opacity = '0.5';
+                    duplicateBtn.style.cursor = 'not-allowed';
+                }
+            })
+            .catch(function(error) {
+                console.error('Duplicate error:', error);
+            });
+        };
+    }
     
     modal.style.display = 'flex';
 }
@@ -2133,16 +2149,12 @@ function executeNoteConversion() {
             // Reload the page to show the converted note
             window.location.reload();
         } else {
-            showNotificationPopup(data.error || (window.i18n && window.i18n['modals.convert.error'] 
-                ? window.i18n['modals.convert.error'] 
-                : 'Failed to convert note'), 'error');
+            showNotificationPopup(data.error || (window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note'), 'error');
         }
     })
     .catch(function(error) {
         console.error('Convert error:', error);
-        showNotificationPopup(window.i18n && window.i18n['modals.convert.error'] 
-            ? window.i18n['modals.convert.error'] 
-            : 'Failed to convert note', 'error');
+        showNotificationPopup(window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note', 'error');
     });
     
     // Reset
