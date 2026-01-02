@@ -107,6 +107,10 @@
 
             request.onsuccess = () => {
                 resolve(noteData);
+                // Mettre à jour le compteur dans le menu
+                if (window.updateOfflineNotesCount) {
+                    window.updateOfflineNotesCount();
+                }
             };
 
             request.onerror = () => {
@@ -133,6 +137,10 @@
 
             request.onsuccess = () => {
                 resolve();
+                // Mettre à jour le compteur dans le menu
+                if (window.updateOfflineNotesCount) {
+                    window.updateOfflineNotesCount();
+                }
             };
 
             request.onerror = () => {

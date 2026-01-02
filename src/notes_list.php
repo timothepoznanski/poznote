@@ -143,28 +143,28 @@ echo "<div class='system-menu-dropdown' id='system-menu-dropdown' style='display
 echo "<div class='system-menu-item' onclick='window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-trash'></i>";
 echo "<span>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
-echo "<span class='menu-item-count'>" . $trash_count . "</span>";
+echo "<span class='menu-item-count' id='count-trash'>" . $trash_count . "</span>";
 echo "</div>";
 
 // Public (cloud)
 echo "<div class='system-menu-item' onclick='window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-cloud'></i>";
 echo "<span>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
-echo "<span class='menu-item-count'>" . $shared_count . "</span>";
+echo "<span class='menu-item-count' id='count-shared'>" . $shared_count . "</span>";
 echo "</div>";
 
 // Offline (plane)
 echo "<div class='system-menu-item' onclick='window.location = \"offline.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-plane'></i>";
 echo "<span>" . t_h('notes_list.system_folders.offline', [], 'Offline') . "</span>";
-echo "<span class='menu-item-count'>0</span>";
+echo "<span class='menu-item-count' id='count-offline'>0</span>";
 echo "</div>";
 
 // Attachments
 echo "<div class='system-menu-item' onclick='window.location = \"attachments_list.php?workspace=" . urlencode($workspace_filter) . "\"'>";
 echo "<i class='fa-paperclip'></i>";
 echo "<span>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
-echo "<span class='menu-item-count'>" . $attachments_count . "</span>";
+echo "<span class='menu-item-count' id='count-attachments'>" . $attachments_count . "</span>";
 echo "</div>";
 
 echo "</div>"; // Fin du menu dropdown
