@@ -301,15 +301,18 @@ window.loadNoteDirectly = function(url, noteId, event) {
                             }
                         } catch (error) {
                             console.error('Error parsing note content:', error);
-                            showNotificationPopup('Error loading note: ' + error.message);
+                            showNotificationPopup('Error loading note: ' + error.message, 'error');
                             hideNoteLoadingState();
                             if (isMobileDevice()) {
                                 document.body.classList.remove('note-open');
                             }
                         }
                     } else {
-                        console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
-                        showNotificationPopup('Failed to load note (status: ' + xhr.status + ')');
+                        // Don't show error popup for network errors (status 0), xhr.onerror will handle it
+                        if (xhr.status !== 0) {
+                            console.error('Failed to load note, status:', xhr.status, 'response:', xhr.responseText);
+                            showNotificationPopup('Failed to load note (status: ' + xhr.status + ')', 'error');
+                        }
                         hideNoteLoadingState();
                         if (isMobileDevice()) {
                             document.body.classList.remove('note-open');
@@ -329,7 +332,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
         xhr.onerror = function() {
             window.isLoadingNote = false;
             console.error('Network error during note loading');
-            showNotificationPopup('Network error - please check your connection');
+            showNotificationPopup('Network error - please check your connection', 'error');
             hideNoteLoadingState();
             if (isMobileDevice()) {
                 document.body.classList.remove('note-open');
@@ -343,7 +346,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
         xhr.ontimeout = function() {
             window.isLoadingNote = false;
             console.error('Request timeout during note loading');
-            showNotificationPopup('Request timeout - please try again');
+            showNotificationPopup('Request timeout - please try again', 'error');
             hideNoteLoadingState();
             if (isMobileDevice()) {
                 document.body.classList.remove('note-open');
@@ -362,7 +365,7 @@ window.loadNoteDirectly = function(url, noteId, event) {
         if (isMobileDevice()) {
             document.body.classList.remove('note-open');
         }
-        showNotificationPopup('Error initializing note load: ' + error.message);
+        showNotificationPopup('Error initializing note load: ' + error.message, 'error');
         return false;
     }
 };
@@ -443,7 +446,7 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
                     }
                 } catch (error) {
                     console.error('Error loading note:', error);
-                    showNotificationPopup('Error loading note: ' + error.message);
+                    showNotificationPopup('Error loading note: ' + error.message, 'error');
                     hideNoteLoadingState();
                     
                     // On error, remove note-open class to go back to note list
@@ -452,8 +455,11 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
                     }
                 }
             } else {
-                console.error('Failed to load note:', xhr.status, xhr.statusText);
-                showNotificationPopup('Failed to load note. Please try again.');
+                // Don't show error popup for network errors (status 0), xhr.onerror will handle it
+                if (xhr.status !== 0) {
+                    console.error('Failed to load note:', xhr.status, xhr.statusText);
+                    showNotificationPopup('Failed to load note. Please try again.', 'error');
+                }
                 hideNoteLoadingState();
                 
                 // On error, remove note-open class to go back to note list
@@ -467,7 +473,7 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
     xhr.onerror = function() {
         isNoteLoading = false;
         console.error('Network error while loading note');
-        showNotificationPopup('Network error. Please check your connection.');
+        showNotificationPopup('Network error. Please check your connection.', 'error');
         hideNoteLoadingState();
         
         // On error, remove note-open class to go back to note list
@@ -479,7 +485,7 @@ function loadNoteViaAjax(url, noteId, clickedLink, fromHistory) {
     xhr.ontimeout = function() {
         isNoteLoading = false;
         console.error('Request timeout during note loading');
-        showNotificationPopup('Request timeout - please try again');
+        showNotificationPopup('Request timeout - please try again', 'error');
         hideNoteLoadingState();
         
         // On error, remove note-open class to go back to note list
@@ -1302,15 +1308,6 @@ function reinitializeNoteContent() {
 
     // Force interface refresh to sync with loaded content - but don't trigger auto-save
     // since content was just loaded from server and is already saved
-
-    // Update offline button status for the loaded note
-    if (typeof window.updateOfflineButtonStatus === 'function' && window.noteid) {
-        try {
-            window.updateOfflineButtonStatus(window.noteid);
-        } catch (e) {
-            console.error('Error updating offline button status:', e);
-        }
-    }
 
     // Mark that note loading is complete
     window.isLoadingNote = false;

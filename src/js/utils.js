@@ -55,11 +55,11 @@ function performFavoriteToggle(noteId) {
                 window.location.reload();
             }, 50);
         } else {
-            showNotificationPopup('Error: ' + (data.message || 'Unknown error'));
+            showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
         }
     })
     .catch(function(error) {
-        showNotificationPopup('Error updating favorites');
+        showNotificationPopup('Error updating favorites', 'error');
         console.error('Favorite toggle error:', error);
     });
 }

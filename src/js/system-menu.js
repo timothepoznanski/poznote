@@ -13,11 +13,6 @@ function toggleSystemMenu() {
         if (isVisible) {
             dropdown.style.display = 'none';
         } else {
-            // Mettre à jour le compteur offline avant d'afficher le menu
-            if (window.updateOfflineNotesCount) {
-                window.updateOfflineNotesCount();
-            }
-            
             // Calculer la position du menu
             const rect = menuContainer.getBoundingClientRect();
             const dropdownHeight = 300; // Hauteur estimée du menu

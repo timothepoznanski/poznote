@@ -536,9 +536,7 @@
       "insert_checklist": "Insert checklist",
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
-      "open_in_new_tab": "Open in new tab",
-      "make_offline": "Make available offline",
-      "remove_offline": "Remove from offline mode"
+      "open_in_new_tab": "Open in new tab"
     },
     "link": {
       "add_title": "Add Link",
@@ -733,7 +731,6 @@
       "tags": "Tags",
       "favorites": "Favorites",
       "public": "Public",
-      "offline": "Offline",
       "attachments": "Attachments"
     },
     "drop_zone": {
@@ -1316,28 +1313,5 @@
     "change_password_title": "Change password",
     "password_remove_hint": "Leave empty to remove password protection.",
     "enter_new_password": "Enter new password"
-  },
-  "offline": {
-    "note_saved": "Note available offline",
-    "note_removed": "Note removed from offline mode",
-    "error": "Error saving note offline",
-    "no_notes": "No notes available offline",
-    "notes_list": "Notes available offline",
-    "page": {
-      "title": "Offline Notes",
-      "no_offline_notes": "No offline notes yet.",
-      "offline_hint": "Make a note available offline by clicking the download button in the note toolbar.",
-      "filter_placeholder": "Filter by title...",
-      "refresh": "Refresh",
-      "view_content": "View content",
-      "open_note": "Open note",
-      "remove_offline": "Remove from offline",
-      "confirm_remove": "Remove this note from offline storage?",
-      "no_filter_results": "No notes match your search.",
-      "no_content": "No content",
-      "just_now": "Just now",
-      "minutes_ago": "min ago",
-      "hours_ago": "h ago"
-    }
   }
 }

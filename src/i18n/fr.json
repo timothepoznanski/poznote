@@ -536,9 +536,7 @@
       "insert_checklist": "Insérer une checklist",
       "add_separator": "Ajouter un séparateur",
       "insert_note_reference": "Insérer une référence de note",
-      "open_in_new_tab": "Ouvrir dans un nouvel onglet",
-      "make_offline": "Rendre disponible hors ligne",
-      "remove_offline": "Retirer du mode hors ligne"
+      "open_in_new_tab": "Ouvrir dans un nouvel onglet"
     },
     "link": {
       "add_title": "Ajouter un lien",
@@ -733,7 +731,6 @@
       "tags": "Tags",
       "favorites": "Favoris",
       "public": "Publiques",
-      "offline": "Hors ligne",
       "attachments": "Pièces jointes"
     },
     "drop_zone": {
@@ -1313,28 +1310,5 @@
     "change_password_title": "Modifier le mot de passe",
     "password_remove_hint": "Laissez vide pour supprimer la protection par mot de passe.",
     "enter_new_password": "Entrez un nouveau mot de passe"
-  },
-  "offline": {
-    "note_saved": "Note disponible hors ligne",
-    "note_removed": "Note retirée du mode hors ligne",
-    "error": "Erreur lors de la sauvegarde offline",
-    "no_notes": "Aucune note disponible hors ligne",
-    "notes_list": "Notes disponibles hors ligne",
-    "page": {
-      "title": "Notes hors ligne",
-      "no_offline_notes": "Aucune note hors ligne pour le moment.",
-      "offline_hint": "Rendez une note disponible hors ligne en cliquant sur le bouton de téléchargement dans la barre d'outils de la note.",
-      "filter_placeholder": "Filtrer par titre...",
-      "refresh": "Actualiser",
-      "view_content": "Voir le contenu",
-      "open_note": "Ouvrir la note",
-      "remove_offline": "Retirer du mode hors ligne",
-      "confirm_remove": "Retirer cette note du stockage hors ligne ?",
-      "no_filter_results": "Aucune note ne correspond à votre recherche.",
-      "no_content": "Pas de contenu",
-      "just_now": "À l'instant",
-      "minutes_ago": "min",
-      "hours_ago": "h"
-    }
   }
 }

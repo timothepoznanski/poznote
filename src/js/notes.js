@@ -220,13 +220,6 @@ function saveNoteToServer() {
         if (data.success) {
             handleSaveResponse(JSON.stringify({date: new Date().toLocaleDateString(), title: headi, original_title: headi}));
             
-            // Synchroniser avec IndexedDB si la note est offline
-            if (window.OfflineNotesManager && window.OfflineNotesManager.syncOfflineNoteWithServer) {
-                window.OfflineNotesManager.syncOfflineNoteWithServer(noteid).catch(function(error) {
-                    console.error('Erreur lors de la sync offline:', error);
-                });
-            }
-            
             // Refresh tags count in sidebar after successful save
             if (typeof window.refreshTagsCount === 'function') {
                 window.refreshTagsCount();

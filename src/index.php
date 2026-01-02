@@ -178,7 +178,6 @@ try {
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
-    <script src="js/offline-notes.js?v=<?php echo $v; ?>"></script>
     <script src="js/checklist.js?v=<?php echo $v; ?>"></script>
     <script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
     <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
@@ -769,9 +768,6 @@ $body_classes = trim($extra_body_classes);
                     
                     // Share button
                     echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-cloud"></i></button>';
-                    
-                    // Offline button
-                    echo '<button type="button" class="toolbar-btn btn-offline note-action-btn" title="'.t_h('editor.toolbar.make_offline', [], 'Rendre disponible hors ligne').'" onclick="toggleOfflineNote('.$row['id'].')"><i class="fa-plane"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
                     
