@@ -281,13 +281,31 @@
                     <div class="create-note-option" data-type="html" onclick="selectCreateType('html')">
                         <i class="fa fa-file-alt"></i>
                         <div>
-                            <span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
+                            <span><?php 
+                                $title = t_h('modals.create.note.title', [], 'Note');
+                                $parenPos = strpos($title, ' (');
+                                if ($parenPos !== false) {
+                                    echo htmlspecialchars(substr($title, 0, $parenPos));
+                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                } else {
+                                    echo htmlspecialchars($title);
+                                }
+                            ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
                         <i class="fa fa-markdown"></i>
                         <div>
-                            <span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
+                            <span><?php 
+                                $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
+                                $parenPos = strpos($title, ' (');
+                                if ($parenPos !== false) {
+                                    echo htmlspecialchars(substr($title, 0, $parenPos));
+                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                } else {
+                                    echo htmlspecialchars($title);
+                                }
+                            ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="list" onclick="selectCreateType('list')">

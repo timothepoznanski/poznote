@@ -4067,6 +4067,21 @@ body.dark-mode .create-note-option p {
     color: #aaa;
 }
 
+/* Discreet subtitle text for create modal options */
+.create-note-option .create-note-subtitle {
+    font-size: 13px !important;
+    color: var(--text-muted, #fd4545);
+    font-weight: 300 !important;
+    margin-left: 4px;
+    opacity: 0.7;
+    display: inline;
+}
+
+html[data-theme='dark'] .create-note-subtitle,
+body.dark-mode .create-note-subtitle {
+    color: var(--text-muted-dark, #999999) !important;
+}
+
 html[data-theme='dark'] .create-section h4,
 body.dark-mode .create-section h4 {
     color: #aaa;

@@ -671,10 +671,10 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "Note"
+        "title": "HTML Note (not markdown)"
       },
       "markdown": {
-        "title": "Markdown Note"
+        "title": "Markdown note (not HTML)"
       },
       "task_list": {
         "title": "Task List"

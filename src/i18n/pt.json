@@ -659,10 +659,10 @@
       "title_in_folder": "Criar em {{folder}}",
       "folder_fallback": "pasta",
       "note": {
-        "title": "Nota"
+        "title": "Nota HTML (não Markdown)"
       },
       "markdown": {
-        "title": "Nota Markdown"
+        "title": "Nota Markdown (não HTML)"
       },
       "task_list": {
         "title": "Lista de Tarefas"

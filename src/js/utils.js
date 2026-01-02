@@ -1658,11 +1658,11 @@ function showExportModal(noteId, filename, title, noteType) {
         var printOption = modal.querySelector('.export-option-print');
         
         if (noteType === 'markdown') {
-            // For markdown notes: only allow MD export, no HTML or print
+            // For markdown notes: allow MD export, HTML export and print
             if (markdownOption) markdownOption.style.display = 'flex';
-            if (htmlOption) htmlOption.style.display = 'none';
+            if (htmlOption) htmlOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
-            if (printOption) printOption.style.display = 'none';
+            if (printOption) printOption.style.display = 'flex';
         } else {
             // For other notes: show HTML, print and PDF options, hide MD option
             if (markdownOption) markdownOption.style.display = 'none';
