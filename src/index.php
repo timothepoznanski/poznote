@@ -784,6 +784,7 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert\')"><i class="fa-exchange-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
@@ -849,6 +850,13 @@ $body_classes = trim($extra_body_classes);
                     
                     // Download button
                     echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" onclick="showExportModal(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
+                    
+                    // Convert button (only for markdown and note types)
+                    if ($note_type === 'markdown') {
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" onclick="showConvertNoteModal(\''.$row['id'].'\', \'html\')" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="fa-file-code"></i></button>';
+                    } elseif ($note_type === 'note') {
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" onclick="showConvertNoteModal(\''.$row['id'].'\', \'markdown\')" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="fa-file-alt"></i></button>';
+                    }
                     
                     echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="'.t_h('common.delete', [], 'Delete').'"><i class="fa-trash"></i></button>';
                     

@@ -12,6 +12,7 @@
     "confirmation": "Confirmation",
     "save": "Enregistrer",
     "download": "Télécharger",
+    "convert": "Convertir",
     "create": "Créer",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
@@ -695,6 +696,19 @@
         "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"
       }
     },
+    "convert": {
+      "title": "Convertir la note",
+      "message": "Êtes-vous sûr de vouloir convertir cette note ?",
+      "to_html_title": "Convertir en HTML",
+      "to_html_message": "Cela convertira votre note Markdown en format HTML. La syntaxe markdown sera rendue en HTML.",
+      "to_html_warning": "Cette action ne peut pas être facilement annulée. Assurez-vous de sauvegarder votre note d'abord.",
+      "to_markdown_title": "Convertir en Markdown",
+      "to_markdown_message": "Cela convertira votre note HTML en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
+      "to_markdown_warning": "Certains formatages HTML complexes peuvent ne pas se convertir parfaitement en Markdown.",
+      "converting": "Conversion en cours...",
+      "success": "Note convertie avec succès !",
+      "error": "Échec de la conversion de la note"
+    },
     "note_sort": {
       "title": "Ordre de tri des notes",
       "description": "Choisissez l’ordre d’affichage des notes dans la liste :",
@@ -849,7 +863,10 @@
       "favorite_remove": "Retirer des favoris",
       "public_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
-      "menu_actions": "Actions du menu"
+      "menu_actions": "Actions du menu",
+      "convert_to_html": "Convertir en HTML",
+      "convert_to_markdown": "Convertir en Markdown",
+      "share_note": "Partager la note"
     },
     "public_modal": {
       "title": "URL publique",

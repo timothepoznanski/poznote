@@ -12,6 +12,7 @@
     "confirmation": "Confirmation",
     "save": "Save",
     "download": "Download",
+    "convert": "Convert",
     "create": "Create",
     "delete": "Delete",
     "duplicate": "Duplicate",
@@ -704,6 +705,19 @@
         "description": "Use browser's native print dialog to save as PDF"
       }
     },
+    "convert": {
+      "title": "Convert Note",
+      "message": "Are you sure you want to convert this note?",
+      "to_html_title": "Convert to HTML",
+      "to_html_message": "This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.",
+      "to_html_warning": "This action cannot be easily undone. Make sure to backup your note first.",
+      "to_markdown_title": "Convert to Markdown",
+      "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
+      "to_markdown_warning": "Some complex HTML formatting may not convert perfectly to Markdown.",
+      "converting": "Converting note...",
+      "success": "Note converted successfully!",
+      "error": "Failed to convert note"
+    },
     "note_sort": {
       "title": "Note sort order",
       "description": "Choose how notes are ordered in the notes list:",
@@ -849,7 +863,10 @@
       "favorite_remove": "Remove from favorites",
       "public_note": "Make note public",
       "attachments_with_count": "Attachments ({{count}})",
-      "menu_actions": "Menu actions"
+      "menu_actions": "Menu actions",
+      "convert_to_html": "Convert to HTML",
+      "convert_to_markdown": "Convert to Markdown",
+      "share_note": "Share note"
     },
     "public_modal": {
       "title": "Public URL",

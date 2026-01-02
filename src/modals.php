@@ -392,6 +392,21 @@
     </div>
 </div>
 
+<!-- Convert Note Modal -->
+<div id="convertNoteModal" class="modal">
+    <div class="modal-content">
+        <h3 id="convertNoteTitle"><?php echo t_h('modals.convert.title', [], 'Convert Note'); ?></h3>
+        <div class="modal-body">
+            <p id="convertNoteMessage"><?php echo t_h('modals.convert.message', [], 'Are you sure you want to convert this note?'); ?></p>
+            <p id="convertNoteWarning" class="convert-warning" style="color: #dc3545; font-size: 13px; margin-top: 10px;"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeModal('convertNoteModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmConvertBtn"><?php echo t_h('common.convert', [], 'Convert'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
     <div class="modal-content">

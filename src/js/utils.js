@@ -2055,3 +2055,97 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
+// ============================================
+// Note Conversion Functions
+// ============================================
+
+var convertNoteId = null;
+var convertNoteTarget = null;
+
+/**
+ * Show the convert note confirmation modal
+ * @param {string} noteId - The note ID to convert
+ * @param {string} target - Target type: 'html' or 'markdown'
+ */
+function showConvertNoteModal(noteId, target) {
+    convertNoteId = noteId;
+    convertNoteTarget = target;
+    
+    var modal = document.getElementById('convertNoteModal');
+    var titleEl = document.getElementById('convertNoteTitle');
+    var messageEl = document.getElementById('convertNoteMessage');
+    var warningEl = document.getElementById('convertNoteWarning');
+    var confirmBtn = document.getElementById('confirmConvertBtn');
+    
+    if (!modal) return;
+    
+    if (target === 'html') {
+        titleEl.textContent = window.i18n && window.i18n['modals.convert.to_html_title'] 
+            ? window.i18n['modals.convert.to_html_title'] 
+            : 'Convert to HTML';
+        messageEl.textContent = window.i18n && window.i18n['modals.convert.to_html_message'] 
+            ? window.i18n['modals.convert.to_html_message'] 
+            : 'This will convert your Markdown note to HTML format. The markdown syntax will be rendered as HTML.';
+        warningEl.textContent = window.i18n && window.i18n['modals.convert.to_html_warning'] 
+            ? window.i18n['modals.convert.to_html_warning'] 
+            : 'This action cannot be easily undone. Make sure to backup your note first.';
+    } else {
+        titleEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_title'] 
+            ? window.i18n['modals.convert.to_markdown_title'] 
+            : 'Convert to Markdown';
+        messageEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_message'] 
+            ? window.i18n['modals.convert.to_markdown_message'] 
+            : 'This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.';
+        warningEl.textContent = window.i18n && window.i18n['modals.convert.to_markdown_warning'] 
+            ? window.i18n['modals.convert.to_markdown_warning'] 
+            : 'Some complex HTML formatting may not convert perfectly to Markdown.';
+    }
+    
+    confirmBtn.onclick = function() {
+        executeNoteConversion();
+    };
+    
+    modal.style.display = 'flex';
+}
+
+/**
+ * Execute the note conversion
+ */
+function executeNoteConversion() {
+    if (!convertNoteId || !convertNoteTarget) return;
+    
+    closeModal('convertNoteModal');
+    
+    var formData = new FormData();
+    formData.append('id', convertNoteId);
+    formData.append('target', convertNoteTarget);
+    
+    fetch('api_convert_note.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            // Reload the page to show the converted note
+            window.location.reload();
+        } else {
+            showNotificationPopup(data.error || (window.i18n && window.i18n['modals.convert.error'] 
+                ? window.i18n['modals.convert.error'] 
+                : 'Failed to convert note'), 'error');
+        }
+    })
+    .catch(function(error) {
+        console.error('Convert error:', error);
+        showNotificationPopup(window.i18n && window.i18n['modals.convert.error'] 
+            ? window.i18n['modals.convert.error'] 
+            : 'Failed to convert note', 'error');
+    });
+    
+    // Reset
+    convertNoteId = null;
+    convertNoteTarget = null;
+}
