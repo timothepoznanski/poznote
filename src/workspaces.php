@@ -535,7 +535,13 @@ try {
                                         <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?></button>
                                     <?php endif; ?>
                                 </div>
-                                <div class="ws-col ws-col-move"><button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button></div>
+                                <div class="ws-col ws-col-move">
+                                    <?php 
+                                        $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
+                                        $isDisabled = ($cnt === 0);
+                                    ?>
+                                    <button class="btn btn-warning action-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" <?php echo $isDisabled ? 'disabled' : ''; ?>><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang); ?></button>
+                                </div>
                                 <?php if (count($workspaces) > 1): ?>
                                 <div class="ws-col ws-col-delete">
                                     <form method="POST" class="delete-form" data-ws-name="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">

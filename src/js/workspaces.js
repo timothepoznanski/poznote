@@ -686,6 +686,11 @@ function handleCreateWorkspace(event) {
 // Handle move button clicks
 function handleMoveButtonClick(e) {
     if (e.target && e.target.classList && e.target.classList.contains('btn-move')) {
+        // Prevent action if button is disabled
+        if (e.target.disabled) {
+            return;
+        }
+        
         var source = e.target.getAttribute('data-ws');
         if (!source) return;
         
