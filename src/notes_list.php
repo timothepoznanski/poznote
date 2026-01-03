@@ -191,6 +191,22 @@ echo "</div>"; // Fin du container system-folders
 
 <?php
 /**
+ * Calculate total number of notes in a folder and all its subfolders recursively
+ */
+function countNotesRecursively($folderData) {
+    $count = count($folderData['notes']);
+    
+    // Add notes from all subfolders
+    if (isset($folderData['children']) && !empty($folderData['children'])) {
+        foreach ($folderData['children'] as $childData) {
+            $count += countNotesRecursively($childData);
+        }
+    }
+    
+    return $count;
+}
+
+/**
  * Recursive function to display folders and their subfolders
  */
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags) {
@@ -248,7 +264,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         }
         $dblActionAttr = $isSystemFolder ? '' : " data-dblaction='edit-folder-name' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "'";
         echo "<span class='folder-name'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
-        $noteCount = count($notes);
+        // Count notes recursively (includes all subfolder notes)
+        $noteCount = countNotesRecursively($folderData);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
         
