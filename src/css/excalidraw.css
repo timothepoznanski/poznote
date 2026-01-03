@@ -651,5 +651,41 @@ html[data-theme='dark'] #app * {
     color: white;
 }
 
+/* Button hover states - moved from inline styles for CSP compliance */
+.excalidraw-toolbar-btn:hover {
+    background: #1e40af !important;
+}
+
+.excalidraw-save-btn:hover {
+    background: #2d7b3e !important;
+}
+
+#cancelBtn:hover {
+    background: #b91c1c !important;
+}
+
+#saveAndExitBtn:hover {
+    background: #1d4ed8 !important;
+}
+
+.excalidraw-toolbar-btn:disabled,
+.excalidraw-save-btn:disabled {
+    background: #9ca3af !important;
+    border-color: #9ca3af !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.excalidraw-toolbar-btn:disabled:hover,
+.excalidraw-save-btn:disabled:hover {
+    background: #9ca3af !important;
+}
+
+/* Inter font for Excalidraw */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+}
+
 
 
