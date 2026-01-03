@@ -713,7 +713,7 @@
       "to_html_warning": "Before converting this note, you can duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
       "to_markdown_title": "Convert to Markdown",
       "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
-      "to_markdown_warning": "Some complex HTML formatting may not convert perfectly to Markdown.",
+      "to_markdown_warning": "Before converting this note, you can duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
       "converting": "Converting note...",
       "success": "Note converted successfully!",
       "error": "Failed to convert note",

@@ -686,7 +686,7 @@
       "to_html_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
       "to_markdown_title": "Converter para Markdown",
       "to_markdown_message": "Isso converterá sua nota HTML para o formato Markdown. Imagens incorporadas serão salvas como anexos.",
-      "to_markdown_warning": "Algumas formatações HTML complexas podem não converter perfeitamente para Markdown.",
+      "to_markdown_warning": "Antes de converter esta nota, você pode duplicá-la para manter uma cópia caso a conversão não atenda às suas expectativas.",
       "converting": "Convertendo nota...",
       "success": "Nota convertida com sucesso!",
       "error": "Falha ao converter nota",
