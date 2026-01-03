@@ -2158,3 +2158,63 @@ body.dark-mode .filter-stats {
     background-color: rgba(0, 125, 184, 0.2);
     color: #a0c4e0;
 }
+/* Folder Icon Modal */
+html[data-theme='dark'] .folder-icon-modal-content h3,
+body.dark-mode .folder-icon-modal-content h3 {
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-icon-description,
+body.dark-mode .folder-icon-description {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .folder-icon-grid,
+body.dark-mode .folder-icon-grid {
+    background: #1a1a1a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .folder-icon-item,
+body.dark-mode .folder-icon-item {
+    background: #2a2a2a;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-icon-item:hover,
+body.dark-mode .folder-icon-item:hover {
+    background: #333333;
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-icon-item.selected,
+body.dark-mode .folder-icon-item.selected {
+    background: #1e1b4b;
+    border-color: #6366f1;
+}
+
+html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary,
+body.dark-mode .folder-icon-modal-content .modal-buttons .btn-secondary {
+    background: #4b5563;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .folder-icon-modal-content .modal-buttons .btn-secondary:hover,
+body.dark-mode .folder-icon-modal-content .modal-buttons .btn-secondary:hover {
+    background: #6b7280;
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-track,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+html[data-theme='dark'] .folder-icon-grid::-webkit-scrollbar-thumb:hover,
+body.dark-mode .folder-icon-grid::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;

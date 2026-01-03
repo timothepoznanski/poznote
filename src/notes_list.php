@@ -238,20 +238,31 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         $should_be_open = shouldFolderBeOpen($con, $folderId, $folderName, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
         
         // Set appropriate folder icon (open/closed) and display style
-        $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
+        // Check if folder has a custom icon
+        $customIcon = isset($folderData['icon']) && !empty($folderData['icon']) ? $folderData['icon'] : null;
+        
+        if ($customIcon) {
+            // Use custom icon - don't toggle between open/closed
+            $chevron_icon = $customIcon;
+        } else {
+            // Use default icons that toggle
+            $chevron_icon = $should_be_open ? 'fa-folder-open' : 'fa-folder';
+        }
+        
         $folder_display = $should_be_open ? 'block' : 'none';
         
         // Escape folder name for use in JavaScript
         $escapedFolderName = addslashes($folderName);
         
         echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'>";
-        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'>";
+        echo "<div class='folder-toggle'>";
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
             echo "<i class='fa-star-light folder-icon'></i>";
         } else {
-            echo "<i class='$chevron_icon folder-icon'></i>";
+            // Add click action to change icon (except for Favorites)
+            echo "<i class='$chevron_icon folder-icon' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "' data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "'></i>";
         }
         
         // Workspace-aware folder handling in UI
@@ -263,7 +274,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $folderDisplayName = t('notes_list.system_folders.favorites', [], 'Favorites');
         }
         $dblActionAttr = $isSystemFolder ? '' : " data-dblaction='edit-folder-name' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "'";
-        echo "<span class='folder-name'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
+        // Add toggle-folder action on the folder name span
+        echo "<span class='folder-name' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
         // Count notes recursively (includes all subfolder notes)
         $noteCount = countNotesRecursively($folderData);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";

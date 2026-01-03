@@ -944,6 +944,37 @@ switch($action) {
         }
         break;
         
+    case 'update_icon':
+        $folderId = (int)($_POST['folder_id'] ?? 0);
+        $icon = trim($_POST['icon'] ?? '');
+        
+        if ($folderId <= 0) {
+            echo json_encode(['success' => false, 'error' => 'Invalid folder ID']);
+            exit;
+        }
+        
+        try {
+            // Update the folder's icon (or set to null if empty)
+            $query = "UPDATE folders SET icon = ? WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $iconValue = $icon === '' ? null : $icon;
+            $success = $stmt->execute([$iconValue, $folderId]);
+            
+            if ($success) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Folder icon updated successfully',
+                    'icon' => $iconValue
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Database error']);
+            }
+        } catch (Exception $e) {
+            error_log("Update folder icon error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Internal server error: ' . $e->getMessage()]);
+        }
+        break;
+        
     default:
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
         break;

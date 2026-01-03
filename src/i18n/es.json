@@ -679,6 +679,10 @@
         "title": "Espacio de trabajo"
       }
     },
+    "folder_icon": {
+      "title": "Cambiar icono de carpeta",
+      "reset": "Restaurar el comportamiento predeterminado"
+    },
     "convert": {
       "title": "Convertir nota",
       "message": "¿Estás seguro de que quieres convertir esta nota?",
@@ -755,6 +759,7 @@
       "rename_folder": "Renombrar carpeta",
       "delete_folder": "Eliminar carpeta",
       "move_folder": "Mover carpeta a subcarpeta",
+      "change_icon": "Cambiar icono",
       "download_folder": "Descargar carpeta"
     }
   },

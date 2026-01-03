@@ -140,6 +140,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
@@ -815,6 +816,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
+<script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>

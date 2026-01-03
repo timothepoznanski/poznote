@@ -690,6 +690,10 @@
         "title": "Workspace"
       }
     },
+    "folder_icon": {
+      "title": "Change folder icon",
+      "reset": "Restore default behavior"
+    },
     "export": {
       "title": "Export Note",
       "markdown": {
@@ -757,7 +761,8 @@
       "move_folder": "Move folder to subfolder",
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder",
-      "download_folder": "Download folder"
+      "download_folder": "Download folder",
+      "change_icon": "Change icon"
     }
   },
   "update": {

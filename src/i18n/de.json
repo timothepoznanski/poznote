@@ -679,6 +679,10 @@
         "title": "Arbeitsbereich"
       }
     },
+    "folder_icon": {
+      "title": "Ordnersymbol ändern",
+      "reset": "Standardverhalten wiederherstellen"
+    },
     "convert": {
       "title": "Notiz konvertieren",
       "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
@@ -755,7 +759,8 @@
       "rename_folder": "Ordner umbenennen",
       "delete_folder": "Ordner löschen",
       "move_folder": "Ordner in Unterordner verschieben",
-      "download_folder": "Ordner herunterladen"
+      "download_folder": "Ordner herunterladen",
+      "change_icon": "Symbol ändern"
     }
   },
   "update": {

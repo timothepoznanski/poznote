@@ -15,6 +15,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
         $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
         $folderName = $row1["folder"] ?: null;
+        $folderIcon = null; // Initialize icon variable
         
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
@@ -26,8 +27,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         if (isset($folders[$folderId])) {
             $folderName = $folders[$folderId]['name'];
         } else {
-            // First time seeing this folder_id - get the canonical name from folders table
-            $canonicalQuery = "SELECT name FROM folders WHERE id = ?";
+            // First time seeing this folder_id - get the canonical name and icon from folders table
+            $canonicalQuery = "SELECT name, icon FROM folders WHERE id = ?";
             if ($workspace_filter) {
                 $canonicalQuery .= " AND workspace = ?";
                 $canonicalStmt = $con->prepare($canonicalQuery);
@@ -39,6 +40,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $canonicalData = $canonicalStmt->fetch(PDO::FETCH_ASSOC);
             if ($canonicalData) {
                 $folderName = $canonicalData['name'];
+                $folderIcon = $canonicalData['icon'] ?? null;
             }
         }
         
@@ -46,6 +48,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
+                'icon' => $folderIcon ?? null,
                 'notes' => []
             ];
         }
@@ -64,7 +67,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  * Now uses folder_id as key
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name FROM folders";
+    $folders_sql = "SELECT id, name, icon FROM folders";
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = '" . addslashes($workspace_filter) . "'";
     }
@@ -74,13 +77,18 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
     while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
         $folderId = (int)$folder_row['id'];
         $folderName = $folder_row['name'];
+        $folderIcon = $folder_row['icon'] ?? null;
         
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
+                'icon' => $folderIcon,
                 'notes' => []
             ];
+        } else {
+            // Update icon if folder already exists
+            $folders[$folderId]['icon'] = $folderIcon;
         }
     }
     
@@ -220,6 +228,12 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<div class='folder-actions-menu-item' data-action='rename-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-edit'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
+        $actions .= "</div>";
+        
+        // Change folder icon action
+        $actions .= "<div class='folder-actions-menu-item' data-action='change-folder-icon' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+        $actions .= "<i class='fa-palette'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
         $actions .= "</div>";
         
         // Delete folder action

@@ -146,6 +146,16 @@
                 }
                 break;
                 
+            case 'open-folder-icon-picker':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderId, folderName);
+                }
+                break;
+                
             case 'load-note':
                 // Handle note loading via AJAX
                 var noteLink = actionElement.getAttribute('href');
@@ -243,6 +253,19 @@
                 }
                 if (folderId && folderName && typeof window.deleteFolder === 'function') {
                     window.deleteFolder(folderId, folderName);
+                }
+                break;
+                
+            case 'change-folder-icon':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.showChangeFolderIconModal === 'function') {
+                    window.showChangeFolderIconModal(folderId, folderName);
                 }
                 break;
         }

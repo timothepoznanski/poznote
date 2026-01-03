@@ -2835,6 +2835,18 @@ hr {
     color: rgb(55, 53, 47);
     flex: 0 0 auto;
     min-width: 0;
+    cursor: pointer;
+}
+
+/* Make folder icon clickable for changing icon */
+.folder-icon[data-action='open-folder-icon-picker'] {
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.folder-icon[data-action='open-folder-icon-picker']:hover {
+    transform: scale(1.15);
+    opacity: 0.7;
 }
 
 .folder-note-count {
@@ -3366,10 +3378,61 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-times-circle::before { content: "\f057"; }
 .fa-arrow-up::before { content: "\f062"; }
 .fa-arrow-down::before { content: "\f063"; }
+.fa-briefcase::before { content: "\f0b1"; }
+.fa-heart::before { content: "\f004"; }
+.fa-music::before { content: "\f001"; }
+.fa-book::before { content: "\f02d"; }
+.fa-graduation-cap::before { content: "\f19d"; }
+.fa-rocket::before { content: "\f135"; }
+.fa-users::before { content: "\f0c0"; }
+.fa-wrench::before { content: "\f0ad"; }
+.fa-camera::before { content: "\f030"; }
+.fa-shield::before { content: "\f3ed"; }
+.fa-lock::before { content: "\f023"; }
+.fa-key::before { content: "\f084"; }
+.fa-envelope::before { content: "\f0e0"; }
+.fa-inbox::before { content: "\f01c"; }
+.fa-archive::before { content: "\f187"; }
+.fa-box::before { content: "\f466"; }
+.fa-shopping-cart::before { content: "\f07a"; }
+.fa-credit-card::before { content: "\f09d"; }
+.fa-chart-line::before { content: "\f201"; }
+.fa-chart-bar::before { content: "\f080"; }
+.fa-database::before { content: "\f1c0"; }
+.fa-server::before { content: "\f233"; }
+.fa-upload::before { content: "\f093"; }
+.fa-tasks::before { content: "\f0ae"; }
+.fa-clipboard::before { content: "\f328"; }
+.fa-gamepad::before { content: "\f11b"; }
+.fa-trophy::before { content: "\f091"; }
+.fa-gift::before { content: "\f06b"; }
+.fa-birthday-cake::before { content: "\f1fd"; }
+.fa-coffee::before { content: "\f0f4"; }
+.fa-pizza-slice::before { content: "\f818"; }
+.fa-utensils::before { content: "\f2e7"; }
+.fa-medkit::before { content: "\f0fa"; }
+.fa-heartbeat::before { content: "\f21e"; }
+.fa-dumbbell::before { content: "\f44b"; }
+.fa-bicycle::before { content: "\f206"; }
+.fa-tree::before { content: "\f1bb"; }
+.fa-leaf::before { content: "\f06c"; }
+.fa-seedling::before { content: "\f4d8"; }
+.fa-paw::before { content: "\f1b0"; }
+.fa-bug::before { content: "\f188"; }
+.fa-flask::before { content: "\f0c3"; }
+.fa-atom::before { content: "\f5d2"; }
+.fa-magnet::before { content: "\f076"; }
+.fa-fire::before { content: "\f06d"; }
+.fa-sun::before { content: "\f185"; }
+.fa-umbrella::before { content: "\f0e9"; }
+.fa-snowflake::before { content: "\f2dc"; }
+.fa-flag::before { content: "\f024"; }
+.fa-bookmark::before { content: "\f02e"; }
+.fa-thumbs-up::before { content: "\f164"; }
+.fa-video::before { content: "\f03d"; }
+.fa-file-alt::before { content: "\f15c"; }
+.fa-paint-brush::before { content: "\f1fc"; }
 
-
-.fa-question-circle,
-.fa-times-circle,
 .fa-question-circle,
 .fa-times-circle,
 .fa-eye,
@@ -3404,7 +3467,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-star,
 .fa-layer-group,
 .fa-cog,
-.fa-eye,
 .fa-columns,
 .fa-home,
 .fa-bold,
@@ -3447,18 +3509,65 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .fa-grip-vertical,
 .fa-grip-lines-vertical,
 .fa-video,
-.fa-plus,
 .fa-list-check,
 .fa-image,
-.fa-tags,
-.fa-code,
 .fa-share,
 .fa-arrows-up-down,
 .fa-arrows-h,
 .fa-sort,
-.fa-mobile,
 .fa-file-import,
-.fa-moon {
+.fa-moon,
+.fa-briefcase,
+.fa-heart,
+.fa-music,
+.fa-book,
+.fa-graduation-cap,
+.fa-rocket,
+.fa-users,
+.fa-wrench,
+.fa-camera,
+.fa-shield,
+.fa-lock,
+.fa-key,
+.fa-envelope,
+.fa-inbox,
+.fa-archive,
+.fa-box,
+.fa-shopping-cart,
+.fa-credit-card,
+.fa-chart-line,
+.fa-chart-bar,
+.fa-database,
+.fa-server,
+.fa-tasks,
+.fa-clipboard,
+.fa-gamepad,
+.fa-trophy,
+.fa-gift,
+.fa-birthday-cake,
+.fa-coffee,
+.fa-pizza-slice,
+.fa-utensils,
+.fa-medkit,
+.fa-heartbeat,
+.fa-dumbbell,
+.fa-bicycle,
+.fa-tree,
+.fa-leaf,
+.fa-seedling,
+.fa-paw,
+.fa-bug,
+.fa-flask,
+.fa-atom,
+.fa-magnet,
+.fa-fire,
+.fa-sun,
+.fa-umbrella,
+.fa-snowflake,
+.fa-bolt,
+.fa-flag,
+.fa-bookmark,
+.fa-thumbs-up {
   font-family: "Font Awesome 5 Pro";
   font-weight: 300;
   font-style: normal;
