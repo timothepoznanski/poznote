@@ -32,16 +32,26 @@ try {
             $currentLang = 'en';
         }
 
+        // Read default_workspace to decide if we should clear localStorage
+        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['default_workspace']);
+        $default_workspace = $stmt->fetchColumn();
+        if ($default_workspace === false) {
+            $default_workspace = '';
+        }
+
         $tmpCon = null;
     } catch (Exception $e) {
         // ignore DB errors and leave display name empty
         $login_display_name = '';
         $currentLang = 'en';
+        $default_workspace = '';
     }
     if ($login_display_name === false) $login_display_name = '';
 } catch (Exception $e) {
     $login_display_name = '';
     $currentLang = 'en';
+    $default_workspace = '';
 }
 
 // If already authenticated, redirect to home
@@ -172,6 +182,18 @@ if (isset($_GET['oidc_error'])) {
                     oidcButton.focus();
                 }
             });
+        </script>
+        <?php endif; ?>
+        <?php
+        // Only clear localStorage if a specific workspace is set as default (not __last_opened__ or empty)
+        // This allows "last opened" to work while still respecting specific workspace defaults
+        $shouldClearLocalStorage = !empty($default_workspace) && $default_workspace !== '__last_opened__';
+        ?>
+        <?php if ($shouldClearLocalStorage): ?>
+        <script>
+            // Clear selected workspace from localStorage when arriving on login page
+            // This ensures the default_workspace setting takes effect after re-login
+            try { localStorage.removeItem('poznote_selected_workspace'); } catch(e) {}
         </script>
         <?php endif; ?>
 </body>
