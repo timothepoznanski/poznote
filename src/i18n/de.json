@@ -11,6 +11,7 @@
     "confirmation": "Bestätigung",
     "save": "Speichern",
     "download": "Herunterladen",
+    "convert": "Konvertieren",
     "create": "Erstellen",
     "delete": "Löschen",
     "duplicate": "Duplizieren",
@@ -269,7 +270,7 @@
       "check_updates": "Nach Updates suchen",
       "api_docs": "API-Dokumentation",
       "documentation": "Github Repository",
-      "news": "Poznote-News",
+      "news": "Poznote-Blog",
       "website": "Poznote-Website",
       "support": "Entwickler unterstützen",
       "release_notes": "Versionshinweise"
@@ -660,10 +661,10 @@
       "title_in_folder": "Erstellen in {{folder}}",
       "folder_fallback": "Ordner",
       "note": {
-        "title": "Notiz"
+        "title": "HTML-Notiz (nicht Markdown)"
       },
       "markdown": {
-        "title": "Markdown-Notiz"
+        "title": "Markdown-Notiz (nicht HTML)"
       },
       "task_list": {
         "title": "Aufgabenliste"
@@ -677,6 +678,20 @@
       "workspace": {
         "title": "Arbeitsbereich"
       }
+    },
+    "convert": {
+      "title": "Notiz konvertieren",
+      "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
+      "to_html_title": "In HTML konvertieren",
+      "to_html_message": "Dies wird Ihre Markdown-Notiz in das HTML-Format konvertieren.",
+      "to_html_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
+      "to_markdown_title": "In Markdown konvertieren",
+      "to_markdown_message": "Dies wird Ihre HTML-Notiz in das Markdown-Format konvertieren. Eingebettete Bilder werden als Anhänge gespeichert.",
+      "to_markdown_warning": "Bevor Sie diese Notiz konvertieren, können Sie sie duplizieren, um eine Kopie zu behalten, falls die Konvertierung nicht Ihren Erwartungen entspricht.",
+      "converting": "Notiz wird konvertiert...",
+      "success": "Notiz erfolgreich konvertiert!",
+      "error": "Fehler beim Konvertieren der Notiz",
+      "duplicate_button": "Duplizieren"
     },
     "export": {
       "title": "Notiz exportieren",

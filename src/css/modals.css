@@ -198,6 +198,22 @@
 .modal-buttons button.btn-cancel:hover {
     background-color: #e9ecef;
 }
+.modal-buttons button.btn-success {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+.modal-buttons button.btn-success:hover {
+    background-color: #218838;
+}
+.modal-buttons button.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+.modal-buttons button.btn-danger:hover {
+    background-color: #c82333;
+}
 
 /* Specific rules for the dynamically-created input modal to ensure consistent styling */
 #inputModal .modal-content {
@@ -1842,4 +1858,11 @@ html[data-theme='dark'] input:checked + .toggle-slider {
 
 #createModal .modal-content {
     margin: 0 auto !important;
+}
+
+/* Convert note modal warning */
+#convertNoteModal .convert-warning {
+    color: #dc3545;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }

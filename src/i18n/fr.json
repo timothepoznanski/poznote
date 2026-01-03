@@ -12,6 +12,7 @@
     "confirmation": "Confirmation",
     "save": "Enregistrer",
     "download": "Télécharger",
+    "convert": "Convertir",
     "create": "Créer",
     "delete": "Supprimer",
     "duplicate": "Dupliquer",
@@ -662,10 +663,10 @@
       "title_in_folder": "Créer dans {{folder}}",
       "folder_fallback": "dossier",
       "note": {
-        "title": "Note"
+        "title": "Note HTML (pas Markdown)"
       },
       "markdown": {
-        "title": "Note Markdown"
+        "title": "Note Markdown (pas HTML)"
       },
       "task_list": {
         "title": "Liste de tâches"
@@ -694,6 +695,20 @@
         "title": "Imprimer en PDF (Navigateur)",
         "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"
       }
+    },
+    "convert": {
+      "title": "Convertir la note",
+      "message": "Êtes-vous sûr de vouloir convertir cette note ?",
+      "to_html_title": "Convertir en HTML",
+      "to_html_message": "Cela convertira votre note Markdown en format HTML.",
+      "to_html_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
+      "to_markdown_title": "Convertir en Markdown",
+      "to_markdown_message": "Cela convertira votre note HTML en format Markdown. Les images intégrées seront enregistrées comme pièces jointes.",
+      "to_markdown_warning": "Avant de convertir cette note, vous pouvez la dupliquer pour conserver une copie au cas où la conversion ne serait pas satisfaisante.",
+      "converting": "Conversion en cours...",
+      "success": "Note convertie avec succès !",
+      "error": "Échec de la conversion de la note",
+      "duplicate_button": "Dupliquer"
     },
     "note_sort": {
       "title": "Ordre de tri des notes",
@@ -849,7 +864,10 @@
       "favorite_remove": "Retirer des favoris",
       "public_note": "Rendre la note publique",
       "attachments_with_count": "Pièces jointes ({{count}})",
-      "menu_actions": "Actions du menu"
+      "menu_actions": "Actions du menu",
+      "convert_to_html": "Convertir en HTML",
+      "convert_to_markdown": "Convertir en Markdown",
+      "share_note": "Partager la note"
     },
     "public_modal": {
       "title": "URL publique",

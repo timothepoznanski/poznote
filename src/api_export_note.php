@@ -131,21 +131,19 @@ try {
         exportAsJson($raw, $note['heading']);
     }
 
-    // HTML export is not available for markdown notes
-    if ($format === 'html' && $noteType === 'markdown') {
-        header('Content-Type: application/json');
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'HTML export is not available for markdown notes. Use "markdown" format instead.']);
-        exit;
-    }
-
     // Check format and export accordingly
     if ($format === 'markdown') {
         // Export as Markdown with front matter YAML
         exportAsMarkdown($content, $note, $con);
     } else {
+        // For markdown notes, convert markdown to HTML first
+        if ($noteType === 'markdown') {
+            // Convert images to base64 only for HTML export (download), not for print (inline)
+            $embedImages = ($disposition === 'attachment');
+            $content = parseMarkdownToHtml($content, $embedImages);
+        }
         // For tasklist notes, convert stored JSON to HTML before styling
-        if ($noteType === 'tasklist') {
+        elseif ($noteType === 'tasklist') {
             $decoded = json_decode($content, true);
             if (is_array($decoded)) {
                 $tasksContent = '<div class="task-list-container">' . "\n";
@@ -182,10 +180,117 @@ try {
 }
 
 /**
+ * Convert local image path to base64 data URI
+ */
+function convertImageToBase64($imagePath) {
+    global $con;
+    
+    // Only convert local attachment images, not external URLs
+    if (preg_match('/^https?:\/\//i', $imagePath)) {
+        return $imagePath;
+    }
+    
+    $attachmentsPath = getAttachmentsPath();
+    $fullPath = null;
+    
+    // Decode HTML entities first (in case URL is already escaped)
+    $imagePath = html_entity_decode($imagePath, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    
+    // Case 1: api_attachments.php?action=download&note_id=X&attachment_id=Y
+    // Note: attachments are stored in entries.attachments (JSON), not a separate table.
+    if (stripos($imagePath, 'api_attachments.php') !== false) {
+        $parts = parse_url($imagePath);
+        $queryString = $parts['query'] ?? '';
+        $params = [];
+        parse_str($queryString, $params);
+
+        $noteId = isset($params['note_id']) ? (int)$params['note_id'] : 0;
+        $attachmentId = isset($params['attachment_id']) ? (string)$params['attachment_id'] : '';
+        $workspace = isset($params['workspace']) ? (string)$params['workspace'] : null;
+
+        if ($noteId > 0 && $attachmentId !== '') {
+            try {
+                if ($workspace !== null && $workspace !== '') {
+                    $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ? AND workspace = ?');
+                    $stmt->execute([$noteId, $workspace]);
+                } else {
+                    $stmt = $con->prepare('SELECT attachments FROM entries WHERE id = ?');
+                    $stmt->execute([$noteId]);
+                }
+
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $attachments = (!empty($row['attachments'])) ? json_decode($row['attachments'], true) : [];
+                if (is_array($attachments)) {
+                    foreach ($attachments as $attachment) {
+                        if (isset($attachment['id']) && (string)$attachment['id'] === $attachmentId && !empty($attachment['filename'])) {
+                            $fullPath = $attachmentsPath . '/' . $attachment['filename'];
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                return $imagePath;
+            }
+        }
+    }
+    // Case 2: Regular file paths
+    else {
+        // Remove leading ../ or ./ if present
+        $cleanPath = preg_replace('/^\.\.?\//', '', $imagePath);
+        
+        // Remove 'data/attachments/' prefix if present
+        if (strpos($cleanPath, 'data/attachments/') === 0) {
+            $cleanPath = substr($cleanPath, strlen('data/attachments/'));
+        }
+        // Remove 'attachments/' prefix if present
+        elseif (strpos($cleanPath, 'attachments/') === 0) {
+            $cleanPath = substr($cleanPath, strlen('attachments/'));
+        }
+        
+        $fullPath = $attachmentsPath . '/' . $cleanPath;
+    }
+    
+    // If no valid path was found, return original
+    if (!$fullPath) {
+        return $imagePath;
+    }
+    
+    // Security check: ensure path is within attachments directory
+    $realPath = realpath($fullPath);
+    $expectedDir = realpath($attachmentsPath);
+    
+    if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
+        return $imagePath; // Return original path if security check fails
+    }
+    
+    if (!file_exists($realPath) || !is_readable($realPath)) {
+        return $imagePath; // Return original path if file not found
+    }
+    
+    // Get file contents and convert to base64
+    $imageData = file_get_contents($realPath);
+    if ($imageData === false) {
+        return $imagePath;
+    }
+    
+    // Determine MIME type
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $realPath);
+    finfo_close($finfo);
+    
+    // Create data URI
+    $base64 = base64_encode($imageData);
+    return 'data:' . $mimeType . ';base64,' . $base64;
+}
+
+/**
  * Simple markdown to HTML parser
  * Based on the version used in public_note.php
+ * 
+ * @param string $text The markdown text to convert
+ * @param bool $embedImages Whether to convert local images to base64
  */
-function parseMarkdownToHtml($text) {
+function parseMarkdownToHtml($text, $embedImages = false) {
     if (!$text) return '';
     
     // First, extract and protect images and links from HTML escaping
@@ -193,10 +298,16 @@ function parseMarkdownToHtml($text) {
     $protectedIndex = 0;
     
     // Protect images first ![alt](url "title")
-    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\)]+?)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, $embedImages) {
         $alt = $matches[1];
-        $url = $matches[2];
+        $url = trim($matches[2]);
         $title = isset($matches[3]) ? $matches[3] : '';
+        
+        // Convert to base64 if requested and it's a local image
+        if ($embedImages) {
+            $url = convertImageToBase64($url);
+        }
+        
         $placeholder = "\x00PIMG" . $protectedIndex . "\x00";
         if ($title) {
             $imgTag = '<img src="' . htmlspecialchars($url) . '" alt="' . htmlspecialchars($alt) . '" title="' . htmlspecialchars($title) . '">';

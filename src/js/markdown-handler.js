@@ -44,7 +44,7 @@ function normalizeContentEditableText(element) {
             if (j > 0) {
                 // Only add a newline separator if the previous part doesn't already end with one
                 var prevPart = parts[j - 1];
-                if (!prevPart.endsWith('\n') && part !== '') {
+                if (!prevPart.endsWith('\n')) {
                     content += '\n';
                 }
             }

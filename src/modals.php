@@ -281,13 +281,31 @@
                     <div class="create-note-option" data-type="html" onclick="selectCreateType('html')">
                         <i class="fa fa-file-alt"></i>
                         <div>
-                            <span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
+                            <span><?php 
+                                $title = t_h('modals.create.note.title', [], 'Note');
+                                $parenPos = strpos($title, ' (');
+                                if ($parenPos !== false) {
+                                    echo htmlspecialchars(substr($title, 0, $parenPos));
+                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                } else {
+                                    echo htmlspecialchars($title);
+                                }
+                            ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
                         <i class="fa fa-markdown"></i>
                         <div>
-                            <span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
+                            <span><?php 
+                                $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
+                                $parenPos = strpos($title, ' (');
+                                if ($parenPos !== false) {
+                                    echo htmlspecialchars(substr($title, 0, $parenPos));
+                                    echo '<span class="create-note-subtitle">' . htmlspecialchars(substr($title, $parenPos)) . '</span>';
+                                } else {
+                                    echo htmlspecialchars($title);
+                                }
+                            ?></span>
                         </div>
                     </div>
                     <div class="create-note-option" data-type="list" onclick="selectCreateType('list')">
@@ -370,6 +388,22 @@
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeModal('exportModal')"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Convert Note Modal -->
+<div id="convertNoteModal" class="modal">
+    <div class="modal-content">
+        <h3 id="convertNoteTitle"><?php echo t_h('modals.convert.title', [], 'Convert Note'); ?></h3>
+        <div class="modal-body">
+            <p id="convertNoteMessage"><?php echo t_h('modals.convert.message', [], 'Are you sure you want to convert this note?'); ?></p>
+            <p id="convertNoteWarning" class="convert-warning"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-danger" onclick="closeModal('convertNoteModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-success" id="duplicateBeforeConvertBtn"><?php echo t_h('modals.convert.duplicate_button', [], 'Duplicate'); ?></button>
+            <button type="button" class="btn-primary" id="confirmConvertBtn"><?php echo t_h('common.convert', [], 'Convert'); ?></button>
         </div>
     </div>
 </div>

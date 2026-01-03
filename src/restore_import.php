@@ -749,7 +749,10 @@ function importZipWithFolders($uploadedFile, $workspace) {
             
             // Extract title - prioritize front matter, then filename
             if ($frontMatterData && isset($frontMatterData['title'])) {
-                $title = $frontMatterData['title'];
+                // Ensure title is a string (some YAML parsers may return arrays)
+                $title = is_array($frontMatterData['title']) 
+                    ? implode(' ', $frontMatterData['title'])
+                    : $frontMatterData['title'];
             } else {
                 $title = pathinfo($fileName, PATHINFO_FILENAME);
             }
@@ -1196,7 +1199,10 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         
         // Extract title - prioritize front matter, then filename
         if ($frontMatterData && isset($frontMatterData['title'])) {
-            $title = $frontMatterData['title'];
+            // Ensure title is a string (some YAML parsers may return arrays)
+            $title = is_array($frontMatterData['title']) 
+                ? implode(' ', $frontMatterData['title'])
+                : $frontMatterData['title'];
         } else {
             $title = pathinfo($fileName, PATHINFO_FILENAME);
         }
@@ -1410,7 +1416,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         // Extract title - prioritize front matter, then filename
         if ($frontMatterData && isset($frontMatterData['title'])) {
-            $title = $frontMatterData['title'];
+            // Ensure title is a string (some YAML parsers may return arrays)
+            $title = is_array($frontMatterData['title']) 
+                ? implode(' ', $frontMatterData['title'])
+                : $frontMatterData['title'];
         } else {
             $title = pathinfo($fileName, PATHINFO_FILENAME);
         }

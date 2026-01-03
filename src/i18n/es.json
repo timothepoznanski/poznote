@@ -11,6 +11,7 @@
     "confirmation": "Confirmación",
     "save": "Guardar",
     "download": "Descargar",
+    "convert": "Convertir",
     "create": "Crear",
     "delete": "Eliminar",
     "duplicate": "Duplicar",
@@ -269,7 +270,7 @@
       "check_updates": "Buscar actualizaciones",
       "api_docs": "Documentación de API",
       "documentation": "Repositorio Github",
-      "news": "Noticias de Poznote",
+      "news": "Blog de Poznote",
       "website": "Sitio web de Poznote",
       "support": "Apoyar al desarrollador",
       "release_notes": "Notas de la versión"
@@ -660,10 +661,10 @@
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota"
+        "title": "Nota HTML (no Markdown)"
       },
       "markdown": {
-        "title": "Nota Markdown"
+        "title": "Nota Markdown (no HTML)"
       },
       "task_list": {
         "title": "Lista de tareas"
@@ -677,6 +678,20 @@
       "workspace": {
         "title": "Espacio de trabajo"
       }
+    },
+    "convert": {
+      "title": "Convertir nota",
+      "message": "¿Estás seguro de que quieres convertir esta nota?",
+      "to_html_title": "Convertir a HTML",
+      "to_html_message": "Esto convertirá tu nota Markdown a formato HTML.",
+      "to_html_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
+      "to_markdown_title": "Convertir a Markdown",
+      "to_markdown_message": "Esto convertirá tu nota HTML a formato Markdown. Las imágenes embebidas se guardarán como adjuntos.",
+      "to_markdown_warning": "Antes de convertir esta nota, puedes duplicarla para mantener una copia en caso de que la conversión no cumpla con tus expectativas.",
+      "converting": "Convirtiendo nota...",
+      "success": "¡Nota convertida con éxito!",
+      "error": "Error al convertir la nota",
+      "duplicate_button": "Duplicar"
     },
     "export": {
       "title": "Exportar nota",

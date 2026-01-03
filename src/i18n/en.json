@@ -12,6 +12,7 @@
     "confirmation": "Confirmation",
     "save": "Save",
     "download": "Download",
+    "convert": "Convert",
     "create": "Create",
     "delete": "Delete",
     "duplicate": "Duplicate",
@@ -271,7 +272,7 @@
       "check_updates": "Check for Updates",
       "api_docs": "API Documentation",
       "documentation": "Github Repository",
-      "news": "Poznote News",
+      "news": "Poznote Blog",
       "website": "Poznote Website",
       "support": "Support Developer",
       "release_notes": "Release Notes"
@@ -671,10 +672,10 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "Note"
+        "title": "HTML Note (not markdown)"
       },
       "markdown": {
-        "title": "Markdown Note"
+        "title": "Markdown note (not HTML)"
       },
       "task_list": {
         "title": "Task List"
@@ -703,6 +704,20 @@
         "title": "Print to PDF (Browser)",
         "description": "Use browser's native print dialog to save as PDF"
       }
+    },
+    "convert": {
+      "title": "Convert Note",
+      "message": "Are you sure you want to convert this note?",
+      "to_html_title": "Convert to HTML",
+      "to_html_message": "This will convert your Markdown note to HTML format.",
+      "to_html_warning": "Before converting this note, you can duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
+      "to_markdown_title": "Convert to Markdown",
+      "to_markdown_message": "This will convert your HTML note to Markdown format. Embedded images will be saved as attachments.",
+      "to_markdown_warning": "Before converting this note, you can duplicate it to keep a copy in case the conversion doesn't meet your expectations.",
+      "converting": "Converting note...",
+      "success": "Note converted successfully!",
+      "error": "Failed to convert note",
+      "duplicate_button": "Duplicate"
     },
     "note_sort": {
       "title": "Note sort order",
@@ -849,7 +864,10 @@
       "favorite_remove": "Remove from favorites",
       "public_note": "Make note public",
       "attachments_with_count": "Attachments ({{count}})",
-      "menu_actions": "Menu actions"
+      "menu_actions": "Menu actions",
+      "convert_to_html": "Convert to HTML",
+      "convert_to_markdown": "Convert to Markdown",
+      "share_note": "Share note"
     },
     "public_modal": {
       "title": "Public URL",
