@@ -37,8 +37,143 @@ if (typeof window.hideCustomAlert !== 'function') {
     };
 }
 
+// Accordion toggle function
+function toggleAccordion(sectionId) {
+    const content = document.getElementById(sectionId);
+    const icon = document.getElementById(sectionId + 'Icon');
+
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        icon.textContent = '▼';
+    } else {
+        content.style.display = 'none';
+        icon.textContent = '▶';
+    }
+}
+
+// Format file size for display
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 ' + tr('restore_import.units.bytes', 'Bytes');
+    const k = 1024;
+    const sizes = [
+        tr('restore_import.units.bytes', 'Bytes'),
+        tr('restore_import.units.kb', 'KB'),
+        tr('restore_import.units.mb', 'MB'),
+        tr('restore_import.units.gb', 'GB')
+    ];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Event delegation handler for all click actions
+function handleRestoreImportClick(e) {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+
+    const action = target.dataset.action;
+    const section = target.dataset.section;
+
+    switch (action) {
+        // Accordion toggles
+        case 'toggle-accordion':
+            if (section) toggleAccordion(section);
+            break;
+
+        // Complete restore actions
+        case 'show-complete-restore-confirmation':
+            showCompleteRestoreConfirmation();
+            break;
+        case 'hide-complete-restore-confirmation':
+            hideCompleteRestoreConfirmation();
+            break;
+        case 'proceed-complete-restore':
+            proceedWithCompleteRestore();
+            break;
+
+        // Chunked restore actions
+        case 'start-chunked-restore':
+            startChunkedRestore();
+            break;
+        case 'show-chunked-restore-confirmation':
+            showChunkedRestoreConfirmation();
+            break;
+        case 'hide-chunked-restore-confirmation':
+            hideChunkedRestoreConfirmation();
+            break;
+        case 'proceed-chunked-restore':
+            proceedWithChunkedRestore();
+            break;
+
+        // Direct copy restore actions
+        case 'show-direct-copy-restore-confirmation':
+            showDirectCopyRestoreConfirmation();
+            break;
+        case 'hide-direct-copy-restore-confirmation':
+            hideDirectCopyRestoreConfirmation();
+            break;
+        case 'proceed-direct-copy-restore':
+            proceedWithDirectCopyRestore();
+            break;
+
+        // Import confirmation actions
+        case 'hide-import-confirmation':
+            hideImportConfirmation();
+            break;
+        case 'proceed-import':
+            proceedWithImport();
+            break;
+
+        // Notes import actions
+        case 'hide-notes-import-confirmation':
+            hideNotesImportConfirmation();
+            break;
+        case 'proceed-notes-import':
+            proceedWithNotesImport();
+            break;
+
+        // Attachments import actions
+        case 'hide-attachments-import-confirmation':
+            hideAttachmentsImportConfirmation();
+            break;
+        case 'proceed-attachments-import':
+            proceedWithAttachmentsImport();
+            break;
+
+        // Individual notes import actions
+        case 'show-individual-notes-import-confirmation':
+            showIndividualNotesImportConfirmation();
+            break;
+        case 'hide-individual-notes-import-confirmation':
+            hideIndividualNotesImportConfirmation();
+            break;
+        case 'proceed-individual-notes-import':
+            proceedWithIndividualNotesImport();
+            break;
+
+        // Custom alert
+        case 'hide-custom-alert':
+            hideCustomAlert();
+            break;
+    }
+}
+
 // Initialize event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Load config from JSON element if present
+    const configEl = document.getElementById('restore-import-config');
+    if (configEl) {
+        try {
+            const config = JSON.parse(configEl.textContent);
+            window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES = config.maxIndividualFiles || 50;
+            window.POZNOTE_IMPORT_MAX_ZIP_FILES = config.maxZipFiles || 300;
+        } catch (e) {
+            console.error('Failed to parse restore-import config:', e);
+        }
+    }
+
+    // Event delegation for all click actions
+    document.addEventListener('click', handleRestoreImportClick);
+
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('import-confirm-modal') || e.target.classList.contains('custom-alert')) {
@@ -65,6 +200,112 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup drag and drop visual feedback
     setupDragAndDrop();
+
+    // Setup file input change listeners
+    setupFileInputListeners();
+
+    // Setup workspace select change listener
+    const workspaceSelect = document.getElementById('target_workspace_select');
+    if (workspaceSelect) {
+        workspaceSelect.addEventListener('change', function() {
+            loadFoldersForImport(this.value);
+        });
+    }
+
+    // Update Back to Notes link with stored workspace
+    try {
+        const stored = localStorage.getItem('poznote_selected_workspace');
+        if (stored) {
+            const backLink = document.getElementById('backToNotesLink');
+            if (backLink) backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+        }
+    } catch (e) { /* ignore */ }
+});
+
+// Setup file input change listeners for standard and chunked restore
+function setupFileInputListeners() {
+    const completeFileInput = document.getElementById('complete_backup_file');
+    const chunkedFileInput = document.getElementById('chunked_backup_file');
+
+    if (completeFileInput) {
+        completeFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const button = document.getElementById('completeRestoreBtn');
+            const sizeText = button ? button.parentElement.querySelector('small') : null;
+            
+            if (file && file.name.toLowerCase().endsWith('.zip')) {
+                const sizeMB = file.size / (1024 * 1024);
+                
+                button.disabled = false;
+                button.textContent = tr('restore_import.inline.standard.button', 'Start Complete Restore (Standard)');
+                
+                if (sizeText) {
+                    if (sizeMB > 500) {
+                        sizeText.textContent = tr(
+                            'restore_import.inline.standard.too_large',
+                            '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.',
+                            { size: sizeMB.toFixed(1) }
+                        );
+                        sizeText.style.color = '#dc3545';
+                    } else {
+                        sizeText.textContent = tr(
+                            'restore_import.sections.standard_restore.helper',
+                            'Maximum recommended size: 500MB. For larger files, use chunked upload below.'
+                        );
+                        sizeText.style.color = '#6c757d';
+                    }
+                }
+            }
+        });
+    }
+
+    if (chunkedFileInput) {
+        chunkedFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const button = document.getElementById('chunkedRestoreBtn');
+            const sizeText = document.querySelector('#chunkedUploadForm small');
+            
+            if (file && file.name.toLowerCase().endsWith('.zip')) {
+                const sizeMB = file.size / (1024 * 1024);
+                
+                button.disabled = false;
+                button.textContent = tr('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore') + ' (' + formatFileSize(file.size) + ')';
+                
+                if (sizeText) {
+                    if (sizeMB < 500) {
+                        sizeText.textContent = tr(
+                            'restore_import.inline.chunked.small_file_note',
+                            'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.'
+                        );
+                    } else {
+                        sizeText.textContent = tr(
+                            'restore_import.sections.chunked_restore.helper',
+                            'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
+                        );
+                    }
+                }
+            } else {
+                button.disabled = true;
+                button.textContent = tr('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore');
+                if (sizeText) {
+                    sizeText.textContent = tr(
+                        'restore_import.sections.chunked_restore.helper',
+                        'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
+                    );
+                }
+            }
+        });
+    }
+}
+
+// Chunked uploader reference for cleanup
+let chunkedUploader = null;
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (chunkedUploader) {
+        chunkedUploader.cleanup();
+    }
 });
 
 // Complete Restore Functions
