@@ -3,6 +3,82 @@ require 'auth.php';
 requireAuth();
 
 require_once 'config.php';
+
+// Check if settings access is disabled
+if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Access Denied</title>
+        <link rel="stylesheet" href="css/fontawesome.min.css">
+        <link rel="stylesheet" href="css/all.css">
+        <link rel="stylesheet" href="css/modal-alerts.css">
+        <link rel="stylesheet" href="css/light.min.css">
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background-color: #f5f5f5;
+            }
+            .access-denied-modal {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                padding: 30px;
+                max-width: 450px;
+                text-align: center;
+            }
+            .access-denied-modal i {
+                font-size: 64px;
+                color: #e74c3c;
+                margin-bottom: 20px;
+            }
+            .access-denied-modal h1 {
+                font-size: 24px;
+                margin: 0 0 15px 0;
+                color: #333;
+            }
+            .access-denied-modal p {
+                font-size: 16px;
+                color: #666;
+                margin: 0 0 25px 0;
+                line-height: 1.5;
+            }
+            .access-denied-modal button {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            .access-denied-modal button:hover {
+                background-color: #2980b9;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="access-denied-modal">
+            <i class="fas fa-lock"></i>
+            <h1>Access Denied</h1>
+            <p>Access to settings is disabled by administrator.</p>
+            <button onclick="window.location.href='index.php'">Return to Home</button>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 include 'db_connect.php';
 include 'functions.php';
 
