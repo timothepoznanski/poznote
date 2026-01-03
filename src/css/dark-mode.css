@@ -1162,6 +1162,17 @@ body.dark-mode .attachment-link:hover {
     color: #6ab3ff;
 }
 
+html[data-theme='dark'] .attachments-display,
+body.dark-mode .attachments-display {
+    background: #1a1a1a;
+    border-color: #404040;
+}
+
+html[data-theme='dark'] .no-attachments,
+body.dark-mode .no-attachments {
+    color: #e0e0e0;
+}
+
 /* Code blocks */
 html[data-theme='dark'] .noteentry code,
 html[data-theme='dark'] .noteentry pre,
