@@ -390,7 +390,7 @@ function parseMarkdown(text) {
         });
         
         // Handle angle bracket URLs <https://example.com>
-        text = text.replace(/&lt;(https?:\/\/[^\s&gt;]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        text = text.replace(/&lt;(https?:\/\/[^>]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
         
         // Bold and italic
         text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
