@@ -56,30 +56,10 @@ if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
             $defaultWorkspace = $wsRow ? $wsRow['name'] : '';
         } catch (Exception $e) {}
         
-        echo '<!DOCTYPE html><html><head><script>
-        (function(){
-            var defaultWs = ' . json_encode($defaultWorkspace) . ';
-            try {
-                var workspace = localStorage.getItem("poznote_selected_workspace");
-                // Always redirect to include workspace parameter
-                if (workspace && workspace !== "") {
-                    var params = new URLSearchParams(window.location.search);
-                    params.set("workspace", workspace);
-                    window.location.href = "index.php?" + params.toString();
-                } else {
-                    // No workspace in localStorage, redirect with first available workspace
-                    var params = new URLSearchParams(window.location.search);
-                    params.set("workspace", defaultWs);
-                    window.location.href = "index.php?" + params.toString();
-                }
-            } catch(e) {
-                // If localStorage fails, redirect with first available workspace
-                var params = new URLSearchParams(window.location.search);
-                params.set("workspace", defaultWs);
-                window.location.href = "index.php?" + params.toString();
-            }
-        })();
-        </script></head><body></body></html>';
+        echo '<!DOCTYPE html><html><head>
+        <script type="application/json" id="workspace-redirect-data">' . json_encode($defaultWorkspace) . '</script>
+        <script src="js/workspace-redirect.js"></script>
+        </head><body></body></html>';
         // Don't exit here - let the page continue loading with first workspace as default
     }
 }
@@ -144,20 +124,7 @@ try {
     // Cache version based on app version to force reload on updates
     $v = getAppVersion();
     ?>
-    <script>
-    (function(){
-        try {
-            var theme = localStorage.getItem('poznote-theme');
-            if (!theme) {
-                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-            }
-            var root = document.documentElement;
-            root.setAttribute('data-theme', theme);
-            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
-        } catch (e) {}
-    })();
-    </script>
+    <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <meta name="color-scheme" content="dark light">
     <link type="text/css" rel="stylesheet" href="css/fontawesome.min.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/light.min.css?v=<?php echo $v; ?>"/>
@@ -254,122 +221,17 @@ $body_classes = trim($extra_body_classes);
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
-    <!-- Debug console info removed in production -->
-    <script>
-    // Global error handler to catch all JavaScript errors
-    window.addEventListener('error', function(event) {
-        console.error('JavaScript Error caught:', {
-            message: event.message,
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno,
-            error: event.error,
-            stack: event.error ? event.error.stack : 'No stack trace available'
-        });
-        
-        // Specific handling for syntax errors that might prevent settings from working
-        if (event.message.includes('Unexpected end of input') || event.message.includes('SyntaxError')) {
-            console.warn('Syntax error detected - this may prevent display settings from working properly');
-        }
-        
-        // Store in sessionStorage for inspection
-        try {
-            const errorInfo = {
-                timestamp: new Date().toISOString(),
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                stack: event.error ? event.error.stack : 'No stack trace'
-            };
-            sessionStorage.setItem('lastJSError', JSON.stringify(errorInfo));
-        } catch (e) {
-            // Ignore storage errors
-        }
-    });
-    
-    // Catch unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(event) {
-        console.error('Unhandled Promise Rejection:', event.reason);
-        try {
-            const errorInfo = {
-                timestamp: new Date().toISOString(),
-                type: 'Promise Rejection',
-                reason: event.reason.toString(),
-                stack: event.reason.stack || 'No stack trace'
-            };
-            sessionStorage.setItem('lastPromiseError', JSON.stringify(errorInfo));
-        } catch (e) {
-            // Ignore storage errors
-        }
-    });
-    
-    // Helper function to check last errors (callable from console)
-    window.checkLastErrors = function() {
-        try {
-            const lastJSError = sessionStorage.getItem('lastJSError');
-            const lastPromiseError = sessionStorage.getItem('lastPromiseError');
-            
-            if (lastJSError) {
-                console.log('Last JavaScript Error:', JSON.parse(lastJSError));
-            }
-            if (lastPromiseError) {
-                console.log('Last Promise Error:', JSON.parse(lastPromiseError));
-            }
-            
-            if (!lastJSError && !lastPromiseError) {
-                console.log('No recent errors found.');
-            }
-        } catch (e) {
-            console.log('Error checking stored errors:', e);
-        }
-    };
-    </script>
+    <!-- Global error handler (external for CSP compliance) -->
+    <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
 
-    <script>
-    // Restore folder states from localStorage
-    document.addEventListener('DOMContentLoaded', function() {
-
-        try {
-            var folderContents = document.querySelectorAll('.folder-content');
-            for (var i = 0; i < folderContents.length; i++) {
-                var content = folderContents[i];
-                var folderId = content.id;
-                var savedState = localStorage.getItem('folder_' + folderId);
-
-                if (savedState === 'closed') {
-                    // add a closed class so CSS can hide it; existing code expects this state
-                    content.classList.add('closed');
-                }
-            }
-        } catch (e) {
-            // ignore errors during initial folder state restoration
-        }
-
-        window.workspaceDisplayMap = <?php
-            $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
-            $json_output = json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
-            echo $json_output ?: '{}';
-        ?>;
-
-        // Update workspace title if using __last_opened__
-        <?php if ($workspace_filter === '__last_opened__'): ?>
-        try {
-            var lastWorkspace = localStorage.getItem('poznote_selected_workspace');
-            if (lastWorkspace && lastWorkspace !== '__last_opened__') {
-                var titleElement = document.querySelector('.workspace-title-text');
-                if (titleElement) {
-                    // Use the display map to get the proper label
-                    var displayName = window.workspaceDisplayMap[lastWorkspace] || lastWorkspace;
-                    titleElement.textContent = displayName;
-                }
-            }
-        } catch (e) {
-            console.error('Error updating workspace title:', e);
-        }
-        <?php endif; ?>
-    });
-    </script>
+    <!-- Workspace data for JavaScript (CSP compliant) -->
+    <script type="application/json" id="workspace-display-map-data"><?php
+        $display_map = generateWorkspaceDisplayMap($workspaces, $labels);
+        echo json_encode($display_map, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
+    ?></script>
+    <?php if ($workspace_filter === '__last_opened__'): ?>
+    <script type="application/json" id="workspace-last-opened-flag">true</script>
+    <?php endif; ?>
 
     <?php include 'modals.php'; ?>
     
@@ -391,35 +253,34 @@ $body_classes = trim($extra_body_classes);
     <!-- MENU RIGHT COLUMN -->	 
     <div class="sidebar-header">
         <div class="sidebar-title-row">
-            <div class="sidebar-title" role="button" tabindex="0" onclick="toggleWorkspaceMenu(event);">
+            <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
                 <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-settings" onclick="navigateToDisplayOrSettings('settings.php');" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge" style="display: none;"></span></button>
-                <button class="sidebar-plus" onclick="toggleCreateMenu();" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
+                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge" style="display: none;"></span></button>
+                <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
 
             <div class="workspace-menu" id="workspaceMenu"></div>
         </div>
     </div>
         
-    <script>
-    // Set configuration variables for the main page
-    window.isSearchMode = <?php echo (!empty($search) || !empty($tags_search)) ? 'true' : 'false'; ?>;
-    window.currentNoteFolder = <?php 
+    <!-- Page configuration data (CSP compliant) -->
+    <script type="application/json" id="page-config-data"><?php 
+        $config_data = [
+            'isSearchMode' => !empty($search) || !empty($tags_search),
+            'currentNoteFolder' => null,
+            'selectedWorkspace' => $workspace_filter ?? ''
+        ];
         if ($note != '' && empty($search) && empty($tags_search)) {
-            $folder_value = $current_note_folder ?? '';
-            echo json_encode($folder_value);
+            $config_data['currentNoteFolder'] = $current_note_folder ?? '';
         } else if (isset($default_note_folder) && $default_note_folder && empty($search) && empty($tags_search)) {
-            echo json_encode($default_note_folder);
-        } else {
-            echo 'null';
+            $config_data['currentNoteFolder'] = $default_note_folder;
         }
-    ?>;
-    window.selectedWorkspace = <?php echo json_encode($workspace_filter ?? ''); ?>;
-    </script>
+        echo json_encode($config_data, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP);
+    ?></script>
                     
     <?php
         
@@ -473,104 +334,6 @@ $body_classes = trim($extra_body_classes);
     ?>
 
     </div>
-    <script>
-    // Create menu functionality - now opens unified modal
-    function toggleCreateMenu() {
-        // Show the unified create modal instead of dropdown menu
-        if (typeof showCreateModal === 'function') {
-            showCreateModal();
-        } else {
-            console.error('showCreateModal function not available');
-        }
-    }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        var menu = document.getElementById('header-create-menu');
-        var plusBtn = document.querySelector('.sidebar-plus');
-        if (menu && plusBtn && !plusBtn.contains(e.target) && !menu.contains(e.target)) {
-            menu.remove();
-            plusBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-    
-    // Make function globally available
-    window.toggleCreateMenu = toggleCreateMenu;
-    
-    // Task list creation function
-    function createTaskListNote() {
-        var params = new URLSearchParams({
-            now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-            folder: selectedFolder,
-            workspace: selectedWorkspace || getSelectedWorkspace(),
-            type: 'tasklist'
-        });
-        
-        fetch("api_insert_new.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-            body: params.toString()
-        })
-        .then(function(response) { return response.text(); })
-        .then(function(data) {
-            try {
-                var res = JSON.parse(data);
-                if(res.status === 1) {
-                    window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-                } else {
-                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
-                }
-            } catch(e) {
-                showNotificationPopup((window.t ? window.t('index.errors.create_task_list_prefix', null, 'Error creating task list: ') : 'Error creating task list: ') + data, 'error');
-            }
-        })
-        .catch(function(error) {
-            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
-        });
-    }
-    
-    // Make function globally available
-    window.createTaskListNote = createTaskListNote;
-    
-    // Markdown note creation function
-    function createMarkdownNote() {
-        var params = new URLSearchParams({
-            now: (new Date().getTime()/1000) - new Date().getTimezoneOffset()*60,
-            folder: selectedFolder,
-            workspace: selectedWorkspace || getSelectedWorkspace(),
-            type: 'markdown'
-        });
-        
-        fetch("api_insert_new.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest' },
-            body: params.toString()
-        })
-        .then(function(response) { return response.text(); })
-        .then(function(data) {
-            try {
-                var res = JSON.parse(data);
-                if(res.status === 1) {
-                    window.scrollTo(0, 0);
-                    var ws = encodeURIComponent(selectedWorkspace || getSelectedWorkspace());
-                    window.location.href = "index.php?workspace=" + ws + "&note=" + res.id + "&scroll=1";
-                } else {
-                    showNotificationPopup(res.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
-                }
-            } catch(e) {
-                showNotificationPopup((window.t ? window.t('index.errors.create_markdown_note_prefix', null, 'Error creating markdown note: ') : 'Error creating markdown note: ') + data, 'error');
-            }
-        })
-        .catch(function(error) {
-            showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
-        });
-    }
-    
-    // Make function globally available
-    window.createMarkdownNote = createMarkdownNote;
-    </script>
     
     <div class="resize-handle" id="resizeHandle"></div>
     
@@ -650,22 +413,22 @@ $body_classes = trim($extra_body_classes);
                     }
                 
                     // Home button (mobile only)
-                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="' . t_h('editor.toolbar.back_to_notes') . '" onclick="scrollToLeftColumn()"><i class="fa-home"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-home mobile-home-btn" title="' . t_h('editor.toolbar.back_to_notes') . '" data-action="scroll-to-left-column"><i class="fa-home"></i></button>';
                     
                     // Text formatting buttons (save button removed - auto-save is now automatic)
-                    echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" onclick="document.execCommand(\'bold\')"><i class="fa-bold"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="' . t_h('editor.toolbar.italic') . '" onclick="document.execCommand(\'italic\')"><i class="fa-italic"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="' . t_h('editor.toolbar.underline') . '" onclick="document.execCommand(\'underline\')"><i class="fa-underline"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="' . t_h('editor.toolbar.strikethrough') . '" onclick="document.execCommand(\'strikeThrough\')"><i class="fa-strikethrough"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="' . t_h('editor.toolbar.link') . '" onclick="addLinkToNote()"><i class="fa-link"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="' . t_h('editor.toolbar.text_color') . '" onclick="toggleRedColor()"><i class="fa-palette"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="' . t_h('editor.toolbar.highlight') . '" onclick="toggleYellowHighlight()"><i class="fa-fill-drip"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" onclick="document.execCommand(\'insertUnorderedList\')"><i class="fa-list-ul"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" onclick="document.execCommand(\'insertOrderedList\')"><i class="fa-list-ol"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('editor.toolbar.font_size') . '" onclick="changeFontSize()"><i class="fa-text-height"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" onclick="toggleCodeBlock()"><i class="fa-code"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" onclick="toggleInlineCode()"><i class="fa-terminal"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" onclick="document.execCommand(\'removeFormat\')"><i class="fa-eraser"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-bold text-format-btn" title="' . t_h('editor.toolbar.bold') . '" data-action="exec-bold"><i class="fa-bold"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-italic text-format-btn" title="' . t_h('editor.toolbar.italic') . '" data-action="exec-italic"><i class="fa-italic"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-underline text-format-btn" title="' . t_h('editor.toolbar.underline') . '" data-action="exec-underline"><i class="fa-underline"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-strikethrough text-format-btn" title="' . t_h('editor.toolbar.strikethrough') . '" data-action="exec-strikethrough"><i class="fa-strikethrough"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="' . t_h('editor.toolbar.link') . '" data-action="add-link"><i class="fa-link"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="' . t_h('editor.toolbar.text_color') . '" data-action="toggle-red-color"><i class="fa-palette"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="' . t_h('editor.toolbar.highlight') . '" data-action="toggle-yellow-highlight"><i class="fa-fill-drip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" data-action="exec-unordered-list"><i class="fa-list-ul"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" data-action="exec-ordered-list"><i class="fa-list-ol"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('editor.toolbar.font_size') . '" data-action="change-font-size"><i class="fa-text-height"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="fa-code"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" data-action="toggle-inline-code"><i class="fa-terminal"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="fa-eraser"></i></button>';
                 
                     // Task list order button (only visible for tasklist notes)
                     if ($note_type === 'tasklist') {
@@ -682,24 +445,24 @@ $body_classes = trim($extra_body_classes);
                         $order_icon = $task_order === 'top' ? 'fa-arrow-up' : 'fa-arrow-down';
                         $order_title = $task_order === 'top' ? t_h('tasklist.add_to_top') : t_h('tasklist.add_to_bottom');
                         $active_class = $task_order === 'top' ? ' active' : '';
-                        echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" onclick="toggleTaskInsertOrder()"><i class="' . $order_icon . '"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-task-order note-action-btn' . $active_class . '" title="' . $order_title . '" data-action="toggle-task-insert-order"><i class="' . $order_icon . '"></i></button>';
                     }
                 
                     // Excalidraw diagram button - insert at cursor position (hidden for markdown and tasklist notes)
                     if ($note_type !== 'markdown' && $note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" onclick="insertExcalidrawDiagram()"><i class="fal fa-paint-brush"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-excalidraw note-action-btn" title="' . t_h('editor.toolbar.insert_excalidraw') . '" data-action="insert-excalidraw"><i class="fal fa-paint-brush"></i></button>';
                     }
                 
                     // Hide emoji button for tasklist notes
                     if ($note_type !== 'tasklist') {
-                        echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="' . t_h('editor.toolbar.insert_emoji') . '" onclick="toggleEmojiPicker()"><i class="fa-smile"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-emoji note-action-btn" title="' . t_h('editor.toolbar.insert_emoji') . '" data-action="toggle-emoji-picker"><i class="fa-smile"></i></button>';
                     }
                     
                     // Table and separator buttons
-                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="' . t_h('editor.toolbar.insert_table') . '" onclick="toggleTablePicker()"><i class="fa-table"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="' . t_h('editor.toolbar.insert_checklist') . '" onclick="insertChecklist()"><i class="fa-list-check"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="' . t_h('editor.toolbar.add_separator') . '" onclick="insertSeparator()"><i class="fa-minus"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="' . t_h('editor.toolbar.insert_note_reference') . '" onclick="openNoteReferenceModal()"><i class="fa-at"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-table note-action-btn" title="' . t_h('editor.toolbar.insert_table') . '" data-action="toggle-table-picker"><i class="fa-table"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-checklist note-action-btn" title="' . t_h('editor.toolbar.insert_checklist') . '" data-action="insert-checklist"><i class="fa-list-check"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-separator note-action-btn" title="' . t_h('editor.toolbar.add_separator') . '" data-action="insert-separator"><i class="fa-minus"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-note-reference note-action-btn" title="' . t_h('editor.toolbar.insert_note_reference') . '" data-action="open-note-reference-modal"><i class="fa-at"></i></button>';
 
                 
                     // Favorite / Share / Attachment buttons
@@ -717,38 +480,38 @@ $body_classes = trim($extra_body_classes);
                         ? t_h('index.toolbar.favorite_remove', [], 'Remove from favorites')
                         : t_h('index.toolbar.favorite_add', [], 'Add to favorites');
 
-                    echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" onclick="toggleFavorite(\''.$row['id'].'\')"><i class="fa-star-light"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" data-action="toggle-favorite" data-note-id="'.$row['id'].'"><i class="fa-star-light"></i></button>';
                     $share_class = $is_shared ? ' is-shared' : '';
                     
                     // Share button
-                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" onclick="openPublicShareModal(\''.$row['id'].'\')"><i class="fa-cloud"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="fa-cloud"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" onclick="showAttachmentDialog(\''.$row['id'].'\')"><i class="fa-paperclip"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.($attachments_count > 0 ? ' has-attachments' : '').'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="fa-paperclip"></i></button>';
                     
                     // Open in new tab button
-                    echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" onclick="openNoteInNewTab('.$row['id'].')"><i class="fa-external-link"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="fa-external-link"></i></button>';
 
                     // Mobile overflow menu button (shown only on mobile via CSS)
                     // Marked as note-action-btn so it can be hidden during text selection (hide-on-selection)
-                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" onclick="toggleMobileToolbarMenu(this)" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
+                    echo '<button type="button" class="toolbar-btn mobile-more-btn note-action-btn" title="'.t_h('common.menu', [], 'Menu').'" data-action="toggle-mobile-toolbar-menu" aria-haspopup="true" aria-expanded="false"><i class="fa-ellipsis"></i></button>';
 
                     // Mobile dropdown menu (actions moved here on mobile)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
 
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
                     
                     // Convert button (only for markdown and note types, with appropriate icon)
                     if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert\')"><i class="fa-file-code"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fa-file-code"></i> '.t_h('common.convert', [], 'Convert').'</button>';
                     } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert\')"><i class="fa-file-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="fa-file-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
                     }
                     
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-trash"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';
                     echo '</div>';
                         
                     // Generate dates safely for JavaScript with robust encoding
@@ -806,22 +569,22 @@ $body_classes = trim($extra_body_classes);
                     $attachments_count_json_escaped = htmlspecialchars($attachments_count_json, ENT_QUOTES);
                     
                     // Individual action buttons
-                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" onclick="duplicateNote(\''.$row['id'].'\')" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fa-copy"></i></button>';
-                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" onclick="showMoveFolderDialog(\''.$row['id'].'\')" title="'.t_h('common.move', [], 'Move').'"><i class="fa-folder-open"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-duplicate note-action-btn" data-action="duplicate-note" data-note-id="'.$row['id'].'" title="'.t_h('common.duplicate', [], 'Duplicate').'"><i class="fa-copy"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-move note-action-btn" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('common.move', [], 'Move').'"><i class="fa-folder-open"></i></button>';
                     
                     // Download button
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" onclick="showExportModal(\''.$row['id'].'\', \''.$filename.'\', '.htmlspecialchars($title_json, ENT_QUOTES).', \''.$note_type.'\')"><i class="fa-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="fa-download"></i></button>';
                     
                     // Convert button (only for markdown and note types)
                     if ($note_type === 'markdown') {
-                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" onclick="showConvertNoteModal(\''.$row['id'].'\', \'html\')" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="fa-file-code"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to HTML').'"><i class="fa-file-code"></i></button>';
                     } elseif ($note_type === 'note') {
-                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" onclick="showConvertNoteModal(\''.$row['id'].'\', \'markdown\')" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="fa-file-alt"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="markdown" title="'.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'"><i class="fa-file-alt"></i></button>';
                     }
                     
-                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" onclick="deleteNote(\''.$row['id'].'\')" title="'.t_h('common.delete', [], 'Delete').'"><i class="fa-trash"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="fa-trash"></i></button>';
                     
-                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" onclick="showNoteInfo(\''.$row['id'].'\', '.$created_json_escaped.', '.$updated_json_escaped.', '.$folder_json_escaped.', '.$favorite_json_escaped.', '.$tags_json_escaped.', '.$attachments_count_json_escaped.')"><i class="fa-info-circle"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="fa-info-circle"></i></button>';
                 
                     echo '</div>';
                     echo '</div>';
@@ -830,10 +593,10 @@ $body_classes = trim($extra_body_classes);
                     // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                     echo '<div class="note-tags-row">';
                     echo '<div class="folder-wrapper">';
-                    echo '<span class="fa-folder icon_folder" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
-                    echo '<span class="folder_name" onclick="showMoveFolderDialog(\''.$row['id'].'\')" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    echo '<span class="fa-folder icon_folder" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
+                    echo '<span class="folder_name" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     echo '</div>';
-                    echo '<span class="fa-tag icon_tag" onclick="window.location=\'list_tags.php?workspace=\' + encodeURIComponent(window.selectedWorkspace || \'\')"></span>';
+                    echo '<span class="fa-tag icon_tag" data-action="navigate-tags"></span>';
                     echo '<span class="name_tags">'
                         .'<input type="hidden" id="tags'.$row['id'].'" value="'.htmlspecialchars(str_replace(',', ' ', $row['tags'] ?? ''), ENT_QUOTES).'"/>'
                     .'</span>';
@@ -845,14 +608,14 @@ $body_classes = trim($extra_body_classes);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
                             echo '<div class="note-attachments-row">';
                             // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" onclick="showAttachmentDialog(\''.$row['id'].'\')" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fa-paperclip icon_attachment"></span></button>';
+                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="fa-paperclip icon_attachment"></span></button>';
                             echo '<span class="note-attachments-list">';
                             $attachment_links = [];
                             foreach ($attachments_data as $attachment) {
                                 if (isset($attachment['id']) && isset($attachment['original_filename'])) {
                                     $original_filename = (string)$attachment['original_filename'];
                                     $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
-                                    $attachment_links[] = '<a href="#" class="attachment-link" onclick="downloadAttachment(\''.$attachment['id'].'\', \''.$row['id'].'\')" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
+                                    $attachment_links[] = '<a href="#" class="attachment-link" data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
                                 }
                             }
                             echo implode(' ', $attachment_links);
@@ -880,7 +643,7 @@ $body_classes = trim($extra_body_classes);
                     } else {
                         $titlePlaceholder = t_h('index.note.title_placeholder', [], 'Title ?');
                     }
-                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateidhead(this);" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"/></h4>';
+                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
                     if (!empty($final_created)) {
@@ -924,14 +687,14 @@ $body_classes = trim($extra_body_classes);
                         // Render subheading as plain text (clickable, but not styled as a blue link)
                         if ($show_subheading_setting) {
                             if ($has_subheading) {
-                                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')">' . $subheading_display . '</span>';
+                                echo '<span class="subheading-link" id="subheading-display-'.$row['id'].'" data-action="open-note-info-edit" data-note-id="'.$row['id'].'">' . $subheading_display . '</span>';
                             } else {
-                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" onclick="openNoteInfoEdit('.$row['id'].')"><em>'.t_h('index.subheading.placeholder', [], 'Add subheading here').'</em></span>';
+                                echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" data-action="open-note-info-edit" data-note-id="'.$row['id'].'"><em>'.t_h('index.subheading.placeholder', [], 'Add subheading here').'</em></span>';
                             }
                         }
                         echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
-                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" onclick="saveSubheadingInline('.$row['id'].')">'.t_h('common.save', [], 'Save').'</button>';
-                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" onclick="cancelSubheadingInline('.$row['id'].')">'.t_h('common.cancel', [], 'Cancel').'</button>';
+                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" data-action="save-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.save', [], 'Save').'</button>';
+                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" data-action="cancel-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.cancel', [], 'Cancel').'</button>';
                         echo '</div>';
                     }
                 
@@ -985,7 +748,7 @@ $body_classes = trim($extra_body_classes);
                         $placeholder_attr .= ' data-ph-mobile="' . htmlspecialchars($placeholder_mobile, ENT_QUOTES) . '"';
                     }
 
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" onfocus="updateident(this);" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
@@ -1011,158 +774,18 @@ $body_classes = trim($extra_body_classes);
         ?>        
     </div>
     
+    <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
-    <!-- Initialize all tasklists -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initializeTaskList === 'function') {
-            <?php foreach ($tasklist_ids as $tasklist_id): ?>
-            initializeTaskList(<?php echo $tasklist_id; ?>, 'tasklist');
-            <?php endforeach; ?>
-        }
-    });
-    </script>
+    <script type="application/json" id="tasklist-init-data"><?php echo json_encode($tasklist_ids); ?></script>
     <?php endif; ?>
     
     <?php if (!empty($markdown_ids)): ?>
-    <!-- Initialize all markdown notes -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initializeMarkdownNote === 'function') {
-            <?php foreach ($markdown_ids as $markdown_id): ?>
-            initializeMarkdownNote(<?php echo $markdown_id; ?>);
-            <?php endforeach; ?>
-        }
-    });
-    </script>
+    <script type="application/json" id="markdown-init-data"><?php echo json_encode($markdown_ids); ?></script>
     <?php endif; ?>
-    
-    <!-- Track opened note and process note references -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Track the currently opened note for recent notes list
-        var noteEntry = document.querySelector('.noteentry[data-note-id]');
-        if (noteEntry && typeof window.trackNoteOpened === 'function') {
-            var noteId = noteEntry.getAttribute('data-note-id');
-            var heading = noteEntry.getAttribute('data-note-heading');
-            if (noteId && heading) {
-                window.trackNoteOpened(noteId, heading);
-            }
-        }
-        
-        // Process note references [[Note Title]] in rendered content
-        if (typeof window.processNoteReferences === 'function') {
-            var noteEntries = document.querySelectorAll('.noteentry');
-            noteEntries.forEach(function(entry) {
-                // Only process for view mode or after markdown rendering
-                window.processNoteReferences(entry);
-            });
-        }
-    });
-    </script>
         
     </div>  <!-- Close main-container -->
-    <script>
-        function startEditSubheading(noteId) {
-            var disp = document.getElementById('subheading-display-' + noteId);
-            var input = document.getElementById('subheading-input-' + noteId);
-            var editBtn = document.getElementById('edit-subheading-' + noteId);
-            var saveBtn = document.getElementById('save-subheading-' + noteId);
-            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
-            if (!disp || !input) return;
-            disp.style.display = 'none';
-            editBtn.style.display = 'none';
-            input.style.display = 'inline-block';
-            saveBtn.style.display = 'inline-block';
-            cancelBtn.style.display = 'inline-block';
-            input.focus();
-            input.select();
-        }
-
-        function cancelSubheadingInline(noteId) {
-            var disp = document.getElementById('subheading-display-' + noteId);
-            var input = document.getElementById('subheading-input-' + noteId);
-            var editBtn = document.getElementById('edit-subheading-' + noteId);
-            var saveBtn = document.getElementById('save-subheading-' + noteId);
-            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
-            if (!disp || !input) return;
-            input.style.display = 'none';
-            saveBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
-            disp.style.display = 'inline';
-            editBtn.style.display = 'inline-block';
-            // restore original value
-            input.value = disp.textContent.trim();
-        }
-
-        function saveSubheadingInline(noteId) {
-            var disp = document.getElementById('subheading-display-' + noteId);
-            var input = document.getElementById('subheading-input-' + noteId);
-            var editBtn = document.getElementById('edit-subheading-' + noteId);
-            var saveBtn = document.getElementById('save-subheading-' + noteId);
-            var cancelBtn = document.getElementById('cancel-subheading-' + noteId);
-            if (!disp || !input) return;
-            var newVal = input.value.trim();
-            // POST to api_update_subheading.php
-            var body = 'note_id=' + encodeURIComponent(noteId) + '&subheading=' + encodeURIComponent(newVal);
-            fetch('api_update_subheading.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body
-            }).then(r => r.json()).then(function(data) {
-                if (data && data.success) {
-                    disp.textContent = newVal || '';
-                    cancelSubheadingInline(noteId);
-                } else {
-                    alert(window.t ? window.t('index.errors.failed_to_save_subheading', null, 'Failed to save heading') : 'Failed to save heading');
-                }
-            }).catch(function(e){ console.error(e); alert(window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error'); });
-        }
-        
-        function openNoteInfoEdit(noteId) {
-            var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
-            if (window.selectedWorkspace && window.selectedWorkspace) {
-                url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
-            }
-            window.location.href = url;
-        }
-    </script>
     
 </body>
-<script>
-    function openNoteInfoEdit(noteId) {
-        var url = 'info.php?note_id=' + encodeURIComponent(noteId) + '&edit_subheading=1';
-        if (window.selectedWorkspace && window.selectedWorkspace) {
-            url += '&workspace=' + encodeURIComponent(window.selectedWorkspace);
-        }
-        window.location.href = url;
-    }
-    
-    // Navigate to settings.php with current workspace and note parameters
-    function navigateToDisplayOrSettings(page) {
-        var url = page;
-        var params = [];
-        
-        // Add workspace parameter if selected
-        if (window.selectedWorkspace && window.selectedWorkspace) {
-            params.push('workspace=' + encodeURIComponent(window.selectedWorkspace));
-        }
-        
-        // Add note parameter if currently viewing a note
-        var urlParams = new URLSearchParams(window.location.search);
-        var noteId = urlParams.get('note');
-        if (noteId) {
-            params.push('note=' + encodeURIComponent(noteId));
-        }
-        
-        // Build final URL
-        if (params.length > 0) {
-            url += '?' + params.join('&');
-        }
-        
-        window.location.href = url;
-    }
-</script>
 <script src="js/index-config.js"></script>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js"></script>
@@ -1192,116 +815,11 @@ $body_classes = trim($extra_body_classes);
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
+<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 
-<script>
-// Mobile navigation functionality
-function scrollToRightColumn() {
-    if (window.innerWidth < 800) {
-        // On mobile, columns are in horizontal flex layout
-        // We need to scroll the body horizontally
-        const scrollAmount = window.innerWidth;
-        document.documentElement.scrollLeft = scrollAmount;
-        document.body.scrollLeft = scrollAmount;
-        window.scrollTo({
-            left: scrollAmount,
-            behavior: 'smooth'
-        });
-    } else {
-        // On desktop, use classic scrollIntoView
-        const rightCol = document.getElementById('right_col');
-        if (rightCol) {
-            rightCol.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start',
-                inline: 'start'
-            });
-        }
-    }
-}
-
-function scrollToLeftColumn() {
-    if (window.innerWidth < 800) {
-        // On mobile, go back to the left column
-        document.documentElement.scrollLeft = 0;
-        document.body.scrollLeft = 0;
-        window.scrollTo({
-            left: 0,
-            behavior: 'smooth'
-        });
-    } else {
-        // On desktop
-        const leftCol = document.getElementById('left_col');
-        if (leftCol) {
-            leftCol.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start',
-                inline: 'start'
-            });
-        }
-    }
-}
-
-
-
-// Auto-scroll to right column when a note is loaded on mobile
-function checkAndScrollToNote() {
-    const isMobile = window.innerWidth <= 800;
-    if (isMobile) {
-        // Only scroll if there's a scroll parameter in the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const shouldScroll = urlParams.has('scroll') && urlParams.get('scroll') === '1';
-        
-        if (shouldScroll) {
-            setTimeout(function() {
-                scrollToRightColumn();
-                // Remove the scroll parameter from URL
-                urlParams.delete('scroll');
-                const newUrl = window.location.pathname + '?' + urlParams.toString();
-                window.history.replaceState({}, '', newUrl);
-            }, 100);
-        }
-    }
-}
-
-// Auto-scroll to right column when clicking on any element that loads a note
-function handleNoteClick(event) {
-    const isMobile = window.innerWidth <= 800;
-    if (isMobile) {
-        // Mark that we want to scroll after the note loads
-        sessionStorage.setItem('shouldScrollToNote', 'true');
-    }
-}
-
-// Add click listeners to all note-related elements
-window.initializeNoteClickHandlers = function() {
-    // Listen for clicks on note links and elements that might load notes
-    const noteElements = document.querySelectorAll('a[href*="note="], .links_arbo_left, .note-title, .note-link');
-    noteElements.forEach(element => {
-        element.addEventListener('click', handleNoteClick);
-    });
-}
-
-// Event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    initializeNoteClickHandlers();
-    checkAndScrollToNote();
-    
-    // Initialize image click handlers for images in notes
-    if (typeof reinitializeImageClickHandlers === 'function') {
-        reinitializeImageClickHandlers();
-    }
-    
-    // Check for unsaved drafts after note loads
-    <?php if ($note && is_numeric($note)): ?>
-    setTimeout(function() {
-        if (typeof checkForUnsavedDraft === 'function') {
-            // Check if this was a forced refresh (skip auto-restore in that case)
-            var isRefresh = window.location.search.includes('_refresh=');
-            checkForUnsavedDraft('<?php echo $note; ?>', isRefresh);
-        }
-    }, 500); // Small delay to ensure content is fully loaded
-    <?php endif; ?>
-});
-</script>
+<?php if ($note && is_numeric($note)): ?>
+<!-- Data for draft check (used by index-events.js) -->
+<script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
+<?php endif; ?>
 
 </html>
