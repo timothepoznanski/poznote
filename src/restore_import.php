@@ -1781,7 +1781,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <label for="target_workspace_select" class="form-label">
                         1. <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
                     </label>
-                    <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required onchange="loadFoldersForImport(this.value)">
+                    <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required>
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
                     </select>
                 </div>
