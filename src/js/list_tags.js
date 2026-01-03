@@ -1,41 +1,5 @@
 // JavaScript for tags page
-
-// Get workspace from data-attribute (set by PHP)
-function getPageWorkspace() {
-    var body = document.body;
-    return body ? body.getAttribute('data-workspace') || '' : '';
-}
-
-// Navigate back to notes list
-function goBackToNotes() {
-    // Build return URL with workspace from localStorage
-    var url = 'index.php';
-    var params = [];
-    var pageWorkspace = getPageWorkspace();
-    
-    // Get workspace from localStorage first, fallback to PHP value
-    try {
-        var workspace = localStorage.getItem('poznote_selected_workspace');
-        if (!workspace || workspace === '') {
-            workspace = pageWorkspace;
-        }
-        if (workspace && workspace !== '') {
-            params.push('workspace=' + encodeURIComponent(workspace));
-        }
-    } catch(e) {
-        // Fallback to PHP workspace if localStorage fails
-        if (pageWorkspace && pageWorkspace !== '') {
-            params.push('workspace=' + encodeURIComponent(pageWorkspace));
-        }
-    }
-    
-    // Build final URL
-    if (params.length > 0) {
-        url += '?' + params.join('&');
-    }
-    
-    window.location.href = url;
-}
+// Requires: navigation.js (for getPageWorkspace, goBackToNotes)
 
 document.addEventListener('DOMContentLoaded', function() {
     // Tag search/filtering management

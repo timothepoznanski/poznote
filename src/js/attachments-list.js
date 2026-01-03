@@ -1,10 +1,5 @@
 // JavaScript for attachments list page
-
-// Get workspace from data-attribute (set by PHP)
-function getPageWorkspace() {
-    var body = document.body;
-    return body ? body.getAttribute('data-workspace') || '' : '';
-}
+// Requires: navigation.js (for getPageWorkspace, goBackToNotes)
 
 let allRows = [];
 let filteredRows = [];
@@ -54,11 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadAttachments();
 });
-
-function goBackToNotes() {
-    var workspace = getPageWorkspace();
-    window.location.href = 'index.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
-}
 
 async function loadAttachments() {
     const spinner = document.getElementById('loadingSpinner');

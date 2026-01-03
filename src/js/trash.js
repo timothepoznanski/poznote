@@ -1,69 +1,9 @@
 // JavaScript for trash page
-
-// Get workspace from data-attribute (set by PHP)
-function getPageWorkspace() {
-    var body = document.body;
-    return body ? body.getAttribute('data-workspace') || '' : '';
-}
-
-// Navigate back to notes list
-function goBackToNotes() {
-    var url = 'index.php';
-    var params = [];
-    var pageWorkspace = getPageWorkspace();
-    
-    // Get workspace from localStorage first, fallback to PHP value
-    try {
-        var workspace = localStorage.getItem('poznote_selected_workspace');
-        if (!workspace || workspace === '') {
-            workspace = pageWorkspace;
-        }
-        if (workspace && workspace !== '') {
-            params.push('workspace=' + encodeURIComponent(workspace));
-        }
-    } catch(e) {
-        // Fallback to PHP workspace if localStorage fails
-        if (pageWorkspace && pageWorkspace !== '') {
-            params.push('workspace=' + encodeURIComponent(pageWorkspace));
-        }
-    }
-    
-    // Build final URL
-    if (params.length > 0) {
-        url += '?' + params.join('&');
-    }
-    
-    window.location.href = url;
-}
+// Requires: navigation.js (for getPageWorkspace, getEffectiveWorkspace, goBackToNotes)
 
 // Clear search and return to trash page
 function clearSearchAndReturn() {
-    var url = 'trash.php';
-    var params = [];
-    var pageWorkspace = getPageWorkspace();
-    
-    // Get workspace from localStorage first, fallback to PHP value
-    try {
-        var workspace = localStorage.getItem('poznote_selected_workspace');
-        if (!workspace || workspace === '') {
-            workspace = pageWorkspace;
-        }
-        if (workspace && workspace !== '') {
-            params.push('workspace=' + encodeURIComponent(workspace));
-        }
-    } catch(e) {
-        // Fallback to PHP workspace if localStorage fails
-        if (pageWorkspace && pageWorkspace !== '') {
-            params.push('workspace=' + encodeURIComponent(pageWorkspace));
-        }
-    }
-    
-    // Build final URL
-    if (params.length > 0) {
-        url += '?' + params.join('&');
-    }
-    
-    window.location.href = url;
+    navigateToPage('trash.php');
 }
 
 document.addEventListener('DOMContentLoaded', function() {

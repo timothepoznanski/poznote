@@ -112,6 +112,7 @@ $currentLang = getUserLanguage();
 	</div>
 	
 	<script src="js/globals.js"></script>
+	<script src="js/navigation.js"></script>
 	<script src="js/list_tags.js"></script>
 	<script src="js/clickable-tags.js"></script>
 </body>

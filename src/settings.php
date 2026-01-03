@@ -37,7 +37,10 @@ $currentLang = getUserLanguage();
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/dark-mode.css">
 </head>
-<body>
+<body data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
+      data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
+      data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
+      data-workspace="<?php echo htmlspecialchars(getWorkspaceFilter(), ENT_QUOTES, 'UTF-8'); ?>">
     <div class="settings-container">
         <?php 
             // Build basic URL - workspace will be handled by JavaScript
@@ -58,7 +61,7 @@ $currentLang = getUserLanguage();
             <!-- Left Column: Actions (without badges) -->
             <div class="settings-column settings-column-left">
                 <!-- Back to Notes -->
-                <div class="settings-card" id="backToNotesLink" onclick="window.location = '<?php echo $back_href; ?>';" style="cursor: pointer;">
+                <div class="settings-card" id="backToNotesLink" data-href="<?php echo $back_href; ?>" style="cursor: pointer;">
                     <div class="settings-card-icon">
                         <i class="fa-arrow-left"></i>
                     </div>
@@ -68,7 +71,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Workspaces -->
-                <div class="settings-card" onclick="window.location = 'workspaces.php';">
+                <div class="settings-card" id="workspaces-card">
                     <div class="settings-card-icon">
                         <i class="fa-layer-group"></i>
                     </div>
@@ -78,7 +81,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Backup / Export -->
-                <div class="settings-card" onclick="window.location = 'backup_export.php';">
+                <div class="settings-card" id="backup-export-card">
                     <div class="settings-card-icon">
                         <i class="fa-upload"></i>
                     </div>
@@ -88,7 +91,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Restore / Import -->
-                <div class="settings-card" onclick="window.location = 'restore_import.php';">
+                <div class="settings-card" id="restore-import-card">
                     <div class="settings-card-icon">
                         <i class="fa-download"></i>
                     </div>
@@ -98,7 +101,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Check for Updates -->
-                <div class="settings-card" onclick="checkForUpdates();">
+                <div class="settings-card" id="check-updates-card">
                     <div class="settings-card-icon">
                         <i class="fa-sync-alt"></i>
                         <span class="update-badge" style="display: none;"></span>
@@ -109,7 +112,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- API Documentation -->
-                <div class="settings-card" onclick="window.open('api-docs/', '_blank');">
+                <div class="settings-card" id="api-docs-card">
                     <div class="settings-card-icon">
                         <i class="fa-code"></i>
                     </div>
@@ -119,7 +122,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Github repository -->
-                <div class="settings-card" onclick="window.open('https://github.com/timothepoznanski/poznote', '_blank');">
+                <div class="settings-card" id="github-card">
                     <div class="settings-card-icon">
                         <i class="fa-code-branch"></i>
                     </div>
@@ -129,7 +132,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- News -->
-                <div class="settings-card" onclick="window.open('https://poznote.com/news.html', '_blank');">
+                <div class="settings-card" id="news-card">
                     <div class="settings-card-icon">
                         <i class="fa-newspaper"></i>
                     </div>
@@ -139,7 +142,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Poznote Website -->
-                <div class="settings-card" onclick="window.open('https://poznote.com', '_blank');">
+                <div class="settings-card" id="website-card">
                     <div class="settings-card-icon">
                         <i class="fa-globe"></i>
                     </div>
@@ -149,7 +152,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Support Developer -->
-                <div class="settings-card" onclick="window.open('https://ko-fi.com/timothepoznanski', '_blank');">
+                <div class="settings-card" id="support-card">
                     <div class="settings-card-icon">
                         <i class="fa-heart heart-blink"></i>
                     </div>
@@ -165,7 +168,7 @@ $currentLang = getUserLanguage();
                 <div class="settings-sep settings-sep-mobile"></div>
                 
                 <!-- Login Display -->
-                <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
+                <div class="settings-card" id="login-display-card">
                     <div class="settings-card-icon">
                         <i class="fa-user"></i>
                     </div>
@@ -175,7 +178,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Language -->
-                <div class="settings-card" id="language-card" onclick="showLanguageModal();">
+                <div class="settings-card" id="language-card">
                     <div class="settings-card-icon">
                         <i class="fal fa-flag"></i>
                     </div>
@@ -185,7 +188,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Theme Mode -->
-                <div class="settings-card" id="theme-mode-card" onclick="toggleTheme();">
+                <div class="settings-card" id="theme-mode-card">
                     <div class="settings-card-icon">
                         <i class="fa fa-sun"></i>
                     </div>
@@ -195,7 +198,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Font Size -->
-                <div class="settings-card" onclick="showNoteFontSizePrompt();">
+                <div class="settings-card" id="font-size-card">
                     <div class="settings-card-icon">
                         <i class="fa-text-height"></i>
                     </div>
@@ -205,7 +208,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Timezone -->
-                <div class="settings-card" onclick="showTimezonePrompt();">
+                <div class="settings-card" id="timezone-card">
                     <div class="settings-card-icon"><i class="fal fa-clock"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.timezone'); ?> <span id="timezone-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
@@ -213,7 +216,7 @@ $currentLang = getUserLanguage();
                 </div>
 
                 <!-- Note Sort Order -->
-                <div class="settings-card" id="note-sort-card" onclick="openNoteSortModal();">
+                <div class="settings-card" id="note-sort-card">
                     <div class="settings-card-icon"><i class="fa-sort-amount-down"></i></div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('display.cards.note_sort_order'); ?> <span id="note-sort-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span></h3>
@@ -269,498 +272,6 @@ $currentLang = getUserLanguage();
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
-    <script>
-    // Restore update badge if update is available
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof restoreUpdateBadge === 'function') {
-            restoreUpdateBadge();
-        }
-    });
-    </script>
-
-    <script>
-    // Update Back to Notes link with workspace from localStorage
-    (function() {
-        try {
-            var workspace = localStorage.getItem('poznote_selected_workspace');
-            var backLink = document.getElementById('backToNotesLink');
-            if (backLink && workspace && workspace !== '') {
-                var url = new URL(backLink.href, window.location.origin);
-                url.searchParams.set('workspace', workspace);
-                backLink.href = url.toString();
-            }
-        } catch(e) {
-            // Ignore errors
-        }
-    })();
-    </script>
-
-    <script>
-    // Toggle logic for settings
-    (function(){
-        var TXT_ENABLED = <?php echo json_encode(t('common.enabled')); ?>;
-        var TXT_DISABLED = <?php echo json_encode(t('common.disabled')); ?>;
-        
-        // Show created
-        var cardCreated = document.getElementById('show-created-card');
-        var statusCreated = document.getElementById('show-created-status');
-        function refreshCreated(){ 
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','show_note_created'); 
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true'); 
-                if(statusCreated){ 
-                    statusCreated.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
-                    statusCreated.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                }
-            }).catch(()=>{}); 
-        }
-        if(cardCreated){ 
-            cardCreated.addEventListener('click', function(){ 
-                var form = new FormData(); 
-                form.append('action','get'); 
-                form.append('key','show_note_created'); 
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ 
-                    var currently = j && j.success && (j.value === '1' || j.value === 'true'); 
-                    var toSet = currently ? '0' : '1'; 
-                    var setForm = new FormData(); 
-                    setForm.append('action','set'); 
-                    setForm.append('key','show_note_created'); 
-                    setForm.append('value', toSet); 
-                    return fetch('api_settings.php',{method:'POST',body:setForm}); 
-                }).then(function(){ 
-                    refreshCreated(); 
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
-                }).catch(e=>console.error(e)); 
-            }); 
-        }
-        refreshCreated();
-
-        // Subheading
-        var cardSub = document.getElementById('show-subheading-card');
-        var statusSub = document.getElementById('show-subheading-status');
-        function refreshSub(){ 
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','show_note_subheading'); 
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true'); 
-                if(statusSub){ 
-                    statusSub.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
-                    statusSub.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                }
-            }).catch(()=>{}); 
-        }
-        if(cardSub){ 
-            cardSub.addEventListener('click', function(){ 
-                var form = new FormData(); 
-                form.append('action','get'); 
-                form.append('key','show_note_subheading'); 
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{ 
-                    var currently = j && j.success && (j.value === '1' || j.value === 'true'); 
-                    var toSet = currently ? '0' : '1'; 
-                    var setForm = new FormData(); 
-                    setForm.append('action','set'); 
-                    setForm.append('key','show_note_subheading'); 
-                    setForm.append('value', toSet); 
-                    return fetch('api_settings.php',{method:'POST',body:setForm}); 
-                }).then(function(){ 
-                    refreshSub(); 
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
-                }).catch(e=>console.error(e)); 
-            }); 
-        }
-        refreshSub();
-
-        // Folder counts
-        var cardFolder = document.getElementById('folder-counts-card');
-        var statusFolder = document.getElementById('folder-counts-status');
-        function refreshFolder(){
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','hide_folder_counts');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true' || j.value===null);
-                if(statusFolder){ 
-                    statusFolder.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
-                    statusFolder.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                }
-            }).catch(()=>{});
-        }
-        if(cardFolder){ 
-            cardFolder.addEventListener('click', function(){
-                var form = new FormData(); 
-                form.append('action','get'); 
-                form.append('key','hide_folder_counts');
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                    var currently = j && j.success && (j.value === '1' || j.value === 'true' || j.value === null);
-                    var toSet = currently ? '0' : '1';
-                    var setForm = new FormData(); 
-                    setForm.append('action','set'); 
-                    setForm.append('key','hide_folder_counts'); 
-                    setForm.append('value', toSet);
-                    return fetch('api_settings.php',{method:'POST',body:setForm});
-                }).then(function(){ 
-                    refreshFolder(); 
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
-                }).catch(e=>console.error(e));
-            }); 
-        }
-        refreshFolder();
-
-        // Notes without folders position
-        var cardNotesPos = document.getElementById('notes-without-folders-card');
-        var statusNotesPos = document.getElementById('notes-without-folders-status');
-        function refreshNotesPos(){
-            var form = new FormData(); 
-            form.append('action','get'); 
-            form.append('key','notes_without_folders_after_folders');
-            fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                var enabled = j && j.success && (j.value==='1' || j.value==='true');
-                if(statusNotesPos){ 
-                    statusNotesPos.textContent = enabled ? TXT_ENABLED : TXT_DISABLED; 
-                    statusNotesPos.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled'); 
-                }
-            }).catch(()=>{});
-        }
-        if(cardNotesPos){ 
-            cardNotesPos.addEventListener('click', function(){
-                var form = new FormData(); 
-                form.append('action','get'); 
-                form.append('key','notes_without_folders_after_folders');
-                fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-                    var currently = j && j.success && (j.value === '1' || j.value === 'true');
-                    var toSet = currently ? '0' : '1';
-                    var setForm = new FormData(); 
-                    setForm.append('action','set'); 
-                    setForm.append('key','notes_without_folders_after_folders'); 
-                    setForm.append('value', toSet);
-                    return fetch('api_settings.php',{method:'POST',body:setForm});
-                }).then(function(){ 
-                    refreshNotesPos(); 
-                    if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) window.opener.location.reload(); 
-                }).catch(e=>console.error(e));
-            }); 
-        }
-        refreshNotesPos();
-    })();
-    </script>
-
-    <script>
-    // Language modal handler
-    function showLanguageModal() {
-        var modal = document.getElementById('languageModal');
-        if (!modal) return;
-        var form = new FormData(); 
-        form.append('action','get'); 
-        form.append('key','language');
-        fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-            var v = j && j.success ? j.value : 'en';
-            var radios = document.getElementsByName('languageChoice');
-            for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
-            }
-            modal.style.display = 'flex';
-        }).catch(function(){ modal.style.display = 'flex'; });
-    }
-
-    // Modal-based note sort handlers
-    function openNoteSortModal() {
-        var modal = document.getElementById('noteSortModal');
-        if (!modal) return;
-        var form = new FormData(); 
-        form.append('action','get'); 
-        form.append('key','note_list_sort');
-        fetch('api_settings.php',{method:'POST',body:form}).then(r=>r.json()).then(j=>{
-            var v = j && j.success ? j.value : 'updated_desc';
-            var radios = document.getElementsByName('noteSort');
-            for (var i = 0; i < radios.length; i++) {
-                try { radios[i].checked = (radios[i].value === v); } catch(e) {}
-            }
-            modal.style.display = 'flex';
-        }).catch(function(){ modal.style.display = 'flex'; });
-    }
-
-    document.addEventListener('DOMContentLoaded', function(){
-        var saveBtn = document.getElementById('saveNoteSortModalBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function(){
-                var radios = document.getElementsByName('noteSort');
-                var selected = null;
-                for (var i = 0; i < radios.length; i++) { 
-                    if (radios[i].checked) { 
-                        selected = radios[i].value; 
-                        break; 
-                    } 
-                }
-                if (!selected) selected = 'updated_desc';
-                var setForm = new FormData(); 
-                setForm.append('action','set'); 
-                setForm.append('key','note_list_sort'); 
-                setForm.append('value', selected);
-                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(){ 
-                    try{ closeModal('noteSortModal'); }catch(e){}; 
-                    try{ 
-                        if(window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) 
-                            window.opener.location.reload(); 
-                    }catch(e){}; 
-                    
-                    if (typeof window.refreshNoteSortBadge === 'function') {
-                        window.refreshNoteSortBadge();
-                    }
-                }).catch(function(){ 
-                    alert(window.t ? window.t('display.alerts.error_saving_preference', {}, 'Error saving preference') : 'Error saving preference'); 
-                });
-            });
-        }
-
-        // Language modal handler
-        var saveLangBtn = document.getElementById('saveLanguageModalBtn');
-        if (saveLangBtn) {
-            saveLangBtn.addEventListener('click', function(){
-                var radios = document.getElementsByName('languageChoice');
-                var selected = null;
-                for (var i = 0; i < radios.length; i++) { 
-                    if (radios[i].checked) { 
-                        selected = radios[i].value; 
-                        break; 
-                    } 
-                }
-                if (!selected) selected = 'en';
-                var setForm = new FormData(); 
-                setForm.append('action','set'); 
-                setForm.append('key','language'); 
-                setForm.append('value', selected);
-                fetch('api_settings.php',{method:'POST',body:setForm}).then(r=>r.json()).then(function(result){ 
-                    if (result && result.success) {
-                        try{ closeModal('languageModal'); }catch(e){};
-                        if (typeof window.refreshLanguageBadge === 'function') {
-                            window.refreshLanguageBadge();
-                        }
-                        setTimeout(function() { window.location.reload(); }, 300);
-                    } else {
-                        alert(window.t ? window.t('settings.language.save_error', {}, 'Error saving language') : 'Error saving language');
-                    }
-                }).catch(function(){ 
-                    alert(window.t ? window.t('settings.language.save_error', {}, 'Error saving language') : 'Error saving language'); 
-                });
-            });
-        }
-    });
-    </script>
-
-    <script>
-    // Timezone setting modal
-    function showTimezonePrompt() {
-        var modal = document.getElementById('timezoneModal');
-        if (!modal) return;
-        
-        var form = new FormData();
-        form.append('action', 'get');
-        form.append('key', 'timezone');
-        
-        fetch('api_settings.php', {method: 'POST', body: form})
-            .then(r => r.json())
-            .then(j => {
-                var currentValue = (j && j.success && j.value) ? j.value : 'Europe/Paris';
-                var select = document.getElementById('timezoneSelect');
-                if (select) {
-                    select.value = currentValue;
-                }
-                modal.style.display = 'flex';
-            })
-            .catch(function() {
-                modal.style.display = 'flex';
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function(){
-        var saveBtn = document.getElementById('saveTimezoneModalBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function(){
-                var select = document.getElementById('timezoneSelect');
-                var selectedTimezone = select ? select.value : 'Europe/Paris';
-                
-                var setForm = new FormData();
-                setForm.append('action', 'set');
-                setForm.append('key', 'timezone');
-                setForm.append('value', selectedTimezone);
-                
-                fetch('api_settings.php', {method: 'POST', body: setForm})
-                    .then(r => r.json())
-                    .then(function(result) {
-                        if (result && result.success) {
-                            try { closeModal('timezoneModal'); } catch(e) {}
-                            if (typeof window.refreshTimezoneBadge === 'function') {
-                                window.refreshTimezoneBadge();
-                            }
-                            try {
-                                if (window.opener && window.opener.location && window.opener.location.pathname.includes('index.php')) {
-                                    window.opener.location.reload();
-                                }
-                            } catch(e) {}
-                        } else {
-                            alert(window.t ? window.t('display.timezone.alerts.update_error', {}, 'Error updating timezone') : 'Error updating timezone');
-                        }
-                    })
-                    .catch(function() {
-                        alert(window.t ? window.t('display.timezone.alerts.update_error', {}, 'Error updating timezone') : 'Error updating timezone');
-                    });
-            });
-        }
-    });
-    </script>
-
-    <script>
-    // Load and display current values in badges
-    (function(){
-        var TXT_NOT_DEFINED = <?php echo json_encode(t('common.not_defined')); ?>;
-
-        function tr(key, vars, fallback) {
-            try {
-                if (typeof window.t === 'function') return window.t(key, vars || {}, fallback);
-            } catch (e) {}
-            return (fallback != null ? String(fallback) : String(key));
-        }
-
-        function getLanguageLabel(code) {
-            switch (code) {
-                case 'fr': return tr('settings.language.french', {}, 'French');
-                case 'es': return tr('settings.language.spanish', {}, 'Spanish');
-                case 'pt': return tr('settings.language.portuguese', {}, 'Portuguese');
-                case 'de': return tr('settings.language.german', {}, 'German');
-                case 'en':
-                default: return tr('settings.language.english', {}, 'English');
-            }
-        }
-
-        function getSetting(key, callback) {
-            var form = new FormData();
-            form.append('action', 'get');
-            form.append('key', key);
-            fetch('api_settings.php', {method: 'POST', body: form})
-                .then(r => r.json())
-                .then(j => {
-                    if (j && j.success) {
-                        callback(j.value);
-                    } else {
-                        callback(null);
-                    }
-                })
-                .catch(() => callback(null));
-        }
-
-        function refreshLoginDisplayBadge() {
-            getSetting('login_display_name', function(value) {
-                var badge = document.getElementById('login-display-badge');
-                if (badge) {
-                    if (value && value.trim()) {
-                        badge.textContent = value.trim();
-                        badge.className = 'setting-status enabled';
-                    } else {
-                        badge.textContent = TXT_NOT_DEFINED;
-                        badge.className = 'setting-status disabled';
-                    }
-                }
-            });
-        }
-
-        function refreshFontSizeBadge() {
-            getSetting('note_font_size', function(value) {
-                var badge = document.getElementById('font-size-badge');
-                if (badge) {
-                    if (value && value.trim()) {
-                        badge.textContent = value + 'px';
-                        badge.className = 'setting-status enabled';
-                    } else {
-                        badge.textContent = tr('display.badges.font_size_default', { size: 15 }, 'default (15px)');
-                        badge.className = 'setting-status disabled';
-                    }
-                }
-            });
-        }
-
-        function refreshLanguageBadge() {
-            getSetting('language', function(value) {
-                var badge = document.getElementById('language-badge');
-                if (badge) {
-                    var langValue = value || 'en';
-                    badge.textContent = getLanguageLabel(langValue);
-                    badge.className = 'setting-status enabled';
-                }
-            });
-        }
-
-        function refreshNoteSortBadge() {
-            getSetting('note_list_sort', function(value) {
-                var badge = document.getElementById('note-sort-badge');
-                if (badge) {
-                    var sortValue = value || 'updated_desc';
-                    var sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                    
-                    switch(sortValue) {
-                        case 'updated_desc':
-                            sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                            break;
-                        case 'created_desc':
-                            sortLabel = tr('modals.note_sort.options.last_created', {}, 'Last created');
-                            break;
-                        case 'heading_asc':
-                            sortLabel = tr('modals.note_sort.options.alphabetical', {}, 'Alphabetical');
-                            break;
-                        default:
-                            sortLabel = tr('modals.note_sort.options.last_modified', {}, 'Last modified');
-                            break;
-                    }
-                    
-                    badge.textContent = sortLabel;
-                    badge.className = 'setting-status enabled';
-                }
-            });
-        }
-
-        function refreshTimezoneBadge() {
-            getSetting('timezone', function(value) {
-                var badge = document.getElementById('timezone-badge');
-                if (badge) {
-                    if (value && value.trim()) {
-                        badge.textContent = value.trim();
-                        badge.className = 'setting-status enabled';
-                    } else {
-                        badge.textContent = 'Europe/Paris';
-                        badge.className = 'setting-status disabled';
-                    }
-                }
-            });
-        }
-
-        // Load all badges on page load
-        refreshLanguageBadge();
-        refreshLoginDisplayBadge();
-        refreshFontSizeBadge();
-        refreshNoteSortBadge();
-        refreshTimezoneBadge();
-
-        // Re-translate dynamic badges once client-side i18n is loaded
-        document.addEventListener('poznote:i18n:loaded', function(){
-            try { refreshLanguageBadge(); } catch(e) {}
-            try { refreshFontSizeBadge(); } catch(e) {}
-            try { refreshNoteSortBadge(); } catch(e) {}
-        });
-        
-        // Make refresh functions available globally
-        window.refreshLanguageBadge = refreshLanguageBadge;
-        window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
-        window.refreshFontSizeBadge = refreshFontSizeBadge;
-        window.refreshNoteSortBadge = refreshNoteSortBadge;
-        window.refreshTimezoneBadge = refreshTimezoneBadge;
-    })();
-    </script>
-    
-    <script>
-    // Set workspace context for JavaScript functions
-    window.selectedWorkspace = <?php echo json_encode(getWorkspaceFilter()); ?>;
-    </script>
+    <script src="js/settings-page.js"></script>
 </body>
 </html>

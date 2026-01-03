@@ -59,6 +59,7 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
+	<script src="js/navigation.js"></script>
 	<script src="js/attachments-list.js"></script>
 </body>
 </html>
