@@ -649,3 +649,12 @@ body.shared-page {
         color: #b0b0b0;
     }
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}

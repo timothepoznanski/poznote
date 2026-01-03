@@ -128,16 +128,16 @@ $currentLang = getUserLanguage();
         ?>
 
         <!-- Version Display (mobile top) -->
-        <div class="version-display version-display-mobile-top" style="text-align: center; padding: 12px 6px; margin-bottom: 12px; color: var(--text-secondary);">
+        <div class="version-display version-display-mobile-top">
             <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" style="color: var(--link-color); text-decoration: underline; opacity: 1;"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
+            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
         </div>
 
         <div class="settings-two-columns">
             <!-- Left Column: Actions (without badges) -->
             <div class="settings-column settings-column-left">
                 <!-- Back to Notes -->
-                <div class="settings-card" id="backToNotesLink" data-href="<?php echo $back_href; ?>" style="cursor: pointer;">
+                <div class="settings-card settings-card-clickable" id="backToNotesLink" data-href="<?php echo $back_href; ?>">
                     <div class="settings-card-icon">
                         <i class="fa-arrow-left"></i>
                     </div>
@@ -180,7 +180,7 @@ $currentLang = getUserLanguage();
                 <div class="settings-card" id="check-updates-card">
                     <div class="settings-card-icon">
                         <i class="fa-sync-alt"></i>
-                        <span class="update-badge" style="display: none;"></span>
+                        <span class="update-badge update-badge-hidden"></span>
                     </div>
                     <div class="settings-card-content">
                         <h3><?php echo t_h('settings.cards.check_updates'); ?></h3>
@@ -334,9 +334,9 @@ $currentLang = getUserLanguage();
         </div>
 
         <!-- Version Display (desktop bottom) -->
-        <div class="version-display version-display-desktop-bottom" style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+        <div class="version-display version-display-desktop-bottom">
             <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
-            <small><a href="https://poznote.com/releases.html" target="_blank" style="color: var(--link-color); text-decoration: underline; opacity: 1;"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
+            <small><a href="https://poznote.com/releases.html" target="_blank" class="release-notes-link"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
         </div>
     </div>
 

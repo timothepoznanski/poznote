@@ -1101,7 +1101,7 @@
         "loading": "Cargando...",
         "folder": "Carpeta destino",
         "optional": "opcional",
-        "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo",
+        "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo.",
         "zip_folders_info": "ZIP con estructura de carpetas:",
         "zip_folders_description": "Si su ZIP contiene carpetas, se crearán automáticamente como carpetas en Poznote, preservando su jerarquía (subcarpetas incluidas).",
         "no_folder": "Sin carpeta (nivel raíz)",

@@ -1881,3 +1881,126 @@ html[data-theme='dark'] input:checked + .toggle-slider {
     margin-top: 10px;
     margin-bottom: 20px;
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Text colors */
+.text-danger {
+    color: #dc3545;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-small {
+    font-size: 14px;
+}
+
+.text-small-muted {
+    color: #6c757d;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Margin utilities */
+.mt-8 {
+    margin-top: 8px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-12 {
+    margin-top: 12px;
+}
+
+.mt-16 {
+    margin-top: 16px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-15 {
+    margin-bottom: 15px;
+}
+
+/* Delete folder modal styles */
+.delete-folder-message {
+    margin: 15px 0;
+}
+
+.delete-folder-main-message {
+    margin-bottom: 10px;
+}
+
+.delete-folder-details {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.delete-folder-note {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Move folder files modal info */
+.modal-info-message {
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Modal body with margin */
+.modal-body-spaced {
+    margin-bottom: 10px;
+}
+
+/* New folder input styling */
+.new-folder-input {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Radio button container */
+.radio-options {
+    margin-top: 8px;
+}
+
+/* Timezone select */
+.timezone-select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Default font size info block */
+.default-font-size-info {
+    display: block;
+}
+
+/* Backup warning text */
+.backup-warning-text {
+    color: #dc3545;
+}

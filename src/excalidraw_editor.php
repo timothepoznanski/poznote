@@ -165,27 +165,27 @@ if ($note_id > 0) {
     <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
 </head>
 <body>
-    <div style="display: flex; flex-direction: column; height: 100vh;">
+    <div class="excalidraw-page-wrapper">
         <!-- Clean toolbar -->
-        <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 5000;">
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
+        <div class="poznote-toolbar">
+            <div class="poznote-toolbar-buttons">
+                <button id="saveBtn" class="excalidraw-btn excalidraw-save-btn" disabled>
                     <?php echo t_h('common.save', [], 'Save'); ?>
                 </button>
-                <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
+                <button id="saveAndExitBtn" class="excalidraw-btn excalidraw-btn-blue" disabled>
                     <?php echo t_h('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'); ?>
                 </button>
-                <button id="cancelBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #dc2626; border: 1px solid #dc2626; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                <button id="cancelBtn" class="excalidraw-btn excalidraw-btn-red">
                     <?php echo t_h('excalidraw.editor.toolbar.exit_without_saving', [], 'Exit without saving'); ?>
                 </button>
             </div>
-            <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
-            <div style="width: 100px;"></div> <!-- Spacer pour équilibrer le layout -->
+            <h3 class="poznote-toolbar-title">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
+            <div class="poznote-toolbar-spacer"></div> <!-- Spacer pour équilibrer le layout -->
         </div>
         
         <!-- Excalidraw container -->
-        <div id="app" style="flex: 1; background: #fff;">
-            <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 18px; font-family: 'Inter', sans-serif;">
+        <div id="app" class="excalidraw-app-container">
+            <div id="loading" class="excalidraw-loading">
                 <?php echo t_h('excalidraw.editor.loading', [], 'Loading Excalidraw Poznote...'); ?>
             </div>
         </div>
@@ -630,14 +630,14 @@ if ($note_id > 0) {
     }
     </script>
     <!-- Library Warning Modal -->
-    <div id="libraryWarningModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; color: #d97706; font-size: 18px; font-weight: 600;"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button id="libraryWarningCancel" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                <button id="libraryWarningOk" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
+    <div id="libraryWarningModal" class="library-warning-modal">
+        <div class="library-warning-content">
+            <h3 class="library-warning-title"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
+            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
+            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
+            <div class="library-warning-buttons">
+                <button id="libraryWarningCancel" class="library-warning-btn library-warning-btn-cancel"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button id="libraryWarningOk" class="library-warning-btn library-warning-btn-ok"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
             </div>
         </div>
     </div>

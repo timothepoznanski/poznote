@@ -377,7 +377,7 @@ if ($favoritesFolder && $favorites_count > 0) {
 
 // Add drop zone for moving notes to root (no folder)
 if (empty($folder_filter)) {
-    echo '<div id="root-drop-zone" class="root-drop-zone" style="display: none;">';
+    echo '<div id="root-drop-zone" class="root-drop-zone initially-hidden">';
     echo '<div class="drop-zone-content">';
     echo '<i class="fa-home drop-zone-icon"></i>';
     echo '<span class="drop-zone-text">' . t_h('notes_list.drop_zone.remove_from_folder', [], 'Drop here to remove from folder') . '</span>';

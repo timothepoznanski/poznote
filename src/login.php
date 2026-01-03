@@ -166,7 +166,7 @@ if (isset($_GET['oidc_error'])) {
         <?php endif; ?>
 
         <?php if ($oidcError): ?>
-            <div class="error" style="margin-top: 0.75rem; text-align: center;"><?php echo htmlspecialchars($oidcError); ?></div>
+            <div class="error oidc-error"><?php echo htmlspecialchars($oidcError); ?></div>
         <?php endif; ?>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">

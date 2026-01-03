@@ -1097,7 +1097,7 @@
         "loading": "Carregando...",
         "folder": "Pasta destino",
         "optional": "opcional",
-        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho",
+        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho.",
         "zip_folders_info": "ZIP com estrutura de pastas:",
         "zip_folders_description": "Se o seu ZIP contiver pastas, elas serão criadas automaticamente como pastas no Poznote, preservando sua hierarquia (subpastas incluídas).",
         "no_folder": "Sem pasta (nível raiz)",

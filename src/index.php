@@ -260,7 +260,7 @@ $body_classes = trim($extra_body_classes);
                 <i class="fa-caret-down workspace-dropdown-icon"></i>
             </div>
             <div class="sidebar-title-actions">
-                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge" style="display: none;"></span></button>
+                <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>"><i class="fa-cog"></i><span class="update-badge update-badge-hidden"></span></button>
                 <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>"><i class="fa-plus-circle"></i></button>
             </div>
 
@@ -594,8 +594,8 @@ $body_classes = trim($extra_body_classes);
                     // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                     echo '<div class="note-tags-row">';
                     echo '<div class="folder-wrapper">';
-                    echo '<span class="fa-folder icon_folder" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
-                    echo '<span class="folder_name" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" style="cursor: pointer;" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    echo '<span class="fa-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
+                    echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     echo '</div>';
                     echo '<span class="fa-tag icon_tag" data-action="navigate-tags"></span>';
                     echo '<span class="name_tags">'
@@ -693,9 +693,9 @@ $body_classes = trim($extra_body_classes);
                                 echo '<span class="subheading-link subheading-placeholder" id="subheading-display-'.$row['id'].'" data-action="open-note-info-edit" data-note-id="'.$row['id'].'"><em>'.t_h('index.subheading.placeholder', [], 'Add subheading here').'</em></span>';
                             }
                         }
-                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input" style="display:none;" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
-                        echo '<button class="btn-inline-save" id="save-subheading-'.$row['id'].'" style="display:none;" data-action="save-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.save', [], 'Save').'</button>';
-                        echo '<button class="btn-inline-cancel" id="cancel-subheading-'.$row['id'].'" style="display:none;" data-action="cancel-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.cancel', [], 'Cancel').'</button>';
+                        echo '<input type="text" id="subheading-input-'.$row['id'].'" class="inline-subheading-input initially-hidden" value="'.htmlspecialchars($subheading_display, ENT_QUOTES, 'UTF-8').'" />';
+                        echo '<button class="btn-inline-save initially-hidden" id="save-subheading-'.$row['id'].'" data-action="save-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.save', [], 'Save').'</button>';
+                        echo '<button class="btn-inline-cancel initially-hidden" id="cancel-subheading-'.$row['id'].'" data-action="cancel-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.cancel', [], 'Cancel').'</button>';
                         echo '</div>';
                     }
                 

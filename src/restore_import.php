@@ -1628,7 +1628,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <span class="accordion-icon" id="restoreBackupIcon">▶</span>
                 <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
             </h3>
-            <div id="restoreBackup" class="accordion-content" style="display: none;">
+            <div id="restoreBackup" class="accordion-content initially-hidden">
+            
+            <div>
+            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
+            <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
+                <?php echo t_h('restore_import.page.more_info_link'); ?>
+            </a>.
+        </div>
+        <br>
             
         <!-- Standard Complete Restore Section -->
         <div class="backup-section child-section">
@@ -1636,7 +1644,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <span class="accordion-icon" id="standardRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
             </h3>
-            <div id="standardRestore" class="accordion-content" style="display: none;">
+            <div id="standardRestore" class="accordion-content initially-hidden">
             <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
 
             <form method="post" enctype="multipart/form-data">
@@ -1650,7 +1658,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <span><?php echo t_h('restore_import.buttons.start_restore'); ?></span>
                 </button>
                 <!-- Spinner shown while processing restore -->
-                <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                <div id="restoreSpinner" class="restore-spinner initially-hidden" role="status" aria-live="polite" aria-hidden="true">
                     <div class="restore-spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
@@ -1665,11 +1673,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <span class="accordion-icon" id="chunkedRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
             </h3>
-            <div id="chunkedRestore" class="accordion-content" style="display: none;">
+            <div id="chunkedRestore" class="accordion-content initially-hidden">
             <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
-            <div id="chunkedUploadStatus" style="display: none;">
+            <div id="chunkedUploadStatus" class="initially-hidden">
                 <div class="progress-bar">
-                    <div id="chunkedProgress" class="progress-fill" style="width: 0%;">0%</div>
+                    <div id="chunkedProgress" class="progress-fill progress-fill-initial">0%</div>
                 </div>
                 <div id="chunkedStatusText"><?php echo t_h('restore_import.chunked.preparing_upload'); ?></div>
             </div>
@@ -1693,10 +1701,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <span class="accordion-icon" id="directCopyRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
             </h3>
-            <div id="directCopyRestore" class="accordion-content" style="display: none;">
+            <div id="directCopyRestore" class="accordion-content initially-hidden">
             <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
-                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
                     <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
                 </a>.
             </p>
@@ -1720,7 +1728,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     echo "</div>";
 
                     // Show confirmation form
-                    echo "<form method='post' id='directCopyRestoreForm' style='margin-top: 10px;'>";
+                    echo "<form method='post' id='directCopyRestoreForm' class='form-with-margin-top'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
                     echo "<button type='button' class='btn btn-warning' data-action='show-direct-copy-restore-confirmation'>";
                     echo t_h('restore_import.direct_copy.buttons.yes_restore_direct_copy');
@@ -1764,41 +1772,41 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 <span class="accordion-icon" id="individualNotesIcon">▶</span>
                 <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
             </h3>
-            <div id="individualNotes" class="accordion-content" style="display: none;">
+            <div id="individualNotes" class="accordion-content initially-hidden">
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="target_workspace_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="target_workspace_select" class="form-label">
                         1. <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
                     </label>
-                    <select id="target_workspace_select" name="target_workspace" class="form-control" required style="font-size: 15px; padding: 0.5rem;">
+                    <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required onchange="loadFoldersForImport(this.value)">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="target_folder_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="target_folder_select" class="form-label">
                         2. <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
                     </label>
-                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #dc3545; font-size: 0.875rem;">
+                    <small class="form-text form-text-block form-text-danger">
                         <?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', 'Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà'); ?>
                     </small>
-                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #17a2b8; font-size: 0.875rem;">
+                    <small class="form-text form-text-block form-text-info">
                         <strong><?php echo t_h('restore_import.sections.individual_notes.zip_folders_info', 'ZIP avec structure de dossiers :'); ?></strong> <?php echo t_h('restore_import.sections.individual_notes.zip_folders_description', 'Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).'); ?>
                     </small>
-                    <select id="target_folder_select" name="target_folder" class="form-control" style="font-size: 15px; padding: 0.5rem;">
+                    <select id="target_folder_select" name="target_folder" class="form-control form-select-styled">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="individual_notes_files" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="individual_notes_files" class="form-label">
                         3. <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
                     </label>
-                    <small class="form-text text-muted" style="display: block; margin-bottom: 0.5rem; line-height: 1.5;">
-                        <span style="color: #dc3545;">
+                    <small class="form-text text-muted form-text-muted-block">
+                        <span class="text-danger">
                         <?php 
                         $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
                         $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
@@ -1810,15 +1818,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required style="padding: 0.5rem;">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required class="form-file-input">
                 </div>
                 
-                <button type="button" class="btn btn-primary" data-action="show-individual-notes-import-confirmation" style="margin-top: 1rem;" id="individualNotesImportBtn">
+                <button type="button" class="btn btn-primary btn-with-margin-top" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">
                     <?php echo t_h('restore_import.buttons.start_import', 'Start Import'); ?>
                 </button>
                 
                 <!-- Spinner shown while processing import -->
-                <div id="individualNotesImportSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none; margin-top: 1rem;">
+                <div id="individualNotesImportSpinner" class="restore-spinner initially-hidden spinner-with-margin-top" role="status" aria-live="polite" aria-hidden="true">
                     <div class="restore-spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.importing_notes', 'Importation des notes en cours...'); ?></span>
@@ -1828,7 +1836,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         </div>
         
         <!-- Bottom padding for better spacing -->
-        <div style="padding-bottom: 50px;"></div>
+        <div class="section-bottom-spacer"></div>
     </div>
 
     <!-- Simple Import Confirmation Modal -->

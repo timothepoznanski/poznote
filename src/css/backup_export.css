@@ -157,3 +157,55 @@ html[data-theme='dark'] .info-box {
     border-left: 4px solid #4a9eff;
     color: #64b5f6;
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default (for spinners, etc.) */
+.initially-hidden {
+    display: none;
+}
+
+/* Text warning styles */
+.text-warning-bold {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.text-danger {
+    color: red;
+}
+
+/* List with custom margins */
+.backup-list-styled {
+    margin: 10px 0;
+    padding-left: 20px;
+    padding-bottom: 10px;
+}
+
+/* Form group with custom spacing */
+.form-group-export {
+    margin: 25px 0 30px 0;
+}
+
+/* Export label styles */
+.export-label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Export select styles */
+.export-select {
+    max-width: 350px;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+/* Bottom padding spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}

@@ -1111,7 +1111,7 @@
         "loading": "Chargement...",
         "folder": "Dossier cible",
         "optional": "optionnel",
-        "frontmatter_warning": "Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà, sinon la note sera créée à la racine du workspace",
+        "frontmatter_warning": "Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà, sinon la note sera créée à la racine du workspace.",
         "zip_folders_info": "ZIP avec structure de dossiers :",
         "zip_folders_description": "Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).",
         "no_folder": "Aucun dossier (racine)",

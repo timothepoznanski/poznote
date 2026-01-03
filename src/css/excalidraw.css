@@ -482,5 +482,174 @@ html[data-theme='dark'] #app * {
     display: none !important;
 }
 
+/* ===========================================
+   EXCALIDRAW EDITOR PAGE STYLES
+   =========================================== */
+
+/* Main wrapper for excalidraw editor page */
+.excalidraw-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Poznote toolbar at the top of excalidraw editor */
+.poznote-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #e1e4e8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 5000;
+}
+
+.poznote-toolbar-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.poznote-toolbar-title {
+    margin: 0;
+    color: #24292f;
+    font-weight: 400;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+}
+
+.poznote-toolbar-spacer {
+    width: 100px;
+}
+
+/* Excalidraw toolbar button base styles */
+.excalidraw-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    transition: all 0.2s;
+}
+
+.excalidraw-save-btn {
+    background: #238636;
+    border: 1px solid #238636;
+}
+
+.excalidraw-save-btn:hover {
+    background: #2ea043;
+}
+
+.excalidraw-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.excalidraw-btn-blue {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+}
+
+.excalidraw-btn-blue:hover {
+    background: #3b82f6;
+}
+
+.excalidraw-btn-blue:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.excalidraw-btn-red {
+    background: #dc2626;
+    border: 1px solid #dc2626;
+}
+
+.excalidraw-btn-red:hover {
+    background: #ef4444;
+}
+
+/* Excalidraw app container */
+.excalidraw-app-container {
+    flex: 1;
+    background: #fff;
+}
+
+/* Loading state */
+.excalidraw-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 18px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Library warning modal */
+.library-warning-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.library-warning-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.library-warning-title {
+    margin-top: 0;
+    color: #d97706;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.library-warning-text {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.library-warning-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.library-warning-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+}
+
+.library-warning-btn-cancel {
+    background: #e5e7eb;
+}
+
+.library-warning-btn-ok {
+    background: #2563eb;
+    color: white;
+}
+
 
 

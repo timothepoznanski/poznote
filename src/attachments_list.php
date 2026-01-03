@@ -39,7 +39,7 @@ $currentLang = getUserLanguage();
 		<div class="shared-filter-bar">
 			<div class="filter-input-wrapper">
 				<input type="text" id="filterInput" class="filter-input" placeholder="<?php echo t_h('attachments.list.filter_placeholder'); ?>"/>
-				<button id="clearFilterBtn" class="clear-filter-btn" style="display: none;">
+				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>
 				</button>
 			</div>
@@ -52,7 +52,7 @@ $currentLang = getUserLanguage();
 				<?php echo t_h('common.loading', [], 'Loading...'); ?>
 			</div>
 			<div id="attachmentsContainer" class="attachments-list-container"></div>
-			<div id="emptyMessage" class="empty-message" style="display: none;">
+			<div id="emptyMessage" class="empty-message initially-hidden">
 				<i class="fa-paperclip"></i>
 				<p><?php echo t_h('attachments.list.no_attachments', [], 'No notes with attachments yet.'); ?></p>
 			</div>

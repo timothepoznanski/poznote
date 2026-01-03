@@ -147,9 +147,9 @@ $subheadingText = $note['subheading'] ?: ($note['location'] ?: t('common.not_spe
             <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.subheading', [], 'Subheading:'); ?></div>
                 <div class="info-value">
-                    <span id="subheading-display" style="cursor:pointer;" role="button" tabindex="0"><?php echo htmlspecialchars($subheadingText); ?></span>
-                    <input type="text" id="subheading-input" style="display: none;" />
-                    <div id="subheading-buttons" style="display: none; margin-left: 10px;">
+                    <span id="subheading-display" class="cursor-pointer" role="button" tabindex="0"><?php echo htmlspecialchars($subheadingText); ?></span>
+                    <input type="text" id="subheading-input" class="initially-hidden" />
+                    <div id="subheading-buttons" class="subheading-buttons-container">
                         <button type="button" class="btn-save"><?php echo t_h('common.save', [], 'Save'); ?></button>
                         <button type="button" class="btn-cancel"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                     </div>

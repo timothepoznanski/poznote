@@ -510,3 +510,47 @@ body {
     padding: 10px 6px;
     border-bottom: 1px solid #eee;
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Alert margins */
+.alert-with-margin {
+    margin-top: 12px;
+}
+
+/* Default workspace select */
+.default-workspace-select {
+    width: 300px;
+    padding: 8px;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+/* Default workspace status message */
+.default-workspace-status {
+    margin-top: 8px;
+    color: #10b981;
+    display: none;
+}
+
+/* Bottom padding spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}
+
+/* Buttons container margin */
+.buttons-with-margin {
+    margin-top: 12px;
+}
+
+/* Text colors */
+.text-danger {
+    color: red;
+}

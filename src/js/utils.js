@@ -609,8 +609,9 @@ function checkForUpdatesAutomatic() {
                 localStorage.setItem('poznote_update_available', 'true');
                 showUpdateBadge();
             } else {
-                // Clear update availability flag
+                // Clear update availability flag and hide badge
                 localStorage.removeItem('poznote_update_available');
+                hideUpdateBadge();
             }
         })
         .catch(function(error) {
@@ -814,13 +815,15 @@ function showUpdateCheckResult(title, message, type) {
 function hideUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
-        badges[i].style.display = 'none';
+        badges[i].classList.add('update-badge-hidden');
+        badges[i].style.display = '';
     }
 }
 
 function showUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
+        badges[i].classList.remove('update-badge-hidden');
         badges[i].style.display = 'inline-block';
     }
 }

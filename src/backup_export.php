@@ -329,12 +329,12 @@ function createBackup() {
             <?php endif; ?>
             <p>
                 <?php echo t_h('backup_export.sections.complete_backup.description_prefix'); ?>
-                <span style="color: #dc3545; font-weight: bold;"><?php echo t_h('backup_export.common.all_workspaces'); ?></span>
+                <span class="text-warning-bold"><?php echo t_h('backup_export.common.all_workspaces'); ?></span>
                 <?php echo t_h('backup_export.sections.complete_backup.description_suffix'); ?>
                 <br><br>
                 <?php echo t_h('backup_export.sections.complete_backup.use_cases'); ?><br>
             </p>
-            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
+            <ul class="backup-list-styled">
                 <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_restore_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_restore_text'); ?></li><br>
                 <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_offline_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text'); ?> <b>index.html</b> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text_suffix'); ?></li><br>
             </ul>
@@ -345,7 +345,7 @@ function createBackup() {
                     <span><?php echo t_h('backup_export.buttons.download_complete_backup'); ?></span>
                 </button>
                 <!-- Spinner shown while creating ZIP/download is in progress -->
-                <div id="backupSpinner" class="backup-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                <div id="backupSpinner" class="backup-spinner initially-hidden" role="status" aria-live="polite" aria-hidden="true">
                     <div class="spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('backup_export.spinner.preparing'); ?></span>
                     <span class="backup-spinner-text"><?php echo t_h('backup_export.spinner.preparing_long'); ?></span>
@@ -359,14 +359,14 @@ function createBackup() {
             <p>
                 <?php echo t_h('backup_export.sections.structured_export.description'); ?>
                 <br><br>
-                <span style="color: red;"><?php echo t_h('backup_export.sections.structured_export.warning'); ?></span>
+                <span class="text-danger"><?php echo t_h('backup_export.sections.structured_export.warning'); ?></span>
             </p>
             
-            <div class="form-group" style="margin: 25px 0 30px 0;">
-                <label for="structuredExportWorkspaceSelect" style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 14px;">
+            <div class="form-group form-group-export">
+                <label for="structuredExportWorkspaceSelect" class="export-label">
                     <?php echo t_h('backup_export.sections.structured_export.select_workspace'); ?>
                 </label>
-                <select id="structuredExportWorkspaceSelect" class="form-control" style="max-width: 350px; padding: 10px 12px; font-size: 14px; border-radius: 4px;">
+                <select id="structuredExportWorkspaceSelect" class="form-control export-select">
                     <option value=""><?php echo t_h('backup_export.sections.structured_export.loading_workspaces'); ?></option>
                 </select>
             </div>
@@ -377,7 +377,7 @@ function createBackup() {
         </div>
         
         <!-- Bottom padding for better spacing -->
-        <div style="padding-bottom: 50px;"></div>
+        <div class="section-bottom-spacer"></div>
     </div>
     
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>

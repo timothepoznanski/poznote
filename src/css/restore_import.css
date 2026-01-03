@@ -483,3 +483,102 @@ body {
     white-space: nowrap;
 }
 
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default (for accordion content, spinners, etc.) */
+.initially-hidden {
+    display: none;
+}
+
+/* Progress bar initial state */
+.progress-fill-initial {
+    width: 0%;
+}
+
+/* Link styles */
+.link-primary {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link-primary:hover {
+    text-decoration: underline;
+}
+
+/* Form group with spacing */
+.form-group-spaced {
+    margin-bottom: 1.25rem;
+}
+
+/* Form label styles */
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Form select styles */
+.form-select-styled {
+    font-size: 15px;
+    padding: 0.5rem;
+}
+
+/* Form helper text */
+.form-text-block {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-text-danger {
+    color: #dc3545;
+}
+
+.form-text-info {
+    color: #17a2b8;
+}
+
+.form-text-muted-block {
+    display: block;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* File input with padding */
+.form-file-input {
+    padding: 0.5rem;
+}
+
+/* Button with top margin */
+.btn-with-margin-top {
+    margin-top: 1rem;
+}
+
+/* Spinner with top margin */
+.spinner-with-margin-top {
+    margin-top: 1rem;
+}
+
+/* Direct copy restore form margin */
+.form-with-margin-top {
+    margin-top: 10px;
+}
+
+/* Bottom padding spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}
+
+/* Text colors */
+.text-danger {
+    color: #dc3545;
+}
+
+.text-warning-bold {
+    color: #dc3545;
+    font-weight: bold;
+}
+

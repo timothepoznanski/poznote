@@ -337,3 +337,41 @@ body {
     text-decoration: none;
     transform: translateY(-1px);
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Version display styles */
+.version-display {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.version-display-mobile-top {
+    padding: 12px 6px;
+    margin-bottom: 12px;
+}
+
+.version-display-desktop-bottom {
+    padding: 20px;
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Settings card cursor */
+.settings-card-clickable {
+    cursor: pointer;
+}
+
+/* Update badge hidden state */
+.update-badge.update-badge-hidden {
+    display: none !important;
+}
+
+/* Release notes link */
+.release-notes-link {
+    color: var(--link-color);
+    text-decoration: underline;
+    opacity: 1;
+}

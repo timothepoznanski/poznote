@@ -64,7 +64,7 @@ $currentLang = getUserLanguage();
 					class="filter-input" 
 					placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by title or token...'); ?>"
 				/>
-				<button id="clearFilterBtn" class="clear-filter-btn" style="display: none;">
+				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="fa-times"></i>
 				</button>
 			</div>
@@ -77,7 +77,7 @@ $currentLang = getUserLanguage();
 				<?php echo t_h('common.loading', [], 'Loading...'); ?>
 			</div>
 			<div id="sharedNotesContainer"></div>
-			<div id="emptyMessage" class="empty-message" style="display: none;">
+			<div id="emptyMessage" class="empty-message initially-hidden">
 			<i class="fa-cloud"></i>
 			<p><?php echo t_h('public.page.no_public_notes', [], 'No public notes yet.'); ?></p>
 				<p class="empty-hint"><?php echo t_h('public.page.public_hint', [], 'Make a note public by clicking the cloud button in the note toolbar.'); ?></p>

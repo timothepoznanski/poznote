@@ -579,3 +579,12 @@ body.attachments-page {
 		margin-left: 10px;
 	}
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}

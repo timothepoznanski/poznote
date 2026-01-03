@@ -38,7 +38,6 @@ if (!$hasAttachments) {
     <title>Poznote - Attachments Export</title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/light.min.css">
-        <link rel="stylesheet" href="css/ai.css">
         <link href="css/modals.css" rel="stylesheet">
     </head>
     <body class="ai-page">

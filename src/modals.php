@@ -7,14 +7,14 @@
     <div class="modal-content">
         <h3><?php echo t_h('modals.update.title'); ?></h3>
         <p id="updateMessage"></p>
-        <div class="backup-warning" id="updateBackupWarning" style="display: none;">
-            <p><strong>⚠️ </strong> <span style="color: #dc3545;"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
-            <p style="color: #6c757d; font-size: 14px; margin-top: 8px;"><?php echo t('modals.update.backup_hint'); ?></p>
+        <div class="backup-warning initially-hidden" id="updateBackupWarning">
+            <p><strong>⚠️ </strong> <span class="backup-warning-text"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
+            <p class="text-small-muted"><?php echo t('modals.update.backup_hint'); ?></p>
         </div>
         <div class="version-info">
             <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
-            <p id="releaseNotesLink" style="display: none;"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
+            <p id="releaseNotesLink" class="initially-hidden"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
         <div class="update-buttons-container">
             <div class="update-instructions-buttons">
@@ -64,7 +64,7 @@
                 <div class="font-size-section">
                     <label for="fontSizeInput"><?php echo t_h('modals.font_size.label'); ?></label>
                     <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="15">
-                    <div id="defaultFontSizeInfo" class="default-info" style="display: block;">
+                    <div id="defaultFontSizeInfo" class="default-info default-font-size-info">
                         <?php echo t_h('modals.font_size.default_value', ['size' => '15']); ?>
                     </div>
                     <div class="font-size-preview">
@@ -87,7 +87,7 @@
         <p id="confirmMessage"><?php echo t_h('modals.confirm.message'); ?></p>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-confirm-modal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-secondary" id="saveAndExitButton" data-action="execute-save-and-exit" style="display: none;"><?php echo t_h('modals.confirm.save_and_exit'); ?></button>
+            <button type="button" class="btn-secondary initially-hidden" id="saveAndExitButton" data-action="execute-save-and-exit"><?php echo t_h('modals.confirm.save_and_exit'); ?></button>
             <button type="button" class="btn-primary" id="confirmButton" data-action="execute-confirmed-action"><?php echo t_h('modals.confirm.exit_without_saving'); ?></button>
         </div>
     </div>
@@ -97,8 +97,8 @@
 <div id="newFolderModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.folder.new_title'); ?></h3>
-        <div class="modal-body" style="margin-bottom: 10px;">
-            <input type="text" id="newFolderName" placeholder="<?php echo t_h('modals.folder.new_placeholder'); ?>" maxlength="255" style="width:100%; padding:8px 12px; margin-bottom:0; border:1px solid #ddd; border-radius:4px; font-size:14px; font-family:'Inter',sans-serif; box-sizing:border-box;" data-enter-action="create-folder">
+        <div class="modal-body modal-body-spaced">
+            <input type="text" id="newFolderName" placeholder="<?php echo t_h('modals.folder.new_placeholder'); ?>" maxlength="255" class="new-folder-input" data-enter-action="create-folder">
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="newFolderModal"><?php echo t_h('common.cancel'); ?></button>
@@ -172,11 +172,11 @@
 <div id="deleteFolderModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.folder.delete_title'); ?></h3>
-        <div id="deleteFolderMessage" style="margin: 15px 0;">
-            <p id="deleteFolderMainMessage" style="margin-bottom: 10px;"></p>
-            <ul id="deleteFolderDetails" style="list-style: none; padding: 0; margin: 10px 0;">
+        <div id="deleteFolderMessage" class="delete-folder-message">
+            <p id="deleteFolderMainMessage" class="delete-folder-main-message"></p>
+            <ul id="deleteFolderDetails" class="delete-folder-details">
             </ul>
-            <p id="deleteFolderNote" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+            <p id="deleteFolderNote" class="delete-folder-note"></p>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteFolderModal"><?php echo t_h('common.cancel'); ?></button>
@@ -196,7 +196,7 @@
         <div id="folderFilesCount" class="modal-info-message">
             <span id="filesCountText"></span>
         </div>
-        <div class="modal-info-message" style="margin-top: 12px; font-size: 0.9em; color: #666;">
+        <div class="modal-info-message mt-12">
             • <?php echo t_h('modals.move_folder_files.hint_move_single', [], 'To move a single note to another workspace, use the "Move note" button in the toolbar'); ?><br><br>
             • <?php echo t_h('modals.move_folder_files.hint_move_all', [], 'To move all notes from one workspace to another, go to Settings → Workspaces'); ?><br><br>
         </div>
@@ -225,7 +225,7 @@
 </div>
 
 <!-- Move notes modal (for workspaces.php) -->
-<div id="moveNotesModal" class="modal" style="display:none;">
+<div id="moveNotesModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.move_notes_title', [], 'Move notes from'); ?> "<span id="moveSourceName"></span>"</h3>
         <div class="form-group">
@@ -233,7 +233,7 @@
             <select id="moveTargetSelect">
             </select>
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmMoveBtn" class="btn btn-primary"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes'); ?></button>
             <button data-action="close-move-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
@@ -241,14 +241,14 @@
 </div>
 
 <!-- Rename modal (for workspaces.php) -->
-<div id="renameModal" class="modal" style="display:none;">
+<div id="renameModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.rename_title', [], 'Rename workspace'); ?> <span id="renameSource"></span></h3>
         <div class="form-group">
             <label for="renameNewName"><?php echo t_h('modals.workspaces.new_name', [], 'New name'); ?></label>
             <input id="renameNewName" type="text" />
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmRenameBtn" class="btn btn-primary"><?php echo t_h('common.rename', [], 'Rename'); ?></button>
             <button data-action="close-rename-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
@@ -256,14 +256,14 @@
 </div>
 
 <!-- Delete confirmation modal (for workspaces.php) -->
-<div id="deleteModal" class="modal" style="display:none;">
+<div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.delete_title', [], 'Confirm delete workspace'); ?> "<span id="deleteWorkspaceName"></span>"</h3>
-        <p style="color: red;"><?php echo t_h('modals.workspaces.delete_description', [], 'Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.'); ?></p>
+        <p class="text-danger"><?php echo t_h('modals.workspaces.delete_description', [], 'Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.'); ?></p>
         <div class="form-group">
             <input id="confirmDeleteInput" type="text" placeholder="<?php echo t_h('modals.workspaces.delete_placeholder', [], 'Type workspace name to confirm'); ?>" />
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmDeleteBtn" class="btn btn-danger" disabled><?php echo t_h('modals.workspaces.delete_button', [], 'Delete workspace'); ?></button>
             <button data-action="close-delete-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
@@ -314,7 +314,7 @@
                             <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="subfolder" data-action="select-create-type" id="subfolderOption" style="display: none;">
+                    <div class="create-note-option initially-hidden" data-type="subfolder" data-action="select-create-type" id="subfolderOption">
                         <i class="fal fa-folder-plus"></i>
                         <div>
                             <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
@@ -323,14 +323,14 @@
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
-                <div class="create-section" id="otherSection" style="margin-top: 12px;">
+                <div class="create-section mt-12" id="otherSection">
                     <div class="create-note-option" data-type="folder" data-action="select-create-type">
                         <i class="fa fa-folder"></i>
                         <div>
                             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="workspace" data-action="select-create-type" style="margin-top: 14px;">
+                    <div class="create-note-option mt-12" data-type="workspace" data-action="select-create-type">
                         <i class="fa fa-layer-group"></i>
                         <div>
                             <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
@@ -339,7 +339,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal-buttons" style="margin-top: 16px;">
+        <div class="modal-buttons mt-16">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="createModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
@@ -352,7 +352,7 @@
         <div class="modal-body">
             <div class="export-options">
                 <!-- Markdown export option (shown only for markdown notes) -->
-                <div class="export-option export-option-markdown" data-action="select-export-type" data-type="markdown" style="display:none;">
+                <div class="export-option export-option-markdown initially-hidden" data-action="select-export-type" data-type="markdown">
                     <i class="fal fa-file-alt"></i>
                     <div>
                         <span><?php echo t_h('modals.export.markdown.title', [], 'Export as Markdown'); ?></span>
@@ -369,7 +369,7 @@
                 </div>
 
                 <!-- JSON export option (shown only for tasklist notes) -->
-                <div class="export-option export-option-json" data-action="select-export-type" data-type="json" style="display:none;">
+                <div class="export-option export-option-json initially-hidden" data-action="select-export-type" data-type="json">
                     <i class="fal fa-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.json.title', [], 'Download as JSON'); ?></span>
@@ -414,7 +414,7 @@
         <h3><?php echo t_h('modals.note_sort.title', [], 'Note sort order'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.note_sort.description', [], 'Choose how notes are ordered in the notes list:'); ?></p>
-            <div style="margin-top:8px;">
+            <div class="radio-options">
                 <label><input type="radio" name="noteSort" value="updated_desc"> <?php echo t_h('modals.note_sort.options.last_modified', [], 'Last modified'); ?></label>
                 <label><input type="radio" name="noteSort" value="created_desc"> <?php echo t_h('modals.note_sort.options.last_created', [], 'Last created'); ?></label>
                 <label><input type="radio" name="noteSort" value="heading_asc"> <?php echo t_h('modals.note_sort.options.alphabetical', [], 'Alphabetical'); ?></label>
@@ -433,7 +433,7 @@
         <h3><?php echo t_h('settings.language.label'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.language.description', [], 'Select your preferred language:'); ?></p>
-            <div style="margin-top:8px;">
+            <div class="radio-options">
                 <label><input type="radio" name="languageChoice" value="en"> <?php echo t_h('settings.language.english'); ?></label>
                 <label><input type="radio" name="languageChoice" value="fr"> <?php echo t_h('settings.language.french'); ?></label>
                 <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
@@ -454,7 +454,7 @@
         <h3><?php echo t_h('modals.timezone.title', [], 'Timezone'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.timezone.description', [], 'Select your timezone:'); ?></p>
-            <select id="timezoneSelect" style="width:100%; padding:8px; margin-top:10px; border:1px solid #ddd; border-radius:4px; font-size:14px;">
+            <select id="timezoneSelect" class="timezone-select">
                 <optgroup label="<?php echo t_h('modals.timezone.groups.europe', [], 'Europe'); ?>">
                     <option value="Europe/Paris">Europe/Paris (France, CET/CEST)</option>
                     <option value="Europe/London">Europe/London (UK, GMT/BST)</option>

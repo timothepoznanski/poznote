@@ -4594,6 +4594,31 @@ a.links_arbo_left.dragging,
     font-size: 13px;
 }
 
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Initially hidden elements (used by JS to toggle) */
+.initially-hidden {
+    display: none;
+}
+
+/* Cursor pointer */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Update badge hidden in sidebar */
+.sidebar-settings .update-badge.update-badge-hidden,
+.update-badge.update-badge-hidden {
+    display: none !important;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}
+
 /* ============================================
 .folder-content .links_arbo_left {
     pointer-events: auto;

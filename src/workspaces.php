@@ -479,7 +479,7 @@ try {
         <br><br>
 
         <!-- Top alert area: used for both server-side and client-side messages -->
-        <div id="topAlert" style="<?php echo ($message || $error) ? '' : 'display:none;'; ?> margin-top:12px;" class="<?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
+        <div id="topAlert" class="<?php echo ($message || $error) ? '' : 'initially-hidden'; ?> alert-with-margin <?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
             <?php if ($message): ?>
                 <?php echo htmlspecialchars($message); ?>
             <?php elseif ($error): ?>
@@ -565,16 +565,16 @@ try {
                 <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
             </p>
             <div class="form-group">
-                <select id="defaultWorkspaceSelect" style="width: 300px; padding: 8px; font-size: 14px; margin-right: 10px;">
+                <select id="defaultWorkspaceSelect" class="default-workspace-select">
                     <option value=""><?php echo t_h('common.loading', [], 'Loading...', $currentLang); ?></option>
                 </select>
                 <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> <?php echo t_h('workspaces.default.save_button', [], 'Save Default', $currentLang); ?></button>
             </div>
-            <div id="defaultWorkspaceStatus" style="margin-top: 8px; color: #10b981; display: none;"></div>
+            <div id="defaultWorkspaceStatus" class="default-workspace-status"></div>
         </div>
 
-    <div id="ajaxAlert" style="display:none; margin-top:12px;"></div>
-    <div style="padding-bottom: 50px;"></div>
+    <div id="ajaxAlert" class="initially-hidden alert-with-margin"></div>
+    <div class="section-bottom-spacer"></div>
     </div>
 
     <script src="js/theme-manager.js"></script>

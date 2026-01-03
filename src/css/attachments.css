@@ -853,3 +853,17 @@ body {
         font-size: 12px;
     }
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Section bottom spacer */
+.section-bottom-spacer {
+    padding-bottom: 50px;
+}

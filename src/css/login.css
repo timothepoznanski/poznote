@@ -334,3 +334,13 @@ html[data-theme='dark'] .github-link a:hover {
         font-size: 0.75rem;
     }
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* OIDC error message */
+.oidc-error {
+    margin-top: 0.75rem;
+    text-align: center;
+}

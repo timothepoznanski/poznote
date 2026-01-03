@@ -119,7 +119,7 @@ if (!$note) {
                 </button>
             </div>
             
-            <div id="uploadProgress" class="upload-progress" style="display: none;">
+            <div id="uploadProgress" class="upload-progress initially-hidden">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
@@ -138,7 +138,7 @@ if (!$note) {
         </div>
         
         <!-- Bottom padding for better spacing -->
-        <div style="padding-bottom: 50px;"></div>
+        <div class="section-bottom-spacer"></div>
     </div>
 
     <script src="js/attachments-page.js"></script>
