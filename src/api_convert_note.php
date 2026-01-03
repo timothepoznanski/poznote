@@ -560,7 +560,13 @@ function convertHtmlToMarkdown($html, $noteId, $existingAttachmentsJson, $con) {
             $extension = $imageType === 'jpeg' ? 'jpg' : $imageType;
             $attachmentId = uniqid();
             $filename = $attachmentId . '.' . $extension;
-            $originalFilename = ($alt && $alt !== 'image') ? $alt . '.' . $extension : 'image_' . $attachmentId . '.' . $extension;
+            
+            // Remove existing extension from alt text if present
+            $altWithoutExt = $alt;
+            if ($alt && $alt !== 'image') {
+                $altWithoutExt = preg_replace('/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i', '', $alt);
+            }
+            $originalFilename = ($altWithoutExt && $altWithoutExt !== 'image') ? $altWithoutExt . '.' . $extension : 'image_' . $attachmentId . '.' . $extension;
             
             // Decode and save image
             $imageData = base64_decode($base64Data);
