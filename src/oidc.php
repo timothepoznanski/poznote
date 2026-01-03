@@ -21,9 +21,8 @@ function oidc_base64url_decode($data) {
 }
 
 function oidc_get_base_url() {
-    $proto = get_protocol();
     $host = $_SERVER['HTTP_HOST'] ?? (defined('SERVER_NAME') ? SERVER_NAME : 'localhost');
-    return $proto . '://' . $host;
+    return 'https://' . $host;
 }
 
 function oidc_get_redirect_uri() {

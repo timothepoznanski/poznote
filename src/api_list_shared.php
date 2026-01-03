@@ -43,14 +43,13 @@ try {
     $shared_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Build URLs for each shared note
-    $protocol = get_protocol();
     $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
     $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
     if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
         $scriptDir = '';
     }
     $scriptDir = rtrim($scriptDir, '/\\');
-    $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+    $base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
     
     foreach ($shared_notes as &$note) {
         $token = $note['token'];

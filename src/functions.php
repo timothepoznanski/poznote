@@ -85,20 +85,6 @@ function t_h($key, $vars = [], $default = null, $lang = null) {
 }
 
 /**
- * Get the protocol (http or https) from the current request
- * Takes into account reverse proxy headers (X-Forwarded-Proto)
- * @return string 'http' or 'https'
- */
-function get_protocol() {
-    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-        return strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]));
-    } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-        return 'https';
-    }
-    return 'http';
-}
-
-/**
  * Get the user's configured timezone from the database
  * Returns 'UTC' if no timezone is configured
  * @return string The timezone identifier (e.g., 'Europe/Paris')

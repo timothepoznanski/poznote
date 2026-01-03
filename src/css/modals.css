@@ -1555,6 +1555,7 @@
     -moz-user-select: text;
     cursor: text;
     border-radius: 6px;
+    margin-top: 12px;
     margin-bottom: 30px; /* 30px spacing between URL and buttons */
     color: #333;
 }
@@ -1572,6 +1573,20 @@
     white-space: nowrap;
     padding: 8px 16px;
     min-width: fit-content;
+}
+
+/* Protocol toggle row (keep switch next to the HTTPS label) */
+#shareModal .share-protocol-wrap {
+    margin: 0 0 8px 0;
+}
+
+#shareModal .share-protocol-wrap .share-indexable-label {
+    justify-content: flex-start !important;
+    gap: 10px;
+}
+
+#shareModal .share-protocol-wrap .indexable-label-text {
+    flex: 0 0 auto;
 }
 
 #shareModal .share-custom-wrap {
