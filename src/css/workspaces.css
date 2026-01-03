@@ -527,9 +527,9 @@ body {
 
 /* Default workspace select */
 .default-workspace-select {
-    width: 300px;
-    padding: 8px;
-    font-size: 14px;
+    width: 450px;
+    padding: 12px;
+    font-size: 16px;
     margin-right: 10px;
 }
 

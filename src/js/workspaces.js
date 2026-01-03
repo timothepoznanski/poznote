@@ -821,7 +821,7 @@ function loadDefaultWorkspaceSetting() {
     // Add special option for last workspace opened
     var optLast = document.createElement('option');
     optLast.value = '__last_opened__';
-    optLast.textContent = '🕐 ' + lastOpenedLabel;
+    optLast.textContent = lastOpenedLabel;
     select.appendChild(optLast);
     
     var workspacesList = [];
@@ -831,18 +831,10 @@ function loadDefaultWorkspaceSetting() {
         workspacesList = [];
     }
     
-    // Add separator if there are workspaces
-    if (workspacesList.length > 0) {
-        var optSep = document.createElement('option');
-        optSep.disabled = true;
-        optSep.textContent = '──────────────';
-        select.appendChild(optSep);
-    }
-    
     workspacesList.forEach(function(w) {
         var opt = document.createElement('option');
         opt.value = w;
-        opt.textContent = '📁 ' + w;
+        opt.textContent = w;
         select.appendChild(opt);
     });
     

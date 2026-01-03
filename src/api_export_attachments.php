@@ -35,28 +35,29 @@ if (!$hasAttachments) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poznote - Attachments Export</title>
+        <title>Poznote - Attachments Export</title>
         <link rel="stylesheet" href="css/fontawesome.min.css">
         <link rel="stylesheet" href="css/light.min.css">
         <link href="css/modals.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/export-attachments.css">
     </head>
     <body class="ai-page">
         <div class="summary-page">
             <div class="summary-header">
                 <h1>Attachments Export</h1>
-                <p style="color: #6c757d; margin: 10px 0 0 0; font-size: 14px;">No attachments found</p>
+                <p class="subtitle-text">No attachments found</p>
             </div>
             
             <div class="summary-content">
-                <div style="text-align: center;">
-                    <div style="font-size: 48px; color: #6c757d; margin-bottom: 20px;">
+                <div class="empty-state-container">
+                    <div class="empty-state-icon">
                         <i class="fa-paperclip"></i>
                     </div>
-                    <h2 style="color: #333; margin-bottom: 15px; font-size: 24px;">No attachments found</h2>
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
+                    <h2 class="empty-state-title">No attachments found</h2>
+                    <p class="empty-state-description">
                         There are currently no attachments in your notes.
                     </p>
-                    <p style="color: #666; line-height: 1.6; margin-bottom: 0; font-size: 16px;">
+                    <p class="empty-state-description">
                         To add attachments to your notes, use the <strong><i class="fa-paperclip"></i></strong> button in the note editor.
                     </p>
                 </div>
@@ -72,16 +73,7 @@ if (!$hasAttachments) {
             </div>
         </div>
         
-        <script>
-        // Ensure Back to Notes opens the stored workspace if present
-        (function(){ try {
-            var stored = localStorage.getItem('poznote_selected_workspace');
-            if (stored) {
-                var a = document.getElementById('backToNotesLink'); 
-                if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-            }
-        } catch(e){} })();
-        </script>
+        <script src="js/export-attachments.js"></script>
     </body>
     </html>
     <?php

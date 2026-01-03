@@ -564,17 +564,11 @@ try {
             <p>
                 <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
             </p>
-            <p class="text-muted small">
-                <?php 
-                $lastOpenedLabel = t_h('workspaces.default.last_opened', [], 'Last workspace opened', $currentLang);
-                echo t_h('workspaces.default.description_2', ['last' => $lastOpenedLabel], 'Select "{{last}}" to always open the workspace you were using previously.', $currentLang); 
-                ?>
-            </p>
             <div class="form-group">
-                <select id="defaultWorkspaceSelect" class="default-workspace-select form-control" style="max-width: 400px;">
+                <select id="defaultWorkspaceSelect" class="default-workspace-select">
                     <option value=""><?php echo t_h('common.loading', [], 'Loading...', $currentLang); ?></option>
                 </select>
-                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn" style="margin-top: 10px;"> <?php echo t_h('workspaces.default.save_button', [], 'Save Default', $currentLang); ?></button>
+                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> <?php echo t_h('workspaces.default.save_button', [], 'Save Default', $currentLang); ?></button>
             </div>
             <div id="defaultWorkspaceStatus" class="default-workspace-status"></div>
         </div>
