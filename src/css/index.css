@@ -2254,7 +2254,7 @@ textarea:focus{
     outline: none;
     resize: none;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    font-size: 15px;
+    font-size: var(--note-font-size, 15px);
 }
 
 /* Apply Inter to text elements, except in code blocks */

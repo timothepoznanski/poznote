@@ -110,6 +110,19 @@ try {
     $login_display_name = '';
 }
 
+// Load note font size for CSS custom property
+$note_font_size = '15';
+try {
+    $stmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+    $stmt->execute(['note_font_size']);
+    $font_size_value = $stmt->fetchColumn();
+    if ($font_size_value !== false) {
+        $note_font_size = $font_size_value;
+    }
+} catch (Exception $e) {
+    // Use default if error
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -143,6 +156,7 @@ try {
     <link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
+    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; }</style>
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
     <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
@@ -698,20 +712,6 @@ $body_classes = trim($extra_body_classes);
                         echo '<button class="btn-inline-cancel initially-hidden" id="cancel-subheading-'.$row['id'].'" data-action="cancel-subheading-inline" data-note-id="'.$row['id'].'">'.t_h('common.cancel', [], 'Cancel').'</button>';
                         echo '</div>';
                     }
-                
-                    // Get font size from settings
-                    $font_size = '16';
-                    
-                    try {
-                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-                        $stmt->execute(['note_font_size']);
-                        $font_size_value = $stmt->fetchColumn();
-                        if ($font_size_value !== false) {
-                            $font_size = $font_size_value;
-                        }
-                    } catch (Exception $e) {
-                        // Use default if error
-                    }
                     
                     // Note content with font size style
                     $note_type = $row['type'] ?? 'note';
@@ -749,7 +749,7 @@ $body_classes = trim($extra_body_classes);
                         $placeholder_attr .= ' data-ph-mobile="' . htmlspecialchars($placeholder_mobile, ENT_QUOTES) . '"';
                     }
 
-                    echo '<div class="noteentry" style="font-size:'.$font_size.'px;" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';
