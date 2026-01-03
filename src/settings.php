@@ -48,6 +48,12 @@ $currentLang = getUserLanguage();
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
 
+        <!-- Version Display (mobile top) -->
+        <div class="version-display version-display-mobile-top" style="text-align: center; padding: 12px 6px; margin-bottom: 12px; color: var(--text-secondary);">
+            <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
+            <small><a href="https://poznote.com/releases.html" target="_blank" style="color: var(--link-color); text-decoration: underline; opacity: 1;"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
+        </div>
+
         <div class="settings-two-columns">
             <!-- Left Column: Actions (without badges) -->
             <div class="settings-column settings-column-left">
@@ -155,6 +161,9 @@ $currentLang = getUserLanguage();
 
             <!-- Right Column: Settings with badges -->
             <div class="settings-column settings-column-right">
+                <!-- Mobile Separator -->
+                <div class="settings-sep settings-sep-mobile"></div>
+                
                 <!-- Login Display -->
                 <div class="settings-card" onclick="showLoginDisplayNamePrompt();">
                     <div class="settings-card-icon">
@@ -245,8 +254,8 @@ $currentLang = getUserLanguage();
             </div>
         </div>
 
-        <!-- Version Display -->
-        <div style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+        <!-- Version Display (desktop bottom) -->
+        <div class="version-display version-display-desktop-bottom" style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
             <small>Poznote <?php echo htmlspecialchars(trim(file_get_contents('version.txt')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></small><br>
             <small><a href="https://poznote.com/releases.html" target="_blank" style="color: var(--link-color); text-decoration: underline; opacity: 1;"><?php echo t_h('settings.cards.release_notes'); ?></a></small>
         </div>

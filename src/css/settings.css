@@ -60,7 +60,7 @@ body {
 }
 
 /* Mobile: stack columns */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .settings-two-columns {
         grid-template-columns: 1fr;
     }
@@ -71,6 +71,37 @@ body {
     background: #afb3b6ff;
     margin: 12px 0;
 }
+
+.settings-sep-mobile {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .settings-sep-mobile {
+        display: block;
+    }
+}
+
+/* Version display positioning */
+.version-display-mobile-top {
+    display: none;
+}
+
+.version-display-desktop-bottom {
+    display: block;
+}
+
+@media (max-width: 800px) {
+    .version-display-mobile-top {
+        display: block;
+        margin-bottom: 20px;
+    }
+    
+    .version-display-desktop-bottom {
+        display: none;
+    }
+}
+
 .settings-footer {
     display: flex;
     gap: 12px;
@@ -88,7 +119,6 @@ body {
     padding: 12px 6px;
     cursor: pointer;
     transition: background 0.12s ease;
-    border-bottom: 1px solid #eef2f5;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -155,7 +185,7 @@ body {
 }
 
 /* Mobile: allow text wrapping */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .settings-card h3 {
         white-space: normal;
         overflow: visible;
