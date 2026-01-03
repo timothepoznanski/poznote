@@ -9,6 +9,12 @@
         r.setAttribute('data-theme', t);
         r.style.colorScheme = t === 'dark' ? 'dark' : 'light';
         r.style.backgroundColor = t === 'dark' ? '#1a1a1a' : '#ffffff';
+        // Add theme class for pages that need it (settings, display)
+        if (t === 'dark') {
+            r.classList.add('theme-dark');
+        } else {
+            r.classList.add('theme-light');
+        }
     } catch (e) {
         // Fallback silently if localStorage unavailable
     }
