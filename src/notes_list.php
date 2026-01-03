@@ -11,7 +11,7 @@
 echo "<div class='system-folders-container'>";
 
 // Icône toggle pour la barre de recherche
-echo "<div class='folder-header system-folder' onclick='toggleSearchBar()' title='Recherche'>";
+echo "<div class='folder-header system-folder' data-action='toggle-search-bar' title='Recherche'>";
 echo "<div class='folder-toggle'>";
 echo "<i class='fa-search folder-icon'></i>";
 echo "<span class='folder-name'>Recherche</span>";
@@ -47,7 +47,7 @@ try {
 
 // Render a dedicated "Tags" folder
 echo "<div class='folder-header system-folder' data-folder='Tags'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"list_tags.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.tags', [], 'Tags') . "'>";
+echo "<div class='folder-toggle' data-action='navigate-tags' data-url='list_tags.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.tags', [], 'Tags') . "'>";
 echo "<i class='fa-tags folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.tags', [], 'Tags') . "</span>";
 echo "<span class='folder-note-count' id='count-tags'>" . $tag_count . "</span>";
@@ -122,7 +122,7 @@ try {
 // Add Favorites icon BEFORE the menu (only if there are favorites)
 if ($favorites_count > 0) {
     echo "<div class='folder-header system-folder system-folder-favorites' data-folder='Favorites' data-folder-id='folder-favorites' data-folder-key='folder_folder-favorites'>";
-    echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"folder-favorites\")' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
+    echo "<div class='folder-toggle' data-action='toggle-favorites' data-folder-id='folder-favorites' title='" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "'>";
     echo "<i class='fa-star-light folder-icon'></i>";
     echo "<span class='folder-name'>" . t_h('notes_list.system_folders.favorites', [], 'Favorites') . "</span>";
     echo "<span class='folder-note-count' id='count-favorites'>" . $favorites_count . "</span>";
@@ -131,7 +131,7 @@ if ($favorites_count > 0) {
 
 // Public/Shared notes icon in the bar
 echo "<div class='folder-header system-folder' data-folder='Shared'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); window.location = \"shared.php?workspace=" . urlencode($workspace_filter) . "\"' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
+echo "<div class='folder-toggle' data-action='navigate-shared' data-url='shared.php?workspace=" . urlencode($workspace_filter) . "' title='" . t_h('notes_list.system_folders.public', [], 'Public') . "'>";
 echo "<i class='fa-cloud folder-icon'></i>";
 echo "<span class='folder-name'>" . t_h('notes_list.system_folders.public', [], 'Public') . "</span>";
 echo "<span class='folder-note-count' id='count-shared'>" . $shared_count . "</span>";
@@ -139,7 +139,7 @@ echo "</div></div>";
 
 // Menu trois points verticaux (DERNIER élément - tout à droite)
 echo "<div class='folder-header system-folder system-menu-container' data-folder='SystemMenu'>";
-echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleSystemMenu()' title='Menu'>";
+echo "<div class='folder-toggle' data-action='toggle-system-menu' title='Menu'>";
 echo "<i class='fa-ellipsis-v folder-icon'></i>";
 echo "<span class='folder-name'>Menu</span>";
 echo "</div>";
@@ -148,14 +148,14 @@ echo "</div>";
 echo "<div class='system-menu-dropdown' id='system-menu-dropdown' style='display: none;'>";
 
 // Trash
-echo "<div class='system-menu-item' onclick='window.location = \"trash.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<div class='system-menu-item' data-action='navigate-trash' data-url='trash.php?workspace=" . urlencode($workspace_filter) . "'>";
 echo "<i class='fa-trash'></i>";
 echo "<span>" . t_h('notes_list.system_folders.trash', [], 'Trash') . "</span>";
 echo "<span class='menu-item-count' id='count-trash'>" . $trash_count . "</span>";
 echo "</div>";
 
 // Attachments
-echo "<div class='system-menu-item' onclick='window.location = \"attachments_list.php?workspace=" . urlencode($workspace_filter) . "\"'>";
+echo "<div class='system-menu-item' data-action='navigate-attachments' data-url='attachments_list.php?workspace=" . urlencode($workspace_filter) . "'>";
 echo "<i class='fa-paperclip'></i>";
 echo "<span>" . t_h('notes_list.system_folders.attachments', [], 'Attachments') . "</span>";
 echo "<span class='menu-item-count' id='count-attachments'>" . $attachments_count . "</span>";
@@ -176,7 +176,7 @@ echo "</div>"; // Fin du container system-folders
                     <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
                     <span class="searchbar-icon"><span class="fa-search"></span></span>
                     <?php if (!empty($search) || !empty($tags_search)): ?>
-                        <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" onclick="clearUnifiedSearch(); return false;"><span class="clear-icon">×</span></button>
+                        <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" data-action="clear-search"><span class="clear-icon">×</span></button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -228,8 +228,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Escape folder name for use in JavaScript
         $escapedFolderName = addslashes($folderName);
         
-        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' onclick='selectFolder($folderId, \"$escapedFolderName\", this)'>";
-        echo "<div class='folder-toggle' onclick='event.stopPropagation(); toggleFolder(\"$folderDomId\")' data-folder-id='$folderDomId'>";
+        echo "<div class='$folderClass' data-folder-id='$folderId' data-folder='$folderName' data-folder-key='folder_$folderId' data-action='select-folder'>";
+        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'>";
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
@@ -241,12 +241,13 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Workspace-aware folder handling in UI
         // Disable double-click rename for system folders
         $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
-        $ondbl = in_array($folderName, $systemFolders) ? '' : 'editFolderName(' . $folderId . ', \"' . $folderName . '\")';
+        $isSystemFolder = in_array($folderName, $systemFolders);
         $folderDisplayName = $folderName;
         if ($folderName === 'Favorites') {
             $folderDisplayName = t('notes_list.system_folders.favorites', [], 'Favorites');
         }
-        echo "<span class='folder-name' ondblclick='" . $ondbl . "'>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
+        $dblActionAttr = $isSystemFolder ? '' : " data-dblaction='edit-folder-name' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "'";
+        echo "<span class='folder-name'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
         $noteCount = count($notes);
         echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
         echo "<span class='folder-actions'>";
@@ -270,10 +271,6 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         if ($depth > 0) $noteClass .= ' note-in-subfolder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add onclick handler for AJAX loading
-        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
-        
         // Translate default note titles (New note, Nouvelle note, etc.)
         $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
         
@@ -287,7 +284,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             }
         }
         
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' draggable='true'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='$folderId' data-folder='$folderName' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
@@ -382,11 +379,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add onclick handler for AJAX loading
-        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
-        
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";
@@ -409,11 +402,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
         
-        // Add onclick handler for AJAX loading
-        $jsEscapedLink = json_encode($link, JSON_HEX_APOS | JSON_HEX_QUOT);
-        $onclickHandler = " data-onclick='return loadNoteDirectly($jsEscapedLink, $noteDbId, event);'";
-        
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true'$onclickHandler>";
+        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-folder-id='' data-folder='' draggable='true' data-action='load-note'>";
         echo "<span class='note-title'>" . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "<div id=pxbetweennotes></div>";

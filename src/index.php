@@ -403,52 +403,6 @@ $body_classes = trim($extra_body_classes);
 
             <div class="workspace-menu" id="workspaceMenu"></div>
         </div>
-
-    <script>
-    function toggleSearchBar() {
-        const searchContainer = document.getElementById('search-bar-container');
-        const searchInput = document.getElementById('unified-search');
-        const currentDisplay = window.getComputedStyle(searchContainer).display;
-        
-        if (currentDisplay === 'none') {
-            // Ouvrir la barre de recherche
-            searchContainer.style.display = 'block';
-            localStorage.setItem('searchBarVisible', 'true');
-            
-            // Positionner le curseur dans le champ de recherche
-            if (searchInput) {
-                setTimeout(() => {
-                    searchInput.focus();
-                }, 100);
-            }
-        } else {
-            // Fermer la barre de recherche
-            searchContainer.style.display = 'none';
-            localStorage.setItem('searchBarVisible', 'false');
-            
-            // Effacer la recherche en cours seulement s'il y a une recherche active
-            if (window.isSearchMode && typeof clearUnifiedSearch === 'function') {
-                clearUnifiedSearch();
-            }
-        }
-    }
-    
-    // Restaurer l'état au chargement
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchContainer = document.getElementById('search-bar-container');
-        const isVisible = localStorage.getItem('searchBarVisible');
-        
-        // Forcer l'affichage si une recherche est active (search ou tags_search)
-        if (window.isSearchMode) {
-            searchContainer.style.display = 'block';
-            localStorage.setItem('searchBarVisible', 'true');
-        }
-        // Par défaut, la barre est cachée si pas de recherche active
-        else if (isVisible !== 'true') {
-            searchContainer.style.display = 'none';
-        }
-    });
-    </script>
     </div>
         
     <script>
@@ -1236,6 +1190,7 @@ $body_classes = trim($extra_body_classes);
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
+<script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 
 <script>
 // Mobile navigation functionality
