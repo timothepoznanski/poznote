@@ -934,10 +934,18 @@
         "use_case_offline_label": "Offline-Lesen",
         "use_case_offline_text": "Öffnen Sie die enthaltene",
         "use_case_offline_text_suffix": "um Ihre Notizen ohne Poznote zu durchsuchen"
+      },
+      "structured_export": {
+        "title": "Strukturierter Export",
+        "description": "Exportieren Sie Ihre Notizen organisiert in Ordnern, die Ihrer Poznote-Ordnerstruktur entsprechen. Jede Notiz wird in einem Verzeichnis gespeichert, das ihrem Ordner in Poznote entspricht und die vollständige Hierarchie bewahrt. Markdown-Dateien enthalten YAML-Front-Matter mit Metadaten.",
+        "warning": "Hinweis: Dieser Exporttyp ist nicht für eine perfekte Sicherung von Poznote konzipiert.",
+        "select_workspace": "Arbeitsbereich auswählen:",
+        "loading_workspaces": "Arbeitsbereiche werden geladen..."
       }
     },
     "buttons": {
-      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)"
+      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)",
+      "download_structured_export": "Strukturierten Export herunterladen (ZIP)"
     },
     "spinner": {
       "preparing": "Sicherung wird vorbereitet...",

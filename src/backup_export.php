@@ -359,14 +359,17 @@ function createBackup() {
             <p>
                 <?php echo t_h('backup_export.sections.structured_export.description'); ?>
                 <br><br>
-                <strong><?php echo t_h('backup_export.sections.structured_export.features'); ?></strong><br>
+                <span style="color: red;"><?php echo t_h('backup_export.sections.structured_export.warning'); ?></span>
             </p>
-            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_folders'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_subfolders'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_metadata'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_formats'); ?></li>
-            </ul>
+            
+            <div class="form-group" style="margin: 25px 0 30px 0;">
+                <label for="structuredExportWorkspaceSelect" style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 14px;">
+                    <?php echo t_h('backup_export.sections.structured_export.select_workspace'); ?>
+                </label>
+                <select id="structuredExportWorkspaceSelect" class="form-control" style="max-width: 350px; padding: 10px 12px; font-size: 14px; border-radius: 4px;">
+                    <option value=""><?php echo t_h('backup_export.sections.structured_export.loading_workspaces'); ?></option>
+                </select>
+            </div>
             
             <button id="structuredExportBtn" type="button" class="btn btn-primary" onclick="startStructuredExport();">
                 <span><?php echo t_h('backup_export.buttons.download_structured_export'); ?></span>

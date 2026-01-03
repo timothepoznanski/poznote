@@ -950,12 +950,10 @@
       },
       "structured_export": {
         "title": "Structured Export",
-        "description": "Export your notes organized in folders matching your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the complete hierarchy.",
-        "features": "Features:",
-        "feature_folders": "Folder structure preserved",
-        "feature_subfolders": "Subfolders maintained",
-        "feature_metadata": "Markdown files include YAML front matter with metadata",
-        "feature_formats": "Original file formats preserved (.html or .md)"
+        "description": "Export your notes organized in folders matching your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the complete hierarchy. Markdown files include YAML front matter with metadata.",
+        "warning": "Note: This export type is not designed for a perfect backup of Poznote.",
+        "select_workspace": "Select workspace:",
+        "loading_workspaces": "Loading workspaces..."
       }
     },
     "buttons": {

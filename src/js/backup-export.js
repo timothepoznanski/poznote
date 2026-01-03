@@ -15,8 +15,16 @@ function startDownload() {
  * Download structured export as ZIP file
  */
 function startStructuredExport() {
-    // Create a direct link to the structured export script
-    window.location.href = 'api_export_structured.php';
+    var workspaceSelect = document.getElementById('structuredExportWorkspaceSelect');
+    var workspace = workspaceSelect ? workspaceSelect.value : '';
+    
+    if (workspace) {
+        // Create a direct link to the structured export script with workspace parameter
+        window.location.href = 'api_export_structured.php?workspace=' + encodeURIComponent(workspace);
+    } else {
+        // No workspace selected, export all
+        window.location.href = 'api_export_structured.php';
+    }
 }
 
 /**
@@ -42,7 +50,57 @@ function showBackupSpinner() {
         }
     } catch (e) { /* ignore */ }
 }
+/**
+ * Load workspaces for structured export select
+ */
+function loadWorkspacesForStructuredExport() {
+    var select = document.getElementById('structuredExportWorkspaceSelect');
+    if (!select) return;
+    
+    fetch('api_workspaces.php?action=list', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success && data.workspaces) {
+            select.innerHTML = '';
+            
+            // Try to get current workspace from localStorage
+            var currentWorkspace = '';
+            try {
+                currentWorkspace = localStorage.getItem('poznote_selected_workspace') || '';
+            } catch(e) {}
+            
+            // Add each workspace as an option
+            data.workspaces.forEach(function(ws) {
+                var option = document.createElement('option');
+                option.value = ws.name;
+                option.textContent = ws.name;
+                if (ws.name === currentWorkspace) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            
+            // If no workspace was selected and we have workspaces, select the first one
+            if (!currentWorkspace && data.workspaces.length > 0) {
+                select.value = data.workspaces[0].name;
+            }
+        }
+    })
+    .catch(function(error) {
+        console.error('Error loading workspaces:', error);
+        select.innerHTML = '<option value="">Error loading workspaces</option>';
+    });
+}
 
+// Load workspaces when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadWorkspacesForStructuredExport);
+} else {
+    loadWorkspacesForStructuredExport();
+}
 // Hide spinner and re-enable submit
 function hideBackupSpinner() {
     try {

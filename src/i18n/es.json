@@ -934,10 +934,18 @@
         "use_case_offline_label": "Lectura sin conexión",
         "use_case_offline_text": "Abre el incluido",
         "use_case_offline_text_suffix": "para navegar tus notas sin Poznote"
+      },
+      "structured_export": {
+        "title": "Exportación Estructurada",
+        "description": "Exporta tus notas organizadas en carpetas que coinciden con tu estructura de carpetas de Poznote. Cada nota se guardará en un directorio que corresponde a su carpeta en Poznote, preservando la jerarquía completa. Los archivos Markdown incluyen front matter YAML con metadatos.",
+        "warning": "Nota: Este tipo de exportación no está diseñado para una copia de seguridad perfecta de Poznote.",
+        "select_workspace": "Seleccionar espacio de trabajo:",
+        "loading_workspaces": "Cargando espacios de trabajo..."
       }
     },
     "buttons": {
-      "download_complete_backup": "Descargar copia de seguridad completa (ZIP)"
+      "download_complete_backup": "Descargar copia de seguridad completa (ZIP)",
+      "download_structured_export": "Descargar exportación estructurada (ZIP)"
     },
     "spinner": {
       "preparing": "Preparando copia de seguridad...",
