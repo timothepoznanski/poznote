@@ -1630,14 +1630,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             </h3>
             <div id="restoreBackup" class="accordion-content initially-hidden">
             
-            <div>
-            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
-            <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
-                <?php echo t_h('restore_import.page.more_info_link'); ?>
-            </a>.
-        </div>
-        <br>
-            
         <!-- Standard Complete Restore Section -->
         <div class="backup-section child-section">
             <h3 class="accordion-header" data-action="toggle-accordion" data-section="standardRestore">
