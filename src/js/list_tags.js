@@ -1,5 +1,42 @@
 // JavaScript for tags page
 
+// Get workspace from data-attribute (set by PHP)
+function getPageWorkspace() {
+    var body = document.body;
+    return body ? body.getAttribute('data-workspace') || '' : '';
+}
+
+// Navigate back to notes list
+function goBackToNotes() {
+    // Build return URL with workspace from localStorage
+    var url = 'index.php';
+    var params = [];
+    var pageWorkspace = getPageWorkspace();
+    
+    // Get workspace from localStorage first, fallback to PHP value
+    try {
+        var workspace = localStorage.getItem('poznote_selected_workspace');
+        if (!workspace || workspace === '') {
+            workspace = pageWorkspace;
+        }
+        if (workspace && workspace !== '') {
+            params.push('workspace=' + encodeURIComponent(workspace));
+        }
+    } catch(e) {
+        // Fallback to PHP workspace if localStorage fails
+        if (pageWorkspace && pageWorkspace !== '') {
+            params.push('workspace=' + encodeURIComponent(pageWorkspace));
+        }
+    }
+    
+    // Build final URL
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+    
+    window.location.href = url;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tag search/filtering management
     const searchInput = document.getElementById('tagsSearchInput');
@@ -15,7 +52,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Attach back button event listener
+    const backBtn = document.getElementById('backToNotesBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', goBackToNotes);
+    }
     
+    // Attach click listeners to tag items (using event delegation)
+    const tagsList = document.getElementById('tagsList');
+    if (tagsList) {
+        tagsList.addEventListener('click', function(e) {
+            const tagItem = e.target.closest('.tag-item');
+            if (tagItem && tagItem.dataset.tag) {
+                if (typeof window.redirectToTag === 'function') {
+                    window.redirectToTag(tagItem.dataset.tag);
+                }
+            }
+        });
+    }
+    
+    // Expose workspace for other scripts (like clickable-tags.js)
+    window.pageWorkspace = getPageWorkspace();
 });
 
 // folder-exclusion logic removed from tags page
