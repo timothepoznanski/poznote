@@ -26,12 +26,12 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
-<body class="shared-page">
+<body class="shared-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>">
 	<div class="shared-container">
 		<h2 class="shared-header"><?php echo t_h('attachments.list.title', [], 'Notes with Attachments'); ?></h2>
 		
 		<div class="shared-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()">
+			<button id="backToNotesBtn" class="btn btn-secondary">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
 		</div>
@@ -59,154 +59,6 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script>
-	const workspace = <?php echo json_encode($pageWorkspace); ?>;
-	let allRows = [];
-	let filteredRows = [];
-	let filterText = '';
-	
-	document.addEventListener('DOMContentLoaded', function() {
-		const filterInput = document.getElementById('filterInput');
-		const clearFilterBtn = document.getElementById('clearFilterBtn');
-		
-		filterInput.addEventListener('input', function() {
-			filterText = this.value.trim().toLowerCase();
-			applyFilter();
-			clearFilterBtn.style.display = filterText ? 'flex' : 'none';
-		});
-		
-		clearFilterBtn.addEventListener('click', function() {
-			filterInput.value = '';
-			filterText = '';
-			applyFilter();
-			this.style.display = 'none';
-			filterInput.focus();
-		});
-		
-		filterInput.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape') {
-				filterInput.value = '';
-				filterText = '';
-				applyFilter();
-				clearFilterBtn.style.display = 'none';
-			}
-		});
-		
-		loadAttachments();
-	});
-	
-	function goBackToNotes() {
-		window.location.href = 'index.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
-	}
-	
-	async function loadAttachments() {
-		const spinner = document.getElementById('loadingSpinner');
-		const container = document.getElementById('attachmentsContainer');
-		const emptyMessage = document.getElementById('emptyMessage');
-		
-		try {
-			const response = await fetch('api_list_notes_with_attachments.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : ''), {
-				credentials: 'same-origin'
-			});
-			
-			if (!response.ok) throw new Error('HTTP error ' + response.status);
-			
-			const data = await response.json();
-			if (data.error) throw new Error(data.error);
-			
-			spinner.style.display = 'none';
-			
-			// Group: one row per note with all its attachments
-			allRows = (data.notes || []).map(note => ({
-				noteId: note.id,
-				noteName: note.heading || '<?php echo t_h('common.untitled', [], 'Untitled'); ?>',
-				attachments: (note.attachments || []).map(att => ({
-					id: att.id,
-					filename: att.original_filename || att.filename
-				}))
-			}));
-			
-			if (allRows.length === 0) {
-				emptyMessage.style.display = 'block';
-				return;
-			}
-			
-			applyFilter();
-		} catch (error) {
-			spinner.style.display = 'none';
-			container.innerHTML = '<div class="error-message"><i class="fa-exclamation-triangle"></i> Error: ' + error.message + '</div>';
-		}
-	}
-	
-	function applyFilter() {
-		filteredRows = filterText 
-			? allRows.filter(r => {
-					const nameMatch = r.noteName.toLowerCase().includes(filterText);
-					const fileMatch = r.attachments.some(att => att.filename.toLowerCase().includes(filterText));
-					return nameMatch || fileMatch;
-				})
-			: [...allRows];
-		
-		renderRows();
-		
-		const statsDiv = document.getElementById('filterStats');
-		if (filterText && filteredRows.length < allRows.length) {
-			statsDiv.textContent = filteredRows.length + ' / ' + allRows.length;
-			statsDiv.style.display = 'block';
-		} else {
-			statsDiv.style.display = 'none';
-		}
-	}
-	
-	function renderRows() {
-		const container = document.getElementById('attachmentsContainer');
-		const emptyMessage = document.getElementById('emptyMessage');
-		
-		if (filteredRows.length === 0) {
-			container.innerHTML = filterText 
-				? '<div class="empty-message"><p><?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?></p></div>'
-				: '';
-			emptyMessage.style.display = filterText ? 'none' : 'block';
-			return;
-		}
-		
-		emptyMessage.style.display = 'none';
-		
-		container.innerHTML = filteredRows.map(row => {
-			const attachmentsList = row.attachments.map(att => 
-				`<div class="attachment-file-item">
-					<i class="fa-paperclip"></i>
-					<a href="#" class="attachment-file-link" onclick="downloadAttachment('${att.id}', '${row.noteId}'); return false;" title="${escapeHtml(att.filename)}">${escapeHtml(att.filename)}</a>
-				</div>`
-			).join('');
-			
-			return `
-				<div class="attachment-row">
-					<a href="index.php?note=${row.noteId}${workspace ? '&workspace=' + encodeURIComponent(workspace) : ''}" class="attachment-note-name" title="${escapeHtml(row.noteName)}">
-						${escapeHtml(row.noteName)}
-
-					</a>
-					<div class="attachment-files-list">
-						${attachmentsList}
-					</div>
-				</div>
-			`;
-		}).join('');
-	}
-	
-	function escapeHtml(text) {
-		const div = document.createElement('div');
-		div.textContent = text;
-		return div.innerHTML;
-	}
-	
-	function downloadAttachment(attachmentId, noteId) {
-		if (!noteId || !attachmentId) {
-			console.error('Missing noteId or attachmentId');
-			return;
-		}
-		window.open('api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachmentId, '_blank');
-	}
-	</script>
+	<script src="js/attachments-list.js"></script>
 </body>
 </html>

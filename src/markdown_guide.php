@@ -297,7 +297,7 @@ $currentLang = getUserLanguage();
     </script>
 </head>
 <body>
-    <button onclick="window.close(); setTimeout(function(){ window.history.back(); }, 100);" class="back-link"><?php echo t_h('common.back_to_notes'); ?></button>
+    <button class="back-link"><?php echo t_h('common.back_to_notes'); ?></button>
     
     <h1><?php echo t_h('markdown_guide.title'); ?></h1>
 
@@ -652,5 +652,6 @@ flowchart TD
         </div>
     </section>
     
+    <script src="js/markdown-guide.js"></script>
 </body>
 </html>

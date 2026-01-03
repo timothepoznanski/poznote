@@ -371,7 +371,7 @@ function createBackup() {
                 </select>
             </div>
             
-            <button id="structuredExportBtn" type="button" class="btn btn-primary" onclick="startStructuredExport();">
+            <button id="structuredExportBtn" type="button" class="btn btn-primary">
                 <span><?php echo t_h('backup_export.buttons.download_structured_export'); ?></span>
             </button>
         </div>
@@ -381,14 +381,6 @@ function createBackup() {
     </div>
     
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
-    <script>
-    (function(){ try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) {
-            var a = document.getElementById('backToNotesLink'); 
-            if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-        }
-    } catch(e){} })();
-    </script>
+    <script src="js/backup-export-init.js"></script>
 </body>
 </html>
