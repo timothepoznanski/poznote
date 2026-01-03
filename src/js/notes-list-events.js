@@ -157,6 +157,94 @@
                     }
                 }
                 break;
+                
+            // Folder actions menu
+            case 'toggle-folder-actions-menu':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                if (folderId && typeof window.toggleFolderActionsMenu === 'function') {
+                    window.toggleFolderActionsMenu(folderId);
+                }
+                break;
+                
+            case 'create-note-in-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.showCreateNoteInFolderModal === 'function') {
+                    window.showCreateNoteInFolderModal(folderId, folderName);
+                }
+                break;
+                
+            case 'move-folder-files':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.showMoveFolderFilesDialog === 'function') {
+                    window.showMoveFolderFilesDialog(folderId, folderName);
+                }
+                break;
+                
+            case 'move-entire-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.showMoveEntireFolderDialog === 'function') {
+                    window.showMoveEntireFolderDialog(folderId, folderName);
+                }
+                break;
+                
+            case 'download-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.downloadFolder === 'function') {
+                    window.downloadFolder(folderId, folderName);
+                }
+                break;
+                
+            case 'rename-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.editFolderName === 'function') {
+                    window.editFolderName(folderId, folderName);
+                }
+                break;
+                
+            case 'delete-folder':
+                event.preventDefault();
+                event.stopPropagation();
+                var folderId = parseInt(actionElement.getAttribute('data-folder-id'), 10);
+                var folderName = actionElement.getAttribute('data-folder-name');
+                if (typeof window.closeFolderActionsMenu === 'function') {
+                    window.closeFolderActionsMenu(folderId);
+                }
+                if (folderId && folderName && typeof window.deleteFolder === 'function') {
+                    window.deleteFolder(folderId, folderName);
+                }
+                break;
         }
     }
 
