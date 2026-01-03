@@ -851,6 +851,22 @@ curl -u 'username:password' \
   "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=inline"
 ```
 
+**Convert Note Type**
+
+Convert a markdown note to HTML:
+```bash
+curl -X POST -u 'username:password' \
+  -d 'id=123&target=html' \
+  http://YOUR_SERVER/api_convert_note.php
+```
+
+Convert an HTML note to markdown:
+```bash
+curl -X POST -u 'username:password' \
+  -d 'id=123&target=markdown' \
+  http://YOUR_SERVER/api_convert_note.php
+```
+
 **Move Note**
 
 Move a note to a different folder or workspace:
