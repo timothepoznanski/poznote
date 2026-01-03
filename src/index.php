@@ -784,7 +784,12 @@ $body_classes = trim($extra_body_classes);
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-duplicate\')"><i class="fa-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-move\')"><i class="fa-folder-open"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-download\')"><i class="fa-download"></i> '.t_h('common.download', [], 'Download').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert\')"><i class="fa-exchange-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                    
+                    // Convert button (only for markdown and note types)
+                    if ($note_type === 'markdown' || $note_type === 'note') {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-convert\')"><i class="fa-exchange-alt"></i> '.t_h('common.convert', [], 'Convert').'</button>';
+                    }
+                    
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-open-new-tab\')"><i class="fa-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-trash\')"><i class="fa-trash"></i> '.t_h('common.delete', [], 'Delete').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" onclick="triggerMobileToolbarAction(this, \'.btn-info\')"><i class="fa-info-circle"></i> '.t_h('common.information', [], 'Information').'</button>';

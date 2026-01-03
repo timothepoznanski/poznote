@@ -33,7 +33,7 @@
 }
 
 /* Hide specific toolbar buttons on desktop only (keep on mobile) */
-@media screen and (min-width: 769px) {
+@media (min-width: 800px) {
     .btn-excalidraw,
     .btn-emoji,
     .btn-table,
@@ -1710,21 +1710,6 @@ a[data-image-link] {
     align-items: center;
 }
 
-@media (max-width: 800px) {
-    .note-tags-row {
-        flex-wrap: wrap;
-    }
-    
-    .folder-wrapper {
-        flex-basis: 100%;
-        margin-bottom: 8px;
-    }
-    
-    .folder_name {
-        margin-right: 0;
-    }
-}
-
 .fa-tag.icon_tag {
     font-size: 14px;
     margin-right: 4px;
@@ -2217,12 +2202,6 @@ a[data-image-link] {
 div[contentEditable=true]:empty:before {
         content:attr(data-ph);
         color: #bababa;
-}
-
-@media (max-width: 800px) {
-    div[contentEditable=true][data-ph-mobile]:empty:before {
-        content: attr(data-ph-mobile);
-    }
 }
 
 /* Exclure les blocs de code du placeholder automatique */
@@ -2805,20 +2784,6 @@ hr {
 /* Réduire les icônes dans les autres dossiers (non-système) */
 .folder-icon:not(.system-folder .folder-icon) {
     font-size: 0.8em !important;
-}
-
-/* Agrandir les icônes système en vue mobile */
-@media (max-width: 800px) {
-    .system-folder .fa-trash.folder-icon,
-    .system-folder .fa-tags.folder-icon,
-    .system-folder .fa-cloud.folder-icon,
-    .system-folder .fa-star-light.folder-icon,
-    .system-folder .fa-paperclip.folder-icon,
-    .system-folder .fa-eye.folder-icon,
-    .system-folder .fa-cog.folder-icon,
-    .system-folder .fa-search.folder-icon {
-        font-size: 14px !important;
-    }
 }
 
 /* Cacher uniquement l'en-tête du dossier Favorites qui apparaît normalement dans la liste */
