@@ -955,6 +955,9 @@ function handleImageClick(event) {
                     document.body.removeChild(submenu);
                 }
             } else if (action === 'add-link') {
+                // Stop event propagation to prevent triggering link modal on parent <a> tags
+                e.stopPropagation();
+                e.preventDefault();
                 addOrEditImageLink(img);
                 // Remove both menus
                 if (document.body.contains(menu)) {
@@ -1077,6 +1080,9 @@ function handleImageClick(event) {
                 document.body.removeChild(menu);
             }
         } else if (action === 'add-link') {
+            // Stop event propagation to prevent triggering link modal on parent <a> tags
+            e.stopPropagation();
+            e.preventDefault();
             addOrEditImageLink(img);
             // Remove menu safely
             if (document.body.contains(menu)) {
