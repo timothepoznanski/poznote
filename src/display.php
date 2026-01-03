@@ -150,6 +150,7 @@ $currentLang = getUserLanguage();
     <script src="js/utils.js"></script>
     <script src="js/font-size-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
+    <script src="js/modals-events.js"></script>
     <script src="js/display-page.js"></script>
 </body>
 </html>

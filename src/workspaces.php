@@ -573,6 +573,7 @@ try {
 
     <script src="js/theme-manager.js"></script>
     <script src="js/workspaces.js"></script>
+    <script src="js/modals-events.js"></script>
     
     <?php include 'modals.php'; ?>
     
