@@ -992,9 +992,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Restaurar / Importar",
-      "more_info_prefix": "Si quieres saber más sobre por qué tenemos varios métodos de restauración:",
-      "more_info_link": "ver documentación aquí"
+      "title": "Restaurar / Importar"
     },
     "advanced": {
       "show": "Mostrar opciones de importación avanzadas",

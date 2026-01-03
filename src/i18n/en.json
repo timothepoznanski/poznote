@@ -1005,9 +1005,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Restore / Import",
-      "more_info_prefix": "If you want to know more about why we have several restore methods:",
-      "more_info_link": "see documentation here"
+      "title": "Restore / Import"
     },
     "advanced": {
       "show": "Show Advanced Import Options",

@@ -602,6 +602,8 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+For more information about the different restore methods, see the [Backup & Restore Guide](https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md).
+
 </details>
 
 <a id="automated-backups-with-bash-script"></a>

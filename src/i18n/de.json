@@ -992,9 +992,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Wiederherstellen / Importieren",
-      "more_info_prefix": "Wenn Sie mehr darüber erfahren möchten, warum wir mehrere Wiederherstellungsmethoden haben:",
-      "more_info_link": "siehe Dokumentation hier"
+      "title": "Wiederherstellen / Importieren"
     },
     "advanced": {
       "show": "Erweiterte Importoptionen anzeigen",
