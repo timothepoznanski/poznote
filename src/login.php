@@ -57,16 +57,10 @@ try {
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
     // Redirect to index with JavaScript to include localStorage workspace
-    // Include minimal HTML to ensure proper execution
+    // CSP-compliant: use external script with JSON config
     echo '<!DOCTYPE html><html><head>';
-    echo '<script>
-        var workspace = localStorage.getItem("poznote_selected_workspace");
-        if (workspace) {
-            window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
-        } else {
-            window.location.href = "index.php";
-        }
-    </script>';
+    echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
+    echo '<script src="js/workspace-redirect.js"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
     exit;
 }
@@ -85,16 +79,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     
     if (authenticate($username, $password, $rememberMe)) {
         // Redirect to index with JavaScript to include localStorage workspace
-        // Include minimal HTML to ensure proper execution
+        // CSP-compliant: use external script with JSON config
         echo '<!DOCTYPE html><html><head>';
-        echo '<script>
-            var workspace = localStorage.getItem("poznote_selected_workspace");
-            if (workspace) {
-                window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
-            } else {
-                window.location.href = "index.php";
-            }
-        </script>';
+        echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
+        echo '<script src="js/workspace-redirect.js"></script>';
         echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
         exit;
     } else {
@@ -174,27 +162,16 @@ if (isset($_GET['oidc_error'])) {
                 </a>
             </p>
         </div>
-        <?php if (!$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var oidcButton = document.querySelector('.oidc-button');
-                if (oidcButton) {
-                    oidcButton.focus();
-                }
-            });
-        </script>
-        <?php endif; ?>
         <?php
         // Only clear localStorage if a specific workspace is set as default (not __last_opened__ or empty)
         // This allows "last opened" to work while still respecting specific workspace defaults
         $shouldClearLocalStorage = !empty($default_workspace) && $default_workspace !== '__last_opened__';
+        $loginConfig = [
+            'clearWorkspace' => $shouldClearLocalStorage,
+            'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
+        ];
         ?>
-        <?php if ($shouldClearLocalStorage): ?>
-        <script>
-            // Clear selected workspace from localStorage when arriving on login page
-            // This ensures the default_workspace setting takes effect after re-login
-            try { localStorage.removeItem('poznote_selected_workspace'); } catch(e) {}
-        </script>
-        <?php endif; ?>
+        <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
+        <script src="js/login-page.js"></script>
 </body>
 </html>
