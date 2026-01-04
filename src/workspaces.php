@@ -68,6 +68,21 @@ if ($_POST) {
                     // Settings table may not exist - ignore
                 }
 
+                // Check if this workspace is set as the last opened workspace
+                $currentLastOpened = null;
+                try {
+                    $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                    $stmt->execute(['last_opened_workspace']);
+                    $currentLastOpened = $stmt->fetchColumn();
+                } catch (Exception $e) {
+                    // Settings table may not exist - ignore
+                }
+
+                // Find another workspace to redirect to after deletion
+                $otherWs = $con->prepare("SELECT name FROM workspaces WHERE name != ? ORDER BY name LIMIT 1");
+                $otherWs->execute([$name]);
+                $targetWorkspace = $otherWs->fetchColumn();
+
                 // Delete all entries for this workspace (including trashed notes)
                 $selectEntries = $con->prepare('SELECT id, attachments, type FROM entries WHERE workspace = ?');
                 $selectEntries->execute([$name]);
@@ -179,6 +194,16 @@ if ($_POST) {
                     }
                 }
 
+                // If the deleted workspace was the last opened workspace, update to target workspace
+                if ($currentLastOpened === $name && $targetWorkspace) {
+                    try {
+                        $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                        $resetStmt->execute(['last_opened_workspace', $targetWorkspace]);
+                    } catch (Exception $e) {
+                        // If settings update fails, continue - it's not critical for workspace deletion
+                    }
+                }
+
                 // Finally remove workspace record
                 $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
                 $stmt->execute([$name]);
@@ -244,6 +269,19 @@ if ($_POST) {
                         if ($currentDefault === $name) {
                             $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
                             $stmt->execute([$new_name, 'default_workspace']);
+                        }
+                    } catch (Exception $e) {
+                        // Non-fatal
+                    }
+
+                    // Update last_opened_workspace setting if it references the old name
+                    try {
+                        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+                        $stmt->execute(['last_opened_workspace']);
+                        $currentLastOpened = $stmt->fetchColumn();
+                        if ($currentLastOpened === $name) {
+                            $stmt = $con->prepare('UPDATE settings SET value = ? WHERE key = ?');
+                            $stmt->execute([$new_name, 'last_opened_workspace']);
                         }
                     } catch (Exception $e) {
                         // Non-fatal

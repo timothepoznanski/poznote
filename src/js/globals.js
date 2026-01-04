@@ -33,11 +33,9 @@ function updateFolderCache(folders) {
 }
 
 function getSelectedWorkspace() {
-    try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) return stored;
-    } catch(e) {}
-    return selectedWorkspace || '';
+    // Return workspace from global variable (set by PHP from URL/database)
+    // No more localStorage dependency
+    return selectedWorkspace || (typeof window.selectedWorkspace !== 'undefined' ? window.selectedWorkspace : '') || '';
 }
 
 // Apply global preferences on load

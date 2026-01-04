@@ -17,16 +17,10 @@ function tr(key, vars, fallback) {
 function initializeWorkspaces() {
     var wsSelector = document.getElementById('workspaceSelector');
     
-    // First priority: use window.selectedWorkspace (set by PHP from URL or default_workspace setting)
+    // Use window.selectedWorkspace (set by PHP from URL or database settings)
     // This ensures the workspace selector matches the actual page workspace
     if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) {
         selectedWorkspace = window.selectedWorkspace;
-    } else {
-        // Second priority: load workspace from localStorage
-        try {
-            var stored = localStorage.getItem('poznote_selected_workspace');
-            if (stored) selectedWorkspace = stored;
-        } catch(e) {}
     }
 
     // Validate that workspace exists in selector
@@ -46,9 +40,10 @@ function initializeWorkspaces() {
             } else {
                 selectedWorkspace = '';
             }
-            try { 
-                localStorage.setItem('poznote_selected_workspace', selectedWorkspace); 
-            } catch(e) {}
+            // Save to database
+            if (typeof saveLastOpenedWorkspace === 'function') {
+                saveLastOpenedWorkspace(selectedWorkspace);
+            }
         }
         
         wsSelector.value = selectedWorkspace;
@@ -63,9 +58,10 @@ function onWorkspaceChange() {
     var val = wsSelector.value;
     selectedWorkspace = val;
     
-    try { 
-        localStorage.setItem('poznote_selected_workspace', val); 
-    } catch(e) {}
+    // Save last opened workspace to database
+    if (typeof saveLastOpenedWorkspace === 'function') {
+        saveLastOpenedWorkspace(val);
+    }
     
     // Reload the page with the new workspace
     var url = new URL(window.location.href);
@@ -212,9 +208,10 @@ function switchToWorkspace(workspaceName) {
     updateWorkspaceNameInHeaders(workspaceName);
     selectedWorkspace = workspaceName;
     
-    try { 
-        localStorage.setItem('poznote_selected_workspace', workspaceName); 
-    } catch(e) {}
+    // Save last opened workspace to database
+    if (typeof saveLastOpenedWorkspace === 'function') {
+        saveLastOpenedWorkspace(workspaceName);
+    }
     
     // Clear the right column when switching workspace
     clearRightColumn();
@@ -458,13 +455,12 @@ function handleRenameButtonClick(e) {
                     // Close modal
                     try { closeRenameModal(); } catch(e) {}
                     
-                    // Update localStorage if the renamed workspace was selected
-                    try {
-                        var stored = localStorage.getItem('poznote_selected_workspace');
-                        if (stored === currentName) {
-                            localStorage.setItem('poznote_selected_workspace', newName);
+                    // Update last opened workspace if the renamed workspace was the current one
+                    if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace === currentName) {
+                        if (typeof saveLastOpenedWorkspace === 'function') {
+                            saveLastOpenedWorkspace(newName);
                         }
-                    } catch(e) {}
+                    }
                     
                     // Reload page to show updated workspace name
                     setTimeout(function() {
@@ -487,7 +483,10 @@ function handleSelectButtonClick(e) {
     if (e.target && e.target.classList && e.target.classList.contains('btn-select')) {
         var name = e.target.getAttribute('data-ws');
         if (!name) return;
-        try { localStorage.setItem('poznote_selected_workspace', name); } catch(err) {}
+        // Save to database
+        if (typeof saveLastOpenedWorkspace === 'function') {
+            saveLastOpenedWorkspace(name);
+        }
         try {
             var leftHeader = document.querySelector('.left-header-text'); if (leftHeader) leftHeader.textContent = name;
         } catch(err) {}
@@ -547,25 +546,21 @@ function handleDeleteButtonClick(e) {
                     showAjaxAlert(tr('workspaces.alerts.deleted_success', {}, 'Workspace deleted successfully'), 'success');
                     // Close modal
                     try { closeDeleteModal(); } catch(e) {}
-                    // If the deleted workspace was the one stored in localStorage, find another workspace
-                    try {
-                        var stored = localStorage.getItem('poznote_selected_workspace');
-                        if (stored && stored === workspaceName) {
-                            // Find another workspace from the page
-                            var newWorkspace = null;
-                            var items = document.querySelectorAll('.workspace-name-item');
-                            for (var i = 0; i < items.length; i++) {
-                                var wsName = items[i].textContent.trim();
-                                if (wsName !== workspaceName) {
-                                    newWorkspace = wsName;
-                                    break;
-                                }
-                            }
-                            if (newWorkspace) {
-                                localStorage.setItem('poznote_selected_workspace', newWorkspace);
+                    // If the deleted workspace was the current one, find another workspace and save it
+                    if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace === workspaceName) {
+                        var newWorkspace = null;
+                        var items = document.querySelectorAll('.workspace-name-item');
+                        for (var i = 0; i < items.length; i++) {
+                            var wsName = items[i].textContent.trim();
+                            if (wsName !== workspaceName) {
+                                newWorkspace = wsName;
+                                break;
                             }
                         }
-                    } catch (e) {}
+                        if (newWorkspace && typeof saveLastOpenedWorkspace === 'function') {
+                            saveLastOpenedWorkspace(newWorkspace);
+                        }
+                    }
                     // Additionally clean any folder-related localStorage keys left by this workspace
                     try {
                         // Remove keys by prefix
@@ -784,7 +779,9 @@ function handleMoveButtonClick(e) {
                         // non-fatal UI update error
                     }
                     // Persist the selected workspace so returning to notes shows destination
-                    try { localStorage.setItem('poznote_selected_workspace', json.target); } catch(e) {}
+                    if (typeof saveLastOpenedWorkspace === 'function') {
+                        saveLastOpenedWorkspace(json.target);
+                    }
                     // Update any Back to Notes links on this page to include the workspace param
                     try {
                         var backLinks = document.querySelectorAll('a.btn.btn-secondary');
@@ -903,7 +900,9 @@ function initializeWorkspacesPage() {
     if (clearWs) {
         try {
             var firstWs = JSON.parse(clearWs);
-            localStorage.setItem('poznote_selected_workspace', firstWs);
+            if (typeof saveLastOpenedWorkspace === 'function') {
+                saveLastOpenedWorkspace(firstWs);
+            }
             window.location = 'index.php?workspace=' + encodeURIComponent(firstWs);
             return; // Exit early, redirect will happen
         } catch(e) {}
@@ -921,29 +920,11 @@ function initializeWorkspacesPage() {
         createForm.addEventListener('submit', handleCreateWorkspace);
     }
     
-    // Update back link with stored workspace
+    // Update back link with current workspace from PHP
     try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
         var a = document.getElementById('backToNotesLink');
-        if (a && stored) {
-            var exists = false;
-            try {
-                var items = document.querySelectorAll('.workspace-name-item');
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i].textContent.trim() === stored) { exists = true; break; }
-                }
-            } catch (e) {
-                exists = false;
-            }
-
-            if (exists) {
-                a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-            } else {
-                var firstWsName = document.querySelector('.workspace-name-item');
-                var fallbackWs = firstWsName ? firstWsName.textContent.trim() : '';
-                try { localStorage.setItem('poznote_selected_workspace', fallbackWs); } catch(e) {}
-                a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(fallbackWs));
-            }
+        if (a && typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) {
+            a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(window.selectedWorkspace));
         }
     } catch(e) {}
     

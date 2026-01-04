@@ -66,11 +66,9 @@ function loadWorkspacesForStructuredExport() {
         if (data.success && data.workspaces) {
             select.innerHTML = '';
             
-            // Try to get current workspace from localStorage
-            var currentWorkspace = '';
-            try {
-                currentWorkspace = localStorage.getItem('poznote_selected_workspace') || '';
-            } catch(e) {}
+            // Get current workspace from PHP global (no more localStorage)
+            var currentWorkspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                                   (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : '';
             
             // Add each workspace as an option
             data.workspaces.forEach(function(ws) {

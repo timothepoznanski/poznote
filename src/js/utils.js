@@ -1,5 +1,29 @@
 // Utility and miscellaneous functions
 
+/**
+ * Save the last opened workspace to the database
+ * This replaces localStorage for workspace persistence
+ * @param {string} workspaceName - The workspace name to save
+ */
+function saveLastOpenedWorkspace(workspaceName) {
+    if (!workspaceName) return;
+    
+    var form = new FormData();
+    form.append('action', 'set');
+    form.append('key', 'last_opened_workspace');
+    form.append('value', workspaceName);
+    
+    fetch('api_settings.php', { method: 'POST', body: form })
+        .then(function(r) { return r.json(); })
+        .catch(function(e) {
+            // Silently fail - this is a best-effort save
+            console.debug && console.debug('Failed to save last opened workspace:', e);
+        });
+}
+
+// Expose globally
+window.saveLastOpenedWorkspace = saveLastOpenedWorkspace;
+
 function startDownload() {
     window.location = 'api_export_entries.php';
 }
@@ -404,9 +428,10 @@ function showNewWorkspacePrompt() {
                 }
                 sel.value = name;
                 selectedWorkspace = name;
-                try { 
-                    localStorage.setItem('poznote_selected_workspace', name); 
-                } catch(e) {}
+                // Save to database
+                if (typeof saveLastOpenedWorkspace === 'function') {
+                    saveLastOpenedWorkspace(name);
+                }
                 
                 refreshLeftColumnForWorkspace(name);
                 // Workspace created and selected - no notification needed
@@ -457,9 +482,10 @@ function deleteCurrentWorkspace() {
                 // Get the first remaining workspace from the selector
                 var firstWorkspace = sel.options.length > 0 ? sel.options[0].value : '';
                 selectedWorkspace = firstWorkspace;
-                try { 
-                    localStorage.setItem('poznote_selected_workspace', firstWorkspace); 
-                } catch(e) {}
+                // Save to database
+                if (typeof saveLastOpenedWorkspace === 'function') {
+                    saveLastOpenedWorkspace(firstWorkspace);
+                }
                 
                 // Clean up localStorage entries related to folders that belonged to the deleted workspace
                 try {

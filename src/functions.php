@@ -193,8 +193,8 @@ function getFirstWorkspaceName() {
  * Priority order:
  * 1. GET/POST parameter (highest priority)
  * 2. Database setting 'default_workspace' (if set to a specific workspace name)
- *    Special value '__last_opened__' means use localStorage
- * 3. localStorage 'poznote_selected_workspace' (handled by index.php redirect)
+ *    Special value '__last_opened__' means use last_opened_workspace from database
+ * 3. Database setting 'last_opened_workspace' (the last workspace the user opened)
  * 4. Fallback to first available workspace
  * 
  * @return string The workspace name
@@ -215,8 +215,27 @@ function getWorkspaceFilter() {
             $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
             $stmt->execute(['default_workspace']);
             $defaultWorkspace = $stmt->fetchColumn();
-            if ($defaultWorkspace !== false && $defaultWorkspace !== '') {
-                return $defaultWorkspace;
+            // Only use defaultWorkspace if it's a real workspace name (not __last_opened__ or empty)
+            if ($defaultWorkspace !== false && $defaultWorkspace !== '' && $defaultWorkspace !== '__last_opened__') {
+                // Verify workspace exists
+                $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+                $checkStmt->execute([$defaultWorkspace]);
+                if ((int)$checkStmt->fetchColumn() > 0) {
+                    return $defaultWorkspace;
+                }
+            }
+            
+            // Check for last_opened_workspace setting (used when default_workspace is '__last_opened__' or empty)
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['last_opened_workspace']);
+            $lastOpened = $stmt->fetchColumn();
+            if ($lastOpened !== false && $lastOpened !== '') {
+                // Verify the workspace still exists
+                $checkStmt = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+                $checkStmt->execute([$lastOpened]);
+                if ((int)$checkStmt->fetchColumn() > 0) {
+                    return $lastOpened;
+                }
             }
         } catch (Exception $e) {
             // If settings table doesn't exist or query fails, continue to default
@@ -224,8 +243,28 @@ function getWorkspaceFilter() {
     }
     
     // Final fallback: get first available workspace
-    // Note: localStorage is checked by index.php before this function is called
     return getFirstWorkspaceName();
+}
+
+/**
+ * Save the last opened workspace to the database
+ * This is called when a workspace is opened/selected
+ * 
+ * @param string $workspace The workspace name to save
+ * @return bool Whether the save was successful
+ */
+function saveLastOpenedWorkspace($workspace) {
+    global $con;
+    if (!isset($con) || empty($workspace)) {
+        return false;
+    }
+    
+    try {
+        $stmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        return $stmt->execute(['last_opened_workspace', $workspace]);
+    } catch (Exception $e) {
+        return false;
+    }
 }
 
 /**

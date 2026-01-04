@@ -1796,10 +1796,9 @@ function setupLinkEvents() {
                 
                 // If workspace is different, reload page with new workspace and note
                 if (targetWorkspace !== selectedWorkspace) {
-                    // Update localStorage with the new workspace
-                    try {
-                        localStorage.setItem('poznote_selected_workspace', targetWorkspace);
-                    } catch (e) {
+                    // Save the new workspace to database
+                    if (typeof saveLastOpenedWorkspace === 'function') {
+                        saveLastOpenedWorkspace(targetWorkspace);
                     }
                     
                     // Navigate to the new workspace with the target note

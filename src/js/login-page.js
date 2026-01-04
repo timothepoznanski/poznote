@@ -21,14 +21,7 @@
                 }
             }
             
-            // Clear workspace from localStorage if configured
-            if (config.clearWorkspace) {
-                try {
-                    localStorage.removeItem('poznote_selected_workspace');
-                } catch (e) {
-                    // localStorage not available
-                }
-            }
+            // Note: last_opened_workspace is now stored in database, no localStorage cleanup needed
         } catch (e) {
             // Ignore parse errors
         }

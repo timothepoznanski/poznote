@@ -11,18 +11,17 @@ function getPageWorkspace() {
 }
 
 /**
- * Get the effective workspace, checking localStorage first then falling back to page data
+ * Get the effective workspace from global variable or page data (no more localStorage)
  * @param {string} fallbackWorkspace - The fallback workspace from page data
  * @returns {string} The workspace to use
  */
 function getEffectiveWorkspace(fallbackWorkspace) {
-    try {
-        var workspace = localStorage.getItem('poznote_selected_workspace');
-        if (workspace && workspace !== '') {
-            return workspace;
-        }
-    } catch(e) {
-        // localStorage not available
+    // Use global selectedWorkspace (set by PHP from URL/database)
+    if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace && selectedWorkspace !== '') {
+        return selectedWorkspace;
+    }
+    if (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace && window.selectedWorkspace !== '') {
+        return window.selectedWorkspace;
     }
     return fallbackWorkspace || '';
 }

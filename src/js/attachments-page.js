@@ -413,15 +413,17 @@
         closeDeleteAttachmentConfirmModal();
     }
 
-    // Update back link with stored workspace
+    // Update back link with current workspace from PHP
     function updateBackLink() {
         try {
-            var stored = localStorage.getItem('poznote_selected_workspace');
-            if (stored) {
+            // Use workspace from PHP (set as global variable)
+            var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                            (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+            if (workspace) {
                 var a = document.getElementById('backToNotesLink');
                 if (a) {
                     var params = [];
-                    params.push('workspace=' + encodeURIComponent(stored));
+                    params.push('workspace=' + encodeURIComponent(workspace));
                     if (noteId) {
                         params.push('note=' + noteId);
                     }

@@ -86,6 +86,16 @@ try {
             // Settings table may not exist - ignore
         }
         
+        // Check if this workspace is set as the last opened workspace
+        $currentLastOpened = null;
+        try {
+            $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['last_opened_workspace']);
+            $currentLastOpened = $stmt->fetchColumn();
+        } catch (Exception $e) {
+            // Settings table may not exist - ignore
+        }
+        
         // Find another workspace to move notes to
         $otherWs = $con->prepare("SELECT name FROM workspaces WHERE name != ? ORDER BY name LIMIT 1");
         $otherWs->execute([$name]);
@@ -100,6 +110,16 @@ try {
             try {
                 $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $resetStmt->execute(['default_workspace', '__last_opened__']);
+            } catch (Exception $e) {
+                // If settings update fails, continue - it's not critical for workspace deletion
+            }
+        }
+        
+        // If the deleted workspace was the last opened workspace, update to target workspace
+        if ($currentLastOpened === $name) {
+            try {
+                $resetStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                $resetStmt->execute(['last_opened_workspace', $targetWorkspace]);
             } catch (Exception $e) {
                 // If settings update fails, continue - it's not critical for workspace deletion
             }

@@ -163,11 +163,8 @@ if (isset($_GET['oidc_error'])) {
             </p>
         </div>
         <?php
-        // Only clear localStorage if a specific workspace is set as default (not __last_opened__ or empty)
-        // This allows "last opened" to work while still respecting specific workspace defaults
-        $shouldClearLocalStorage = !empty($default_workspace) && $default_workspace !== '__last_opened__';
+        // Note: last_opened_workspace is now stored in database, no localStorage clearing needed
         $loginConfig = [
-            'clearWorkspace' => $shouldClearLocalStorage,
             'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
         ];
         ?>

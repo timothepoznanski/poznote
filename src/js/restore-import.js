@@ -212,12 +212,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Update Back to Notes link with stored workspace
+    // Update Back to Notes link with current workspace from PHP
     try {
-        const stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) {
+        const workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                          (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+        if (workspace) {
             const backLink = document.getElementById('backToNotesLink');
-            if (backLink) backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+            if (backLink) backLink.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(workspace));
         }
     } catch (e) { /* ignore */ }
 });
@@ -761,8 +762,9 @@ function loadWorkspacesForImport() {
             if (data.success && data.workspaces) {
                 workspaceSelect.innerHTML = '';
                 
-                // Get the workspace from localStorage
-                const savedWorkspace = localStorage.getItem('poznote_selected_workspace');
+                // Get the workspace from PHP global (no more localStorage)
+                const currentWorkspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                                         (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
                 
                 // Add workspaces to select
                 data.workspaces.forEach(workspace => {
@@ -770,10 +772,10 @@ function loadWorkspacesForImport() {
                     option.value = workspace.name;
                     option.textContent = workspace.name;
                     
-                    // Select workspace from localStorage if it exists, otherwise select first one
-                    if (savedWorkspace && workspace.name === savedWorkspace) {
+                    // Select current workspace if it exists, otherwise select first one
+                    if (currentWorkspace && workspace.name === currentWorkspace) {
                         option.selected = true;
-                    } else if (!savedWorkspace && workspaceSelect.options.length === 0) {
+                    } else if (!currentWorkspace && workspaceSelect.options.length === 0) {
                         option.selected = true;
                     }
                     
@@ -781,9 +783,9 @@ function loadWorkspacesForImport() {
                 });
                 
                 // Load folders for the selected workspace
-                const selectedWorkspace = workspaceSelect.value;
-                if (selectedWorkspace) {
-                    loadFoldersForImport(selectedWorkspace);
+                const selectedWs = workspaceSelect.value;
+                if (selectedWs) {
+                    loadFoldersForImport(selectedWs);
                 }
             } else {
                 console.error('Failed to load workspaces:', data);
