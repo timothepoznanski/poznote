@@ -56,14 +56,15 @@ function toggleFavorite(noteId) {
 }
 
 function performFavoriteToggle(noteId) {
-    fetch('api_favorites.php', {
+    var workspace = selectedWorkspace || getSelectedWorkspace();
+    var wsParam = workspace ? '?workspace=' + encodeURIComponent(workspace) : '';
+    
+    fetch('/api/v1/notes/' + noteId + '/favorite' + wsParam, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify({
-            action: 'toggle_favorite',
-            note_id: noteId,
-            workspace: selectedWorkspace || getSelectedWorkspace()
+            workspace: workspace
         })
     })
     .then(function(response) {

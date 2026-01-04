@@ -941,6 +941,67 @@ class NotesController {
     }
     
     /**
+     * POST /api/v1/notes/{id}/favorite
+     * Toggle favorite status for a note
+     */
+    public function toggleFavorite($id) {
+        $workspace = $_GET['workspace'] ?? null;
+        
+        // Also check JSON body for workspace
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$workspace && isset($input['workspace'])) {
+            $workspace = $input['workspace'];
+        }
+        
+        if (empty($id)) {
+            $this->sendError(400, 'note_id is required');
+            return;
+        }
+        
+        try {
+            // Get current favorite status
+            if ($workspace) {
+                $query = "SELECT favorite FROM entries WHERE id = ? AND workspace = ?";
+                $stmt = $this->con->prepare($query);
+                $stmt->execute([$id, $workspace]);
+            } else {
+                $query = "SELECT favorite FROM entries WHERE id = ?";
+                $stmt = $this->con->prepare($query);
+                $stmt->execute([$id]);
+            }
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$result) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+            
+            $currentFavorite = $result['favorite'];
+            $newFavorite = $currentFavorite ? 0 : 1;
+            
+            // Update database
+            if ($workspace) {
+                $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ? AND workspace = ?";
+                $updateStmt = $this->con->prepare($updateQuery);
+                $success = $updateStmt->execute([$newFavorite, $id, $workspace]);
+            } else {
+                $updateQuery = "UPDATE entries SET favorite = ? WHERE id = ?";
+                $updateStmt = $this->con->prepare($updateQuery);
+                $success = $updateStmt->execute([$newFavorite, $id]);
+            }
+            
+            if ($success) {
+                $this->sendSuccess(['is_favorite' => $newFavorite]);
+            } else {
+                $this->sendError(500, 'Error updating database');
+            }
+            
+        } catch (Exception $e) {
+            $this->sendError(500, 'Error toggling favorite: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * Send a success response
      */
     private function sendSuccess(array $data): void {
