@@ -47,6 +47,7 @@ require_once __DIR__ . '/controllers/FoldersController.php';
 require_once __DIR__ . '/controllers/TrashController.php';
 require_once __DIR__ . '/controllers/WorkspacesController.php';
 require_once __DIR__ . '/controllers/TagsController.php';
+require_once __DIR__ . '/controllers/AttachmentsController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -181,6 +182,7 @@ $foldersController = new FoldersController($con);
 $trashController = new TrashController($con);
 $workspacesController = new WorkspacesController($con);
 $tagsController = new TagsController($con);
+$attachmentsController = new AttachmentsController($con);
 
 // ======================
 // Notes Routes
@@ -355,6 +357,30 @@ $router->delete('/workspaces/{name}', function($params) use ($workspacesControll
 // List all unique tags
 $router->get('/tags', function($params) use ($tagsController) {
     $tagsController->index();
+});
+
+// ======================
+// Attachments Routes
+// ======================
+
+// List all attachments for a note
+$router->get('/notes/{noteId}/attachments', function($params) use ($attachmentsController) {
+    $attachmentsController->index($params['noteId']);
+});
+
+// Upload an attachment to a note
+$router->post('/notes/{noteId}/attachments', function($params) use ($attachmentsController) {
+    $attachmentsController->store($params['noteId']);
+});
+
+// Download an attachment
+$router->get('/notes/{noteId}/attachments/{attachmentId}', function($params) use ($attachmentsController) {
+    $attachmentsController->show($params['noteId'], $params['attachmentId']);
+});
+
+// Delete an attachment
+$router->delete('/notes/{noteId}/attachments/{attachmentId}', function($params) use ($attachmentsController) {
+    $attachmentsController->destroy($params['noteId'], $params['attachmentId']);
 });
 
 // Dispatch the request

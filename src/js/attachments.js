@@ -84,11 +84,10 @@ function uploadAttachment() {
     uploadButton.disabled = true;
     
     var formData = new FormData();
-    formData.append('action', 'upload');
     formData.append('note_id', currentNoteIdForAttachments);
     formData.append('file', file);
     
-    fetch('api_attachments.php', {
+    fetch('/api/v1/notes/' + currentNoteIdForAttachments + '/attachments', {
         method: 'POST',
         body: formData
     })
@@ -131,7 +130,11 @@ function uploadAttachment() {
 }
 
 function loadAttachments(noteId) {
-    fetch('api_attachments.php?action=list&note_id=' + noteId)
+    fetch('/api/v1/notes/' + noteId + '/attachments', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
@@ -184,7 +187,7 @@ function downloadAttachment(attachmentId, noteId) {
         showNotificationPopup(tr('attachments.errors.no_note_selected', {}, 'No note selected'), 'error');
         return;
     }
-    window.open('api_attachments.php?action=download&note_id=' + noteIdToUse + '&attachment_id=' + attachmentId, '_blank');
+    window.open('/api/v1/notes/' + noteIdToUse + '/attachments/' + attachmentId, '_blank');
 }
 
 function deleteAttachment(attachmentId) {
@@ -194,14 +197,10 @@ function deleteAttachment(attachmentId) {
         return;
     }
 
-    var formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('note_id', currentNoteIdForAttachments);
-    formData.append('attachment_id', attachmentId);
-    
-    fetch('api_attachments.php', {
-        method: 'POST',
-        body: formData
+    fetch('/api/v1/notes/' + currentNoteIdForAttachments + '/attachments/' + attachmentId, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -218,7 +217,11 @@ function deleteAttachment(attachmentId) {
 }
 
 function updateAttachmentCountInMenu(noteId) {
-    fetch('api_attachments.php?action=list&note_id=' + noteId)
+    fetch('/api/v1/notes/' + noteId + '/attachments', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
@@ -367,14 +370,13 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     
     // Upload the file
     var formData = new FormData();
-    formData.append('action', 'upload');
     formData.append('note_id', noteId);
     formData.append('file', file);
     if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
         formData.append('workspace', selectedWorkspace);
     }
     
-    fetch('api_attachments.php', {
+    fetch('/api/v1/notes/' + noteId + '/attachments', {
         method: 'POST',
         body: formData
     })
@@ -384,7 +386,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     .then(function(data) {
         if (data.success) {
             // Remplacer le texte de chargement par la syntaxe markdown finale
-            var imageMarkdown = '![' + file.name + '](api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + data.attachment_id + ')';
+            var imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
             replaceLoadingText(loadingText, imageMarkdown, dropTarget);
             
             // Marquer la note comme modifiée

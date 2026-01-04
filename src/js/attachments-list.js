@@ -182,5 +182,5 @@ function downloadAttachment(attachmentId, noteId) {
         console.error('Missing noteId or attachmentId');
         return;
     }
-    window.open('api_attachments.php?action=download&note_id=' + noteId + '&attachment_id=' + attachmentId, '_blank');
+    window.open('/api/v1/notes/' + noteId + '/attachments/' + attachmentId, '_blank');
 }
