@@ -48,6 +48,7 @@ require_once __DIR__ . '/controllers/TrashController.php';
 require_once __DIR__ . '/controllers/WorkspacesController.php';
 require_once __DIR__ . '/controllers/TagsController.php';
 require_once __DIR__ . '/controllers/AttachmentsController.php';
+require_once __DIR__ . '/controllers/ShareController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -183,6 +184,7 @@ $trashController = new TrashController($con);
 $workspacesController = new WorkspacesController($con);
 $tagsController = new TagsController($con);
 $attachmentsController = new AttachmentsController($con);
+$shareController = new ShareController($con);
 
 // ======================
 // Notes Routes
@@ -231,6 +233,26 @@ $router->put('/notes/{id}/tags', function($params) use ($notesController) {
 // Toggle favorite status for a note
 $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
+});
+
+// Get share status for a note
+$router->get('/notes/{id}/share', function($params) use ($shareController) {
+    $shareController->show($params['id']);
+});
+
+// Create/renew share link
+$router->post('/notes/{id}/share', function($params) use ($shareController) {
+    $shareController->store($params['id']);
+});
+
+// Update share settings
+$router->patch('/notes/{id}/share', function($params) use ($shareController) {
+    $shareController->update($params['id']);
+});
+
+// Revoke share link
+$router->delete('/notes/{id}/share', function($params) use ($shareController) {
+    $shareController->destroy($params['id']);
 });
 
 // Move a note to a folder

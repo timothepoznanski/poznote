@@ -171,15 +171,16 @@ async function createPublicShare(noteId) {
         } catch (e) {}
 
         const theme = localStorage.getItem('poznote-theme') || 'light';
-        const body = { note_id: noteId, theme: theme, indexable: indexable };
+        const body = { theme: theme, indexable: indexable };
         if (customToken) body.custom_token = customToken;
         if (password) body.password = password;
 
-        const resp = await fetch('api_share_note.php', {
+        const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
             method: 'POST',
             credentials: 'same-origin', // send session cookie
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(body)
         });
@@ -445,11 +446,11 @@ function showShareModal(url, options) {
                 try {
                     // Get current theme from localStorage
                     const theme = localStorage.getItem('poznote-theme') || 'light';
-                    const resp = await fetch('api_share_note.php', {
+                    const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
                         method: 'POST',
                         credentials: 'same-origin',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ note_id: noteId, action: 'renew', theme: theme })
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ theme: theme })
                     });
                     if (resp.ok) {
                         const ct = resp.headers.get('content-type') || '';
@@ -487,11 +488,10 @@ function showShareModal(url, options) {
             try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) {}
             // Call API to revoke
             try {
-                const resp = await fetch('api_share_note.php', {
-                    method: 'POST',
+                const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
+                    method: 'DELETE',
                     credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ note_id: noteId, action: 'revoke' })
+                    headers: { 'Accept': 'application/json' }
                 });
                 if (resp.ok) {
                     markShareIconShared(noteId, false);
@@ -626,11 +626,10 @@ window.createPublicShare = createPublicShare;
 async function getPublicShare(noteId) {
     if (!noteId) return { shared: false };
     try {
-        const resp = await fetch('api_share_note.php', {
-            method: 'POST',
+        const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'GET',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note_id: noteId, action: 'get' })
+            headers: { 'Accept': 'application/json' }
         });
         if (!resp.ok) return { shared: false };
         const ct = resp.headers.get('content-type') || '';

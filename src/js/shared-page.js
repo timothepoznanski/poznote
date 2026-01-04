@@ -129,10 +129,10 @@
     }
     
     function revokeShare(noteId) {
-        fetch('api_share_note.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note_id: noteId, action: 'revoke' })
+        fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'DELETE',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
         })
         .then(function(response) { return response.json(); })
         .then(function(data) {
@@ -163,12 +163,11 @@
     }
     
     function toggleIndexable(noteId, isIndexable) {
-        fetch('api_share_note.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify({
-                note_id: noteId,
-                action: 'update_indexable',
                 indexable: isIndexable ? 1 : 0
             })
         })
@@ -193,12 +192,11 @@
     }
     
     function updatePassword(noteId, password) {
-        return fetch('api_share_note.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        return fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify({
-                note_id: noteId,
-                action: 'update_password',
                 password: password
             })
         })
@@ -225,13 +223,11 @@
             return;
         }
         
-        fetch('api_share_note.php', {
+        fetch('/api/v1/notes/' + noteId + '/share', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ 
-                note_id: noteId, 
-                action: 'renew',
                 custom_token: newToken
             })
         })
