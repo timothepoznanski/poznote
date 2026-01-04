@@ -108,17 +108,17 @@ function createSubfolder(parentFolderKey) {
     showInputModal(modalTitle, modalMessage, '', function(folderName) {
         if (!folderName) return;
         
-        var formData = new FormData();
-        formData.append('action', 'create');
-        formData.append('folder_name', folderName);
-        formData.append('parent_folder_key', parentFolderKey);
-        
         var ws = getSelectedWorkspace();
-        if (ws) formData.append('workspace', ws);
+        var requestData = {
+            folder_name: folderName,
+            parent_folder_key: parentFolderKey
+        };
+        if (ws) requestData.workspace = ws;
         
-        fetch('api_folders.php', {
+        fetch('/api/v1/folders', {
             method: 'POST',
-            body: formData,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData),
             credentials: 'same-origin'
         })
         .then(function(response) { return response.json(); })
@@ -157,15 +157,13 @@ function createSubfolder(parentFolderKey) {
  * Get folder path (breadcrumb)
  */
 function getFolderPath(folderId, callback) {
-    var formData = new FormData();
-    formData.append('action', 'get_folder_path');
-    formData.append('folder_id', folderId);
     var ws = getSelectedWorkspace();
-    if (ws) formData.append('workspace', ws);
+    var url = '/api/v1/folders/' + folderId + '/path';
+    if (ws) url += '?workspace=' + encodeURIComponent(ws);
     
-    fetch('api_folders.php', {
-        method: 'POST',
-        body: formData,
+    fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })

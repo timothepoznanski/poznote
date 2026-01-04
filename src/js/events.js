@@ -1646,21 +1646,19 @@ function moveNoteToTargetFolder(noteId, targetFolderIdOrName) {
         }
     }
     
-    var params = new URLSearchParams({
-        action: 'move_to',
-        note_id: noteId,
+    var requestData = {
         folder_id: targetFolderId || '',
         workspace: selectedWorkspace || getSelectedWorkspace()
-    });
+    };
     
-    fetch("api_folders.php", {
-        method: "POST",
+    fetch('/api/v1/notes/' + noteId + '/folder', {
+        method: 'POST',
         headers: { 
-            "Content-Type": "application/x-www-form-urlencoded", 
-            'X-Requested-With': 'XMLHttpRequest', 
+            'Content-Type': 'application/json', 
             'Accept': 'application/json' 
         },
-        body: params.toString()
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -1733,20 +1731,18 @@ function handleRootDrop(e) {
 }
 
 function moveNoteToRoot(noteId) {
-    var params = new URLSearchParams({
-        action: 'remove_from_folder',
-        note_id: noteId,
+    var requestData = {
         workspace: selectedWorkspace || getSelectedWorkspace()
-    });
+    };
     
-    fetch("api_folders.php", {
-        method: "POST",
+    fetch('/api/v1/notes/' + noteId + '/remove-folder', {
+        method: 'POST',
         headers: { 
-            "Content-Type": "application/x-www-form-urlencoded", 
-            'X-Requested-With': 'XMLHttpRequest', 
+            'Content-Type': 'application/json', 
             'Accept': 'application/json' 
         },
-        body: params.toString()
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -2398,10 +2394,9 @@ function emergencySave(noteId) {
         }
     }
     
-    var params = {
-        id: noteId,
+    var updates = {
         heading: headi,
-        entry: ent,
+        content: ent,
         tags: tags,
         folder: folder,
         folder_id: folder_id,
@@ -2409,14 +2404,15 @@ function emergencySave(noteId) {
     };
     
     // Strategy 1: Try fetch with keepalive (most reliable)
+    // Use RESTful API: PATCH /api/v1/notes/{id}
     try {
-        fetch("api_update_note.php", {
-            method: "POST",
+        fetch("/api/v1/notes/" + noteId, {
+            method: "PATCH",
             headers: { 
                 "Content-Type": "application/json",
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify(params),
+            body: JSON.stringify(updates),
             keepalive: true
         }).then(function() {
         }).catch(function(err) {
@@ -2424,15 +2420,14 @@ function emergencySave(noteId) {
         });
     } catch (err) {
         
-        // Strategy 2: Fallback to sendBeacon with FormData (some servers accept this)
+        // Strategy 2: Fallback to sendBeacon with FormData
+        // Uses dedicated beacon endpoint that accepts FormData
         try {
             var formData = new FormData();
-            formData.append('action', 'beacon_save'); // Use beacon_save action for API compatibility
-            formData.append('note_id', noteId);
             formData.append('content', ent);
             formData.append('workspace', window.selectedWorkspace || getSelectedWorkspace());
             
-            if (navigator.sendBeacon('api_update_note.php', formData)) {
+            if (navigator.sendBeacon('/api/v1/notes/' + noteId + '/beacon', formData)) {
             } else {
                 console.error('[Poznote Auto-Save] sendBeacon returned false');
             }
@@ -2442,10 +2437,10 @@ function emergencySave(noteId) {
             // Strategy 3: Last resort - synchronous XMLHttpRequest (deprecated but works)
             try {
                 var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'api_update_note.php', false); // false = synchronous
+                xhr.open('PATCH', '/api/v1/notes/' + noteId, false); // false = synchronous
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.send(JSON.stringify(params));
+                xhr.send(JSON.stringify(updates));
             } catch (xhrErr) {
                 console.error('[Poznote Auto-Save] All emergency save strategies failed:', xhrErr);
             }

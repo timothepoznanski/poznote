@@ -142,15 +142,14 @@ function updateSearchResults(count, searchTerm) {
 
 function restoreNote(noteid) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
-    const requestBody = {
-        id: noteid
-    };
+    const requestBody = {};
     
     if (workspace) {
         requestBody.workspace = workspace;
     }
     
-    fetch('api_restore_note.php', {
+    // Use RESTful API: POST /api/v1/notes/{id}/restore
+    fetch('/api/v1/notes/' + noteid + '/restore', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

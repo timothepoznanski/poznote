@@ -146,8 +146,8 @@
             // Get current workspace from global (set by PHP)
             const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
             
-            // Fetch notes from API
-            const response = await fetch(`api_list_notes.php?workspace=${encodeURIComponent(workspace)}`);
+            // Fetch notes from RESTful API: GET /api/v1/notes
+            const response = await fetch(`/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
             const data = await response.json();
             
             if (!data.success || !data.notes) {

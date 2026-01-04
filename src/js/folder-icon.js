@@ -173,14 +173,13 @@ function saveFolderIcon() {
     if (!currentFolderIdForIcon || !selectedIconClass) return;
     
     // Send request to API
-    fetch('api_folders.php', {
-        method: 'POST',
+    fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
+        method: 'PUT',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-            action: 'update_icon',
-            folder_id: currentFolderIdForIcon,
+        credentials: 'same-origin',
+        body: JSON.stringify({
             icon: selectedIconClass
         })
     })
@@ -219,14 +218,13 @@ function resetFolderIcon() {
     if (!currentFolderIdForIcon) return;
     
     // Send request to API to clear icon
-    fetch('api_folders.php', {
-        method: 'POST',
+    fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
+        method: 'PUT',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-            action: 'update_icon',
-            folder_id: currentFolderIdForIcon,
+        credentials: 'same-origin',
+        body: JSON.stringify({
             icon: ''
         })
     })

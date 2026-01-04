@@ -818,16 +818,12 @@ function loadFoldersForImport(workspace) {
     }
     
     // Fetch folders for the selected workspace
-    fetch('api_folders.php', {
-        method: 'POST',
+    fetch('/api/v1/folders?workspace=' + encodeURIComponent(workspace) + '&hierarchical=true', {
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
         },
-        body: new URLSearchParams({
-            action: 'list',
-            workspace: workspace,
-            hierarchical: 'true'
-        })
+        credentials: 'same-origin'
     })
         .then(response => response.json())
         .then(data => {

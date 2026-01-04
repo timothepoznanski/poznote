@@ -131,7 +131,7 @@ function newFolder() {
             workspace: selectedWorkspace || getSelectedWorkspace()
         };
         
-        fetch('api_create_folder.php', {
+        fetch('/api/v1/folders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
@@ -198,10 +198,10 @@ function deleteFolder(folderId, folderName) {
     var ws = getSelectedWorkspace();
     if (ws) params.append('workspace', ws);
 
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: params.toString()
+    fetch('/api/v1/folders/' + folderId + '/notes?workspace=' + encodeURIComponent(ws || ''), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -302,10 +302,10 @@ function executeDeleteFolderOperation(folderId, folderName) {
     var ws = getSelectedWorkspace();
     if (ws) deleteParams.append('workspace', ws);
     
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: deleteParams.toString()
+    fetch('/api/v1/folders/' + folderId + '?workspace=' + encodeURIComponent(ws || ''), {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -867,14 +867,8 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
     document.getElementById('sourceFolderName').textContent = sourceFolderName;
     document.getElementById('sourceFolderName').dataset.folderId = sourceFolderId;
     
-    // Get count of files in source folder
-    fetch('api_list_notes.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'folder=' + encodeURIComponent(sourceFolderName) + '&workspace=' + encodeURIComponent(selectedWorkspace)
-    })
+    // Get count of files in source folder using RESTful API
+    fetch('/api/v1/notes?folder=' + encodeURIComponent(sourceFolderName) + '&workspace=' + encodeURIComponent(selectedWorkspace))
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
@@ -924,14 +918,8 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     defaultOption.textContent = window.t ? window.t('modals.folder.no_folder', null, 'No folder') : 'No folder';
     select.appendChild(defaultOption);
     
-    // Get all folders
-    fetch('api_list_notes.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace)
-    })
+    // Get all folders using RESTful API
+    fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace))
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success && data.folders) {
@@ -998,14 +986,17 @@ function executeMoveAllFiles() {
     // Use "0" for "No folder" if targetFolderId is empty
     var targetId = targetFolderId === '' ? '0' : targetFolderId;
     
-    fetch('api_move_folder_files.php', {
+    fetch('/api/v1/folders/move-files', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
-        body: 'source_folder_id=' + encodeURIComponent(sourceFolderId) + 
-              '&target_folder_id=' + encodeURIComponent(targetId) + 
-              '&workspace=' + encodeURIComponent(selectedWorkspace)
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            source_folder_id: parseInt(sourceFolderId),
+            target_folder_id: parseInt(targetId),
+            workspace: selectedWorkspace
+        })
     })
     .then(function(response) {
         if (!response.ok) {
@@ -1072,14 +1063,8 @@ function showMoveEntireFolderDialog(folderId, folderName) {
     rootOption.textContent = window.t ? window.t('modals.move_folder.root', null, 'Root (Top Level)') : 'Root (Top Level)';
     select.appendChild(rootOption);
     
-    // Get all folders
-    fetch('api_list_notes.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace)
-    })
+    // Get all folders using RESTful API
+    fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace))
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success && data.folders) {
@@ -1134,11 +1119,12 @@ function executeMoveFolderToSubfolder() {
         requestData.new_parent_folder_id = null;
     }
     
-    fetch('api_move_folder.php', {
+    fetch('/api/v1/folders/' + sourceFolderId + '/move', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'same-origin',
         body: JSON.stringify(requestData)
     })
     .then(function(response) {
@@ -1209,19 +1195,17 @@ function saveFolderName() {
         return;
     }
     
-    var params = new URLSearchParams({
-        action: 'rename',
-        folder_id: folderId,
-        old_name: oldName,
-        new_name: newName
-    });
     var ws = getSelectedWorkspace();
-    if (ws) params.append('workspace', ws);
+    var requestData = {
+        name: newName
+    };
+    if (ws) requestData.workspace = ws;
 
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: params.toString()
+    fetch('/api/v1/folders/' + folderId, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -1354,17 +1338,15 @@ function emptyFolder(folderId, folderName) {
 }
 
 function executeEmptyFolder(folderId, folderName) {
-    var params = new URLSearchParams({
-        action: 'empty_folder',
-        folder_id: folderId
-    });
     var ws = getSelectedWorkspace();
-    if (ws) params.append('workspace', ws);
+    var requestData = {};
+    if (ws) requestData.workspace = ws;
     
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: params.toString()
+    fetch('/api/v1/folders/' + folderId + '/empty', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -1453,20 +1435,15 @@ function loadWorkspacesForMoveModal(callback) {
 
 function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
     // Load folders
-    var params = new URLSearchParams({
-        action: 'list'
-    });
+    var ws = '';
     try {
-        var ws = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : null;
-        if (ws) {
-            params.append('workspace', ws);
-        }
+        ws = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : '';
     } catch (e) {}
     
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
+    fetch('/api/v1/folders?workspace=' + encodeURIComponent(ws || ''), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) {
         return response.text().then(function(text) {
@@ -1525,15 +1502,10 @@ function onWorkspaceChange() {
     hideMoveFolderError();
     
     // Load folders for the selected workspace
-    var params = new URLSearchParams({
-        action: 'list',
-        workspace: newWorkspace
-    });
-    
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString()
+    fetch('/api/v1/folders?workspace=' + encodeURIComponent(newWorkspace || ''), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) {
         return response.text().then(function(text) {
@@ -1623,17 +1595,16 @@ function moveNoteToFolder() {
     var workspaceSelect = document.getElementById('workspaceSelect');
     var targetWorkspace = workspaceSelect ? workspaceSelect.value : (selectedWorkspace || getSelectedWorkspace());
 
-    var params = new URLSearchParams({
-        action: 'move_to',
-        note_id: noteId,
+    var requestData = {
         folder_id: targetFolderId,
         workspace: targetWorkspace
-    });
+    };
 
-    fetch("api_folders.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
-        body: params.toString()
+    fetch('/api/v1/notes/' + noteId + '/folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(requestData)
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
@@ -1945,8 +1916,14 @@ function createHtmlNote() {
         } else if (typeof createNewNote === 'function') {
             createNewNote();
         } else {
-            // Fallback to basic creation
-            window.open('api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId), '_blank');
+            // Fallback to RESTful API
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'note' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
         
         // Restore original folder
@@ -1959,7 +1936,13 @@ function createHtmlNote() {
         } else if (typeof createNewNote === 'function') {
             createNewNote();
         } else {
-            window.open('api_insert_new.php', '_blank');
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ workspace: selectedWorkspace, type: 'note' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
     }
 }
@@ -1979,8 +1962,14 @@ function createTaskListNoteInUtils() {
         if (typeof window.createTaskListNote === 'function') {
             window.createTaskListNote();
         } else {
-            // Fallback
-            window.location.href = 'api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=tasklist';
+            // Fallback to RESTful API
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'tasklist' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
         
         // Restore original folder
@@ -1991,8 +1980,14 @@ function createTaskListNoteInUtils() {
         if (typeof window.createTaskListNote === 'function') {
             window.createTaskListNote();
         } else {
-            // Fallback
-            window.location.href = 'api_insert_new.php?type=tasklist';
+            // Fallback to RESTful API
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ workspace: selectedWorkspace, type: 'tasklist' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
     }
 }
@@ -2011,8 +2006,14 @@ function createMarkdownNoteInUtils() {
         if (typeof window.createMarkdownNote === 'function') {
             window.createMarkdownNote();
         } else {
-            // Fallback to basic markdown creation
-            window.open('api_insert_new.php?folder_id=' + encodeURIComponent(targetFolderId) + '&type=markdown', '_blank');
+            // Fallback to RESTful API
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: 'markdown' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
         
         // Restore original folder
@@ -2023,7 +2024,13 @@ function createMarkdownNoteInUtils() {
         if (typeof window.createMarkdownNote === 'function') {
             window.createMarkdownNote();
         } else {
-            window.open('api_insert_new.php?type=markdown', '_blank');
+            fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ workspace: selectedWorkspace, type: 'markdown' })
+            }).then(r => r.json()).then(data => {
+                if (data.success && data.note) window.location.href = 'index.php?note=' + data.note.id;
+            });
         }
     }
 }
