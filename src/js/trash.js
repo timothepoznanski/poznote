@@ -180,30 +180,17 @@ function restoreNote(noteid) {
 }
 
 function permanentlyDeleteNote(noteid) {
-    const wsBodyDel = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '&workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('api_permanent_delete.php', {
-        method: 'POST',
+    const wsParam = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '?workspace=' + encodeURIComponent(pageWorkspace) : '';
+    fetch('/api/v1/trash/' + encodeURIComponent(noteid) + wsParam, {
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
         },
-        body: 'id=' + encodeURIComponent(noteid) + wsBodyDel
+        credentials: 'same-origin'
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
-        // Handle both old format ('1') and new JSON format
-        let success = false;
-        if (data === '1') {
-            success = true;
-        } else {
-            try {
-                const jsonData = JSON.parse(data);
-                success = jsonData && jsonData.success === true;
-            } catch (e) {
-                success = false;
-            }
-        }
-        
-        if (success) {
+        if (data && data.success === true) {
             // Visually remove note from list
             const noteElement = document.getElementById('note' + noteid);
             if (noteElement) {
@@ -212,7 +199,7 @@ function permanentlyDeleteNote(noteid) {
         } else {
             const title = (window.t ? window.t('trash.alerts.delete_error_title', {}, 'Delete Error') : 'Delete Error');
             const msgPrefix = (window.t ? window.t('trash.alerts.delete_error_prefix', {}, 'Error during permanent deletion: ') : 'Error during permanent deletion: ');
-            showInfoModal(title, msgPrefix + data);
+            showInfoModal(title, msgPrefix + (data.error || 'Unknown error'));
         }
     })
     .catch(error => {
@@ -224,14 +211,13 @@ function permanentlyDeleteNote(noteid) {
 }
 
 function emptyTrash() {
-    const wsEmpty = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? 'workspace=' + encodeURIComponent(pageWorkspace) : '';
-    fetch('api_empty_trash.php', {
-        method: 'POST',
+    const wsParam = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? '?workspace=' + encodeURIComponent(pageWorkspace) : '';
+    fetch('/api/v1/trash' + wsParam, {
+        method: 'DELETE',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        }
-        ,
-        body: wsEmpty
+            'Accept': 'application/json',
+        },
+        credentials: 'same-origin'
     })
     .then(response => response.json())
     .then(data => {

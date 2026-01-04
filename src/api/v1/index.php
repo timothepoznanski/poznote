@@ -44,6 +44,7 @@ requireApiAuth();
 // Include controllers
 require_once __DIR__ . '/controllers/NotesController.php';
 require_once __DIR__ . '/controllers/FoldersController.php';
+require_once __DIR__ . '/controllers/TrashController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -175,6 +176,7 @@ $router = new Router();
 // Create controller instances
 $notesController = new NotesController($con);
 $foldersController = new FoldersController($con);
+$trashController = new TrashController($con);
 
 // ======================
 // Notes Routes
@@ -297,6 +299,25 @@ $router->get('/folders/{id}/notes', function($params) use ($foldersController) {
 // Get folder path
 $router->get('/folders/{id}/path', function($params) use ($foldersController) {
     $foldersController->path($params['id']);
+});
+
+// ======================
+// Trash Routes
+// ======================
+
+// List all notes in trash
+$router->get('/trash', function($params) use ($trashController) {
+    $trashController->index();
+});
+
+// Empty trash (delete all)
+$router->delete('/trash', function($params) use ($trashController) {
+    $trashController->empty();
+});
+
+// Permanently delete a specific note from trash
+$router->delete('/trash/{id}', function($params) use ($trashController) {
+    $trashController->destroy($params['id']);
 });
 
 // Dispatch the request
