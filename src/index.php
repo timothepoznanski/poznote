@@ -22,46 +22,28 @@ require_once 'note_loader.php';
 require_once 'favorites_handler.php';
 require_once 'folders_display.php';
 
-// Check if we need to redirect to include workspace from localStorage or default_workspace setting
+// Check if we need to redirect to include workspace from database settings
 // Only redirect if no workspace parameter is present in GET
 if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
-    // Check for default workspace in database
-    $defaultWorkspace = null;
-    try {
-        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
-        $stmt->execute(['default_workspace']);
-        $defaultWorkspace = $stmt->fetchColumn();
-        if ($defaultWorkspace === false || $defaultWorkspace === '') {
-            $defaultWorkspace = null;
-        }
-    } catch (Exception $e) {
-        $defaultWorkspace = null;
-    }
+    // Use getWorkspaceFilter() which handles the full priority logic:
+    // 1. default_workspace if set to a specific workspace
+    // 2. last_opened_workspace from database
+    // 3. First available workspace as fallback
+    $resolvedWorkspace = getWorkspaceFilter();
     
-    // If default workspace is set to a specific workspace (not __last_opened__), redirect with it
-    if ($defaultWorkspace !== null && $defaultWorkspace !== '__last_opened__') {
+    if ($resolvedWorkspace && $resolvedWorkspace !== '') {
         // Build redirect URL preserving other parameters
         $params = $_GET;
-        $params['workspace'] = $defaultWorkspace;
+        $params['workspace'] = $resolvedWorkspace;
         $queryString = http_build_query($params);
         header('Location: index.php?' . $queryString);
         exit;
-    } else {
-        // Use localStorage (either because default is __last_opened__ or no default is set)
-        // Get first workspace from database to use as fallback
-        $defaultWorkspace = '';
-        try {
-            $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
-            $wsRow = $wsStmt->fetch(PDO::FETCH_ASSOC);
-            $defaultWorkspace = $wsRow ? $wsRow['name'] : '';
-        } catch (Exception $e) {}
-        
-        echo '<!DOCTYPE html><html><head>
-        <script type="application/json" id="workspace-redirect-data">' . json_encode(['defaultWorkspace' => $defaultWorkspace]) . '</script>
-        <script src="js/workspace-redirect.js"></script>
-        </head><body></body></html>';
-        exit; // Exit to prevent further processing and redirect loop
     }
+}
+
+// Save the currently opened workspace to database for "last opened" feature
+if (isset($_GET['workspace']) && $_GET['workspace'] !== '') {
+    saveLastOpenedWorkspace($_GET['workspace']);
 }
 
 // Initialization of workspaces and labels
@@ -71,7 +53,7 @@ initializeWorkspacesAndLabels($con);
 $search_params = initializeSearchParams();
 extract($search_params); // Extracts variables: $search, $tags_search, $note, etc.
 
-// Display workspace name (for __last_opened__, get the actual workspace from localStorage via JavaScript)
+// Display workspace name
 if ($workspace_filter === '__last_opened__') {
     // Get first available workspace from database
     $displayWorkspace = '';

@@ -287,13 +287,14 @@
     // ========== Initialization ==========
     
     document.addEventListener('DOMContentLoaded', function() {
-        // Back to Notes link with workspace from localStorage
+        // Back to Notes link with workspace from PHP global (no more localStorage)
         var backLink = document.getElementById('backToNotesLink');
         if (backLink) {
             backLink.addEventListener('click', function() {
                 var href = backLink.getAttribute('data-href') || 'index.php';
                 try {
-                    var workspace = localStorage.getItem('poznote_selected_workspace');
+                    var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                                    (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
                     if (workspace && workspace !== '') {
                         var url = new URL(href, window.location.origin);
                         url.searchParams.set('workspace', workspace);

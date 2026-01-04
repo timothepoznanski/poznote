@@ -749,21 +749,7 @@ function redirectToTag(tag) {
         console.warn('redirectToTag: Error reading URL params:', e);
     }
     
-    // 2. If not found in URL, check localStorage
-    if (!currentWorkspace) {
-        try {
-            currentWorkspace = localStorage.getItem('poznote_selected_workspace');
-            if (currentWorkspace && currentWorkspace !== '') {
-                workspaceSource = 'localStorage';
-            } else {
-                currentWorkspace = null;
-            }
-        } catch (e) {
-            console.warn('redirectToTag: Error reading localStorage:', e);
-        }
-    }
-    
-    // 3. If not found in localStorage, check global variables (including pageWorkspace from list_tags.php)
+    // 2. If not found in URL, check global variables (set by PHP from database)
     if (!currentWorkspace) {
         if (typeof pageWorkspace !== 'undefined' && pageWorkspace && pageWorkspace !== 'undefined') {
             currentWorkspace = pageWorkspace;
@@ -780,18 +766,12 @@ function redirectToTag(tag) {
         }
     }
     
-    // 4. Fallback: try to get from workspaceSelector or localStorage
+    // 3. Fallback: try to get from workspaceSelector
     if (!currentWorkspace || currentWorkspace === '' || currentWorkspace === 'undefined') {
         var wsSelector = document.getElementById('workspaceSelector');
         if (wsSelector && wsSelector.value) {
             currentWorkspace = wsSelector.value;
             workspaceSource = 'workspaceSelector';
-        } else {
-            var storedWs = localStorage.getItem('poznote_selected_workspace');
-            if (storedWs) {
-                currentWorkspace = storedWs;
-                workspaceSource = 'localStorage';
-            }
         }
     }
     

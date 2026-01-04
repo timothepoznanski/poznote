@@ -4,7 +4,7 @@ requireAuth();
 
 require_once 'config.php';
 
-// Check if settings access is disabled
+// Check if settings access is completely disabled
 if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
     ?>
     <!DOCTYPE html>
@@ -28,6 +28,48 @@ if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
     </html>
     <?php
     exit;
+}
+
+// Check if settings require password protection
+if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
+    // Session is already started by auth.php
+    
+    // Check if user has already authenticated for settings
+    if (!isset($_SESSION['settings_authenticated']) || $_SESSION['settings_authenticated'] !== true) {
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Settings Access</title>
+            <link rel="stylesheet" href="css/fontawesome.min.css">
+            <link rel="stylesheet" href="css/all.css">
+            <link rel="stylesheet" href="css/settings-password.css">
+        </head>
+        <body class="settings-password-page">
+            <div class="settings-password-modal">
+                <i class="fas fa-lock"></i>
+                <h1>Settings Protected</h1>
+                <p>Please enter the password to access settings.</p>
+                <div class="settings-password-form">
+                    <input type="password" id="settings-password-input" placeholder="Enter password" autocomplete="off">
+                    <div id="settings-password-error" class="error-message"></div>
+                    <div class="settings-password-buttons">
+                        <button id="settings-password-submit" class="btn-primary">
+                            <i class="fas fa-check"></i> Submit
+                        </button>
+                        <button id="settings-password-cancel" class="btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <script src="js/settings-password.js"></script>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
 }
 
 include 'db_connect.php';

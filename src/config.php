@@ -30,6 +30,9 @@
     // Example: 'user1@example.com,user2@example.com' or 'user1,user2'
     define('OIDC_ALLOWED_USERS', (string)($_ENV['POZNOTE_OIDC_ALLOWED_USERS'] ?? ''));
     
-    // Optional: Disable access to settings page
+    // Optional: Settings access control
+    // Option 1: Completely block access to settings
     define('DISABLE_SETTINGS_ACCESS', filter_var($_ENV['POZNOTE_DISABLE_SETTINGS_ACCESS'] ?? false, FILTER_VALIDATE_BOOL));
+    // Option 2: Protect settings with a password
+    define('SETTINGS_PASSWORD', (string)($_ENV['POZNOTE_SETTINGS_PASSWORD'] ?? ''));
 ?>

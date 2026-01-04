@@ -366,16 +366,17 @@
             }
         }
         
-        // Update workspace title if using __last_opened__
+        // Update workspace title - use selectedWorkspace from PHP (no more localStorage dependency)
         var lastOpenedFlag = document.getElementById('workspace-last-opened-flag');
         if (lastOpenedFlag) {
             try {
-                var lastWorkspace = localStorage.getItem('poznote_selected_workspace');
-                if (lastWorkspace && lastWorkspace !== '__last_opened__') {
+                var currentWs = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace : 
+                                (typeof window.selectedWorkspace !== 'undefined') ? window.selectedWorkspace : null;
+                if (currentWs && currentWs !== '__last_opened__') {
                     var titleElement = document.querySelector('.workspace-title-text');
                     if (titleElement && window.workspaceDisplayMap) {
                         // Use the display map to get the proper label
-                        var displayName = window.workspaceDisplayMap[lastWorkspace] || lastWorkspace;
+                        var displayName = window.workspaceDisplayMap[currentWs] || currentWs;
                         titleElement.textContent = displayName;
                     }
                 }

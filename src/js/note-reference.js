@@ -143,8 +143,8 @@
         listContainer.innerHTML = '<div class="note-reference-loading"><i class="fa-spinner fa-spin"></i> ' + tr('note_reference.loading', {}, 'Loading...') + '</div>';
         
         try {
-            // Get current workspace
-            const workspace = localStorage.getItem('poznote_selected_workspace') || '';
+            // Get current workspace from global (set by PHP)
+            const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
             
             // Fetch notes from API
             const response = await fetch(`api_list_notes.php?workspace=${encodeURIComponent(workspace)}`);
@@ -311,7 +311,7 @@
      * Navigate to a referenced note
      */
     window.navigateToNote = function(noteId) {
-        const workspace = localStorage.getItem('poznote_selected_workspace') || '';
+        const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
         const isMobile = window.innerWidth <= 800;
         
         // Add scroll parameter for mobile to trigger auto-scroll to note content
@@ -367,7 +367,7 @@
     window.processNoteReferences = async function(container, workspace) {
         if (!container) return;
         
-        workspace = workspace || localStorage.getItem('poznote_selected_workspace') || '';
+        workspace = workspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
         
         // Find all text nodes containing [[...]]
         const walker = document.createTreeWalker(

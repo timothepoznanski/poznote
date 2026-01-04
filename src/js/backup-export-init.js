@@ -1,12 +1,13 @@
 // JavaScript for backup export page
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Update back to notes link with workspace from localStorage
+    // Update back to notes link with workspace from PHP global
     try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) {
+        var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : 
+                        (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : null;
+        if (workspace) {
             var a = document.getElementById('backToNotesLink');
-            if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
+            if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(workspace));
         }
     } catch(e) {}
     

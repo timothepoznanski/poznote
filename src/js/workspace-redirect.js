@@ -1,6 +1,7 @@
 /**
- * Workspace redirect - handles localStorage workspace selection
+ * Workspace redirect - handles workspace selection after authentication
  * Used by login.php, oidc_callback.php for CSP-compliant redirects after authentication
+ * Note: last_opened_workspace is now stored in database, not localStorage
  */
 (function() {
     'use strict';
@@ -12,26 +13,14 @@
     try {
         var config = JSON.parse(dataElement.textContent);
         var redirectAfter = config.redirectAfter || null;
-        var defaultWorkspace = config.defaultWorkspace || config; // Support both object and string format
-        var workspace = null;
-        
-        try {
-            workspace = localStorage.getItem('poznote_selected_workspace');
-        } catch (e) {
-            // localStorage not available
-        }
         
         // If a specific redirect URL is provided (from OIDC flow), use it
         if (redirectAfter && typeof redirectAfter === 'string' && redirectAfter !== '') {
             window.location.href = redirectAfter;
-        } else if (workspace && workspace !== '') {
-            window.location.href = 'index.php?workspace=' + encodeURIComponent(workspace);
-        } else if (defaultWorkspace && typeof defaultWorkspace === 'string' && defaultWorkspace !== '') {
-            // Use default workspace if no localStorage workspace
-            window.location.href = 'index.php?workspace=' + encodeURIComponent(defaultWorkspace);
         } else {
-            // Final fallback - use first available workspace or empty
-            window.location.href = 'index.php?workspace=';
+            // Redirect to index without workspace parameter - server will handle
+            // workspace selection based on database settings (last_opened_workspace, default_workspace)
+            window.location.href = 'index.php';
         }
     } catch (e) {
         // Final fallback - redirect to index without workspace
