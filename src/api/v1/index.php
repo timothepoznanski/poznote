@@ -50,6 +50,7 @@ require_once __DIR__ . '/controllers/TagsController.php';
 require_once __DIR__ . '/controllers/AttachmentsController.php';
 require_once __DIR__ . '/controllers/ShareController.php';
 require_once __DIR__ . '/controllers/SettingsController.php';
+require_once __DIR__ . '/controllers/BackupController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -187,6 +188,7 @@ $tagsController = new TagsController($con);
 $attachmentsController = new AttachmentsController($con);
 $shareController = new ShareController($con);
 $settingsController = new SettingsController($con);
+$backupController = new BackupController($con);
 
 // ======================
 // Notes Routes
@@ -424,6 +426,45 @@ $router->get('/settings/{key}', function($params) use ($settingsController) {
 // Set a setting value
 $router->put('/settings/{key}', function($params) use ($settingsController) {
     $settingsController->update($params['key']);
+});
+
+// ======================
+// Backup Routes
+// ======================
+
+// List all backups
+$router->get('/backups', function($params) use ($backupController) {
+    echo json_encode($backupController->index());
+});
+
+// Create a new backup
+$router->post('/backups', function($params) use ($backupController) {
+    echo json_encode($backupController->create());
+});
+
+// Download a backup file
+$router->get('/backups/{filename}', function($params) use ($backupController) {
+    echo json_encode($backupController->download($params['filename']));
+});
+
+// Delete a backup file
+$router->delete('/backups/{filename}', function($params) use ($backupController) {
+    echo json_encode($backupController->destroy($params['filename']));
+});
+
+// Chunked restore - upload chunk
+$router->post('/backups/restore/chunk', function($params) use ($backupController) {
+    echo json_encode($backupController->uploadChunk());
+});
+
+// Chunked restore - assemble chunks
+$router->post('/backups/restore/assemble', function($params) use ($backupController) {
+    echo json_encode($backupController->assembleChunks());
+});
+
+// Chunked restore - cleanup
+$router->post('/backups/restore/cleanup', function($params) use ($backupController) {
+    echo json_encode($backupController->cleanupChunks());
 });
 
 // Dispatch the request
