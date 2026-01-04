@@ -32,10 +32,7 @@ if (defined('DISABLE_SETTINGS_ACCESS') && DISABLE_SETTINGS_ACCESS === true) {
 
 // Check if settings require password protection
 if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
-    // Start session if not already started
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    // Session is already started by auth.php
     
     // Check if user has already authenticated for settings
     if (!isset($_SESSION['settings_authenticated']) || $_SESSION['settings_authenticated'] !== true) {

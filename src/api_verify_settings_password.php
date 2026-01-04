@@ -2,6 +2,11 @@
 header('Content-Type: application/json');
 require_once 'config.php';
 
+// Configure session name based on configured port to allow multiple instances
+$configured_port = $_ENV['HTTP_WEB_PORT'] ?? '8040';
+$session_name = 'POZNOTE_SESSION_' . $configured_port;
+session_name($session_name);
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
