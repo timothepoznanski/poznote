@@ -57,10 +57,10 @@ if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
         } catch (Exception $e) {}
         
         echo '<!DOCTYPE html><html><head>
-        <script type="application/json" id="workspace-redirect-data">' . json_encode($defaultWorkspace) . '</script>
+        <script type="application/json" id="workspace-redirect-data">' . json_encode(['defaultWorkspace' => $defaultWorkspace]) . '</script>
         <script src="js/workspace-redirect.js"></script>
         </head><body></body></html>';
-        // Don't exit here - let the page continue loading with first workspace as default
+        exit; // Exit to prevent further processing and redirect loop
     }
 }
 
