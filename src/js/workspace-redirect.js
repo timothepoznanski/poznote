@@ -30,8 +30,8 @@
             // Use default workspace if no localStorage workspace
             window.location.href = 'index.php?workspace=' + encodeURIComponent(defaultWorkspace);
         } else {
-            // Final fallback - use first available workspace or empty
-            window.location.href = 'index.php?workspace=';
+            // Final fallback - redirect without workspace parameter to let server handle it
+            window.location.href = 'index.php';
         }
     } catch (e) {
         // Final fallback - redirect to index without workspace

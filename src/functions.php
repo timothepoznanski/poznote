@@ -200,15 +200,15 @@ function getFirstWorkspaceName() {
  * @return string The workspace name
  */
 function getWorkspaceFilter() {
-    // First check URL parameters
-    if (isset($_GET['workspace'])) {
+    // First check URL parameters - but ignore if empty
+    if (isset($_GET['workspace']) && $_GET['workspace'] !== '') {
         return $_GET['workspace'];
     }
-    if (isset($_POST['workspace'])) {
+    if (isset($_POST['workspace']) && $_POST['workspace'] !== '') {
         return $_POST['workspace'];
     }
     
-    // If no parameter, check for default workspace setting in database
+    // If no parameter or empty parameter, check for default workspace setting in database
     global $con;
     if (isset($con)) {
         try {
