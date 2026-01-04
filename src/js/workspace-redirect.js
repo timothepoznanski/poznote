@@ -12,6 +12,7 @@
     try {
         var config = JSON.parse(dataElement.textContent);
         var redirectAfter = config.redirectAfter || null;
+        var defaultWorkspace = config.defaultWorkspace || config; // Support both object and string format
         var workspace = null;
         
         try {
@@ -25,8 +26,12 @@
             window.location.href = redirectAfter;
         } else if (workspace && workspace !== '') {
             window.location.href = 'index.php?workspace=' + encodeURIComponent(workspace);
+        } else if (defaultWorkspace && typeof defaultWorkspace === 'string' && defaultWorkspace !== '') {
+            // Use default workspace if no localStorage workspace
+            window.location.href = 'index.php?workspace=' + encodeURIComponent(defaultWorkspace);
         } else {
-            window.location.href = 'index.php';
+            // Final fallback - use first available workspace or empty
+            window.location.href = 'index.php?workspace=';
         }
     } catch (e) {
         // Final fallback - redirect to index without workspace
