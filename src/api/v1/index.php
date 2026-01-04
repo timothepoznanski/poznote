@@ -49,6 +49,7 @@ require_once __DIR__ . '/controllers/WorkspacesController.php';
 require_once __DIR__ . '/controllers/TagsController.php';
 require_once __DIR__ . '/controllers/AttachmentsController.php';
 require_once __DIR__ . '/controllers/ShareController.php';
+require_once __DIR__ . '/controllers/SettingsController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -185,6 +186,7 @@ $workspacesController = new WorkspacesController($con);
 $tagsController = new TagsController($con);
 $attachmentsController = new AttachmentsController($con);
 $shareController = new ShareController($con);
+$settingsController = new SettingsController($con);
 
 // ======================
 // Notes Routes
@@ -408,6 +410,20 @@ $router->get('/notes/{noteId}/attachments/{attachmentId}', function($params) use
 // Delete an attachment
 $router->delete('/notes/{noteId}/attachments/{attachmentId}', function($params) use ($attachmentsController) {
     $attachmentsController->destroy($params['noteId'], $params['attachmentId']);
+});
+
+// ======================
+// Settings Routes
+// ======================
+
+// Get a setting value
+$router->get('/settings/{key}', function($params) use ($settingsController) {
+    $settingsController->show($params['key']);
+});
+
+// Set a setting value
+$router->put('/settings/{key}', function($params) use ($settingsController) {
+    $settingsController->update($params['key']);
 });
 
 // Dispatch the request

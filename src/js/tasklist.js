@@ -189,11 +189,10 @@ function addTask(noteId) {
     newTask.important = false;
 
     // Get task insert order preference from database (default: bottom)
-    const formGet = new FormData();
-    formGet.append('action', 'get');
-    formGet.append('key', 'tasklist_insert_order');
-    
-    fetch('api_settings.php', { method: 'POST', body: formGet })
+    fetch('/api/v1/settings/tasklist_insert_order', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
         .then(r => r.json())
         .then(data => {
             const insertOrder = (data && data.success && data.value) ? data.value : 'bottom';
@@ -618,23 +617,22 @@ window.toggleTaskInsertOrder = toggleTaskInsertOrder;
 // Toggle the task insert order preference (top vs bottom)
 function toggleTaskInsertOrder() {
     // Get current order from database
-    const formGet = new FormData();
-    formGet.append('action', 'get');
-    formGet.append('key', 'tasklist_insert_order');
-    
-    fetch('api_settings.php', { method: 'POST', body: formGet })
+    fetch('/api/v1/settings/tasklist_insert_order', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
         .then(r => r.json())
         .then(data => {
             const currentOrder = (data && data.success && data.value) ? data.value : 'bottom';
             const newOrder = currentOrder === 'top' ? 'bottom' : 'top';
             
             // Save new order to database
-            const formSet = new FormData();
-            formSet.append('action', 'set');
-            formSet.append('key', 'tasklist_insert_order');
-            formSet.append('value', newOrder);
-            
-            return fetch('api_settings.php', { method: 'POST', body: formSet })
+            return fetch('/api/v1/settings/tasklist_insert_order', {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ value: newOrder })
+            })
                 .then(r => r.json())
                 .then(() => {
                     // Update button appearance
@@ -665,11 +663,10 @@ function updateTaskInsertOrderButton(orderValue) {
     if (orderValue) {
         applyOrderToButton(orderValue);
     } else {
-        const formGet = new FormData();
-        formGet.append('action', 'get');
-        formGet.append('key', 'tasklist_insert_order');
-        
-        fetch('api_settings.php', { method: 'POST', body: formGet })
+        fetch('/api/v1/settings/tasklist_insert_order', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
             .then(r => r.json())
             .then(data => {
                 const currentOrder = (data && data.success && data.value) ? data.value : 'bottom';

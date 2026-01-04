@@ -235,11 +235,11 @@ function showLoginDisplayNamePrompt() {
         var val = prompt(promptText);
         if (val === null) return;
         
-        var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: val });
-        fetch('api_settings.php', { 
-            method: 'POST', 
-            headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-            body: params.toString() 
+        fetch('/api/v1/settings/login_display_name', { 
+            method: 'PUT', 
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ value: val })
         })
         .then(function(r) { return r.json(); })
         .then(function(resp) { 
@@ -257,12 +257,11 @@ function showLoginDisplayNamePrompt() {
 
     // Helper function to handle server responses
     function doSet(value) {
-        var params = new URLSearchParams({ action: 'set', key: 'login_display_name', value: value });
-        return fetch('api_settings.php', { 
-            method: 'POST', 
+        return fetch('/api/v1/settings/login_display_name', { 
+            method: 'PUT', 
             credentials: 'same-origin', 
-            headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-            body: params.toString() 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ value: value })
         })
         .then(function(r) {
             if (!r.ok) {
@@ -279,11 +278,9 @@ function showLoginDisplayNamePrompt() {
     }
 
     // Charger la valeur actuelle et afficher la modal
-    fetch('api_settings.php', { 
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' }, 
-        body: 'action=get&key=login_display_name' 
+    fetch('/api/v1/settings/login_display_name', { 
+        method: 'GET', 
+        credentials: 'same-origin'
     })
     .then(function(r) {
         if (!r.ok) {

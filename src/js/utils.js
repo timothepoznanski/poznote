@@ -8,12 +8,12 @@
 function saveLastOpenedWorkspace(workspaceName) {
     if (!workspaceName) return;
     
-    var form = new FormData();
-    form.append('action', 'set');
-    form.append('key', 'last_opened_workspace');
-    form.append('value', workspaceName);
-    
-    fetch('api_settings.php', { method: 'POST', body: form })
+    fetch('/api/v1/settings/last_opened_workspace', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ value: workspaceName })
+    })
         .then(function(r) { return r.json(); })
         .catch(function(e) {
             // Silently fail - this is a best-effort save

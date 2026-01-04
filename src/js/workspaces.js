@@ -840,11 +840,10 @@ function loadDefaultWorkspaceSetting() {
     });
     
     // Load current default workspace setting
-    var form = new FormData();
-    form.append('action', 'get');
-    form.append('key', 'default_workspace');
-    
-    fetch('api_settings.php', {method: 'POST', body: form})
+    fetch('/api/v1/settings/default_workspace', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
         .then(function(r) { return r.json(); })
         .then(function(j) {
             if (j && j.success && j.value) {
@@ -866,12 +865,13 @@ function saveDefaultWorkspaceSetting() {
     
     var lastOpenedLabel = document.body.getAttribute('data-txt-last-opened') || 'Last workspace opened';
     var selectedWorkspace = select.value;
-    var setForm = new FormData();
-    setForm.append('action', 'set');
-    setForm.append('key', 'default_workspace');
-    setForm.append('value', selectedWorkspace);
     
-    fetch('api_settings.php', {method: 'POST', body: setForm})
+    fetch('/api/v1/settings/default_workspace', {
+        method: 'PUT',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: selectedWorkspace })
+    })
         .then(function(r) { return r.json(); })
         .then(function(result) {
             if (result && result.success) {
