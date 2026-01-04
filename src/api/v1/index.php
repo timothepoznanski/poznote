@@ -46,6 +46,7 @@ require_once __DIR__ . '/controllers/NotesController.php';
 require_once __DIR__ . '/controllers/FoldersController.php';
 require_once __DIR__ . '/controllers/TrashController.php';
 require_once __DIR__ . '/controllers/WorkspacesController.php';
+require_once __DIR__ . '/controllers/TagsController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -179,6 +180,7 @@ $notesController = new NotesController($con);
 $foldersController = new FoldersController($con);
 $trashController = new TrashController($con);
 $workspacesController = new WorkspacesController($con);
+$tagsController = new TagsController($con);
 
 // ======================
 // Notes Routes
@@ -344,6 +346,15 @@ $router->patch('/workspaces/{name}', function($params) use ($workspacesControlle
 // Delete a workspace
 $router->delete('/workspaces/{name}', function($params) use ($workspacesController) {
     $workspacesController->destroy($params['name']);
+});
+
+// ======================
+// Tags Routes
+// ======================
+
+// List all unique tags
+$router->get('/tags', function($params) use ($tagsController) {
+    $tagsController->index();
 });
 
 // Dispatch the request
