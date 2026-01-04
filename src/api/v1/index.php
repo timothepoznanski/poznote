@@ -45,6 +45,7 @@ requireApiAuth();
 require_once __DIR__ . '/controllers/NotesController.php';
 require_once __DIR__ . '/controllers/FoldersController.php';
 require_once __DIR__ . '/controllers/TrashController.php';
+require_once __DIR__ . '/controllers/WorkspacesController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -177,6 +178,7 @@ $router = new Router();
 $notesController = new NotesController($con);
 $foldersController = new FoldersController($con);
 $trashController = new TrashController($con);
+$workspacesController = new WorkspacesController($con);
 
 // ======================
 // Notes Routes
@@ -318,6 +320,30 @@ $router->delete('/trash', function($params) use ($trashController) {
 // Permanently delete a specific note from trash
 $router->delete('/trash/{id}', function($params) use ($trashController) {
     $trashController->destroy($params['id']);
+});
+
+// ======================
+// Workspaces Routes
+// ======================
+
+// List all workspaces
+$router->get('/workspaces', function($params) use ($workspacesController) {
+    $workspacesController->index();
+});
+
+// Create a new workspace
+$router->post('/workspaces', function($params) use ($workspacesController) {
+    $workspacesController->store();
+});
+
+// Rename a workspace
+$router->patch('/workspaces/{name}', function($params) use ($workspacesController) {
+    $workspacesController->update($params['name']);
+});
+
+// Delete a workspace
+$router->delete('/workspaces/{name}', function($params) use ($workspacesController) {
+    $workspacesController->destroy($params['name']);
 });
 
 // Dispatch the request

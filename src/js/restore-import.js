@@ -756,7 +756,11 @@ function loadWorkspacesForImport() {
     const workspaceSelect = document.getElementById('target_workspace_select');
     if (!workspaceSelect) return;
     
-    fetch('api_workspaces.php?action=list')
+    fetch('/api/v1/workspaces', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
         .then(response => response.json())
         .then(data => {
             if (data.success && data.workspaces) {

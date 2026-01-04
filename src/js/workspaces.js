@@ -132,7 +132,11 @@ function loadAndShowWorkspaceMenu(menu) {
     menu.innerHTML = '<div class="workspace-menu-item"><i class="fa-spinner fa-spin"></i>' + tr('workspaces.menu.loading', {}, 'Loading workspaces...') + '</div>';
     menu.style.display = 'block';
     
-    fetch('api_workspaces.php?action=list')
+    fetch('/api/v1/workspaces', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.success) {

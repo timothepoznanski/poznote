@@ -401,12 +401,11 @@ function showNewWorkspacePrompt() {
         return;
     }
     
-    var params = new URLSearchParams({ action: 'create', name: name });
-    
-    fetch('api_workspaces.php', { 
+    fetch('/api/v1/workspaces', { 
         method: 'POST', 
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
-        body: params.toString() 
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, 
+        body: JSON.stringify({ name: name }),
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(res) {
@@ -469,12 +468,10 @@ function deleteCurrentWorkspace() {
     )
         .then(function(confirmed) {
             if (confirmed) {
-                var params = new URLSearchParams({ action: 'delete', name: name });
-                
-                fetch('api_workspaces.php', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
-                    body: params.toString() 
+                fetch('/api/v1/workspaces/' + encodeURIComponent(name), { 
+                    method: 'DELETE', 
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
                 })
         .then(function(response) { return response.json(); })
         .then(function(res) {
@@ -1400,9 +1397,10 @@ function showMoveFolderDialog(noteId) {
 }
 
 function loadWorkspacesForMoveModal(callback) {
-    fetch("api_workspaces.php?action=list", {
-        method: "GET",
-        headers: { "Accept": "application/json" }
+    fetch('/api/v1/workspaces', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
     })
     .then(function(response) { return response.json(); })
     .then(function(data) {
