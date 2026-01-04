@@ -19,6 +19,8 @@ body.access-denied-page {
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     padding: 30px;
     max-width: 450px;
+    width: 90%;
+    margin: 0 15px;
     text-align: center;
 }
 
@@ -50,10 +52,68 @@ body.access-denied-page {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: 100%;
+    max-width: 200px;
 }
 
 .access-denied-modal button:hover {
     background-color: #2980b9;
+}
+
+/* Responsive design for mobile devices */
+@media (max-width: 768px) {
+    .access-denied-modal {
+        padding: 25px 20px;
+        max-width: 90%;
+    }
+
+    .access-denied-modal i {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .access-denied-modal h1 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    .access-denied-modal p {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .access-denied-modal button {
+        padding: 10px 20px;
+        font-size: 14px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .access-denied-modal {
+        padding: 20px 15px;
+        margin: 0 10px;
+    }
+
+    .access-denied-modal i {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    .access-denied-modal h1 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .access-denied-modal p {
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .access-denied-modal button {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
 }
 
 /* Dark mode support */
