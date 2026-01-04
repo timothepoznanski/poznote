@@ -1,0 +1,126 @@
+/* Folder Icon Modal Styles */
+
+.folder-icon-modal-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+.folder-icon-modal-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px 0;
+    font-size: 1.3em;
+    color: #1f2937;
+}
+
+.folder-icon-modal-content h3 i {
+    color: #6366f1;
+}
+
+.folder-icon-description {
+    margin: 0 0 20px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.folder-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.folder-icon-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 24px;
+    color: #374151;
+}
+
+.folder-icon-item:hover {
+    background: #f3f4f6;
+    border-color: #6366f1;
+    transform: scale(1.05);
+}
+
+.folder-icon-item.selected {
+    background: #eef2ff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.folder-icon-item i {
+    font-size: 24px;
+}
+
+.folder-icon-modal-content .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.folder-icon-modal-content .modal-buttons .btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.folder-icon-modal-content .modal-buttons .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.folder-icon-modal-content .modal-buttons .btn-cancel {
+    margin-left: auto;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.folder-icon-modal-content .modal-buttons .btn-cancel:hover {
+    background: #b91c1c;
+}
+
+/* Scrollbar styling for icon grid */
+.folder-icon-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.folder-icon-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.folder-icon-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.folder-icon-grid::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+

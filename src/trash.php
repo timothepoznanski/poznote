@@ -35,8 +35,8 @@ $currentLang = getUserLanguage();
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 	<title><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?> - <?php echo t_h('app.name'); ?></title>
-	<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
 	<meta name="color-scheme" content="dark light">
+	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals.css"/>
@@ -44,14 +44,14 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
-<body class="trash-page">
+<body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<div class="trash-container">
 		<h2 class="trash-header"><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></h2>
 		
 	<?php if (!empty($search)): ?>
 			<div class="trash-search-notice">
 				<?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
-		<span class="trash-clear-search" onclick="clearSearchAndReturn()">
+		<span class="trash-clear-search">
 					<i class="fa-times"></i>
 				</span>
 			</div>
@@ -70,7 +70,7 @@ $currentLang = getUserLanguage();
 		</form>
 		
 		<div class="trash-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="<?php echo t_h('common.back_to_notes'); ?>">
+			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
 			<button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
@@ -182,8 +182,8 @@ $currentLang = getUserLanguage();
 			<h3><?php echo t_h('trash.modals.empty.title', [], 'Empty Trash'); ?></h3>
 			<p><?php echo t_h('trash.modals.empty.message', [], 'Do you want to empty the trash completely? This action cannot be undone.'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeEmptyTrashConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
-				<button type="button" class="btn-danger" onclick="executeEmptyTrash()"><?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?></button>
+				<button type="button" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-danger"><?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -194,7 +194,7 @@ $currentLang = getUserLanguage();
 			<h3 id="infoModalTitle"><?php echo t_h('common.information'); ?></h3>
 			<p id="infoModalMessage"></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-primary" onclick="closeInfoModal()"><?php echo t_h('common.close'); ?></button>
+				<button type="button" class="btn-primary"><?php echo t_h('common.close'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -205,8 +205,8 @@ $currentLang = getUserLanguage();
 			<h3><?php echo t_h('trash.modals.restore.title', [], 'Restore Note'); ?></h3>
 			<p><?php echo t_h('trash.modals.restore.message', [], 'Do you want to restore this note?'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeRestoreConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
-				<button type="button" class="btn-primary" onclick="executeRestoreNote()"><?php echo t_h('trash.actions.restore', [], 'Restore'); ?></button>
+				<button type="button" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-primary"><?php echo t_h('trash.actions.restore', [], 'Restore'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -217,8 +217,8 @@ $currentLang = getUserLanguage();
 			<h3><?php echo t_h('trash.modals.delete.title', [], 'Permanently Delete Note'); ?></h3>
 			<p><?php echo t_h('trash.modals.delete.message', [], 'Do you want to permanently delete this note? This action cannot be undone.'); ?></p>
 			<div class="modal-buttons">
-				<button type="button" class="btn-cancel" onclick="closeDeleteConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
-				<button type="button" class="btn-danger" onclick="executePermanentDelete()"><?php echo t_h('trash.actions.delete_forever', [], 'Delete Forever'); ?></button>
+				<button type="button" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-danger"><?php echo t_h('trash.actions.delete_forever', [], 'Delete Forever'); ?></button>
 			</div>
 		</div>
 	</div>
@@ -236,67 +236,7 @@ $currentLang = getUserLanguage();
 	<script src="js/checklist.js?v=<?php echo $v; ?>"></script>
 	<script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
 	<script src="js/main.js"></script>
+	<script src="js/navigation.js"></script>
 	<script src="js/trash.js"></script>
-	<script>
-		var pageWorkspace = <?php echo $pageWorkspace ? json_encode($pageWorkspace) : 'undefined'; ?>;
-		
-		function goBackToNotes() {
-			// Build return URL with workspace from localStorage
-			var url = 'index.php';
-			var params = [];
-			
-			// Get workspace from localStorage first, fallback to PHP value
-			try {
-				var workspace = localStorage.getItem('poznote_selected_workspace');
-				if (!workspace || workspace === '') {
-					workspace = pageWorkspace;
-				}
-				if (workspace && workspace !== '') {
-					params.push('workspace=' + encodeURIComponent(workspace));
-				}
-			} catch(e) {
-				// Fallback to PHP workspace if localStorage fails
-				if (pageWorkspace && pageWorkspace !== '') {
-					params.push('workspace=' + encodeURIComponent(pageWorkspace));
-				}
-			}
-			
-			// Build final URL
-			if (params.length > 0) {
-				url += '?' + params.join('&');
-			}
-			
-			window.location.href = url;
-		}
-		
-		function clearSearchAndReturn() {
-			// Clear search and return to trash page with correct workspace
-			var url = 'trash.php';
-			var params = [];
-			
-			// Get workspace from localStorage first, fallback to PHP value
-			try {
-				var workspace = localStorage.getItem('poznote_selected_workspace');
-				if (!workspace || workspace === '') {
-					workspace = pageWorkspace;
-				}
-				if (workspace && workspace !== '') {
-					params.push('workspace=' + encodeURIComponent(workspace));
-				}
-			} catch(e) {
-				// Fallback to PHP workspace if localStorage fails
-				if (pageWorkspace && pageWorkspace !== '') {
-					params.push('workspace=' + encodeURIComponent(pageWorkspace));
-				}
-			}
-			
-			// Build final URL
-			if (params.length > 0) {
-				url += '?' + params.join('&');
-			}
-			
-			window.location.href = url;
-		}
-	</script>
 </body>
 </html>

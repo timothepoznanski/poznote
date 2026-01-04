@@ -681,6 +681,10 @@
         "title": "Espace de travail"
       }
     },
+    "folder_icon": {
+      "title": "Changer l'icône du dossier",
+      "reset": "Remettre le comportement par défaut"
+    },
     "export": {
       "title": "Exporter la note",
       "markdown": {
@@ -757,7 +761,8 @@
       "move_folder": "Déplacer le dossier en sous-dossier",
       "rename_folder": "Renommer le dossier",
       "delete_folder": "Supprimer le dossier",
-      "download_folder": "Télécharger le dossier"
+      "download_folder": "Télécharger le dossier",
+      "change_icon": "Changer l'icône"
     }
   },
   "update": {
@@ -947,12 +952,10 @@
       },
       "structured_export": {
         "title": "Export structuré",
-        "description": "Exportez vos notes organisées dans des dossiers correspondant à votre structure de dossiers Poznote. Chaque note sera enregistrée dans un répertoire qui correspond à son dossier dans Poznote, préservant la hiérarchie complète.",
-        "features": "Fonctionnalités :",
-        "feature_folders": "Structure des dossiers préservée",
-        "feature_subfolders": "Sous-dossiers maintenus",
-        "feature_metadata": "Les fichiers Markdown incluent un front matter YAML avec les métadonnées",
-        "feature_formats": "Formats de fichiers originaux préservés (.html ou .md)"
+        "description": "Exportez vos notes organisées dans des dossiers correspondant à votre structure de dossiers Poznote. Chaque note sera enregistrée dans un répertoire qui correspond à son dossier dans Poznote, préservant la hiérarchie complète. Les fichiers Markdown incluent un front matter YAML avec les métadonnées.",
+        "warning": "Note : Ce type d'export n'est pas conçu pour une sauvegarde parfaite de Poznote.",
+        "select_workspace": "Sélectionner l'espace de travail :",
+        "loading_workspaces": "Chargement des espaces de travail..."
       }
     },
     "buttons": {
@@ -999,9 +1002,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Restauration / Import",
-      "more_info_prefix": "Si vous voulez en savoir plus sur les différentes méthodes de restauration :",
-      "more_info_link": "voir la documentation ici"
+      "title": "Restauration / Import"
     },
     "advanced": {
       "show": "Afficher les options d’import avancées",
@@ -1110,7 +1111,7 @@
         "loading": "Chargement...",
         "folder": "Dossier cible",
         "optional": "optionnel",
-        "frontmatter_warning": "Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà, sinon la note sera créée à la racine du workspace",
+        "frontmatter_warning": "Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà, sinon la note sera créée à la racine du workspace.",
         "zip_folders_info": "ZIP avec structure de dossiers :",
         "zip_folders_description": "Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).",
         "no_folder": "Aucun dossier (racine)",

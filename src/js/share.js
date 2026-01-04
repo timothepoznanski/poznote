@@ -230,6 +230,39 @@ async function createPublicShare(noteId) {
     }
 }
 
+function getPreferredPublicUrlProtocol() {
+    try {
+        const v = localStorage.getItem('poznote-public-url-protocol');
+        if (v === 'http' || v === 'https') return v;
+    } catch (e) {
+        // ignore
+    }
+    return 'https';
+}
+
+function setPreferredPublicUrlProtocol(protocol) {
+    try {
+        if (protocol === 'http' || protocol === 'https') {
+            localStorage.setItem('poznote-public-url-protocol', protocol);
+        }
+    } catch (e) {
+        // ignore
+    }
+}
+
+function applyProtocolToPublicUrl(url, protocol) {
+    if (!url) return url;
+    if (protocol !== 'http' && protocol !== 'https') return url;
+
+    if (/^https?:\/\//i.test(url)) {
+        return protocol + '://' + url.replace(/^https?:\/\//i, '');
+    }
+    if (/^\/\//.test(url)) {
+        return protocol + ':' + url;
+    }
+    return url;
+}
+
 // Close share menu when clicking elsewhere
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.share-dropdown')) {
@@ -275,7 +308,8 @@ function showShareModal(url, options) {
     const urlDiv = document.createElement('div');
     urlDiv.id = 'shareModalUrl';
     urlDiv.className = 'share-url';
-    urlDiv.textContent = url;
+    const preferredProto = getPreferredPublicUrlProtocol();
+    urlDiv.textContent = applyProtocolToPublicUrl(url, preferredProto);
     content.appendChild(urlDiv);
 
     const buttonsDiv = document.createElement('div');
@@ -288,6 +322,38 @@ function showShareModal(url, options) {
 
     // Conditionally add buttons based on share status
     if (isShared) {
+        // Protocol toggle (default: HTTPS)
+        const protocolWrap = document.createElement('div');
+        protocolWrap.className = 'share-protocol-wrap';
+        const protocolLabel = document.createElement('label');
+        protocolLabel.className = 'share-indexable-label';
+        const protocolText = document.createElement('span');
+        protocolText.className = 'indexable-label-text';
+        protocolText.textContent = 'HTTPS';
+
+        const toggleSwitch = document.createElement('label');
+        toggleSwitch.className = 'toggle-switch';
+        const protocolCheckbox = document.createElement('input');
+        protocolCheckbox.type = 'checkbox';
+        protocolCheckbox.id = 'shareProtocolHttps';
+        protocolCheckbox.checked = (preferredProto === 'https');
+        const slider = document.createElement('span');
+        slider.className = 'toggle-slider';
+        toggleSwitch.appendChild(protocolCheckbox);
+        toggleSwitch.appendChild(slider);
+
+        protocolLabel.appendChild(protocolText);
+        protocolLabel.appendChild(toggleSwitch);
+        protocolWrap.appendChild(protocolLabel);
+        // Place the toggle above the URL (URL spacing stays consistent)
+        content.insertBefore(protocolWrap, urlDiv);
+
+        protocolCheckbox.addEventListener('change', function () {
+            const nextProto = protocolCheckbox.checked ? 'https' : 'http';
+            setPreferredPublicUrlProtocol(nextProto);
+            urlDiv.textContent = applyProtocolToPublicUrl(urlDiv.textContent, nextProto);
+        });
+
         // If shared, show Open, Copy, Revoke, Renew
         // Open button: opens the URL in a new tab (keeps modal open)
         const openBtn = document.createElement('button');
@@ -390,9 +456,10 @@ function showShareModal(url, options) {
                         if (ct.indexOf('application/json') !== -1) {
                             const j = await resp.json();
                             if (j && j.url) {
+                                const nextDisplayUrl = applyProtocolToPublicUrl(j.url, getPreferredPublicUrlProtocol());
                                 // Update displayed URL and workspace
                                 const urlDivEl = document.getElementById('shareModalUrl');
-                                if (urlDivEl) urlDivEl.textContent = j.url;
+                                if (urlDivEl) urlDivEl.textContent = nextDisplayUrl;
                                 // Update the workspace variable in modal closure
                                 if (j.workspace !== undefined) {
                                     // We need to recreate the modal with updated workspace

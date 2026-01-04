@@ -36,19 +36,15 @@ try {
     $redirectAfter = $_SESSION['oidc_redirect_after'] ?? null;
     unset($_SESSION['oidc_redirect_after']);
 
-    // Same redirect style as login.php, to preserve localStorage workspace behavior
-    echo '<!DOCTYPE html><html><head>';
-    echo '<script>';
-    echo 'var workspace = null; try { workspace = localStorage.getItem("poznote_selected_workspace"); } catch(e) {}';
-
+    // CSP-compliant redirect using external script with JSON config
+    $redirectConfig = ['redirectAfter' => null];
     if (is_string($redirectAfter) && $redirectAfter !== '' && !preg_match('#^[a-zA-Z][a-zA-Z0-9+.-]*://#', $redirectAfter) && !str_starts_with($redirectAfter, '//')) {
-        // If redirectAfter already includes query params, keep it as-is.
-        echo 'window.location.href = ' . json_encode($redirectAfter) . ';';
-    } else {
-        echo 'if (workspace) { window.location.href = "index.php?workspace=" + encodeURIComponent(workspace); } else { window.location.href = "index.php"; }';
+        $redirectConfig['redirectAfter'] = $redirectAfter;
     }
-
-    echo '</script>';
+    
+    echo '<!DOCTYPE html><html><head>';
+    echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
+    echo '<script src="js/workspace-redirect.js"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
     exit;
 } catch (Exception $e) {

@@ -7,22 +7,22 @@
     <div class="modal-content">
         <h3><?php echo t_h('modals.update.title'); ?></h3>
         <p id="updateMessage"></p>
-        <div class="backup-warning" id="updateBackupWarning" style="display: none;">
-            <p><strong>⚠️ </strong> <span style="color: #dc3545;"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
-            <p style="color: #6c757d; font-size: 14px; margin-top: 8px;"><?php echo t('modals.update.backup_hint'); ?></p>
+        <div class="backup-warning initially-hidden" id="updateBackupWarning">
+            <p><strong>⚠️ </strong> <span class="backup-warning-text"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
+            <p class="text-small-muted"><?php echo t('modals.update.backup_hint'); ?></p>
         </div>
         <div class="version-info">
             <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
-            <p id="releaseNotesLink" style="display: none;"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
+            <p id="releaseNotesLink" class="initially-hidden"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
         <div class="update-buttons-container">
             <div class="update-instructions-buttons">
-                <button type="button" class="btn-update" onclick="goToSelfHostedUpdateInstructions()"><?php echo t_h('modals.update.self_hosted'); ?></button>
-                <button type="button" class="btn-update" onclick="goToCloudUpdateInstructions()"><?php echo t_h('modals.update.cloud'); ?></button>
+                <button type="button" class="btn-update" data-action="go-to-self-hosted-update"><?php echo t_h('modals.update.self_hosted'); ?></button>
+                <button type="button" class="btn-update" data-action="go-to-cloud-update"><?php echo t_h('modals.update.cloud'); ?></button>
             </div>
             <div class="modal-buttons">
-                <button type="button" class="btn-cancel" onclick="closeUpdateModal()"><?php echo t_h('common.close'); ?></button>
+                <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
         <h3><?php echo t_h('modals.update_check.title'); ?></h3>
         <p id="updateCheckStatus"><?php echo t_h('modals.update_check.status'); ?></p>
         <div class="modal-buttons" id="updateCheckButtons">
-            <button type="button" class="btn-cancel" onclick="closeUpdateCheckModal()"><?php echo t_h('common.close'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-update-check-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>
@@ -46,7 +46,7 @@
         <p><?php echo t_h('modals.login_display.description'); ?></p>
         <input type="text" id="loginDisplayInput" placeholder="<?php echo t_h('modals.login_display.placeholder'); ?>" maxlength="255" />
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeLoginDisplayModal()"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-login-display-modal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveLoginDisplayBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
@@ -64,7 +64,7 @@
                 <div class="font-size-section">
                     <label for="fontSizeInput"><?php echo t_h('modals.font_size.label'); ?></label>
                     <input type="number" id="fontSizeInput" min="10" max="32" step="1" value="15">
-                    <div id="defaultFontSizeInfo" class="default-info" style="display: block;">
+                    <div id="defaultFontSizeInfo" class="default-info default-font-size-info">
                         <?php echo t_h('modals.font_size.default_value', ['size' => '15']); ?>
                     </div>
                     <div class="font-size-preview">
@@ -86,9 +86,9 @@
         <h3 id="confirmTitle"><?php echo t_h('modals.confirm.title'); ?></h3>
         <p id="confirmMessage"><?php echo t_h('modals.confirm.message'); ?></p>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeConfirmModal()"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-secondary" id="saveAndExitButton" onclick="executeSaveAndExitAction()" style="display: none;"><?php echo t_h('modals.confirm.save_and_exit'); ?></button>
-            <button type="button" class="btn-primary" id="confirmButton" onclick="executeConfirmedAction()"><?php echo t_h('modals.confirm.exit_without_saving'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-confirm-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-secondary initially-hidden" id="saveAndExitButton" data-action="execute-save-and-exit"><?php echo t_h('modals.confirm.save_and_exit'); ?></button>
+            <button type="button" class="btn-primary" id="confirmButton" data-action="execute-confirmed-action"><?php echo t_h('modals.confirm.exit_without_saving'); ?></button>
         </div>
     </div>
 </div>
@@ -97,12 +97,12 @@
 <div id="newFolderModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.folder.new_title'); ?></h3>
-        <div class="modal-body" style="margin-bottom: 10px;">
-            <input type="text" id="newFolderName" placeholder="<?php echo t_h('modals.folder.new_placeholder'); ?>" maxlength="255" style="width:100%; padding:8px 12px; margin-bottom:0; border:1px solid #ddd; border-radius:4px; font-size:14px; font-family:'Inter',sans-serif; box-sizing:border-box;" onkeypress="if(event.key==='Enter') createFolder()">
+        <div class="modal-body modal-body-spaced">
+            <input type="text" id="newFolderName" placeholder="<?php echo t_h('modals.folder.new_placeholder'); ?>" maxlength="255" class="new-folder-input" data-enter-action="create-folder">
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('newFolderModal')"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" onclick="createFolder()"><?php echo t_h('common.create'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="newFolderModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" data-action="create-folder"><?php echo t_h('common.create'); ?></button>
         </div>
     </div>
 </div>
@@ -116,8 +116,8 @@
             <option value=""><?php echo t_h('modals.folder.no_folder'); ?></option>
         </select>
         <div class="modal-buttons">
-            <button onclick="moveNoteToFolder()"><?php echo t_h('common.move'); ?></button>
-            <button onclick="closeModal('moveNoteModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button data-action="move-note-to-folder"><?php echo t_h('common.move'); ?></button>
+            <button data-action="close-modal" data-modal="moveNoteModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
@@ -130,7 +130,7 @@
         <!-- Workspace selection -->
         <div class="form-group">
             <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
-        <select id="workspaceSelect" class="workspace-select" onchange="onWorkspaceChange()">
+        <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
                 <!-- Workspaces will be loaded here -->
             </select>
         </div>
@@ -145,8 +145,8 @@
         
         <!-- Action buttons -->
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('moveNoteFolderModal')"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" id="moveActionButton" class="btn-primary" onclick="moveNoteToFolder()"><?php echo t_h('common.move'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveNoteFolderModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" id="moveActionButton" class="btn-primary" data-action="move-note-to-folder"><?php echo t_h('common.move'); ?></button>
         </div>
         
         <!-- Error message display -->
@@ -162,8 +162,8 @@
         <h3><?php echo t_h('modals.folder.rename_title'); ?></h3>
         <input type="text" id="editFolderName" placeholder="<?php echo t_h('modals.folder.rename_placeholder'); ?>" maxlength="255">
         <div class="modal-buttons">
-            <button onclick="saveFolderName()"><?php echo t_h('common.save'); ?></button>
-            <button onclick="closeModal('editFolderModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button data-action="save-folder-name"><?php echo t_h('common.save'); ?></button>
+            <button data-action="close-modal" data-modal="editFolderModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
@@ -172,15 +172,15 @@
 <div id="deleteFolderModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.folder.delete_title'); ?></h3>
-        <div id="deleteFolderMessage" style="margin: 15px 0;">
-            <p id="deleteFolderMainMessage" style="margin-bottom: 10px;"></p>
-            <ul id="deleteFolderDetails" style="list-style: none; padding: 0; margin: 10px 0;">
+        <div id="deleteFolderMessage" class="delete-folder-message">
+            <p id="deleteFolderMainMessage" class="delete-folder-main-message"></p>
+            <ul id="deleteFolderDetails" class="delete-folder-details">
             </ul>
-            <p id="deleteFolderNote" style="margin-top: 10px; font-size: 0.9em; color: #666;"></p>
+            <p id="deleteFolderNote" class="delete-folder-note"></p>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('deleteFolderModal')"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-danger" onclick="executeDeleteFolder()"><?php echo t_h('modals.folder.delete_folder'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteFolderModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-danger" data-action="execute-delete-folder"><?php echo t_h('modals.folder.delete_folder'); ?></button>
         </div>
     </div>
 </div>
@@ -196,13 +196,13 @@
         <div id="folderFilesCount" class="modal-info-message">
             <span id="filesCountText"></span>
         </div>
-        <div class="modal-info-message" style="margin-top: 12px; font-size: 0.9em; color: #666;">
+        <div class="modal-info-message mt-12">
             • <?php echo t_h('modals.move_folder_files.hint_move_single', [], 'To move a single note to another workspace, use the "Move note" button in the toolbar'); ?><br><br>
             • <?php echo t_h('modals.move_folder_files.hint_move_all', [], 'To move all notes from one workspace to another, go to Settings → Workspaces'); ?><br><br>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('moveFolderFilesModal')"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" onclick="executeMoveAllFiles()"><?php echo t_h('modals.move_folder_files.move_all', [], 'Move All Files'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveFolderFilesModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" data-action="execute-move-all-files"><?php echo t_h('modals.move_folder_files.move_all', [], 'Move All Files'); ?></button>
         </div>
         <div id="moveFilesErrorMessage" class="modal-error-message"></div>
     </div>
@@ -217,15 +217,15 @@
             <option value=""><?php echo t_h('modals.move_folder.select_target', [], 'Select parent folder...'); ?></option>
         </select>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('moveFolderModal')"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" onclick="executeMoveFolderToSubfolder()"><?php echo t_h('modals.move_folder.move', [], 'Move Folder'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="moveFolderModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" data-action="execute-move-folder-to-subfolder"><?php echo t_h('modals.move_folder.move', [], 'Move Folder'); ?></button>
         </div>
         <div id="moveFolderErrorMessage" class="modal-error-message"></div>
     </div>
 </div>
 
 <!-- Move notes modal (for workspaces.php) -->
-<div id="moveNotesModal" class="modal" style="display:none;">
+<div id="moveNotesModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.move_notes_title', [], 'Move notes from'); ?> "<span id="moveSourceName"></span>"</h3>
         <div class="form-group">
@@ -233,39 +233,39 @@
             <select id="moveTargetSelect">
             </select>
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmMoveBtn" class="btn btn-primary"><?php echo t_h('workspaces.actions.move_notes', [], 'Move notes'); ?></button>
-            <button onclick="closeMoveModal()" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+            <button data-action="close-move-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
 
 <!-- Rename modal (for workspaces.php) -->
-<div id="renameModal" class="modal" style="display:none;">
+<div id="renameModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.rename_title', [], 'Rename workspace'); ?> <span id="renameSource"></span></h3>
         <div class="form-group">
             <label for="renameNewName"><?php echo t_h('modals.workspaces.new_name', [], 'New name'); ?></label>
             <input id="renameNewName" type="text" />
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmRenameBtn" class="btn btn-primary"><?php echo t_h('common.rename', [], 'Rename'); ?></button>
-            <button onclick="closeRenameModal()" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+            <button data-action="close-rename-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
 
 <!-- Delete confirmation modal (for workspaces.php) -->
-<div id="deleteModal" class="modal" style="display:none;">
+<div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.delete_title', [], 'Confirm delete workspace'); ?> "<span id="deleteWorkspaceName"></span>"</h3>
-        <p style="color: red;"><?php echo t_h('modals.workspaces.delete_description', [], 'Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.'); ?></p>
+        <p class="text-danger"><?php echo t_h('modals.workspaces.delete_description', [], 'Enter the workspace name to confirm deletion. All notes and folders will be permanently deleted and cannot be recovered.'); ?></p>
         <div class="form-group">
             <input id="confirmDeleteInput" type="text" placeholder="<?php echo t_h('modals.workspaces.delete_placeholder', [], 'Type workspace name to confirm'); ?>" />
         </div>
-        <div style="margin-top:12px;">
+        <div class="buttons-with-margin">
             <button id="confirmDeleteBtn" class="btn btn-danger" disabled><?php echo t_h('modals.workspaces.delete_button', [], 'Delete workspace'); ?></button>
-            <button onclick="closeDeleteModal()" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+            <button data-action="close-delete-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
@@ -278,7 +278,7 @@
             <div class="create-options">
                 <!-- Notes section -->
                 <div class="create-section" id="notesSection">
-                    <div class="create-note-option" data-type="html" onclick="selectCreateType('html')">
+                    <div class="create-note-option" data-type="html" data-action="select-create-type">
                         <i class="fa fa-file-alt"></i>
                         <div>
                             <span><?php 
@@ -293,7 +293,7 @@
                             ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="markdown" onclick="selectCreateType('markdown')">
+                    <div class="create-note-option" data-type="markdown" data-action="select-create-type">
                         <i class="fa fa-markdown"></i>
                         <div>
                             <span><?php 
@@ -308,13 +308,13 @@
                             ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="list" onclick="selectCreateType('list')">
+                    <div class="create-note-option" data-type="list" data-action="select-create-type">
                         <i class="fa fa-list-ul"></i>
                         <div>
                             <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="subfolder" onclick="selectCreateType('subfolder')" id="subfolderOption" style="display: none;">
+                    <div class="create-note-option initially-hidden" data-type="subfolder" data-action="select-create-type" id="subfolderOption">
                         <i class="fal fa-folder-plus"></i>
                         <div>
                             <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
@@ -323,14 +323,14 @@
                 </div>
                 
                 <!-- Other items section (only shown when creating from main button) -->
-                <div class="create-section" id="otherSection" style="margin-top: 12px;">
-                    <div class="create-note-option" data-type="folder" onclick="selectCreateType('folder')">
+                <div class="create-section mt-12" id="otherSection">
+                    <div class="create-note-option" data-type="folder" data-action="select-create-type">
                         <i class="fa fa-folder"></i>
                         <div>
                             <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
                         </div>
                     </div>
-                    <div class="create-note-option" data-type="workspace" onclick="selectCreateType('workspace')" style="margin-top: 14px;">
+                    <div class="create-note-option mt-12" data-type="workspace" data-action="select-create-type">
                         <i class="fa fa-layer-group"></i>
                         <div>
                             <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
@@ -339,8 +339,8 @@
                 </div>
             </div>
         </div>
-        <div class="modal-buttons" style="margin-top: 16px;">
-            <button type="button" class="btn-cancel" onclick="closeModal('createModal')"><?php echo t_h('common.cancel'); ?></button>
+        <div class="modal-buttons mt-16">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="createModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
@@ -352,7 +352,7 @@
         <div class="modal-body">
             <div class="export-options">
                 <!-- Markdown export option (shown only for markdown notes) -->
-                <div class="export-option export-option-markdown" onclick="selectExportType('markdown')" style="display:none;">
+                <div class="export-option export-option-markdown initially-hidden" data-action="select-export-type" data-type="markdown">
                     <i class="fal fa-file-alt"></i>
                     <div>
                         <span><?php echo t_h('modals.export.markdown.title', [], 'Export as Markdown'); ?></span>
@@ -360,7 +360,7 @@
                     </div>
                 </div>
                 <!-- HTML export option (shown only for non-markdown notes) -->
-                <div class="export-option export-option-html" onclick="selectExportType('html')">
+                <div class="export-option export-option-html" data-action="select-export-type" data-type="html">
                     <i class="fal fa-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.html.title', [], 'Export as HTML'); ?></span>
@@ -369,7 +369,7 @@
                 </div>
 
                 <!-- JSON export option (shown only for tasklist notes) -->
-                <div class="export-option export-option-json" onclick="selectExportType('json')" style="display:none;">
+                <div class="export-option export-option-json initially-hidden" data-action="select-export-type" data-type="json">
                     <i class="fal fa-file-code"></i>
                     <div>
                         <span><?php echo t_h('modals.export.json.title', [], 'Download as JSON'); ?></span>
@@ -377,7 +377,7 @@
                     </div>
                 </div>
 
-                <div class="export-option export-option-print" onclick="selectExportType('print')">
+                <div class="export-option export-option-print" data-action="select-export-type" data-type="print">
                     <i class="fal fa-print"></i>
                     <div>
                         <span><?php echo t_h('modals.export.print.title', [], 'Print to PDF (Browser)'); ?></span>
@@ -387,7 +387,7 @@
             </div>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('exportModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="exportModal"><?php echo t_h('common.cancel'); ?></button>
         </div>
     </div>
 </div>
@@ -401,7 +401,7 @@
             <p id="convertNoteWarning" class="convert-warning"></p>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-danger" onclick="closeModal('convertNoteModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-danger" data-action="close-modal" data-modal="convertNoteModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-success" id="duplicateBeforeConvertBtn"><?php echo t_h('modals.convert.duplicate_button', [], 'Duplicate'); ?></button>
             <button type="button" class="btn-primary" id="confirmConvertBtn"><?php echo t_h('common.convert', [], 'Convert'); ?></button>
         </div>
@@ -414,14 +414,14 @@
         <h3><?php echo t_h('modals.note_sort.title', [], 'Note sort order'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.note_sort.description', [], 'Choose how notes are ordered in the notes list:'); ?></p>
-            <div style="margin-top:8px;">
+            <div class="radio-options">
                 <label><input type="radio" name="noteSort" value="updated_desc"> <?php echo t_h('modals.note_sort.options.last_modified', [], 'Last modified'); ?></label>
                 <label><input type="radio" name="noteSort" value="created_desc"> <?php echo t_h('modals.note_sort.options.last_created', [], 'Last created'); ?></label>
                 <label><input type="radio" name="noteSort" value="heading_asc"> <?php echo t_h('modals.note_sort.options.alphabetical', [], 'Alphabetical'); ?></label>
             </div>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('noteSortModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteSortModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveNoteSortModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
@@ -433,7 +433,7 @@
         <h3><?php echo t_h('settings.language.label'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.language.description', [], 'Select your preferred language:'); ?></p>
-            <div style="margin-top:8px;">
+            <div class="radio-options">
                 <label><input type="radio" name="languageChoice" value="en"> <?php echo t_h('settings.language.english'); ?></label>
                 <label><input type="radio" name="languageChoice" value="fr"> <?php echo t_h('settings.language.french'); ?></label>
                 <label><input type="radio" name="languageChoice" value="es"> <?php echo t_h('settings.language.spanish'); ?></label>
@@ -442,7 +442,7 @@
             </div>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('languageModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="languageModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveLanguageModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
@@ -454,7 +454,7 @@
         <h3><?php echo t_h('modals.timezone.title', [], 'Timezone'); ?></h3>
         <div class="modal-body">
             <p><?php echo t_h('modals.timezone.description', [], 'Select your timezone:'); ?></p>
-            <select id="timezoneSelect" style="width:100%; padding:8px; margin-top:10px; border:1px solid #ddd; border-radius:4px; font-size:14px;">
+            <select id="timezoneSelect" class="timezone-select">
                 <optgroup label="<?php echo t_h('modals.timezone.groups.europe', [], 'Europe'); ?>">
                     <option value="Europe/Paris">Europe/Paris (France, CET/CEST)</option>
                     <option value="Europe/London">Europe/London (UK, GMT/BST)</option>
@@ -526,7 +526,7 @@
             </select>
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeModal('timezoneModal')"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="timezoneModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveTimezoneModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
@@ -544,7 +544,19 @@
             <!-- Notes will be populated here -->
         </div>
         <div class="modal-buttons">
-            <button type="button" class="btn-cancel" onclick="closeNoteReferenceModal()"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-note-reference-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+<!-- Folder Icon Modal -->
+<div id="folderIconModal" class="modal">
+    <div class="modal-content folder-icon-modal-content">
+        <div class="folder-icon-grid" id="folderIconGrid">
+            <!-- Icons will be populated here -->
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><?php echo t_h('modals.folder_icon.reset', [], 'Restore default behavior'); ?> <i class="fa-folder-open"></i> / <i class="fa-folder"></i></button>
         </div>
     </div>
 </div>

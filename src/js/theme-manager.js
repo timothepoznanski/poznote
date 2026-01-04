@@ -118,18 +118,4 @@
     } else {
         initTheme();
     }
-    
-    // For display.php specifically, add a listener for page visibility changes
-    // to reapply theme when returning to the page
-    if (window.location.pathname.includes('display.php')) {
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                // Page became visible again, reapply theme after a small delay
-                setTimeout(function() {
-                    var currentTheme = localStorage.getItem('poznote-theme') || 'light';
-                    applyTheme(currentTheme);
-                }, 100);
-            }
-        });
-    }
 })();

@@ -935,10 +935,18 @@
         "use_case_offline_label": "Leitura Offline",
         "use_case_offline_text": "Abra o arquivo incluído",
         "use_case_offline_text_suffix": "para navegar suas notas sem o Poznote"
+      },
+      "structured_export": {
+        "title": "Exportação Estruturada",
+        "description": "Exporte suas notas organizadas em pastas que correspondem à sua estrutura de pastas do Poznote. Cada nota será salva em um diretório que corresponde à sua pasta no Poznote, preservando a hierarquia completa. Arquivos Markdown incluem front matter YAML com metadados.",
+        "warning": "Nota: Este tipo de exportação não é projetado para um backup perfeito do Poznote.",
+        "select_workspace": "Selecionar espaço de trabalho:",
+        "loading_workspaces": "Carregando espaços de trabalho..."
       }
     },
     "buttons": {
-      "download_complete_backup": "Baixar Backup Completo (ZIP)"
+      "download_complete_backup": "Baixar Backup Completo (ZIP)",
+      "download_structured_export": "Baixar Exportação Estruturada (ZIP)"
     },
     "spinner": {
       "preparing": "Preparando backup...",
@@ -980,9 +988,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Restaurar / Importar",
-      "more_info_prefix": "Se você quiser saber mais sobre por que temos vários métodos de restauração:",
-      "more_info_link": "veja a documentação aqui"
+      "title": "Restaurar / Importar"
     },
     "advanced": {
       "show": "Mostrar Opções Avançadas de Importação",
@@ -1091,7 +1097,7 @@
         "loading": "Carregando...",
         "folder": "Pasta destino",
         "optional": "opcional",
-        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho",
+        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho.",
         "zip_folders_info": "ZIP com estrutura de pastas:",
         "zip_folders_description": "Se o seu ZIP contiver pastas, elas serão criadas automaticamente como pastas no Poznote, preservando sua hierarquia (subpastas incluídas).",
         "no_folder": "Sem pasta (nível raiz)",

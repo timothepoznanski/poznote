@@ -234,8 +234,7 @@ if (isset($note['type']) && $note['type'] === 'markdown') {
     // The content is raw markdown, we need to convert it to HTML
     $content = parseMarkdown($content);
 }
-$protocol = get_protocol();
-$baseUrl = $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+$baseUrl = '//' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 // If the app is in a subdirectory, ensure the base includes the script dir
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 if ($scriptDir && $scriptDir !== '/') {
@@ -284,16 +283,9 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title>Shared note - <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></title>
-    <script>
-        // Apply theme immediately to prevent flash
-        (function() {
-            var theme = '<?php echo $theme; ?>';
-            var root = document.documentElement;
-            root.setAttribute('data-theme', theme);
-            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
-        })();
-    </script>
+    <!-- CSP-compliant theme initialization -->
+    <script type="application/json" id="public-note-config"><?php echo json_encode(['serverTheme' => $theme]); ?></script>
+    <script src="js/public-note-theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/light.min.css">
@@ -319,183 +311,5 @@ if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
 </body>
 <script src="js/copy-code-on-focus.js"></script>
 <script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
-<script>
-    // Mark this as a public note page for JS behavior
-    window.isPublicNotePage = true;
-    
-    // Theme toggle functionality
-    (function() {
-        var themeToggle = document.getElementById('themeToggle');
-        var root = document.documentElement;
-        
-        function updateThemeIcon(theme) {
-            var icon = themeToggle.querySelector('i');
-            if (theme === 'dark') {
-                icon.className = 'fas fa-sun';
-            } else {
-                icon.className = 'fas fa-moon';
-            }
-        }
-        
-        function setTheme(theme) {
-            root.setAttribute('data-theme', theme);
-            root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-            root.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
-            localStorage.setItem('poznote-public-theme', theme);
-            updateThemeIcon(theme);
-            
-            // Reinitialize mermaid with new theme if present
-            if (typeof mermaid !== 'undefined') {
-                var mermaidTheme = theme === 'dark' ? 'dark' : 'default';
-                try {
-                    mermaid.initialize({ startOnLoad: false, theme: mermaidTheme });
-                    var mermaidNodes = document.querySelectorAll('.mermaid');
-                    if (mermaidNodes.length > 0) {
-                        // Re-render mermaid diagrams with new theme
-                        mermaidNodes.forEach(function(node) {
-                            var source = node.getAttribute('data-mermaid-source') || '';
-                            if (source) {
-                                node.textContent = source;
-                            }
-                        });
-                        mermaid.run({ nodes: mermaidNodes });
-                    }
-                } catch (e) {
-                    console.error('Mermaid theme update failed', e);
-                }
-            }
-        }
-        
-        themeToggle.addEventListener('click', function() {
-            var currentTheme = root.getAttribute('data-theme');
-            var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
-        
-        // Check localStorage on page load (visitor preference overrides server theme)
-        var savedTheme = localStorage.getItem('poznote-public-theme');
-        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
-            var serverTheme = root.getAttribute('data-theme');
-            if (savedTheme !== serverTheme) {
-                setTheme(savedTheme);
-            } else {
-                updateThemeIcon(savedTheme);
-            }
-        } else {
-            updateThemeIcon(root.getAttribute('data-theme'));
-        }
-    })();
-    
-    if (typeof mermaid !== 'undefined') {
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function renderMermaidError(node, err, source) {
-            var msg = 'Mermaid: syntax error.';
-            try {
-                if (err) {
-                    if (typeof err === 'string') msg = err;
-                    else if (err.str) msg = err.str;
-                    else if (err.message) msg = err.message;
-                }
-            } catch (e) {}
-
-            node.classList.remove('mermaid');
-            node.innerHTML =
-                '<pre><code class="language-text">' +
-                escapeHtml(msg) +
-                (source ? ('\n\n' + escapeHtml(source)) : '') +
-                '</code></pre>';
-        }
-
-        var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
-        try {
-            // Support Mermaid blocks that ended up rendered as regular code blocks
-            // e.g. <pre><code class="language-mermaid">...</code></pre>
-            (function() {
-                var codeNodes = document.querySelectorAll('pre > code, code');
-                for (var i = 0; i < codeNodes.length; i++) {
-                    var codeNode = codeNodes[i];
-                    if (!codeNode || !codeNode.classList) continue;
-                    var isMermaidCode = codeNode.classList.contains('language-mermaid') ||
-                        codeNode.classList.contains('lang-mermaid') ||
-                        codeNode.classList.contains('mermaid');
-                    if (!isMermaidCode) continue;
-                    if (codeNode.closest && codeNode.closest('.mermaid')) continue;
-
-                    var pre = codeNode.parentElement && codeNode.parentElement.tagName === 'PRE'
-                        ? codeNode.parentElement
-                        : (codeNode.closest ? codeNode.closest('pre') : null);
-
-                    var diagramText = codeNode.textContent || '';
-                    if (!diagramText.trim()) continue;
-
-                    var mermaidDiv = document.createElement('div');
-                    mermaidDiv.className = 'mermaid';
-                    mermaidDiv.textContent = diagramText;
-
-                    if (pre && pre.parentNode) {
-                        pre.parentNode.replaceChild(mermaidDiv, pre);
-                    } else if (codeNode.parentNode) {
-                        codeNode.parentNode.replaceChild(mermaidDiv, codeNode);
-                    }
-                }
-            })();
-
-            mermaid.initialize({ startOnLoad: false, theme: theme });
-
-            var mermaidNodes = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
-            for (var j = 0; j < mermaidNodes.length; j++) {
-                var n = mermaidNodes[j];
-                if (!n.getAttribute('data-mermaid-source')) {
-                    n.setAttribute('data-mermaid-source', (n.textContent || '').trim());
-                }
-            }
-
-            if (typeof mermaid.parse === 'function' && typeof Promise !== 'undefined') {
-                var validNodes = [];
-                var checks = mermaidNodes.map(function(node) {
-                    var src = node.getAttribute('data-mermaid-source') || '';
-                    if (!src.trim()) return Promise.resolve();
-                    return Promise.resolve(mermaid.parse(src))
-                        .then(function() {
-                            node.textContent = src;
-                            validNodes.push(node);
-                        })
-                        .catch(function(err) {
-                            renderMermaidError(node, err, src);
-                        });
-                });
-
-                Promise.all(checks).then(function() {
-                    if (!validNodes.length) return;
-                    return mermaid.run({
-                        nodes: validNodes,
-                        suppressErrors: true
-                    });
-                }).catch(function(e1) {
-                    console.error('Mermaid rendering failed', e1);
-                });
-            } else {
-                mermaid.run({
-                    nodes: document.querySelectorAll('.mermaid'),
-                    suppressErrors: true
-                });
-            }
-        } catch (e) {
-            try {
-                mermaid.initialize({ startOnLoad: false, theme: theme });
-                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-            } catch (e2) {
-                console.error('Mermaid initialization failed', e2);
-            }
-        }
-    }
-</script>
+<script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>
 </html>

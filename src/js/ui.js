@@ -343,12 +343,6 @@ function showLoginDisplayNamePrompt() {
                 
                 if (resp && resp.success) { 
                     modal.style.display = 'none';
-                    // Refresh display.php if we're on that page
-                    if (window.location.pathname.includes('display.php')) {
-                        if (typeof window.refreshLoginDisplayBadge === 'function') {
-                            window.refreshLoginDisplayBadge();
-                        }
-                    }
                 } else { 
                     showNotificationPopup('Save error', 'error'); 
                 } 

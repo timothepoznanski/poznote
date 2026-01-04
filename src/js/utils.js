@@ -609,8 +609,9 @@ function checkForUpdatesAutomatic() {
                 localStorage.setItem('poznote_update_available', 'true');
                 showUpdateBadge();
             } else {
-                // Clear update availability flag
+                // Clear update availability flag and hide badge
                 localStorage.removeItem('poznote_update_available');
+                hideUpdateBadge();
             }
         })
         .catch(function(error) {
@@ -814,13 +815,15 @@ function showUpdateCheckResult(title, message, type) {
 function hideUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
-        badges[i].style.display = 'none';
+        badges[i].classList.add('update-badge-hidden');
+        badges[i].style.display = '';
     }
 }
 
 function showUpdateBadge() {
     var badges = document.querySelectorAll('.update-badge');
     for (var i = 0; i < badges.length; i++) {
+        badges[i].classList.remove('update-badge-hidden');
         badges[i].style.display = 'inline-block';
     }
 }
@@ -1228,24 +1231,30 @@ function cleanupRenamedFolderInLocalStorage(oldName, newName) {
 // Folder management function (open/closed folder icon)
 function toggleFolder(folderId) {
     var content = document.getElementById(folderId);
-    var icon = document.querySelector('[data-folder-id="' + folderId + '"] .folder-icon');
+    // Find the corresponding folder header/icon by folder DOM id (e.g. "folder-123")
+    var folderNameEl = document.querySelector('.folder-name[data-folder-dom-id="' + folderId + '"]');
+    var folderToggle = folderNameEl ? folderNameEl.closest('.folder-toggle') : null;
+    var icon = folderToggle ? folderToggle.querySelector('.folder-icon') : null;
     // Determine folder name to avoid changing icon for the Favorites pseudo-folder
-    var folderHeader = document.querySelector('[data-folder-id="' + folderId + '"]').parentElement;
+    var folderHeader = folderNameEl ? folderNameEl.closest('.folder-header') : null;
     var folderKey = folderHeader ? folderHeader.getAttribute('data-folder') : '';
     var isFavoritesFolder = folderKey === 'Favorites';
     
+    // Check if icon is custom (don't toggle if custom)
+    var isCustomIcon = icon && icon.getAttribute('data-custom-icon') === 'true';
+    
     if (content.style.display === 'none') {
         content.style.display = 'block';
-        // show open folder icon
-        if (icon && !isFavoritesFolder) {
+        // show open folder icon (only if not custom and not favorites)
+        if (icon && !isFavoritesFolder && !isCustomIcon) {
             icon.classList.remove('fa-folder');
             icon.classList.add('fa-folder-open');
         }
         localStorage.setItem('folder_' + folderId, 'open');
     } else {
         content.style.display = 'none';
-        // show closed folder icon
-        if (icon && !isFavoritesFolder) {
+        // show closed folder icon (only if not custom and not favorites)
+        if (icon && !isFavoritesFolder && !isCustomIcon) {
             icon.classList.remove('fa-folder-open');
             icon.classList.add('fa-folder');
         }
@@ -1258,36 +1267,40 @@ function toggleFolder(folderId) {
  * This preserves user preferences for which folders should stay open/closed
  */
 function restoreFolderStates() {
-    // Get all folder toggle elements
-    const folderToggles = document.querySelectorAll('[data-folder-id]');
+    // Get all folder name elements that control toggling
+    const folderToggles = document.querySelectorAll('.folder-name[data-folder-dom-id]');
     
     folderToggles.forEach(function(toggleElement) {
-        const folderId = toggleElement.getAttribute('data-folder-id');
-        const folderContent = document.getElementById(folderId);
-        const icon = toggleElement.querySelector('.folder-icon');
+        const folderDomId = toggleElement.getAttribute('data-folder-dom-id');
+        const folderContent = folderDomId ? document.getElementById(folderDomId) : null;
+        const folderToggle = toggleElement.closest('.folder-toggle');
+        const icon = folderToggle ? folderToggle.querySelector('.folder-icon') : null;
         
-        if (!folderContent || !folderId) return;
+        if (!folderContent || !folderDomId) return;
         
         // Get the folder name to check if it's Favorites
         const folderHeader = toggleElement.closest('.folder-header');
         const folderKey = folderHeader ? folderHeader.getAttribute('data-folder') : '';
         const isFavoritesFolder = folderKey === 'Favorites';
         
+        // Check if icon is custom
+        const isCustomIcon = icon && icon.getAttribute('data-custom-icon') === 'true';
+        
         // Check localStorage for this folder's state
-        const savedState = localStorage.getItem('folder_' + folderId);
+        const savedState = localStorage.getItem('folder_' + folderDomId);
         
         // Only override the PHP-determined state if user has explicitly set a preference
         if (savedState === 'open') {
             // User explicitly opened this folder - keep it open
             folderContent.style.display = 'block';
-            if (icon && !isFavoritesFolder) {
+            if (icon && !isFavoritesFolder && !isCustomIcon) {
                 icon.classList.remove('fa-folder');
                 icon.classList.add('fa-folder-open');
             }
         } else if (savedState === 'closed') {
             // User explicitly closed this folder - keep it closed
             folderContent.style.display = 'none';
-            if (icon && !isFavoritesFolder) {
+            if (icon && !isFavoritesFolder && !isCustomIcon) {
                 icon.classList.remove('fa-folder-open');
                 icon.classList.add('fa-folder');
             }

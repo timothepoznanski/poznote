@@ -233,3 +233,23 @@ body {
         justify-content: center;
     }
 }
+
+/* ===========================================
+   UTILITY CLASSES FOR INLINE STYLE EXTRACTION
+   =========================================== */
+
+/* Hidden by default */
+.initially-hidden {
+    display: none;
+}
+
+/* Cursor pointer */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Subheading buttons container */
+.subheading-buttons-container {
+    display: none;
+    margin-left: 10px;
+}

@@ -690,6 +690,10 @@
         "title": "Workspace"
       }
     },
+    "folder_icon": {
+      "title": "Change folder icon",
+      "reset": "Restore default behavior"
+    },
     "export": {
       "title": "Export Note",
       "markdown": {
@@ -757,7 +761,8 @@
       "move_folder": "Move folder to subfolder",
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder",
-      "download_folder": "Download folder"
+      "download_folder": "Download folder",
+      "change_icon": "Change icon"
     }
   },
   "update": {
@@ -950,12 +955,10 @@
       },
       "structured_export": {
         "title": "Structured Export",
-        "description": "Export your notes organized in folders matching your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the complete hierarchy.",
-        "features": "Features:",
-        "feature_folders": "Folder structure preserved",
-        "feature_subfolders": "Subfolders maintained",
-        "feature_metadata": "Markdown files include YAML front matter with metadata",
-        "feature_formats": "Original file formats preserved (.html or .md)"
+        "description": "Export your notes organized in folders matching your Poznote folder structure. Each note will be saved in a directory that corresponds to its folder in Poznote, preserving the complete hierarchy. Markdown files include YAML front matter with metadata.",
+        "warning": "Note: This export type is not designed for a perfect backup of Poznote.",
+        "select_workspace": "Select workspace:",
+        "loading_workspaces": "Loading workspaces..."
       }
     },
     "buttons": {
@@ -1002,9 +1005,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Restore / Import",
-      "more_info_prefix": "If you want to know more about why we have several restore methods:",
-      "more_info_link": "see documentation here"
+      "title": "Restore / Import"
     },
     "advanced": {
       "show": "Show Advanced Import Options",
@@ -1113,7 +1114,7 @@
         "loading": "Loading...",
         "folder": "Target Folder",
         "optional": "optional",
-        "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore first ensure that the folder already exists, otherwise the note will be created at the workspace root",
+        "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore first ensure that the folder already exists, otherwise the note will be created at the workspace root.",
         "zip_folders_info": "ZIP with folder structure:",
         "zip_folders_description": "If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).",
         "no_folder": "No folder (root level)",

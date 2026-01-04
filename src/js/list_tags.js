@@ -1,4 +1,5 @@
 // JavaScript for tags page
+// Requires: navigation.js (for getPageWorkspace, goBackToNotes)
 
 document.addEventListener('DOMContentLoaded', function() {
     // Tag search/filtering management
@@ -15,7 +16,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Attach back button event listener
+    const backBtn = document.getElementById('backToNotesBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', goBackToNotes);
+    }
     
+    // Attach click listeners to tag items (using event delegation)
+    const tagsList = document.getElementById('tagsList');
+    if (tagsList) {
+        tagsList.addEventListener('click', function(e) {
+            const tagItem = e.target.closest('.tag-item');
+            if (tagItem && tagItem.dataset.tag) {
+                if (typeof window.redirectToTag === 'function') {
+                    window.redirectToTag(tagItem.dataset.tag);
+                }
+            }
+        });
+    }
+    
+    // Expose workspace for other scripts (like clickable-tags.js)
+    window.pageWorkspace = getPageWorkspace();
 });
 
 // folder-exclusion logic removed from tags page

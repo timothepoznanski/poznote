@@ -1,0 +1,55 @@
+/**
+ * Export attachments page styles
+ * Used by api_export_attachments.php for "no attachments" message
+ */
+
+/* Summary page header subtitle */
+.summary-header .subtitle-text {
+    color: #6c757d;
+    margin: 10px 0 0 0;
+    font-size: 14px;
+}
+
+/* Empty state container */
+.empty-state-container {
+    text-align: center;
+}
+
+/* Empty state icon */
+.empty-state-icon {
+    font-size: 48px;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* Empty state title */
+.empty-state-title {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+/* Empty state description */
+.empty-state-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.empty-state-description:last-child {
+    margin-bottom: 0;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .empty-state-title {
+    color: #fff;
+}
+
+[data-theme="dark"] .empty-state-description {
+    color: #aaa;
+}
+
+[data-theme="dark"] .summary-header .subtitle-text {
+    color: #999;
+}

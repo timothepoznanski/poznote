@@ -32,31 +32,35 @@ try {
             $currentLang = 'en';
         }
 
+        // Read default_workspace to decide if we should clear localStorage
+        $stmt = $tmpCon->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute(['default_workspace']);
+        $default_workspace = $stmt->fetchColumn();
+        if ($default_workspace === false) {
+            $default_workspace = '';
+        }
+
         $tmpCon = null;
     } catch (Exception $e) {
         // ignore DB errors and leave display name empty
         $login_display_name = '';
         $currentLang = 'en';
+        $default_workspace = '';
     }
     if ($login_display_name === false) $login_display_name = '';
 } catch (Exception $e) {
     $login_display_name = '';
     $currentLang = 'en';
+    $default_workspace = '';
 }
 
 // If already authenticated, redirect to home
 if (isAuthenticated()) {
     // Redirect to index with JavaScript to include localStorage workspace
-    // Include minimal HTML to ensure proper execution
+    // CSP-compliant: use external script with JSON config
     echo '<!DOCTYPE html><html><head>';
-    echo '<script>
-        var workspace = localStorage.getItem("poznote_selected_workspace");
-        if (workspace) {
-            window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
-        } else {
-            window.location.href = "index.php";
-        }
-    </script>';
+    echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
+    echo '<script src="js/workspace-redirect.js"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
     exit;
 }
@@ -75,16 +79,10 @@ if ($_POST && isset($_POST['username']) && isset($_POST['password'])) {
     
     if (authenticate($username, $password, $rememberMe)) {
         // Redirect to index with JavaScript to include localStorage workspace
-        // Include minimal HTML to ensure proper execution
+        // CSP-compliant: use external script with JSON config
         echo '<!DOCTYPE html><html><head>';
-        echo '<script>
-            var workspace = localStorage.getItem("poznote_selected_workspace");
-            if (workspace) {
-                window.location.href = "index.php?workspace=" + encodeURIComponent(workspace);
-            } else {
-                window.location.href = "index.php";
-            }
-        </script>';
+        echo '<script type="application/json" id="workspace-redirect-data">{}</script>';
+        echo '<script src="js/workspace-redirect.js"></script>';
         echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang ?? 'en') . '</body></html>';
         exit;
     } else {
@@ -107,8 +105,8 @@ if (isset($_GET['oidc_error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : t_h('app.name', [], 'Poznote', $currentLang ?? 'en')); ?></title>
-    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
+    <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/login.css">
@@ -156,7 +154,7 @@ if (isset($_GET['oidc_error'])) {
         <?php endif; ?>
 
         <?php if ($oidcError): ?>
-            <div class="error" style="margin-top: 0.75rem; text-align: center;"><?php echo htmlspecialchars($oidcError); ?></div>
+            <div class="error oidc-error"><?php echo htmlspecialchars($oidcError); ?></div>
         <?php endif; ?>
             <p class="github-link">
                 <a href="https://github.com/timothepoznanski/poznote" target="_blank">
@@ -164,15 +162,16 @@ if (isset($_GET['oidc_error'])) {
                 </a>
             </p>
         </div>
-        <?php if (!$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var oidcButton = document.querySelector('.oidc-button');
-                if (oidcButton) {
-                    oidcButton.focus();
-                }
-            });
-        </script>
-        <?php endif; ?>
+        <?php
+        // Only clear localStorage if a specific workspace is set as default (not __last_opened__ or empty)
+        // This allows "last opened" to work while still respecting specific workspace defaults
+        $shouldClearLocalStorage = !empty($default_workspace) && $default_workspace !== '__last_opened__';
+        $loginConfig = [
+            'clearWorkspace' => $shouldClearLocalStorage,
+            'focusOidc' => !$showNormalLogin && function_exists('oidc_is_enabled') && oidc_is_enabled()
+        ];
+        ?>
+        <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
+        <script src="js/login-page.js"></script>
 </body>
 </html>

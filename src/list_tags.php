@@ -53,8 +53,8 @@ $currentLang = getUserLanguage();
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?> - <?php echo t_h('app.name'); ?></title>
-<script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
-<meta name="color-scheme" content="dark light">
+	<meta name="color-scheme" content="dark light">
+	<script src="js/theme-init.js"></script>
 	<link type="text/css" rel="stylesheet" href="css/fontawesome.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/light.min.css"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css"/>
@@ -62,10 +62,10 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode.css"/>
 	<script src="js/theme-manager.js"></script>
 </head>
-<body class="tags-page">
+<body class="tags-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<div class="tags-container">
 		<div class="tags-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" onclick="goBackToNotes()" title="<?php echo t_h('common.back_to_notes'); ?>">
+			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
 			<h1 class="tags-header"><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
@@ -101,7 +101,7 @@ $currentLang = getUserLanguage();
 			foreach($tags_list as $tag) {
 				if (!empty(trim($tag))) {
 					$tag_encoded = urlencode($tag);
-					echo '<div class="tag-item" onclick="redirectToTag(\'' . htmlspecialchars($tag_encoded, ENT_QUOTES) . '\')">
+					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag_encoded, ENT_QUOTES) . '">
 						<div class="tag-name">'.htmlspecialchars($tag).'</div>
 					</div>';
 				}
@@ -111,43 +111,9 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script>
-		// Expose current workspace to the tags page JS so redirects include it
-		var pageWorkspace = <?php echo json_encode($workspace); ?>;
-	</script>
 	<script src="js/globals.js"></script>
+	<script src="js/navigation.js"></script>
 	<script src="js/list_tags.js"></script>
 	<script src="js/clickable-tags.js"></script>
-	<script>
-		
-		function goBackToNotes() {
-			// Build return URL with workspace from localStorage
-			var url = 'index.php';
-			var params = [];
-			
-			// Get workspace from localStorage first, fallback to PHP value
-			try {
-				var workspace = localStorage.getItem('poznote_selected_workspace');
-				if (!workspace || workspace === '') {
-					workspace = pageWorkspace;
-				}
-				if (workspace && workspace !== '') {
-					params.push('workspace=' + encodeURIComponent(workspace));
-				}
-			} catch(e) {
-				// Fallback to PHP workspace if localStorage fails
-				if (pageWorkspace && pageWorkspace !== '') {
-					params.push('workspace=' + encodeURIComponent(pageWorkspace));
-				}
-			}
-			
-			// Build final URL
-			if (params.length > 0) {
-				url += '?' + params.join('&');
-			}
-			
-			window.location.href = url;
-		}
-	</script>
 </body>
 </html>

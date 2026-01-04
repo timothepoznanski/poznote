@@ -1,6 +1,27 @@
 // JavaScript for trash page
+// Requires: navigation.js (for getPageWorkspace, getEffectiveWorkspace, goBackToNotes)
+
+// Clear search and return to trash page
+function clearSearchAndReturn() {
+    navigateToPage('trash.php');
+}
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Set global pageWorkspace for compatibility with other functions
+    window.pageWorkspace = getPageWorkspace();
+    
+    // Back to notes button
+    var backBtn = document.getElementById('backToNotesBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', goBackToNotes);
+    }
+    
+    // Clear search button
+    var clearSearchBtn = document.querySelector('.trash-clear-search');
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', clearSearchAndReturn);
+    }
+    
     // Trash notes search management
     const searchInput = document.getElementById('searchInput'); 
     if (searchInput) {
@@ -55,6 +76,43 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             showEmptyTrashConfirmModal();
         });
+    }
+    
+    // Modal button event listeners
+    // Empty trash modal
+    var emptyTrashCancelBtn = document.querySelector('#emptyTrashConfirmModal .btn-cancel');
+    if (emptyTrashCancelBtn) {
+        emptyTrashCancelBtn.addEventListener('click', closeEmptyTrashConfirmModal);
+    }
+    var emptyTrashConfirmBtn = document.querySelector('#emptyTrashConfirmModal .btn-danger');
+    if (emptyTrashConfirmBtn) {
+        emptyTrashConfirmBtn.addEventListener('click', executeEmptyTrash);
+    }
+    
+    // Info modal
+    var infoModalCloseBtn = document.querySelector('#infoModal .btn-primary');
+    if (infoModalCloseBtn) {
+        infoModalCloseBtn.addEventListener('click', closeInfoModal);
+    }
+    
+    // Restore modal
+    var restoreCancelBtn = document.querySelector('#restoreConfirmModal .btn-cancel');
+    if (restoreCancelBtn) {
+        restoreCancelBtn.addEventListener('click', closeRestoreConfirmModal);
+    }
+    var restoreConfirmBtn = document.querySelector('#restoreConfirmModal .btn-primary');
+    if (restoreConfirmBtn) {
+        restoreConfirmBtn.addEventListener('click', executeRestoreNote);
+    }
+    
+    // Delete modal
+    var deleteCancelBtn = document.querySelector('#deleteConfirmModal .btn-cancel');
+    if (deleteCancelBtn) {
+        deleteCancelBtn.addEventListener('click', closeDeleteConfirmModal);
+    }
+    var deleteConfirmBtn = document.querySelector('#deleteConfirmModal .btn-danger');
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.addEventListener('click', executePermanentDelete);
     }
 });
 
@@ -133,7 +191,20 @@ function permanentlyDeleteNote(noteid) {
     })
     .then(response => response.text())
     .then(data => {
+        // Handle both old format ('1') and new JSON format
+        let success = false;
         if (data === '1') {
+            success = true;
+        } else {
+            try {
+                const jsonData = JSON.parse(data);
+                success = jsonData && jsonData.success === true;
+            } catch (e) {
+                success = false;
+            }
+        }
+        
+        if (success) {
             // Visually remove note from list
             const noteElement = document.getElementById('note' + noteid);
             if (noteElement) {

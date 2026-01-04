@@ -390,7 +390,7 @@ function parseMarkdown(text) {
         });
         
         // Handle angle bracket URLs <https://example.com>
-        text = text.replace(/&lt;(https?:\/\/[^\s&gt;]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        text = text.replace(/&lt;(https?:\/\/[^>]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
         
         // Bold and italic
         text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
@@ -977,23 +977,6 @@ function initializeMarkdownNote(noteId) {
             toolbar.insertBefore(viewModeBtn, toolbar.firstChild);
             
             // Create markdown help button
-            var helpBtn = document.createElement('button');
-            helpBtn.type = 'button';
-            helpBtn.className = 'toolbar-btn markdown-help-btn note-action-btn';
-            helpBtn.innerHTML = '<i class="fa-question-circle"></i>';
-            helpBtn.title = 'Markdown Guide';
-            helpBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.open('markdown_guide.php', '_blank');
-            };
-            
-            // Insert help button after view mode button
-            if (viewModeBtn.nextSibling) {
-                toolbar.insertBefore(helpBtn, viewModeBtn.nextSibling);
-            } else {
-                toolbar.appendChild(helpBtn);
-            }
             
             // Create split view button
             var splitBtn = document.createElement('button');
@@ -1020,8 +1003,13 @@ function initializeMarkdownNote(noteId) {
                 splitBtn.classList.add('active');
             }
             
-            // Insert split button before help button
-            toolbar.insertBefore(splitBtn, helpBtn);
+            // Insert split button before favorite button (star)
+            var favoriteBtn = toolbar.querySelector('.btn-favorite');
+            if (favoriteBtn) {
+                toolbar.insertBefore(splitBtn, favoriteBtn);
+            } else {
+                toolbar.appendChild(splitBtn);
+            }
         } else {
             // Update existing button based on current state
             var currentMode;

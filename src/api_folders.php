@@ -535,17 +535,46 @@ switch($action) {
         break;
         
     case 'get_folder_counts':
-        // Get note counts for each folder (using folder_id)
-        $query = "SELECT folder_id, COUNT(*) as count FROM entries WHERE trash = 0 AND folder_id IS NOT NULL";
+        // Get all folders first to build hierarchy
+        $foldersQuery = "SELECT id, parent_id FROM folders";
         if ($workspace !== null) {
-            $query .= " AND workspace = '" . addslashes($workspace) . "'";
+            $foldersQuery .= " WHERE workspace = '" . addslashes($workspace) . "'";
         }
-        $query .= " GROUP BY folder_id";
-        $result = $con->query($query);
+        $foldersResult = $con->query($foldersQuery);
         
+        $folderHierarchy = [];
+        while ($folder = $foldersResult->fetch(PDO::FETCH_ASSOC)) {
+            $folderHierarchy[(int)$folder['id']] = $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
+        }
+        
+        // Function to get all descendant folder IDs
+        $getDescendants = function($folderId) use (&$getDescendants, $folderHierarchy) {
+            $descendants = [$folderId];
+            foreach ($folderHierarchy as $id => $parentId) {
+                if ($parentId === $folderId) {
+                    $descendants = array_merge($descendants, $getDescendants($id));
+                }
+            }
+            return $descendants;
+        };
+        
+        // Get note counts for each folder including all subfolder notes
         $counts = [];
-        while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $folderId = (int)$row['folder_id'];
+        foreach (array_keys($folderHierarchy) as $folderId) {
+            $allFolderIds = $getDescendants($folderId);
+            $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
+            
+            $query = "SELECT COUNT(*) as count FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)";
+            if ($workspace !== null) {
+                $query .= " AND workspace = ?";
+                $params = array_merge($allFolderIds, [$workspace]);
+            } else {
+                $params = $allFolderIds;
+            }
+            
+            $stmt = $con->prepare($query);
+            $stmt->execute($params);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $counts[$folderId] = (int)$row['count'];
         }
         
@@ -911,6 +940,37 @@ switch($action) {
             }
         } catch (Exception $e) {
             error_log("Remove from folder error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Internal server error: ' . $e->getMessage()]);
+        }
+        break;
+        
+    case 'update_icon':
+        $folderId = (int)($_POST['folder_id'] ?? 0);
+        $icon = trim($_POST['icon'] ?? '');
+        
+        if ($folderId <= 0) {
+            echo json_encode(['success' => false, 'error' => 'Invalid folder ID']);
+            exit;
+        }
+        
+        try {
+            // Update the folder's icon (or set to null if empty)
+            $query = "UPDATE folders SET icon = ? WHERE id = ?";
+            $stmt = $con->prepare($query);
+            $iconValue = $icon === '' ? null : $icon;
+            $success = $stmt->execute([$iconValue, $folderId]);
+            
+            if ($success) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Folder icon updated successfully',
+                    'icon' => $iconValue
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Database error']);
+            }
+        } catch (Exception $e) {
+            error_log("Update folder icon error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Internal server error: ' . $e->getMessage()]);
         }
         break;

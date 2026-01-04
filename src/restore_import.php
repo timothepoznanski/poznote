@@ -1551,8 +1551,8 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 <head>
     <title><?php echo t_h('restore_import.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
+    <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/restore_import.css">
@@ -1624,27 +1624,19 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         <!-- Parent Restore Section -->
         <div class="backup-section parent-section">
-            <h3 class="accordion-header" onclick="toggleAccordion('restoreBackup')">
+            <h3 class="accordion-header" data-action="toggle-accordion" data-section="restoreBackup">
                 <span class="accordion-icon" id="restoreBackupIcon">▶</span>
                 <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
             </h3>
-            <div id="restoreBackup" class="accordion-content" style="display: none;">
-            
-            <div>
-            <?php echo t_h('restore_import.page.more_info_prefix'); ?>
-            <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
-                <?php echo t_h('restore_import.page.more_info_link'); ?>
-            </a>.
-        </div>
-        <br>
+            <div id="restoreBackup" class="accordion-content initially-hidden">
             
         <!-- Standard Complete Restore Section -->
         <div class="backup-section child-section">
-            <h3 class="accordion-header" onclick="toggleAccordion('standardRestore')">
+            <h3 class="accordion-header" data-action="toggle-accordion" data-section="standardRestore">
                 <span class="accordion-icon" id="standardRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
             </h3>
-            <div id="standardRestore" class="accordion-content" style="display: none;">
+            <div id="standardRestore" class="accordion-content initially-hidden">
             <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
 
             <form method="post" enctype="multipart/form-data">
@@ -1654,11 +1646,11 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <small class="form-text text-muted"><?php echo t_h('restore_import.sections.standard_restore.helper'); ?></small>
                 </div>
                 
-                <button type="button" id="completeRestoreBtn" class="btn btn-primary" onclick="showCompleteRestoreConfirmation()">
+                <button type="button" id="completeRestoreBtn" class="btn btn-primary" data-action="show-complete-restore-confirmation">
                     <span><?php echo t_h('restore_import.buttons.start_restore'); ?></span>
                 </button>
                 <!-- Spinner shown while processing restore -->
-                <div id="restoreSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                <div id="restoreSpinner" class="restore-spinner initially-hidden" role="status" aria-live="polite" aria-hidden="true">
                     <div class="restore-spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
@@ -1669,15 +1661,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 
         <!-- Chunked Complete Restore Section -->
         <div class="backup-section child-section">
-            <h3 class="accordion-header" onclick="toggleAccordion('chunkedRestore')">
+            <h3 class="accordion-header" data-action="toggle-accordion" data-section="chunkedRestore">
                 <span class="accordion-icon" id="chunkedRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.chunked_restore.title'); ?>
             </h3>
-            <div id="chunkedRestore" class="accordion-content" style="display: none;">
+            <div id="chunkedRestore" class="accordion-content initially-hidden">
             <p><?php echo t_h('restore_import.sections.chunked_restore.description'); ?></p>
-            <div id="chunkedUploadStatus" style="display: none;">
+            <div id="chunkedUploadStatus" class="initially-hidden">
                 <div class="progress-bar">
-                    <div id="chunkedProgress" class="progress-fill" style="width: 0%;">0%</div>
+                    <div id="chunkedProgress" class="progress-fill progress-fill-initial">0%</div>
                 </div>
                 <div id="chunkedStatusText"><?php echo t_h('restore_import.chunked.preparing_upload'); ?></div>
             </div>
@@ -1688,7 +1680,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <small class="form-text text-muted"><?php echo t_h('restore_import.sections.chunked_restore.helper'); ?></small>
                 </div>
                 
-                <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" onclick="startChunkedRestore()" disabled>
+                <button type="button" id="chunkedRestoreBtn" class="btn btn-primary" data-action="show-chunked-restore-confirmation" disabled>
                     <?php echo t_h('restore_import.buttons.start_restore'); ?>
                 </button>
             </div>
@@ -1697,21 +1689,21 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 
         <!-- Direct Copy Restore Section -->
         <div class="backup-section child-section">
-            <h3 class="accordion-header" onclick="toggleAccordion('directCopyRestore')">
+            <h3 class="accordion-header" data-action="toggle-accordion" data-section="directCopyRestore">
                 <span class="accordion-icon" id="directCopyRestoreIcon">▶</span>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
             </h3>
-            <div id="directCopyRestore" class="accordion-content" style="display: none;">
+            <div id="directCopyRestore" class="accordion-content initially-hidden">
             <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.description_prefix'); ?>
-                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" style="color: #007bff; text-decoration: none;">
+                <a href="https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md" target="_blank" class="link-primary">
                     <?php echo t_h('restore_import.sections.direct_copy_restore.description_link'); ?>
                 </a>.
             </p>
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
-                <button type="button" class="btn btn-primary" onclick="showDirectCopyRestoreConfirmation()">
+                <button type="button" class="btn btn-primary" data-action="show-direct-copy-restore-confirmation">
                     <?php echo t_h('restore_import.buttons.start_restore'); ?>
                 </button>
             </form>
@@ -1728,9 +1720,9 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     echo "</div>";
 
                     // Show confirmation form
-                    echo "<form method='post' id='directCopyRestoreForm' style='margin-top: 10px;'>";
+                    echo "<form method='post' id='directCopyRestoreForm' class='form-with-margin-top'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
-                    echo "<button type='button' class='btn btn-warning' onclick='showDirectCopyRestoreConfirmation()'>";
+                    echo "<button type='button' class='btn btn-warning' data-action='show-direct-copy-restore-confirmation'>";
                     echo t_h('restore_import.direct_copy.buttons.yes_restore_direct_copy');
                     echo "</button>";
                     echo "</form>";
@@ -1768,45 +1760,45 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         
         <!-- Individual Notes Import Section -->
         <div class="backup-section">
-            <h3 class="accordion-header" onclick="toggleAccordion('individualNotes')">
+            <h3 class="accordion-header" data-action="toggle-accordion" data-section="individualNotes">
                 <span class="accordion-icon" id="individualNotesIcon">▶</span>
                 <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
             </h3>
-            <div id="individualNotes" class="accordion-content" style="display: none;">
+            <div id="individualNotes" class="accordion-content initially-hidden">
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="target_workspace_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="target_workspace_select" class="form-label">
                         1. <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
                     </label>
-                    <select id="target_workspace_select" name="target_workspace" class="form-control" required onchange="loadFoldersForImport(this.value)" style="font-size: 15px; padding: 0.5rem;">
+                    <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required>
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="target_folder_select" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="target_folder_select" class="form-label">
                         2. <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
                     </label>
-                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #dc3545; font-size: 0.875rem;">
+                    <small class="form-text form-text-block form-text-danger">
                         <?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', 'Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà'); ?>
                     </small>
-                    <small class="form-text" style="display: block; margin-bottom: 0.5rem; color: #17a2b8; font-size: 0.875rem;">
+                    <small class="form-text form-text-block form-text-info">
                         <strong><?php echo t_h('restore_import.sections.individual_notes.zip_folders_info', 'ZIP avec structure de dossiers :'); ?></strong> <?php echo t_h('restore_import.sections.individual_notes.zip_folders_description', 'Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).'); ?>
                     </small>
-                    <select id="target_folder_select" name="target_folder" class="form-control" style="font-size: 15px; padding: 0.5rem;">
+                    <select id="target_folder_select" name="target_folder" class="form-control form-select-styled">
                         <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>
                     </select>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 1.25rem;">
-                    <label for="individual_notes_files" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+                <div class="form-group form-group-spaced">
+                    <label for="individual_notes_files" class="form-label">
                         3. <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
                     </label>
-                    <small class="form-text text-muted" style="display: block; margin-bottom: 0.5rem; line-height: 1.5;">
-                        <span style="color: #dc3545;">
+                    <small class="form-text text-muted form-text-muted-block">
+                        <span class="text-danger">
                         <?php 
                         $maxIndividualFiles = (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50);
                         $maxZipFiles = (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300);
@@ -1818,15 +1810,15 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         </span><br>
                         <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
                     </small>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required style="padding: 0.5rem;">
+                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.zip" multiple required class="form-file-input">
                 </div>
                 
-                <button type="button" class="btn btn-primary" onclick="showIndividualNotesImportConfirmation()" style="margin-top: 1rem;" id="individualNotesImportBtn">
+                <button type="button" class="btn btn-primary btn-with-margin-top" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">
                     <?php echo t_h('restore_import.buttons.start_import', 'Start Import'); ?>
                 </button>
                 
                 <!-- Spinner shown while processing import -->
-                <div id="individualNotesImportSpinner" class="restore-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none; margin-top: 1rem;">
+                <div id="individualNotesImportSpinner" class="restore-spinner initially-hidden spinner-with-margin-top" role="status" aria-live="polite" aria-hidden="true">
                     <div class="restore-spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.importing_notes', 'Importation des notes en cours...'); ?></span>
@@ -1836,7 +1828,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         </div>
         
         <!-- Bottom padding for better spacing -->
-        <div style="padding-bottom: 50px;"></div>
+        <div class="section-bottom-spacer"></div>
     </div>
 
     <!-- Simple Import Confirmation Modal -->
@@ -1846,10 +1838,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p><?php echo t_h('restore_import.modals.import_confirm.body'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideImportConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-import-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithImport()">
+                <button type="button" class="btn-confirm" data-action="proceed-import">
                     <?php echo t_h('restore_import.modals.import_confirm.confirm'); ?>
                 </button>
             </div>
@@ -1863,10 +1855,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideCompleteRestoreConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-complete-restore-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithCompleteRestore()">
+                <button type="button" class="btn-confirm" data-action="proceed-complete-restore">
                     <?php echo t_h('restore_import.modals.complete_restore.confirm'); ?>
                 </button>
             </div>
@@ -1880,10 +1872,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p id="chunkedRestoreWarning"><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore_chunked.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideChunkedRestoreConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-chunked-restore-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithChunkedRestore()">
+                <button type="button" class="btn-confirm" data-action="proceed-chunked-restore">
                     <?php echo t_h('restore_import.modals.complete_restore_chunked.confirm'); ?>
                 </button>
             </div>
@@ -1897,10 +1889,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p><?php echo t_h('restore_import.modals.import_notes.body'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideNotesImportConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-notes-import-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithNotesImport()">
+                <button type="button" class="btn-confirm" data-action="proceed-notes-import">
                     <?php echo t_h('restore_import.modals.import_notes.confirm'); ?>
                 </button>
             </div>
@@ -1914,10 +1906,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p><?php echo t_h('restore_import.modals.import_attachments.body'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideAttachmentsImportConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-attachments-import-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithAttachmentsImport()">
+                <button type="button" class="btn-confirm" data-action="proceed-attachments-import">
                     <?php echo t_h('restore_import.modals.import_attachments.confirm'); ?>
                 </button>
             </div>
@@ -1931,10 +1923,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p><strong><?php echo t_h('common.warning'); ?>:</strong> <?php echo t('restore_import.modals.complete_restore_direct_copy.body_html'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideDirectCopyRestoreConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-direct-copy-restore-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithDirectCopyRestore()">
+                <button type="button" class="btn-confirm" data-action="proceed-direct-copy-restore">
                     <?php echo t_h('restore_import.modals.complete_restore_direct_copy.confirm'); ?>
                 </button>
             </div>
@@ -1948,10 +1940,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             <p id="individualNotesImportSummary"><?php echo t_h('restore_import.modals.import_individual_notes.body'); ?></p>
             
             <div class="import-confirm-buttons">
-                <button type="button" class="btn-cancel" onclick="hideIndividualNotesImportConfirmation()">
+                <button type="button" class="btn-cancel" data-action="hide-individual-notes-import-confirmation">
                     <?php echo t_h('common.cancel'); ?>
                 </button>
-                <button type="button" class="btn-confirm" onclick="proceedWithIndividualNotesImport()">
+                <button type="button" class="btn-confirm" data-action="proceed-individual-notes-import">
                     <?php echo t_h('restore_import.modals.import_individual_notes.confirm'); ?>
                 </button>
             </div>
@@ -1961,144 +1953,20 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
         <div class="custom-alert-content">
             <h3 id="alertTitle"><?php echo t_h('restore_import.alerts.no_file_selected.title'); ?></h3>
             <p id="alertMessage"><?php echo t_h('restore_import.alerts.no_file_selected.body'); ?></p>
-            <button type="button" class="alert-ok-button" onclick="hideCustomAlert()">
+            <button type="button" class="alert-ok-button" data-action="hide-custom-alert">
                 <?php echo t_h('restore_import.alerts.ok'); ?>
             </button>
         </div>
     </div>
     
+    <!-- Configuration for JavaScript -->
+    <script type="application/json" id="restore-import-config"><?php
+        echo json_encode([
+            'maxIndividualFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50),
+            'maxZipFiles' => (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300)
+        ]);
+    ?></script>
     <script src="js/restore-import.js"></script>
     <script src="js/chunked-uploader.js"></script>
-    <script>
-        (function () {
-            const trLocal = (key, fallback, vars) => {
-                if (typeof window.t === 'function') {
-                    return window.t(key, vars || null, fallback);
-                }
-                if (fallback != null) {
-                    return fallback;
-                }
-                return key;
-            };
-
-            // Import limits configuration from PHP environment
-            window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES = <?php echo (int)(getenv('POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES') ?: 50); ?>;
-            window.POZNOTE_IMPORT_MAX_ZIP_FILES = <?php echo (int)(getenv('POZNOTE_IMPORT_MAX_ZIP_FILES') ?: 300); ?>;
-
-            // Accordion functionality (onclick handlers expect a global)
-            if (typeof window.toggleAccordion !== 'function') {
-                window.toggleAccordion = function (sectionId) {
-                    const content = document.getElementById(sectionId);
-                    const icon = document.getElementById(sectionId + 'Icon');
-
-                    if (content.style.display === 'none' || content.style.display === '') {
-                        content.style.display = 'block';
-                        icon.textContent = '▼';
-                    } else {
-                        content.style.display = 'none';
-                        icon.textContent = '▶';
-                    }
-                };
-            }
-
-        // Standard upload file size check
-        document.getElementById('complete_backup_file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const button = document.getElementById('completeRestoreBtn');
-            const sizeText = document.querySelector('#completeRestoreBtn').parentElement.querySelector('small');
-            
-            if (file && file.name.toLowerCase().endsWith('.zip')) {
-                const sizeMB = file.size / (1024 * 1024);
-                
-                button.disabled = false;
-                button.textContent = trLocal('restore_import.inline.standard.button', 'Start Complete Restore (Standard)');
-                
-                if (sizeMB > 500) {
-                    sizeText.textContent = trLocal(
-                        'restore_import.inline.standard.too_large',
-                        '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail - consider using chunked upload below.',
-                        { size: sizeMB.toFixed(1) }
-                    );
-                    sizeText.style.color = '#dc3545';
-                } else {
-                    sizeText.textContent = trLocal(
-                        'restore_import.sections.standard_restore.helper',
-                        'Maximum recommended size: 500MB. For larger files, use chunked upload below.'
-                    );
-                    sizeText.style.color = '#6c757d';
-                }
-            }
-        });
-
-        // Chunked upload functionality
-        let chunkedUploader = null;
-
-        // Enable/disable chunked restore button based on file selection
-        document.getElementById('chunked_backup_file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const button = document.getElementById('chunkedRestoreBtn');
-            const sizeText = document.querySelector('#chunkedUploadForm small');
-            
-            if (file && file.name.toLowerCase().endsWith('.zip')) {
-                const sizeMB = file.size / (1024 * 1024);
-                
-                button.disabled = false;
-                button.textContent = `${trLocal('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore')} (${formatFileSize(file.size)})`;
-                button.onclick = showChunkedRestoreConfirmation;
-                
-                if (sizeMB < 500) {
-                    sizeText.textContent = trLocal(
-                        'restore_import.inline.chunked.small_file_note',
-                        'Note: For small files, standard upload is usually faster. But you can still use chunked upload if preferred.'
-                    );
-                } else {
-                    sizeText.textContent = trLocal(
-                        'restore_import.sections.chunked_restore.helper',
-                        'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
-                    );
-                }
-            } else {
-                button.disabled = true;
-                button.textContent = trLocal('restore_import.inline.chunked.button_prefix', 'Start Chunked Restore');
-                button.onclick = showChunkedRestoreConfirmation;
-                sizeText.textContent = trLocal(
-                    'restore_import.sections.chunked_restore.helper',
-                    'Recommended for files over 500MB to 800MB. Files are uploaded in 5MB chunks.'
-                );
-            }
-        });
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 ' + trLocal('restore_import.units.bytes', 'Bytes');
-            const k = 1024;
-            const sizes = [
-                trLocal('restore_import.units.bytes', 'Bytes'),
-                trLocal('restore_import.units.kb', 'KB'),
-                trLocal('restore_import.units.mb', 'MB'),
-                trLocal('restore_import.units.gb', 'GB')
-            ];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (chunkedUploader) {
-                chunkedUploader.cleanup();
-            }
-        });
-        })();
-    </script>
 </body>
 </html>
-
-<script>
-// Ensure Back to Notes opens the stored workspace if present
-(function(){ try {
-    var stored = localStorage.getItem('poznote_selected_workspace');
-    if (stored) {
-        var a = document.getElementById('backToNotesLink'); 
-        if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-    }
-} catch(e){} })();
-</script>

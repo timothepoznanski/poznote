@@ -356,6 +356,82 @@ paths:
         '200':
           description: Tags updated successfully
 
+  /api_convert_note.php:
+    post:
+      tags:
+        - Notes Management
+      summary: Convert note type
+      description: |
+        Convert a note between markdown and HTML formats.
+        - Convert **markdown to HTML**: Set target to 'html' (removes embedded images from attachments)
+        - Convert **HTML to markdown**: Set target to 'markdown' (extracts images as attachments)
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - id
+                - target
+              properties:
+                id:
+                  type: integer
+                  description: "Note ID (required)"
+                  example: 123
+                target:
+                  type: string
+                  description: "Target type - 'html' or 'markdown' (required)"
+                  enum: [html, markdown]
+                  example: "markdown"
+      responses:
+        '200':
+          description: Note converted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Note converted successfully"
+                  newType:
+                    type: string
+                    example: "markdown"
+        '400':
+          description: Bad request (missing/invalid parameters or invalid conversion)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Only markdown notes can be converted to HTML"
+        '404':
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Note not found"
+        '405':
+          description: Method not allowed (only POST is accepted)
+        '500':
+          description: Server error during conversion
+
   /api_delete_note.php:
     delete:
       tags:

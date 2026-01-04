@@ -293,8 +293,8 @@ function createBackup() {
 <head>
     <title><?php echo t_h('backup_export.page.title'); ?> - <?php echo t_h('app.name'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>(function(){try{var t=localStorage.getItem('poznote-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t==='dark'?'dark':'light';r.style.backgroundColor=t==='dark'?'#1a1a1a':'#ffffff';}catch(e){}})();</script>
     <meta name="color-scheme" content="dark light">
+    <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/light.min.css">
     <link rel="stylesheet" href="css/backup_export.css">
@@ -329,12 +329,12 @@ function createBackup() {
             <?php endif; ?>
             <p>
                 <?php echo t_h('backup_export.sections.complete_backup.description_prefix'); ?>
-                <span style="color: #dc3545; font-weight: bold;"><?php echo t_h('backup_export.common.all_workspaces'); ?></span>
+                <span class="text-warning-bold"><?php echo t_h('backup_export.common.all_workspaces'); ?></span>
                 <?php echo t_h('backup_export.sections.complete_backup.description_suffix'); ?>
                 <br><br>
                 <?php echo t_h('backup_export.sections.complete_backup.use_cases'); ?><br>
             </p>
-            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
+            <ul class="backup-list-styled">
                 <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_restore_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_restore_text'); ?></li><br>
                 <li><strong><?php echo t_h('backup_export.sections.complete_backup.use_case_offline_label'); ?>:</strong> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text'); ?> <b>index.html</b> <?php echo t_h('backup_export.sections.complete_backup.use_case_offline_text_suffix'); ?></li><br>
             </ul>
@@ -345,7 +345,7 @@ function createBackup() {
                     <span><?php echo t_h('backup_export.buttons.download_complete_backup'); ?></span>
                 </button>
                 <!-- Spinner shown while creating ZIP/download is in progress -->
-                <div id="backupSpinner" class="backup-spinner" role="status" aria-live="polite" aria-hidden="true" style="display:none;">
+                <div id="backupSpinner" class="backup-spinner initially-hidden" role="status" aria-live="polite" aria-hidden="true">
                     <div class="spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('backup_export.spinner.preparing'); ?></span>
                     <span class="backup-spinner-text"><?php echo t_h('backup_export.spinner.preparing_long'); ?></span>
@@ -359,33 +359,28 @@ function createBackup() {
             <p>
                 <?php echo t_h('backup_export.sections.structured_export.description'); ?>
                 <br><br>
-                <strong><?php echo t_h('backup_export.sections.structured_export.features'); ?></strong><br>
+                <span class="text-danger"><?php echo t_h('backup_export.sections.structured_export.warning'); ?></span>
             </p>
-            <ul style="margin: 10px 0; padding-left: 20px; padding-bottom: 10px;">
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_folders'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_subfolders'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_metadata'); ?></li>
-                <li><?php echo t_h('backup_export.sections.structured_export.feature_formats'); ?></li>
-            </ul>
             
-            <button id="structuredExportBtn" type="button" class="btn btn-primary" onclick="startStructuredExport();">
+            <div class="form-group form-group-export">
+                <label for="structuredExportWorkspaceSelect" class="export-label">
+                    <?php echo t_h('backup_export.sections.structured_export.select_workspace'); ?>
+                </label>
+                <select id="structuredExportWorkspaceSelect" class="form-control export-select">
+                    <option value=""><?php echo t_h('backup_export.sections.structured_export.loading_workspaces'); ?></option>
+                </select>
+            </div>
+            
+            <button id="structuredExportBtn" type="button" class="btn btn-primary">
                 <span><?php echo t_h('backup_export.buttons.download_structured_export'); ?></span>
             </button>
         </div>
         
         <!-- Bottom padding for better spacing -->
-        <div style="padding-bottom: 50px;"></div>
+        <div class="section-bottom-spacer"></div>
     </div>
     
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
-    <script>
-    (function(){ try {
-        var stored = localStorage.getItem('poznote_selected_workspace');
-        if (stored) {
-            var a = document.getElementById('backToNotesLink'); 
-            if (a) a.setAttribute('href', 'index.php?workspace=' + encodeURIComponent(stored));
-        }
-    } catch(e){} })();
-    </script>
+    <script src="js/backup-export-init.js"></script>
 </body>
 </html>

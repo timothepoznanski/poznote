@@ -29,4 +29,7 @@
     // If not set, all authenticated users from the identity provider can access the application
     // Example: 'user1@example.com,user2@example.com' or 'user1,user2'
     define('OIDC_ALLOWED_USERS', (string)($_ENV['POZNOTE_OIDC_ALLOWED_USERS'] ?? ''));
+    
+    // Optional: Disable access to settings page
+    define('DISABLE_SETTINGS_ACCESS', filter_var($_ENV['POZNOTE_DISABLE_SETTINGS_ACCESS'] ?? false, FILTER_VALIDATE_BOOL));
 ?>

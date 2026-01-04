@@ -679,6 +679,10 @@
         "title": "Arbeitsbereich"
       }
     },
+    "folder_icon": {
+      "title": "Ordnersymbol ändern",
+      "reset": "Standardverhalten wiederherstellen"
+    },
     "convert": {
       "title": "Notiz konvertieren",
       "message": "Sind Sie sicher, dass Sie diese Notiz konvertieren möchten?",
@@ -755,7 +759,8 @@
       "rename_folder": "Ordner umbenennen",
       "delete_folder": "Ordner löschen",
       "move_folder": "Ordner in Unterordner verschieben",
-      "download_folder": "Ordner herunterladen"
+      "download_folder": "Ordner herunterladen",
+      "change_icon": "Symbol ändern"
     }
   },
   "update": {
@@ -934,10 +939,18 @@
         "use_case_offline_label": "Offline-Lesen",
         "use_case_offline_text": "Öffnen Sie die enthaltene",
         "use_case_offline_text_suffix": "um Ihre Notizen ohne Poznote zu durchsuchen"
+      },
+      "structured_export": {
+        "title": "Strukturierter Export",
+        "description": "Exportieren Sie Ihre Notizen organisiert in Ordnern, die Ihrer Poznote-Ordnerstruktur entsprechen. Jede Notiz wird in einem Verzeichnis gespeichert, das ihrem Ordner in Poznote entspricht und die vollständige Hierarchie bewahrt. Markdown-Dateien enthalten YAML-Front-Matter mit Metadaten.",
+        "warning": "Hinweis: Dieser Exporttyp ist nicht für eine perfekte Sicherung von Poznote konzipiert.",
+        "select_workspace": "Arbeitsbereich auswählen:",
+        "loading_workspaces": "Arbeitsbereiche werden geladen..."
       }
     },
     "buttons": {
-      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)"
+      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)",
+      "download_structured_export": "Strukturierten Export herunterladen (ZIP)"
     },
     "spinner": {
       "preparing": "Sicherung wird vorbereitet...",
@@ -979,9 +992,7 @@
   },
   "restore_import": {
     "page": {
-      "title": "Wiederherstellen / Importieren",
-      "more_info_prefix": "Wenn Sie mehr darüber erfahren möchten, warum wir mehrere Wiederherstellungsmethoden haben:",
-      "more_info_link": "siehe Dokumentation hier"
+      "title": "Wiederherstellen / Importieren"
     },
     "advanced": {
       "show": "Erweiterte Importoptionen anzeigen",
@@ -1090,7 +1101,7 @@
         "loading": "Laden...",
         "folder": "Zielordner",
         "optional": "optional",
-        "frontmatter_warning": "Wenn eine MD-Notiz einen Ordnerschlüssel in einem Front-Matter enthält, überschreibt dieser Wert den unten ausgewählten. Sie müssen daher zunächst sicherstellen, dass der Ordner bereits existiert, andernfalls wird die Notiz im Wurzelverzeichnis des Arbeitsbereichs erstellt",
+        "frontmatter_warning": "Wenn eine MD-Notiz einen Ordnerschlüssel in einem Front-Matter enthält, überschreibt dieser Wert den unten ausgewählten. Sie müssen daher zunächst sicherstellen, dass der Ordner bereits existiert, andernfalls wird die Notiz im Wurzelverzeichnis des Arbeitsbereichs erstellt.",
         "zip_folders_info": "ZIP mit Ordnerstruktur:",
         "zip_folders_description": "Wenn Ihre ZIP-Datei Ordner enthält, werden diese automatisch als Ordner in Poznote erstellt und ihre Hierarchie (einschließlich Unterordner) beibehalten.",
         "no_folder": "Kein Ordner (Root-Ebene)",

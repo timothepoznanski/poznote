@@ -602,6 +602,8 @@ Upload the complete backup ZIP to restore everything:
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
 
+For more information about the different restore methods, see the [Backup & Restore Guide](https://github.com/timothepoznanski/poznote/blob/main/Docs/BACKUP_RESTORE_GUIDE.md).
+
 </details>
 
 <a id="automated-backups-with-bash-script"></a>
@@ -849,6 +851,22 @@ Export a note for browser viewing/printing (inline):
 ```bash
 curl -u 'username:password' \
   "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=inline"
+```
+
+**Convert Note Type**
+
+Convert a markdown note to HTML:
+```bash
+curl -X POST -u 'username:password' \
+  -d 'id=123&target=html' \
+  http://YOUR_SERVER/api_convert_note.php
+```
+
+Convert an HTML note to markdown:
+```bash
+curl -X POST -u 'username:password' \
+  -d 'id=123&target=markdown' \
+  http://YOUR_SERVER/api_convert_note.php
 ```
 
 **Move Note**

@@ -48,14 +48,13 @@ try {
         $hasPassword = !empty($row['password']);
         
         // Build pretty URLs (same as create/renew)
-        $protocol = get_protocol();
         $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
         if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
             $scriptDir = '';
         }
         $scriptDir = rtrim($scriptDir, '/\\');
-        $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+        $base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
         $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
         $url_path = $base . '/' . rawurlencode($token);
         $url_workspace = $base . '/workspace/' . rawurlencode($token);
@@ -183,7 +182,6 @@ try {
         exit;
     }
 
-    $protocol = get_protocol();
     $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
     // Build path safely: avoid double slashes when script is in webroot
     $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
@@ -192,7 +190,7 @@ try {
     }
     $scriptDir = rtrim($scriptDir, '/\\');
     // Build three variants without the theme parameter so the mode is not visible in the public URL
-    $base = $protocol . '://' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+    $base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
     $url_query = $base . '/public_note.php?token=' . rawurlencode($token);
     $url_path = $base . '/' . rawurlencode($token);
     $url_workspace = $base . '/workspace/' . rawurlencode($token);

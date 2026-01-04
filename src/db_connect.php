@@ -79,6 +79,24 @@ try {
                 ON folders(name, workspace) 
                 WHERE parent_id IS NULL');
 
+    // Add 'icon' column to folders if it doesn't exist (for custom folder icons)
+    try {
+        $cols = $con->query("PRAGMA table_info(folders)")->fetchAll(PDO::FETCH_ASSOC);
+        $hasIcon = false;
+        foreach ($cols as $c) {
+            if (isset($c['name']) && $c['name'] === 'icon') {
+                $hasIcon = true;
+                break;
+            }
+        }
+        if (!$hasIcon) {
+            $con->exec("ALTER TABLE folders ADD COLUMN icon TEXT");
+        }
+    } catch (Exception $e) {
+        // Non-fatal: if this fails, continue without icon support
+        error_log('Could not add icon column to folders: ' . $e->getMessage());
+    }
+
     // Create workspaces table
     $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

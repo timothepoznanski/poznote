@@ -113,7 +113,7 @@ function parseMarkdown($text) {
         }, $text);
         
         // Handle angle bracket URLs <https://example.com>
-        $text = preg_replace('/&lt;(https?:\/\/[^\s&gt;]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
+        $text = preg_replace('/&lt;(https?:\/\/[^>]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
         
         // Bold and italic
         $text = preg_replace('/\*\*\*([^\*]+)\*\*\*/', '<strong><em>$1</em></strong>', $text);

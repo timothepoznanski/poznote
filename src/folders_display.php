@@ -15,6 +15,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
     while($row1 = $stmt_left->fetch(PDO::FETCH_ASSOC)) {
         $folderId = isset($row1["folder_id"]) && $row1["folder_id"] ? (int)$row1["folder_id"] : null;
         $folderName = $row1["folder"] ?: null;
+        $folderIcon = null; // Initialize icon variable
         
         // If no folder_id, this note has no folder - add to uncategorized list
         if ($folderId === null) {
@@ -26,8 +27,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
         if (isset($folders[$folderId])) {
             $folderName = $folders[$folderId]['name'];
         } else {
-            // First time seeing this folder_id - get the canonical name from folders table
-            $canonicalQuery = "SELECT name FROM folders WHERE id = ?";
+            // First time seeing this folder_id - get the canonical name and icon from folders table
+            $canonicalQuery = "SELECT name, icon FROM folders WHERE id = ?";
             if ($workspace_filter) {
                 $canonicalQuery .= " AND workspace = ?";
                 $canonicalStmt = $con->prepare($canonicalQuery);
@@ -39,6 +40,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $canonicalData = $canonicalStmt->fetch(PDO::FETCH_ASSOC);
             if ($canonicalData) {
                 $folderName = $canonicalData['name'];
+                $folderIcon = $canonicalData['icon'] ?? null;
             }
         }
         
@@ -46,6 +48,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
+                'icon' => $folderIcon ?? null,
                 'notes' => []
             ];
         }
@@ -64,7 +67,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter) {
  * Now uses folder_id as key
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name FROM folders";
+    $folders_sql = "SELECT id, name, icon FROM folders";
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = '" . addslashes($workspace_filter) . "'";
     }
@@ -74,13 +77,18 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
     while($folder_row = $empty_folders_query->fetch(PDO::FETCH_ASSOC)) {
         $folderId = (int)$folder_row['id'];
         $folderName = $folder_row['name'];
+        $folderIcon = $folder_row['icon'] ?? null;
         
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
                 'id' => $folderId,
                 'name' => $folderName,
+                'icon' => $folderIcon,
                 'notes' => []
             ];
+        } else {
+            // Update icon if folder already exists
+            $folders[$folderId]['icon'] = $folderIcon;
         }
     }
     
@@ -175,12 +183,13 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
     
     // Escape folder name for use in JavaScript strings
     $escapedFolderName = addslashes($folderName);
+    $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
     
     if ($folderName === 'Favorites') {
         // No actions for Favorites folder
     } else {
         // Create three-dot menu
-        $actions .= "<div class='folder-actions-toggle' onclick='event.stopPropagation(); toggleFolderActionsMenu($folderId)' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
+        $actions .= "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu' data-folder-id='$folderId' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
         $actions .= "<i class='fa-ellipsis-v'></i>";
         $actions .= "</div>";
         
@@ -188,41 +197,47 @@ function generateFolderActions($folderId, $folderName, $workspace_filter, $noteC
         $actions .= "<div class='folder-actions-menu' id='folder-actions-menu-$folderId'>";
         
         // Create note action
-        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showCreateNoteInFolderModal($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<div class='folder-actions-menu-item' data-action='create-note-in-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-plus-circle'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
         $actions .= "</div>";
         
         // Move all files action (only if folder has notes)
         if ($noteCount > 0) {
-            $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showMoveFolderFilesDialog($folderId, \"$escapedFolderName\")'>";
+            $actions .= "<div class='folder-actions-menu-item' data-action='move-folder-files' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
             $actions .= "<i class='fa-folder-open'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files') . "</span>";
             $actions .= "</div>";
         }
         
         // Move folder action
-        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); showMoveEntireFolderDialog($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<div class='folder-actions-menu-item' data-action='move-entire-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-share'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
         $actions .= "</div>";
         
         // Download folder action (only if folder has notes)
         if ($noteCount > 0) {
-            $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); downloadFolder($folderId, \"$escapedFolderName\")'>";
+            $actions .= "<div class='folder-actions-menu-item' data-action='download-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
             $actions .= "<i class='fa-download'></i>";
             $actions .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
             $actions .= "</div>";
         }
         
         // Rename folder action
-        $actions .= "<div class='folder-actions-menu-item' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); editFolderName($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<div class='folder-actions-menu-item' data-action='rename-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-edit'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
         $actions .= "</div>";
         
+        // Change folder icon action
+        $actions .= "<div class='folder-actions-menu-item' data-action='change-folder-icon' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
+        $actions .= "<i class='fa-palette'></i>";
+        $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+        $actions .= "</div>";
+        
         // Delete folder action
-        $actions .= "<div class='folder-actions-menu-item danger' onclick='event.stopPropagation(); closeFolderActionsMenu($folderId); deleteFolder($folderId, \"$escapedFolderName\")'>";
+        $actions .= "<div class='folder-actions-menu-item danger' data-action='delete-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
         $actions .= "<i class='fa-trash'></i>";
         $actions .= "<span>" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . "</span>";
         $actions .= "</div>";

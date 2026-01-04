@@ -157,7 +157,7 @@ function saveFontSize() {
             // Apply font size to current note
             applyFontSizeToNotes();
             
-            // Refresh the font size badge if the function exists (on display.php page)
+            // Refresh the font size badge if the function exists
             if (typeof window.refreshFontSizeBadge === 'function') {
                 window.refreshFontSizeBadge();
             }

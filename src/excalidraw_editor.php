@@ -114,50 +114,12 @@ if ($note_id > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0"/>
     <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
-    <!-- Theme -->
-    <script>
-    (function(){
-        try {
-            var theme = localStorage.getItem('poznote-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', theme);
-            document.documentElement.style.backgroundColor = theme === 'dark' ? '#1a1a1a' : '#ffffff';
-        } catch (e) {}
-    })();
-    </script>
+    <!-- Theme initialization - CSP compliant -->
+    <script src="js/excalidraw-theme-init.js"></script>
     
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/excalidraw.css">
     <link rel="stylesheet" href="css/dark-mode.css">
-    
-    <style>
-    @font-face {
-        font-family: 'Inter';
-        src: url('webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
-    }
-    .excalidraw-toolbar-btn:hover {
-        background: #1e40af !important;
-    }
-    .excalidraw-save-btn:hover {
-        background: #2d7b3e !important;
-    }
-    #cancelBtn:hover {
-        background: #b91c1c !important;
-    }
-    #saveAndExitBtn:hover {
-        background: #1d4ed8 !important;
-    }
-    .excalidraw-toolbar-btn:disabled,
-    .excalidraw-save-btn:disabled {
-        background: #9ca3af !important;
-        border-color: #9ca3af !important;
-        cursor: not-allowed !important;
-        opacity: 0.6;
-    }
-    .excalidraw-toolbar-btn:disabled:hover,
-    .excalidraw-save-btn:disabled:hover {
-        background: #9ca3af !important;
-    }
-    </style>
     
     <!-- Modal alerts system -->
     <script src="js/modal-alerts.js"></script>
@@ -165,517 +127,67 @@ if ($note_id > 0) {
     <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
 </head>
 <body>
-    <div style="display: flex; flex-direction: column; height: 100vh;">
+    <div class="excalidraw-page-wrapper">
         <!-- Clean toolbar -->
-        <div class="poznote-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #ffffff; border-bottom: 1px solid #e1e4e8; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; z-index: 5000;">
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="saveBtn" class="excalidraw-save-btn" style="padding: 6px 12px; background: #238636; border: 1px solid #238636; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
+        <div class="poznote-toolbar">
+            <div class="poznote-toolbar-buttons">
+                <button id="saveBtn" class="excalidraw-btn excalidraw-save-btn" disabled>
                     <?php echo t_h('common.save', [], 'Save'); ?>
                 </button>
-                <button id="saveAndExitBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #2563eb; border: 1px solid #2563eb; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;" disabled>
+                <button id="saveAndExitBtn" class="excalidraw-btn excalidraw-btn-blue" disabled>
                     <?php echo t_h('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'); ?>
                 </button>
-                <button id="cancelBtn" class="excalidraw-toolbar-btn" style="padding: 6px 12px; background: #dc2626; border: 1px solid #dc2626; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: #ffffff; transition: all 0.2s;">
+                <button id="cancelBtn" class="excalidraw-btn excalidraw-btn-red">
                     <?php echo t_h('excalidraw.editor.toolbar.exit_without_saving', [], 'Exit without saving'); ?>
                 </button>
             </div>
-            <h3 style="margin: 0; color: #24292f; font-weight: 400; font-size: 16px; font-family: 'Inter', sans-serif;">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
-            <div style="width: 100px;"></div> <!-- Spacer pour équilibrer le layout -->
+            <h3 class="poznote-toolbar-title">Poznote - <?php echo htmlspecialchars($note_title, ENT_QUOTES); ?></h3>
+            <div class="poznote-toolbar-spacer"></div> <!-- Spacer pour équilibrer le layout -->
         </div>
         
         <!-- Excalidraw container -->
-        <div id="app" style="flex: 1; background: #fff;">
-            <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100%; font-size: 18px; font-family: 'Inter', sans-serif;">
+        <div id="app" class="excalidraw-app-container">
+            <div id="loading" class="excalidraw-loading">
                 <?php echo t_h('excalidraw.editor.loading', [], 'Loading Excalidraw Poznote...'); ?>
             </div>
         </div>
     </div>
 
-    <script>
-    const TXT_EDITOR_NOT_READY = <?php echo json_encode(t('excalidraw.editor.alerts.editor_not_ready', [], 'Editor not ready')); ?>;
-    const TXT_SAVING = <?php echo json_encode(t('excalidraw.editor.toolbar.saving', [], 'Saving...')); ?>;
-    const TXT_SAVED = <?php echo json_encode(t('excalidraw.editor.toolbar.saved', [], 'Saved!')); ?>;
-    const TXT_SAVE = <?php echo json_encode(t('common.save', [], 'Save')); ?>;
-    const TXT_SAVE_AND_EXIT = <?php echo json_encode(t('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit')); ?>;
-    const TXT_FAILED_TO_LOAD = <?php echo json_encode(t('excalidraw.editor.errors.failed_to_load', [], 'Error: Failed to load Excalidraw. Please refresh the page.')); ?>;
-    const TXT_INIT_ERROR_TEMPLATE = <?php echo json_encode(t('excalidraw.editor.errors.initializing_prefix', ['error' => '{{error}}'], 'Error initializing Excalidraw: {{error}}')); ?>;
-    const TXT_ERROR_TEMPLATE = <?php echo json_encode(t('excalidraw.editor.alerts.error_prefix', ['error' => '{{error}}'], 'Error: {{error}}')); ?>;
-    const TXT_SAVE_FAILED = <?php echo json_encode(t('excalidraw.editor.errors.save_failed', [], 'Save failed')); ?>;
-
-    function tpl(template, vars) {
-        return String(template).replace(/\{\{(\w+)\}\}/g, (match, key) => {
-            return Object.prototype.hasOwnProperty.call(vars, key) ? String(vars[key]) : match;
-        });
-    }
-
-    let noteId = <?php echo $note_id; ?>;
-    const workspace = <?php echo json_encode($workspace); ?>;
-    const diagramId = <?php echo json_encode($diagram_id); ?>;
-    const isEmbeddedDiagram = <?php echo $is_embedded_diagram ? 'true' : 'false'; ?>;
-    
-    // Get cursor position from sessionStorage if available
-    let cursorPosition = null;
-    try {
-        const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
-        if (context.cursorPosition !== undefined && context.cursorPosition !== null) {
-            cursorPosition = context.cursorPosition;
-        }
-    } catch (e) {
-        console.error('Failed to parse excalidraw context:', e);
-    }
-    
-    // Safer data handling
-    let existingData = null;
-    try {
-        const rawData = <?php echo $existing_data ? json_encode($existing_data) : 'null'; ?>;
-        
-        if (rawData) {
-            if (typeof rawData === 'object') {
-                existingData = rawData;
-            } else if (typeof rawData === 'string') {
-                // If the string contains non-JSON characters, try to clean it
-                let cleanedData = rawData.trim();
-                
-                // Look for complete JSON structure that starts with { and ends with }}
-                let jsonMatch = cleanedData.match(/^(\{.*\}\})/);
-                if (jsonMatch) {
-                    cleanedData = jsonMatch[1];
-                }
-                
-                existingData = JSON.parse(cleanedData);
-            }
-        }
-        
-        // Validate and clean the data structure for Excalidraw
-        if (existingData) {
-            // Ensure we have proper structure
-            if (!existingData.elements) {
-                existingData.elements = [];
-            }
-            if (!existingData.appState) {
-                existingData.appState = {};
-            }
-            if (!existingData.files) {
-                existingData.files = {};
-            }
-            if (!existingData.libraryItems) {
-                existingData.libraryItems = [];
-            }
-            
-            // Ensure elements is an array
-            if (!Array.isArray(existingData.elements)) {
-                existingData.elements = [];
-            }
-            
-            // Create a clean data structure with essential properties
-            existingData = {
-                elements: existingData.elements,
-                appState: {
-                    viewBackgroundColor: existingData.appState.viewBackgroundColor || "#ffffff",
-                    zoom: existingData.appState.zoom || { value: 1 },
-                    scrollX: existingData.appState.scrollX || 0,
-                    scrollY: existingData.appState.scrollY || 0
-                },
-                files: existingData.files || {},
-                libraryItems: existingData.libraryItems || []
-            };
-        }
-        
-    } catch (parseError) {
-        console.error('Failed to load diagram data');
-        existingData = null;
-    }
-    
-    let excalidrawAPI = null;
-    let hasChanges = false;
-    let initialElements = null;
-
-    // Function to enable/disable save buttons based on changes
-    function updateSaveButtonsState() {
-        const saveBtn = document.getElementById('saveBtn');
-        const saveAndExitBtn = document.getElementById('saveAndExitBtn');
-        
-        if (hasChanges) {
-            saveBtn.disabled = false;
-            saveAndExitBtn.disabled = false;
-        } else {
-            saveBtn.disabled = true;
-            saveAndExitBtn.disabled = true;
-        }
-    }
-
-    // Function to check if there are changes
-    function checkForChanges() {
-        if (!excalidrawAPI || !initialElements) {
-            return;
-        }
-        
-        const currentElements = excalidrawAPI.getSceneElements();
-        
-        // Check if elements count changed
-        if (currentElements.length !== initialElements.length) {
-            hasChanges = true;
-            updateSaveButtonsState();
-            return;
-        }
-        
-        // Check if any element has changed
-        const currentJSON = JSON.stringify(currentElements);
-        const initialJSON = JSON.stringify(initialElements);
-        
-        if (currentJSON !== initialJSON) {
-            hasChanges = true;
-        } else {
-            hasChanges = false;
-        }
-        
-        updateSaveButtonsState();
-    }
-
-    window.addEventListener('DOMContentLoaded', function() {
-        // Mobile optimizations
-        if (window.innerWidth < 800) {
-            // Prevent zoom on double tap for better touch experience
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', function (event) {
-                const now = (new Date()).getTime();
-                if (now - lastTouchEnd <= 300) {
-                    event.preventDefault();
-                }
-                lastTouchEnd = now;
-            }, false);
-            
-            // Force toolbar to stay visible
-            const toolbar = document.querySelector('.poznote-toolbar');
-            if (toolbar) {
-                toolbar.style.position = 'fixed';
-                toolbar.style.top = '0';
-                toolbar.style.left = '0';
-                toolbar.style.right = '0';
-                toolbar.style.zIndex = '10000';
-            }
-            
-            // Adjust app container for mobile
-            const app = document.getElementById('app');
-            if (app) {
-                app.style.marginTop = '50px';
-                app.style.height = 'calc(100vh - 50px)';
-            }
-        }
-        
-        // Wait for bundle to load
-        setTimeout(function() {
-            if (!window.PoznoteExcalidraw) {
-                console.error('PoznoteExcalidraw not found');
-                document.getElementById('loading').innerHTML = TXT_FAILED_TO_LOAD;
-                return;
-            }
-            
-            try {
-                // Initialize Excalidraw with safe fallback
-                const safeInitialData = existingData || { elements: [], appState: {}, files: {} };
-                
-                excalidrawAPI = window.PoznoteExcalidraw.init('app', {
-                    initialData: safeInitialData,
-                    theme: getTheme()
-                });
-                
-                // Store initial elements for change detection
-                setTimeout(function() {
-                    if (excalidrawAPI) {
-                        initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
-                        
-                        // Set up change detection interval
-                        setInterval(checkForChanges, 500);
-                    }
-                }, 500);
-                
-                // Hide loading message
-                const loading = document.getElementById('loading');
-                if (loading) loading.style.display = 'none';
-                
-            } catch (error) {
-                console.error('Error initializing Excalidraw:', error);
-                document.getElementById('loading').innerHTML = tpl(TXT_INIT_ERROR_TEMPLATE, { error: error.message });
-            }
-        }, 1000);
-    });
-
-    function getTheme() {
-        try {
-            return localStorage.getItem('poznote-theme') || 'light';
-        } catch (e) {
-            return 'light';
-        }
-    }
-
-        // Save button handler
-    document.getElementById('saveBtn').onclick = async function() {
-        if (!excalidrawAPI) {
-            alert(TXT_EDITOR_NOT_READY);
-            return;
-        }
-        
-        this.textContent = TXT_SAVING;
-        
-        try {
-            const elements = excalidrawAPI.getSceneElements();
-            const appState = excalidrawAPI.getAppState();
-            const files = excalidrawAPI.getFiles();
-            const libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
-            
-            // Convert files to serializable format with minimal required properties
-            const serializableFiles = {};
-            for (const [id, file] of Object.entries(files)) {
-                if (file && file.dataURL) {
-                    serializableFiles[id] = {
-                        id: file.id || id,
-                        dataURL: file.dataURL,
-                        mimeType: file.mimeType || 'image/png',
-                        created: file.created || Date.now()
-                    };
-                }
-            }
-            
-            // Include files in the data object
-            const data = { elements, appState, files: serializableFiles, libraryItems };
-            
-            if (isEmbeddedDiagram) {
-                // Embedded diagram mode: save to existing note HTML
-                await saveEmbeddedDiagram(data, elements, appState, files);
-            } else {
-                // Full note mode: save as complete Excalidraw note
-                await saveFullNote(data, elements, appState, files);
-            }
-            
-            // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
-            try {
-                localStorage.removeItem('poznote_draft_' + noteId);
-                localStorage.removeItem('poznote_title_' + noteId);
-                localStorage.removeItem('poznote_tags_' + noteId);
-            } catch (err) {
-            }
-            
-            // Reset change tracking after save
-            initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
-            hasChanges = false;
-            updateSaveButtonsState();
-            
-            this.textContent = TXT_SAVED;
-            setTimeout(() => { this.textContent = TXT_SAVE; }, 2000);
-            
-        } catch (e) {
-            console.error('Save error:', e);
-            alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
-            this.textContent = TXT_SAVE;
-        }
-    };
-
-    // Save and exit button handler
-    document.getElementById('saveAndExitBtn').onclick = async function() {
-        if (!excalidrawAPI) {
-            alert(TXT_EDITOR_NOT_READY);
-            return;
-        }
-        
-        this.textContent = TXT_SAVING;
-        
-        try {
-            const elements = excalidrawAPI.getSceneElements();
-            const appState = excalidrawAPI.getAppState();
-            const files = excalidrawAPI.getFiles();
-            const libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
-            
-            // Convert files to serializable format with minimal required properties
-            const serializableFiles = {};
-            for (const [id, file] of Object.entries(files)) {
-                if (file && file.dataURL) {
-                    serializableFiles[id] = {
-                        id: file.id || id,
-                        dataURL: file.dataURL,
-                        mimeType: file.mimeType || 'image/png',
-                        created: file.created || Date.now()
-                    };
-                }
-            }
-            
-            // Include files in the data object
-            const data = { elements, appState, files: serializableFiles, libraryItems };
-            
-            if (isEmbeddedDiagram) {
-                // Embedded diagram mode: save to existing note HTML
-                await saveEmbeddedDiagram(data, elements, appState, files);
-            } else {
-                // Full note mode: save as complete Excalidraw note
-                await saveFullNote(data, elements, appState, files);
-            }
-            
-            // Clear localStorage draft to prevent auto-restore from overriding the saved diagram
-            try {
-                localStorage.removeItem('poznote_draft_' + noteId);
-                localStorage.removeItem('poznote_title_' + noteId);
-                localStorage.removeItem('poznote_tags_' + noteId);
-            } catch (err) {
-            }
-            
-            // After saving, redirect back to notes
-            const params = new URLSearchParams({ workspace: workspace });
-            if (noteId > 0) params.append('note', noteId);
-            window.location.href = 'index.php?' + params.toString();
-            
-        } catch (e) {
-            console.error('Save error:', e);
-            alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
-            this.textContent = TXT_SAVE_AND_EXIT;
-        }
-    };
-        
-    // Cancel button
-    document.getElementById('cancelBtn').onclick = function() {
-        const params = new URLSearchParams({ workspace: workspace });
-        if (noteId > 0) params.append('note', noteId);
-        window.location.href = 'index.php?' + params.toString();
-    };
-    
-    // Save embedded diagram
-    async function saveEmbeddedDiagram(data, elements, appState, files) {
-        // Generate preview canvas
-        const canvas = await excalidrawAPI.exportToCanvas({
-            elements: elements,
-            appState: appState,
-            files: files
-        });
-        
-        // Convert to base64 image for embedding
-        const base64Image = canvas.toDataURL('image/png');
-        
-        const formData = new FormData();
-        formData.append('action', 'save_embedded_diagram');
-        formData.append('note_id', noteId);
-        formData.append('diagram_id', diagramId);
-        formData.append('workspace', workspace);
-        formData.append('diagram_data', JSON.stringify(data));
-        formData.append('preview_image_base64', base64Image);
-        
-        // Send cursor position if available
-        if (cursorPosition !== null) {
-            formData.append('cursor_position', cursorPosition);
-        }
-        
-        const response = await fetch('api_save_excalidraw.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Stay in editor after save - don't redirect
-            
-            // Optional: You could add a visual notification here
-            // For now, the "Saved!" text in the button is sufficient
-            
-            // Commented out auto-redirect to stay in editor:
-            // const context = JSON.parse(sessionStorage.getItem('excalidraw_context') || '{}');
-            // if (context.returnUrl) {
-            //     window.location.href = context.returnUrl;
-            // } else {
-            //     const params = new URLSearchParams({ workspace: workspace, note: noteId });
-            //     window.location.href = 'index.php?' + params.toString();
-            // }
-        } else {
-            throw new Error(result.message || TXT_SAVE_FAILED);
-        }
-    }
-    
-    // Save full note
-    async function saveFullNote(data, elements, appState, files) {
-        // Generate PNG preview
-        const canvas = await excalidrawAPI.exportToCanvas({
-            elements: elements,
-            appState: appState,
-            files: files
-        });
-        
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        
-        // Send to server
-        const formData = new FormData();
-        formData.append('note_id', noteId);
-        formData.append('workspace', workspace);
-        formData.append('heading', document.querySelector('h3').textContent);
-        formData.append('diagram_data', JSON.stringify(data));
-        formData.append('preview_image', blob, 'preview.png');
-        
-        const response = await fetch('api_save_excalidraw.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Update the note ID if it was a new note
-            if (result.note_id && noteId === 0) {
-                noteId = result.note_id;
-                
-                // Update URL to include note_id for future reloads
-                const url = new URL(window.location);
-                url.searchParams.set('note_id', noteId);
-                window.history.replaceState({}, '', url);
-            }
-        } else {
-            throw new Error(result.message || TXT_SAVE_FAILED);
-        }
-    }
-    </script>
     <!-- Library Warning Modal -->
-    <div id="libraryWarningModal" class="modal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; color: #d97706; font-size: 18px; font-weight: 600;"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
-            <p style="font-size: 14px; color: #374151; line-height: 1.5;"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                <button id="libraryWarningCancel" style="padding: 8px 16px; background: #e5e7eb; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                <button id="libraryWarningOk" style="padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-family: 'Inter', sans-serif;"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
+    <div id="libraryWarningModal" class="library-warning-modal">
+        <div class="library-warning-content">
+            <h3 class="library-warning-title"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
+            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
+            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
+            <div class="library-warning-buttons">
+                <button id="libraryWarningCancel" class="library-warning-btn library-warning-btn-cancel"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button id="libraryWarningOk" class="library-warning-btn library-warning-btn-ok"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
             </div>
         </div>
     </div>
 
-    <script>
-    // Library Warning Modal Logic
-    window.showLibraryWarning = function(url) {
-        const modal = document.getElementById('libraryWarningModal');
-        const cancelBtn = document.getElementById('libraryWarningCancel');
-        const okBtn = document.getElementById('libraryWarningOk');
-        
-        if (!modal) return;
-        
-        modal.style.display = 'block';
-        
-        const closeModal = () => {
-            modal.style.display = 'none';
-        };
-        
-        // Remove old event listeners to prevent duplicates if called multiple times
-        const newCancelBtn = cancelBtn.cloneNode(true);
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-        newCancelBtn.onclick = closeModal;
-        
-        const newOkBtn = okBtn.cloneNode(true);
-        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-        newOkBtn.onclick = () => {
-            closeModal();
-            window.open(url, '_blank');
-        };
-        
-        // Close on click outside
-        modal.onclick = (event) => {
-            if (event.target == modal) {
-                closeModal();
-            }
-        };
-    };
-    </script>
+    <!-- CSP-compliant configuration via JSON -->
+    <script type="application/json" id="excalidraw-config"><?php
+        $excalidrawConfig = [
+            'noteId' => $note_id,
+            'workspace' => $workspace,
+            'diagramId' => $diagram_id,
+            'isEmbeddedDiagram' => $is_embedded_diagram,
+            'existingData' => $existing_data,
+            'txt' => [
+                'editorNotReady' => t('excalidraw.editor.alerts.editor_not_ready', [], 'Editor not ready'),
+                'saving' => t('excalidraw.editor.toolbar.saving', [], 'Saving...'),
+                'saved' => t('excalidraw.editor.toolbar.saved', [], 'Saved!'),
+                'save' => t('common.save', [], 'Save'),
+                'saveAndExit' => t('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'),
+                'failedToLoad' => t('excalidraw.editor.errors.failed_to_load', [], 'Error: Failed to load Excalidraw. Please refresh the page.'),
+                'initErrorTemplate' => t('excalidraw.editor.errors.initializing_prefix', ['error' => '{{error}}'], 'Error initializing Excalidraw: {{error}}'),
+                'errorTemplate' => t('excalidraw.editor.alerts.error_prefix', ['error' => '{{error}}'], 'Error: {{error}}'),
+                'saveFailed' => t('excalidraw.editor.errors.save_failed', [], 'Save failed')
+            ]
+        ];
+        echo json_encode($excalidrawConfig);
+    ?></script>
+    <script src="js/excalidraw-editor.js"></script>
 </body>
 </html>
