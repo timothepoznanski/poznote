@@ -726,7 +726,9 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 
 ## API Documentation
 
-Poznote provides a REST API for programmatic access to notes, folders, workspaces, tags, and attachments.
+Poznote provides a RESTful API v1 for programmatic access to notes, folders, workspaces, tags, and attachments.
+
+**Base URL:** `/api/v1`
 
 ### Interactive Documentation (Swagger)
 
@@ -745,13 +747,13 @@ Ready-to-use curl commands for every API operation.
 List all notes in the system:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_notes.php
+  http://YOUR_SERVER/api/v1/notes
 ```
 
-Filter notes by specific workspace:
+Filter notes by workspace, folder, tag, or search:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_notes.php?workspace=Poznote"
+  "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects&tag=important"
 ```
 
 **List Notes with Attachments**
@@ -759,30 +761,21 @@ curl -u 'username:password' \
 List all notes that have file attachments:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_notes_with_attachments.php
-```
-
-Filter notes with attachments by workspace:
-```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_notes_with_attachments.php?workspace=Poznote"
+  http://YOUR_SERVER/api/v1/notes/with-attachments
 ```
 
 **Get Note Content**
 
-Get the raw content of a note by ID:
+Get a specific note by ID:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_note_content.php?id=123"
+  http://YOUR_SERVER/api/v1/notes/123
 ```
 
-Resolve a note by title (reference) inside a workspace, then return its content:
+Resolve a note by title (reference) inside a workspace:
 ```bash
 curl -u 'username:password' \
-  --get \
-  --data-urlencode "reference=My Note" \
-  --data-urlencode "workspace=Poznote" \
-  "http://YOUR_SERVER/api_note_content.php"
+  "http://YOUR_SERVER/api/v1/notes/resolve?reference=My+Note&workspace=Personal"
 ```
 
 **Create Note**
@@ -793,120 +786,161 @@ curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
     "heading": "My New Note",
-    "entrycontent": "This is the content of my note",
+    "content": "This is the content of my note",
     "tags": "work,important",
-    "folder_name": "Projects",
-    "workspace": "Poznote"
+    "folder": "Projects",
+    "workspace": "Personal",
+    "type": "markdown"
   }' \
-  http://YOUR_SERVER/api_create_note.php
+  http://YOUR_SERVER/api/v1/notes
 ```
 
 **Update Note**
 
-Update an existing note by ID with new content:
+Update an existing note by ID:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X PATCH -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
-    "id": 123,
     "heading": "Updated Title",
-    "entry": "<p>Updated content</p>",
-    "tags": "work,updated",
-    "folder": "Projects",
-    "workspace": "Personal"
+    "content": "Updated content here",
+    "tags": "work,updated"
   }' \
-  http://YOUR_SERVER/api_update_note.php
-```
-
-**Insert New Note**
-
-Create a new empty note with basic metadata:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Accept: application/json" \
-  -d 'now=1640995200&workspace=Poznote&folder=Projects&type=markdown' \
-  http://YOUR_SERVER/api_insert_new.php
+  http://YOUR_SERVER/api/v1/notes/123
 ```
 
 **Delete Note**
 
-Move a note to trash by ID:
+Move a note to trash:
 ```bash
 curl -X DELETE -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"note_id": 123}' \
-  http://YOUR_SERVER/api_delete_note.php
+  http://YOUR_SERVER/api/v1/notes/123
 ```
 
-**Export Note**
-
-Export a note as a styled HTML document (download):
+Permanently delete (bypass trash):
 ```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=attachment" \
-  -o exported-note.html
+curl -X DELETE -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/notes/123?permanent=true"
 ```
 
-Export a note for browser viewing/printing (inline):
+**Restore Note**
+
+Restore a note from trash:
 ```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_export_note.php?id=123&type=note&format=html&disposition=inline"
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/restore
+```
+
+**Duplicate Note**
+
+Create a copy of an existing note:
+```bash
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/duplicate
 ```
 
 **Convert Note Type**
 
-Convert a markdown note to HTML:
+Convert between markdown and HTML:
 ```bash
 curl -X POST -u 'username:password' \
-  -d 'id=123&target=html' \
-  http://YOUR_SERVER/api_convert_note.php
+  -H "Content-Type: application/json" \
+  -d '{"target_type": "markdown"}' \
+  http://YOUR_SERVER/api/v1/notes/123/convert
 ```
 
-Convert an HTML note to markdown:
+**Update Tags**
+
+Replace all tags on a note:
+```bash
+curl -X PUT -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"tags": "work,urgent,meeting"}' \
+  http://YOUR_SERVER/api/v1/notes/123/tags
+```
+
+**Toggle Favorite**
+
+Toggle favorite status:
 ```bash
 curl -X POST -u 'username:password' \
-  -d 'id=123&target=markdown' \
-  http://YOUR_SERVER/api_convert_note.php
+  http://YOUR_SERVER/api/v1/notes/123/favorite
 ```
 
-**Move Note**
+**Move Note to Folder**
 
-Move a note to a different folder or workspace:
+Move a note to a different folder:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"folder_id": 45}' \
+  http://YOUR_SERVER/api/v1/notes/123/folder
+```
+
+Remove from folder (move to root):
+```bash
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/remove-folder
+```
+
+</details>
+
+<details>
+<summary><strong>🔗 Public Sharing</strong></summary>
+<br>
+
+**Get Share Status**
+
+Check if a note is shared:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/share
+```
+
+**Create Share Link**
+
+Create a public share link for a note:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
-    "note_id": 123,
-    "folder_name": "Archive",
-    "workspace": "Poznote"
+    "theme": "light",
+    "indexable": false,
+    "password": "optional-password"
   }' \
-  http://YOUR_SERVER/api_move_note.php
+  http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
-**Public Note**
+**Update Share Settings**
 
-Create or enable public access for a note (generates public link):
+Update share settings:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X PATCH -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"note_id": 123, "action": "create"}' \
-  http://YOUR_SERVER/api_share_note.php
+  -d '{"theme": "dark", "indexable": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
-Revoke sharing for a note:
+**Revoke Share Link**
+
+Remove public access:
 ```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"note_id": 123, "action": "revoke"}' \
-  http://YOUR_SERVER/api_share_note.php
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
-Get existing public note URL:
+**List All Shared Notes**
+
+Get list of all publicly shared notes:
 ```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"note_id": 123, "action": "get"}' \
-  http://YOUR_SERVER/api_share_note.php
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/shared
+```
+
+Filter by workspace:
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/shared?workspace=Personal"
 ```
 
 </details>
@@ -917,50 +951,32 @@ curl -X POST -u 'username:password' \
 
 **List Trash**
 
-Get all notes currently in the trash:
+Get all notes in trash:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_trash.php
+  http://YOUR_SERVER/api/v1/trash
 ```
 
-Filter trash notes by workspace:
+Filter by workspace:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_trash.php?workspace=Poznote"
-```
-
-**Restore Note**
-
-Restore a note from trash back to its original location:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"id": 123}' \
-  http://YOUR_SERVER/api_restore_note.php
+  "http://YOUR_SERVER/api/v1/trash?workspace=Personal"
 ```
 
 **Empty Trash**
 
-Permanently delete all notes in trash and their attachments:
+Permanently delete all notes in trash:
 ```bash
-curl -X POST -u 'username:password' \
-  http://YOUR_SERVER/api_empty_trash.php
-```
-
-Empty trash for a specific workspace:
-```bash
-curl -X POST -u 'username:password' \
-  -d 'workspace=Poznote' \
-  http://YOUR_SERVER/api_empty_trash.php
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/trash
 ```
 
 **Permanently Delete Note**
 
-Permanently delete a specific note and its attachments (bypasses trash):
+Delete a specific note from trash:
 ```bash
-curl -X POST -u 'username:password' \
-  -d 'id=123' \
-  http://YOUR_SERVER/api_permanent_delete.php
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/trash/123
 ```
 
 </details>
@@ -969,118 +985,105 @@ curl -X POST -u 'username:password' \
 <summary><strong>📁 Folders Management</strong></summary>
 <br>
 
-**Get Folder Operations**
+**List Folders**
 
-List folders (same as api_list_folders.php):
+List all folders in a workspace:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_folders.php?workspace=Poznote"
+  "http://YOUR_SERVER/api/v1/folders?workspace=Personal"
+```
+
+Get folder tree (nested structure):
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/folders?workspace=Personal&tree=true"
+```
+
+**Get Folder Counts**
+
+Get note counts for all folders:
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/folders/counts?workspace=Personal"
 ```
 
 **Create Folder**
 
-Create a new folder in the specified workspace:
+Create a new folder:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
-    "folder_name": "My Projects",
-    "workspace": "Poznote"
+    "name": "My Projects",
+    "workspace": "Personal"
   }' \
-  http://YOUR_SERVER/api_create_folder.php
+  http://YOUR_SERVER/api/v1/folders
 ```
 
-**Create Subfolder (parent/child)**
-
-Create a subfolder by specifying a parent folder path:
+Create a subfolder:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
   -d '{
-    "folder_name": "2024",
-    "parent_folder": "My Projects",
-    "workspace": "Poznote"
+    "name": "2024",
+    "workspace": "Personal",
+    "parent_id": 12
   }' \
-  http://YOUR_SERVER/api_create_folder.php
+  http://YOUR_SERVER/api/v1/folders
 ```
 
-You can also target a specific parent folder by ID:
+**Rename Folder**
+
+Rename an existing folder:
+```bash
+curl -X PATCH -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"name": "New Folder Name"}' \
+  http://YOUR_SERVER/api/v1/folders/12
+```
+
+**Move Folder**
+
+Move folder to a different parent:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{
-    "folder_name": "Q1",
-    "parent_folder_id": 12,
-    "workspace": "Poznote"
-  }' \
-  http://YOUR_SERVER/api_create_folder.php
+  -d '{"parent_id": 56}' \
+  http://YOUR_SERVER/api/v1/folders/34/move
 ```
 
-**Create Nested Folders in One Call (path notation)**
-
-Create a nested structure in one request:
+Move to root (no parent):
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{
-    "folder_path": "Projects/2024/Q1",
-    "workspace": "Poznote",
-    "create_parents": true
-  }' \
-  http://YOUR_SERVER/api_create_folder.php
+  -d '{"parent_id": null}' \
+  http://YOUR_SERVER/api/v1/folders/34/move
 ```
 
-**List Folders (flat or hierarchy)**
+**Update Folder Icon**
 
-List folders (flat list with `path`):
+Set a custom icon:
 ```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_folders.php?workspace=Poznote"
+curl -X PUT -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"icon": "fa-folder-open"}' \
+  http://YOUR_SERVER/api/v1/folders/12/icon
 ```
 
-List folders as a hierarchy tree (nested `children`):
-```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_folders.php?workspace=Poznote&include_hierarchy=true"
-```
+**Empty Folder**
 
-**Move Folder to a Different Parent**
-
-Move a folder by path:
+Move all notes in folder to trash:
 ```bash
 curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "folder_path": "Projects/2024/Q1",
-    "new_parent_folder": "Archive/2023",
-    "workspace": "Poznote"
-  }' \
-  http://YOUR_SERVER/api_move_folder.php
-```
-
-Move a folder by ID:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "folder_id": 34,
-    "new_parent_folder_id": 56,
-    "workspace": "Poznote"
-  }' \
-  http://YOUR_SERVER/api_move_folder.php
+  http://YOUR_SERVER/api/v1/folders/12/empty
 ```
 
 **Delete Folder**
 
-Delete a folder and move its contents to no folder (uncategorized):
+Delete a folder:
 ```bash
 curl -X DELETE -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "folder_name": "Old Projects",
-    "workspace": "Poznote"
-  }' \
-  http://YOUR_SERVER/api_delete_folder.php
+  http://YOUR_SERVER/api/v1/folders/12
 ```
 
 </details>
@@ -1091,10 +1094,10 @@ curl -X DELETE -u 'username:password' \
 
 **List Workspaces**
 
-Get all available workspaces in your Poznote instance:
+Get all workspaces:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_workspaces.php?action=list"
+  http://YOUR_SERVER/api/v1/workspaces
 ```
 
 **Create Workspace**
@@ -1103,38 +1106,26 @@ Create a new workspace:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{
-    "action": "create",
-    "name": "MyProject"
-  }' \
-  http://YOUR_SERVER/api_workspaces.php
-```
-
-**Delete Workspace**
-
-Delete a workspace (notes are moved to Poznote default workspace):
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "delete",
-    "name": "OldWorkspace"
-  }' \
-  http://YOUR_SERVER/api_workspaces.php
+  -d '{"name": "MyProject"}' \
+  http://YOUR_SERVER/api/v1/workspaces
 ```
 
 **Rename Workspace**
 
 Rename an existing workspace:
 ```bash
-curl -X POST -u 'username:password' \
+curl -X PATCH -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{
-    "action": "rename",
-    "old_name": "OldName",
-    "new_name": "NewName"
-  }' \
-  http://YOUR_SERVER/api_workspaces.php
+  -d '{"new_name": "NewName"}' \
+  http://YOUR_SERVER/api/v1/workspaces/OldName
+```
+
+**Delete Workspace**
+
+Delete a workspace:
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/workspaces/OldWorkspace
 ```
 
 </details>
@@ -1145,56 +1136,16 @@ curl -X POST -u 'username:password' \
 
 **List Tags**
 
-Get all tags used across all notes:
+Get all unique tags:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_tags.php
+  http://YOUR_SERVER/api/v1/tags
 ```
 
-**Apply Tags**
-
-Add or update tags for a specific note (replaces existing tags).
-
-Tags can be provided as a comma-separated string:
+Filter by workspace:
 ```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "note_id": 123,
-    "tags": "work,urgent,meeting"
-  }' \
-  http://YOUR_SERVER/api_apply_tags.php
-```
-
-Or as an array:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "note_id": 123,
-    "tags": ["work", "urgent", "meeting"]
-  }' \
-  http://YOUR_SERVER/api_apply_tags.php
-```
-
-</details>
-
-<details>
-<summary><strong>⭐ Favorites Management</strong></summary>
-<br>
-
-**Toggle Favorite**
-
-Toggle favorite status for a note (add or remove):
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "toggle_favorite",
-    "note_id": 123,
-    "workspace": "Poznote"
-  }' \
-  http://YOUR_SERVER/api_favorites.php
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api/v1/tags?workspace=Personal"
 ```
 
 </details>
@@ -1205,21 +1156,36 @@ curl -X POST -u 'username:password' \
 
 **List Attachments**
 
-Get all file attachments for a specific note:
+Get all attachments for a note:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_attachments.php?action=list&note_id=123"
+  http://YOUR_SERVER/api/v1/notes/123/attachments
 ```
 
 **Upload Attachment**
 
-Upload a file and attach it to a note:
+Upload a file to a note:
 ```bash
 curl -X POST -u 'username:password' \
-  -F "action=upload" \
-  -F "note_id=123" \
   -F "file=@/path/to/file.pdf" \
-  http://YOUR_SERVER/api_attachments.php
+  http://YOUR_SERVER/api/v1/notes/123/attachments
+```
+
+**Download Attachment**
+
+Download a specific attachment:
+```bash
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/attachments/456 \
+  -o downloaded-file.pdf
+```
+
+**Delete Attachment**
+
+Delete an attachment:
+```bash
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/notes/123/attachments/456
 ```
 
 </details>
@@ -1228,42 +1194,37 @@ curl -X POST -u 'username:password' \
 <summary><strong>💾 Backup Management</strong></summary>
 <br>
 
-**Create Backup**
-
-Create a complete backup of all notes, attachments and database:
-```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  http://YOUR_SERVER/api_backup.php
-```
-
 **List Backups**
 
-Get a list of all available backup files:
+Get a list of all backup files:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_backups.php
+  http://YOUR_SERVER/api/v1/backups
+```
+
+**Create Backup**
+
+Create a complete backup:
+```bash
+curl -X POST -u 'username:password' \
+  http://YOUR_SERVER/api/v1/backups
 ```
 
 **Download Backup**
 
-Download a specific backup file by filename:
+Download a specific backup file:
 ```bash
 curl -u 'username:password' \
-  "http://YOUR_SERVER/api_download_backup.php?filename=poznote_backup_2025-10-24_14-30-15.zip" \
+  http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip \
   -o backup.zip
 ```
 
-Backups are stored in the `data/backups/` directory with the naming pattern: `poznote_backup_YYYY-MM-DD_HH-MM-SS.zip`
-
 **Delete Backup**
 
-Delete a specific backup file from the server:
+Delete a backup file:
 ```bash
-curl -X POST -u 'username:password' \
-  -H "Content-Type: application/json" \
-  -d '{"filename": "poznote_backup_2025-01-15_10-30-00.zip"}' \
-  http://YOUR_SERVER/api_delete_backup.php
+curl -X DELETE -u 'username:password' \
+  http://YOUR_SERVER/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip
 ```
 
 </details>
@@ -1272,9 +1233,20 @@ curl -X POST -u 'username:password' \
 <summary><strong>📤 Export Management</strong></summary>
 <br>
 
+> Note: Export endpoints remain as legacy URLs for file downloads.
+
+**Export Note**
+
+Export a note as HTML or Markdown:
+```bash
+curl -u 'username:password' \
+  "http://YOUR_SERVER/api_export_note.php?id=123&format=html" \
+  -o exported-note.html
+```
+
 **Export Folder**
 
-Export a specific folder and all its contents as a ZIP file:
+Export a folder as ZIP:
 ```bash
 curl -u 'username:password' \
   "http://YOUR_SERVER/api_export_folder.php?folder_id=123" \
@@ -1283,23 +1255,16 @@ curl -u 'username:password' \
 
 **Export Structured Notes**
 
-Export all notes and folders in a structured ZIP file preserving folder hierarchy:
+Export all notes preserving folder hierarchy:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_export_structured.php \
+  "http://YOUR_SERVER/api_export_structured.php?workspace=Personal" \
   -o structured-export.zip
 ```
 
-Export notes from a specific workspace:
-```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_export_structured.php?workspace=Poznote" \
-  -o personal-notes.zip
-```
+**Export All Notes**
 
-**Export All Note Files**
-
-Export all note files as a ZIP archive with HTML index:
+Export all note files as ZIP:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_export_entries.php \
@@ -1308,7 +1273,7 @@ curl -u 'username:password' \
 
 **Export All Attachments**
 
-Export all file attachments from all notes as a ZIP archive:
+Export all attachments as ZIP:
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api_export_attachments.php \
@@ -1318,21 +1283,25 @@ curl -u 'username:password' \
 </details>
 
 <details>
-<summary><strong>🌐 Public Sharing</strong></summary>
+<summary><strong>⚙️ Settings</strong></summary>
 <br>
 
-**List Shared Notes**
+**Get Setting**
 
-Get list of all publicly shared notes:
+Get a setting value:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_list_shared.php
+  http://YOUR_SERVER/api/v1/settings/language
 ```
 
-Filter shared notes by workspace:
+**Update Setting**
+
+Set a setting value:
 ```bash
-curl -u 'username:password' \
-  "http://YOUR_SERVER/api_list_shared.php?workspace=Poznote"
+curl -X PUT -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"value": "fr"}' \
+  http://YOUR_SERVER/api/v1/settings/language
 ```
 
 </details>
@@ -1341,32 +1310,28 @@ curl -u 'username:password' \
 <summary><strong>ℹ️ System Information</strong></summary>
 <br>
 
-**Check Version**
+**Get Version**
 
-Get the current Poznote version and system information:
+Get current version and system info:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_version.php
+  http://YOUR_SERVER/api/v1/system/version
 ```
 
 **Check for Updates**
 
-Check if a newer version of Poznote is available:
+Check if a newer version is available:
 ```bash
 curl -u 'username:password' \
-  http://YOUR_SERVER/api_check_updates.php
+  http://YOUR_SERVER/api/v1/system/updates
 ```
 
-**Get Internationalization Strings**
+**Get Translations**
 
-Get merged translation strings for the user's language (no authentication required):
+Get translation strings:
 ```bash
-curl http://YOUR_SERVER/api_i18n.php
-```
-
-Override language for testing:
-```bash
-curl "http://YOUR_SERVER/api_i18n.php?lang=fr"
+curl -u 'username:password' \
+  http://YOUR_SERVER/api/v1/system/i18n
 ```
 
 </details>
