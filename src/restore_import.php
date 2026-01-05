@@ -963,6 +963,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     
     // Detect if ZIP contains folder structure and find common root
     $hasSubfolders = false;
+    $hasFilesAtRoot = false;
     $rootFolderName = null;
     $allFilesShareSameRoot = true;
     $filesAnalyzed = [];
@@ -1004,7 +1005,15 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     $allFilesShareSameRoot = false;
                 }
             }
+        } else {
+            // File is at root level - mark that we have files at root
+            $hasFilesAtRoot = true;
         }
+    }
+    
+    // If we have files at both root level and in subfolders, they don't share the same root
+    if ($hasFilesAtRoot && $hasSubfolders) {
+        $allFilesShareSameRoot = false;
     }
     
     // Only use rootFolderName if ALL files share the same root
@@ -1044,6 +1053,81 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             'success' => false,
             'error' => t('restore_import.individual_notes.errors.too_many_files', ['max' => $maxFiles, 'count' => $validFileCount])
         ];
+    }
+    
+    // Get attachments directory for importing images
+    $attachmentsPath = getAttachmentsPath();
+    if (!$attachmentsPath || !is_dir($attachmentsPath)) {
+        // Try to create the attachments directory
+        if (!mkdir($attachmentsPath, 0755, true)) {
+            $zip->close();
+            unlink($tempFile);
+            return ['success' => false, 'error' => 'Cannot create attachments directory'];
+        }
+    }
+    
+    // Pre-extract all images from the ZIP and build a mapping of original filename to stored filename
+    // This handles Obsidian-style image references like ![[image.png]]
+    $imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico'];
+    $importedImages = []; // Maps original filename (lowercase) to stored attachment info
+    $importedImagesCount = 0;
+    
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+        
+        // Skip directories and hidden files/folders
+        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
+            continue;
+        }
+        
+        // Skip files in hidden folders (like .obsidian)
+        if (preg_match('/\/\./', $fileName) || strpos($fileName, '.') === 0) {
+            $parts = explode('/', $fileName);
+            $skipFile = false;
+            foreach ($parts as $part) {
+                if (!empty($part) && $part[0] === '.') {
+                    $skipFile = true;
+                    break;
+                }
+            }
+            if ($skipFile) continue;
+        }
+        
+        // Get file extension
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        // Only process image files
+        if (!in_array($fileExtension, $imageExtensions)) {
+            continue;
+        }
+        
+        // Extract image content
+        $imageContent = $zip->getFromIndex($i);
+        if ($imageContent === false) {
+            continue;
+        }
+        
+        // Get the original filename (basename only, for matching with ![[filename]])
+        $originalFilename = basename($fileName);
+        
+        // Generate unique filename for storage
+        $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+        $targetPath = $attachmentsPath . '/' . $uniqueFilename;
+        
+        // Save the image
+        if (file_put_contents($targetPath, $imageContent) !== false) {
+            chmod($targetPath, 0644);
+            
+            // Store mapping using lowercase key for case-insensitive matching
+            $importedImages[strtolower($originalFilename)] = [
+                'unique_filename' => $uniqueFilename,
+                'original_filename' => $originalFilename,
+                'file_size' => strlen($imageContent),
+                'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
+            ];
+            $importedImagesCount++;
+        }
     }
     
     $importedCount = 0;
@@ -1277,6 +1361,109 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             }
             $noteId = $con->lastInsertId();
             
+            // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
+            // Also build the attachments array for this note
+            $noteAttachments = [];
+            if ($noteType === 'markdown' && !empty($importedImages)) {
+                // Match Obsidian wikilink image syntax: ![[filename.ext]] or ![[filename.ext|alt text]]
+                $content = preg_replace_callback('/!\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
+                    $imageName = trim($matches[1]);
+                    $altText = isset($matches[2]) ? trim($matches[2]) : $imageName;
+                    
+                    // Look up the image in our imported images (case-insensitive)
+                    $imageKey = strtolower(basename($imageName));
+                    
+                    if (isset($importedImages[$imageKey])) {
+                        $imageInfo = $importedImages[$imageKey];
+                        
+                        // Add to note's attachments if not already added
+                        $alreadyAdded = false;
+                        foreach ($noteAttachments as $att) {
+                            if ($att['filename'] === $imageInfo['unique_filename']) {
+                                $alreadyAdded = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!$alreadyAdded) {
+                            $attachmentId = uniqid();
+                            $noteAttachments[] = [
+                                'id' => $attachmentId,
+                                'filename' => $imageInfo['unique_filename'],
+                                'original_filename' => $imageInfo['original_filename'],
+                                'file_size' => $imageInfo['file_size'],
+                                'file_type' => $imageInfo['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                        } else {
+                            // Find the existing attachment ID
+                            foreach ($noteAttachments as $att) {
+                                if ($att['filename'] === $imageInfo['unique_filename']) {
+                                    $attachmentId = $att['id'];
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Convert to standard markdown with API path
+                        return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
+                    }
+                    
+                    // Image not found in imported images, keep original syntax but convert to standard markdown
+                    return '![' . $altText . '](' . $imageName . ')';
+                }, $content);
+                
+                // Also handle standard markdown images that reference local files
+                // ![alt](image.png) or ![alt](./image.png)
+                $content = preg_replace_callback('/!\[([^\]]*)\]\((?:\.\/)?([^)\/][^)]*\.(?:png|jpg|jpeg|gif|webp|svg|bmp|ico))\)/i', function($matches) use ($noteId, $importedImages, &$noteAttachments) {
+                    $altText = $matches[1];
+                    $imageName = $matches[2];
+                    
+                    // Look up the image in our imported images (case-insensitive)
+                    $imageKey = strtolower(basename($imageName));
+                    
+                    if (isset($importedImages[$imageKey])) {
+                        $imageInfo = $importedImages[$imageKey];
+                        
+                        // Add to note's attachments if not already added
+                        $alreadyAdded = false;
+                        $attachmentId = null;
+                        foreach ($noteAttachments as $att) {
+                            if ($att['filename'] === $imageInfo['unique_filename']) {
+                                $alreadyAdded = true;
+                                $attachmentId = $att['id'];
+                                break;
+                            }
+                        }
+                        
+                        if (!$alreadyAdded) {
+                            $attachmentId = uniqid();
+                            $noteAttachments[] = [
+                                'id' => $attachmentId,
+                                'filename' => $imageInfo['unique_filename'],
+                                'original_filename' => $imageInfo['original_filename'],
+                                'file_size' => $imageInfo['file_size'],
+                                'file_type' => $imageInfo['file_type'],
+                                'uploaded_at' => date('Y-m-d H:i:s')
+                            ];
+                        }
+                        
+                        // Convert to API path
+                        return '![' . $altText . '](/api/v1/notes/' . $noteId . '/attachments/' . $attachmentId . ')';
+                    }
+                    
+                    // Image not found, keep original
+                    return $matches[0];
+                }, $content);
+                
+                // Update the note's attachments in the database if any were added
+                if (!empty($noteAttachments)) {
+                    $attachmentsJson = json_encode($noteAttachments);
+                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+                    $updateStmt->execute([$attachmentsJson, $noteId]);
+                }
+            }
+            
             // Save content to file with correct extension
             $fileExt = ($noteType === 'markdown') ? '.md' : '.html';
             $noteFile = $entriesPath . '/' . $noteId . $fileExt;
@@ -1320,6 +1507,11 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     } else {
         $folderDisplay = empty($folder) ? t('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)') : $folder;
         $message = t('restore_import.messages.notes_imported_zip', ['count' => $importedCount, 'workspace' => $workspace, 'folder' => $folderDisplay], 'Imported {{count}} note(s) from ZIP into workspace "{{workspace}}", folder "{{folder}}".');
+    }
+    
+    // Add info about imported images
+    if ($importedImagesCount > 0) {
+        $message .= ' ' . $importedImagesCount . ' image(s) imported as attachments.';
     }
     
     if ($errorCount > 0) {
